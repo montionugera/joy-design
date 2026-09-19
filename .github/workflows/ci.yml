@@ -44,9 +44,9 @@ jobs:
             app:
               - 'packages/**'
               - 'apps/**'
+              - 'scripts/**'
               - 'Dockerfile'
               - 'nginx.conf'
-              - 'scripts/integration.sh'
               - '.github/workflows/**'
             k8s:
               - 'k8s/**'
@@ -79,11 +79,12 @@ jobs:
     name: 🐳 Build & Push Image
     runs-on: ubuntu-latest
     needs: [changes, build]
-    # Build image only on push to main when app code changed, or on workflow_dispatch if image_tag is empty
+    # Build image on push when app changed, OR on workflow_dispatch when no explicit tag is provided
     if: |
-      github.event_name == 'push' && github.ref == 'refs/heads/main' && (
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && (
         needs.changes.outputs.app == 'true' || needs.changes.outputs.k8s != 'true'
-      )
+      )) ||
+      (github.event_name == 'workflow_dispatch' && inputs.image_tag == '')
 
     permissions:
       contents: read
