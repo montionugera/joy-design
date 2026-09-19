@@ -625,7 +625,7 @@ ${inlinedThemeCss}
         <span class="icon">📭</span> Empty State
       </a>
       <a class="nav-item" onclick="switchView('icons-gallery')">
-        <span class="icon">💎</span> Icons Gallery (54 SVGs)
+        <span class="icon">💎</span> Icons Gallery (89 SVGs)
       </a>
     </nav>
   </aside>
@@ -1836,11 +1836,11 @@ ${inlinedThemeCss}
       <!-- View: Icons Gallery -->
       <section id="view-icons-gallery" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Vector Icons Gallery (@joymify/icons)</h2>
-        <p class="header-tagline">54 enterprise SVG icons ported from Zen-UI with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
+        <p class="header-tagline">89 enterprise SVG icons covering trading, navigation, file ops, and observability with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
 
         <div class="playground-box">
           <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h4>Icon System Collection (54 Vector Assets)</h4>
+            <h4>Icon System Collection (89 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
             <div id="copy-toast-banner" style="font-size: 0.8125rem; color: #10b981; font-weight: 600; display: none;">Copied to clipboard!</div>
           </div>
           <div style="padding: 24px;">
@@ -2229,7 +2229,7 @@ ${inlinedThemeCss}
     function copyIconName(name) {
       const code = activeFramework === 'svelte'
         ? "import { " + name + " } from '@joymify/icons';"
-        : "import { " + name + " } from '@joymify/icons';";
+        : "import { " + name + " } from '@joymify/icons/react';";
       navigator.clipboard.writeText(code).then(() => {
         showDemoToast('Copied: ' + code, 'success');
         const banner = document.getElementById('copy-toast-banner');
