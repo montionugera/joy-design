@@ -99,4 +99,35 @@ test('React standard library components implement accessible traits and forwardR
   const md = fs.readFileSync(path.resolve('./src/MarkdownViewer.tsx'), 'utf8');
   assert.ok(md.includes('joy-markdown'), 'MarkdownViewer must render joy-markdown class');
   assert.ok(md.includes('joy-markdown__copy-btn'), 'MarkdownViewer must include copy button');
+
+  // Wave 5 Assertions (Landing Page Architecture & Enterprise Workflow Suite)
+  const bentoGrid = fs.readFileSync(path.resolve('./src/BentoGrid.tsx'), 'utf8');
+  assert.ok(bentoGrid.includes('joy-bento-grid'), 'BentoGrid must render joy-bento-grid class');
+
+  const bentoCard = fs.readFileSync(path.resolve('./src/BentoCard.tsx'), 'utf8');
+  assert.ok(bentoCard.includes('joy-bento-card'), 'BentoCard must render joy-bento-card class');
+
+  const hero = fs.readFileSync(path.resolve('./src/HeroSection.tsx'), 'utf8');
+  assert.ok(hero.includes('joy-hero'), 'HeroSection must render joy-hero class');
+
+  const pricingCard = fs.readFileSync(path.resolve('./src/PricingCard.tsx'), 'utf8');
+  assert.ok(pricingCard.includes('joy-pricing-card'), 'PricingCard must render joy-pricing-card class');
+
+  const pricingMatrix = fs.readFileSync(path.resolve('./src/PricingMatrix.tsx'), 'utf8');
+  assert.ok(pricingMatrix.includes('joy-pricing-matrix'), 'PricingMatrix must render joy-pricing-matrix class');
+
+  const testimonialCard = fs.readFileSync(path.resolve('./src/TestimonialCard.tsx'), 'utf8');
+  assert.ok(testimonialCard.includes('joy-testimonial-card'), 'TestimonialCard must render joy-testimonial-card class');
+
+  const steps = fs.readFileSync(path.resolve('./src/Steps.tsx'), 'utf8');
+  assert.ok(steps.includes('joy-steps'), 'Steps must render joy-steps class');
+  assert.ok(steps.includes('role="navigation"'), 'Steps must implement role=navigation');
+
+  const timeline = fs.readFileSync(path.resolve('./src/Timeline.tsx'), 'utf8');
+  assert.ok(timeline.includes('joy-timeline'), 'Timeline must render joy-timeline class');
+  assert.ok(timeline.includes('role="list"'), 'Timeline must implement role=list');
+
+  const result = fs.readFileSync(path.resolve('./src/Result.tsx'), 'utf8');
+  assert.ok(result.includes('joy-result'), 'Result must render joy-result class');
+  assert.ok(result.includes('role="alert"'), 'Result must implement role=alert');
 });

@@ -31,3 +31,14 @@ export { Avatar, type AvatarProps, type AvatarShape, type AvatarSize, type Avata
 export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup.js';
 export { Slider, type SliderProps } from './Slider.js';
 export { MarkdownViewer, type MarkdownViewerProps } from './MarkdownViewer.js';
+
+// Wave 5: Landing Page Architecture & Enterprise Workflow Suite
+export { BentoGrid, type BentoGridProps } from './BentoGrid.js';
+export { BentoCard, type BentoCardProps } from './BentoCard.js';
+export { HeroSection, type HeroSectionProps } from './HeroSection.js';
+export { PricingCard, type PricingCardProps } from './PricingCard.js';
+export { PricingMatrix, type PricingMatrixProps } from './PricingMatrix.js';
+export { TestimonialCard, type TestimonialCardProps } from './TestimonialCard.js';
+export { Steps, type StepsProps, type StepItem } from './Steps.js';
+export { Timeline, type TimelineProps, type TimelineItem } from './Timeline.js';
+export { Result, type ResultProps, type ResultStatus } from './Result.js';
