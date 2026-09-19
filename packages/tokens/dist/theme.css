@@ -995,4 +995,26 @@
   color: #f8fafc;
 }
 
+/* ── OpenDesign Posture Integration (Linear / Datadog Spec) ── */
+:root {
+  --joy-font-display-letter-spacing: -0.02em;
+  --joy-font-variant-numeric: tabular-nums;
+  --joy-border-hairline: 1px solid rgba(226, 232, 240, 0.8);
+  --joy-surface-frosted: rgba(255, 255, 255, 0.82);
+  --joy-backdrop-blur: blur(12px);
+}
+[data-theme="dark"] {
+  --joy-border-hairline: 1px solid rgba(51, 65, 85, 0.6);
+  --joy-surface-frosted: rgba(15, 23, 42, 0.82);
+}
+
+h1, h2, h3, .joy-display {
+  letter-spacing: var(--joy-font-display-letter-spacing, -0.02em);
+}
+
+.joy-table td, .joy-table th, .joy-metric-tile__value, .joy-pagination {
+  font-variant-numeric: var(--joy-font-variant-numeric, tabular-nums);
+}
+
+
 
