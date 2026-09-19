@@ -102,4 +102,26 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const md = fs.readFileSync(path.resolve('./src/lib/MarkdownViewer.svelte'), 'utf8');
   assert.ok(md.includes('joy-markdown'), 'MarkdownViewer must have joy-markdown class');
   assert.ok(md.includes('joy-markdown__copy-btn'), 'MarkdownViewer must include copy button');
+
+  // Wave 5 Assertions (Landing Page Architecture & Enterprise Workflow Suite)
+  const bento = fs.readFileSync(path.resolve('./src/lib/BentoCard.svelte'), 'utf8');
+  assert.ok(bento.includes('joy-bento-card'), 'BentoCard must have joy-bento-card class');
+  assert.ok(bento.includes('$props()'), 'BentoCard must use Svelte 5 runes');
+
+  const hero = fs.readFileSync(path.resolve('./src/lib/HeroSection.svelte'), 'utf8');
+  assert.ok(hero.includes('joy-hero'), 'HeroSection must have joy-hero class');
+
+  const pricing = fs.readFileSync(path.resolve('./src/lib/PricingCard.svelte'), 'utf8');
+  assert.ok(pricing.includes('joy-pricing-card'), 'PricingCard must have joy-pricing-card class');
+
+  const steps = fs.readFileSync(path.resolve('./src/lib/Steps.svelte'), 'utf8');
+  assert.ok(steps.includes('joy-steps'), 'Steps must have joy-steps class');
+  assert.ok(steps.includes('role="navigation"'), 'Steps must implement role=navigation');
+
+  const timeline = fs.readFileSync(path.resolve('./src/lib/Timeline.svelte'), 'utf8');
+  assert.ok(timeline.includes('joy-timeline'), 'Timeline must have joy-timeline class');
+
+  const result = fs.readFileSync(path.resolve('./src/lib/Result.svelte'), 'utf8');
+  assert.ok(result.includes('joy-result'), 'Result must have joy-result class');
+  assert.ok(result.includes('role="alert"'), 'Result must implement role=alert');
 });

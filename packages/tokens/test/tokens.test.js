@@ -40,6 +40,15 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-slider'), 'slider styles must exist');
   assert.ok(css.includes('.joy-markdown'), 'markdown viewer styles must exist');
   assert.ok(css.includes('.joy-button--wave'), 'button wave micro-animation must exist');
+
+  // Wave 5 Assertions (Landing Page Architecture & Enterprise Workflow Suite)
+  assert.ok(css.includes('.joy-bento-grid'), 'bento grid styles must exist');
+  assert.ok(css.includes('.joy-hero'), 'hero section styles must exist');
+  assert.ok(css.includes('.joy-pricing-matrix'), 'pricing matrix styles must exist');
+  assert.ok(css.includes('.joy-testimonial-card'), 'testimonial card styles must exist');
+  assert.ok(css.includes('.joy-steps'), 'steps workflow styles must exist');
+  assert.ok(css.includes('.joy-timeline'), 'timeline audit styles must exist');
+  assert.ok(css.includes('.joy-result'), 'result feedback styles must exist');
 });
 
 
