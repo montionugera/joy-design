@@ -65,7 +65,9 @@ const navIcons = {
   upload: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`,
   avatar: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
   slider: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><circle cx="4" cy="12" r="2"></circle><circle cx="12" cy="10" r="2"></circle><circle cx="20" cy="14" r="2"></circle></svg>`,
-  markdown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`
+  markdown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+  landing: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
+  workflow: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`
 };
 
 const html = `<!DOCTYPE html>
@@ -675,6 +677,16 @@ ${inlinedThemeCss}
       </a>
       <a class="nav-item" onclick="switchView('icons-gallery')">
         <span class="icon">${navIcons.iconsGallery}</span> Icons Gallery (138 SVGs)
+      </a>
+
+      <div class="nav-section">Wave 5: Landing Page Architecture</div>
+      <a class="nav-item" onclick="switchView('landing-blocks')">
+        <span class="icon">${navIcons.landing}</span> Bento & Landing Suite
+      </a>
+
+      <div class="nav-section">Wave 5: Enterprise Workflow</div>
+      <a class="nav-item" onclick="switchView('enterprise-workflow')">
+        <span class="icon">${navIcons.workflow}</span> Steps, Timeline & Result
       </a>
     </nav>
   </aside>
@@ -2070,6 +2082,320 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
         </div>
       </section>
+
+      <!-- View: Landing Page Architecture & Bento Suite -->
+      <section id="view-landing-blocks" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Modern Landing Page Suite</h2>
+        <p class="header-tagline">Comprehensive conversion & product architecture blocks: HeroSection with gradient canvas, responsive BentoGrid with glow-card dynamics, multi-tier PricingMatrix, and social proof TestimonialCards.</p>
+
+        <!-- Hero Section Demo -->
+        <div class="joy-hero" style="margin-bottom: 24px;">
+          <div class="joy-hero__badge">Enterprise Architecture 2026</div>
+          <h1 class="joy-hero__title">High-Velocity Quantitative Execution Engine</h1>
+          <p class="joy-hero__subtitle">Institutional order routing, dark-mode financial telemetry, and deterministic UI components engineered for maximum density and accessibility.</p>
+          <div class="joy-hero__actions">
+            <button class="joy-button joy-button--solid joy-button--lg" onclick="showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy Solution</button>
+            <button class="joy-button joy-button--outline joy-button--lg" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
+          </div>
+        </div>
+
+        <!-- Bento Grid Demo -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Bento Grid 4-Column Responsive Layout</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-bento-grid">
+              <div class="joy-bento-card joy-bento-card--col-span-2">
+                <div class="joy-bento-card__badge">Latency Metric</div>
+                <h4 class="joy-bento-card__title">Sub-millisecond Order Routing</h4>
+                <p class="joy-bento-card__desc">Co-located matching engine gateway with continuous FPGA hardware acceleration and zero-allocation socket rings.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--success joy-badge--subtle">0.42ms Tick-to-Trade</span>
+                  <span class="joy-badge joy-badge--brand joy-badge--subtle">DPDK Enabled</span>
+                </div>
+              </div>
+              <div class="joy-bento-card">
+                <div class="joy-bento-card__badge">Cross-Chain</div>
+                <h4 class="joy-bento-card__title">Unified Liquidity</h4>
+                <p class="joy-bento-card__desc">Continuous aggregation across 14 EVM & SVM settlement layers.</p>
+              </div>
+              <div class="joy-bento-card">
+                <div class="joy-bento-card__badge">Security</div>
+                <h4 class="joy-bento-card__title">MPC Vaults</h4>
+                <p class="joy-bento-card__desc">Hardware-isolated multi-party threshold signatures.</p>
+              </div>
+              <div class="joy-bento-card joy-bento-card--col-span-3">
+                <div class="joy-bento-card__badge">Deep Analytics</div>
+                <h4 class="joy-bento-card__title">Real-Time Risk & Telemetry Visualizer</h4>
+                <p class="joy-bento-card__desc">Granular Greeks calculations, portfolio VAR distributions, and live liquidation distance metrics streaming at 60fps.</p>
+              </div>
+              <div class="joy-bento-card">
+                <div class="joy-bento-card__badge">Compliance</div>
+                <h4 class="joy-bento-card__title">Automated Audit</h4>
+                <p class="joy-bento-card__desc">WORM storage log trails.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Matrix Demo -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Pricing Matrix & Subscription Tiers</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-pricing-matrix">
+              <div class="joy-pricing-card">
+                <h3 class="joy-pricing-card__title">Developer</h3>
+                <p class="joy-pricing-card__desc">Core design tokens, SVG vector icons, and standard UI primitives.</p>
+                <div class="joy-pricing-card__price">
+                  <span>$0</span>
+                  <span class="joy-pricing-card__period">/month</span>
+                </div>
+                <ul class="joy-pricing-card__features">
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>138 Vector Icons included</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Svelte 5 & React 19 packages</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Community Discord support</span>
+                  </li>
+                </ul>
+                <button type="button" class="joy-button joy-button--outline joy-button--md" style="width: 100%; margin-top: auto;" onclick="showDemoToast('Developer tier selected', 'info')">Start Free</button>
+              </div>
+
+              <div class="joy-pricing-card joy-pricing-card--featured">
+                <div class="joy-pricing-card__badge">Most Popular</div>
+                <h3 class="joy-pricing-card__title">Professional</h3>
+                <p class="joy-pricing-card__desc">Full financial suite, live orderbook tables, and Bento layout blocks.</p>
+                <div class="joy-pricing-card__price">
+                  <span>$149</span>
+                  <span class="joy-pricing-card__period">/month</span>
+                </div>
+                <ul class="joy-pricing-card__features">
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>All Developer tier features</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Financial High-Density Tables</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Bento & Landing Architecture</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>24/7 Priority SLA response</span>
+                  </li>
+                </ul>
+                <button type="button" class="joy-button joy-button--solid joy-button--md" style="width: 100%; margin-top: auto;" onclick="showDemoToast('Professional tier selected', 'success')">Upgrade to Pro</button>
+              </div>
+
+              <div class="joy-pricing-card">
+                <h3 class="joy-pricing-card__title">Institutional</h3>
+                <p class="joy-pricing-card__desc">Dedicated infrastructure, white-label design token engine, custom audits.</p>
+                <div class="joy-pricing-card__price">
+                  <span>$899</span>
+                  <span class="joy-pricing-card__period">/month</span>
+                </div>
+                <ul class="joy-pricing-card__features">
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Unlimited sub-accounts & seats</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Custom token pipeline & theme export</span>
+                  </li>
+                  <li class="joy-pricing-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Dedicated Technical Account Mgr</span>
+                  </li>
+                </ul>
+                <button type="button" class="joy-button joy-button--outline joy-button--md" style="width: 100%; margin-top: auto;" onclick="showDemoToast('Institutional sales inquiry dispatched', 'info')">Contact Enterprise</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial Cards Demo -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Social Proof & Testimonials</h4>
+          </div>
+          <div style="padding: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+            <div class="joy-testimonial-card">
+              <div class="joy-testimonial-card__stars">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </div>
+              <p class="joy-testimonial-card__quote">"The transition from generic UI kits to Joymify Design was immediate. High-density financial views and Svelte 5 Rune reactivity cut our portal re-render overhead by 40%."</p>
+              <div class="joy-testimonial-card__author">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-color-brand-primary, #7c3aed);">
+                  <span class="joy-avatar__fallback">AK</span>
+                </div>
+                <div class="joy-testimonial-card__author-info">
+                  <h6>Alexandre K.</h6>
+                  <p>Lead Architect, Quant Fund</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="joy-testimonial-card">
+              <div class="joy-testimonial-card__stars">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </div>
+              <p class="joy-testimonial-card__quote">"Dark mode coherence is unmatched. Zero unstyled background leaks and crisp 138-vector asset suite that matches Ant Design enterprise rigor."</p>
+              <div class="joy-testimonial-card__author">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #0ea5e9;">
+                  <span class="joy-avatar__fallback">ML</span>
+                </div>
+                <div class="joy-testimonial-card__author-info">
+                  <h6>Maya Lin</h6>
+                  <p>Design Director, JoyPortal</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Enterprise Workflow Suite -->
+      <section id="view-enterprise-workflow" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Enterprise Workflow Suite (Ant Design Parity)</h2>
+        <p class="header-tagline">Structured progress indicators, audit trail timelines, and comprehensive transaction outcome states designed for high-stakes operational workflows.</p>
+
+        <!-- Steps Progress Demo -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Interactive Multi-Step Progress Tracker</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-steps" id="demo-steps-nav">
+              <div class="joy-steps__item joy-steps__item--finish" onclick="setDemoStep(0)">
+                <div class="joy-steps__icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="joy-steps__content">
+                  <div class="joy-steps__title">KYC Verification</div>
+                  <div class="joy-steps__desc">Identity and residency verified</div>
+                </div>
+              </div>
+              <div class="joy-steps__item joy-steps__item--process" onclick="setDemoStep(1)" aria-current="step">
+                <div class="joy-steps__icon">2</div>
+                <div class="joy-steps__content">
+                  <div class="joy-steps__title">Account Funding</div>
+                  <div class="joy-steps__desc">Collateral deposit via wire or USDC</div>
+                </div>
+              </div>
+              <div class="joy-steps__item joy-steps__item--wait" onclick="setDemoStep(2)">
+                <div class="joy-steps__icon">3</div>
+                <div class="joy-steps__content">
+                  <div class="joy-steps__title">Algorithm Activation</div>
+                  <div class="joy-steps__desc">Deploy quantitative strategies</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; gap: 8px;">
+              <button class="joy-button joy-button--outline joy-button--sm" onclick="advanceDemoStep(-1)">Previous Step</button>
+              <button class="joy-button joy-button--solid joy-button--sm" onclick="advanceDemoStep(1)">Next Step</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Audit Trail Demo -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Chronological Event & Execution Timeline</h4>
+          </div>
+          <div style="padding: 24px;">
+            <ul class="joy-timeline">
+              <li class="joy-timeline__item">
+                <div class="joy-timeline__dot joy-timeline__dot--success"></div>
+                <div class="joy-timeline__content">
+                  <div style="font-weight: 600;">Trade Order #8841-EX Filled</div>
+                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">Executed 250.00 SOL at average fill price $184.20 via Phoenix Gateway.</div>
+                  <div class="joy-timeline__time">14:32:08 UTC</div>
+                </div>
+              </li>
+              <li class="joy-timeline__item">
+                <div class="joy-timeline__dot joy-timeline__dot--primary"></div>
+                <div class="joy-timeline__content">
+                  <div style="font-weight: 600;">Risk Check Simulation Passed</div>
+                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">Portfolio beta remains within target limit (0.28 vs max 0.40).</div>
+                  <div class="joy-timeline__time">14:31:55 UTC</div>
+                </div>
+              </li>
+              <li class="joy-timeline__item">
+                <div class="joy-timeline__dot joy-timeline__dot--warning"></div>
+                <div class="joy-timeline__content">
+                  <div style="font-weight: 600;">Slippage Tolerance Rebalanced</div>
+                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">Elevated market volatility triggered auto-adjustment from 5 bps to 12 bps.</div>
+                  <div class="joy-timeline__time">14:28:10 UTC</div>
+                </div>
+              </li>
+              <li class="joy-timeline__item">
+                <div class="joy-timeline__dot joy-timeline__dot--info"></div>
+                <div class="joy-timeline__content">
+                  <div style="font-weight: 600;">Sub-Account Session Authenticated</div>
+                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">API Key authorization from Singapore gateway worker.</div>
+                  <div class="joy-timeline__time">14:15:00 UTC</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Result States Demo -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Workflow Result Outcomes</h4>
+          </div>
+          <div style="padding: 24px; display: flex; flex-direction: column; gap: 32px;">
+            <!-- Success Result -->
+            <div class="joy-result joy-result--success">
+              <div class="joy-result__icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              <h2 class="joy-result__title">Order Batch Dispatched Successfully</h2>
+              <p class="joy-result__subtitle">Order batch ID: 20260920-88127. 42 orders routed to dark pool liquidity providers with zero rejection errors.</p>
+              <div class="joy-result__actions">
+                <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Viewing Order Batch', 'info')">View Execution</button>
+                <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Starting New Order', 'info')">New Order</button>
+              </div>
+            </div>
+
+            <!-- Error Result -->
+            <div class="joy-result joy-result--error">
+              <div class="joy-result__icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </div>
+              <h2 class="joy-result__title">Margin Limit Exceeded</h2>
+              <p class="joy-result__subtitle">The requested position would increase portfolio leverage beyond the allocated collateral requirement. Please deposit funds or adjust lot sizes.</p>
+              <div class="joy-result__actions">
+                <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Navigating to Deposit Collateral', 'info')">Deposit Collateral</button>
+                <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Dismissed error', 'info')">Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
   </main>
 
   <!-- Interactive Demo Drawer -->
@@ -2460,6 +2786,38 @@ export async function executeHedge(symbol: string, size: number) {
       }).catch(() => {
         showDemoToast('Import: ' + code, 'info');
       });
+    }
+
+    // Wave 5 Steps Demo Handlers
+    let currentWorkflowStep = 1;
+    function setDemoStep(idx) {
+      currentWorkflowStep = idx;
+      updateStepsUi();
+    }
+    function advanceDemoStep(delta) {
+      currentWorkflowStep = Math.max(0, Math.min(2, currentWorkflowStep + delta));
+      updateStepsUi();
+    }
+    function updateStepsUi() {
+      const stepItems = document.querySelectorAll('#demo-steps-nav .joy-steps__item');
+      stepItems.forEach((item, idx) => {
+        item.classList.remove('joy-steps__item--finish', 'joy-steps__item--process', 'joy-steps__item--wait');
+        const iconDiv = item.querySelector('.joy-steps__icon');
+        if (idx < currentWorkflowStep) {
+          item.classList.add('joy-steps__item--finish');
+          item.removeAttribute('aria-current');
+          if (iconDiv) iconDiv.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else if (idx === currentWorkflowStep) {
+          item.classList.add('joy-steps__item--process');
+          item.setAttribute('aria-current', 'step');
+          if (iconDiv) iconDiv.innerText = String(idx + 1);
+        } else {
+          item.classList.add('joy-steps__item--wait');
+          item.removeAttribute('aria-current');
+          if (iconDiv) iconDiv.innerText = String(idx + 1);
+        }
+      });
+      showDemoToast('Workflow advanced to step ' + (currentWorkflowStep + 1), 'info');
     }
 
     // Initial render

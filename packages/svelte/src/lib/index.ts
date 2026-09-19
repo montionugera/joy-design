@@ -31,3 +31,14 @@ export { default as Avatar } from './Avatar.svelte';
 export { default as AvatarGroup } from './AvatarGroup.svelte';
 export { default as Slider } from './Slider.svelte';
 export { default as MarkdownViewer } from './MarkdownViewer.svelte';
+
+// Wave 5 Components (Landing Page Architecture & Enterprise Workflow Suite)
+export { default as BentoGrid } from './BentoGrid.svelte';
+export { default as BentoCard } from './BentoCard.svelte';
+export { default as HeroSection } from './HeroSection.svelte';
+export { default as PricingCard } from './PricingCard.svelte';
+export { default as PricingMatrix } from './PricingMatrix.svelte';
+export { default as TestimonialCard } from './TestimonialCard.svelte';
+export { default as Steps, type StepItem } from './Steps.svelte';
+export { default as Timeline, type TimelineItem } from './Timeline.svelte';
+export { default as Result } from './Result.svelte';
