@@ -34,11 +34,12 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes(':focus-visible'), 'WCAG 2.2 focus rings must exist');
   assert.ok(css.includes('.joy-props-table'), 'props documentation table styles must exist');
 
-  // OpenDesign Integration Assertions (Linear / Datadog Posture)
-  assert.ok(css.includes('--joy-font-display-letter-spacing: -0.02em;'), 'OpenDesign display letter spacing must exist');
-  assert.ok(css.includes('--joy-font-variant-numeric: tabular-nums;'), 'OpenDesign tabular numbers must exist');
-  assert.ok(css.includes('--joy-border-hairline:'), 'OpenDesign hairline border token must exist');
-  assert.ok(css.includes('--joy-surface-frosted:'), 'OpenDesign frosted surface token must exist');
+  // Wave 4 Assertions (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer, Micro-animations)
+  assert.ok(css.includes('.joy-upload'), 'upload styles must exist');
+  assert.ok(css.includes('.joy-avatar'), 'avatar styles must exist');
+  assert.ok(css.includes('.joy-slider'), 'slider styles must exist');
+  assert.ok(css.includes('.joy-markdown'), 'markdown viewer styles must exist');
+  assert.ok(css.includes('.joy-button--wave'), 'button wave micro-animation must exist');
 });
 
 

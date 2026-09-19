@@ -82,4 +82,21 @@ test('React standard library components implement accessible traits and forwardR
 
   const emptyState = fs.readFileSync(path.resolve('./src/EmptyState.tsx'), 'utf8');
   assert.ok(emptyState.includes('joy-empty-state'), 'EmptyState must render joy-empty-state class');
+
+  // Wave 4 Assertions (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer)
+  const upload = fs.readFileSync(path.resolve('./src/Upload.tsx'), 'utf8');
+  assert.ok(upload.includes('joy-upload'), 'Upload must render joy-upload class');
+
+  const avatar = fs.readFileSync(path.resolve('./src/Avatar.tsx'), 'utf8');
+  assert.ok(avatar.includes('joy-avatar'), 'Avatar must render joy-avatar class');
+  assert.ok(avatar.includes('React.forwardRef'), 'Avatar must implement forwardRef');
+
+  const slider = fs.readFileSync(path.resolve('./src/Slider.tsx'), 'utf8');
+  assert.ok(slider.includes('joy-slider'), 'Slider must render joy-slider class');
+  assert.ok(slider.includes('role="slider"'), 'Slider must implement role=slider');
+  assert.ok(slider.includes('React.forwardRef'), 'Slider must implement forwardRef');
+
+  const md = fs.readFileSync(path.resolve('./src/MarkdownViewer.tsx'), 'utf8');
+  assert.ok(md.includes('joy-markdown'), 'MarkdownViewer must render joy-markdown class');
+  assert.ok(md.includes('joy-markdown__copy-btn'), 'MarkdownViewer must include copy button');
 });
