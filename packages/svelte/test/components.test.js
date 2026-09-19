@@ -20,4 +20,17 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const alert = fs.readFileSync(path.resolve('./src/lib/Alert.svelte'), 'utf8');
   assert.ok(alert.includes('role="alert"'), 'Alert must have accessible role');
+
+  const modal = fs.readFileSync(path.resolve('./src/lib/Modal.svelte'), 'utf8');
+  assert.ok(modal.includes('role="dialog"'), 'Modal must implement dialog role');
+  assert.ok(modal.includes('$props()'), 'Modal must use Svelte 5 runes');
+
+  const dropdown = fs.readFileSync(path.resolve('./src/lib/Dropdown.svelte'), 'utf8');
+  assert.ok(dropdown.includes('role="menu"'), 'Dropdown must implement menu role');
+
+  const tabs = fs.readFileSync(path.resolve('./src/lib/Tabs.svelte'), 'utf8');
+  assert.ok(tabs.includes('role="tablist"'), 'Tabs must implement tablist role');
+
+  const tooltip = fs.readFileSync(path.resolve('./src/lib/Tooltip.svelte'), 'utf8');
+  assert.ok(tooltip.includes('role="tooltip"'), 'Tooltip must implement tooltip role');
 });

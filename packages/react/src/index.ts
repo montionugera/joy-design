@@ -5,3 +5,7 @@ export { Input, type InputProps } from './Input.js';
 export { Switch, type SwitchProps } from './Switch.js';
 export { Table, type TableProps, type Column } from './Table.js';
 export { Alert, type AlertProps } from './Alert.js';
+export { Modal, type ModalProps } from './Modal.js';
+export { Dropdown, type DropdownProps, type DropdownItem } from './Dropdown.js';
+export { Tabs, type TabsProps, type TabItem } from './Tabs.js';
+export { Tooltip, type TooltipProps } from './Tooltip.js';

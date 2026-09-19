@@ -101,7 +101,7 @@ const html = `<!DOCTYPE html>
       color: #334155;
       text-decoration: none;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all var(--joy-motion-duration-fast, 150ms);
     }
     .nav-item:hover {
       background: #f1f5f9;
@@ -150,7 +150,7 @@ const html = `<!DOCTYPE html>
       border-radius: 9999px;
       cursor: pointer;
       color: #64748b;
-      transition: all 0.15s;
+      transition: all var(--joy-motion-duration-fast, 150ms);
     }
     .framework-btn.active {
       background: #ffffff;
@@ -170,6 +170,7 @@ const html = `<!DOCTYPE html>
     }
     .view-panel.active {
       display: block;
+      animation: joy-fade-in var(--joy-motion-duration-fast, 150ms) ease-out;
     }
     .header-tagline {
       margin-top: 4px;
@@ -291,7 +292,7 @@ const html = `<!DOCTYPE html>
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
-        <span>v1.5 Enterprise Portal</span>
+        <span>v1.8 Enterprise Suite</span>
       </div>
     </div>
     <nav class="nav">
@@ -300,10 +301,10 @@ const html = `<!DOCTYPE html>
         <span class="icon">✨</span> Overview & Architecture
       </a>
       <a class="nav-item" onclick="switchView('tokens')">
-        <span class="icon">🎨</span> Design Tokens (DTCG)
+        <span class="icon">🎨</span> Design Tokens & Motion
       </a>
 
-      <div class="nav-section">Component Workshop</div>
+      <div class="nav-section">Standard Components</div>
       <a class="nav-item" onclick="switchView('button')">
         <span class="icon">🔘</span> Button
       </a>
@@ -323,7 +324,21 @@ const html = `<!DOCTYPE html>
         <span class="icon">📊</span> MetricTile (Quant)
       </a>
       <a class="nav-item" onclick="switchView('table')">
-        <span class="icon">📑</span> Table (Virtual/Compact)
+        <span class="icon">📑</span> Table (Compact)
+      </a>
+
+      <div class="nav-section">Enterprise Overlays & Navigation</div>
+      <a class="nav-item" onclick="switchView('modal')">
+        <span class="icon">🪟</span> Modal / Dialog
+      </a>
+      <a class="nav-item" onclick="switchView('dropdown')">
+        <span class="icon">🔽</span> Dropdown Menu
+      </a>
+      <a class="nav-item" onclick="switchView('tabs')">
+        <span class="icon">🗂️</span> Tabs Layout
+      </a>
+      <a class="nav-item" onclick="switchView('tooltip')">
+        <span class="icon">💬</span> Tooltip Overlay
       </a>
     </nav>
   </aside>
@@ -332,8 +347,8 @@ const html = `<!DOCTYPE html>
   <main class="main">
     <div class="topbar">
       <div>
-        <span style="font-weight: 600; font-size: 0.9375rem; color: #334155;">Active Target:</span>
-        <span class="badge joy-badge joy-badge--brand" style="margin-left: 8px;">Multi-Platform Core</span>
+        <span style="font-weight: 600; font-size: 0.9375rem; color: #334155;">Target Suite:</span>
+        <span class="badge joy-badge joy-badge--brand" style="margin-left: 8px;">Multi-Platform Enterprise</span>
       </div>
       <div class="framework-pill">
         <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
@@ -349,21 +364,21 @@ const html = `<!DOCTYPE html>
 
       <!-- View: Overview -->
       <section id="view-overview" class="view-panel active">
-        <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Production Standard Library</div>
+        <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Enterprise Component Architecture</div>
         <h1 style="margin: 0; font-size: 2rem; color: var(--joy-color-brand-primary);">Joymify Design System</h1>
         <p class="header-tagline">
-          Enterprise multi-platform component workshop and design tokens specification engineered for 
+          Enterprise multi-platform design tokens specification and production component library built for 
           <strong>Quant</strong>, <strong>JoyCoach</strong>, <strong>AssetStudio</strong>, and <strong>JoyQuest</strong>.
         </p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 36px;">
           <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="switchView('tokens')">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-              <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens</span>
+              <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/tokens</h3>
             <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
-              W3C Design Tokens Community Group specification compiling directly into CSS Custom Properties and Tailwind v4 themes.
+              W3C DTCG tokens including GPU spring motion curves, elevation shadows, z-index hierarchy, and colors.
             </p>
           </div>
 
@@ -373,7 +388,7 @@ const html = `<!DOCTYPE html>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/svelte</h3>
             <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
-              Zero-runtime-overhead components powered by Runes ($state, $props, $derived) built for high-throughput execution.
+              Zero-overhead Runes ($state, $props, $derived, $bindable) engineered for real-time order books and high-FPS canvases.
             </p>
           </div>
 
@@ -383,25 +398,57 @@ const html = `<!DOCTYPE html>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/react</h3>
             <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
-              Strict WAI-ARIA accessible React 19 library with forwardRef support engineered for complex canvas tools.
+              Strict WAI-ARIA accessible React 19 component library with forwardRef support and zero runtime CSS overhead.
             </p>
           </div>
         </div>
 
         <div class="joy-alert joy-alert--info">
-          <div class="joy-alert__title">💡 Interactive Workshop Navigation</div>
+          <div class="joy-alert__title">💡 Complete AntDesign Parity Suite</div>
           <div class="joy-alert__desc">
-            Click any component on the left sidebar to enter the live interactive playground. You can test interactions, toggle variants, tweak parameters, and view copy-pasteable code.
+            Explore 11 standard & enterprise components including Modals, Dropdown menus, Tabs, and Tooltips with full GPU spring motion transitions.
           </div>
         </div>
       </section>
 
       <!-- View: Tokens -->
       <section id="view-tokens" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">Design Tokens Specification</h2>
+        <h2 style="margin: 0 0 8px 0;">Design Tokens & Motion Engine</h2>
         <p class="header-tagline">Central source of truth defined in DTCG JSON format, compiled for CSS Variables and Tailwind v4.</p>
 
-        <h3 style="margin-top: 24px;">Core Brand & Surface Palette</h3>
+        <h3 style="margin-top: 24px;">Motion & Easing Tokens</h3>
+        <table class="tokens-table" style="margin-bottom: 24px;">
+          <thead>
+            <tr>
+              <th>Token Name</th>
+              <th>CSS Custom Property</th>
+              <th>Value</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>motion.duration.fast</code></td>
+              <td><code>--joy-motion-duration-fast</code></td>
+              <td><code>150ms</code></td>
+              <td>Micro-interactions, button hovers, badge transitions</td>
+            </tr>
+            <tr>
+              <td><code>motion.duration.normal</code></td>
+              <td><code>--joy-motion-duration-normal</code></td>
+              <td><code>250ms</code></td>
+              <td>Dropdown expands, modal pop, drawer slides</td>
+            </tr>
+            <tr>
+              <td><code>motion.easing.spring</code></td>
+              <td><code>--joy-motion-easing-spring</code></td>
+              <td><code>cubic-bezier(0.175, 0.885, 0.32, 1.275)</code></td>
+              <td>Natural organic bounce effect for popovers & dialogs</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Core Brand & Surface Palette</h3>
         <table class="tokens-table">
           <thead>
             <tr>
@@ -423,18 +470,6 @@ const html = `<!DOCTYPE html>
               <td><code>--joy-color-brand-primary-hover</code></td>
               <td><span class="color-swatch" style="background: var(--joy-color-brand-primary-hover);"></span>Hover</td>
               <td><code>#6d28d9</code></td>
-            </tr>
-            <tr>
-              <td><code>color.brand.secondary</code></td>
-              <td><code>--joy-color-brand-secondary</code></td>
-              <td><span class="color-swatch" style="background: var(--joy-color-brand-secondary);"></span>Secondary</td>
-              <td><code>#f59e0b</code></td>
-            </tr>
-            <tr>
-              <td><code>color.brand.accent</code></td>
-              <td><code>--joy-color-brand-accent</code></td>
-              <td><span class="color-swatch" style="background: var(--joy-color-brand-accent);"></span>Accent</td>
-              <td><code>#10b981</code></td>
             </tr>
             <tr>
               <td><code>color.status.success</code></td>
@@ -523,12 +558,6 @@ const html = `<!DOCTYPE html>
             <span class="joy-badge joy-badge--danger joy-badge--md"><span class="joy-badge__dot"></span> Rejected</span>
             <span class="joy-badge joy-badge--neutral joy-badge--md">Draft</span>
           </div>
-        </div>
-
-        <div class="code-snippet" id="badge-code">
-          // React 19 Example<br>
-          import { Badge } from '@joymify/react';<br><br>
-          &lt;Badge variant="success" dot&gt;Active Trade&lt;/Badge&gt;
         </div>
       </section>
 
@@ -676,16 +705,134 @@ const html = `<!DOCTYPE html>
                     <td>4.20 ETH</td>
                     <td><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
                   </tr>
-                  <tr>
-                    <td><code>#ORD-8923</code></td>
-                    <td><strong>SOL/USDT</strong></td>
-                    <td><span style="color: #10b981; font-weight: 600;">BUY</span></td>
-                    <td>$182.40</td>
-                    <td>50 SOL</td>
-                    <td><span class="joy-badge joy-badge--warning joy-badge--sm">OPEN</span></td>
-                  </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Modal -->
+      <section id="view-modal" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Modal / Dialog Component</h2>
+        <p class="header-tagline">Accessible modal dialog overlay with backdrop blur, focus trap, and escape key listener.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Dialog Trigger</h4>
+          </div>
+          <div class="canvas">
+            <button class="joy-button joy-button--solid joy-button--md" onclick="openDemoModal()">
+              Open Confirm Modal
+            </button>
+          </div>
+        </div>
+
+        <div id="demo-modal-container" style="display: none;">
+          <div class="joy-modal-backdrop" onclick="closeDemoModal(event)">
+            <div class="joy-modal">
+              <div class="joy-modal__header">
+                <h3 class="joy-modal__title">Confirm Liquidation Order</h3>
+                <button type="button" class="joy-modal__close" onclick="closeDemoModal()">&times;</button>
+              </div>
+              <div class="joy-modal__body">
+                Are you sure you want to trigger emergency liquidation across all connected sub-accounts? This action is immediate and non-reversible.
+              </div>
+              <div class="joy-modal__footer">
+                <button class="joy-button joy-button--ghost joy-button--md" onclick="closeDemoModal()">Cancel</button>
+                <button class="joy-button joy-button--danger joy-button--md" onclick="alert('Order submitted!'); closeDemoModal();">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Code Usage</h3>
+        <div class="code-snippet">
+          // Svelte 5<br>
+          &lt;Modal open={isOpen} title="Confirm Order" onclose={() => isOpen = false}&gt;<br>
+          &nbsp;&nbsp;Are you sure you want to proceed?<br>
+          &lt;/Modal&gt;
+        </div>
+      </section>
+
+      <!-- View: Dropdown -->
+      <section id="view-dropdown" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Dropdown Menu Component</h2>
+        <p class="header-tagline">Action menu with keyboard navigation, danger items, and animated spring popover.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Dropdown</h4>
+          </div>
+          <div class="canvas" style="min-height: 220px;">
+            <div class="joy-dropdown-wrapper">
+              <button class="joy-button joy-button--outline joy-button--md" onclick="toggleDemoDropdown()">
+                Strategy Options ▾
+              </button>
+              <div class="joy-dropdown" id="demo-dropdown-menu" style="display: none;">
+                <button class="joy-dropdown__item" onclick="selectDropdownAction('Duplicate')">📋 Duplicate Strategy</button>
+                <button class="joy-dropdown__item" onclick="selectDropdownAction('Export CSV')">📥 Export Performance CSV</button>
+                <button class="joy-dropdown__item" onclick="selectDropdownAction('Backtest')">⚡ Run Deep Backtest</button>
+                <button class="joy-dropdown__item joy-dropdown__item--danger" style="color: #ef4444;" onclick="selectDropdownAction('Archive')">🗑️ Archive Strategy</button>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 0.875rem;">
+            Selected action: <strong id="dropdown-selection-text" style="color: #7c3aed;">None</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Tabs -->
+      <section id="view-tabs" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Tabs Layout Component</h2>
+        <p class="header-tagline">Smooth tabbed navigation supporting controlled and uncontrolled active state transitions.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Tabs</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-tabs">
+              <button class="joy-tab-btn joy-tab-btn--active" id="tab-btn-1" onclick="switchDemoTab('tab-btn-1', 'tab-panel-1')">Live Orders</button>
+              <button class="joy-tab-btn" id="tab-btn-2" onclick="switchDemoTab('tab-btn-2', 'tab-panel-2')">Historical Fills</button>
+              <button class="joy-tab-btn" id="tab-btn-3" onclick="switchDemoTab('tab-btn-3', 'tab-panel-3')">Risk Matrix</button>
+            </div>
+            <div id="tab-panel-1" class="tab-panel-demo">
+              <p style="margin: 0; color: #334155;">Showing 3 active live limit orders awaiting counter-party match.</p>
+            </div>
+            <div id="tab-panel-2" class="tab-panel-demo" style="display: none;">
+              <p style="margin: 0; color: #334155;">12 fills executed in the last 24 hours with zero rejected packets.</p>
+            </div>
+            <div id="tab-panel-3" class="tab-panel-demo" style="display: none;">
+              <p style="margin: 0; color: #334155;">Value at Risk (VaR 99%): 1.42 BTC across delta-neutral positions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Tooltip -->
+      <section id="view-tooltip" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Tooltip Overlay Component</h2>
+        <p class="header-tagline">Informational micro-popover triggered on hover and keyboard focus with arrow pointer.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Tooltips</h4>
+          </div>
+          <div class="canvas" style="gap: 32px;">
+            <div class="joy-tooltip-wrapper">
+              <button class="joy-button joy-button--outline joy-button--md">
+                Hover Me (Trading Fee)
+              </button>
+              <div class="joy-tooltip">Maker fee: 0.01% | Taker: 0.04%</div>
+            </div>
+
+            <div class="joy-tooltip-wrapper">
+              <span class="joy-badge joy-badge--brand joy-badge--md" tabindex="0">
+                Focus Me (Keyboard)
+              </span>
+              <div class="joy-tooltip">Accessible ARIA tooltip with keyboard tab support</div>
             </div>
           </div>
         </div>
@@ -762,6 +909,32 @@ const html = `<!DOCTYPE html>
       sw.classList.toggle('joy-switch--checked', isSwitchOn);
       sw.setAttribute('aria-checked', isSwitchOn);
       label.innerText = 'Auto-Refresh: ' + (isSwitchOn ? 'ON' : 'OFF');
+    }
+
+    function openDemoModal() {
+      document.getElementById('demo-modal-container').style.display = 'block';
+    }
+
+    function closeDemoModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('demo-modal-container').style.display = 'none';
+    }
+
+    function toggleDemoDropdown() {
+      const menu = document.getElementById('demo-dropdown-menu');
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function selectDropdownAction(action) {
+      document.getElementById('dropdown-selection-text').innerText = action;
+      document.getElementById('demo-dropdown-menu').style.display = 'none';
+    }
+
+    function switchDemoTab(btnId, panelId) {
+      document.querySelectorAll('.joy-tab-btn').forEach(b => b.classList.remove('joy-tab-btn--active'));
+      document.getElementById(btnId).classList.add('joy-tab-btn--active');
+      document.querySelectorAll('.tab-panel-demo').forEach(p => p.style.display = 'none');
+      document.getElementById(panelId).style.display = 'block';
     }
 
     function updateCodeSnippets() {
