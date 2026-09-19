@@ -1,0 +1,30 @@
+:root {
+  --joy-color-brand-primary: #7c3aed;
+  --joy-color-brand-primary-hover: #6d28d9;
+  --joy-color-brand-secondary: #f59e0b;
+  --joy-color-brand-accent: #10b981;
+  --joy-color-surface-base: #ffffff;
+  --joy-color-surface-subtle: #f8fafc;
+  --joy-color-surface-muted: #f1f5f9;
+  --joy-color-surface-dark-base: #0f172a;
+  --joy-color-surface-dark-subtle: #1e293b;
+  --joy-color-text-primary: #0f172a;
+  --joy-color-text-muted: #64748b;
+  --joy-color-text-inverse: #ffffff;
+  --joy-color-status-success: #10b981;
+  --joy-color-status-warning: #f59e0b;
+  --joy-color-status-danger: #ef4444;
+  --joy-color-status-info: #3b82f6;
+  --joy-spacing-1: 4px;
+  --joy-spacing-2: 8px;
+  --joy-spacing-3: 12px;
+  --joy-spacing-4: 16px;
+  --joy-spacing-6: 24px;
+  --joy-spacing-8: 32px;
+  --joy-radius-sm: 4px;
+  --joy-radius-md: 8px;
+  --joy-radius-lg: 12px;
+  --joy-radius-full: 9999px;
+  --joy-font-family-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  --joy-font-family-mono: JetBrains Mono, Menlo, monospace;
+}
