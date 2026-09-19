@@ -154,5 +154,14 @@
     "claimed_at": "2026-09-19T15:16:32.537113+00:00",
     "shipped_at": "2026-09-19T15:19:07.540423+00:00",
     "promoted_at": "2026-09-19T15:20:08.956944+00:00"
+  },
+  {
+    "id": "F-014",
+    "title": "Enterprise Parity: Vector Icons, Date and Time Pickers, Dark Mode Semantics, and Zero-Interruption AGENTS policy",
+    "from_idea": "I-014",
+    "created_at": "2026-09-19T15:34:45.500190+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
