@@ -85,4 +85,21 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const emptyState = fs.readFileSync(path.resolve('./src/lib/EmptyState.svelte'), 'utf8');
   assert.ok(emptyState.includes('joy-empty-state'), 'EmptyState must have joy-empty-state class');
+
+  // Wave 4 Assertions (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer)
+  const upload = fs.readFileSync(path.resolve('./src/lib/Upload.svelte'), 'utf8');
+  assert.ok(upload.includes('joy-upload'), 'Upload must have joy-upload class');
+  assert.ok(upload.includes('$props()'), 'Upload must use Svelte 5 runes');
+
+  const avatar = fs.readFileSync(path.resolve('./src/lib/Avatar.svelte'), 'utf8');
+  assert.ok(avatar.includes('joy-avatar'), 'Avatar must have joy-avatar class');
+  assert.ok(avatar.includes('$props()'), 'Avatar must use Svelte 5 runes');
+
+  const slider = fs.readFileSync(path.resolve('./src/lib/Slider.svelte'), 'utf8');
+  assert.ok(slider.includes('joy-slider'), 'Slider must have joy-slider class');
+  assert.ok(slider.includes('role="slider"'), 'Slider must implement role=slider');
+
+  const md = fs.readFileSync(path.resolve('./src/lib/MarkdownViewer.svelte'), 'utf8');
+  assert.ok(md.includes('joy-markdown'), 'MarkdownViewer must have joy-markdown class');
+  assert.ok(md.includes('joy-markdown__copy-btn'), 'MarkdownViewer must include copy button');
 });
