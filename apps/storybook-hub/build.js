@@ -6,13 +6,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, 'dist');
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
+const tokensSrcPath = path.join(__dirname, '../../packages/tokens/dist/theme.css');
+const inlinedThemeCss = fs.existsSync(tokensSrcPath) ? fs.readFileSync(tokensSrcPath, 'utf8') : '';
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Joymify Design System & Component Portal</title>
-  <link rel="stylesheet" href="/theme.css">
+  <style id="joy-theme-inline">
+${inlinedThemeCss}
+  </style>
+  <link rel="stylesheet" href="/theme.css?v=2.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,6 +28,11 @@ const html = `<!DOCTYPE html>
     }
     * {
       box-sizing: border-box;
+    }
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
     body {
       font-family: var(--joy-font-family-sans, 'Inter', -apple-system, sans-serif);
@@ -203,16 +214,21 @@ const html = `<!DOCTYPE html>
       color: var(--joy-color-text-primary, #0f172a);
     }
     .canvas {
-      padding: 36px 24px;
+      padding: 44px 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 16px;
       flex-wrap: wrap;
       background: #fafafa;
-      background-image: radial-gradient(#e2e8f0 1px, transparent 0);
-      background-size: 16px 16px;
-      min-height: 160px;
+      background-image: radial-gradient(#cbd5e1 1.2px, transparent 0);
+      background-size: 20px 20px;
+      min-height: 180px;
+      position: relative;
+    }
+    [data-theme="dark"] .canvas {
+      background: #090d16;
+      background-image: radial-gradient(#1e293b 1.2px, transparent 0);
     }
     .controls-table {
       width: 100%;
@@ -221,14 +237,71 @@ const html = `<!DOCTYPE html>
       border-collapse: collapse;
       font-size: 0.875rem;
     }
+    [data-theme="dark"] .controls-table {
+      background: #0f172a;
+      border-top-color: #334155;
+    }
     .controls-table td {
-      padding: 12px 20px;
+      padding: 14px 24px;
       border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    [data-theme="dark"] .controls-table td {
+      border-bottom-color: #1e293b;
     }
     .controls-table td:first-child {
       font-weight: 600;
       color: #334155;
-      width: 220px;
+      width: 180px;
+    }
+    [data-theme="dark"] .controls-table td:first-child {
+      color: #94a3b8;
+    }
+    .segmented-control {
+      display: inline-flex;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .segment-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #64748b;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: inherit;
+    }
+    .segment-btn:hover {
+      color: #0f172a;
+    }
+    .segment-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="dark"] .segmented-control {
+      background: #020617;
+      border-color: #334155;
+    }
+    [data-theme="dark"] .segment-btn {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .segment-btn:hover {
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .segment-btn.active {
+      background: #1e293b;
+      color: #f8fafc;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     .code-snippet {
       background: #0f172a;
@@ -777,39 +850,51 @@ const html = `<!DOCTYPE html>
 
         <div class="playground-box">
           <div class="playground-header">
-            <h4>Live Interactive Canvas</h4>
-            <span class="joy-badge joy-badge--brand joy-badge--sm">Active Preview</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h4>Live Interactive Canvas</h4>
+              <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Active Preview</span>
+            </div>
+            <div style="font-size: 0.8125rem; color: #64748b;">Click button or test controls below</div>
           </div>
           <div class="canvas" id="button-canvas">
             <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()">
               Click Me! (Clicked: <span id="click-counter">0</span>)
             </button>
-            <button class="joy-button joy-button--outline joy-button--md">Outline</button>
-            <button class="joy-button joy-button--ghost joy-button--md">Ghost</button>
-            <button class="joy-button joy-button--danger joy-button--md">Danger</button>
+            <button class="joy-button joy-button--outline joy-button--md" onclick="setBtnVariant('outline')">Outline</button>
+            <button class="joy-button joy-button--ghost joy-button--md" onclick="setBtnVariant('ghost')">Ghost</button>
+            <button class="joy-button joy-button--danger joy-button--md" onclick="setBtnVariant('danger')">Danger</button>
           </div>
           <table class="controls-table">
             <tr>
               <td>Variant</td>
               <td>
-                <button class="joy-button joy-button--outline joy-button--sm" onclick="setBtnVariant('solid')">Solid</button>
-                <button class="joy-button joy-button--outline joy-button--sm" onclick="setBtnVariant('outline')">Outline</button>
-                <button class="joy-button joy-button--outline joy-button--sm" onclick="setBtnVariant('ghost')">Ghost</button>
-                <button class="joy-button joy-button--outline joy-button--sm" onclick="setBtnVariant('danger')">Danger</button>
+                <div class="segmented-control" id="seg-variant">
+                  <button class="segment-btn active" id="seg-v-solid" onclick="setBtnVariant('solid')">Solid</button>
+                  <button class="segment-btn" id="seg-v-outline" onclick="setBtnVariant('outline')">Outline</button>
+                  <button class="segment-btn" id="seg-v-ghost" onclick="setBtnVariant('ghost')">Ghost</button>
+                  <button class="segment-btn" id="seg-v-danger" onclick="setBtnVariant('danger')">Danger</button>
+                </div>
               </td>
             </tr>
             <tr>
               <td>Size</td>
               <td>
-                <button class="joy-button joy-button--ghost joy-button--sm" onclick="setBtnSize('sm')">Small</button>
-                <button class="joy-button joy-button--ghost joy-button--sm" onclick="setBtnSize('md')">Medium</button>
-                <button class="joy-button joy-button--ghost joy-button--sm" onclick="setBtnSize('lg')">Large</button>
+                <div class="segmented-control" id="seg-size">
+                  <button class="segment-btn" id="seg-s-sm" onclick="setBtnSize('sm')">Small (sm)</button>
+                  <button class="segment-btn active" id="seg-s-md" onclick="setBtnSize('md')">Medium (md)</button>
+                  <button class="segment-btn" id="seg-s-lg" onclick="setBtnSize('lg')">Large (lg)</button>
+                </div>
               </td>
             </tr>
             <tr>
               <td>Loading State</td>
               <td>
-                <button class="joy-button joy-button--outline joy-button--sm" onclick="toggleBtnLoading()">Toggle Loading State</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <button class="joy-switch" id="btn-loading-switch" role="switch" aria-checked="false" onclick="toggleBtnLoading()">
+                    <span class="joy-switch__thumb"></span>
+                  </button>
+                  <span id="btn-loading-status" style="font-size: 0.8125rem; font-weight: 500; color: #64748b;">Idle</span>
+                </div>
               </td>
             </tr>
           </table>
@@ -865,7 +950,12 @@ const html = `<!DOCTYPE html>
             <tr>
               <td>Error State</td>
               <td>
-                <button class="joy-button joy-button--outline joy-button--sm" onclick="toggleInputError()">Toggle Error State</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <button class="joy-switch" id="input-error-switch" role="switch" aria-checked="false" onclick="toggleInputError()">
+                    <span class="joy-switch__thumb"></span>
+                  </button>
+                  <span id="input-error-status" style="font-size: 0.8125rem; font-weight: 500; color: #64748b;">Normal (No Error)</span>
+                </div>
               </td>
             </tr>
           </table>
@@ -1446,23 +1536,44 @@ const html = `<!DOCTYPE html>
       document.getElementById('click-counter').innerText = clickCount;
     }
 
+    let currentBtnVariant = 'solid';
+    let currentBtnSize = 'md';
+
     function setBtnVariant(variant) {
+      currentBtnVariant = variant;
       const btn = document.getElementById('demo-btn');
-      btn.className = 'joy-button joy-button--' + variant + ' joy-button--md';
+      btn.className = 'joy-button joy-button--' + variant + ' joy-button--' + currentBtnSize;
+      ['solid', 'outline', 'ghost', 'danger'].forEach(v => {
+        const seg = document.getElementById('seg-v-' + v);
+        if (seg) seg.classList.toggle('active', v === variant);
+      });
       updateCodeSnippets();
     }
 
     function setBtnSize(size) {
+      currentBtnSize = size;
       const btn = document.getElementById('demo-btn');
-      const currentVariant = btn.className.match(/joy-button--(solid|outline|ghost|danger)/)?.[1] || 'solid';
-      btn.className = 'joy-button joy-button--' + currentVariant + ' joy-button--' + size;
+      btn.className = 'joy-button joy-button--' + currentBtnVariant + ' joy-button--' + size;
+      ['sm', 'md', 'lg'].forEach(s => {
+        const seg = document.getElementById('seg-s-' + s);
+        if (seg) seg.classList.toggle('active', s === size);
+      });
     }
 
     function toggleBtnLoading() {
       isBtnLoading = !isBtnLoading;
       const btn = document.getElementById('demo-btn');
+      const sw = document.getElementById('btn-loading-switch');
+      const statusText = document.getElementById('btn-loading-status');
+      if (sw) {
+        sw.classList.toggle('joy-switch--checked', isBtnLoading);
+        sw.setAttribute('aria-checked', isBtnLoading ? 'true' : 'false');
+      }
+      if (statusText) {
+        statusText.innerText = isBtnLoading ? 'Loading Active' : 'Idle';
+      }
       if (isBtnLoading) {
-        btn.innerHTML = '<span class="joy-button__spinner">⏳</span> Loading...';
+        btn.innerHTML = '<span class="joy-button__spinner" style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> Loading...';
         btn.disabled = true;
       } else {
         btn.innerHTML = 'Click Me! (Clicked: <span id="click-counter">' + clickCount + '</span>)';
@@ -1476,7 +1587,16 @@ const html = `<!DOCTYPE html>
 
     function toggleInputError() {
       const wrapper = document.querySelector('.joy-input-wrapper');
-      wrapper.classList.toggle('joy-input-wrapper--error');
+      const sw = document.getElementById('input-error-switch');
+      const statusText = document.getElementById('input-error-status');
+      const hasErr = wrapper.classList.toggle('joy-input-wrapper--error');
+      if (sw) {
+        sw.classList.toggle('joy-switch--checked', hasErr);
+        sw.setAttribute('aria-checked', hasErr ? 'true' : 'false');
+      }
+      if (statusText) {
+        statusText.innerText = hasErr ? 'Error State Active (Red Border)' : 'Normal (No Error)';
+      }
     }
 
     function toggleSwitch() {
