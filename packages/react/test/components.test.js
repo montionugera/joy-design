@@ -130,4 +130,39 @@ test('React standard library components implement accessible traits and forwardR
   const result = fs.readFileSync(path.resolve('./src/Result.tsx'), 'utf8');
   assert.ok(result.includes('joy-result'), 'Result must render joy-result class');
   assert.ok(result.includes('role="alert"'), 'Result must implement role=alert');
+
+  // Wave 6 Assertions (High-Performance Financial Charts & Layout Primitives)
+  const lineChart = fs.readFileSync(path.resolve('./src/LineChart.tsx'), 'utf8');
+  assert.ok(lineChart.includes('joy-chart'), 'LineChart must render joy-chart class');
+  assert.ok(lineChart.includes('JoyChartCore'), 'LineChart must initialize JoyChartCore');
+  assert.ok(lineChart.includes('forwardRef'), 'LineChart must implement forwardRef');
+
+  const candleChart = fs.readFileSync(path.resolve('./src/CandlestickChart.tsx'), 'utf8');
+  assert.ok(candleChart.includes('joy-chart'), 'CandlestickChart must render joy-chart class');
+  assert.ok(candleChart.includes('joy-chart__hud'), 'CandlestickChart must render OHLC HUD');
+  assert.ok(candleChart.includes('forwardRef'), 'CandlestickChart must implement forwardRef');
+
+  const divider = fs.readFileSync(path.resolve('./src/Divider.tsx'), 'utf8');
+  assert.ok(divider.includes('joy-divider'), 'Divider must render joy-divider class');
+  assert.ok(divider.includes('role="separator"'), 'Divider must implement role=separator');
+
+  const flex = fs.readFileSync(path.resolve('./src/Flex.tsx'), 'utf8');
+  assert.ok(flex.includes('joy-flex'), 'Flex must render joy-flex class');
+
+  const space = fs.readFileSync(path.resolve('./src/Space.tsx'), 'utf8');
+  assert.ok(space.includes('joy-space'), 'Space must render joy-space class');
+
+  const splitter = fs.readFileSync(path.resolve('./src/Splitter.tsx'), 'utf8');
+  assert.ok(splitter.includes('joy-splitter'), 'Splitter must render joy-splitter class');
+  assert.ok(splitter.includes('role="separator"'), 'Splitter bar must implement role=separator');
+
+  const statistic = fs.readFileSync(path.resolve('./src/Statistic.tsx'), 'utf8');
+  assert.ok(statistic.includes('joy-statistic'), 'Statistic must render joy-statistic class');
+
+  const tag = fs.readFileSync(path.resolve('./src/Tag.tsx'), 'utf8');
+  assert.ok(tag.includes('joy-tag'), 'Tag must render joy-tag class');
+
+  const segmented = fs.readFileSync(path.resolve('./src/Segmented.tsx'), 'utf8');
+  assert.ok(segmented.includes('joy-segmented'), 'Segmented must render joy-segmented class');
+  assert.ok(segmented.includes('role="radiogroup"'), 'Segmented must implement role=radiogroup');
 });
