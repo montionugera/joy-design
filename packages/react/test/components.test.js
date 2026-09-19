@@ -64,6 +64,22 @@ test('React standard library components implement accessible traits and forwardR
   const skeleton = fs.readFileSync(path.resolve('./src/Skeleton.tsx'), 'utf8');
   assert.ok(skeleton.includes('role="progressbar"'), 'Skeleton must implement accessible role=progressbar');
   assert.ok(skeleton.includes('joy-skeleton'), 'Skeleton must render joy-skeleton class');
+
+  // Wave 3 / Enterprise Parity Assertions
+  const datePicker = fs.readFileSync(path.resolve('./src/DatePicker.tsx'), 'utf8');
+  assert.ok(datePicker.includes('joy-date-picker'), 'DatePicker must render joy-date-picker class');
+  assert.ok(datePicker.includes('React.forwardRef'), 'DatePicker must implement forwardRef');
+
+  const breadcrumb = fs.readFileSync(path.resolve('./src/Breadcrumb.tsx'), 'utf8');
+  assert.ok(breadcrumb.includes('joy-breadcrumb'), 'Breadcrumb must render joy-breadcrumb class');
+  assert.ok(breadcrumb.includes('aria-label="Breadcrumb"'), 'Breadcrumb must have accessible aria-label');
+
+  const statCard = fs.readFileSync(path.resolve('./src/StatCard.tsx'), 'utf8');
+  assert.ok(statCard.includes('joy-stat-card'), 'StatCard must render joy-stat-card class');
+
+  const progress = fs.readFileSync(path.resolve('./src/Progress.tsx'), 'utf8');
+  assert.ok(progress.includes('joy-progress'), 'Progress must render joy-progress class');
+
+  const emptyState = fs.readFileSync(path.resolve('./src/EmptyState.tsx'), 'utf8');
+  assert.ok(emptyState.includes('joy-empty-state'), 'EmptyState must render joy-empty-state class');
 });
-
-
