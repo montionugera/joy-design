@@ -14,3 +14,5 @@ export { Checkbox, type CheckboxProps } from './Checkbox.js';
 export { RadioGroup, type RadioGroupProps, type RadioOption } from './RadioGroup.js';
 export { Drawer, type DrawerProps } from './Drawer.js';
 export { Toast, type ToastProps } from './Toast.js';
+export { Pagination, type PaginationProps } from './Pagination.js';
+export { Skeleton, type SkeletonProps } from './Skeleton.js';
