@@ -24,8 +24,8 @@ if [ "$status" != "200" ]; then
   exit 1
 fi
 
-# Verify index content contains Joymify or Storybook token
-body=$(curl -sS -L --max-time 15 "https://${host}/" | head -n 30)
+# Verify index content contains Joymify or Storybook token (avoid head early pipe closure)
+body=$(curl -sS -L --max-time 15 "https://${host}/" || true)
 if echo "$body" | grep -qiE "joymify|storybook|design"; then
   echo "✅ Content verification passed: Storybook app shell detected."
 else
