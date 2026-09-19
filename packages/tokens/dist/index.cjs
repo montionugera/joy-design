@@ -26,6 +26,20 @@ exports.tokens = {
   "radius-lg": "12px",
   "radius-full": "9999px",
   "font-family-sans": "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
-  "font-family-mono": "JetBrains Mono, Menlo, monospace"
+  "font-family-mono": "JetBrains Mono, Menlo, monospace",
+  "motion-duration-fast": "150ms",
+  "motion-duration-normal": "250ms",
+  "motion-duration-slow": "400ms",
+  "motion-easing-standard": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+  "motion-easing-decelerate": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+  "motion-easing-accelerate": "cubic-bezier(0.4, 0.0, 1, 1)",
+  "motion-easing-spring": "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+  "shadow-sm": "0 1px 2px rgba(0, 0, 0, 0.05)",
+  "shadow-md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+  "shadow-lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+  "shadow-overlay": "0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+  "z-index-dropdown": "1000",
+  "z-index-modal": "1050",
+  "z-index-tooltip": "1100"
 };
 exports.default = exports.tokens;
