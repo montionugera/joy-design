@@ -208,8 +208,9 @@
     "title": "High-Performance Financial & Large-Dataset Charts Engine plus Ant Design Complete Parity Expansion",
     "from_idea": "I-018",
     "created_at": "2026-09-19T17:31:39.079169+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-09-19T17:31:46.181038+00:00"
   }
 ]
