@@ -292,7 +292,7 @@ const html = `<!DOCTYPE html>
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
-        <span>v1.9 Enterprise Suite (Wave 1)</span>
+        <span>v2.0 Enterprise Suite (Wave 2)</span>
       </div>
     </div>
     <nav class="nav">
@@ -356,6 +356,17 @@ const html = `<!DOCTYPE html>
       </a>
       <a class="nav-item" onclick="switchView('toast')">
         <span class="icon">🍞</span> Toast Notifications
+      </a>
+
+      <div class="nav-section">Wave 2: Financial Trading & Skeletons</div>
+      <a class="nav-item" onclick="switchView('financial-table')">
+        <span class="icon">📈</span> Live Trading Orderbook
+      </a>
+      <a class="nav-item" onclick="switchView('pagination')">
+        <span class="icon">🔢</span> Pagination Controls
+      </a>
+      <a class="nav-item" onclick="switchView('skeleton')">
+        <span class="icon">🦴</span> Skeleton Loading States
       </a>
     </nav>
   </aside>
@@ -995,6 +1006,129 @@ const html = `<!DOCTYPE html>
         </div>
       </section>
 
+      <!-- View: Financial Table -->
+      <section id="view-financial-table" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Enterprise Financial Orderbook & Trading Table</h2>
+        <p class="header-tagline">High-throughput sortable market tape with real-time green/red ticker flash animations and client-side filtering.</p>
+
+        <div class="playground-box">
+          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h4>Live Quant Market Feeds</h4>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="text" id="market-search-input" class="joy-input" placeholder="Filter pairs (e.g. BTC, ETH)..." style="width: 220px; padding: 6px 12px; font-size: 0.8125rem;" oninput="handleMarketFilter(this.value)">
+              <button class="joy-button joy-button--solid joy-button--sm" onclick="simulateRandomTick()">
+                ⚡ Random Tick
+              </button>
+              <button class="joy-button joy-button--outline joy-button--sm" id="btn-stream-toggle" onclick="toggleAutoStream()">
+                ▶ Auto-Stream (Off)
+              </button>
+            </div>
+          </div>
+          <div style="padding: 16px;">
+            <div class="joy-table-container">
+              <table class="joy-table joy-table--compact" id="financial-order-table">
+                <thead>
+                  <tr>
+                    <th class="joy-table-th--sortable" onclick="sortMarketTable('pair')">Pair <span class="joy-table-sort-icon">⇅</span></th>
+                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('price')">Price (USDT) <span class="joy-table-sort-icon">⇅</span></th>
+                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('change')">24h Change <span class="joy-table-sort-icon">⇅</span></th>
+                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('volume')">24h Vol (USDT) <span class="joy-table-sort-icon">⇅</span></th>
+                    <th style="text-align: center;">Execution Status</th>
+                  </tr>
+                </thead>
+                <tbody id="market-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Pagination -->
+      <section id="view-pagination" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Pagination Controls</h2>
+        <p class="header-tagline">Accessible ARIA navigation bar with quick page stepping, custom page sizes, and total count metadata.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Trade Ledger Pagination</h4>
+          </div>
+          <div class="canvas" style="flex-direction: column; align-items: stretch; max-width: 680px; margin: 0 auto;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;" id="paged-content-box">
+              <div style="font-weight: 600; color: #334155; margin-bottom: 8px;" id="paged-range-text">Showing Orders 1 to 10 of 50</div>
+              <ul style="margin: 0; padding-left: 20px; color: #64748b; font-size: 0.875rem;" id="paged-records-list">
+                <!-- Records list -->
+              </ul>
+            </div>
+
+            <nav class="joy-pagination" role="navigation" aria-label="Pagination">
+              <button type="button" class="joy-pagination__btn" id="pg-prev" onclick="handlePageNav('prev')">&larr;</button>
+              <button type="button" class="joy-pagination__btn joy-pagination__btn--active" id="pg-1" onclick="goToDemoPage(1)">1</button>
+              <button type="button" class="joy-pagination__btn" id="pg-2" onclick="goToDemoPage(2)">2</button>
+              <button type="button" class="joy-pagination__btn" id="pg-3" onclick="goToDemoPage(3)">3</button>
+              <button type="button" class="joy-pagination__btn" id="pg-4" onclick="goToDemoPage(4)">4</button>
+              <button type="button" class="joy-pagination__btn" id="pg-5" onclick="goToDemoPage(5)">5</button>
+              <button type="button" class="joy-pagination__btn" id="pg-next" onclick="handlePageNav('next')">&rarr;</button>
+
+              <select class="joy-select" style="width: auto; padding: 4px 28px 4px 8px; font-size: 0.8125rem; margin-left: 12px;" onchange="handleDemoPageSize(this.value)">
+                <option value="10">10 / page</option>
+                <option value="20">20 / page</option>
+                <option value="50">50 / page</option>
+              </select>
+
+              <span class="joy-pagination__info" id="pg-info-text">Total: 50 orders</span>
+            </nav>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Skeleton -->
+      <section id="view-skeleton" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Skeleton Loading States</h2>
+        <p class="header-tagline">High-performance GPU gradient shimmer placeholders preventing layout shift during async order book fetches.</p>
+
+        <div class="playground-box">
+          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h4>Asset Card Shimmer Placeholder</h4>
+            <button class="joy-button joy-button--outline joy-button--sm" onclick="toggleSkeletonLoading()">
+              🔄 Toggle Loading State
+            </button>
+          </div>
+          <div class="canvas" style="gap: 32px; justify-content: center;">
+            <div id="skeleton-card-loading" style="width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div class="joy-skeleton joy-skeleton--circle"></div>
+                <div style="flex: 1;">
+                  <div class="joy-skeleton joy-skeleton--text" style="width: 60%;"></div>
+                  <div class="joy-skeleton joy-skeleton--text" style="width: 40%; margin-bottom: 0;"></div>
+                </div>
+              </div>
+              <div class="joy-skeleton joy-skeleton--text"></div>
+              <div class="joy-skeleton joy-skeleton--text" style="width: 80%;"></div>
+              <div class="joy-skeleton joy-skeleton--rect" style="height: 60px; margin-top: 12px;"></div>
+            </div>
+
+            <div id="skeleton-card-loaded" style="display: none; width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ede9fe; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-weight: 700;">JOY</div>
+                <div>
+                  <h4 style="margin: 0; font-size: 1rem;">Joymify Quant Pool</h4>
+                  <span style="font-size: 0.75rem; color: #64748b;">Arbitrage High-Freq Vault</span>
+                </div>
+              </div>
+              <p style="margin: 0 0 12px; font-size: 0.875rem; color: #334155; line-height: 1.5;">
+                Delta-neutral funding rate harvester with sub-millisecond execution routing on Vultr Kubernetes.
+              </p>
+              <div style="background: #f8fafc; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.8125rem; color: #64748b;">Annualized APY</span>
+                <strong style="color: #10b981; font-size: 1.1rem; font-family: var(--joy-font-family-mono, monospace);">+28.4%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -1175,6 +1309,164 @@ const html = `<!DOCTYPE html>
       }, 4000);
     }
 
+    // Wave 2 Market Data & Ticker Logic
+    let marketData = [
+      { pair: 'BTC/USDT', price: 68420.50, change: 3.42, volume: 1420500120, status: 'Active', flash: null },
+      { pair: 'ETH/USDT', price: 3540.25, change: -1.18, volume: 854200450, status: 'Active', flash: null },
+      { pair: 'SOL/USDT', price: 154.80, change: 8.92, volume: 492100800, status: 'Active', flash: null },
+      { pair: 'JOY/USDT', price: 12.45, change: 14.60, volume: 128400500, status: 'Active', flash: null },
+      { pair: 'AVAX/USDT', price: 28.90, change: -2.45, volume: 64120300, status: 'Active', flash: null }
+    ];
+    let marketFilter = '';
+    let sortColumnKey = '';
+    let sortDirection = 'asc';
+    let autoStreamTimer = null;
+
+    function renderMarketTable() {
+      const tbody = document.getElementById('market-table-body');
+      if (!tbody) return;
+      let rows = marketData.filter(d => d.pair.toLowerCase().includes(marketFilter.toLowerCase()));
+      if (sortColumnKey) {
+        rows.sort((a, b) => {
+          let vA = a[sortColumnKey];
+          let vB = b[sortColumnKey];
+          if (typeof vA === 'string') {
+            return sortDirection === 'asc' ? vA.localeCompare(vB) : vB.localeCompare(vA);
+          }
+          return sortDirection === 'asc' ? vA - vB : vB - vA;
+        });
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        let flashClass = r.flash === 'up' ? 'joy-table-cell--flash-up' : (r.flash === 'down' ? 'joy-table-cell--flash-down' : '');
+        let changeColor = r.change >= 0 ? 'var(--joy-color-status-success, #10b981)' : 'var(--joy-color-status-danger, #ef4444)';
+        let changeSign = r.change >= 0 ? '+' : '';
+        return '<tr>' +
+          '<td style="font-weight: 600;">' + r.pair + '</td>' +
+          '<td style="text-align: right; font-family: var(--joy-font-family-mono, monospace);" class="' + flashClass + '">' +
+            '$' + r.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+          '</td>' +
+          '<td style="text-align: right; font-weight: 600; color: ' + changeColor + ';">' +
+            changeSign + r.change.toFixed(2) + '%' +
+          '</td>' +
+          '<td style="text-align: right; font-family: var(--joy-font-family-mono, monospace); color: #64748b;">' +
+            '$' + (r.volume / 1e6).toFixed(1) + 'M' +
+          '</td>' +
+          '<td style="text-align: center;">' +
+            '<span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> ' + r.status + '</span>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function simulateRandomTick() {
+      const idx = Math.floor(Math.random() * marketData.length);
+      const isUp = Math.random() > 0.45;
+      const deltaPercent = (Math.random() * 0.8 + 0.1);
+      const mult = isUp ? (1 + deltaPercent / 100) : (1 - deltaPercent / 100);
+      marketData[idx].price = +(marketData[idx].price * mult).toFixed(2);
+      marketData[idx].change += isUp ? deltaPercent : -deltaPercent;
+      marketData[idx].flash = isUp ? 'up' : 'down';
+      renderMarketTable();
+      showDemoToast(marketData[idx].pair + (isUp ? ' 📈 Up' : ' 📉 Down') + ' tick: $' + marketData[idx].price.toFixed(2), isUp ? 'success' : 'warning');
+      setTimeout(() => {
+        marketData[idx].flash = null;
+      }, 1000);
+    }
+
+    function toggleAutoStream() {
+      const btn = document.getElementById('btn-stream-toggle');
+      if (autoStreamTimer) {
+        clearInterval(autoStreamTimer);
+        autoStreamTimer = null;
+        btn.innerText = '▶ Auto-Stream (Off)';
+        btn.className = 'joy-button joy-button--outline joy-button--sm';
+      } else {
+        autoStreamTimer = setInterval(simulateRandomTick, 1500);
+        btn.innerText = '⏸ Auto-Stream (Active)';
+        btn.className = 'joy-button joy-button--solid joy-button--sm';
+      }
+    }
+
+    function sortMarketTable(key) {
+      if (sortColumnKey === key) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumnKey = key;
+        sortDirection = 'asc';
+      }
+      renderMarketTable();
+    }
+
+    function handleMarketFilter(val) {
+      marketFilter = val;
+      renderMarketTable();
+    }
+
+    // Pagination Demo Logic
+    let currentDemoPage = 1;
+    let demoPageSize = 10;
+    const totalOrders = 50;
+
+    function renderPaginationDemo() {
+      const list = document.getElementById('paged-records-list');
+      const rangeText = document.getElementById('paged-range-text');
+      const start = (currentDemoPage - 1) * demoPageSize + 1;
+      const end = Math.min(totalOrders, currentDemoPage * demoPageSize);
+      if (rangeText) rangeText.innerText = 'Showing Orders ' + start + ' to ' + end + ' of ' + totalOrders;
+
+      if (list) {
+        list.innerHTML = '';
+        for (let i = start; i <= end; i++) {
+          const li = document.createElement('li');
+          li.style.padding = '4px 0';
+          li.innerHTML = 'Order #ORD-2026-' + String(i).padStart(4, '0') + ' &mdash; <strong>' + (Math.random() * 2 + 0.1).toFixed(3) + ' BTC</strong> @ $68,' + Math.floor(Math.random() * 800 + 100) + ' Limit Fill';
+          list.appendChild(li);
+        }
+      }
+
+      for (let p = 1; p <= 5; p++) {
+        const btn = document.getElementById('pg-' + p);
+        if (btn) btn.classList.toggle('joy-pagination__btn--active', p === currentDemoPage);
+      }
+      const prevBtn = document.getElementById('pg-prev');
+      const nextBtn = document.getElementById('pg-next');
+      if (prevBtn) prevBtn.disabled = currentDemoPage <= 1;
+      if (nextBtn) nextBtn.disabled = currentDemoPage >= Math.ceil(totalOrders / demoPageSize);
+    }
+
+    function goToDemoPage(p) {
+      currentDemoPage = p;
+      renderPaginationDemo();
+    }
+
+    function handlePageNav(dir) {
+      const maxPages = Math.ceil(totalOrders / demoPageSize);
+      if (dir === 'prev' && currentDemoPage > 1) currentDemoPage--;
+      if (dir === 'next' && currentDemoPage < maxPages) currentDemoPage++;
+      renderPaginationDemo();
+    }
+
+    function handleDemoPageSize(size) {
+      demoPageSize = Number(size);
+      currentDemoPage = 1;
+      renderPaginationDemo();
+    }
+
+    // Skeleton Demo Logic
+    let isSkeletonLoading = true;
+    function toggleSkeletonLoading() {
+      isSkeletonLoading = !isSkeletonLoading;
+      document.getElementById('skeleton-card-loading').style.display = isSkeletonLoading ? 'block' : 'none';
+      document.getElementById('skeleton-card-loaded').style.display = isSkeletonLoading ? 'none' : 'block';
+    }
+
+    // Initial render
+    setTimeout(() => {
+      renderMarketTable();
+      renderPaginationDemo();
+    }, 100);
+
     function updateCodeSnippets() {
       const btnSnippet = document.getElementById('button-code');
       if (!btnSnippet) return;
@@ -1184,6 +1476,7 @@ const html = `<!DOCTYPE html>
         btnSnippet.innerHTML = \`// React 19 Modern Example<br>import { Button } from '@joymify/react';<br><br>&lt;Button variant="solid" size="md" onClick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
       }
     }
+
   </script>
 </body>
 </html>

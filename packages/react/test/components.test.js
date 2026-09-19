@@ -51,5 +51,19 @@ test('React standard library components implement accessible traits and forwardR
   const toast = fs.readFileSync(path.resolve('./src/Toast.tsx'), 'utf8');
   assert.ok(toast.includes('role="status"'), 'Toast must implement accessible role=status');
   assert.ok(toast.includes('joy-toast'), 'Toast must render joy-toast class');
+
+  // Wave 2 Assertions (Financial Table, Pagination, Skeleton)
+  assert.ok(tbl.includes('joy-table-th--sortable'), 'Table must support sortable columns');
+  assert.ok(tbl.includes('joy-table-cell--flash-up'), 'Table must support ticker flash up');
+  assert.ok(tbl.includes('joy-table-cell--flash-down'), 'Table must support ticker flash down');
+
+  const pagination = fs.readFileSync(path.resolve('./src/Pagination.tsx'), 'utf8');
+  assert.ok(pagination.includes('role="navigation"'), 'Pagination must implement accessible role=navigation');
+  assert.ok(pagination.includes('joy-pagination'), 'Pagination must render joy-pagination class');
+
+  const skeleton = fs.readFileSync(path.resolve('./src/Skeleton.tsx'), 'utf8');
+  assert.ok(skeleton.includes('role="progressbar"'), 'Skeleton must implement accessible role=progressbar');
+  assert.ok(skeleton.includes('joy-skeleton'), 'Skeleton must render joy-skeleton class');
 });
+
 

@@ -53,5 +53,20 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const toast = fs.readFileSync(path.resolve('./src/lib/Toast.svelte'), 'utf8');
   assert.ok(toast.includes('joy-toast'), 'Toast must have joy-toast class');
   assert.ok(toast.includes('role="status"'), 'Toast must implement role=status');
+
+  // Wave 2 Assertions (Financial Table, Pagination, Skeleton)
+  assert.ok(tbl.includes('joy-table-th--sortable'), 'Table must support sortable columns');
+  assert.ok(tbl.includes('joy-table-cell--flash-up'), 'Table must support ticker flash up');
+  assert.ok(tbl.includes('joy-table-cell--flash-down'), 'Table must support ticker flash down');
+
+  const pagination = fs.readFileSync(path.resolve('./src/lib/Pagination.svelte'), 'utf8');
+  assert.ok(pagination.includes('role="navigation"'), 'Pagination must implement role=navigation');
+  assert.ok(pagination.includes('joy-pagination'), 'Pagination must have joy-pagination class');
+  assert.ok(pagination.includes('$derived'), 'Pagination must use Svelte 5 $derived()');
+
+  const skeleton = fs.readFileSync(path.resolve('./src/lib/Skeleton.svelte'), 'utf8');
+  assert.ok(skeleton.includes('role="progressbar"'), 'Skeleton must implement role=progressbar');
+  assert.ok(skeleton.includes('joy-skeleton'), 'Skeleton must have joy-skeleton class');
 });
+
 
