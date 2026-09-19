@@ -46,5 +46,16 @@
     "claimed_at": "2026-09-19T13:01:53.710209+00:00",
     "shipped_at": "2026-09-19T13:02:33.068574+00:00",
     "promoted_at": "2026-09-19T13:03:05.528528+00:00"
+  },
+  {
+    "id": "F-005",
+    "title": "Build fully interactive Design System Documentation and Live Component Playground Portal",
+    "from_idea": "I-005",
+    "created_at": "2026-09-19T13:58:38.597294+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "1.5",
+    "claimed_at": "2026-09-19T13:58:42.847983+00:00",
+    "shipped_at": "2026-09-19T14:00:19.178465+00:00"
   }
 ]
