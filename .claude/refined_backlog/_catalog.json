@@ -130,5 +130,16 @@
     "claimed_at": "2026-09-19T14:53:58.643886+00:00",
     "shipped_at": "2026-09-19T14:55:18.452157+00:00",
     "promoted_at": "2026-09-19T14:55:51.010961+00:00"
+  },
+  {
+    "id": "F-012",
+    "title": "Integrate OpenDesign posture typography and hairline borders into Joymify Design System",
+    "from_idea": "I-012",
+    "created_at": "2026-09-19T15:01:44.549727+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.2",
+    "claimed_at": "2026-09-19T15:01:50.045060+00:00",
+    "shipped_at": "2026-09-19T15:03:37.711066+00:00"
   }
 ]
