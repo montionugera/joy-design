@@ -24,3 +24,10 @@ export { default as Breadcrumb } from './Breadcrumb.svelte';
 export { default as EmptyState } from './EmptyState.svelte';
 export { default as StatCard } from './StatCard.svelte';
 export { default as Progress } from './Progress.svelte';
+
+// Wave 4 Components (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer)
+export { default as Upload, type UploadFile } from './Upload.svelte';
+export { default as Avatar } from './Avatar.svelte';
+export { default as AvatarGroup } from './AvatarGroup.svelte';
+export { default as Slider } from './Slider.svelte';
+export { default as MarkdownViewer } from './MarkdownViewer.svelte';

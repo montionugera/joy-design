@@ -33,6 +33,41 @@ const iconCardsHtml = fs.existsSync(iconsSrcDir)
       }).join('\n')
   : '';
 
+
+const navIcons = {
+  overview: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
+  tokens: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>`,
+  propsSpec: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
+  button: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="4"></rect><line x1="9" y1="12" x2="15" y2="12"></line></svg>`,
+  badge: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>`,
+  input: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+  switch: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect><circle cx="16" cy="12" r="3"></circle></svg>`,
+  alert: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
+  metric: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>`,
+  table: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>`,
+  modal: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`,
+  dropdown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+  tabs: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+  tooltip: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+  select: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`,
+  checkbox: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`,
+  radio: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg>`,
+  drawer: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
+  toast: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>`,
+  financialTable: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="3" x2="9" y2="6"></line><line x1="9" y1="18" x2="9" y2="21"></line><rect x="6" y="6" width="6" height="12" rx="1"></rect><line x1="17" y1="7" x2="17" y2="10"></line><line x1="17" y1="16" x2="17" y2="19"></line><rect x="14" y="10" width="6" height="6" rx="1"></rect></svg>`,
+  pagination: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>`,
+  skeleton: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
+  datePicker: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+  enterpriseDisplay: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+  progress: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+  emptyState: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`,
+  iconsGallery: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+  upload: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`,
+  avatar: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+  slider: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><circle cx="4" cy="12" r="2"></circle><circle cx="12" cy="10" r="2"></circle><circle cx="20" cy="14" r="2"></circle></svg>`,
+  markdown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`
+};
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -537,95 +572,109 @@ ${inlinedThemeCss}
     <nav class="nav">
       <div class="nav-section">Overview</div>
       <a class="nav-item active" onclick="switchView('overview')">
-        <span class="icon">✨</span> Overview & Architecture
+        <span class="icon">${navIcons.overview}</span> Overview & Architecture
       </a>
       <a class="nav-item" onclick="switchView('tokens')">
-        <span class="icon">🎨</span> Design Tokens & Motion
+        <span class="icon">${navIcons.tokens}</span> Design Tokens & Motion
       </a>
       <a class="nav-item" onclick="switchView('props-spec')">
-        <span class="icon">📖</span> Props & API Specs
+        <span class="icon">${navIcons.propsSpec}</span> Props & API Specs
       </a>
 
       <div class="nav-section">Standard Components</div>
       <a class="nav-item" onclick="switchView('button')">
-        <span class="icon">🔘</span> Button
+        <span class="icon">${navIcons.button}</span> Button
       </a>
       <a class="nav-item" onclick="switchView('badge')">
-        <span class="icon">🏷️</span> Badge & Tag
+        <span class="icon">${navIcons.badge}</span> Badge & Tag
       </a>
       <a class="nav-item" onclick="switchView('input')">
-        <span class="icon">✏️</span> Input Field
+        <span class="icon">${navIcons.input}</span> Input Field
       </a>
       <a class="nav-item" onclick="switchView('switch')">
-        <span class="icon">🎚️</span> Switch & Toggle
+        <span class="icon">${navIcons.switch}</span> Switch & Toggle
       </a>
       <a class="nav-item" onclick="switchView('alert')">
-        <span class="icon">🔔</span> Alert & Notice
+        <span class="icon">${navIcons.alert}</span> Alert & Notice
       </a>
       <a class="nav-item" onclick="switchView('metric')">
-        <span class="icon">📊</span> MetricTile (Quant)
+        <span class="icon">${navIcons.metric}</span> MetricTile (Quant)
       </a>
       <a class="nav-item" onclick="switchView('table')">
-        <span class="icon">📑</span> Table (Compact)
+        <span class="icon">${navIcons.table}</span> Table (Compact)
       </a>
 
       <div class="nav-section">Enterprise Overlays & Navigation</div>
       <a class="nav-item" onclick="switchView('modal')">
-        <span class="icon">🪟</span> Modal / Dialog
+        <span class="icon">${navIcons.modal}</span> Modal / Dialog
       </a>
       <a class="nav-item" onclick="switchView('dropdown')">
-        <span class="icon">🔽</span> Dropdown Menu
+        <span class="icon">${navIcons.dropdown}</span> Dropdown Menu
       </a>
       <a class="nav-item" onclick="switchView('tabs')">
-        <span class="icon">🗂️</span> Tabs Layout
+        <span class="icon">${navIcons.tabs}</span> Tabs Layout
       </a>
       <a class="nav-item" onclick="switchView('tooltip')">
-        <span class="icon">💬</span> Tooltip Overlay
+        <span class="icon">${navIcons.tooltip}</span> Tooltip Overlay
       </a>
 
       <div class="nav-section">Wave 1: Enterprise Forms & Overlays</div>
       <a class="nav-item" onclick="switchView('select')">
-        <span class="icon">📋</span> Select Dropdown
+        <span class="icon">${navIcons.select}</span> Select Dropdown
       </a>
       <a class="nav-item" onclick="switchView('checkbox')">
-        <span class="icon">☑️</span> Checkbox
+        <span class="icon">${navIcons.checkbox}</span> Checkbox
       </a>
       <a class="nav-item" onclick="switchView('radio')">
-        <span class="icon">🔘</span> Radio Group
+        <span class="icon">${navIcons.radio}</span> Radio Group
       </a>
       <a class="nav-item" onclick="switchView('drawer')">
-        <span class="icon">🚪</span> Drawer (Sheet)
+        <span class="icon">${navIcons.drawer}</span> Drawer (Sheet)
       </a>
       <a class="nav-item" onclick="switchView('toast')">
-        <span class="icon">🍞</span> Toast Notifications
+        <span class="icon">${navIcons.toast}</span> Toast Notifications
       </a>
 
       <div class="nav-section">Wave 2: Financial Trading & Skeletons</div>
       <a class="nav-item" onclick="switchView('financial-table')">
-        <span class="icon">📈</span> Live Trading Orderbook
+        <span class="icon">${navIcons.financialTable}</span> Live Trading Orderbook
       </a>
       <a class="nav-item" onclick="switchView('pagination')">
-        <span class="icon">🔢</span> Pagination Controls
+        <span class="icon">${navIcons.pagination}</span> Pagination Controls
       </a>
       <a class="nav-item" onclick="switchView('skeleton')">
-        <span class="icon">🦴</span> Skeleton Loading States
+        <span class="icon">${navIcons.skeleton}</span> Skeleton Loading States
       </a>
 
       <div class="nav-section">Wave 3: Data Entry & Assets</div>
       <a class="nav-item" onclick="switchView('date-picker')">
-        <span class="icon">📅</span> Date & Range Picker
+        <span class="icon">${navIcons.datePicker}</span> Date & Range Picker
       </a>
       <a class="nav-item" onclick="switchView('enterprise-display')">
-        <span class="icon">📊</span> Breadcrumb & StatCard
+        <span class="icon">${navIcons.enterpriseDisplay}</span> Breadcrumb & StatCard
       </a>
       <a class="nav-item" onclick="switchView('progress')">
-        <span class="icon">⏳</span> Progress Bar
+        <span class="icon">${navIcons.progress}</span> Progress Bar
       </a>
       <a class="nav-item" onclick="switchView('empty-state')">
-        <span class="icon">📭</span> Empty State
+        <span class="icon">${navIcons.emptyState}</span> Empty State
+      </a>
+
+      <div class="nav-section">Wave 4: AntDesign Parity & Motion</div>
+      <a class="nav-item" onclick="switchView('upload')">
+        <span class="icon">${navIcons.upload}</span> Upload & Dragger
+      </a>
+      <a class="nav-item" onclick="switchView('avatar')">
+        <span class="icon">${navIcons.avatar}</span> Avatar & Group
+      </a>
+      <a class="nav-item" onclick="switchView('slider')">
+        <span class="icon">${navIcons.slider}</span> Slider (Range)
+      </a>
+      <a class="nav-item" onclick="switchView('markdown')">
+        <span class="icon">${navIcons.markdown}</span> MarkdownViewer (Cherry)
       </a>
       <a class="nav-item" onclick="switchView('icons-gallery')">
-        <span class="icon">💎</span> Icons Gallery (89 SVGs)
+        <span class="icon">${navIcons.iconsGallery}</span> Icons Gallery (138 SVGs)
       </a>
     </nav>
   </aside>
@@ -709,7 +758,7 @@ ${inlinedThemeCss}
         </div>
 
         <div class="joy-alert joy-alert--info">
-          <div class="joy-alert__title">💡 Complete AntDesign Parity Suite + OpenDesign Posture Engine</div>
+          <div class="joy-alert__title">Complete Ant Design Parity Suite + OpenDesign Posture Engine</div>
           <div class="joy-alert__desc">
             Explore 18 standard & enterprise components including Modals, Drawers, Dropdown menus, Selects, and Live Trading Orderbooks with full GPU spring motion transitions and OpenDesign posture styling.
           </div>
@@ -1207,12 +1256,12 @@ ${inlinedThemeCss}
             <div class="joy-metric-tile joy-metric-tile--up">
               <div class="joy-metric-tile__title">PORTFOLIO SHARPE</div>
               <div class="joy-metric-tile__value">2.84</div>
-              <div class="joy-metric-tile__change">▲ +14.2% vs benchmark</div>
+              <div class="joy-metric-tile__change">+14.2% vs benchmark</div>
             </div>
             <div class="joy-metric-tile joy-metric-tile--down">
               <div class="joy-metric-tile__title">MAX DRAWDOWN</div>
               <div class="joy-metric-tile__value">-4.12%</div>
-              <div class="joy-metric-tile__change">▼ -0.5% this session</div>
+              <div class="joy-metric-tile__change">-0.5% this session</div>
             </div>
             <div class="joy-metric-tile joy-metric-tile--neutral">
               <div class="joy-metric-tile__title">ACTIVE STRATEGIES</div>
@@ -1324,13 +1373,13 @@ ${inlinedThemeCss}
           <div class="canvas" style="min-height: 220px;">
             <div class="joy-dropdown-wrapper">
               <button class="joy-button joy-button--outline joy-button--md" onclick="toggleDemoDropdown()">
-                Strategy Options ▾
+                Strategy Options <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="m6 9 6 6 6-6"/></svg>
               </button>
               <div class="joy-dropdown" id="demo-dropdown-menu" style="display: none;">
-                <button class="joy-dropdown__item" onclick="selectDropdownAction('Duplicate')">📋 Duplicate Strategy</button>
-                <button class="joy-dropdown__item" onclick="selectDropdownAction('Export CSV')">📥 Export Performance CSV</button>
-                <button class="joy-dropdown__item" onclick="selectDropdownAction('Backtest')">⚡ Run Deep Backtest</button>
-                <button class="joy-dropdown__item joy-dropdown__item--danger" style="color: #ef4444;" onclick="selectDropdownAction('Archive')">🗑️ Archive Strategy</button>
+                <button class="joy-dropdown__item" onclick="selectDropdownAction('Duplicate')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplicate Strategy</button>
+                <button class="joy-dropdown__item" onclick="selectDropdownAction('Export CSV')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export Performance CSV</button>
+                <button class="joy-dropdown__item" onclick="selectDropdownAction('Backtest')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Run Deep Backtest</button>
+                <button class="joy-dropdown__item joy-dropdown__item--danger" style="color: #ef4444;" onclick="selectDropdownAction('Archive')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Archive Strategy</button>
               </div>
             </div>
           </div>
@@ -1495,10 +1544,10 @@ ${inlinedThemeCss}
           </div>
           <div class="canvas" style="gap: 20px;">
             <button class="joy-button joy-button--solid joy-button--md" onclick="openDemoDrawer('right')">
-              👉 Open Right Sheet (Risk Analytics)
+              Open Right Sheet (Risk Analytics) &rarr;
             </button>
             <button class="joy-button joy-button--outline joy-button--md" onclick="openDemoDrawer('left')">
-              👈 Open Left Sheet (Navigation Tree)
+              &larr; Open Left Sheet (Navigation Tree)
             </button>
           </div>
         </div>
@@ -1545,10 +1594,10 @@ ${inlinedThemeCss}
             <div style="display: flex; gap: 10px; align-items: center;">
               <input type="text" id="market-search-input" class="joy-input" placeholder="Filter pairs (e.g. BTC, ETH)..." style="width: 220px; padding: 6px 12px; font-size: 0.8125rem;" oninput="handleMarketFilter(this.value)">
               <button class="joy-button joy-button--solid joy-button--sm" onclick="simulateRandomTick()">
-                ⚡ Random Tick
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Random Tick
               </button>
               <button class="joy-button joy-button--outline joy-button--sm" id="btn-stream-toggle" onclick="toggleAutoStream()">
-                ▶ Auto-Stream (Off)
+                <span id="autostream-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span> Auto-Stream (Off)
               </button>
             </div>
           </div>
@@ -1557,10 +1606,10 @@ ${inlinedThemeCss}
               <table class="joy-table joy-table--compact" id="financial-order-table">
                 <thead>
                   <tr>
-                    <th class="joy-table-th--sortable" onclick="sortMarketTable('pair')">Pair <span class="joy-table-sort-icon">⇅</span></th>
-                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('price')">Price (USDT) <span class="joy-table-sort-icon">⇅</span></th>
-                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('change')">24h Change <span class="joy-table-sort-icon">⇅</span></th>
-                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('volume')">24h Vol (USDT) <span class="joy-table-sort-icon">⇅</span></th>
+                    <th class="joy-table-th--sortable" onclick="sortMarketTable('pair')">Pair <span class="joy-table-sort-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; opacity: 0.6;"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span></th>
+                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('price')">Price (USDT) <span class="joy-table-sort-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; opacity: 0.6;"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span></th>
+                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('change')">24h Change <span class="joy-table-sort-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; opacity: 0.6;"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span></th>
+                    <th class="joy-table-th--sortable" style="text-align: right;" onclick="sortMarketTable('volume')">24h Vol (USDT) <span class="joy-table-sort-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; opacity: 0.6;"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span></th>
                     <th style="text-align: center;">Execution Status</th>
                   </tr>
                 </thead>
@@ -1620,7 +1669,7 @@ ${inlinedThemeCss}
           <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h4>Asset Card Shimmer Placeholder</h4>
             <button class="joy-button joy-button--outline joy-button--sm" onclick="toggleSkeletonLoading()">
-              🔄 Toggle Loading State
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg> Toggle Loading State
             </button>
           </div>
           <div class="canvas" style="gap: 32px; justify-content: center;">
@@ -1833,14 +1882,185 @@ ${inlinedThemeCss}
         </div>
       </section>
 
+      <!-- View: Upload & Dragger -->
+      <section id="view-upload" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Upload & Dragger Component</h2>
+        <p class="header-tagline">Ant Design compliant drag-and-drop file upload with progress feedback, file metadata cards, and removal actions.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Dragger Zone</h4>
+          </div>
+          <div class="canvas" style="padding: 24px; max-width: 600px; margin: 0 auto;">
+            <div class="joy-upload">
+              <input type="file" id="demo-upload-input" style="display: none;" onchange="handleDemoUpload(this.files)" multiple />
+              <div
+                class="joy-upload-dragger"
+                id="demo-upload-dragger"
+                onclick="document.getElementById('demo-upload-input').click()"
+                ondragover="event.preventDefault(); this.classList.add('joy-upload-dragger--dragover');"
+                ondragleave="this.classList.remove('joy-upload-dragger--dragover');"
+                ondrop="event.preventDefault(); this.classList.remove('joy-upload-dragger--dragover'); handleDemoUpload(event.dataTransfer.files);"
+              >
+                <div class="joy-upload-dragger__icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+                <div class="joy-upload-dragger__text">Click or drag files to this area to upload</div>
+                <div class="joy-upload-dragger__hint">Support for single or bulk strategy JSON, backtest CSV, or KYC document upload.</div>
+              </div>
+              <div class="joy-upload-list" id="demo-upload-list">
+                <div class="joy-upload-list__item" id="demo-file-1">
+                  <div class="joy-upload-list__item-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-brand-primary, #7c3aed); flex-shrink: 0;">
+                      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                      <polyline points="13 2 13 9 20 9"></polyline>
+                    </svg>
+                    <span style="font-weight: 500;">alpha_momentum_v3.json</span>
+                    <span style="color: var(--joy-color-text-muted, #64748b); font-size: 0.75rem;">(42.8 KB)</span>
+                  </div>
+                  <button type="button" class="joy-upload-list__item-remove" onclick="document.getElementById('demo-file-1').remove(); showDemoToast('Removed alpha_momentum_v3.json', 'info');">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Avatar & AvatarGroup -->
+      <section id="view-avatar" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Avatar & AvatarGroup Component</h2>
+        <p class="header-tagline">Circle and square avatars with image fallbacks, initials generation, active status indicators, and overlapping team stacks.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Avatar Sizes, Status Indicators & Overlapping Groups</h4>
+          </div>
+          <div class="canvas" style="padding: 32px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="joy-avatar joy-avatar--circle joy-avatar--sm"><span class="joy-avatar__fallback">QA</span></div>
+              <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">JD</span><span class="joy-avatar__badge joy-avatar__badge--online"></span></div>
+              <div class="joy-avatar joy-avatar--circle joy-avatar--lg"><span class="joy-avatar__fallback">TC</span><span class="joy-avatar__badge joy-avatar__badge--offline"></span></div>
+              <div class="joy-avatar joy-avatar--square joy-avatar--lg" style="background-color: #0284c7;"><span class="joy-avatar__fallback">VT</span></div>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <h5 style="margin: 0 0 8px 0; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--joy-color-text-muted, #64748b);">AvatarGroup (Overlapping Team Stack)</h5>
+              <div class="joy-avatar-group">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #7c3aed;"><span class="joy-avatar__fallback">AM</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #059669;"><span class="joy-avatar__fallback">BL</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #d97706;"><span class="joy-avatar__fallback">CR</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #475569;"><span class="joy-avatar__fallback">+4</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Slider -->
+      <section id="view-slider" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Slider & Stepped Range Input</h2>
+        <p class="header-tagline">Continuous and stepped value slider with customized gradient track, dragging tooltip bubbles, and keyboard accessible handles.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Quant Leverage & Threshold Slider</h4>
+          </div>
+          <div class="canvas" style="padding: 40px 32px; max-width: 540px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <label style="font-size: 0.875rem; font-weight: 600;">Max Execution Leverage</label>
+              <span class="joy-badge joy-badge--brand joy-badge--sm" id="demo-slider-badge">25x</span>
+            </div>
+            <div class="joy-slider" id="demo-slider-box">
+              <div class="joy-slider__rail"></div>
+              <div class="joy-slider__track" id="demo-slider-track" style="width: 25%;"></div>
+              <div class="joy-slider__handle" id="demo-slider-handle" style="left: 25%;" tabindex="0" role="slider" aria-valuenow="25" aria-valuemin="1" aria-valuemax="100">
+                <div class="joy-slider__tooltip" id="demo-slider-tooltip" style="display: none;">25x</div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-top: 8px;">
+              <span>1x (Spot)</span>
+              <span>50x</span>
+              <span>100x (Max)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: MarkdownViewer (Cherry Engine) -->
+      <section id="view-markdown" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">MarkdownViewer (Cherry Engine Inspired)</h2>
+        <p class="header-tagline">Stream-safe high-performance markdown renderer with syntax code blocks, one-click copy, responsive tables, and callouts.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Live Stream-Safe Markdown Preview</h4>
+          </div>
+          <div class="canvas" style="padding: 24px; max-width: 720px;">
+            <div class="joy-markdown">
+              <h2>Delta-Neutral Arbitrage Execution Spec</h2>
+              <p>The <strong>Joymify Quant Strategy Engine</strong> executes cross-venue arbitrage across centralized and decentralized liquidity books.</p>
+              <blockquote>
+                <strong>Execution Safety:</strong> Slippage protection circuit breaker is actively enforced at 0.05% tolerance.
+              </blockquote>
+              <pre class="joy-markdown__pre"><code>// TypeScript Quantitative Order Router
+import { Router, OrderType } from '@joymify/quant';
+
+export async function executeHedge(symbol: string, size: number) {
+  const quote = await Router.getOptimalQuote(symbol, size);
+  return Router.dispatch({ symbol, size, type: OrderType.LIMIT, price: quote.bestAsk });
+}</code><button type="button" class="joy-markdown__copy-btn" onclick="navigator.clipboard?.writeText('// TypeScript Quantitative Order Router\nimport { Router, OrderType } from \'@joymify/quant\';'); showDemoToast('Code copied to clipboard', 'success');"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button></pre>
+              <table class="joy-markdown__table">
+                <thead>
+                  <tr>
+                    <th>Venue</th>
+                    <th>Latency</th>
+                    <th>Fee Tier</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Binance Futures</td>
+                    <td>1.2ms</td>
+                    <td>0.015%</td>
+                    <td>Active</td>
+                  </tr>
+                  <tr>
+                    <td>Bybit Perps</td>
+                    <td>1.8ms</td>
+                    <td>0.020%</td>
+                    <td>Active</td>
+                  </tr>
+                  <tr>
+                    <td>Hyperliquid L1</td>
+                    <td>0.6ms</td>
+                    <td>0.000%</td>
+                    <td>Optimal</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- View: Icons Gallery -->
       <section id="view-icons-gallery" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Vector Icons Gallery (@joymify/icons)</h2>
-        <p class="header-tagline">89 enterprise SVG icons covering trading, navigation, file ops, and observability with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
+        <p class="header-tagline">138 enterprise SVG icons covering trading, navigation, file ops, and observability with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
 
         <div class="playground-box">
           <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h4>Icon System Collection (89 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
+            <h4>Icon System Collection (138 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
             <div id="copy-toast-banner" style="font-size: 0.8125rem; color: #10b981; font-weight: 600; display: none;">Copied to clipboard!</div>
           </div>
           <div style="padding: 24px;">
@@ -2120,7 +2340,7 @@ ${inlinedThemeCss}
       marketData[idx].change += isUp ? deltaPercent : -deltaPercent;
       marketData[idx].flash = isUp ? 'up' : 'down';
       renderMarketTable();
-      showDemoToast(marketData[idx].pair + (isUp ? ' ↑ Up' : ' ↓ Down') + ' tick: $' + marketData[idx].price.toFixed(2), isUp ? 'success' : 'warning');
+      showDemoToast(marketData[idx].pair + (isUp ? ' + Up' : ' - Down') + ' tick: $' + marketData[idx].price.toFixed(2), isUp ? 'success' : 'warning');
       setTimeout(() => {
         marketData[idx].flash = null;
       }, 1000);
@@ -2131,11 +2351,11 @@ ${inlinedThemeCss}
       if (autoStreamTimer) {
         clearInterval(autoStreamTimer);
         autoStreamTimer = null;
-        btn.innerText = '▶ Auto-Stream (Off)';
+        btn.innerText = '<span id="autostream-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span> Auto-Stream (Off)';
         btn.className = 'joy-button joy-button--outline joy-button--sm';
       } else {
         autoStreamTimer = setInterval(simulateRandomTick, 1500);
-        btn.innerText = '⏸ Auto-Stream (Active)';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Auto-Stream (Active)';
         btn.className = 'joy-button joy-button--solid joy-button--sm';
       }
     }
