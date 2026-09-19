@@ -1,9 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const tokens = JSON.parse(fs.readFileSync('./src/tokens.json', 'utf8'));
-const outDir = './dist';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const tokensPath = path.join(__dirname, 'src/tokens.json');
+const outDir = path.join(__dirname, 'dist');
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+
+const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
 
 function flattenTokens(obj, prefix = '') {
   let cssVars = [];
