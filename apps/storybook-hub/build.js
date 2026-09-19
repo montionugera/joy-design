@@ -292,7 +292,7 @@ const html = `<!DOCTYPE html>
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
-        <span>v2.0 Enterprise Suite (Wave 2)</span>
+        <span>v2.1 Enterprise Complete (Wave 3)</span>
       </div>
     </div>
     <nav class="nav">
@@ -302,6 +302,9 @@ const html = `<!DOCTYPE html>
       </a>
       <a class="nav-item" onclick="switchView('tokens')">
         <span class="icon">🎨</span> Design Tokens & Motion
+      </a>
+      <a class="nav-item" onclick="switchView('props-spec')">
+        <span class="icon">📖</span> Props & API Specs
       </a>
 
       <div class="nav-section">Standard Components</div>
@@ -519,6 +522,241 @@ const html = `<!DOCTYPE html>
           </tbody>
         </table>
       </section>
+
+      <!-- View: Props & API Specs -->
+      <section id="view-props-spec" class="view-panel">
+        <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Component API Standards</div>
+        <h1 style="margin: 0 0 8px 0;">Component Props & API Specification</h1>
+        <p class="header-tagline">
+          Complete cross-framework contract specification for all 18 Joymify components across 
+          <strong>Svelte 5 Runes</strong> and <strong>React 19 forwardRef</strong>.
+        </p>
+
+        <!-- Button Specs -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>&lt;Button&gt; Specification</h4>
+            <span class="joy-badge joy-badge--neutral joy-badge--sm">Action Primitive</span>
+          </div>
+          <div style="padding: 16px 20px;">
+            <table class="joy-props-table">
+              <thead>
+                <tr>
+                  <th>Prop</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="joy-prop-name">variant</span></td>
+                  <td><span class="joy-prop-type">'solid' | 'outline' | 'ghost' | 'danger'</span></td>
+                  <td><span class="joy-prop-default">'solid'</span></td>
+                  <td>Visual hierarchy styling</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">size</span></td>
+                  <td><span class="joy-prop-type">'sm' | 'md' | 'lg'</span></td>
+                  <td><span class="joy-prop-default">'md'</span></td>
+                  <td>Padding and font size scale</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">disabled</span></td>
+                  <td><span class="joy-prop-type">boolean</span></td>
+                  <td><span class="joy-prop-default">false</span></td>
+                  <td>Disables button click and reduces opacity</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">loading</span></td>
+                  <td><span class="joy-prop-type">boolean</span></td>
+                  <td><span class="joy-prop-default">false</span></td>
+                  <td>Replaces icon/text with animated loading spinner</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">onclick / onClick</span></td>
+                  <td><span class="joy-prop-type">() =&gt; void</span></td>
+                  <td><span class="joy-prop-default">undefined</span></td>
+                  <td>Click event handler</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table & Trading Specs -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>&lt;Table&gt; & Financial Trading Specification</h4>
+            <span class="joy-badge joy-badge--success joy-badge--sm">Quant High-Throughput</span>
+          </div>
+          <div style="padding: 16px 20px;">
+            <table class="joy-props-table">
+              <thead>
+                <tr>
+                  <th>Prop</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="joy-prop-name">columns</span></td>
+                  <td><span class="joy-prop-type">Column&lt;T&gt;[]</span></td>
+                  <td><span class="joy-prop-default">required</span></td>
+                  <td>Column definitions ({ key, title, width, sortable, align })</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">data</span></td>
+                  <td><span class="joy-prop-type">T[]</span></td>
+                  <td><span class="joy-prop-default">required</span></td>
+                  <td>Array of tabular row objects</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">density</span></td>
+                  <td><span class="joy-prop-type">'compact' | 'normal'</span></td>
+                  <td><span class="joy-prop-default">'compact'</span></td>
+                  <td>Spacing density optimized for order books vs general tables</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">sortKey</span></td>
+                  <td><span class="joy-prop-type">string</span></td>
+                  <td><span class="joy-prop-default">''</span></td>
+                  <td>Currently sorted column key</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">sortDirection</span></td>
+                  <td><span class="joy-prop-type">'asc' | 'desc'</span></td>
+                  <td><span class="joy-prop-default">'asc'</span></td>
+                  <td>Sort direction indicator</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">onsort / onSort</span></td>
+                  <td><span class="joy-prop-type">(key, dir) =&gt; void</span></td>
+                  <td><span class="joy-prop-default">undefined</span></td>
+                  <td>Callback when a sortable column header is clicked</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Form Suite Specs -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>&lt;Select&gt;, &lt;Checkbox&gt; & &lt;RadioGroup&gt; Specification</h4>
+            <span class="joy-badge joy-badge--brand joy-badge--sm">Accessible Form Suite</span>
+          </div>
+          <div style="padding: 16px 20px;">
+            <table class="joy-props-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Key Props</th>
+                  <th>Types</th>
+                  <th>Accessibility Traits</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Select&gt;</span></td>
+                  <td>options, value, placeholder, disabled</td>
+                  <td><span class="joy-prop-type">SelectOption[], string</span></td>
+                  <td>Native select keyboard navigation, styled caret</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Checkbox&gt;</span></td>
+                  <td>checked, label, disabled</td>
+                  <td><span class="joy-prop-type">boolean, ReactNode / Snippet</span></td>
+                  <td>role="checkbox", aria-checked, keyboard focus ring</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;RadioGroup&gt;</span></td>
+                  <td>name, value, options, direction</td>
+                  <td><span class="joy-prop-type">string, RadioOption[], 'horizontal' | 'vertical'</span></td>
+                  <td>role="radiogroup", aria-orientation, arrow key selection</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Overlays Specs -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>&lt;Modal&gt;, &lt;Drawer&gt; & &lt;Toast&gt; Specification</h4>
+            <span class="joy-badge joy-badge--brand joy-badge--sm">Enterprise Overlays</span>
+          </div>
+          <div style="padding: 16px 20px;">
+            <table class="joy-props-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Key Props</th>
+                  <th>Types</th>
+                  <th>Keyboard & Motion Traits</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Modal&gt;</span></td>
+                  <td>open, title, onclose / onClose</td>
+                  <td><span class="joy-prop-type">boolean, string, () =&gt; void</span></td>
+                  <td>role="dialog", Escape key to close, backdrop dismiss, spring pop</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Drawer&gt;</span></td>
+                  <td>open, title, placement, onclose</td>
+                  <td><span class="joy-prop-type">boolean, 'left' | 'right', () =&gt; void</span></td>
+                  <td>role="dialog", Escape key to close, side sheet slide animation</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Toast&gt;</span></td>
+                  <td>open, variant, message, onclose</td>
+                  <td><span class="joy-prop-type">boolean, 'info' | 'success' | 'warning' | 'danger'</span></td>
+                  <td>role="status", aria-live="polite", automatic decay</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pagination & Skeleton Specs -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>&lt;Pagination&gt; & &lt;Skeleton&gt; Specification</h4>
+            <span class="joy-badge joy-badge--neutral joy-badge--sm">Navigation & Feedbacks</span>
+          </div>
+          <div style="padding: 16px 20px;">
+            <table class="joy-props-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Key Props</th>
+                  <th>Types</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Pagination&gt;</span></td>
+                  <td>current, pageSize, total, showSizeChanger</td>
+                  <td><span class="joy-prop-type">number, number, number, boolean</span></td>
+                  <td>role="navigation", aria-current="page", trade ledger slicing</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">&lt;Skeleton&gt;</span></td>
+                  <td>variant, width, height, lines</td>
+                  <td><span class="joy-prop-type">'text' | 'rect' | 'circle', string, number</span></td>
+                  <td>role="progressbar", aria-busy="true", GPU shimmer placeholder</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
 
       <!-- View: Button -->
       <section id="view-button" class="view-panel">

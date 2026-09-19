@@ -29,5 +29,10 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-table-th--sortable'), 'table sortable header styles must exist');
   assert.ok(css.includes('.joy-pagination'), 'pagination container styles must exist');
   assert.ok(css.includes('.joy-skeleton'), 'skeleton loader styles must exist');
+
+  // Wave 3 Assertions (Enterprise Polish & A11y)
+  assert.ok(css.includes(':focus-visible'), 'WCAG 2.2 focus rings must exist');
+  assert.ok(css.includes('.joy-props-table'), 'props documentation table styles must exist');
 });
+
 
