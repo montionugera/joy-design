@@ -292,7 +292,7 @@ const html = `<!DOCTYPE html>
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
-        <span>v1.8 Enterprise Suite</span>
+        <span>v1.9 Enterprise Suite (Wave 1)</span>
       </div>
     </div>
     <nav class="nav">
@@ -340,23 +340,45 @@ const html = `<!DOCTYPE html>
       <a class="nav-item" onclick="switchView('tooltip')">
         <span class="icon">💬</span> Tooltip Overlay
       </a>
+
+      <div class="nav-section">Wave 1: Enterprise Forms & Overlays</div>
+      <a class="nav-item" onclick="switchView('select')">
+        <span class="icon">📋</span> Select Dropdown
+      </a>
+      <a class="nav-item" onclick="switchView('checkbox')">
+        <span class="icon">☑️</span> Checkbox
+      </a>
+      <a class="nav-item" onclick="switchView('radio')">
+        <span class="icon">🔘</span> Radio Group
+      </a>
+      <a class="nav-item" onclick="switchView('drawer')">
+        <span class="icon">🚪</span> Drawer (Sheet)
+      </a>
+      <a class="nav-item" onclick="switchView('toast')">
+        <span class="icon">🍞</span> Toast Notifications
+      </a>
     </nav>
   </aside>
 
   <!-- Main Canvas Area -->
   <main class="main">
     <div class="topbar">
-      <div>
+      <div style="display: flex; align-items: center; gap: 12px;">
         <span style="font-weight: 600; font-size: 0.9375rem; color: #334155;">Target Suite:</span>
-        <span class="badge joy-badge joy-badge--brand" style="margin-left: 8px;">Multi-Platform Enterprise</span>
+        <span class="badge joy-badge joy-badge--brand">Multi-Platform Enterprise</span>
       </div>
-      <div class="framework-pill">
-        <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
-          <span class="badge-runes">SVELTE 5</span> Runes
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid #cbd5e1;">
+          <span id="theme-icon">🌙</span> <span id="theme-label">Dark Mode</span>
         </button>
-        <button class="framework-btn" id="btn-tab-react" onclick="setFramework('react')">
-          <span class="badge-react">REACT 19</span> Modern
-        </button>
+        <div class="framework-pill">
+          <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
+            <span class="badge-runes">SVELTE 5</span> Runes
+          </button>
+          <button class="framework-btn" id="btn-tab-react" onclick="setFramework('react')">
+            <span class="badge-react">REACT 19</span> Modern
+          </button>
+        </div>
       </div>
     </div>
 
@@ -838,14 +860,185 @@ const html = `<!DOCTYPE html>
         </div>
       </section>
 
+      <!-- View: Select -->
+      <section id="view-select" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Select Dropdown Component</h2>
+        <p class="header-tagline">Accessible single-selection dropdown with custom styled caret and native keyboard accessibility.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Order Execution Routing</h4>
+          </div>
+          <div class="canvas" style="flex-direction: column; max-width: 420px; margin: 0 auto;">
+            <div class="joy-select-wrapper">
+              <select class="joy-select" id="demo-order-select" onchange="handleSelectOrderType(this.value)">
+                <option value="limit">Limit Order (Default)</option>
+                <option value="market">Market Execution (Aggressive)</option>
+                <option value="stop_loss">Stop Loss Market</option>
+                <option value="trailing">Trailing Dynamic Stop</option>
+              </select>
+            </div>
+            <div style="font-size: 0.875rem; color: #64748b; margin-top: 8px;">
+              Active Mode: <strong id="demo-select-feedback" style="color: var(--joy-color-brand-primary);">Limit Order</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Checkbox -->
+      <section id="view-checkbox" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Checkbox Control</h2>
+        <p class="header-tagline">High-contrast binary state control with custom checkmark vector and keyboard focus outline.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Execution Constraints</h4>
+          </div>
+          <div class="canvas" style="gap: 28px;">
+            <label class="joy-checkbox">
+              <input type="checkbox" id="chk-post-only" checked onchange="handleCheckboxToggle('Post-Only', this.checked)">
+              <span class="joy-checkbox__box"></span>
+              <span>Post-Only (Maker Guarantee)</span>
+            </label>
+
+            <label class="joy-checkbox">
+              <input type="checkbox" id="chk-reduce-only" onchange="handleCheckboxToggle('Reduce-Only', this.checked)">
+              <span class="joy-checkbox__box"></span>
+              <span>Reduce-Only</span>
+            </label>
+
+            <label class="joy-checkbox joy-checkbox--disabled">
+              <input type="checkbox" disabled checked>
+              <span class="joy-checkbox__box"></span>
+              <span>Locked Margin (Disabled)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Radio Group -->
+      <section id="view-radio" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Radio Group Component</h2>
+        <p class="header-tagline">Accessible single-choice selection group with WAI-ARIA radiogroup traits.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Time In Force (TIF)</h4>
+          </div>
+          <div class="canvas">
+            <div class="joy-radio-group" role="radiogroup">
+              <label class="joy-radio">
+                <input type="radio" name="tif" value="gtc" checked onchange="handleRadioSelect('Good \'Til Cancelled (GTC)')">
+                <span class="joy-radio__circle"></span>
+                <span>GTC (Good 'Til Cancelled)</span>
+              </label>
+
+              <label class="joy-radio">
+                <input type="radio" name="tif" value="ioc" onchange="handleRadioSelect('Immediate Or Cancel (IOC)')">
+                <span class="joy-radio__circle"></span>
+                <span>IOC (Immediate Or Cancel)</span>
+              </label>
+
+              <label class="joy-radio">
+                <input type="radio" name="tif" value="fok" onchange="handleRadioSelect('Fill Or Kill (FOK)')">
+                <span class="joy-radio__circle"></span>
+                <span>FOK (Fill Or Kill)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Drawer -->
+      <section id="view-drawer" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Drawer / Slide-out Sheet</h2>
+        <p class="header-tagline">Heavyweight off-canvas inspection panel for deep financial telemetry, analytics, and detail workflows.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Drawer Placement Triggers</h4>
+          </div>
+          <div class="canvas" style="gap: 20px;">
+            <button class="joy-button joy-button--solid joy-button--md" onclick="openDemoDrawer('right')">
+              👉 Open Right Sheet (Risk Analytics)
+            </button>
+            <button class="joy-button joy-button--outline joy-button--md" onclick="openDemoDrawer('left')">
+              👈 Open Left Sheet (Navigation Tree)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Toast -->
+      <section id="view-toast" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Toast Notification System</h2>
+        <p class="header-tagline">Non-blocking live notification system for market fills, margin calls, and system events.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Trigger Notification</h4>
+          </div>
+          <div class="canvas" style="gap: 16px;">
+            <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Limit order #89281 Filled at 68,420.00 USDT', 'success')">
+              🟢 Fill Success
+            </button>
+            <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('WebSocket connection re-synchronized to Quant core', 'info')">
+              🔵 Network Info
+            </button>
+            <button class="joy-button joy-button--ghost joy-button--md" onclick="showDemoToast('Order latency warning: p99 spiked to 4.2ms', 'warning')" style="border: 1px solid #e2e8f0;">
+              🟡 Latency Warning
+            </button>
+            <button class="joy-button joy-button--danger joy-button--md" onclick="showDemoToast('Risk margin threshold exceeded! Immediate liquidation guard', 'danger')">
+              🔴 Risk Danger
+            </button>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
+
+  <!-- Interactive Demo Drawer -->
+  <div id="demo-drawer-container" style="display: none;">
+    <div class="joy-drawer-backdrop" id="demo-drawer-backdrop" onclick="closeDemoDrawer(event)">
+      <div class="joy-drawer" id="demo-drawer-panel">
+        <div class="joy-drawer__header">
+          <h3 class="joy-drawer__title" id="demo-drawer-title">Risk Engine Analysis</h3>
+          <button type="button" class="joy-drawer__close" onclick="closeDemoDrawer()">&times;</button>
+        </div>
+        <div class="joy-drawer__body" id="demo-drawer-body">
+          <p><strong>Sub-account:</strong> Quant Alpha Alpha-1</p>
+          <p><strong>Margin Ratio:</strong> 14.2% (Healthy)</p>
+          <p><strong>Maintenance Margin:</strong> $124,500.00</p>
+          <div class="joy-alert joy-alert--info" style="margin-top: 16px;">
+            <div class="joy-alert__title">Liquidation Buffer</div>
+            <div class="joy-alert__desc">Liquidation price is 48% below current index mark.</div>
+          </div>
+        </div>
+        <div class="joy-drawer__footer">
+          <button class="joy-button joy-button--ghost joy-button--sm" onclick="closeDemoDrawer()">Cancel</button>
+          <button class="joy-button joy-button--solid joy-button--sm" onclick="showDemoToast('Audit snapshot generated successfully', 'success'); closeDemoDrawer();">Export PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Floating Container -->
+  <div class="joy-toast-container" id="demo-toast-container"></div>
 
   <script>
     let activeFramework = 'svelte';
     let clickCount = 0;
     let isBtnLoading = false;
     let isSwitchOn = false;
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      document.getElementById('theme-icon').innerText = next === 'dark' ? '☀️' : '🌙';
+      document.getElementById('theme-label').innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+    }
 
     function switchView(viewName) {
       document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
@@ -937,6 +1130,51 @@ const html = `<!DOCTYPE html>
       document.getElementById(panelId).style.display = 'block';
     }
 
+    function handleSelectOrderType(val) {
+      const map = {
+        limit: 'Limit Order',
+        market: 'Market Execution',
+        stop_loss: 'Stop Loss Market',
+        trailing: 'Trailing Dynamic Stop'
+      };
+      document.getElementById('demo-select-feedback').innerText = map[val] || val;
+      showDemoToast('Order type changed to: ' + (map[val] || val), 'info');
+    }
+
+    function handleCheckboxToggle(name, checked) {
+      showDemoToast(name + (checked ? ' enabled' : ' disabled'), 'info');
+    }
+
+    function handleRadioSelect(label) {
+      showDemoToast('TIF set to: ' + label, 'info');
+    }
+
+    function openDemoDrawer(placement = 'right') {
+      const container = document.getElementById('demo-drawer-container');
+      const panel = document.getElementById('demo-drawer-panel');
+      const backdrop = document.getElementById('demo-drawer-backdrop');
+      backdrop.style.justifyContent = placement === 'left' ? 'flex-start' : 'flex-end';
+      panel.className = 'joy-drawer ' + (placement === 'left' ? 'joy-drawer--left' : '');
+      container.style.display = 'block';
+    }
+
+    function closeDemoDrawer(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('demo-drawer-container').style.display = 'none';
+    }
+
+    function showDemoToast(msg, variant = 'info') {
+      const container = document.getElementById('demo-toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'joy-toast joy-toast--' + variant;
+      toast.setAttribute('role', 'status');
+      toast.innerHTML = '<div style="flex: 1;">' + msg + '</div><button type="button" style="background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--joy-color-text-muted);" onclick="this.parentElement.remove()">&times;</button>';
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentElement) toast.remove();
+      }, 4000);
+    }
+
     function updateCodeSnippets() {
       const btnSnippet = document.getElementById('button-code');
       if (!btnSnippet) return;
@@ -949,6 +1187,7 @@ const html = `<!DOCTYPE html>
   </script>
 </body>
 </html>
+
 `;
 
 fs.writeFileSync(path.join(outDir, 'index.html'), html);

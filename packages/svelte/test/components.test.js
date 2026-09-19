@@ -33,4 +33,25 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const tooltip = fs.readFileSync(path.resolve('./src/lib/Tooltip.svelte'), 'utf8');
   assert.ok(tooltip.includes('role="tooltip"'), 'Tooltip must implement tooltip role');
+
+  // Wave 1 Enterprise Suite assertions
+  const select = fs.readFileSync(path.resolve('./src/lib/Select.svelte'), 'utf8');
+  assert.ok(select.includes('joy-select'), 'Select must have joy-select class');
+  assert.ok(select.includes('$bindable'), 'Select must support bindable value');
+
+  const checkbox = fs.readFileSync(path.resolve('./src/lib/Checkbox.svelte'), 'utf8');
+  assert.ok(checkbox.includes('role="checkbox"'), 'Checkbox must implement role=checkbox');
+  assert.ok(checkbox.includes('joy-checkbox'), 'Checkbox must have joy-checkbox class');
+
+  const radio = fs.readFileSync(path.resolve('./src/lib/RadioGroup.svelte'), 'utf8');
+  assert.ok(radio.includes('role="radiogroup"'), 'RadioGroup must implement role=radiogroup');
+
+  const drawer = fs.readFileSync(path.resolve('./src/lib/Drawer.svelte'), 'utf8');
+  assert.ok(drawer.includes('joy-drawer'), 'Drawer must have joy-drawer class');
+  assert.ok(drawer.includes('role="dialog"'), 'Drawer must implement role=dialog');
+
+  const toast = fs.readFileSync(path.resolve('./src/lib/Toast.svelte'), 'utf8');
+  assert.ok(toast.includes('joy-toast'), 'Toast must have joy-toast class');
+  assert.ok(toast.includes('role="status"'), 'Toast must implement role=status');
 });
+

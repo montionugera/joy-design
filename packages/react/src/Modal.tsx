@@ -43,7 +43,7 @@ export const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <div class="joy-modal__header">
+        <div className="joy-modal__header">
           <h3 id="modal-title" className="joy-modal__title">
             {title}
           </h3>
