@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: joy-design-storybook
+  namespace: default
+  labels:
+    app: joy-design-storybook
+spec:
+  type: ClusterIP
+  selector:
+    app: joy-design-storybook
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
