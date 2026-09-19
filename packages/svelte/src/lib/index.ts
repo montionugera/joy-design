@@ -5,3 +5,7 @@ export { default as Input } from './Input.svelte';
 export { default as Switch } from './Switch.svelte';
 export { default as Table } from './Table.svelte';
 export { default as Alert } from './Alert.svelte';
+export { default as Modal } from './Modal.svelte';
+export { default as Dropdown, type DropdownItem } from './Dropdown.svelte';
+export { default as Tabs, type TabItem } from './Tabs.svelte';
+export { default as Tooltip } from './Tooltip.svelte';

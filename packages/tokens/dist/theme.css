@@ -27,10 +27,33 @@
   --joy-radius-full: 9999px;
   --joy-font-family-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   --joy-font-family-mono: JetBrains Mono, Menlo, monospace;
+  --joy-motion-duration-fast: 150ms;
+  --joy-motion-duration-normal: 250ms;
+  --joy-motion-duration-slow: 400ms;
+  --joy-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --joy-motion-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --joy-motion-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+  --joy-motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --joy-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --joy-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --joy-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --joy-shadow-overlay: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --joy-z-index-dropdown: 1000;
+  --joy-z-index-modal: 1050;
+  --joy-z-index-tooltip: 1100;
 }
 
 
-/* ── Joymify Component Base Styling ── */
+/* ── Joymify Component Base Styling & Motion Engine ── */
+@keyframes joy-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes joy-modal-pop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 .joy-button {
   display: inline-flex;
   align-items: center;
@@ -40,7 +63,7 @@
   font-weight: 600;
   border-radius: var(--joy-radius-md, 8px);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--joy-motion-duration-fast, 150ms) var(--joy-motion-easing-standard, ease);
   border: 1px solid transparent;
   outline: none;
 }
@@ -154,7 +177,7 @@
   background: #ffffff;
   color: var(--joy-color-text-primary, #0f172a);
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: all var(--joy-motion-duration-fast, 150ms);
 }
 .joy-input:focus {
   border-color: var(--joy-color-brand-primary, #7c3aed);
@@ -183,7 +206,7 @@
   height: 24px;
   background: #cbd5e1;
   border-radius: 9999px;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--joy-motion-duration-fast, 150ms) ease;
   display: inline-block;
 }
 .joy-switch__thumb::after {
@@ -195,7 +218,7 @@
   height: 18px;
   background: #ffffff;
   border-radius: 50%;
-  transition: transform 0.2s ease;
+  transition: transform var(--joy-motion-duration-fast, 150ms) cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 .joy-switch--checked .joy-switch__thumb {
@@ -216,6 +239,7 @@
   border-left: 4px solid transparent;
   font-family: var(--joy-font-family-sans, sans-serif);
   margin-bottom: 12px;
+  animation: joy-fade-in var(--joy-motion-duration-fast, 150ms) ease-out;
 }
 .joy-alert__title {
   font-weight: 700;
@@ -254,7 +278,12 @@
   border: 1px solid #e2e8f0;
   border-radius: var(--joy-radius-md, 8px);
   padding: 16px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: var(--joy-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+  transition: transform var(--joy-motion-duration-fast, 150ms) ease, box-shadow var(--joy-motion-duration-fast, 150ms) ease;
+}
+.joy-metric-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--joy-shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1));
 }
 .joy-metric-tile__title {
   font-size: 0.8125rem;
@@ -290,6 +319,7 @@
   border: 1px solid #e2e8f0;
   border-radius: var(--joy-radius-md, 8px);
   background: #ffffff;
+  box-shadow: var(--joy-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
 }
 .joy-table {
   width: 100%;
@@ -311,6 +341,7 @@
   padding: 10px 14px;
   border-bottom: 1px solid #f1f5f9;
   color: var(--joy-color-text-primary, #0f172a);
+  transition: background-color var(--joy-motion-duration-fast, 150ms);
 }
 .joy-table tr:last-child td {
   border-bottom: none;
@@ -321,4 +352,175 @@
 .joy-table--compact th, .joy-table--compact td {
   padding: 6px 10px;
   font-size: 0.8125rem;
+}
+
+/* ── Modal / Dialog ── */
+.joy-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--joy-z-index-modal, 1050);
+  animation: joy-fade-in var(--joy-motion-duration-fast, 150ms) ease-out;
+  padding: 20px;
+}
+.joy-modal {
+  background: #ffffff;
+  border-radius: var(--joy-radius-lg, 12px);
+  box-shadow: var(--joy-shadow-overlay, 0 20px 25px -5px rgba(0,0,0,0.15));
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  animation: joy-modal-pop var(--joy-motion-duration-normal, 250ms) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.joy-modal__header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.joy-modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+.joy-modal__close {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--joy-color-text-muted, #64748b);
+  transition: color var(--joy-motion-duration-fast, 150ms);
+}
+.joy-modal__close:hover {
+  color: var(--joy-color-text-primary, #0f172a);
+}
+.joy-modal__body {
+  padding: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+.joy-modal__footer {
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ── Dropdown Menu ── */
+.joy-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.joy-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--joy-radius-md, 8px);
+  box-shadow: var(--joy-shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1));
+  min-width: 180px;
+  z-index: var(--joy-z-index-dropdown, 1000);
+  overflow: hidden;
+  animation: joy-fade-in var(--joy-motion-duration-fast, 150ms) ease-out;
+}
+.joy-dropdown__item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-family: var(--joy-font-family-sans, sans-serif);
+  font-size: 0.875rem;
+  color: var(--joy-color-text-primary, #0f172a);
+  cursor: pointer;
+  transition: background-color var(--joy-motion-duration-fast, 150ms);
+}
+.joy-dropdown__item:hover {
+  background-color: #f5f3ff;
+  color: var(--joy-color-brand-primary, #7c3aed);
+}
+
+/* ── Tabs ── */
+.joy-tabs {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.joy-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
+  font-family: var(--joy-font-family-sans, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--joy-color-text-muted, #64748b);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--joy-motion-duration-fast, 150ms);
+}
+.joy-tab-btn:hover {
+  color: var(--joy-color-brand-primary, #7c3aed);
+}
+.joy-tab-btn--active {
+  color: var(--joy-color-brand-primary, #7c3aed);
+}
+.joy-tab-btn--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--joy-color-brand-primary, #7c3aed);
+  border-radius: 2px;
+}
+
+/* ── Tooltip ── */
+.joy-tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.joy-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background: var(--joy-color-surface-dark-base, #0f172a);
+  color: var(--joy-color-text-inverse, #ffffff);
+  padding: 6px 10px;
+  border-radius: var(--joy-radius-sm, 4px);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--joy-z-index-tooltip, 1100);
+  box-shadow: var(--joy-shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1));
+  animation: joy-fade-in var(--joy-motion-duration-fast, 150ms) ease-out;
+}
+.joy-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px;
+  border-style: solid;
+  border-color: var(--joy-color-surface-dark-base, #0f172a) transparent transparent transparent;
 }

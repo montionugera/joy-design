@@ -27,4 +27,18 @@
   --color-joy-radius-full: 9999px;
   --color-joy-font-family-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   --color-joy-font-family-mono: JetBrains Mono, Menlo, monospace;
+  --color-joy-motion-duration-fast: 150ms;
+  --color-joy-motion-duration-normal: 250ms;
+  --color-joy-motion-duration-slow: 400ms;
+  --color-joy-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --color-joy-motion-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --color-joy-motion-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+  --color-joy-motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --color-joy-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --color-joy-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --color-joy-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --color-joy-shadow-overlay: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --color-joy-z-index-dropdown: 1000;
+  --color-joy-z-index-modal: 1050;
+  --color-joy-z-index-tooltip: 1100;
 }

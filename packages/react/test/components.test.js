@@ -19,4 +19,16 @@ test('React standard library components implement accessible traits and forwardR
 
   const alert = fs.readFileSync(path.resolve('./src/Alert.tsx'), 'utf8');
   assert.ok(alert.includes('role="alert"'), 'Alert must implement accessible alert role');
+
+  const modal = fs.readFileSync(path.resolve('./src/Modal.tsx'), 'utf8');
+  assert.ok(modal.includes('role="dialog"'), 'Modal must implement accessible dialog role');
+
+  const dropdown = fs.readFileSync(path.resolve('./src/Dropdown.tsx'), 'utf8');
+  assert.ok(dropdown.includes('role="menu"'), 'Dropdown must implement menu role');
+
+  const tabs = fs.readFileSync(path.resolve('./src/Tabs.tsx'), 'utf8');
+  assert.ok(tabs.includes('role="tablist"'), 'Tabs must implement tablist role');
+
+  const tooltip = fs.readFileSync(path.resolve('./src/Tooltip.tsx'), 'utf8');
+  assert.ok(tooltip.includes('role="tooltip"'), 'Tooltip must implement tooltip role');
 });
