@@ -94,5 +94,14 @@
     "claimed_at": "2026-09-19T14:08:26.226255+00:00",
     "shipped_at": "2026-09-19T14:11:01.344436+00:00",
     "promoted_at": "2026-09-19T14:11:31.158275+00:00"
+  },
+  {
+    "id": "F-009",
+    "title": "Wave 1 Enterprise Suite: Select, Checkbox, RadioGroup, Drawer, and Toast notifications with Dark Mode token palette",
+    "from_idea": "I-009",
+    "created_at": "2026-09-19T14:39:50.378215+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
