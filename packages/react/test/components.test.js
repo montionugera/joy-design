@@ -31,4 +31,25 @@ test('React standard library components implement accessible traits and forwardR
 
   const tooltip = fs.readFileSync(path.resolve('./src/Tooltip.tsx'), 'utf8');
   assert.ok(tooltip.includes('role="tooltip"'), 'Tooltip must implement tooltip role');
+
+  // Wave 1 Enterprise Suite assertions
+  const select = fs.readFileSync(path.resolve('./src/Select.tsx'), 'utf8');
+  assert.ok(select.includes('React.forwardRef'), 'Select must forwardRef to native element');
+  assert.ok(select.includes('joy-select'), 'Select must render joy-select class');
+
+  const checkbox = fs.readFileSync(path.resolve('./src/Checkbox.tsx'), 'utf8');
+  assert.ok(checkbox.includes('role="checkbox"'), 'Checkbox must implement accessible role=checkbox');
+  assert.ok(checkbox.includes('React.forwardRef'), 'Checkbox must forwardRef to native input');
+
+  const radio = fs.readFileSync(path.resolve('./src/RadioGroup.tsx'), 'utf8');
+  assert.ok(radio.includes('role="radiogroup"'), 'RadioGroup must implement accessible role=radiogroup');
+
+  const drawer = fs.readFileSync(path.resolve('./src/Drawer.tsx'), 'utf8');
+  assert.ok(drawer.includes('role="dialog"'), 'Drawer must implement accessible role=dialog');
+  assert.ok(drawer.includes('joy-drawer'), 'Drawer must render joy-drawer class');
+
+  const toast = fs.readFileSync(path.resolve('./src/Toast.tsx'), 'utf8');
+  assert.ok(toast.includes('role="status"'), 'Toast must implement accessible role=status');
+  assert.ok(toast.includes('joy-toast'), 'Toast must render joy-toast class');
 });
+
