@@ -1,6 +1,6 @@
 {
   "name": "@joymify/icons",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
@@ -8,12 +8,25 @@
       "types": "./src/index.d.ts",
       "svelte": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./react": {
+      "types": "./src/react.d.ts",
+      "default": "./src/react.ts"
     }
   },
   "scripts": {
     "test": "node --test test/*.test.js"
   },
   "peerDependencies": {
+    "react": "^19.0.0",
     "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
   }
 }
