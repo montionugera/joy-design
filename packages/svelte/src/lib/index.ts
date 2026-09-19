@@ -16,3 +16,11 @@ export { default as Drawer } from './Drawer.svelte';
 export { default as Toast } from './Toast.svelte';
 export { default as Pagination } from './Pagination.svelte';
 export { default as Skeleton } from './Skeleton.svelte';
+
+// Enterprise Parity Components
+export { default as DatePicker } from './DatePicker.svelte';
+export { default as DateRangePicker, type DateRangeValue } from './DateRangePicker.svelte';
+export { default as Breadcrumb } from './Breadcrumb.svelte';
+export { default as EmptyState } from './EmptyState.svelte';
+export { default as StatCard } from './StatCard.svelte';
+export { default as Progress } from './Progress.svelte';

@@ -1053,9 +1053,281 @@ h1, h2, h3, .joy-display {
   letter-spacing: var(--joy-font-display-letter-spacing, -0.02em);
 }
 
-.joy-table td, .joy-table th, .joy-metric-tile__value, .joy-pagination {
-  font-variant-numeric: var(--joy-font-variant-numeric, tabular-nums);
+/* ── Enterprise Parity Components (Wave 3) ── */
+.joy-date-picker {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--joy-color-surface-base, #ffffff);
+  border: 1px solid #cbd5e1;
+  border-radius: var(--joy-radius-md, 8px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all var(--joy-motion-duration-fast, 150ms) ease;
+  cursor: pointer;
+}
+[data-theme="dark"] .joy-date-picker {
+  background: var(--joy-color-surface-dark-subtle, #1e293b);
+  border-color: #334155;
+}
+.joy-date-picker:focus-within {
+  border-color: var(--joy-color-brand-primary, #7c3aed);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+.joy-date-picker--error {
+  border-color: var(--joy-color-status-danger, #ef4444) !important;
+}
+.joy-date-picker--error:focus-within {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+.joy-date-picker--disabled {
+  background: var(--joy-color-surface-muted, #f1f5f9);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.joy-date-picker__input {
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--joy-color-text-primary, #0f172a);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  outline: none;
+  cursor: inherit;
+}
+[data-theme="dark"] .joy-date-picker__input {
+  color: var(--joy-color-text-inverse, #f8fafc);
+}
+.joy-date-picker__icon {
+  flex: 0 0 auto;
+  color: var(--joy-color-text-muted, #64748b);
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+}
+.joy-date-picker__input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.joy-date-range-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.joy-date-range-picker .joy-date-picker {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.joy-date-range-picker__sep {
+  color: var(--joy-color-text-muted, #64748b);
+  font-size: 0.875rem;
+  flex: 0 0 auto;
+}
+.joy-date-range-picker--disabled .joy-date-range-picker__sep {
+  color: #94a3b8;
 }
 
+/* Breadcrumb */
+.joy-breadcrumb {
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--joy-color-text-muted, #64748b);
+}
+.joy-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.joy-breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.joy-breadcrumb__link {
+  color: var(--joy-color-text-muted, #64748b);
+  text-decoration: none;
+  transition: color var(--joy-motion-duration-fast, 150ms) ease;
+}
+.joy-breadcrumb__link:hover {
+  color: var(--joy-color-brand-primary, #7c3aed);
+  text-decoration: underline;
+}
+[data-theme="dark"] .joy-breadcrumb__link:hover {
+  color: #c084fc;
+}
+.joy-breadcrumb__current {
+  color: var(--joy-color-text-primary, #0f172a);
+  font-weight: 500;
+}
+[data-theme="dark"] .joy-breadcrumb__current {
+  color: #f8fafc;
+}
+.joy-breadcrumb__sep {
+  color: #cbd5e1;
+}
+[data-theme="dark"] .joy-breadcrumb__sep {
+  color: #475569;
+}
 
+/* Empty State */
+.joy-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 48px 24px;
+  background: var(--joy-color-surface-base, #ffffff);
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--joy-radius-lg, 12px);
+  max-width: 480px;
+  margin: 0 auto;
+}
+[data-theme="dark"] .joy-empty-state {
+  background: var(--joy-color-surface-dark-subtle, #1e293b);
+  border-color: #334155;
+}
+.joy-empty-state__icon {
+  display: inline-flex;
+  color: var(--joy-color-text-muted, #64748b);
+  margin-bottom: 4px;
+}
+.joy-empty-state__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--joy-color-text-primary, #0f172a);
+  margin: 0;
+}
+[data-theme="dark"] .joy-empty-state__title {
+  color: #f8fafc;
+}
+.joy-empty-state__desc {
+  font-size: 0.875rem;
+  color: var(--joy-color-text-muted, #64748b);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 40ch;
+}
+.joy-empty-state__action {
+  margin-top: 8px;
+}
 
+/* Stat Card */
+.joy-stat-card {
+  background: var(--joy-color-surface-base, #ffffff);
+  border: 1px solid #cbd5e1;
+  border-radius: var(--joy-radius-lg, 12px);
+  padding: 20px;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+[data-theme="dark"] .joy-stat-card {
+  background: var(--joy-color-surface-dark-subtle, #1e293b);
+  border-color: #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.joy-stat-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--joy-color-text-muted, #64748b);
+}
+.joy-stat-card__value {
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.1;
+  margin-top: 8px;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+[data-theme="dark"] .joy-stat-card__value {
+  color: #f8fafc;
+}
+.joy-stat-card__delta {
+  font-size: 0.8125rem;
+  margin-top: 6px;
+  font-weight: 500;
+}
+.joy-stat-card__delta--positive {
+  color: var(--joy-color-status-success, #10b981);
+}
+.joy-stat-card__delta--critical {
+  color: var(--joy-color-status-danger, #ef4444);
+}
+.joy-stat-card__delta--info {
+  color: var(--joy-color-status-info, #3b82f6);
+}
+.joy-stat-card__delta--neutral {
+  color: var(--joy-color-text-muted, #64748b);
+}
+
+/* Progress */
+.joy-progress {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+[data-theme="dark"] .joy-progress {
+  color: #f8fafc;
+}
+.joy-progress__outer {
+  flex: 1;
+  margin-right: 8px;
+}
+.joy-progress__inner {
+  background-color: var(--joy-color-surface-muted, #f1f5f9);
+  border-radius: 100px;
+  overflow: hidden;
+}
+[data-theme="dark"] .joy-progress__inner {
+  background-color: #334155;
+}
+.joy-progress__bg {
+  border-radius: 100px;
+  transition: all 0.3s cubic-bezier(0.08, 0.82, 0.17, 1);
+  background-color: var(--joy-color-brand-primary, #7c3aed);
+  position: relative;
+}
+[data-theme="dark"] .joy-progress__bg {
+  background-color: #a855f7;
+}
+.joy-progress--status-success .joy-progress__bg {
+  background-color: var(--joy-color-status-success, #10b981) !important;
+}
+.joy-progress--status-success .joy-progress__text {
+  color: var(--joy-color-status-success, #10b981);
+}
+.joy-progress--status-exception .joy-progress__bg {
+  background-color: var(--joy-color-status-danger, #ef4444) !important;
+}
+.joy-progress--status-exception .joy-progress__text {
+  color: var(--joy-color-status-danger, #ef4444);
+}
+.joy-progress__text {
+  width: 2.5em;
+  text-align: left;
+  margin-left: 8px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
