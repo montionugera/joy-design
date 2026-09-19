@@ -1,0 +1,17 @@
+{
+  "name": "joy-design-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "check": "turbo run check",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "turbo": "^2.5.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@joymify/tokens",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./theme.css": "./dist/theme.css",
+    "./tailwind": "./dist/tailwind-theme.css"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "test": "node --test test/*.test.js"
+  }
+}
