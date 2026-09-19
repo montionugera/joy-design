@@ -42,3 +42,16 @@ export { default as TestimonialCard } from './TestimonialCard.svelte';
 export { default as Steps, type StepItem } from './Steps.svelte';
 export { default as Timeline, type TimelineItem } from './Timeline.svelte';
 export { default as Result } from './Result.svelte';
+
+// Wave 6: High-Performance Financial Charts & Layout Primitives
+export { default as LineChart } from './LineChart.svelte';
+export { default as BarChart } from './BarChart.svelte';
+export { default as CandlestickChart } from './CandlestickChart.svelte';
+export { default as Divider } from './Divider.svelte';
+export { default as Flex } from './Flex.svelte';
+export { default as Space } from './Space.svelte';
+export { default as Splitter } from './Splitter.svelte';
+export { default as Statistic } from './Statistic.svelte';
+export { default as Tag } from './Tag.svelte';
+export { default as Segmented, type SegmentedOption } from './Segmented.svelte';
+export { JoyChartCore, lttbDownsample, type ChartPoint, type CandlestickDataPoint, type SeriesConfig } from './chart-core.js';

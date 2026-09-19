@@ -49,6 +49,17 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-steps'), 'steps workflow styles must exist');
   assert.ok(css.includes('.joy-timeline'), 'timeline audit styles must exist');
   assert.ok(css.includes('.joy-result'), 'result feedback styles must exist');
+
+  // Wave 6 Assertions (Financial Charts & Layout Primitives)
+  assert.ok(css.includes('.joy-chart'), 'chart engine styles must exist');
+  assert.ok(css.includes('.joy-chart__hud'), 'chart floating HUD styles must exist');
+  assert.ok(css.includes('.joy-divider'), 'divider styles must exist');
+  assert.ok(css.includes('.joy-flex'), 'flex styles must exist');
+  assert.ok(css.includes('.joy-space'), 'space styles must exist');
+  assert.ok(css.includes('.joy-splitter'), 'splitter styles must exist');
+  assert.ok(css.includes('.joy-statistic'), 'statistic styles must exist');
+  assert.ok(css.includes('.joy-tag'), 'tag styles must exist');
+  assert.ok(css.includes('.joy-segmented'), 'segmented styles must exist');
 });
 
 
