@@ -42,61 +42,102 @@ const componentStyles = `
 }
 
 .joy-button {
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--joy-spacing-2, 8px);
   font-family: var(--joy-font-family-sans, sans-serif);
   font-weight: 600;
+  letter-spacing: -0.01em;
   border-radius: var(--joy-radius-md, 8px);
   cursor: pointer;
   transition: all var(--joy-motion-duration-fast, 150ms) var(--joy-motion-easing-standard, ease);
   border: 1px solid transparent;
   outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: 1.25;
+}
+.joy-button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 .joy-button:focus-visible {
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.35);
 }
 .joy-button--sm {
-  padding: var(--joy-spacing-1, 4px) var(--joy-spacing-2, 8px);
+  padding: 6px 12px;
   font-size: 0.8125rem;
+  border-radius: var(--joy-radius-sm, 6px);
 }
 .joy-button--md {
-  padding: var(--joy-spacing-2, 8px) var(--joy-spacing-4, 16px);
-  font-size: 0.9375rem;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  border-radius: var(--joy-radius-md, 8px);
 }
 .joy-button--lg {
-  padding: var(--joy-spacing-3, 12px) var(--joy-spacing-6, 24px);
-  font-size: 1.0625rem;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: var(--joy-radius-lg, 10px);
 }
 .joy-button--solid {
-  background-color: var(--joy-color-brand-primary, #7c3aed);
+  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
   color: var(--joy-color-text-inverse, #ffffff);
+  border-color: rgba(109, 40, 217, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .joy-button--solid:hover:not(:disabled) {
-  background-color: var(--joy-color-brand-primary-hover, #6d28d9);
+  background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .joy-button--outline {
-  background-color: transparent;
-  border-color: var(--joy-color-brand-primary, #7c3aed);
-  color: var(--joy-color-brand-primary, #7c3aed);
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .joy-button--outline:hover:not(:disabled) {
-  background-color: #f5f3ff;
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 .joy-button--ghost {
   background-color: transparent;
-  color: var(--joy-color-text-primary, #0f172a);
+  color: var(--joy-color-text-primary, #334155);
 }
 .joy-button--ghost:hover:not(:disabled) {
   background-color: var(--joy-color-surface-muted, #f1f5f9);
+  color: #0f172a;
 }
 .joy-button--danger {
-  background-color: var(--joy-color-status-danger, #ef4444);
+  background: linear-gradient(180deg, #f43f5e 0%, #ef4444 100%);
   color: var(--joy-color-text-inverse, #ffffff);
+  border-color: rgba(225, 29, 72, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .joy-button--danger:hover:not(:disabled) {
-  background-color: #dc2626;
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .joy-button--outline {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+[data-theme="dark"] .joy-button--outline:hover:not(:disabled) {
+  background-color: #334155;
+  border-color: #475569;
+  color: #ffffff;
+}
+[data-theme="dark"] .joy-button--ghost {
+  color: #94a3b8;
+}
+[data-theme="dark"] .joy-button--ghost:hover:not(:disabled) {
+  background-color: #1e293b;
+  color: #f8fafc;
 }
 .joy-button:disabled {
   opacity: 0.55;
