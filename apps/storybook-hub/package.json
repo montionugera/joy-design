@@ -1,0 +1,8 @@
+{
+  "name": "storybook-hub",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Starting Storybook Hub on port 6008...'",
+    "build": "echo 'Building Storybook Hub static output...'"
+  }
+}
