@@ -125,8 +125,10 @@ const html = `<!DOCTYPE html>
     }
     .topbar {
       height: 60px;
-      border-bottom: 1px solid #e2e8f0;
-      background: #ffffff;
+      border-bottom: var(--joy-border-hairline, 1px solid #e2e8f0);
+      background: var(--joy-surface-frosted, rgba(255, 255, 255, 0.82));
+      backdrop-filter: var(--joy-backdrop-blur, blur(12px));
+      -webkit-backdrop-filter: var(--joy-backdrop-blur, blur(12px));
       padding: 0 32px;
       display: flex;
       align-items: center;
@@ -292,7 +294,7 @@ const html = `<!DOCTYPE html>
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
-        <span>v2.1 Enterprise Complete (Wave 3)</span>
+        <span>v2.2 OpenDesign Integrated</span>
       </div>
     </div>
     <nav class="nav">
@@ -407,18 +409,18 @@ const html = `<!DOCTYPE html>
           <strong>Quant</strong>, <strong>JoyCoach</strong>, <strong>AssetStudio</strong>, and <strong>JoyQuest</strong>.
         </p>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 36px;">
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="switchView('tokens')">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px;">
+          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('tokens')">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/tokens</h3>
             <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
-              W3C DTCG tokens including GPU spring motion curves, elevation shadows, z-index hierarchy, and colors.
+              W3C DTCG tokens with OpenDesign posture integration, GPU spring motion curves, and hairline borders.
             </p>
           </div>
 
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="switchView('button'); setFramework('svelte');">
+          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('button'); setFramework('svelte');">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Svelte 5 Runes</span>
             </div>
@@ -428,7 +430,7 @@ const html = `<!DOCTYPE html>
             </p>
           </div>
 
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="switchView('button'); setFramework('react');">
+          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('button'); setFramework('react');">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> React 19 Ready</span>
             </div>
@@ -437,12 +439,22 @@ const html = `<!DOCTYPE html>
               Strict WAI-ARIA accessible React 19 component library with forwardRef support and zero runtime CSS overhead.
             </p>
           </div>
+
+          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('tokens')">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> OpenDesign Postures</span>
+            </div>
+            <h3 style="margin: 0 0 8px 0;">Modern & Utility</h3>
+            <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+              Unified Linear/Vercel modern-minimal and Datadog/GitHub tech-utility postures with frosted surfaces & hairline borders.
+            </p>
+          </div>
         </div>
 
         <div class="joy-alert joy-alert--info">
-          <div class="joy-alert__title">💡 Complete AntDesign Parity Suite</div>
+          <div class="joy-alert__title">💡 Complete AntDesign Parity Suite + OpenDesign Posture Engine</div>
           <div class="joy-alert__desc">
-            Explore 11 standard & enterprise components including Modals, Dropdown menus, Tabs, and Tooltips with full GPU spring motion transitions.
+            Explore 18 standard & enterprise components including Modals, Drawers, Dropdown menus, Selects, and Live Trading Orderbooks with full GPU spring motion transitions and OpenDesign posture styling.
           </div>
         </div>
       </section>
