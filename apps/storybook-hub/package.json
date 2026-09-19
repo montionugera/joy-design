@@ -1,8 +1,9 @@
 {
   "name": "storybook-hub",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "echo 'Starting Storybook Hub on port 6008...'",
-    "build": "echo 'Building Storybook Hub static output...'"
+    "build": "node build.js",
+    "dev": "echo 'Starting Storybook Hub on port 6008...'"
   }
 }
