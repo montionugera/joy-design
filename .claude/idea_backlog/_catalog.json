@@ -82,5 +82,11 @@
     "title": "Enterprise Parity: Vector Icons, Date and Time Pickers, Dark Mode Semantics, and Zero-Interruption AGENTS policy",
     "created_at": "2026-09-19T15:34:36.764028+00:00",
     "promoted_to": "F-014"
+  },
+  {
+    "id": "I-015",
+    "title": "rich vector icons suite with trading saas navigation and dual svelte react exports",
+    "created_at": "2026-09-19T15:52:17.165292+00:00",
+    "promoted_to": null
   }
 ]
