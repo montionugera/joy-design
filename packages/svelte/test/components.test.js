@@ -67,6 +67,22 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const skeleton = fs.readFileSync(path.resolve('./src/lib/Skeleton.svelte'), 'utf8');
   assert.ok(skeleton.includes('role="progressbar"'), 'Skeleton must implement role=progressbar');
   assert.ok(skeleton.includes('joy-skeleton'), 'Skeleton must have joy-skeleton class');
+
+  // Wave 3 / Enterprise Parity Assertions (DatePicker, Breadcrumb, StatCard, Progress, EmptyState)
+  const datePicker = fs.readFileSync(path.resolve('./src/lib/DatePicker.svelte'), 'utf8');
+  assert.ok(datePicker.includes('joy-date-picker'), 'DatePicker must have joy-date-picker class');
+  assert.ok(datePicker.includes('$props()'), 'DatePicker must use Svelte 5 runes');
+
+  const breadcrumb = fs.readFileSync(path.resolve('./src/lib/Breadcrumb.svelte'), 'utf8');
+  assert.ok(breadcrumb.includes('joy-breadcrumb'), 'Breadcrumb must have joy-breadcrumb class');
+  assert.ok(breadcrumb.includes('aria-label="Breadcrumb"'), 'Breadcrumb must have accessible aria-label');
+
+  const statCard = fs.readFileSync(path.resolve('./src/lib/StatCard.svelte'), 'utf8');
+  assert.ok(statCard.includes('joy-stat-card'), 'StatCard must have joy-stat-card class');
+
+  const progress = fs.readFileSync(path.resolve('./src/lib/Progress.svelte'), 'utf8');
+  assert.ok(progress.includes('joy-progress'), 'Progress must have joy-progress class');
+
+  const emptyState = fs.readFileSync(path.resolve('./src/lib/EmptyState.svelte'), 'utf8');
+  assert.ok(emptyState.includes('joy-empty-state'), 'EmptyState must have joy-empty-state class');
 });
-
-

@@ -9,6 +9,30 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 const tokensSrcPath = path.join(__dirname, '../../packages/tokens/dist/theme.css');
 const inlinedThemeCss = fs.existsSync(tokensSrcPath) ? fs.readFileSync(tokensSrcPath, 'utf8') : '';
 
+// Extract vector SVGs from @joymify/icons
+const iconsSrcDir = path.join(__dirname, '../../packages/icons/src');
+const iconCardsHtml = fs.existsSync(iconsSrcDir)
+  ? fs.readdirSync(iconsSrcDir)
+      .filter(f => f.endsWith('.svelte'))
+      .sort()
+      .map(f => {
+        const name = f.replace('.svelte', '');
+        const content = fs.readFileSync(path.join(iconsSrcDir, f), 'utf8');
+        const svgMatch = content.match(/<svg[\s\S]*?<\/svg>/);
+        let svg = svgMatch ? svgMatch[0] : '';
+        svg = svg.replace(/width=\{size\}/g, 'width="24"')
+                 .replace(/height=\{size\}/g, 'height="24"')
+                 .replace(/stroke=\{color\}/g, 'stroke="currentColor"')
+                 .replace(/fill=\{color\}/g, 'fill="currentColor"');
+        return `
+          <div class="icon-card" onclick="copyIconName('${name}')" title="Click to copy import">
+            <div class="icon-preview">${svg}</div>
+            <div class="icon-name">${name}</div>
+          </div>
+        `;
+      }).join('\n')
+  : '';
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -357,6 +381,146 @@ ${inlinedThemeCss}
       border-radius: 4px;
       font-weight: 700;
     }
+
+    /* ── Coherent Dark Mode Overrides for Hub UI ── */
+    [data-theme="dark"] body {
+      background-color: #0b0f19;
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .sidebar {
+      background: #0f172a;
+      border-right-color: #1e293b;
+    }
+    [data-theme="dark"] .brand {
+      border-bottom-color: #1e293b;
+    }
+    [data-theme="dark"] .brand-info h2 {
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .nav-section {
+      color: #64748b;
+    }
+    [data-theme="dark"] .nav-item {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .nav-item:hover {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .nav-item.active {
+      background: #2e1065;
+      color: #c084fc;
+    }
+    [data-theme="dark"] .topbar {
+      background: rgba(15, 23, 42, 0.85);
+      border-bottom-color: #1e293b;
+    }
+    [data-theme="dark"] .framework-pill {
+      background: #1e293b;
+    }
+    [data-theme="dark"] .framework-btn {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .framework-btn.active {
+      background: #0f172a;
+      color: #c084fc;
+    }
+    [data-theme="dark"] .playground-box {
+      background: #0f172a;
+      border-color: #1e293b;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    [data-theme="dark"] .playground-header {
+      background: #1e293b;
+      border-bottom-color: #334155;
+    }
+    [data-theme="dark"] .playground-header h4 {
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .tokens-table {
+      background: #0f172a;
+      border-color: #1e293b;
+    }
+    [data-theme="dark"] .tokens-table th {
+      background: #1e293b;
+      border-bottom-color: #334155;
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .tokens-table td {
+      border-bottom-color: #1e293b;
+      color: #cbd5e1;
+    }
+    /* Icon Gallery Styling */
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    .icon-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+    .icon-card:hover {
+      border-color: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+    }
+    .icon-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #334155;
+    }
+    .icon-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #64748b;
+      text-align: center;
+      word-break: break-all;
+    }
+    [data-theme="dark"] .icon-card {
+      background: #0f172a;
+      border-color: #1e293b;
+    }
+    [data-theme="dark"] .icon-card:hover {
+      border-color: #a855f7;
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+    }
+    [data-theme="dark"] .icon-preview {
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .icon-name {
+      color: #94a3b8;
+    }
+
+    /* Coherent Dark Mode for All Containers */
+    [data-theme="dark"] .header-tagline {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .content-area div[style*="background: #ffffff"] {
+      background: #0f172a !important;
+      border-color: #1e293b !important;
+    }
+    [data-theme="dark"] .content-area div[style*="background: #f8fafc"] {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+    [data-theme="dark"] .joy-toast {
+      background: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #1e293b !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    }
   </style>
 </head>
 <body>
@@ -446,19 +610,39 @@ ${inlinedThemeCss}
       <a class="nav-item" onclick="switchView('skeleton')">
         <span class="icon">🦴</span> Skeleton Loading States
       </a>
+
+      <div class="nav-section">Wave 3: Data Entry & Assets</div>
+      <a class="nav-item" onclick="switchView('date-picker')">
+        <span class="icon">📅</span> Date & Range Picker
+      </a>
+      <a class="nav-item" onclick="switchView('enterprise-display')">
+        <span class="icon">📊</span> Breadcrumb & StatCard
+      </a>
+      <a class="nav-item" onclick="switchView('progress')">
+        <span class="icon">⏳</span> Progress Bar
+      </a>
+      <a class="nav-item" onclick="switchView('empty-state')">
+        <span class="icon">📭</span> Empty State
+      </a>
+      <a class="nav-item" onclick="switchView('icons-gallery')">
+        <span class="icon">💎</span> Icons Gallery (54 SVGs)
+      </a>
     </nav>
   </aside>
 
   <!-- Main Canvas Area -->
   <main class="main">
     <div class="topbar">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-weight: 600; font-size: 0.9375rem; color: #334155;">Target Suite:</span>
-        <span class="badge joy-badge joy-badge--brand">Multi-Platform Enterprise</span>
+      <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+        <span class="topbar-target-label" style="font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Target Suite:</span>
+        <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
         <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid #cbd5e1;">
-          <span id="theme-icon">🌙</span> <span id="theme-label">Dark Mode</span>
+          <span id="theme-icon" style="display:inline-flex;align-items:center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </span>
+          <span id="theme-label">Dark Mode</span>
         </button>
         <div class="framework-pill">
           <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
@@ -1331,16 +1515,20 @@ ${inlinedThemeCss}
           </div>
           <div class="canvas" style="gap: 16px;">
             <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Limit order #89281 Filled at 68,420.00 USDT', 'success')">
-              🟢 Fill Success
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              Fill Success
             </button>
             <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('WebSocket connection re-synchronized to Quant core', 'info')">
-              🔵 Network Info
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              Network Info
             </button>
             <button class="joy-button joy-button--ghost joy-button--md" onclick="showDemoToast('Order latency warning: p99 spiked to 4.2ms', 'warning')" style="border: 1px solid #e2e8f0;">
-              🟡 Latency Warning
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              Latency Warning
             </button>
             <button class="joy-button joy-button--danger joy-button--md" onclick="showDemoToast('Risk margin threshold exceeded! Immediate liquidation guard', 'danger')">
-              🔴 Risk Danger
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              Risk Danger
             </button>
           </div>
         </div>
@@ -1469,7 +1657,199 @@ ${inlinedThemeCss}
         </div>
       </section>
 
-    </div>
+      <!-- View: Date & Range Picker -->
+      <section id="view-date-picker" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Date & Range Picker</h2>
+        <p class="header-tagline">AntDesign-grade enterprise date pickers with calendar popover triggers, two-way binding, error states, and dark mode support.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Single Date & Date Range Selectors</h4>
+          </div>
+          <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto;">
+            <div style="width: 100%;">
+              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Standard Date Picker</label>
+              <div class="joy-date-picker" id="demo-date-picker-wrap">
+                <input type="date" class="joy-date-picker__input" id="demo-single-date" value="2026-09-19" onchange="handleDateChange(this.value)">
+                <span class="joy-date-picker__icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
+              </div>
+              <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Selected Date: <strong id="single-date-feedback" style="color: #7c3aed;">2026-09-19</strong></div>
+            </div>
+
+            <div style="width: 100%;">
+              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Financial Date Range Picker (Backtest Window)</label>
+              <div class="joy-date-range-picker">
+                <div class="joy-date-picker">
+                  <input type="date" class="joy-date-picker__input" id="demo-range-start" value="2026-01-01" onchange="handleRangeChange()">
+                  <span class="joy-date-picker__icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </span>
+                </div>
+                <span class="joy-date-range-picker__sep">&rarr;</span>
+                <div class="joy-date-picker">
+                  <input type="date" class="joy-date-picker__input" id="demo-range-end" value="2026-09-19" onchange="handleRangeChange()">
+                  <span class="joy-date-picker__icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </span>
+                </div>
+              </div>
+              <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: #7c3aed;">2026-01-01 to 2026-09-19</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Enterprise Display (Breadcrumb & StatCard) -->
+      <section id="view-enterprise-display" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Breadcrumb Navigation & Stat Cards</h2>
+        <p class="header-tagline">Hierarchical route tracking and trading KPI metric displays with high-contrast delta tone badges.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Breadcrumb Navigation</h4>
+          </div>
+          <div class="canvas" style="justify-content: flex-start; padding: 24px;">
+            <nav class="joy-breadcrumb" aria-label="Breadcrumb">
+              <ol>
+                <li><a class="joy-breadcrumb__link" href="#overview" onclick="switchView('overview')">Home</a><span class="joy-breadcrumb__sep">/</span></li>
+                <li><a class="joy-breadcrumb__link" href="#quant" onclick="switchView('financial-table')">Quant Engine</a><span class="joy-breadcrumb__sep">/</span></li>
+                <li><a class="joy-breadcrumb__link" href="#vaults">Vaults</a><span class="joy-breadcrumb__sep">/</span></li>
+                <li><span class="joy-breadcrumb__current" aria-current="page">Alpha-1 Delta Neutral</span></li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Enterprise KPI Stat Cards</h4>
+          </div>
+          <div class="canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+            <div class="joy-stat-card">
+              <div class="joy-stat-card__label">Portfolio Value</div>
+              <div class="joy-stat-card__value">$1,429,850</div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--positive">&uarr; +14.2% (30d)</div>
+            </div>
+            <div class="joy-stat-card">
+              <div class="joy-stat-card__label">Max Drawdown</div>
+              <div class="joy-stat-card__value">1.84%</div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--critical">&darr; -0.4% from peak</div>
+            </div>
+            <div class="joy-stat-card">
+              <div class="joy-stat-card__label">Active Workers</div>
+              <div class="joy-stat-card__value">32 Nodes</div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--info">&bull; 99.99% Vultr Uptime</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Progress -->
+      <section id="view-progress" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Progress Bars</h2>
+        <p class="header-tagline">AntDesign status bar parity with active gradient shimmer, success indicators, and failure states.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Interactive Progress Engine</h4>
+          </div>
+          <div class="canvas" style="flex-direction: column; gap: 20px; align-items: stretch; max-width: 600px; margin: 0 auto;">
+            <div>
+              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Active Harvest Task (72%)</div>
+              <div class="joy-progress">
+                <div class="joy-progress__outer">
+                  <div class="joy-progress__inner">
+                    <div class="joy-progress__bg" style="width: 72%; height: 8px;"></div>
+                  </div>
+                </div>
+                <span class="joy-progress__text">72%</span>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Completed Sync (100% Success)</div>
+              <div class="joy-progress joy-progress--status-success">
+                <div class="joy-progress__outer">
+                  <div class="joy-progress__inner">
+                    <div class="joy-progress__bg" style="width: 100%; height: 8px;"></div>
+                  </div>
+                </div>
+                <span class="joy-progress__text">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Failed Execution (Exception State)</div>
+              <div class="joy-progress joy-progress--status-exception">
+                <div class="joy-progress__outer">
+                  <div class="joy-progress__inner">
+                    <div class="joy-progress__bg" style="width: 45%; height: 8px;"></div>
+                  </div>
+                </div>
+                <span class="joy-progress__text">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Empty State -->
+      <section id="view-empty-state" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Empty State</h2>
+        <p class="header-tagline">Centered feedback view for zero-data scenarios, unconfigured vaults, or empty search queries.</p>
+
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>No Active Positions Placeholder</h4>
+          </div>
+          <div class="canvas" style="padding: 40px 20px;">
+            <div class="joy-empty-state">
+              <div class="joy-empty-state__icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+              </div>
+              <h3 class="joy-empty-state__title">No Active Arbitrage Vaults</h3>
+              <p class="joy-empty-state__desc">You have not deployed any high-frequency quant vaults. Deploy a delta-neutral liquidity vault to start harvesting yields.</p>
+              <div class="joy-empty-state__action">
+                <button class="joy-button joy-button--solid joy-button--sm" onclick="showDemoToast('Vault deployment wizard initialized', 'info')">
+                  Deploy First Vault
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Icons Gallery -->
+      <section id="view-icons-gallery" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Vector Icons Gallery (@joymify/icons)</h2>
+        <p class="header-tagline">54 enterprise SVG icons ported from Zen-UI with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
+
+        <div class="playground-box">
+          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h4>Icon System Collection (54 Vector Assets)</h4>
+            <div id="copy-toast-banner" style="font-size: 0.8125rem; color: #10b981; font-weight: 600; display: none;">Copied to clipboard!</div>
+          </div>
+          <div style="padding: 24px;">
+            <div class="icon-grid">
+              ${iconCardsHtml}
+            </div>
+          </div>
+        </div>
+      </section>
   </main>
 
   <!-- Interactive Demo Drawer -->
@@ -1510,7 +1890,9 @@ ${inlinedThemeCss}
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
-      document.getElementById('theme-icon').innerText = next === 'dark' ? '☀️' : '🌙';
+      document.getElementById('theme-icon').innerHTML = next === 'dark'
+        ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
+        : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
       document.getElementById('theme-label').innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
     }
 
@@ -1573,7 +1955,7 @@ ${inlinedThemeCss}
         statusText.innerText = isBtnLoading ? 'Loading Active' : 'Idle';
       }
       if (isBtnLoading) {
-        btn.innerHTML = '<span class="joy-button__spinner" style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> Loading...';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Loading...';
         btn.disabled = true;
       } else {
         btn.innerHTML = 'Click Me! (Clicked: <span id="click-counter">' + clickCount + '</span>)';
@@ -1738,7 +2120,7 @@ ${inlinedThemeCss}
       marketData[idx].change += isUp ? deltaPercent : -deltaPercent;
       marketData[idx].flash = isUp ? 'up' : 'down';
       renderMarketTable();
-      showDemoToast(marketData[idx].pair + (isUp ? ' 📈 Up' : ' 📉 Down') + ' tick: $' + marketData[idx].price.toFixed(2), isUp ? 'success' : 'warning');
+      showDemoToast(marketData[idx].pair + (isUp ? ' ↑ Up' : ' ↓ Down') + ' tick: $' + marketData[idx].price.toFixed(2), isUp ? 'success' : 'warning');
       setTimeout(() => {
         marketData[idx].flash = null;
       }, 1000);
@@ -1829,6 +2211,35 @@ ${inlinedThemeCss}
       isSkeletonLoading = !isSkeletonLoading;
       document.getElementById('skeleton-card-loading').style.display = isSkeletonLoading ? 'block' : 'none';
       document.getElementById('skeleton-card-loaded').style.display = isSkeletonLoading ? 'none' : 'block';
+    }
+
+    // Wave 3 Date Picker & Icon Demo Handlers
+    function handleDateChange(val) {
+      document.getElementById('single-date-feedback').innerText = val;
+      showDemoToast('Date set to: ' + val, 'info');
+    }
+
+    function handleRangeChange() {
+      const start = document.getElementById('demo-range-start').value;
+      const end = document.getElementById('demo-range-end').value;
+      document.getElementById('range-date-feedback').innerText = start + ' to ' + end;
+      showDemoToast('Backtest window set: ' + start + ' → ' + end, 'info');
+    }
+
+    function copyIconName(name) {
+      const code = activeFramework === 'svelte'
+        ? "import { " + name + " } from '@joymify/icons';"
+        : "import { " + name + " } from '@joymify/icons';";
+      navigator.clipboard.writeText(code).then(() => {
+        showDemoToast('Copied: ' + code, 'success');
+        const banner = document.getElementById('copy-toast-banner');
+        if (banner) {
+          banner.style.display = 'inline';
+          setTimeout(() => banner.style.display = 'none', 2000);
+        }
+      }).catch(() => {
+        showDemoToast('Import: ' + code, 'info');
+      });
     }
 
     // Initial render
