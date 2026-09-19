@@ -42,3 +42,16 @@ export { TestimonialCard, type TestimonialCardProps } from './TestimonialCard.js
 export { Steps, type StepsProps, type StepItem } from './Steps.js';
 export { Timeline, type TimelineProps, type TimelineItem } from './Timeline.js';
 export { Result, type ResultProps, type ResultStatus } from './Result.js';
+
+// Wave 6: High-Performance Financial Charts & Layout Primitives
+export { LineChart, type LineChartProps } from './LineChart.js';
+export { BarChart, type BarChartProps } from './BarChart.js';
+export { CandlestickChart, type CandlestickChartProps } from './CandlestickChart.js';
+export { Divider, type DividerProps } from './Divider.js';
+export { Flex, type FlexProps } from './Flex.js';
+export { Space, type SpaceProps } from './Space.js';
+export { Splitter, type SplitterProps } from './Splitter.js';
+export { Statistic, type StatisticProps } from './Statistic.js';
+export { Tag, type TagProps } from './Tag.js';
+export { Segmented, type SegmentedProps, type SegmentedOption } from './Segmented.js';
+export { JoyChartCore, lttbDownsample, type ChartPoint, type CandlestickDataPoint, type SeriesConfig } from './chart-core.js';

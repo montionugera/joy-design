@@ -124,4 +124,37 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const result = fs.readFileSync(path.resolve('./src/lib/Result.svelte'), 'utf8');
   assert.ok(result.includes('joy-result'), 'Result must have joy-result class');
   assert.ok(result.includes('role="alert"'), 'Result must implement role=alert');
+
+  // Wave 6 Assertions (High-Performance Financial Charts & Layout Primitives)
+  const lineChart = fs.readFileSync(path.resolve('./src/lib/LineChart.svelte'), 'utf8');
+  assert.ok(lineChart.includes('joy-chart'), 'LineChart must have joy-chart class');
+  assert.ok(lineChart.includes('JoyChartCore'), 'LineChart must initialize JoyChartCore');
+
+  const candleChart = fs.readFileSync(path.resolve('./src/lib/CandlestickChart.svelte'), 'utf8');
+  assert.ok(candleChart.includes('joy-chart'), 'CandlestickChart must have joy-chart class');
+  assert.ok(candleChart.includes('joy-chart__hud'), 'CandlestickChart must render OHLC HUD');
+
+  const divider = fs.readFileSync(path.resolve('./src/lib/Divider.svelte'), 'utf8');
+  assert.ok(divider.includes('joy-divider'), 'Divider must have joy-divider class');
+  assert.ok(divider.includes('role="separator"'), 'Divider must implement role=separator');
+
+  const flex = fs.readFileSync(path.resolve('./src/lib/Flex.svelte'), 'utf8');
+  assert.ok(flex.includes('joy-flex'), 'Flex must have joy-flex class');
+
+  const space = fs.readFileSync(path.resolve('./src/lib/Space.svelte'), 'utf8');
+  assert.ok(space.includes('joy-space'), 'Space must have joy-space class');
+
+  const splitter = fs.readFileSync(path.resolve('./src/lib/Splitter.svelte'), 'utf8');
+  assert.ok(splitter.includes('joy-splitter'), 'Splitter must have joy-splitter class');
+  assert.ok(splitter.includes('role="separator"'), 'Splitter bar must implement role=separator');
+
+  const statistic = fs.readFileSync(path.resolve('./src/lib/Statistic.svelte'), 'utf8');
+  assert.ok(statistic.includes('joy-statistic'), 'Statistic must have joy-statistic class');
+
+  const tag = fs.readFileSync(path.resolve('./src/lib/Tag.svelte'), 'utf8');
+  assert.ok(tag.includes('joy-tag'), 'Tag must have joy-tag class');
+
+  const segmented = fs.readFileSync(path.resolve('./src/lib/Segmented.svelte'), 'utf8');
+  assert.ok(segmented.includes('joy-segmented'), 'Segmented must have joy-segmented class');
+  assert.ok(segmented.includes('role="radiogroup"'), 'Segmented must implement role=radiogroup');
 });
