@@ -934,3 +934,65 @@
   border-left: 4px solid var(--joy-color-status-danger, #ef4444);
 }
 
+/* ── WCAG 2.2 AA Focus Indicators ── */
+:focus-visible {
+  outline: 2px solid var(--joy-color-brand-primary, #7c3aed);
+  outline-offset: 2px;
+}
+
+/* ── Props Documentation Specification Tables ── */
+.joy-props-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-family: var(--joy-font-family-sans, sans-serif);
+  font-size: 0.8125rem;
+  border-radius: var(--joy-radius-md, 8px);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+.joy-props-table th {
+  background: var(--joy-color-surface-subtle, #f8fafc);
+  padding: 8px 12px;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  color: var(--joy-color-text-muted, #64748b);
+}
+.joy-props-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+.joy-props-table tr:last-child td {
+  border-bottom: none;
+}
+.joy-prop-name {
+  font-family: var(--joy-font-family-mono, monospace);
+  color: var(--joy-color-brand-primary, #7c3aed);
+  font-weight: 600;
+}
+.joy-prop-type {
+  font-family: var(--joy-font-family-mono, monospace);
+  color: #0284c7;
+  font-size: 0.75rem;
+}
+.joy-prop-default {
+  font-family: var(--joy-font-family-mono, monospace);
+  color: #64748b;
+  font-size: 0.75rem;
+}
+[data-theme="dark"] .joy-props-table {
+  border-color: #334155;
+}
+[data-theme="dark"] .joy-props-table th {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+[data-theme="dark"] .joy-props-table td {
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+
