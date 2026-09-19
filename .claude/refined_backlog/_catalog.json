@@ -178,5 +178,14 @@
     "claimed_at": "2026-09-19T15:52:25.430407+00:00",
     "shipped_at": "2026-09-19T15:53:58.881552+00:00",
     "promoted_at": "2026-09-19T15:54:58.776367+00:00"
+  },
+  {
+    "id": "F-016",
+    "title": "complete antd parity with upload avatar micro animations zero emoji hub and 48 novel icons",
+    "from_idea": "I-016",
+    "created_at": "2026-09-19T16:05:31.645445+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
