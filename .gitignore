@@ -1,0 +1,3 @@
+# ps-release-workflow (gitignored state)
+.claude/state/
+.claude/worktrees/
