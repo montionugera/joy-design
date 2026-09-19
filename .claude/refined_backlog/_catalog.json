@@ -202,5 +202,14 @@
     "claimed_at": "2026-09-19T17:04:05.511995+00:00",
     "shipped_at": "2026-09-19T17:09:37.620287+00:00",
     "promoted_at": "2026-09-19T17:10:37.131944+00:00"
+  },
+  {
+    "id": "F-018",
+    "title": "High-Performance Financial & Large-Dataset Charts Engine plus Ant Design Complete Parity Expansion",
+    "from_idea": "I-018",
+    "created_at": "2026-09-19T17:31:39.079169+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
