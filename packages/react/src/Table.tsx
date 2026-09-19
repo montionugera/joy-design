@@ -4,12 +4,17 @@ export interface Column<T> {
   key: keyof T | string;
   title: string;
   width?: string;
+  sortable?: boolean;
+  align?: 'left' | 'center' | 'right';
 }
 
 export interface TableProps<T> {
   columns: Column<T>[];
   data: T[];
   density?: 'compact' | 'normal';
+  sortKey?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (key: string, direction: 'asc' | 'desc') => void;
   className?: string;
 }
 
@@ -17,26 +22,87 @@ export function Table<T extends Record<string, any>>({
   columns,
   data,
   density = 'compact',
+  sortKey: controlledSortKey,
+  sortDirection: controlledSortDirection,
+  onSort,
   className = ''
 }: TableProps<T>) {
+  const [internalSortKey, setInternalSortKey] = React.useState<string>('');
+  const [internalSortDir, setInternalSortDir] = React.useState<'asc' | 'desc'>('asc');
+
+  const activeSortKey = controlledSortKey !== undefined ? controlledSortKey : internalSortKey;
+  const activeSortDir = controlledSortDirection !== undefined ? controlledSortDirection : internalSortDir;
+
+  const handleHeaderClick = (col: Column<T>) => {
+    if (!col.sortable) return;
+    const key = String(col.key);
+    let nextDir: 'asc' | 'desc' = 'asc';
+    if (activeSortKey === key) {
+      nextDir = activeSortDir === 'asc' ? 'desc' : 'asc';
+    }
+    if (controlledSortKey === undefined) {
+      setInternalSortKey(key);
+      setInternalSortDir(nextDir);
+    }
+    onSort?.(key, nextDir);
+  };
+
   return (
     <div className={`joy-table-container ${className}`}>
       <table className={`joy-table joy-table--${density}`}>
         <thead>
           <tr>
-            {columns.map((col, idx) => (
-              <th key={String(col.key) || idx} style={col.width ? { width: col.width } : undefined}>
-                {col.title}
-              </th>
-            ))}
+            {columns.map((col, idx) => {
+              const key = String(col.key);
+              const isSorted = activeSortKey === key;
+              const thClass = [
+                col.sortable ? 'joy-table-th--sortable' : '',
+                isSorted && activeSortDir === 'asc' ? 'joy-table-th--sorted-asc' : '',
+                isSorted && activeSortDir === 'desc' ? 'joy-table-th--sorted-desc' : ''
+              ].filter(Boolean).join(' ');
+
+              return (
+                <th
+                  key={key || idx}
+                  className={thClass || undefined}
+                  style={{
+                    width: col.width,
+                    textAlign: col.align || 'left'
+                  }}
+                  onClick={() => handleHeaderClick(col)}
+                >
+                  <span>{col.title}</span>
+                  {col.sortable && (
+                    <span className="joy-table-sort-icon">
+                      {isSorted ? (activeSortDir === 'asc' ? '▲' : '▼') : '⇅'}
+                    </span>
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
           {data.map((row, rIdx) => (
             <tr key={rIdx}>
-              {columns.map((col, cIdx) => (
-                <td key={String(col.key) || cIdx}>{row[col.key] ?? ''}</td>
-              ))}
+              {columns.map((col, cIdx) => {
+                const flash = row._flash?.[col.key];
+                const tdClass = flash === 'up'
+                  ? 'joy-table-cell--flash-up'
+                  : flash === 'down'
+                  ? 'joy-table-cell--flash-down'
+                  : undefined;
+
+                return (
+                  <td
+                    key={String(col.key) || cIdx}
+                    className={tdClass}
+                    style={{ textAlign: col.align || 'left' }}
+                  >
+                    {row[col.key] ?? ''}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

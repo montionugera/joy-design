@@ -22,4 +22,12 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-radio-group'), 'radio group styles must exist');
   assert.ok(css.includes('.joy-drawer'), 'drawer panel styles must exist');
   assert.ok(css.includes('.joy-toast-container'), 'toast notifications container styles must exist');
+
+  // Wave 2 Assertions (Financial Suite & Skeletons)
+  assert.ok(css.includes('.joy-table-cell--flash-up'), 'table ticker flash-up must exist');
+  assert.ok(css.includes('.joy-table-cell--flash-down'), 'table ticker flash-down must exist');
+  assert.ok(css.includes('.joy-table-th--sortable'), 'table sortable header styles must exist');
+  assert.ok(css.includes('.joy-pagination'), 'pagination container styles must exist');
+  assert.ok(css.includes('.joy-skeleton'), 'skeleton loader styles must exist');
 });
+

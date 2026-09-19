@@ -14,3 +14,5 @@ export { default as Checkbox } from './Checkbox.svelte';
 export { default as RadioGroup } from './RadioGroup.svelte';
 export { default as Drawer } from './Drawer.svelte';
 export { default as Toast } from './Toast.svelte';
+export { default as Pagination } from './Pagination.svelte';
+export { default as Skeleton } from './Skeleton.svelte';
