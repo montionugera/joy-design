@@ -69,7 +69,8 @@ const navIcons = {
   landing: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
   workflow: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
   charts: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>`,
-  primitives: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
+  primitives: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+  forms: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`
 };
 
 const html = `<!DOCTYPE html>
@@ -697,6 +698,10 @@ ${inlinedThemeCss}
       </a>
       <a class="nav-item" onclick="switchView('primitives')">
         <span class="icon">${navIcons.primitives}</span> Layout & AntD Primitives
+      </a>
+      <div class="nav-section">Wave 7: Form & Data Entry</div>
+      <a class="nav-item" onclick="switchView('forms')">
+        <span class="icon">${navIcons.forms}</span> Form & Advanced Data Entry
       </a>
     </nav>
   </aside>
@@ -2558,6 +2563,251 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
         </div>
       </section>
+
+      <!-- View: Form Suite & Advanced Data Entry Parity -->
+      <section id="view-forms" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Form Suite & Advanced Data Entry Parity</h2>
+        <p class="header-tagline">Ant Design v5 / v6 data entry parity: Form with validation rules & explains, InputNumber spinbutton stepper, Rate interactive star rating, Mentions autocomplete, TimePicker column selector, and Transfer dual-panel list migration.</p>
+
+        <!-- Form & Validation Showcase -->
+        <div class="component-card">
+          <div class="component-header">
+            <div>
+              <div class="component-title">Form & FormItem Validation Engine</div>
+              <div class="component-desc">Standardized enterprise form containers supporting horizontal, vertical, and inline layouts with automatic validation state and explain indicators.</div>
+            </div>
+            <span class="joy-badge joy-badge--brand joy-badge--sm">Ant Design Parity</span>
+          </div>
+          <div class="component-canvas">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; width: 100%;">
+              <!-- Vertical Form -->
+              <div class="joy-form joy-form--vertical" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0);">
+                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-color-brand-primary, #7c3aed);">Vertical Layout with Validation Rules</div>
+                
+                <div class="joy-form-item">
+                  <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Asset Symbol</label>
+                  <div class="joy-form-item__control">
+                    <div class="joy-input-wrapper">
+                      <input class="joy-input" placeholder="e.g. BTC-USDT" value="ETH-PERP" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="joy-form-item joy-form-item--error">
+                  <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Order Execution Size</label>
+                  <div class="joy-form-item__control">
+                    <div class="joy-input-wrapper joy-input-wrapper--error">
+                      <input class="joy-input" placeholder="Min 0.01" value="0.005" />
+                    </div>
+                    <div class="joy-form-item__explain" role="alert">Order size must be at least 0.01 contracts for high-liquidity books</div>
+                  </div>
+                </div>
+
+                <div class="joy-form-item">
+                  <label class="joy-form-item__label">Execution Strategy</label>
+                  <div class="joy-form-item__control">
+                    <div class="joy-select" style="width: 100%;">
+                      <select class="joy-select__input" style="width: 100%; height: 36px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #cbd5e1); background: var(--joy-color-surface-elevated, #fff); color: var(--joy-color-text-primary, #0f172a);">
+                        <option>TWAP (Time-Weighted Average Price)</option>
+                        <option>VWAP (Volume-Weighted Average Price)</option>
+                        <option>POV (Percentage of Volume)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" class="joy-button joy-button--primary joy-button--md" style="align-self: flex-start; margin-top: 8px;">Submit Order</button>
+              </div>
+
+              <!-- Horizontal Form -->
+              <div class="joy-form joy-form--horizontal" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0);">
+                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-color-brand-primary, #7c3aed);">Horizontal Layout Alignment</div>
+                
+                <div class="joy-form-item joy-form-item--horizontal">
+                  <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Account Name</label>
+                  <div class="joy-form-item__control">
+                    <div class="joy-input-wrapper">
+                      <input class="joy-input" value="Trading Ops Prime #01" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="joy-form-item joy-form-item--horizontal">
+                  <label class="joy-form-item__label">Routing Venue</label>
+                  <div class="joy-form-item__control">
+                    <div class="joy-input-wrapper">
+                      <input class="joy-input" value="Direct DMA Gateway 4" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="joy-form-item joy-form-item--horizontal joy-form-item--error">
+                  <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Daily Max Drawdown</label>
+                  <div class="joy-form-item__control">
+                    <div class="joy-input-wrapper joy-input-wrapper--error">
+                      <input class="joy-input" value="35%" />
+                    </div>
+                    <div class="joy-form-item__explain" role="alert">Max permitted risk threshold is 25% per fund policy</div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 12px; margin-left: 140px;">
+                  <button type="button" class="joy-button joy-button--primary joy-button--md">Save Policy</button>
+                  <button type="button" class="joy-button joy-button--outline joy-button--md">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- InputNumber, Rate, Mentions, TimePicker Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-top: 24px;">
+          <!-- InputNumber Card -->
+          <div class="component-card">
+            <div class="component-header">
+              <div>
+                <div class="component-title">InputNumber Stepper</div>
+                <div class="component-desc">High-density numeric spinbutton with min, max, precision, and keyboard arrow controls.</div>
+              </div>
+            </div>
+            <div class="component-canvas" style="flex-direction: column; align-items: flex-start; gap: 16px;">
+              <div>
+                <div style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 6px;">Leverage Multiplier (1x - 100x):</div>
+                <div class="joy-input-number" role="spinbutton" aria-valuenow="10" aria-valuemin="1" aria-valuemax="100" tabindex="0">
+                  <input type="text" class="joy-input-number__input" id="demo-num-input" value="10" />
+                  <div class="joy-input-number__handler-wrap">
+                    <button type="button" class="joy-input-number__handler-up" aria-label="Increase" onclick="stepNumberDemo(1)">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <button type="button" class="joy-input-number__handler-down" aria-label="Decrease" onclick="stepNumberDemo(-1)">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 6px;">Precision Sizing (step 0.05):</div>
+                <div class="joy-input-number" role="spinbutton" aria-valuenow="1.25" tabindex="0">
+                  <input type="text" class="joy-input-number__input" id="demo-num-step" value="1.25" />
+                  <div class="joy-input-number__handler-wrap">
+                    <button type="button" class="joy-input-number__handler-up" aria-label="Increase" onclick="stepFloatDemo(0.05)">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <button type="button" class="joy-input-number__handler-down" aria-label="Decrease" onclick="stepFloatDemo(-0.05)">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rate Card -->
+          <div class="component-card">
+            <div class="component-header">
+              <div>
+                <div class="component-title">Rate Rating Scale</div>
+                <div class="component-desc">Accessible radiogroup rating scale with full and half-star granularity and hover feedback.</div>
+              </div>
+            </div>
+            <div class="component-canvas" style="flex-direction: column; align-items: flex-start; gap: 16px;">
+              <div>
+                <div style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 6px;">Execution Quality Rating:</div>
+                <div class="joy-rate" id="demo-rate" role="radiogroup" aria-label="Rating"></div>
+                <div id="rate-feedback" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-color-brand-accent, #c49a3a); margin-top: 6px;">4.5 Stars</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mentions Card -->
+          <div class="component-card">
+            <div class="component-header">
+              <div>
+                <div class="component-title">Mentions Autocomplete</div>
+                <div class="component-desc">Trigger-based (@ and #) entity tagging with smart suggestion dropdown menu.</div>
+              </div>
+            </div>
+            <div class="component-canvas" style="flex-direction: column; width: 100%;">
+              <div class="joy-mentions" style="width: 100%;">
+                <textarea class="joy-mentions__textarea" rows="3" placeholder="Type @ to mention risk officer or analyst, e.g. @alice" id="demo-mentions" oninput="handleMentionsInput(event)"></textarea>
+                <div class="joy-mentions__dropdown" id="demo-mentions-dropdown" style="display: none;" role="listbox">
+                  <div class="joy-mentions__item" onclick="insertMention('alice')"><span>@alice</span> (Senior Quant)</div>
+                  <div class="joy-mentions__item" onclick="insertMention('bob')"><span>@bob</span> (Risk Manager)</div>
+                  <div class="joy-mentions__item" onclick="insertMention('carol')"><span>@carol</span> (Portfolio Lead)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TimePicker Card -->
+          <div class="component-card">
+            <div class="component-header">
+              <div>
+                <div class="component-title">TimePicker Column Selector</div>
+                <div class="component-desc">Precise time selection with hours, minutes, and seconds scrollable columns.</div>
+              </div>
+            </div>
+            <div class="component-canvas" style="flex-direction: column; align-items: flex-start;">
+              <div class="joy-time-picker" style="width: 220px;">
+                <div class="joy-input-wrapper" onclick="toggleTimePickerDemo()" style="cursor: pointer;">
+                  <input type="text" class="joy-input" id="demo-time-input" readonly value="09:30:00" style="cursor: pointer;" />
+                  <span style="padding-right: 10px; display: flex; align-items: center; color: var(--joy-color-text-muted, #64748b);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </span>
+                </div>
+                <div class="joy-time-picker__panel" id="demo-time-panel" style="display: none;" role="dialog">
+                  <div class="joy-time-picker__column" id="demo-time-h"></div>
+                  <div class="joy-time-picker__column" id="demo-time-m"></div>
+                  <div class="joy-time-picker__column" id="demo-time-s"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transfer Component Showcase (Screenshot 5 parity) -->
+        <div class="component-card" style="margin-top: 24px;">
+          <div class="component-header">
+            <div>
+              <div class="component-title">Transfer Dual-Panel Migration (Ant Design Screenshot 5 Parity)</div>
+              <div class="component-desc">High-throughput transfer list migration engine with multi-item checkbox selection, dynamic count headers, and directional migration controls.</div>
+            </div>
+            <span class="joy-badge joy-badge--brand joy-badge--sm">Direct AntD Parity</span>
+          </div>
+          <div class="component-canvas">
+            <div class="joy-transfer" style="max-width: 640px; margin: 0 auto; width: 100%;" id="demo-transfer-container">
+              <!-- Left Panel -->
+              <div class="joy-transfer__list">
+                <div class="joy-transfer__header">
+                  <span>Available Liquidity Pools</span>
+                  <span class="joy-transfer__header-count" id="transfer-source-count">0/5 items</span>
+                </div>
+                <div class="joy-transfer__body" id="transfer-source-list"></div>
+              </div>
+
+              <!-- Operation Controls -->
+              <div class="joy-transfer__operations">
+                <button type="button" class="joy-button joy-button--primary joy-button--sm" id="btn-transfer-right" onclick="executeTransfer('right')" aria-label="Migrate right">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+                <button type="button" class="joy-button joy-button--primary joy-button--sm" id="btn-transfer-left" onclick="executeTransfer('left')" aria-label="Migrate left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+              </div>
+
+              <!-- Right Panel -->
+              <div class="joy-transfer__list">
+                <div class="joy-transfer__header">
+                  <span>Active Routing Targets</span>
+                  <span class="joy-transfer__header-count" id="transfer-target-count">0/2 items</span>
+                </div>
+                <div class="joy-transfer__body" id="transfer-target-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
   </main>
 
   <!-- Interactive Demo Drawer -->
@@ -3186,6 +3436,200 @@ export async function executeHedge(symbol: string, size: number) {
         showDemoToast('Time horizon set: ' + val.toUpperCase(), 'info');
       }
 
+      // Wave 7 Interactive Handlers
+      function stepNumberDemo(delta) {
+        const inp = document.getElementById('demo-num-input');
+        if (!inp) return;
+        let v = parseInt(inp.value, 10) || 0;
+        v = Math.max(1, Math.min(100, v + delta));
+        inp.value = v;
+        inp.parentElement.setAttribute('aria-valuenow', v);
+      }
+
+      function stepFloatDemo(delta) {
+        const inp = document.getElementById('demo-num-step');
+        if (!inp) return;
+        let v = parseFloat(inp.value) || 0;
+        v = Math.max(0, parseFloat((v + delta).toFixed(2)));
+        inp.value = v.toFixed(2);
+        inp.parentElement.setAttribute('aria-valuenow', v);
+      }
+
+      let currentRate = 4.5;
+      function renderRateDemo(val) {
+        currentRate = val;
+        const container = document.getElementById('demo-rate');
+        const feedback = document.getElementById('rate-feedback');
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+          const isFull = val >= i + 1;
+          const isHalf = !isFull && val >= i + 0.5;
+          const star = document.createElement('div');
+          star.className = 'joy-rate__star' + (isFull ? ' joy-rate__star--full' : '') + (isHalf ? ' joy-rate__star--half' : '');
+          star.setAttribute('role', 'radio');
+          star.setAttribute('aria-checked', isFull ? 'true' : 'false');
+          star.setAttribute('tabindex', '0');
+          star.onclick = () => renderRateDemo(i + 1);
+          const fill = isFull || isHalf ? 'currentColor' : 'none';
+          star.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="' + fill + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+          container.appendChild(star);
+        }
+        if (feedback) feedback.innerText = val + ' Stars';
+      }
+
+      function handleMentionsInput(e) {
+        const text = e.target.value;
+        const dropdown = document.getElementById('demo-mentions-dropdown');
+        if (!dropdown) return;
+        if (text.includes('@')) {
+          dropdown.style.display = 'block';
+        } else {
+          dropdown.style.display = 'none';
+        }
+      }
+
+      function insertMention(name) {
+        const ta = document.getElementById('demo-mentions');
+        const dropdown = document.getElementById('demo-mentions-dropdown');
+        if (!ta || !dropdown) return;
+        const atIndex = ta.value.lastIndexOf('@');
+        ta.value = ta.value.slice(0, atIndex) + '@' + name + ' ';
+        dropdown.style.display = 'none';
+        ta.focus();
+        showDemoToast('Mentioned @' + name, 'info');
+      }
+
+      function toggleTimePickerDemo() {
+        const panel = document.getElementById('demo-time-panel');
+        if (!panel) return;
+        panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+      }
+
+      function renderTimePickerCols() {
+        const hCol = document.getElementById('demo-time-h');
+        const mCol = document.getElementById('demo-time-m');
+        const sCol = document.getElementById('demo-time-s');
+        if (!hCol || !mCol || !sCol) return;
+
+        hCol.innerHTML = '';
+        mCol.innerHTML = '';
+        sCol.innerHTML = '';
+
+        for (let i = 0; i < 24; i++) {
+          const val = String(i).padStart(2, '0');
+          const cell = document.createElement('div');
+          cell.className = 'joy-time-picker__cell' + (val === '09' ? ' joy-time-picker__cell--selected' : '');
+          cell.innerText = val;
+          cell.onclick = () => {
+            hCol.querySelectorAll('.joy-time-picker__cell').forEach(c => c.classList.remove('joy-time-picker__cell--selected'));
+            cell.classList.add('joy-time-picker__cell--selected');
+            updateTimeInput();
+          };
+          hCol.appendChild(cell);
+        }
+
+        for (let i = 0; i < 60; i += 5) {
+          const val = String(i).padStart(2, '0');
+          const cell = document.createElement('div');
+          cell.className = 'joy-time-picker__cell' + (val === '30' ? ' joy-time-picker__cell--selected' : '');
+          cell.innerText = val;
+          cell.onclick = () => {
+            mCol.querySelectorAll('.joy-time-picker__cell').forEach(c => c.classList.remove('joy-time-picker__cell--selected'));
+            cell.classList.add('joy-time-picker__cell--selected');
+            updateTimeInput();
+          };
+          mCol.appendChild(cell);
+        }
+
+        for (let i = 0; i < 60; i += 10) {
+          const val = String(i).padStart(2, '0');
+          const cell = document.createElement('div');
+          cell.className = 'joy-time-picker__cell' + (val === '00' ? ' joy-time-picker__cell--selected' : '');
+          cell.innerText = val;
+          cell.onclick = () => {
+            sCol.querySelectorAll('.joy-time-picker__cell').forEach(c => c.classList.remove('joy-time-picker__cell--selected'));
+            cell.classList.add('joy-time-picker__cell--selected');
+            updateTimeInput();
+          };
+          sCol.appendChild(cell);
+        }
+      }
+
+      function updateTimeInput() {
+        const h = document.querySelector('#demo-time-h .joy-time-picker__cell--selected')?.innerText || '00';
+        const m = document.querySelector('#demo-time-m .joy-time-picker__cell--selected')?.innerText || '00';
+        const s = document.querySelector('#demo-time-s .joy-time-picker__cell--selected')?.innerText || '00';
+        const inp = document.getElementById('demo-time-input');
+        if (inp) inp.value = h + ':' + m + ':' + s;
+      }
+
+      // Transfer demo data
+      let transferData = [
+        { key: 'p1', title: 'Uniswap v3 ETH/USDC 0.05%', target: false },
+        { key: 'p2', title: 'Curve 3pool DAI/USDC/USDT', target: false },
+        { key: 'p3', title: 'Balancer Boosted Aave Pool', target: false },
+        { key: 'p4', title: 'Raydium SOL/USDC CLMM', target: false },
+        { key: 'p5', title: 'TraderJoe AVAX/USDC 0.20%', target: false },
+        { key: 'p6', title: 'Binance Central Order Book Spot', target: true },
+        { key: 'p7', title: 'Coinbase Institutional Prime Gateway', target: true }
+      ];
+
+      function renderTransferDemo() {
+        const sList = document.getElementById('transfer-source-list');
+        const tList = document.getElementById('transfer-target-list');
+        if (!sList || !tList) return;
+
+        sList.innerHTML = '';
+        tList.innerHTML = '';
+
+        const sources = transferData.filter(d => !d.target);
+        const targets = transferData.filter(d => d.target);
+
+        sources.forEach(item => {
+          const row = document.createElement('label');
+          row.className = 'joy-transfer__item';
+          row.innerHTML = '<input type="checkbox" data-key="' + item.key + '" class="transfer-source-chk" onchange="updateTransferCounts()" /> <span>' + item.title + '</span>';
+          sList.appendChild(row);
+        });
+
+        targets.forEach(item => {
+          const row = document.createElement('label');
+          row.className = 'joy-transfer__item';
+          row.innerHTML = '<input type="checkbox" data-key="' + item.key + '" class="transfer-target-chk" onchange="updateTransferCounts()" /> <span>' + item.title + '</span>';
+          tList.appendChild(row);
+        });
+
+        updateTransferCounts();
+      }
+
+      function updateTransferCounts() {
+        const sChecked = document.querySelectorAll('.transfer-source-chk:checked').length;
+        const sTotal = document.querySelectorAll('.transfer-source-chk').length;
+        const tChecked = document.querySelectorAll('.transfer-target-chk:checked').length;
+        const tTotal = document.querySelectorAll('.transfer-target-chk').length;
+
+        const sCount = document.getElementById('transfer-source-count');
+        const tCount = document.getElementById('transfer-target-count');
+        if (sCount) sCount.innerText = sChecked + '/' + sTotal + ' items';
+        if (tCount) tCount.innerText = tChecked + '/' + tTotal + ' items';
+      }
+
+      function executeTransfer(direction) {
+        if (direction === 'right') {
+          const checked = Array.from(document.querySelectorAll('.transfer-source-chk:checked')).map(c => c.getAttribute('data-key'));
+          if (checked.length === 0) return;
+          transferData.forEach(d => { if (checked.includes(d.key)) d.target = true; });
+          showDemoToast('Migrated ' + checked.length + ' pools to Target routing', 'success');
+        } else {
+          const checked = Array.from(document.querySelectorAll('.transfer-target-chk:checked')).map(c => c.getAttribute('data-key'));
+          if (checked.length === 0) return;
+          transferData.forEach(d => { if (checked.includes(d.key)) d.target = false; });
+          showDemoToast('Returned ' + checked.length + ' pools to Source pool', 'info');
+        }
+        renderTransferDemo();
+      }
+
     // Initial render
     setTimeout(() => {
       renderMarketTable();
@@ -3193,6 +3637,9 @@ export async function executeHedge(symbol: string, size: number) {
       generateMockMarketData();
       drawCandlestickCanvas();
       drawLineCanvas();
+      renderRateDemo(4.5);
+      renderTimePickerCols();
+      renderTransferDemo();
     }, 100);
 
     function updateCodeSnippets() {

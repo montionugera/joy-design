@@ -157,4 +157,32 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const segmented = fs.readFileSync(path.resolve('./src/lib/Segmented.svelte'), 'utf8');
   assert.ok(segmented.includes('joy-segmented'), 'Segmented must have joy-segmented class');
   assert.ok(segmented.includes('role="radiogroup"'), 'Segmented must implement role=radiogroup');
+
+  // Wave 7 Assertions (Form Suite & Advanced Data Entry)
+  const form = fs.readFileSync(path.resolve('./src/lib/Form.svelte'), 'utf8');
+  assert.ok(form.includes('joy-form'), 'Form must have joy-form class');
+  assert.ok(form.includes('$props()'), 'Form must use Svelte 5 runes');
+
+  const formItem = fs.readFileSync(path.resolve('./src/lib/FormItem.svelte'), 'utf8');
+  assert.ok(formItem.includes('joy-form-item'), 'FormItem must have joy-form-item class');
+  assert.ok(formItem.includes('role="alert"'), 'FormItem error explain must implement alert role');
+
+  const inputNumber = fs.readFileSync(path.resolve('./src/lib/InputNumber.svelte'), 'utf8');
+  assert.ok(inputNumber.includes('joy-input-number'), 'InputNumber must have joy-input-number class');
+  assert.ok(inputNumber.includes('role="spinbutton"'), 'InputNumber must implement role=spinbutton');
+
+  const rate = fs.readFileSync(path.resolve('./src/lib/Rate.svelte'), 'utf8');
+  assert.ok(rate.includes('joy-rate'), 'Rate must have joy-rate class');
+  assert.ok(rate.includes('role="radiogroup"'), 'Rate must implement role=radiogroup');
+
+  const mentions = fs.readFileSync(path.resolve('./src/lib/Mentions.svelte'), 'utf8');
+  assert.ok(mentions.includes('joy-mentions'), 'Mentions must have joy-mentions class');
+  assert.ok(mentions.includes('role="listbox"'), 'Mentions dropdown must implement role=listbox');
+
+  const timePicker = fs.readFileSync(path.resolve('./src/lib/TimePicker.svelte'), 'utf8');
+  assert.ok(timePicker.includes('joy-time-picker'), 'TimePicker must have joy-time-picker class');
+
+  const transfer = fs.readFileSync(path.resolve('./src/lib/Transfer.svelte'), 'utf8');
+  assert.ok(transfer.includes('joy-transfer'), 'Transfer must have joy-transfer class');
 });
+

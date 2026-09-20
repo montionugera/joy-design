@@ -165,4 +165,37 @@ test('React standard library components implement accessible traits and forwardR
   const segmented = fs.readFileSync(path.resolve('./src/Segmented.tsx'), 'utf8');
   assert.ok(segmented.includes('joy-segmented'), 'Segmented must render joy-segmented class');
   assert.ok(segmented.includes('role="radiogroup"'), 'Segmented must implement role=radiogroup');
+
+  // Wave 7 Assertions (Form Suite & Advanced Data Entry)
+  const form = fs.readFileSync(path.resolve('./src/Form.tsx'), 'utf8');
+  assert.ok(form.includes('joy-form'), 'Form must render joy-form class');
+  assert.ok(form.includes('React.forwardRef'), 'Form must implement forwardRef');
+
+  const formItem = fs.readFileSync(path.resolve('./src/FormItem.tsx'), 'utf8');
+  assert.ok(formItem.includes('joy-form-item'), 'FormItem must render joy-form-item class');
+  assert.ok(formItem.includes('role="alert"'), 'FormItem error explain must implement alert role');
+
+  const inputNumber = fs.readFileSync(path.resolve('./src/InputNumber.tsx'), 'utf8');
+  assert.ok(inputNumber.includes('joy-input-number'), 'InputNumber must render joy-input-number class');
+  assert.ok(inputNumber.includes('role="spinbutton"'), 'InputNumber must implement role=spinbutton');
+  assert.ok(inputNumber.includes('React.forwardRef'), 'InputNumber must implement forwardRef');
+
+  const rate = fs.readFileSync(path.resolve('./src/Rate.tsx'), 'utf8');
+  assert.ok(rate.includes('joy-rate'), 'Rate must render joy-rate class');
+  assert.ok(rate.includes('role="radiogroup"'), 'Rate must implement role=radiogroup');
+  assert.ok(rate.includes('React.forwardRef'), 'Rate must implement forwardRef');
+
+  const mentions = fs.readFileSync(path.resolve('./src/Mentions.tsx'), 'utf8');
+  assert.ok(mentions.includes('joy-mentions'), 'Mentions must render joy-mentions class');
+  assert.ok(mentions.includes('role="listbox"'), 'Mentions dropdown must implement role=listbox');
+  assert.ok(mentions.includes('React.forwardRef'), 'Mentions must implement forwardRef');
+
+  const timePicker = fs.readFileSync(path.resolve('./src/TimePicker.tsx'), 'utf8');
+  assert.ok(timePicker.includes('joy-time-picker'), 'TimePicker must render joy-time-picker class');
+  assert.ok(timePicker.includes('React.forwardRef'), 'TimePicker must implement forwardRef');
+
+  const transfer = fs.readFileSync(path.resolve('./src/Transfer.tsx'), 'utf8');
+  assert.ok(transfer.includes('joy-transfer'), 'Transfer must render joy-transfer class');
+  assert.ok(transfer.includes('React.forwardRef'), 'Transfer must implement forwardRef');
 });
+
