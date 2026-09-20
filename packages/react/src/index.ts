@@ -31,6 +31,7 @@ export { Avatar, type AvatarProps, type AvatarShape, type AvatarSize, type Avata
 export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup.js';
 export { Slider, type SliderProps } from './Slider.js';
 export { MarkdownViewer, type MarkdownViewerProps } from './MarkdownViewer.js';
+export { MarkdownEditor, type MarkdownEditorProps } from './MarkdownEditor.js';
 
 // Wave 5: Landing Page Architecture & Enterprise Workflow Suite
 export { BentoGrid, type BentoGridProps } from './BentoGrid.js';

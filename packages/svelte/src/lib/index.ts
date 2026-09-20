@@ -31,6 +31,7 @@ export { default as Avatar } from './Avatar.svelte';
 export { default as AvatarGroup } from './AvatarGroup.svelte';
 export { default as Slider } from './Slider.svelte';
 export { default as MarkdownViewer } from './MarkdownViewer.svelte';
+export { default as MarkdownEditor } from './MarkdownEditor.svelte';
 
 // Wave 5 Components (Landing Page Architecture & Enterprise Workflow Suite)
 export { default as BentoGrid } from './BentoGrid.svelte';

@@ -221,6 +221,14 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const overlayUtils = fs.readFileSync(path.resolve('./src/lib/overlay-utils.ts'), 'utf8');
   assert.ok(overlayUtils.includes('lockBodyScroll'), 'overlay-utils must export lockBodyScroll');
   assert.ok(overlayUtils.includes('trapFocus'), 'overlay-utils must export trapFocus');
+
+  // Wave 10B Assertions (Live Markdown Editor & Sanitized Preview)
+  const mdEditor = fs.readFileSync(path.resolve('./src/lib/MarkdownEditor.svelte'), 'utf8');
+  assert.ok(mdEditor.includes('joy-markdown-editor'), 'MarkdownEditor must render joy-markdown-editor container');
+  assert.ok(mdEditor.includes('joy-markdown-editor__toolbar'), 'MarkdownEditor must render toolbar');
+  assert.ok(mdEditor.includes('joy-markdown-editor__preview'), 'MarkdownEditor must render live preview');
+  assert.ok(mdEditor.includes('handleEditorScroll'), 'MarkdownEditor must implement synchronized editor scroll');
+  assert.ok(mdEditor.includes('handlePreviewScroll'), 'MarkdownEditor must implement synchronized preview scroll');
 });
 
 
