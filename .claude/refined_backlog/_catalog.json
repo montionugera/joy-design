@@ -334,5 +334,14 @@
     "claimed_at": "2026-09-20T04:43:07.234567+00:00",
     "shipped_at": "2026-09-20T04:44:27.056004+00:00",
     "promoted_at": "2026-09-20T04:44:56.614454+00:00"
+  },
+  {
+    "id": "F-029",
+    "title": "wave-12-micro-animations-and-storybook-showcase",
+    "from_idea": "I-029",
+    "created_at": "2026-09-20T04:45:32.245065+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
