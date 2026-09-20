@@ -55,3 +55,13 @@ export { default as Statistic } from './Statistic.svelte';
 export { default as Tag } from './Tag.svelte';
 export { default as Segmented, type SegmentedOption } from './Segmented.svelte';
 export { JoyChartCore, lttbDownsample, type ChartPoint, type CandlestickDataPoint, type SeriesConfig } from './chart-core.js';
+
+// Wave 7: Form Suite & Advanced Data Entry Parity
+export { default as Form } from './Form.svelte';
+export { default as FormItem, type ValidationRule } from './FormItem.svelte';
+export { default as InputNumber } from './InputNumber.svelte';
+export { default as Rate } from './Rate.svelte';
+export { default as Mentions, type MentionOption } from './Mentions.svelte';
+export { default as TimePicker } from './TimePicker.svelte';
+export { default as Transfer, type TransferItem } from './Transfer.svelte';
+

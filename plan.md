@@ -1,48 +1,53 @@
-# [F-018] High-Performance Financial Charts Engine & Core Ant Design Parity Suite
+# [F-019] Form Suite & Advanced Data Entry Parity
 
-> **For agentic workers:** Autonomous execution mode. Zero mid-turn interruptions. Evidence before assertions. Zero OS emojis.
+> **Autonomous Execution Standard**: Zero mid-turn interruptions. Verify evidence before assertions. Zero OS emojis.
 
-**Goal:** Implement the Joymify High-Performance Financial & Large-Dataset Charts Engine (`LineChart`, `BarChart`, `CandlestickChart` with LTTB decimation, zoom, pan, crosshair, and telemetry HUD) alongside Ant Design Layout & General Primitives (`Divider`, `Flex`, `Space`, `Splitter`, `Statistic`, `Tag`, `Segmented`) with full dual-framework parity (Svelte 5 Runes & React 19), interactive Storybook Hub showcases, and Kubernetes deployment.
+**Goal**: Deliver complete Ant Design parity for Data Entry:
+1. `Form` & `Form.Item` with client/async validation engine (`rules`: `required`, `min`, `max`, `pattern`, `validator`).
+2. `InputNumber`: High-density numeric stepper with min, max, step, precision, spinbutton ARIA traits, and keyboard arrows.
+3. `Rate`: Interactive star rating scale with half-star granularity, hover feedback, and radiogroup ARIA semantics.
+4. `Mentions`: Trigger-based `@` and `#` autocomplete tagging input with dropdown menu.
+5. `TimePicker`: Column-based hour/minute/second picker with 24-hour and 12-hour presets.
+6. `Transfer`: Dual-panel list migration component with selection counts, search filter, and directional action buttons (matching Ant Design Screenshot 5).
+
+Dual-framework exports (`@joymify/svelte` + `@joymify/react`), Storybook Hub interactive showcases, and live Kubernetes deployment.
 
 ---
 
 ## Phase 1: Tokens & Styling Engine Expansion
-- [x] Add Chart & Layout CSS tokens in `packages/tokens/build.js`:
-  - Chart container, canvas overlays, and floating precision HUD (`.joy-chart`, `.joy-chart__hud`, `.joy-chart__crosshair`)
-  - Layout primitives (`.joy-divider`, `.joy-flex`, `.joy-space`, `.joy-splitter`)
-  - Data display primitives (`.joy-typography`, `.joy-statistic`, `.joy-tag`, `.joy-segmented`)
+- [x] Add CSS classes in `packages/tokens/build.js`:
+  - `.joy-form`, `.joy-form-item`, `.joy-form-item__label`, `.joy-form-item__explain`, `.joy-form-item--error`
+  - `.joy-input-number`, `.joy-input-number__handler-wrap`, `.joy-input-number__handler-up`, `.joy-input-number__handler-down`
+  - `.joy-rate`, `.joy-rate__star`, `.joy-rate__star--half`, `.joy-rate__star--full`
+  - `.joy-mentions`, `.joy-mentions__dropdown`, `.joy-mentions__item`
+  - `.joy-time-picker`, `.joy-time-picker__panel`, `.joy-time-picker__column`
+  - `.joy-transfer`, `.joy-transfer__list`, `.joy-transfer__header`, `.joy-transfer__body`, `.joy-transfer__operations`
 - [x] Compile tokens and verify `packages/tokens/test/tokens.test.js`
 
-## Phase 2: Core Charts Engine & Algorithms
-- [x] Implement `JoyChartCore` zero-dependency Canvas engine:
-  - High-DPR sub-pixel crisp rendering with half-pixel alignment
-  - 100,000+ points LTTB (Largest-Triangle-Three-Buckets) decimation algorithm
-  - Monotone cubic hermite spline smoothing
-  - Interactive wheel zoom and inertial pan
-  - Dual-canvas magnetic crosshair & axis pill overlays
-- [x] Implement Svelte 5 Components:
-  - `LineChart.svelte`
-  - `BarChart.svelte`
-  - `CandlestickChart.svelte`
-  - `Divider.svelte`, `Flex.svelte`, `Space.svelte`, `Splitter.svelte`
-  - `Statistic.svelte`, `Tag.svelte`, `Segmented.svelte`
+## Phase 2: Svelte 5 Runes Implementation
+- [x] `Form.svelte` & `FormItem.svelte`
+- [x] `InputNumber.svelte`
+- [x] `Rate.svelte`
+- [x] `Mentions.svelte`
+- [x] `TimePicker.svelte`
+- [x] `Transfer.svelte`
 - [x] Export in `packages/svelte/src/lib/index.ts` and test in `packages/svelte/test/components.test.js`
 
-## Phase 3: React 19 Components Parity
-- [x] Implement React 19 Components with `forwardRef` and TypeScript interfaces:
-  - `LineChart.tsx`, `BarChart.tsx`, `CandlestickChart.tsx`
-  - `Divider.tsx`, `Flex.tsx`, `Space.tsx`, `Splitter.tsx`
-  - `Statistic.tsx`, `Tag.tsx`, `Segmented.tsx`
+## Phase 3: React 19 Implementation
+- [x] `Form.tsx` & `FormItem.tsx`
+- [x] `InputNumber.tsx`
+- [x] `Rate.tsx`
+- [x] `Mentions.tsx`
+- [x] `TimePicker.tsx`
+- [x] `Transfer.tsx`
 - [x] Export in `packages/react/src/index.ts` and test in `packages/react/test/components.test.js`
 
-## Phase 4: Storybook Hub Interactive Showcase & Zero Emoji Policy
-- [x] Add interactive High-Performance Financial Charts tab (`#view-charts`) with live 10,000-point streaming simulator, zoom/pan controls, and candlestick telemetry.
-- [x] Add Layout & Primitives tab (`#view-primitives`) showcasing Splitter, Flex, Space, Statistic, Tag, and Segmented.
-- [x] Verify zero raw OS emojis across all source code and built HTML.
+## Phase 4: Storybook Hub Integration & Zero Emoji Audit
+- [x] Add Form & Advanced Data Entry showcase tab (`#view-forms`) in `apps/storybook-hub/build.js`
+- [x] Verify zero raw OS emojis
 
-## Phase 5: Verification, Release & Live Promotion
-- [x] Run full test suite: `pnpm -r test`
-- [x] Run `./scripts/integration.sh`
-- [ ] Ship via `psrw ship`
-- [ ] Promote via `psrw promote --babysit`
+## Phase 5: Verification & Promotion
+- [ ] Run `./scripts/integration.sh`
+- [ ] `psrw ship`
+- [ ] `psrw promote --babysit`
 - [ ] Live verification on `https://design.joymify.com`

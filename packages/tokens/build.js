@@ -2483,6 +2483,332 @@ h1, h2, h3, .joy-display {
   color: #f8fafc;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
+
+/* ── Ant Design Form & Advanced Data Entry Suite ── */
+/* Form & FormItem */
+.joy-form {
+  box-sizing: border-box;
+  width: 100%;
+}
+.joy-form-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+.joy-form-item--horizontal {
+  flex-direction: row;
+  align-items: flex-start;
+}
+.joy-form-item__label {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--joy-color-text-primary, #0f172a);
+  margin-bottom: 6px;
+}
+.joy-form-item--horizontal .joy-form-item__label {
+  width: 140px;
+  margin-bottom: 0;
+  padding-top: 6px;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .joy-form-item__label {
+  color: #f8fafc;
+}
+.joy-form-item__required {
+  color: var(--joy-color-status-danger, #ef4444);
+  margin-right: 4px;
+}
+.joy-form-item__control {
+  flex: 1;
+  position: relative;
+}
+.joy-form-item__explain {
+  font-size: 0.75rem;
+  color: var(--joy-color-status-danger, #ef4444);
+  margin-top: 4px;
+  min-height: 18px;
+}
+.joy-form-item--error input,
+.joy-form-item--error textarea,
+.joy-form-item--error .joy-input-wrapper {
+  border-color: var(--joy-color-status-danger, #ef4444) !important;
+}
+
+/* InputNumber */
+.joy-input-number {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  max-width: 180px;
+  border: 1px solid var(--joy-color-border-subtle, #cbd5e1);
+  border-radius: var(--joy-radius-md, 8px);
+  background-color: var(--joy-color-surface-elevated, #ffffff);
+  transition: all 0.2s;
+  overflow: hidden;
+}
+[data-theme="dark"] .joy-input-number {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+.joy-input-number:focus-within {
+  border-color: var(--joy-color-brand-primary, #7c3aed);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+}
+.joy-input-number__input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  color: var(--joy-color-text-primary, #0f172a);
+  font-family: var(--joy-font-family-mono, monospace);
+  font-size: 0.875rem;
+  outline: none;
+}
+[data-theme="dark"] .joy-input-number__input {
+  color: #f8fafc;
+}
+.joy-input-number__handler-wrap {
+  display: flex;
+  flex-direction: column;
+  width: 24px;
+  border-left: 1px solid var(--joy-color-border-subtle, #cbd5e1);
+  background: var(--joy-color-surface-subtle, #f8fafc);
+  flex-shrink: 0;
+}
+[data-theme="dark"] .joy-input-number__handler-wrap {
+  border-left-color: #334155;
+  background: #1e293b;
+}
+.joy-input-number__handler-up,
+.joy-input-number__handler-down {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--joy-color-text-muted, #64748b);
+  padding: 0;
+  transition: background-color 0.15s;
+}
+.joy-input-number__handler-up {
+  border-bottom: 1px solid var(--joy-color-border-subtle, #cbd5e1);
+}
+[data-theme="dark"] .joy-input-number__handler-up {
+  border-bottom-color: #334155;
+}
+.joy-input-number__handler-up:hover,
+.joy-input-number__handler-down:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--joy-color-brand-primary, #7c3aed);
+}
+
+/* Rate */
+.joy-rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+.joy-rate__star {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: var(--joy-color-border-subtle, #cbd5e1);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.joy-rate__star:hover {
+  transform: scale(1.15);
+}
+.joy-rate__star--full {
+  color: var(--joy-color-brand-accent, #c49a3a);
+}
+.joy-rate__star--half {
+  color: var(--joy-color-brand-accent, #c49a3a);
+}
+
+/* Mentions */
+.joy-mentions {
+  position: relative;
+  width: 100%;
+}
+.joy-mentions__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-family: var(--joy-font-family-sans, sans-serif);
+  font-size: 0.875rem;
+  border: 1px solid var(--joy-color-border-subtle, #cbd5e1);
+  border-radius: var(--joy-radius-md, 8px);
+  background-color: var(--joy-color-surface-elevated, #ffffff);
+  color: var(--joy-color-text-primary, #0f172a);
+  outline: none;
+  resize: vertical;
+}
+[data-theme="dark"] .joy-mentions__textarea {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+.joy-mentions__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 200px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--joy-color-surface-elevated, #ffffff);
+  border: 1px solid var(--joy-color-border-subtle, #e2e8f0);
+  border-radius: var(--joy-radius-md, 8px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  z-index: 50;
+  padding: 4px;
+}
+[data-theme="dark"] .joy-mentions__dropdown {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+.joy-mentions__item {
+  padding: 6px 10px;
+  font-size: 0.8125rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+[data-theme="dark"] .joy-mentions__item {
+  color: #f8fafc;
+}
+.joy-mentions__item:hover {
+  background-color: rgba(124, 58, 237, 0.08);
+  color: var(--joy-color-brand-primary, #7c3aed);
+}
+
+/* TimePicker */
+.joy-time-picker {
+  position: relative;
+  display: inline-block;
+}
+.joy-time-picker__panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: flex;
+  background: var(--joy-color-surface-elevated, #ffffff);
+  border: 1px solid var(--joy-color-border-subtle, #e2e8f0);
+  border-radius: var(--joy-radius-md, 8px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  z-index: 50;
+  overflow: hidden;
+  margin-top: 4px;
+}
+[data-theme="dark"] .joy-time-picker__panel {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+.joy-time-picker__column {
+  width: 56px;
+  max-height: 180px;
+  overflow-y: auto;
+  border-right: 1px solid var(--joy-color-border-subtle, #f1f5f9);
+  padding: 4px 0;
+}
+[data-theme="dark"] .joy-time-picker__column {
+  border-right-color: #1e293b;
+}
+.joy-time-picker__cell {
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+[data-theme="dark"] .joy-time-picker__cell {
+  color: #cbd5e1;
+}
+.joy-time-picker__cell:hover {
+  background-color: rgba(124, 58, 237, 0.08);
+}
+.joy-time-picker__cell--selected {
+  background-color: var(--joy-color-brand-primary, #7c3aed);
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Transfer (Screenshot 5 parity) */
+.joy-transfer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.joy-transfer__list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 240px;
+  border: 1px solid var(--joy-color-border-subtle, #cbd5e1);
+  border-radius: var(--joy-radius-md, 8px);
+  background-color: var(--joy-color-surface-elevated, #ffffff);
+  overflow: hidden;
+}
+[data-theme="dark"] .joy-transfer__list {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+.joy-transfer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background-color: var(--joy-color-surface-subtle, #f8fafc);
+  border-bottom: 1px solid var(--joy-color-border-subtle, #e2e8f0);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--joy-color-text-primary, #0f172a);
+}
+[data-theme="dark"] .joy-transfer__header {
+  background-color: #1e293b;
+  border-bottom-color: #334155;
+  color: #f8fafc;
+}
+.joy-transfer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+.joy-transfer__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  color: var(--joy-color-text-primary, #0f172a);
+  transition: background-color 0.15s;
+}
+[data-theme="dark"] .joy-transfer__item {
+  color: #cbd5e1;
+}
+.joy-transfer__item:hover {
+  background-color: rgba(124, 58, 237, 0.06);
+}
+.joy-transfer__operations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 `;
 
 const themeCss = `:root {\n${cssVars.join('\n')}\n}\n\n${componentStyles}`;
