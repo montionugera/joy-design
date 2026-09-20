@@ -130,5 +130,11 @@
     "title": "Gate 0: Brand Invariants, Zero Emoji Policy, and Optical Audit Remediation",
     "created_at": "2026-09-20T04:06:26.144304+00:00",
     "promoted_to": "F-022"
+  },
+  {
+    "id": "I-023",
+    "title": "Wave 11R: Icon Ecosystem Compliance, Provenance & Storybook Zero-Emoji Enforcement",
+    "created_at": "2026-09-20T04:27:49.472590+00:00",
+    "promoted_to": null
   }
 ]
