@@ -7,7 +7,9 @@ node -e "console.log('Verifying Node runtime compatibility...');"
 (cd packages/icons && node --test test/icons.test.js)
 (cd packages/svelte && node --test test/components.test.js)
 (cd packages/react && node --test test/components.test.js)
-(cd apps/storybook-hub && node build.js)
+
+echo "==> Running Gate 1 Storybook Hub Contracts <=="
+./scripts/precheck.sh
 
 echo "==> Verifying Kubernetes manifest syntax <=="
 test -f k8s/deployment.yml
