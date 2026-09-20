@@ -719,7 +719,9 @@ const componentStyles = `
   display: inline-block;
   width: 100%;
 }
-.joy-select {
+.joy-select,
+.joy-select select,
+select.joy-select__input {
   width: 100%;
   font-family: var(--joy-font-family-sans, sans-serif);
   padding: 8px 36px 8px 12px;
@@ -730,6 +732,8 @@ const componentStyles = `
   color: var(--joy-color-text-primary, #0f172a);
   outline: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -2500,18 +2504,40 @@ h1, h2, h3, .joy-display {
   align-items: flex-start;
 }
 .joy-form-item__label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--joy-color-text-primary, #0f172a);
   margin-bottom: 6px;
+  line-height: 1.5;
 }
 .joy-form-item--horizontal .joy-form-item__label {
-  width: 140px;
+  width: var(--joy-form-label-width, 160px);
+  min-width: var(--joy-form-label-width, 160px);
   margin-bottom: 0;
-  padding-top: 6px;
+  padding-right: 12px;
+  justify-content: flex-end;
+  text-align: right;
   flex-shrink: 0;
+  box-sizing: border-box;
+  height: 36px;
+  white-space: nowrap;
+}
+.joy-form-item--horizontal .joy-form-item__label::after {
+  content: ":";
+  position: relative;
+  margin: 0 0 0 2px;
+  top: -0.5px;
+}
+.joy-form-item--no-colon .joy-form-item__label::after,
+.joy-form--no-colon .joy-form-item__label::after {
+  content: "";
+}
+.joy-form-item--label-left .joy-form-item__label,
+.joy-form--label-left .joy-form-item__label {
+  justify-content: flex-start;
+  text-align: left;
 }
 [data-theme="dark"] .joy-form-item__label {
   color: #f8fafc;
@@ -2519,10 +2545,23 @@ h1, h2, h3, .joy-display {
 .joy-form-item__required {
   color: var(--joy-color-status-danger, #ef4444);
   margin-right: 4px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
 }
 .joy-form-item__control {
   flex: 1;
+  min-width: 0;
   position: relative;
+}
+.joy-form-item__actions,
+.joy-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.joy-form-item--horizontal .joy-form-item__actions,
+.joy-form--horizontal .joy-form-actions {
+  margin-left: var(--joy-form-label-width, 160px);
 }
 .joy-form-item__explain {
   font-size: 0.75rem;

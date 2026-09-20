@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   export interface ValidationRule {
     required?: boolean;
@@ -10,10 +10,20 @@
     validator?: (value: any) => boolean | Promise<boolean>;
   }
 
+  interface FormContext {
+    layout: 'vertical' | 'horizontal' | 'inline';
+    colon: boolean;
+    labelAlign: 'left' | 'right';
+    labelWidth?: string | number;
+  }
+
   interface Props {
     label?: string;
     name?: string;
     required?: boolean;
+    colon?: boolean;
+    labelAlign?: 'left' | 'right';
+    labelWidth?: string | number;
     error?: string;
     rules?: ValidationRule[];
     layout?: 'vertical' | 'horizontal' | 'inline';
@@ -24,18 +34,32 @@
     label = '',
     name = '',
     required = false,
+    colon,
+    labelAlign,
+    labelWidth,
     error = '',
     rules = [],
-    layout = 'vertical',
+    layout,
     children
   }: Props = $props();
+
+  const getFormCtx = getContext<() => FormContext>('joy-form');
+  const formCtx = $derived(getFormCtx ? getFormCtx() : null);
+
+  const effectiveLayout = $derived(layout ?? formCtx?.layout ?? 'vertical');
+  const effectiveColon = $derived(colon ?? formCtx?.colon ?? true);
+  const effectiveAlign = $derived(labelAlign ?? formCtx?.labelAlign ?? 'right');
+  const effectiveWidth = $derived(labelWidth ?? formCtx?.labelWidth);
 
   let isRequired = $derived(required || rules.some(r => r.required));
 </script>
 
 <div
-  class="joy-form-item joy-form-item--{layout}"
+  class="joy-form-item joy-form-item--{effectiveLayout}"
+  class:joy-form-item--no-colon={!effectiveColon}
+  class:joy-form-item--label-left={effectiveAlign === 'left'}
   class:joy-form-item--error={!!error}
+  style={effectiveWidth ? `--joy-form-label-width: ${typeof effectiveWidth === 'number' ? effectiveWidth + 'px' : effectiveWidth};` : undefined}
 >
   {#if label}
     <label class="joy-form-item__label" for={name || undefined}>
