@@ -3162,3 +3162,49 @@ h1, h2, h3, .joy-display {
 [data-theme="dark"] .joy-spin__mask {
   background-color: rgba(15, 23, 42, 0.65);
 }
+
+/* ── Tactile Micro-Animations & Wave Effects ── */
+@keyframes joy-button-wave {
+  0% { box-shadow: 0 0 0 0 rgba(196, 154, 58, 0.45); }
+  100% { box-shadow: 0 0 0 8px rgba(196, 154, 58, 0); }
+}
+.joy-button:active:not(:disabled) {
+  animation: joy-button-wave 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── TreeSelect & Cascader Hierarchical Primitives ── */
+.joy-treeselect, .joy-cascader {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  font-family: var(--joy-font-family-sans, sans-serif);
+}
+.joy-treeselect--disabled, .joy-cascader--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.joy-treeselect__node--selected, .joy-cascader-menus [role="option"][aria-selected="true"] {
+  background-color: rgba(196, 154, 58, 0.15) !important;
+  color: var(--gold-400, #c49a3a) !important;
+}
+
+/* ── Live Markdown Editor ── */
+.joy-markdown-editor {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--joy-font-family-sans, sans-serif);
+  background-color: var(--joy-surface-card, #14253e);
+  color: var(--joy-text-primary, #f8f3e8);
+}
+.joy-markdown-editor--fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1100 !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+}
+
+/* ── Image Preview Overlay ── */
+.joy-image-preview-mask {
+  animation: joy-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
