@@ -248,6 +248,18 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(mdEditor.includes('joy-markdown-editor__preview'), 'MarkdownEditor must render live preview');
   assert.ok(mdEditor.includes('handleEditorScroll'), 'MarkdownEditor must implement synchronized editor scroll');
   assert.ok(mdEditor.includes('handlePreviewScroll'), 'MarkdownEditor must implement synchronized preview scroll');
+
+  // Wave 10C Assertions (TreeSelect & Cascader Hierarchical Data Entry)
+  const treeSelect = fs.readFileSync(path.resolve('./src/TreeSelect.tsx'), 'utf8');
+  assert.ok(treeSelect.includes('joy-treeselect'), 'TreeSelect must render joy-treeselect class');
+  assert.ok(treeSelect.includes('role="tree"'), 'TreeSelect must implement role=tree');
+  assert.ok(treeSelect.includes('role="treeitem"'), 'TreeSelect must implement role=treeitem');
+  assert.ok(treeSelect.includes('React.forwardRef'), 'TreeSelect must implement forwardRef');
+
+  const cascader = fs.readFileSync(path.resolve('./src/Cascader.tsx'), 'utf8');
+  assert.ok(cascader.includes('joy-cascader'), 'Cascader must render joy-cascader class');
+  assert.ok(cascader.includes('role="listbox"'), 'Cascader must implement role=listbox');
+  assert.ok(cascader.includes('React.forwardRef'), 'Cascader must implement forwardRef');
 });
 
 

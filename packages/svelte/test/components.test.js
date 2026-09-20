@@ -229,6 +229,16 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(mdEditor.includes('joy-markdown-editor__preview'), 'MarkdownEditor must render live preview');
   assert.ok(mdEditor.includes('handleEditorScroll'), 'MarkdownEditor must implement synchronized editor scroll');
   assert.ok(mdEditor.includes('handlePreviewScroll'), 'MarkdownEditor must implement synchronized preview scroll');
+
+  // Wave 10C Assertions (TreeSelect & Cascader Hierarchical Data Entry)
+  const treeSelect = fs.readFileSync(path.resolve('./src/lib/TreeSelect.svelte'), 'utf8');
+  assert.ok(treeSelect.includes('joy-treeselect'), 'TreeSelect must have joy-treeselect class');
+  assert.ok(treeSelect.includes('role="tree"'), 'TreeSelect must implement role=tree');
+  assert.ok(treeSelect.includes('role="treeitem"'), 'TreeSelect must implement role=treeitem');
+
+  const cascader = fs.readFileSync(path.resolve('./src/lib/Cascader.svelte'), 'utf8');
+  assert.ok(cascader.includes('joy-cascader'), 'Cascader must have joy-cascader class');
+  assert.ok(cascader.includes('role="listbox"'), 'Cascader must implement role=listbox');
 });
 
 
