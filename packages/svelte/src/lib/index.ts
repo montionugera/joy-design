@@ -76,6 +76,8 @@ export { default as Spin } from './Spin.svelte';
 // Wave 10: Accessible Overlay Suite & Rich Media Parity
 export { default as Image } from './Image.svelte';
 export { default as ImagePreview, type ImageItem } from './ImagePreview.svelte';
+export { default as TreeSelect, type TreeNode } from './TreeSelect.svelte';
+export { default as Cascader, type CascaderOption } from './Cascader.svelte';
 export { lockBodyScroll, trapFocus } from './overlay-utils.js';
 
 
