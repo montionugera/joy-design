@@ -24,7 +24,7 @@ export const Camera: React.FC<IconProps> = ({
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <rect x="4" y="7" width="16" height="12" rx="2" stroke=color strokeWidth="1.5" /><path

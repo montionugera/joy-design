@@ -12,7 +12,7 @@
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	xmlns="http://www.w3.org/2000/svg"
-	style="display: inline-block; vertical-align: middle;"
+	aria-hidden="true" focusable="false" style="display: inline-block; vertical-align: middle;"
 >
 	<line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline>
 </svg>
