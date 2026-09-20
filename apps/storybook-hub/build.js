@@ -271,12 +271,68 @@ ${inlinedThemeCss}
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-width: 0;
     }
     .playground-header h4 {
       margin: 0;
       font-size: 0.9375rem;
       font-weight: 600;
       color: var(--joy-color-text-primary, #0f172a);
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .playground-header .joy-badge,
+    .playground-header span[class*="joy-badge"] {
+      flex-shrink: 0;
+    }
+    .component-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .component-header {
+      padding: 16px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-width: 0;
+    }
+    .component-header > div:first-child {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .component-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--joy-color-text-primary, #0f172a);
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .component-desc {
+      font-size: 0.8125rem;
+      color: var(--joy-color-text-muted, #64748b);
+      margin-top: 4px;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .component-canvas {
+      padding: 24px;
+      display: flex;
+      background: #ffffff;
+      min-width: 0;
+      overflow-x: auto;
     }
     .canvas {
       padding: 44px 32px;
@@ -544,7 +600,7 @@ ${inlinedThemeCss}
       color: #94a3b8;
     }
 
-    /* Coherent Dark Mode for All Containers */
+    /* Coherent Dark Mode for All Containers & Component Cards */
     [data-theme="dark"] .header-tagline {
       color: #94a3b8;
     }
@@ -556,15 +612,263 @@ ${inlinedThemeCss}
       background: #1e293b !important;
       border-color: #334155 !important;
     }
+    [data-theme="dark"] .component-card {
+      background: #0f172a;
+      border-color: #1e293b;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    [data-theme="dark"] .component-header {
+      background: #1e293b;
+      border-bottom-color: #334155;
+    }
+    [data-theme="dark"] .component-title {
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .component-desc {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .component-canvas {
+      background: #0b0f19;
+    }
     [data-theme="dark"] .joy-toast {
       background: #0f172a !important;
       color: #f8fafc !important;
       border-color: #1e293b !important;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
     }
+
+    /* ── Mobile Navigation Drawer & Backdrop ── */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 998;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+    .mobile-menu-btn {
+      display: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 10px;
+      cursor: pointer;
+      color: #334155;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      transition: all 150ms ease;
+    }
+    .mobile-menu-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .sidebar-close-btn {
+      display: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-left: auto;
+    }
+    .sidebar-close-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    [data-theme="dark"] .sidebar-backdrop {
+      background: rgba(0, 0, 0, 0.75);
+    }
+    [data-theme="dark"] .mobile-menu-btn {
+      background: #1e293b;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+    [data-theme="dark"] .mobile-menu-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+    [data-theme="dark"] .sidebar-close-btn {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .sidebar-close-btn:hover {
+      background: #1e293b;
+      color: #ffffff;
+    }
+
+    /* ── Interactive 3D Kinetic Particle Canvas ── */
+    .kinetic-canvas-container {
+      position: relative;
+      width: 100%;
+      min-height: 380px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      background: #090d16;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    .kinetic-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+    .kinetic-overlay {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px 40px;
+      text-align: center;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 35%, rgba(9, 13, 22, 0.75) 100%);
+    }
+    .kinetic-overlay * {
+      pointer-events: auto;
+    }
+    .kinetic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .kinetic-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .kinetic-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      color: #ffffff;
+      margin: 0 0 14px 0;
+      max-width: 720px;
+    }
+    .kinetic-title-gradient {
+      background: linear-gradient(135deg, #a855f7 0%, #38bdf8 50%, #c49a3a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .kinetic-subtitle {
+      font-size: 1rem;
+      color: #94a3b8;
+      max-width: 620px;
+      margin: 0 0 24px 0;
+      line-height: 1.6;
+    }
+    .kinetic-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .kinetic-hint {
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: #64748b;
+      letter-spacing: 0.03em;
+    }
+    [data-theme="dark"] .kinetic-canvas-container {
+      border-color: #1e293b;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Responsive Mobile & Tablet Rules ── */
+    @media (max-width: 900px) {
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+      .sidebar-close-btn {
+        display: inline-flex;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 999;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: none;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 6px 0 28px rgba(0, 0, 0, 0.25);
+      }
+      .main {
+        width: 100vw;
+        min-width: 0;
+      }
+      .topbar {
+        padding: 0 16px;
+      }
+      .topbar-target-label {
+        display: none;
+      }
+      .content-area {
+        padding: 20px 14px 60px;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      .kinetic-title {
+        font-size: 1.5rem;
+      }
+      .kinetic-subtitle {
+        font-size: 0.875rem;
+      }
+      .kinetic-overlay {
+        padding: 32px 16px 28px;
+      }
+      .form-showcase-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .joy-transfer {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .joy-transfer__operations {
+        flex-direction: row !important;
+        justify-content: center !important;
+        padding: 8px 0 !important;
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileMenu(false)"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -574,9 +878,10 @@ ${inlinedThemeCss}
         <h2>Joymify Design</h2>
         <span>v2.2 OpenDesign Integrated</span>
       </div>
+      <button class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close sidebar">✕</button>
     </div>
     <nav class="nav">
-      <div class="nav-section">Overview</div>
+      <div class="nav-section">Getting Started</div>
       <a class="nav-item active" onclick="switchView('overview')">
         <span class="icon">${navIcons.overview}</span> Overview & Architecture
       </a>
@@ -587,44 +892,47 @@ ${inlinedThemeCss}
         <span class="icon">${navIcons.propsSpec}</span> Props & API Specs
       </a>
 
-      <div class="nav-section">Standard Components</div>
+      <div class="nav-section">General & Primitives</div>
       <a class="nav-item" onclick="switchView('button')">
         <span class="icon">${navIcons.button}</span> Button
       </a>
       <a class="nav-item" onclick="switchView('badge')">
         <span class="icon">${navIcons.badge}</span> Badge & Tag
       </a>
-      <a class="nav-item" onclick="switchView('input')">
-        <span class="icon">${navIcons.input}</span> Input Field
+      <a class="nav-item" onclick="switchView('primitives')">
+        <span class="icon">${navIcons.primitives}</span> Layout & Primitives
       </a>
-      <a class="nav-item" onclick="switchView('switch')">
-        <span class="icon">${navIcons.switch}</span> Switch & Toggle
+      <a class="nav-item" onclick="switchView('avatar')">
+        <span class="icon">${navIcons.avatar}</span> Avatar & Group
       </a>
-      <a class="nav-item" onclick="switchView('alert')">
-        <span class="icon">${navIcons.alert}</span> Alert & Notice
-      </a>
-      <a class="nav-item" onclick="switchView('metric')">
-        <span class="icon">${navIcons.metric}</span> MetricTile (Quant)
-      </a>
-      <a class="nav-item" onclick="switchView('table')">
-        <span class="icon">${navIcons.table}</span> Table (Compact)
+      <a class="nav-item" onclick="switchView('icons-gallery')">
+        <span class="icon">${navIcons.iconsGallery}</span> Icons Gallery (138 SVGs)
       </a>
 
-      <div class="nav-section">Enterprise Overlays & Navigation</div>
-      <a class="nav-item" onclick="switchView('modal')">
-        <span class="icon">${navIcons.modal}</span> Modal / Dialog
-      </a>
-      <a class="nav-item" onclick="switchView('dropdown')">
-        <span class="icon">${navIcons.dropdown}</span> Dropdown Menu
+      <div class="nav-section">Navigation & Workflow</div>
+      <a class="nav-item" onclick="switchView('nav-feedback')">
+        <span class="icon">${navIcons.navigation}</span> Navigation & Feedback
       </a>
       <a class="nav-item" onclick="switchView('tabs')">
         <span class="icon">${navIcons.tabs}</span> Tabs Layout
       </a>
-      <a class="nav-item" onclick="switchView('tooltip')">
-        <span class="icon">${navIcons.tooltip}</span> Tooltip Overlay
+      <a class="nav-item" onclick="switchView('enterprise-workflow')">
+        <span class="icon">${navIcons.workflow}</span> Steps, Timeline & Result
+      </a>
+      <a class="nav-item" onclick="switchView('pagination')">
+        <span class="icon">${navIcons.pagination}</span> Pagination Controls
+      </a>
+      <a class="nav-item" onclick="switchView('enterprise-display')">
+        <span class="icon">${navIcons.enterpriseDisplay}</span> Breadcrumb & StatCard
       </a>
 
-      <div class="nav-section">Wave 1: Enterprise Forms & Overlays</div>
+      <div class="nav-section">Data Entry & Forms</div>
+      <a class="nav-item" onclick="switchView('forms')">
+        <span class="icon">${navIcons.forms}</span> Form & Advanced Data Entry
+      </a>
+      <a class="nav-item" onclick="switchView('input')">
+        <span class="icon">${navIcons.input}</span> Input Field
+      </a>
       <a class="nav-item" onclick="switchView('select')">
         <span class="icon">${navIcons.select}</span> Select Dropdown
       </a>
@@ -634,79 +942,66 @@ ${inlinedThemeCss}
       <a class="nav-item" onclick="switchView('radio')">
         <span class="icon">${navIcons.radio}</span> Radio Group
       </a>
-      <a class="nav-item" onclick="switchView('drawer')">
-        <span class="icon">${navIcons.drawer}</span> Drawer (Sheet)
+      <a class="nav-item" onclick="switchView('switch')">
+        <span class="icon">${navIcons.switch}</span> Switch & Toggle
       </a>
-      <a class="nav-item" onclick="switchView('toast')">
-        <span class="icon">${navIcons.toast}</span> Toast Notifications
-      </a>
-
-      <div class="nav-section">Wave 2: Financial Trading & Skeletons</div>
-      <a class="nav-item" onclick="switchView('financial-table')">
-        <span class="icon">${navIcons.financialTable}</span> Live Trading Orderbook
-      </a>
-      <a class="nav-item" onclick="switchView('pagination')">
-        <span class="icon">${navIcons.pagination}</span> Pagination Controls
-      </a>
-      <a class="nav-item" onclick="switchView('skeleton')">
-        <span class="icon">${navIcons.skeleton}</span> Skeleton Loading States
-      </a>
-
-      <div class="nav-section">Wave 3: Data Entry & Assets</div>
       <a class="nav-item" onclick="switchView('date-picker')">
         <span class="icon">${navIcons.datePicker}</span> Date & Range Picker
-      </a>
-      <a class="nav-item" onclick="switchView('enterprise-display')">
-        <span class="icon">${navIcons.enterpriseDisplay}</span> Breadcrumb & StatCard
-      </a>
-      <a class="nav-item" onclick="switchView('progress')">
-        <span class="icon">${navIcons.progress}</span> Progress Bar
-      </a>
-      <a class="nav-item" onclick="switchView('empty-state')">
-        <span class="icon">${navIcons.emptyState}</span> Empty State
-      </a>
-
-      <div class="nav-section">Wave 4: AntDesign Parity & Motion</div>
-      <a class="nav-item" onclick="switchView('upload')">
-        <span class="icon">${navIcons.upload}</span> Upload & Dragger
-      </a>
-      <a class="nav-item" onclick="switchView('avatar')">
-        <span class="icon">${navIcons.avatar}</span> Avatar & Group
       </a>
       <a class="nav-item" onclick="switchView('slider')">
         <span class="icon">${navIcons.slider}</span> Slider (Range)
       </a>
+      <a class="nav-item" onclick="switchView('upload')">
+        <span class="icon">${navIcons.upload}</span> Upload & Dragger
+      </a>
+
+      <div class="nav-section">Data Display & Feedback</div>
+      <a class="nav-item" onclick="switchView('table')">
+        <span class="icon">${navIcons.table}</span> Table (Compact)
+      </a>
+      <a class="nav-item" onclick="switchView('financial-table')">
+        <span class="icon">${navIcons.financialTable}</span> Live Trading Orderbook
+      </a>
+      <a class="nav-item" onclick="switchView('metric')">
+        <span class="icon">${navIcons.metric}</span> MetricTile (Quant)
+      </a>
+      <a class="nav-item" onclick="switchView('alert')">
+        <span class="icon">${navIcons.alert}</span> Alert & Notice
+      </a>
+      <a class="nav-item" onclick="switchView('toast')">
+        <span class="icon">${navIcons.toast}</span> Toast Notifications
+      </a>
+      <a class="nav-item" onclick="switchView('modal')">
+        <span class="icon">${navIcons.modal}</span> Modal / Dialog
+      </a>
+      <a class="nav-item" onclick="switchView('drawer')">
+        <span class="icon">${navIcons.drawer}</span> Drawer (Sheet)
+      </a>
+      <a class="nav-item" onclick="switchView('dropdown')">
+        <span class="icon">${navIcons.dropdown}</span> Dropdown Menu
+      </a>
+      <a class="nav-item" onclick="switchView('tooltip')">
+        <span class="icon">${navIcons.tooltip}</span> Tooltip Overlay
+      </a>
+      <a class="nav-item" onclick="switchView('progress')">
+        <span class="icon">${navIcons.progress}</span> Progress Bar
+      </a>
+      <a class="nav-item" onclick="switchView('skeleton')">
+        <span class="icon">${navIcons.skeleton}</span> Skeleton Loading States
+      </a>
+      <a class="nav-item" onclick="switchView('empty-state')">
+        <span class="icon">${navIcons.emptyState}</span> Empty State
+      </a>
       <a class="nav-item" onclick="switchView('markdown')">
         <span class="icon">${navIcons.markdown}</span> MarkdownViewer (Cherry)
       </a>
-      <a class="nav-item" onclick="switchView('icons-gallery')">
-        <span class="icon">${navIcons.iconsGallery}</span> Icons Gallery (138 SVGs)
-      </a>
 
-      <div class="nav-section">Wave 5: Landing Page Architecture</div>
+      <div class="nav-section">Enterprise & Telemetry</div>
       <a class="nav-item" onclick="switchView('landing-blocks')">
         <span class="icon">${navIcons.landing}</span> Bento & Landing Suite
       </a>
-
-      <div class="nav-section">Wave 5: Enterprise Workflow</div>
-      <a class="nav-item" onclick="switchView('enterprise-workflow')">
-        <span class="icon">${navIcons.workflow}</span> Steps, Timeline & Result
-      </a>
-
-      <div class="nav-section">Wave 6: Financial Charts & Layout</div>
       <a class="nav-item" onclick="switchView('charts')">
         <span class="icon">${navIcons.charts}</span> High-Perf Financial Charts
-      </a>
-      <a class="nav-item" onclick="switchView('primitives')">
-        <span class="icon">${navIcons.primitives}</span> Layout & AntD Primitives
-      </a>
-      <div class="nav-section">Wave 7: Form & Data Entry</div>
-      <a class="nav-item" onclick="switchView('forms')">
-        <span class="icon">${navIcons.forms}</span> Form & Advanced Data Entry
-      </a>
-      <div class="nav-section">Wave 8: Navigation & Feedback</div>
-      <a class="nav-item" onclick="switchView('nav-feedback')">
-        <span class="icon">${navIcons.navigation}</span> Navigation & Feedback
       </a>
     </nav>
   </aside>
@@ -715,6 +1010,9 @@ ${inlinedThemeCss}
   <main class="main">
     <div class="topbar">
       <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+        <button class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Toggle navigation">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
         <span class="topbar-target-label" style="font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Target Suite:</span>
         <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
       </div>
@@ -1621,7 +1919,7 @@ ${inlinedThemeCss}
         <p class="header-tagline">High-throughput sortable market tape with real-time green/red ticker flash animations and client-side filtering.</p>
 
         <div class="playground-box">
-          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="playground-header">
             <h4>Live Quant Market Feeds</h4>
             <div style="display: flex; gap: 10px; align-items: center;">
               <input type="text" id="market-search-input" class="joy-input" placeholder="Filter pairs (e.g. BTC, ETH)..." style="width: 220px; padding: 6px 12px; font-size: 0.8125rem;" oninput="handleMarketFilter(this.value)">
@@ -1698,7 +1996,7 @@ ${inlinedThemeCss}
         <p class="header-tagline">High-performance GPU gradient shimmer placeholders preventing layout shift during async order book fetches.</p>
 
         <div class="playground-box">
-          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="playground-header">
             <h4>Asset Card Shimmer Placeholder</h4>
             <button class="joy-button joy-button--outline joy-button--sm" onclick="toggleSkeletonLoading()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg> Toggle Loading State
@@ -2091,7 +2389,7 @@ export async function executeHedge(symbol: string, size: number) {
         <p class="header-tagline">138 enterprise SVG icons covering trading, navigation, file ops, and observability with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
 
         <div class="playground-box">
-          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="playground-header">
             <h4>Icon System Collection (138 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
             <div id="copy-toast-banner" style="font-size: 0.8125rem; color: #10b981; font-weight: 600; display: none;">Copied to clipboard!</div>
           </div>
@@ -2106,16 +2404,23 @@ export async function executeHedge(symbol: string, size: number) {
       <!-- View: Landing Page Architecture & Bento Suite -->
       <section id="view-landing-blocks" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Modern Landing Page Suite</h2>
-        <p class="header-tagline">Comprehensive conversion & product architecture blocks: HeroSection with gradient canvas, responsive BentoGrid with glow-card dynamics, multi-tier PricingMatrix, and social proof TestimonialCards.</p>
+        <p class="header-tagline">Comprehensive conversion & product architecture blocks: Interactive 3D kinetic particle canvas with mouse physics, responsive BentoGrid with glow-card dynamics, multi-tier PricingMatrix, and social proof TestimonialCards.</p>
 
-        <!-- Hero Section Demo -->
-        <div class="joy-hero" style="margin-bottom: 24px;">
-          <div class="joy-hero__badge">Enterprise Architecture 2026</div>
-          <h1 class="joy-hero__title">High-Velocity Quantitative Execution Engine</h1>
-          <p class="joy-hero__subtitle">Institutional order routing, dark-mode financial telemetry, and deterministic UI components engineered for maximum density and accessibility.</p>
-          <div class="joy-hero__actions">
-            <button class="joy-button joy-button--solid joy-button--lg" onclick="showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy Solution</button>
-            <button class="joy-button joy-button--outline joy-button--lg" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
+        <!-- Interactive 3D Kinetic Particle Hero Showcase -->
+        <div class="kinetic-canvas-container" id="kinetic-hero-container">
+          <canvas class="kinetic-canvas" id="kinetic-particle-canvas"></canvas>
+          <div class="kinetic-overlay">
+            <div class="kinetic-badge">
+              <span class="kinetic-badge-dot"></span>
+              <span>Interactive 3D Kinetic Field &bull; 60 FPS</span>
+            </div>
+            <h1 class="kinetic-title">High-Velocity <span class="kinetic-title-gradient">Quantitative Execution</span> Engine</h1>
+            <p class="kinetic-subtitle">Institutional order routing, dark-mode financial telemetry, and deterministic UI components engineered for maximum density and accessibility.</p>
+            <div class="kinetic-actions">
+              <button class="joy-button joy-button--solid joy-button--md" onclick="triggerCanvasBurst(event); showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy Solution</button>
+              <button class="joy-button joy-button--outline joy-button--md" style="border-color: rgba(255, 255, 255, 0.35); color: #ffffff;" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
+            </div>
+            <div class="kinetic-hint">Move cursor or touch to perturb 3D particle constellation &bull; Click to pulse shockwave</div>
           </div>
         </div>
 
@@ -2440,7 +2745,7 @@ export async function executeHedge(symbol: string, size: number) {
 
         <!-- Candlestick Financial Chart Demo -->
         <div class="playground-box" style="margin-bottom: 24px;">
-          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="playground-header">
             <h4>Candlestick Chart & Bull/Bear Telemetry (BTC/USDT 1m)</h4>
             <div style="display: flex; gap: 8px;">
               <button class="joy-button joy-button--outline joy-button--sm" onclick="resetChartZoom()">Reset Zoom</button>
@@ -2471,7 +2776,7 @@ export async function executeHedge(symbol: string, size: number) {
 
         <!-- Large-Dataset Line Chart Demo -->
         <div class="playground-box">
-          <div class="playground-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="playground-header">
             <h4>High-Density Line Chart (10,000 Data Points with LTTB Decimation)</h4>
             <span class="joy-badge joy-badge--brand joy-badge--subtle">60 FPS Hardware Scaled</span>
           </div>
@@ -2600,7 +2905,7 @@ export async function executeHedge(symbol: string, size: number) {
             <span class="joy-badge joy-badge--brand joy-badge--sm">Ant Design Parity</span>
           </div>
           <div class="component-canvas">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; width: 100%;">
+            <div class="form-showcase-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 28px; width: 100%;">
               <!-- Vertical Form -->
               <div class="joy-form joy-form--vertical" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0);">
                 <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-color-brand-primary, #7c3aed);">Vertical Layout with Validation Rules</div>
@@ -2682,7 +2987,7 @@ export async function executeHedge(symbol: string, size: number) {
         </div>
 
         <!-- InputNumber, Rate, Mentions, TimePicker Grid -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-top: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; margin-top: 24px;">
           <!-- InputNumber Card -->
           <div class="component-card">
             <div class="component-header">
@@ -2995,21 +3300,86 @@ export async function executeHedge(symbol: string, size: number) {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
-      document.getElementById('theme-icon').innerHTML = next === 'dark'
-        ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
-        : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
-      document.getElementById('theme-label').innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+      try { localStorage.setItem('joy-theme', next); } catch (e) {}
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      if (icon) {
+        icon.innerHTML = next === 'dark'
+          ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
+          : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+      }
+      if (label) {
+        label.innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+      }
     }
 
-    function switchView(viewName) {
+    // Restore saved theme on startup
+    try {
+      const savedTheme = localStorage.getItem('joy-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    } catch (e) {}
+
+    function toggleMobileMenu(open) {
+      const sidebar = document.querySelector('.sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar || !backdrop) return;
+      if (open === undefined) {
+        open = !sidebar.classList.contains('open');
+      }
+      if (open) {
+        sidebar.classList.add('open');
+        backdrop.classList.add('active');
+      } else {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('active');
+      }
+    }
+
+    function switchView(viewName, updateHash = true) {
+      if (updateHash && window.location.hash !== '#' + viewName) {
+        if (window.history && window.history.pushState) {
+          window.history.pushState(null, '', '#' + viewName);
+        } else {
+          window.location.hash = viewName;
+        }
+      }
       document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('view-' + viewName);
-      if (target) target.classList.add('active');
+      if (target) {
+        target.classList.add('active');
+      }
 
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick')?.includes(viewName));
+      const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(el => {
+        const oc = el.getAttribute('onclick');
+        return oc && (oc.includes("'" + viewName + "'") || oc.includes('"' + viewName + '"'));
+      });
       if (activeNav) activeNav.classList.add('active');
+
+      const main = document.querySelector('.main');
+      if (main) main.scrollTop = 0;
+
+      // Close mobile drawer on item selection
+      toggleMobileMenu(false);
+
+      // Trigger 3D particle canvas resize when entering landing blocks
+      if (viewName === 'landing-blocks') {
+        setTimeout(resizeKineticCanvas, 40);
+      }
     }
+
+    function syncViewFromHash() {
+      const hash = window.location.hash.replace(/^#/, '');
+      if (hash && document.getElementById('view-' + hash)) {
+        switchView(hash, false);
+      } else {
+        switchView('overview', false);
+      }
+    }
+
+    window.addEventListener('hashchange', syncViewFromHash);
 
     function setFramework(fw) {
       activeFramework = fw;
@@ -3830,6 +4200,224 @@ export async function executeHedge(symbol: string, size: number) {
         }
       }
 
+    // ── Interactive 3D Kinetic Particle Field Engine ──
+    let kineticCanvas, kineticCtx;
+    let kineticParticles = [];
+    let kineticAnimId = null;
+    let kineticMouse = { x: -1000, y: -1000, vx: 0, vy: 0, lastX: -1000, lastY: -1000, isOver: false };
+    const KINETIC_PARTICLE_COUNT = 90;
+
+    function initKineticCanvas() {
+      kineticCanvas = document.getElementById('kinetic-particle-canvas');
+      if (!kineticCanvas) return;
+      kineticCtx = kineticCanvas.getContext('2d');
+      resizeKineticCanvas();
+
+      kineticParticles = [];
+      const colors = ['#a855f7', '#38bdf8', '#c49a3a', '#e879f9'];
+      for (let i = 0; i < KINETIC_PARTICLE_COUNT; i++) {
+        kineticParticles.push({
+          x: (Math.random() - 0.5) * 600,
+          y: (Math.random() - 0.5) * 350,
+          z: Math.random() * 300 - 150,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          vz: (Math.random() - 0.5) * 0.4,
+          baseRadius: 1.5 + Math.random() * 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+
+      const container = document.getElementById('kinetic-hero-container');
+      if (container) {
+        container.addEventListener('mousemove', (e) => {
+          const rect = container.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          kineticMouse.vx = (mx - kineticMouse.lastX) * 0.3;
+          kineticMouse.vy = (my - kineticMouse.lastY) * 0.3;
+          kineticMouse.lastX = kineticMouse.x;
+          kineticMouse.lastY = kineticMouse.y;
+          kineticMouse.x = mx;
+          kineticMouse.y = my;
+          kineticMouse.isOver = true;
+        });
+        container.addEventListener('mouseleave', () => {
+          kineticMouse.isOver = false;
+          kineticMouse.x = -1000;
+          kineticMouse.y = -1000;
+        });
+        container.addEventListener('touchmove', (e) => {
+          if (e.touches.length > 0) {
+            const rect = container.getBoundingClientRect();
+            kineticMouse.x = e.touches[0].clientX - rect.left;
+            kineticMouse.y = e.touches[0].clientY - rect.top;
+            kineticMouse.isOver = true;
+          }
+        }, { passive: true });
+        container.addEventListener('touchend', () => {
+          kineticMouse.isOver = false;
+          kineticMouse.x = -1000;
+          kineticMouse.y = -1000;
+        });
+        container.addEventListener('click', triggerCanvasBurst);
+      }
+
+      window.addEventListener('resize', resizeKineticCanvas);
+      if (!kineticAnimId) {
+        animateKineticCanvas();
+      }
+    }
+
+    function resizeKineticCanvas() {
+      if (!kineticCanvas) return;
+      const rect = kineticCanvas.parentElement ? kineticCanvas.parentElement.getBoundingClientRect() : null;
+      if (!rect || rect.width === 0) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      kineticCanvas.width = rect.width * dpr;
+      kineticCanvas.height = rect.height * dpr;
+      if (kineticCtx) {
+        kineticCtx.scale(dpr, dpr);
+      }
+    }
+
+    function triggerCanvasBurst(e) {
+      if (!kineticCanvas) return;
+      const container = document.getElementById('kinetic-hero-container');
+      const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: 600, height: 380 };
+      const clickX = e && e.clientX ? e.clientX - rect.left : rect.width / 2;
+      const clickY = e && e.clientY ? e.clientY - rect.top : rect.height / 2;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const fov = 300;
+
+      kineticParticles.forEach(p => {
+        const scale = fov / (fov + p.z);
+        const px = cx + p.x * scale;
+        const py = cy + p.y * scale;
+        const dx = px - clickX;
+        const dy = py - clickY;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const force = Math.max(0, 180 - dist) / 180;
+        p.vx += (dx / dist) * force * 14;
+        p.vy += (dy / dist) * force * 14;
+        p.vz += (Math.random() - 0.5) * force * 10;
+      });
+    }
+
+    function animateKineticCanvas() {
+      kineticAnimId = requestAnimationFrame(animateKineticCanvas);
+      if (!kineticCanvas || !kineticCtx) return;
+
+      const panel = document.getElementById('view-landing-blocks');
+      if (!panel || !panel.classList.contains('active')) return;
+
+      const rect = kineticCanvas.parentElement ? kineticCanvas.parentElement.getBoundingClientRect() : null;
+      if (!rect || rect.width === 0) return;
+      const w = rect.width;
+      const h = rect.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const fov = 300;
+
+      kineticCtx.clearRect(0, 0, w, h);
+
+      const cosRot = Math.cos(0.002);
+      const sinRot = Math.sin(0.002);
+
+      const projected = [];
+      for (let i = 0; i < kineticParticles.length; i++) {
+        const p = kineticParticles[i];
+
+        const rx = p.x * cosRot - p.z * sinRot;
+        const rz = p.z * cosRot + p.x * sinRot;
+        p.x = rx;
+        p.z = rz;
+
+        const scale = fov / (fov + p.z);
+        const px = cx + p.x * scale;
+        const py = cy + p.y * scale;
+
+        if (kineticMouse.isOver) {
+          const mdx = px - kineticMouse.x;
+          const mdy = py - kineticMouse.y;
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mdist < 140 && mdist > 0) {
+            const force = (140 - mdist) / 140;
+            p.vx += (mdx / mdist) * force * 1.5 + (kineticMouse.vx * 0.05);
+            p.vy += (mdy / mdist) * force * 1.5 + (kineticMouse.vy * 0.05);
+          }
+        }
+
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        p.vz *= 0.94;
+        p.x += p.vx + Math.sin(p.phase) * 0.2;
+        p.y += p.vy + Math.cos(p.phase) * 0.2;
+        p.z += p.vz;
+        p.phase += 0.02;
+
+        const boundaryX = w * 0.55;
+        const boundaryY = h * 0.55;
+        if (p.x < -boundaryX) { p.x = -boundaryX; p.vx *= -1; }
+        if (p.x > boundaryX) { p.x = boundaryX; p.vx *= -1; }
+        if (p.y < -boundaryY) { p.y = -boundaryY; p.vy *= -1; }
+        if (p.y > boundaryY) { p.y = boundaryY; p.vy *= -1; }
+        if (p.z < -160) { p.z = -160; p.vz *= -1; }
+        if (p.z > 160) { p.z = 160; p.vz *= -1; }
+
+        const finalScale = fov / (fov + p.z);
+        projected.push({
+          x: cx + p.x * finalScale,
+          y: cy + p.y * finalScale,
+          scale: finalScale,
+          z: p.z,
+          radius: p.baseRadius * finalScale,
+          color: p.color
+        });
+      }
+
+      const maxDist = 85;
+      kineticCtx.lineWidth = 0.75;
+      for (let i = 0; i < projected.length; i++) {
+        const p1 = projected[i];
+        for (let j = i + 1; j < projected.length; j++) {
+          const p2 = projected[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * Math.min(p1.scale, p2.scale) * 0.35;
+            kineticCtx.strokeStyle = 'rgba(168, 85, 247, ' + alpha.toFixed(3) + ')';
+            kineticCtx.beginPath();
+            kineticCtx.moveTo(p1.x, p1.y);
+            kineticCtx.lineTo(p2.x, p2.y);
+            kineticCtx.stroke();
+          }
+        }
+      }
+
+      for (let i = 0; i < projected.length; i++) {
+        const p = projected[i];
+        const rad = Math.max(1, p.radius);
+        const glow = kineticCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 3);
+        glow.addColorStop(0, p.color);
+        glow.addColorStop(0.5, p.color + '66');
+        glow.addColorStop(1, 'transparent');
+
+        kineticCtx.fillStyle = glow;
+        kineticCtx.beginPath();
+        kineticCtx.arc(p.x, p.y, rad * 3, 0, Math.PI * 2);
+        kineticCtx.fill();
+
+        kineticCtx.fillStyle = '#ffffff';
+        kineticCtx.beginPath();
+        kineticCtx.arc(p.x, p.y, rad * 0.6, 0, Math.PI * 2);
+        kineticCtx.fill();
+      }
+    }
+
     // Initial render
     setTimeout(() => {
       renderMarketTable();
@@ -3840,6 +4428,8 @@ export async function executeHedge(symbol: string, size: number) {
       renderRateDemo(4.5);
       renderTimePickerCols();
       renderTransferDemo();
+      initKineticCanvas();
+      syncViewFromHash();
     }, 100);
 
     function updateCodeSnippets() {

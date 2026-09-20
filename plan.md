@@ -1,53 +1,41 @@
-# [F-020] Enterprise Navigation & Feedback Suite Parity
+# [F-031] Storybook Hub UX Overhaul: Hash Routing, Mobile Drawer, 3D Kinetic Canvas & Design System Categorization
 
-> **Autonomous Execution Standard**: Zero mid-turn interruptions. Verify evidence before assertions. Zero OS emojis.
+> **Autonomous Execution Standard**: Zero mid-turn interruptions. Evidence before assertions. Zero OS emojis. Full chain to production.
 
-**Goal**: Deliver complete Ant Design parity for Navigation & Feedback:
-1. `Menu`: Comprehensive navigation menu supporting `horizontal`, `vertical`, and `inline` modes with submenus, selection state, and collapsible sidebar support.
-2. `Anchor`: Smooth in-page section scrolling navigation with active marker track and links.
-3. `Message`: Imperative & declarative top-centered transient feedback notifications (`message.success()`, `message.error()`, `message.info()`, `message.warning()`).
-4. `Notification`: Rich corner alert banner with title, description, status vector SVGs, and auto-dismiss timer.
-5. `Popconfirm`: Compact confirmation popover triggered on buttons/links before destructive actions.
-6. `Spin`: Crisp SVG loading spinner supporting standalone and wrapped container loading states.
-
-Dual-framework exports (`@joymify/svelte` + `@joymify/react`), Storybook Hub interactive showcases, and live Kubernetes deployment.
+**Goal**: Transform Storybook Hub from a wave-centric internal dev showcase into an elegant, high-performance, mobile-first design portal resolving all 6 user-reported issues:
+1. **Hash Routing & Persistence**: Retain active view across page refreshes and browser history via `window.location.hash` (`switchView` updates URL; `hashchange`/`DOMContentLoaded` restores view).
+2. **Interactive 3D / Kinetic Particle Canvas**: Add a 60fps mouse-tracking 3D particle constellation hero on Landing Suite with gravitational pull, kinetic velocities, and depth perspective.
+3. **Responsive Mobile Drawer**: Under 900px, collapse sidebar into an off-canvas drawer with topbar hamburger button, backdrop overlay, and close gesture.
+4. **Zero Text Spill & Robust Layout**: Add `flex-wrap: wrap; gap: 10px; min-width: 0` to all `.playground-header` and `.component-header` elements with word-break rules to prevent badge overlaps.
+5. **Card & Spacing Polish**: Define explicit CSS for `.component-card`, `.component-header`, `.component-title`, `.component-desc`, `.component-canvas` across light/dark themes; fix form grid collapses.
+6. **Design System Categorization**: Replace internal `Wave X` release headers with standard design system categories: Getting Started, General & Primitives, Navigation & Workflow, Data Entry & Forms, Data Display & Feedback, Enterprise & Telemetry.
 
 ---
 
-## Phase 1: Tokens & Styling Engine Expansion
-- [x] Add CSS classes in `packages/tokens/build.js`:
-  - `.joy-menu`, `.joy-menu--horizontal`, `.joy-menu--vertical`, `.joy-menu--inline`, `.joy-menu__item`, `.joy-menu__item--active`, `.joy-menu__submenu`
-  - `.joy-anchor`, `.joy-anchor__ink`, `.joy-anchor__link`, `.joy-anchor__link--active`
-  - `.joy-message`, `.joy-message__notice`, `.joy-message__content`
-  - `.joy-notification`, `.joy-notification__notice`, `.joy-notification__title`, `.joy-notification__desc`
-  - `.joy-popconfirm`, `.joy-popconfirm__panel`, `.joy-popconfirm__buttons`
-  - `.joy-spin`, `.joy-spin--spinning`, `.joy-spin__container`, `.joy-spin__mask`
-- [x] Compile tokens and verify `packages/tokens/test/tokens.test.js`
+## Phase 1: CSS Engine Expansion in `apps/storybook-hub/build.js`
+- [x] Add mobile drawer styles (`@media (max-width: 900px)`) for `.sidebar`, `.sidebar.open`, `.sidebar-backdrop`, `.mobile-menu-btn`.
+- [x] Add explicit CSS for `.component-card`, `.component-header`, `.component-title`, `.component-desc`, `.component-canvas` for light and dark themes.
+- [x] Fix `.playground-header` flex-wrap, text min-width, and overflow rules.
+- [x] Fix responsive grids (`grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr))`).
 
-## Phase 2: Svelte 5 Runes Implementation
-- [x] `Menu.svelte`
-- [x] `Anchor.svelte`
-- [x] `Message.svelte`
-- [x] `Notification.svelte`
-- [x] `Popconfirm.svelte`
-- [x] `Spin.svelte`
-- [x] Export in `packages/svelte/src/lib/index.ts` and test in `packages/svelte/test/components.test.js`
+## Phase 2: Structural Markup & Categorization
+- [x] Reorganize sidebar navigation from release waves (`Wave 1` ... `Wave 8`) into 6 semantic design-system categories.
+- [x] Add hamburger toggle button and mobile close button.
+- [x] Add `.sidebar-backdrop`.
+- [x] Integrate 3D Interactive Kinetic Particle Canvas in `#view-landing-blocks` hero section.
 
-## Phase 3: React 19 Implementation
-- [x] `Menu.tsx`
-- [x] `Anchor.tsx`
-- [x] `Message.tsx`
-- [x] `Notification.tsx`
-- [x] `Popconfirm.tsx`
-- [x] `Spin.tsx`
-- [x] Export in `packages/react/src/index.ts` and test in `packages/react/test/components.test.js`
+## Phase 3: Hash Routing & Particle Canvas Runtime
+- [x] Update `switchView(viewName, updateHash)` to manage `window.location.hash`.
+- [x] Add `initRouting()` and `hashchange` listener to restore active panel on load and back/forward navigation.
+- [x] Implement pure HTML5 60fps 3D particle constellation engine with mouse interaction, spring physics, dynamic connections, and dark/light adaptability.
+- [x] Preserve theme toggle in `localStorage`.
 
-## Phase 4: Storybook Hub Integration & Zero Emoji Audit
-- [x] Add Navigation & Feedback showcase tab (`#view-nav-feedback`) in `apps/storybook-hub/build.js`
-- [x] Verify zero raw OS emojis
+## Phase 4: Build & Integration Verification
+- [x] Compile storybook hub: `node apps/storybook-hub/build.js`.
+- [x] Run full test suite: `./scripts/integration.sh`.
+- [x] Verify zero emoji rule and no syntax errors.
 
-## Phase 5: Verification & Promotion
-- [ ] Run `./scripts/integration.sh`
-- [ ] `psrw ship`
-- [ ] `psrw promote --babysit`
-- [ ] Live verification on `https://design.joymify.com`
+## Phase 5: Ship, Promote & Production Verification
+- [ ] Git commit and `psrw ship`.
+- [ ] `psrw promote --babysit`.
+- [ ] Verify live deployment on `https://design.joymify.com`.
