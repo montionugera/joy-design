@@ -70,7 +70,8 @@ const navIcons = {
   workflow: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
   charts: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>`,
   primitives: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
-  forms: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`
+  forms: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+  navigation: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>`
 };
 
 const html = `<!DOCTYPE html>
@@ -702,6 +703,10 @@ ${inlinedThemeCss}
       <div class="nav-section">Wave 7: Form & Data Entry</div>
       <a class="nav-item" onclick="switchView('forms')">
         <span class="icon">${navIcons.forms}</span> Form & Advanced Data Entry
+      </a>
+      <div class="nav-section">Wave 8: Navigation & Feedback</div>
+      <a class="nav-item" onclick="switchView('nav-feedback')">
+        <span class="icon">${navIcons.navigation}</span> Navigation & Feedback
       </a>
     </nav>
   </aside>
@@ -2808,6 +2813,132 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
         </div>
       </section>
+
+      <!-- View: Navigation & Feedback Suite Parity -->
+      <section id="view-nav-feedback" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Navigation & Feedback Suite Parity</h2>
+        <p class="header-tagline">Ant Design v5 / v6 navigation & feedback parity: Menu (horizontal & inline), Anchor in-page track navigation, Message top-center toasts, Notification rich cards, Popconfirm action confirmation, and Spin loading indicators.</p>
+
+        <!-- Menu Showcase -->
+        <div class="component-card">
+          <div class="component-header">
+            <div>
+              <div class="component-title">Menu Navigation (Horizontal & Inline)</div>
+              <div class="component-desc">Multi-mode navigation menus supporting horizontal topbars and inline collapsible sidebars with active indicators and icons.</div>
+            </div>
+            <span class="joy-badge joy-badge--brand joy-badge--sm">Ant Design Parity</span>
+          </div>
+          <div class="component-canvas" style="flex-direction: column; gap: 24px; align-items: stretch;">
+            <!-- Horizontal Menu -->
+            <div>
+              <div style="font-size: 0.8125rem; font-weight: 600; color: var(--joy-color-text-muted, #64748b); margin-bottom: 8px;">Horizontal Menu:</div>
+              <ul class="joy-menu joy-menu--horizontal" role="menu" id="demo-menu-horiz">
+                <li class="joy-menu__item joy-menu__item--active" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                  <span class="joy-menu__item-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                  </span>
+                  <span>Trading Terminal</span>
+                </li>
+                <li class="joy-menu__item" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                  <span class="joy-menu__item-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  </span>
+                  <span>Portfolio Risk</span>
+                </li>
+                <li class="joy-menu__item" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                  <span class="joy-menu__item-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  </span>
+                  <span>Execution Rules</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Inline Sidebar Menu & Anchor Split -->
+            <div style="display: grid; grid-template-columns: 260px 1fr 220px; gap: 24px; align-items: start;">
+              <!-- Inline Menu -->
+              <div style="background: var(--joy-color-surface-subtle, #f8fafc); border: 1px solid var(--joy-color-border-subtle, #e2e8f0); border-radius: 8px; overflow: hidden;">
+                <div style="padding: 10px 16px; font-weight: 600; font-size: 0.8125rem; color: var(--joy-color-brand-primary, #7c3aed); border-bottom: 1px solid var(--joy-color-border-subtle, #e2e8f0);">Sidebar Subscriptions</div>
+                <ul class="joy-menu joy-menu--inline" role="menu" style="width: 100%; border: none;">
+                  <li class="joy-menu__item joy-menu__item--active" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                    <span>Spot Liquidity (AMM)</span>
+                  </li>
+                  <li class="joy-menu__item" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                    <span>Perpetual Futures</span>
+                  </li>
+                  <li class="joy-menu__item" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                    <span>Options Volatility Surface</span>
+                  </li>
+                  <li class="joy-menu__item" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
+                    <span>Yield Arbitrage Tracker</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Center Interactive Feedback Grid -->
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="font-weight: 600; font-size: 0.875rem;">Message & Notification Triggers:</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button type="button" class="joy-button joy-button--primary joy-button--sm" onclick="triggerMessage('success', 'Order filled successfully at $64,250.00')">Message Success</button>
+                  <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="triggerMessage('error', 'Execution rejected: Insufficient margin')">Message Error</button>
+                  <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="triggerMessage('warning', 'Network latency elevated: 142ms')">Message Warning</button>
+                  <button type="button" class="joy-button joy-button--primary joy-button--sm" onclick="triggerNotification('info', 'Liquidation Warning', 'ETH-PERP margin ratio has dropped below 15%. Consider adding collateral.')">Notification Card</button>
+                </div>
+
+                <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Popconfirm Confirmation:</div>
+                <div style="display: flex; gap: 16px; align-items: center;">
+                  <div class="joy-popconfirm" id="demo-popconfirm">
+                    <button type="button" class="joy-button joy-button--danger joy-button--sm" onclick="togglePopconfirmDemo(this)">Revoke API Key</button>
+                    <div class="joy-popconfirm__panel" id="demo-popconfirm-panel" style="display: none;" role="dialog">
+                      <div class="joy-popconfirm__title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--joy-color-status-warning, #f59e0b)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <span>Revoke DMA Master Key?</span>
+                      </div>
+                      <div class="joy-popconfirm__buttons">
+                        <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="closePopconfirmDemo()">Cancel</button>
+                        <button type="button" class="joy-button joy-button--primary joy-button--sm" onclick="confirmPopconfirmDemo()">Confirm</button>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b);">Prevents accidental destructive operations</span>
+                </div>
+
+                <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Spin Loading Indicators:</div>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                  <div class="joy-spin"><svg class="joy-spin__indicator" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></div>
+                  <div class="joy-spin"><svg class="joy-spin__indicator" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></div>
+                  <div class="joy-spin"><svg class="joy-spin__indicator" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></div>
+                  <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="toggleSpinMask()">Toggle Container Loading</button>
+                </div>
+
+                <!-- Wrapped Container with Spin Mask -->
+                <div class="joy-spin__container" id="demo-spin-container" style="background: var(--joy-color-surface-elevated, #fff); border: 1px solid var(--joy-color-border-subtle, #e2e8f0); border-radius: 8px; padding: 16px; margin-top: 8px;">
+                  <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 6px;">Live Book Depth Stream</div>
+                  <div style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b);">Real-time aggregated L2 order depth feed from 6 venues.</div>
+                  <div class="joy-spin__mask" id="demo-spin-mask" style="display: none;" role="status">
+                    <div class="joy-spin" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                      <svg class="joy-spin__indicator" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                      <span style="font-size: 0.8125rem; color: var(--joy-color-brand-primary, #7c3aed); font-weight: 500;">Rebalancing book...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Anchor Navigation -->
+              <div style="background: var(--joy-color-surface-subtle, #f8fafc); border: 1px solid var(--joy-color-border-subtle, #e2e8f0); border-radius: 8px; padding: 16px;">
+                <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-color-brand-primary, #7c3aed); margin-bottom: 10px;">Anchor Navigator</div>
+                <nav class="joy-anchor" role="navigation" aria-label="Demo Anchor">
+                  <div class="joy-anchor__ink"></div>
+                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" onclick="selectAnchor(this)">#menu-demo</a>
+                  <a href="#feedback-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#feedback-demo</a>
+                  <a href="#popconfirm-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#popconfirm-demo</a>
+                  <a href="#spin-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#spin-demo</a>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
   </main>
 
   <!-- Interactive Demo Drawer -->
@@ -3628,6 +3759,59 @@ export async function executeHedge(symbol: string, size: number) {
           showDemoToast('Returned ' + checked.length + ' pools to Source pool', 'info');
         }
         renderTransferDemo();
+      }
+
+      // Wave 8 Interactive Handlers
+      function selectMenuItem(el) {
+        const parent = el.parentElement;
+        if (!parent) return;
+        parent.querySelectorAll('.joy-menu__item').forEach(i => i.classList.remove('joy-menu__item--active'));
+        el.classList.add('joy-menu__item--active');
+        const text = el.querySelector('span:last-child')?.innerText || 'Menu Item';
+        showDemoToast('Navigated to ' + text, 'info');
+      }
+
+      function selectAnchor(el) {
+        const parent = el.parentElement;
+        if (!parent) return;
+        parent.querySelectorAll('.joy-anchor__link').forEach(a => a.classList.remove('joy-anchor__link--active'));
+        el.classList.add('joy-anchor__link--active');
+        showDemoToast('Scrolled to ' + el.innerText, 'info');
+      }
+
+      function triggerMessage(type, text) {
+        showDemoToast(text, type);
+      }
+
+      function triggerNotification(type, title, desc) {
+        showDemoToast(title + ': ' + desc, type);
+      }
+
+      function togglePopconfirmDemo(btn) {
+        const panel = document.getElementById('demo-popconfirm-panel');
+        if (!panel) return;
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      }
+
+      function closePopconfirmDemo() {
+        const panel = document.getElementById('demo-popconfirm-panel');
+        if (panel) panel.style.display = 'none';
+      }
+
+      function confirmPopconfirmDemo() {
+        closePopconfirmDemo();
+        showDemoToast('API Key revoked successfully', 'success');
+      }
+
+      function toggleSpinMask() {
+        const mask = document.getElementById('demo-spin-mask');
+        if (!mask) return;
+        mask.style.display = mask.style.display === 'none' ? 'flex' : 'none';
+        if (mask.style.display === 'flex') {
+          setTimeout(() => {
+            if (mask) mask.style.display = 'none';
+          }, 2500);
+        }
       }
 
     // Initial render
