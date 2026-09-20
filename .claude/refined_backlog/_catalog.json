@@ -365,8 +365,9 @@
     "from_idea": "I-031",
     "created_at": "2026-09-20T10:09:51.982938+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "claimed",
-    "release_version": null,
-    "claimed_at": "2026-09-20T10:09:57.499096+00:00"
+    "status": "shipped",
+    "release_version": "2.21",
+    "claimed_at": "2026-09-20T10:09:57.499096+00:00",
+    "shipped_at": "2026-09-20T10:16:42.953276+00:00"
   }
 ]
