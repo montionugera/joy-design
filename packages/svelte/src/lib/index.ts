@@ -72,5 +72,9 @@ export { default as Message } from './Message.svelte';
 export { default as Notification } from './Notification.svelte';
 export { default as Popconfirm } from './Popconfirm.svelte';
 export { default as Spin } from './Spin.svelte';
+// Wave 10: Accessible Overlay Suite & Rich Media Parity
+export { default as Image } from './Image.svelte';
+export { default as ImagePreview, type ImageItem } from './ImagePreview.svelte';
+export { lockBodyScroll, trapFocus } from './overlay-utils.js';
 
 
