@@ -5,7 +5,7 @@ import path from 'node:path';
 
 test('compiled tokens exist and contain critical joy variables and enterprise components', () => {
   const css = fs.readFileSync(path.resolve('./dist/theme.css'), 'utf8');
-  assert.ok(css.includes('--joy-color-brand-primary: #7c3aed;'), 'brand primary must exist');
+  assert.ok(css.includes('--joy-color-brand-primary: #c49a3a;'), 'brand primary must exist with canonical gold-400');
   assert.ok(css.includes('--joy-spacing-4: 16px;'), 'spacing-4 must exist');
   assert.ok(css.includes('--joy-radius-md: 8px;'), 'radius-md must exist');
   assert.ok(css.includes('--joy-motion-duration-fast: 150ms;'), 'motion fast duration must exist');
@@ -80,6 +80,41 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('justify-content: flex-end'), 'horizontal form labels must be right-aligned');
   assert.ok(css.includes('-webkit-appearance: none'), 'select controls must reset webkit appearance');
   assert.ok(css.includes('.joy-form-item--horizontal .joy-form-item__label::after'), 'horizontal form labels must support colon punctuation');
+
+  // Gate 0: Canonical Brand Invariants
+  assert.ok(css.includes('--navy-500: #14253e;'), 'canonical navy-500 token must exist');
+  assert.ok(css.includes('--gold-400: #c49a3a;'), 'canonical gold-400 token must exist');
+  assert.ok(css.includes('--cream-100: #f8f3e8;'), 'canonical cream-100 token must exist');
+  assert.ok(css.includes('--ink-500: #1f1c13;'), 'canonical ink-500 token must exist');
+  assert.ok(css.includes('--joy-surface-canvas:'), 'semantic surface-canvas token must exist');
+  assert.ok(css.includes('--joy-surface-card:'), 'semantic surface-card token must exist');
+  assert.ok(css.includes('--joy-border:'), 'semantic border token must exist');
+  assert.ok(css.includes('--joy-text-primary:'), 'semantic text-primary token must exist');
+});
+
+test('zero raw OS emojis across all packages source code', () => {
+  const EMOJI_REGEX = /[\u2300-\u23FF\u2600-\u27BF\uD800-\uDBFF\uDC00-\uDFFF]/;
+  const packagesDir = path.resolve('../');
+  const violations = [];
+
+  function scanDir(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git') continue;
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        scanDir(fullPath);
+      } else if (/\.(tsx?|svelte|jsx?|css)$/.test(entry.name)) {
+        const content = fs.readFileSync(fullPath, 'utf8');
+        if (EMOJI_REGEX.test(content)) {
+          violations.push(fullPath);
+        }
+      }
+    }
+  }
+
+  scanDir(packagesDir);
+  assert.strictEqual(violations.length, 0, `Violations of Zero Emoji Policy found in: ${violations.join(', ')}`);
 });
 
 

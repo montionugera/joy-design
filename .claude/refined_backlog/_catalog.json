@@ -250,5 +250,16 @@
     "claimed_at": "2026-09-20T02:09:10.574854+00:00",
     "shipped_at": "2026-09-20T02:10:35.699675+00:00",
     "promoted_at": "2026-09-20T02:11:19.726728+00:00"
+  },
+  {
+    "id": "F-022",
+    "title": "Gate 0: Brand Invariants, Zero Emoji Policy, and Optical Audit Remediation",
+    "from_idea": "I-022",
+    "created_at": "2026-09-20T04:06:28.562296+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.12",
+    "claimed_at": "2026-09-20T04:06:32.292270+00:00",
+    "shipped_at": "2026-09-20T04:08:36.023570+00:00"
   }
 ]

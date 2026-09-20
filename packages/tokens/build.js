@@ -40,6 +40,19 @@ const componentStyles = `
   from { opacity: 0; transform: scale(0.96) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+@keyframes joy-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.joy-button__spinner-svg {
+  width: 1em;
+  height: 1em;
+  animation: joy-spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
 
 .joy-button {
   appearance: none;
@@ -65,7 +78,7 @@ const componentStyles = `
   transform: scale(0.97);
 }
 .joy-button:focus-visible {
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 0 0 3px rgba(196, 154, 58, 0.35);
 }
 .joy-button--sm {
   padding: 6px 12px;
@@ -83,14 +96,14 @@ const componentStyles = `
   border-radius: var(--joy-radius-lg, 10px);
 }
 .joy-button--solid {
-  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
-  color: var(--joy-color-text-inverse, #ffffff);
-  border-color: rgba(109, 40, 217, 0.6);
+  background: linear-gradient(180deg, #c49a3a 0%, #b3892f 100%);
+  color: #14253e;
+  border-color: rgba(179, 137, 47, 0.6);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .joy-button--solid:hover:not(:disabled) {
-  background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
-  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #d4ab4b 0%, #c49a3a 100%);
+  box-shadow: 0 2px 6px rgba(196, 154, 58, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 .joy-button--outline {
   background-color: #ffffff;
@@ -677,15 +690,23 @@ const componentStyles = `
 
 /* ── Dark Mode Token Overrides ── */
 [data-theme="dark"] {
-  --joy-color-surface-base: #0f172a;
-  --joy-color-surface-subtle: #1e293b;
-  --joy-color-surface-muted: #334155;
-  --joy-color-text-primary: #f8fafc;
+  --joy-color-surface-base: #0d1829;
+  --joy-color-surface-canvas: #0d1829;
+  --joy-color-surface-card: #14253e;
+  --joy-surface-canvas: #0d1829;
+  --joy-surface-card: #14253e;
+  --joy-border: #23354e;
+  --joy-text-primary: #f8f3e8;
+  --joy-color-surface-subtle: #14253e;
+  --joy-color-surface-muted: #1e3352;
+  --joy-color-text-primary: #f8f3e8;
   --joy-color-text-muted: #94a3b8;
-  --joy-color-border-subtle: #334155;
-  --joy-color-border-default: #475569;
-  background-color: #0b0f19;
-  color: #f8fafc;
+  --joy-color-border-subtle: #23354e;
+  --joy-color-border-default: #2d4566;
+  --joy-color-brand-primary: #c49a3a;
+  --joy-color-brand-primary-hover: #d4ab4b;
+  background-color: var(--joy-surface-canvas, #0d1829);
+  color: var(--joy-text-primary, #f8f3e8);
 }
 [data-theme="dark"] .joy-metric-tile,
 [data-theme="dark"] .joy-table-container,
@@ -695,9 +716,9 @@ const componentStyles = `
 [data-theme="dark"] .joy-toast,
 [data-theme="dark"] .joy-input,
 [data-theme="dark"] .joy-select {
-  background-color: #1e293b;
-  border-color: #334155;
-  color: #f8fafc;
+  background-color: var(--joy-surface-card, #14253e);
+  border-color: var(--joy-border, #23354e);
+  color: var(--joy-text-primary, #f8f3e8);
 }
 [data-theme="dark"] .joy-modal__footer,
 [data-theme="dark"] .joy-drawer__footer,
@@ -3112,7 +3133,18 @@ h1, h2, h3, .joy-display {
 }
 `;
 
-const themeCss = `:root {\n${cssVars.join('\n')}\n}\n\n${componentStyles}`;
+const canonicalVars = [
+  '  --navy-500: #14253e;',
+  '  --gold-400: #c49a3a;',
+  '  --cream-100: #f8f3e8;',
+  '  --ink-500: #1f1c13;',
+  '  --joy-surface-canvas: var(--joy-color-surface-canvas, #f8f3e8);',
+  '  --joy-surface-card: var(--joy-color-surface-card, #ffffff);',
+  '  --joy-border: var(--joy-color-border-base, #e2d9c8);',
+  '  --joy-text-primary: var(--joy-color-text-primary, #1f1c13);',
+].join('\n');
+
+const themeCss = `:root {\n${cssVars.join('\n')}\n${canonicalVars}\n}\n\n${componentStyles}`;
 fs.writeFileSync(path.join(outDir, 'theme.css'), themeCss);
 
 // 2. tailwind-theme.css
