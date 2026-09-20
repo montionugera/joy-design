@@ -12,7 +12,7 @@
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	xmlns="http://www.w3.org/2000/svg"
-	style="display: inline-block; vertical-align: middle;"
+	aria-hidden="true" focusable="false" style="display: inline-block; vertical-align: middle;"
 >
 	<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
 </svg>

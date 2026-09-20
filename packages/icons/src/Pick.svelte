@@ -8,7 +8,7 @@
 	viewBox="0 0 24 24"
 	fill="none"
 	xmlns="http://www.w3.org/2000/svg"
-	style="display: inline-block; vertical-align: middle;"
+	aria-hidden="true" focusable="false" style="display: inline-block; vertical-align: middle;"
 >
 	<path
 		d="M11 11V3C11 2.44772 11.4477 2 12 2C12.5523 2 13 2.44772 13 3V11"

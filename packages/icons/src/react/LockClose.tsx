@@ -24,7 +24,7 @@ export const LockClose: React.FC<IconProps> = ({
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <rect x="5" y="10" width="14" height="10" rx="2" stroke=color strokeWidth="1.5" /><path

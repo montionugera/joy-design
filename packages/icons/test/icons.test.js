@@ -42,4 +42,16 @@ test('@joymify/icons exports dual Svelte 5 and React 19 suites', () => {
   const reactServer = fs.readFileSync(path.resolve('./src/react/Server.tsx'), 'utf8');
   assert.ok(reactServer.includes('React.FC'), 'React Server icon must be functional component');
   assert.ok(reactServer.includes('strokeWidth'), 'React Server icon must use camelCase strokeWidth');
+  assert.ok(reactServer.includes('aria-hidden="true"'), 'React icon must have aria-hidden by default');
+  assert.ok(reactServer.includes('focusable="false"'), 'React icon must have focusable=false by default');
+
+  assert.ok(svelteServer.includes('aria-hidden="true"'), 'Svelte icon must have aria-hidden by default');
+  assert.ok(svelteServer.includes('focusable="false"'), 'Svelte icon must have focusable=false by default');
+
+  // Provenance verification
+  const provenance = fs.readFileSync(path.resolve('./PROVENANCE.md'), 'utf8');
+  assert.ok(provenance.includes('Provenance & Attribution Manifest'), 'PROVENANCE.md must exist and document lineage');
+  assert.ok(provenance.includes('Lucide Icons'), 'Provenance must cite Lucide upstream');
+  assert.ok(provenance.includes('Feather Icons'), 'Provenance must cite Feather upstream');
 });
+
