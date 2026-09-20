@@ -33,6 +33,10 @@ const iconCardsHtml = fs.existsSync(iconsSrcDir)
       }).join('\n')
   : '';
 
+// Load semantic navigation manifest
+const manifestPath = path.join(__dirname, 'src/navigation.manifest.json');
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
 
 const navIcons = {
   overview: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
@@ -74,6 +78,19 @@ const navIcons = {
   navigation: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>`
 };
 
+// Generate navigation HTML dynamically from manifest
+const navigationHtml = manifest.categories.map(cat => {
+  const items = cat.views.map(v => {
+    const iconSvg = navIcons[v.icon] || navIcons.overview;
+    return `      <a class="nav-item" onclick="switchView('${v.id}')">
+        <span class="icon">${iconSvg}</span> ${v.label}
+      </a>`;
+  }).join('\n');
+  return `      <div class="nav-section">${cat.label}</div>\n${items}`;
+}).join('\n\n');
+
+
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,6 +110,11 @@ ${inlinedThemeCss}
     }
     * {
       box-sizing: border-box;
+      min-width: 0;
+    }
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
     }
     html {
       -webkit-font-smoothing: antialiased;
@@ -108,6 +130,7 @@ ${inlinedThemeCss}
       display: flex;
       height: 100vh;
       overflow: hidden;
+      overflow-wrap: break-word;
     }
 
     /* Sidebar */
@@ -878,131 +901,12 @@ ${inlinedThemeCss}
         <h2>Joymify Design</h2>
         <span>v2.2 OpenDesign Integrated</span>
       </div>
-      <button class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close sidebar">✕</button>
+      <button class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
     </div>
     <nav class="nav">
-      <div class="nav-section">Getting Started</div>
-      <a class="nav-item active" onclick="switchView('overview')">
-        <span class="icon">${navIcons.overview}</span> Overview & Architecture
-      </a>
-      <a class="nav-item" onclick="switchView('tokens')">
-        <span class="icon">${navIcons.tokens}</span> Design Tokens & Motion
-      </a>
-      <a class="nav-item" onclick="switchView('props-spec')">
-        <span class="icon">${navIcons.propsSpec}</span> Props & API Specs
-      </a>
-
-      <div class="nav-section">General & Primitives</div>
-      <a class="nav-item" onclick="switchView('button')">
-        <span class="icon">${navIcons.button}</span> Button
-      </a>
-      <a class="nav-item" onclick="switchView('badge')">
-        <span class="icon">${navIcons.badge}</span> Badge & Tag
-      </a>
-      <a class="nav-item" onclick="switchView('primitives')">
-        <span class="icon">${navIcons.primitives}</span> Layout & Primitives
-      </a>
-      <a class="nav-item" onclick="switchView('avatar')">
-        <span class="icon">${navIcons.avatar}</span> Avatar & Group
-      </a>
-      <a class="nav-item" onclick="switchView('icons-gallery')">
-        <span class="icon">${navIcons.iconsGallery}</span> Icons Gallery (138 SVGs)
-      </a>
-
-      <div class="nav-section">Navigation & Workflow</div>
-      <a class="nav-item" onclick="switchView('nav-feedback')">
-        <span class="icon">${navIcons.navigation}</span> Navigation & Feedback
-      </a>
-      <a class="nav-item" onclick="switchView('tabs')">
-        <span class="icon">${navIcons.tabs}</span> Tabs Layout
-      </a>
-      <a class="nav-item" onclick="switchView('enterprise-workflow')">
-        <span class="icon">${navIcons.workflow}</span> Steps, Timeline & Result
-      </a>
-      <a class="nav-item" onclick="switchView('pagination')">
-        <span class="icon">${navIcons.pagination}</span> Pagination Controls
-      </a>
-      <a class="nav-item" onclick="switchView('enterprise-display')">
-        <span class="icon">${navIcons.enterpriseDisplay}</span> Breadcrumb & StatCard
-      </a>
-
-      <div class="nav-section">Data Entry & Forms</div>
-      <a class="nav-item" onclick="switchView('forms')">
-        <span class="icon">${navIcons.forms}</span> Form & Advanced Data Entry
-      </a>
-      <a class="nav-item" onclick="switchView('input')">
-        <span class="icon">${navIcons.input}</span> Input Field
-      </a>
-      <a class="nav-item" onclick="switchView('select')">
-        <span class="icon">${navIcons.select}</span> Select Dropdown
-      </a>
-      <a class="nav-item" onclick="switchView('checkbox')">
-        <span class="icon">${navIcons.checkbox}</span> Checkbox
-      </a>
-      <a class="nav-item" onclick="switchView('radio')">
-        <span class="icon">${navIcons.radio}</span> Radio Group
-      </a>
-      <a class="nav-item" onclick="switchView('switch')">
-        <span class="icon">${navIcons.switch}</span> Switch & Toggle
-      </a>
-      <a class="nav-item" onclick="switchView('date-picker')">
-        <span class="icon">${navIcons.datePicker}</span> Date & Range Picker
-      </a>
-      <a class="nav-item" onclick="switchView('slider')">
-        <span class="icon">${navIcons.slider}</span> Slider (Range)
-      </a>
-      <a class="nav-item" onclick="switchView('upload')">
-        <span class="icon">${navIcons.upload}</span> Upload & Dragger
-      </a>
-
-      <div class="nav-section">Data Display & Feedback</div>
-      <a class="nav-item" onclick="switchView('table')">
-        <span class="icon">${navIcons.table}</span> Table (Compact)
-      </a>
-      <a class="nav-item" onclick="switchView('financial-table')">
-        <span class="icon">${navIcons.financialTable}</span> Live Trading Orderbook
-      </a>
-      <a class="nav-item" onclick="switchView('metric')">
-        <span class="icon">${navIcons.metric}</span> MetricTile (Quant)
-      </a>
-      <a class="nav-item" onclick="switchView('alert')">
-        <span class="icon">${navIcons.alert}</span> Alert & Notice
-      </a>
-      <a class="nav-item" onclick="switchView('toast')">
-        <span class="icon">${navIcons.toast}</span> Toast Notifications
-      </a>
-      <a class="nav-item" onclick="switchView('modal')">
-        <span class="icon">${navIcons.modal}</span> Modal / Dialog
-      </a>
-      <a class="nav-item" onclick="switchView('drawer')">
-        <span class="icon">${navIcons.drawer}</span> Drawer (Sheet)
-      </a>
-      <a class="nav-item" onclick="switchView('dropdown')">
-        <span class="icon">${navIcons.dropdown}</span> Dropdown Menu
-      </a>
-      <a class="nav-item" onclick="switchView('tooltip')">
-        <span class="icon">${navIcons.tooltip}</span> Tooltip Overlay
-      </a>
-      <a class="nav-item" onclick="switchView('progress')">
-        <span class="icon">${navIcons.progress}</span> Progress Bar
-      </a>
-      <a class="nav-item" onclick="switchView('skeleton')">
-        <span class="icon">${navIcons.skeleton}</span> Skeleton Loading States
-      </a>
-      <a class="nav-item" onclick="switchView('empty-state')">
-        <span class="icon">${navIcons.emptyState}</span> Empty State
-      </a>
-      <a class="nav-item" onclick="switchView('markdown')">
-        <span class="icon">${navIcons.markdown}</span> MarkdownViewer (Cherry)
-      </a>
-
-      <div class="nav-section">Enterprise & Telemetry</div>
-      <a class="nav-item" onclick="switchView('landing-blocks')">
-        <span class="icon">${navIcons.landing}</span> Bento & Landing Suite
-      </a>
-      <a class="nav-item" onclick="switchView('charts')">
-        <span class="icon">${navIcons.charts}</span> High-Perf Financial Charts
-      </a>
+${navigationHtml}
     </nav>
   </aside>
 
@@ -1037,7 +941,7 @@ ${inlinedThemeCss}
     <div class="content-area">
 
       <!-- View: Overview -->
-      <section id="view-overview" class="view-panel active">
+      <section id="view-overview" class="view-panel">
         <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Enterprise Component Architecture</div>
         <h1 style="margin: 0; font-size: 2rem; color: var(--joy-color-brand-primary);">Joymify Design System</h1>
         <p class="header-tagline">
@@ -3331,11 +3235,21 @@ export async function executeHedge(symbol: string, size: number) {
       if (open) {
         sidebar.classList.add('open');
         backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        const closeBtn = sidebar.querySelector('.sidebar-close-btn');
+        if (closeBtn) closeBtn.focus();
       } else {
         sidebar.classList.remove('open');
         backdrop.classList.remove('active');
+        document.body.style.overflow = '';
       }
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        toggleMobileMenu(false);
+      }
+    });
 
     function switchView(viewName, updateHash = true) {
       if (updateHash && window.location.hash !== '#' + viewName) {
@@ -3379,6 +3293,8 @@ export async function executeHedge(symbol: string, size: number) {
       }
     }
 
+    // Synchronize view immediately on script load to eliminate theme/overview flash
+    syncViewFromHash();
     window.addEventListener('hashchange', syncViewFromHash);
 
     function setFramework(fw) {
@@ -4307,6 +4223,13 @@ export async function executeHedge(symbol: string, size: number) {
     }
 
     function animateKineticCanvas() {
+      // Respect user motion preference and tab visibility
+      const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (document.hidden || prefersReducedMotion) {
+        kineticAnimId = setTimeout(animateKineticCanvas, 300);
+        return;
+      }
+
       kineticAnimId = requestAnimationFrame(animateKineticCanvas);
       if (!kineticCanvas || !kineticCtx) return;
 

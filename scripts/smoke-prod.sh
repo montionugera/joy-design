@@ -27,9 +27,10 @@ fi
 # Verify index content contains Joymify or Storybook token (avoid head early pipe closure)
 body=$(curl -sS -L --max-time 15 "https://${host}/" || true)
 if echo "$body" | grep -qiE "joymify|storybook|design"; then
-  echo "✅ Content verification passed: Storybook app shell detected."
+  echo "[OK] Content verification passed: Storybook app shell detected."
 else
   echo "::warning::Response body did not explicitly match expected title/tokens, but returned 200 OK."
 fi
 
-echo "✅ Smoke check passed successfully for https://${host}"
+echo "[OK] Smoke check passed successfully for https://${host}"
+

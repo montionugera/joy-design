@@ -1,0 +1,79 @@
+{
+  "$schema": "./navigation.schema.json",
+  "version": "2.22",
+  "categories": [
+    {
+      "id": "getting-started",
+      "label": "Getting Started",
+      "views": [
+        { "id": "overview", "label": "Overview & Architecture", "icon": "overview" },
+        { "id": "tokens", "label": "Design Tokens & Motion", "icon": "tokens" },
+        { "id": "props-spec", "label": "Props & API Specs", "icon": "propsSpec" }
+      ]
+    },
+    {
+      "id": "general-primitives",
+      "label": "General & Primitives",
+      "views": [
+        { "id": "button", "label": "Button", "icon": "button" },
+        { "id": "badge", "label": "Badge & Tag", "icon": "badge" },
+        { "id": "primitives", "label": "Layout & Primitives", "icon": "primitives" },
+        { "id": "avatar", "label": "Avatar & Group", "icon": "avatar" },
+        { "id": "icons-gallery", "label": "Icons Gallery (138 SVGs)", "icon": "iconsGallery" }
+      ]
+    },
+    {
+      "id": "navigation-workflow",
+      "label": "Navigation & Workflow",
+      "views": [
+        { "id": "nav-feedback", "label": "Navigation & Feedback", "icon": "navigation" },
+        { "id": "tabs", "label": "Tabs Layout", "icon": "tabs" },
+        { "id": "enterprise-workflow", "label": "Steps, Timeline & Result", "icon": "workflow" },
+        { "id": "pagination", "label": "Pagination Controls", "icon": "pagination" },
+        { "id": "enterprise-display", "label": "Breadcrumb & StatCard", "icon": "enterpriseDisplay" }
+      ]
+    },
+    {
+      "id": "data-entry-forms",
+      "label": "Data Entry & Forms",
+      "views": [
+        { "id": "forms", "label": "Form & Advanced Data Entry", "icon": "forms" },
+        { "id": "input", "label": "Input Field", "icon": "input" },
+        { "id": "select", "label": "Select Dropdown", "icon": "select" },
+        { "id": "checkbox", "label": "Checkbox", "icon": "checkbox" },
+        { "id": "radio", "label": "Radio Group", "icon": "radio" },
+        { "id": "switch", "label": "Switch & Toggle", "icon": "switch" },
+        { "id": "date-picker", "label": "Date & Range Picker", "icon": "datePicker" },
+        { "id": "slider", "label": "Slider (Range)", "icon": "slider" },
+        { "id": "upload", "label": "Upload & Dragger", "icon": "upload" }
+      ]
+    },
+    {
+      "id": "data-display-feedback",
+      "label": "Data Display & Feedback",
+      "views": [
+        { "id": "table", "label": "Table (Compact)", "icon": "table" },
+        { "id": "financial-table", "label": "Live Trading Orderbook", "icon": "financialTable" },
+        { "id": "metric", "label": "MetricTile (Quant)", "icon": "metric" },
+        { "id": "alert", "label": "Alert & Notice", "icon": "alert" },
+        { "id": "toast", "label": "Toast Notifications", "icon": "toast" },
+        { "id": "modal", "label": "Modal / Dialog", "icon": "modal" },
+        { "id": "drawer", "label": "Drawer (Sheet)", "icon": "drawer" },
+        { "id": "dropdown", "label": "Dropdown Menu", "icon": "dropdown" },
+        { "id": "tooltip", "label": "Tooltip Overlay", "icon": "tooltip" },
+        { "id": "progress", "label": "Progress Bar", "icon": "progress" },
+        { "id": "skeleton", "label": "Skeleton Loading States", "icon": "skeleton" },
+        { "id": "empty-state", "label": "Empty State", "icon": "emptyState" },
+        { "id": "markdown", "label": "MarkdownViewer (Cherry)", "icon": "markdown" }
+      ]
+    },
+    {
+      "id": "enterprise-telemetry",
+      "label": "Enterprise & Telemetry",
+      "views": [
+        { "id": "landing-blocks", "label": "Bento & Landing Suite", "icon": "landing" },
+        { "id": "charts", "label": "High-Perf Financial Charts", "icon": "charts" }
+      ]
+    }
+  ]
+}
