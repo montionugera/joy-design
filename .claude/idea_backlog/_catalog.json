@@ -148,5 +148,11 @@
     "title": "wave-9b-chart-canvas-adapters-and-benchmarks",
     "created_at": "2026-09-20T04:34:18.768317+00:00",
     "promoted_to": "F-025"
+  },
+  {
+    "id": "I-026",
+    "title": "wave-10a-image-preview-and-accessible-overlay-stack",
+    "created_at": "2026-09-20T04:37:09.573000+00:00",
+    "promoted_to": null
   }
 ]
