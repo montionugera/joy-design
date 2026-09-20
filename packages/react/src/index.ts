@@ -72,8 +72,11 @@ export { Anchor, type AnchorProps, type AnchorItem } from './Anchor.js';
 export { Message, type MessageProps } from './Message.js';
 export { Notification, type NotificationProps } from './Notification.js';
 export { Popconfirm, type PopconfirmProps } from './Popconfirm.js';
-// Wave 10: Accessible Overlay Suite & Rich Media Parity
+export { Spin, type SpinProps } from './Spin.js';
+// Wave 10: Rich Media, Hierarchical Select & Accessible Overlay Suite
 export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
+export { TreeSelect, type TreeSelectProps, type TreeNode } from './TreeSelect.js';
+export { Cascader, type CascaderProps, type CascaderOption } from './Cascader.js';
 export { lockBodyScroll, trapFocus } from './overlay-utils.js';
 
 
