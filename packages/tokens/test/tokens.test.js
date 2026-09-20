@@ -76,6 +76,10 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-notification'), 'notification styles must exist');
   assert.ok(css.includes('.joy-popconfirm'), 'popconfirm styles must exist');
   assert.ok(css.includes('.joy-spin'), 'spin styles must exist');
+  // Optical Alignment & Form Suite Polish
+  assert.ok(css.includes('justify-content: flex-end'), 'horizontal form labels must be right-aligned');
+  assert.ok(css.includes('-webkit-appearance: none'), 'select controls must reset webkit appearance');
+  assert.ok(css.includes('.joy-form-item--horizontal .joy-form-item__label::after'), 'horizontal form labels must support colon punctuation');
 });
 
 

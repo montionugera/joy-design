@@ -2611,8 +2611,8 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-form-item">
                   <label class="joy-form-item__label">Execution Strategy</label>
                   <div class="joy-form-item__control">
-                    <div class="joy-select" style="width: 100%;">
-                      <select class="joy-select__input" style="width: 100%; height: 36px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #cbd5e1); background: var(--joy-color-surface-elevated, #fff); color: var(--joy-color-text-primary, #0f172a);">
+                    <div class="joy-select-wrapper">
+                      <select class="joy-select">
                         <option>TWAP (Time-Weighted Average Price)</option>
                         <option>VWAP (Volume-Weighted Average Price)</option>
                         <option>POV (Percentage of Volume)</option>
@@ -2625,8 +2625,8 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
 
               <!-- Horizontal Form -->
-              <div class="joy-form joy-form--horizontal" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0);">
-                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-color-brand-primary, #7c3aed);">Horizontal Layout Alignment</div>
+              <div class="joy-form joy-form--horizontal" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 24px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0); --joy-form-label-width: 160px;">
+                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 18px; color: var(--joy-color-brand-primary, #7c3aed);">Horizontal Layout Alignment (Right-Aligned Baselines)</div>
                 
                 <div class="joy-form-item joy-form-item--horizontal">
                   <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Account Name</label>
@@ -2656,7 +2656,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 12px; margin-left: 140px;">
+                <div class="joy-form-actions">
                   <button type="button" class="joy-button joy-button--primary joy-button--md">Save Policy</button>
                   <button type="button" class="joy-button joy-button--outline joy-button--md">Reset</button>
                 </div>
