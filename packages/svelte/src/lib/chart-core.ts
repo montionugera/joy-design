@@ -38,7 +38,7 @@ export interface ChartOptions {
 }
 
 /**
- * Largest-Triangle-Three-Buckets (LTTB) Downsampling Algorithm
+ * Largest-Triangle-Three-Buckets (LTTB) Downsampling Algorithm (For 1D lines/areas)
  */
 export function lttbDownsample(data: ChartPoint[], threshold: number): ChartPoint[] {
   if (threshold >= data.length || threshold === 0) return data;
@@ -92,6 +92,185 @@ export function lttbDownsample(data: ChartPoint[], threshold: number): ChartPoin
   return sampled;
 }
 
+/**
+ * Binary search for visible index range [startIndex, endIndex] in O(log N)
+ * Eliminates full-array scanning and garbage allocation on every frame.
+ */
+export function findVisibleRange(
+  times: number[] | Float64Array,
+  minTime: number,
+  maxTime: number
+): [number, number] {
+  if (!times || times.length === 0) return [0, -1];
+  if (times.length === 1) {
+    return times[0] >= minTime && times[0] <= maxTime ? [0, 0] : [0, -1];
+  }
+
+  let l = 0;
+  let r = times.length - 1;
+  let startIndex = times.length;
+
+  while (l <= r) {
+    const mid = (l + r) >> 1;
+    if (times[mid] >= minTime) {
+      startIndex = mid;
+      r = mid - 1;
+    } else {
+      l = mid + 1;
+    }
+  }
+
+  l = Math.max(0, startIndex > 0 ? startIndex - 1 : 0);
+  r = times.length - 1;
+  let endIndex = -1;
+
+  while (l <= r) {
+    const mid = (l + r) >> 1;
+    if (times[mid] <= maxTime) {
+      endIndex = mid;
+      l = mid + 1;
+    } else {
+      r = mid - 1;
+    }
+  }
+
+  // Include 1 boundary point on each side for smooth edge clipping
+  startIndex = Math.max(0, Math.min(times.length - 1, startIndex > 0 ? startIndex - 1 : 0));
+  endIndex = Math.min(times.length - 1, Math.max(0, endIndex < times.length - 1 ? endIndex + 1 : times.length - 1));
+
+  return [startIndex, endIndex];
+}
+
+/**
+ * Financial OHLC bucket aggregation for dense candlesticks
+ * Preserves Open (first), High (max), Low (min), Close (last), and Volume (sum)
+ */
+export function ohlcBinning(
+  data: CandlestickDataPoint[],
+  startIndex: number,
+  endIndex: number,
+  maxBuckets: number
+): CandlestickDataPoint[] {
+  const count = endIndex - startIndex + 1;
+  if (count <= 0) return [];
+  if (count <= maxBuckets) {
+    return data.slice(startIndex, endIndex + 1);
+  }
+
+  const buckets: CandlestickDataPoint[] = [];
+  const bucketSize = count / maxBuckets;
+
+  for (let b = 0; b < maxBuckets; b++) {
+    const bStart = startIndex + Math.floor(b * bucketSize);
+    const bEnd = Math.min(endIndex + 1, startIndex + Math.floor((b + 1) * bucketSize));
+    if (bStart >= bEnd) continue;
+
+    const first = data[bStart];
+    let high = first.high;
+    let low = first.low;
+    let volume = first.volume || 0;
+
+    for (let i = bStart + 1; i < bEnd; i++) {
+      const p = data[i];
+      if (p.high > high) high = p.high;
+      if (p.low < low) low = p.low;
+      if (p.volume) volume += p.volume;
+    }
+
+    const last = data[bEnd - 1];
+    buckets.push({
+      time: Math.round((first.time + last.time) / 2),
+      open: first.open,
+      high,
+      low,
+      close: last.close,
+      volume
+    });
+  }
+
+  return buckets;
+}
+
+/**
+ * Fast O(log N) binary search for nearest hovered point
+ */
+export function binarySearchNearest<T extends { time?: number; x?: number }>(
+  items: T[],
+  targetTime: number
+): T | null {
+  if (!items || items.length === 0) return null;
+  if (items.length === 1) return items[0];
+
+  let l = 0;
+  let r = items.length - 1;
+
+  while (r - l > 1) {
+    const mid = (l + r) >> 1;
+    const midTime = (items[mid].time ?? items[mid].x)!;
+    if (midTime < targetTime) {
+      l = mid;
+    } else {
+      r = mid;
+    }
+  }
+
+  const lTime = (items[l].time ?? items[l].x)!;
+  const rTime = (items[r].time ?? items[r].x)!;
+  return Math.abs(lTime - targetTime) <= Math.abs(rTime - targetTime) ? items[l] : items[r];
+}
+
+/**
+ * Physical pixel stroke snapping for crisp rendering across arbitrary devicePixelRatio
+ */
+export function snapToPhysicalPixel(cssCoord: number, dpr: number, lineWidth = 1): number {
+  const physicalWidth = lineWidth * dpr;
+  return (Math.round(cssCoord * dpr - physicalWidth / 2) + physicalWidth / 2) / dpr;
+}
+
+/**
+ * Reusable zero-allocation circular buffer for real-time tick feeds
+ */
+export class RingBuffer<T> {
+  private buffer: (T | null)[];
+  private head = 0;
+  private tail = 0;
+  private size = 0;
+  public readonly capacity: number;
+
+  constructor(capacity: number) {
+    this.capacity = capacity;
+    this.buffer = new Array(capacity).fill(null);
+  }
+
+  public push(item: T): void {
+    this.buffer[this.head] = item;
+    this.head = (this.head + 1) % this.capacity;
+    if (this.size < this.capacity) {
+      this.size++;
+    } else {
+      this.tail = (this.tail + 1) % this.capacity;
+    }
+  }
+
+  public length(): number {
+    return this.size;
+  }
+
+  public toArray(): T[] {
+    const arr: T[] = new Array(this.size);
+    for (let i = 0; i < this.size; i++) {
+      arr[i] = this.buffer[(this.tail + i) % this.capacity] as T;
+    }
+    return arr;
+  }
+
+  public clear(): void {
+    this.head = 0;
+    this.tail = 0;
+    this.size = 0;
+  }
+}
+
 export class JoyChartCore {
   private baseCanvas: HTMLCanvasElement;
   private overlayCanvas: HTMLCanvasElement;
@@ -109,7 +288,9 @@ export class JoyChartCore {
 
   private isCandlestick = false;
   private candlestickData: CandlestickDataPoint[] = [];
+  private candlestickTimes: Float64Array = new Float64Array(0);
   private seriesList: SeriesConfig[] = [];
+  private seriesTimesMap: Map<string, Float64Array> = new Map();
   private options: ChartOptions;
 
   // Interaction State
@@ -117,6 +298,7 @@ export class JoyChartCore {
   private dragStartX = 0;
   private dragStartViewMinX = 0;
   private dragStartViewMaxX = 0;
+  private boundListeners: { element: HTMLElement; event: string; handler: EventListener }[] = [];
 
   constructor(
     baseCanvas: HTMLCanvasElement,
@@ -143,6 +325,10 @@ export class JoyChartCore {
   public setCandlesticks(data: CandlestickDataPoint[]) {
     this.isCandlestick = true;
     this.candlestickData = data;
+    this.candlestickTimes = new Float64Array(data.length);
+    for (let i = 0; i < data.length; i++) {
+      this.candlestickTimes[i] = data[i].time;
+    }
     this.autoFit();
     this.render();
   }
@@ -150,6 +336,14 @@ export class JoyChartCore {
   public setSeries(series: SeriesConfig[]) {
     this.isCandlestick = false;
     this.seriesList = series;
+    this.seriesTimesMap = new Map();
+    for (const s of series) {
+      const arr = new Float64Array(s.data.length);
+      for (let i = 0; i < s.data.length; i++) {
+        arr[i] = s.data[i].x;
+      }
+      this.seriesTimesMap.set(s.id, arr);
+    }
     this.autoFit();
     this.render();
   }
@@ -179,10 +373,11 @@ export class JoyChartCore {
       this.viewMaxX = this.candlestickData[this.candlestickData.length - 1].time;
       let min = Infinity;
       let max = -Infinity;
-      this.candlestickData.forEach(c => {
+      for (let i = 0; i < this.candlestickData.length; i++) {
+        const c = this.candlestickData[i];
         if (c.low < min) min = c.low;
         if (c.high > max) max = c.high;
-      });
+      }
       const pad = (max - min) * 0.08 || 1;
       this.viewMinY = min - pad;
       this.viewMaxY = max + pad;
@@ -193,12 +388,13 @@ export class JoyChartCore {
       let maxY = -Infinity;
 
       this.seriesList.forEach(s => {
-        s.data.forEach(p => {
+        for (let i = 0; i < s.data.length; i++) {
+          const p = s.data[i];
           if (p.x < minX) minX = p.x;
           if (p.x > maxX) maxX = p.x;
           if (p.y < minY) minY = p.y;
           if (p.y > maxY) maxY = p.y;
-        });
+        }
       });
 
       this.viewMinX = minX !== Infinity ? minX : 0;
@@ -233,7 +429,7 @@ export class JoyChartCore {
     // Horizontal grid lines
     const ySteps = 5;
     for (let i = 0; i <= ySteps; i++) {
-      const y = Math.floor((this.height / ySteps) * i) + 0.5;
+      const y = snapToPhysicalPixel((this.height / ySteps) * i, this.dpr);
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(this.width, y);
@@ -248,7 +444,7 @@ export class JoyChartCore {
     // Vertical grid lines
     const xSteps = 6;
     for (let i = 0; i <= xSteps; i++) {
-      const x = Math.floor((this.width / xSteps) * i) + 0.5;
+      const x = snapToPhysicalPixel((this.width / xSteps) * i, this.dpr);
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, this.height);
@@ -259,17 +455,26 @@ export class JoyChartCore {
   private drawCandlesticks(ctx: CanvasRenderingContext2D) {
     if (this.candlestickData.length === 0) return;
 
-    // Filter points within view window + 1 buffer point
-    const visible = this.candlestickData.filter(
-      c => c.time >= this.viewMinX && c.time <= this.viewMaxX
-    );
+    // Binary search visible range in O(log N) with 0 allocations
+    const [startIdx, endIdx] = findVisibleRange(this.candlestickTimes, this.viewMinX, this.viewMaxX);
+    if (startIdx > endIdx) return;
+
+    const visibleCount = endIdx - startIdx + 1;
+    const maxVisibleCandles = Math.floor(this.width / 3);
+
+    // OHLC bucket aggregation preserving open, high, low, close, volume
+    const visible = visibleCount > maxVisibleCandles
+      ? ohlcBinning(this.candlestickData, startIdx, endIdx, maxVisibleCandles)
+      : this.candlestickData.slice(startIdx, endIdx + 1);
+
     if (visible.length === 0) return;
 
     const candleWidth = Math.max(2, (this.width / visible.length) * 0.7);
     const bullColor = '#10b981'; // Green
     const bearColor = '#ef4444'; // Red
 
-    visible.forEach(c => {
+    for (let i = 0; i < visible.length; i++) {
+      const c = visible[i];
       const x = this.toPixelX(c.time);
       const openY = this.toPixelY(c.open);
       const closeY = this.toPixelY(c.close);
@@ -284,46 +489,53 @@ export class JoyChartCore {
       ctx.lineWidth = 1.5;
 
       // Wick
+      const wickX = snapToPhysicalPixel(x, this.dpr);
       ctx.beginPath();
-      ctx.moveTo(Math.floor(x) + 0.5, highY);
-      ctx.lineTo(Math.floor(x) + 0.5, lowY);
+      ctx.moveTo(wickX, highY);
+      ctx.lineTo(wickX, lowY);
       ctx.stroke();
 
       // Body
       const top = Math.min(openY, closeY);
       const height = Math.max(2, Math.abs(closeY - openY));
       ctx.fillRect(x - candleWidth / 2, top, candleWidth, height);
-    });
+    }
   }
 
   private drawSeries(ctx: CanvasRenderingContext2D) {
     this.seriesList.forEach(series => {
       if (series.data.length === 0) return;
 
-      // Filter visible window and apply LTTB if points exceed 2x pixel width
-      const visible = series.data.filter(
-        p => p.x >= this.viewMinX && p.x <= this.viewMaxX
-      );
+      const times = this.seriesTimesMap.get(series.id);
+      const [startIdx, endIdx] = times
+        ? findVisibleRange(times, this.viewMinX, this.viewMaxX)
+        : [0, series.data.length - 1];
+
+      if (startIdx > endIdx) return;
+      const visibleCount = endIdx - startIdx + 1;
       const maxDisplayPoints = Math.floor(this.width * 1.5);
-      const points = visible.length > maxDisplayPoints
-        ? lttbDownsample(visible, maxDisplayPoints)
-        : visible;
+
+      const visibleSlice = series.data.slice(startIdx, endIdx + 1);
+      const points = visibleCount > maxDisplayPoints
+        ? lttbDownsample(visibleSlice, maxDisplayPoints)
+        : visibleSlice;
 
       if (points.length === 0) return;
 
-      const color = series.color || '#7c3aed';
+      const color = series.color || '#c49a3a';
       ctx.strokeStyle = color;
       ctx.lineWidth = series.lineWidth || 2;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
 
       ctx.beginPath();
-      points.forEach((p, idx) => {
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
         const px = this.toPixelX(p.x);
         const py = this.toPixelY(p.y);
-        if (idx === 0) ctx.moveTo(px, py);
+        if (i === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
-      });
+      }
       ctx.stroke();
 
       // Area fill
@@ -358,20 +570,25 @@ export class JoyChartCore {
     return this.viewMaxY - (pixelY / this.height) * (this.viewMaxY - this.viewMinY);
   }
 
+  private addListener(element: HTMLElement | Window, event: string, handler: EventListener) {
+    element.addEventListener(event, handler);
+    this.boundListeners.push({ element: element as HTMLElement, event, handler });
+  }
+
   private bindEvents() {
-    this.overlayCanvas.addEventListener('mousedown', (e) => {
+    this.addListener(this.overlayCanvas, 'mousedown', ((e: MouseEvent) => {
       if (!this.options.enableZoomPan) return;
       this.isDragging = true;
       this.dragStartX = e.clientX;
       this.dragStartViewMinX = this.viewMinX;
       this.dragStartViewMaxX = this.viewMaxX;
-    });
+    }) as EventListener);
 
-    window.addEventListener('mouseup', () => {
+    this.addListener(window, 'mouseup', (() => {
       this.isDragging = false;
-    });
+    }) as EventListener);
 
-    this.overlayCanvas.addEventListener('mousemove', (e) => {
+    this.addListener(this.overlayCanvas, 'mousemove', ((e: MouseEvent) => {
       const rect = this.overlayCanvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
@@ -388,9 +605,9 @@ export class JoyChartCore {
       if (this.options.showCrosshair) {
         this.drawCrosshair(mouseX, mouseY);
       }
-    });
+    }) as EventListener);
 
-    this.overlayCanvas.addEventListener('wheel', (e) => {
+    this.addListener(this.overlayCanvas, 'wheel', ((e: WheelEvent) => {
       if (!this.options.enableZoomPan) return;
       e.preventDefault();
 
@@ -407,12 +624,12 @@ export class JoyChartCore {
 
       this.render();
       this.drawCrosshair(mouseX, e.clientY - rect.top);
-    }, { passive: false });
+    }) as EventListener);
 
-    this.overlayCanvas.addEventListener('mouseleave', () => {
+    this.addListener(this.overlayCanvas, 'mouseleave', (() => {
       this.overlayCtx.clearRect(0, 0, this.width, this.height);
       this.options.onHoverPoint?.(null);
-    });
+    }) as EventListener);
   }
 
   private drawCrosshair(mouseX: number, mouseY: number) {
@@ -424,50 +641,43 @@ export class JoyChartCore {
     ctx.setLineDash([4, 4]);
 
     // Vertical Crosshair
+    const x = snapToPhysicalPixel(mouseX, this.dpr);
     ctx.beginPath();
-    ctx.moveTo(Math.floor(mouseX) + 0.5, 0);
-    ctx.lineTo(Math.floor(mouseX) + 0.5, this.height);
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, this.height);
     ctx.stroke();
 
     // Horizontal Crosshair
+    const y = snapToPhysicalPixel(mouseY, this.dpr);
     ctx.beginPath();
-    ctx.moveTo(0, Math.floor(mouseY) + 0.5);
-    ctx.lineTo(this.width, Math.floor(mouseY) + 0.5);
+    ctx.moveTo(0, y);
+    ctx.lineTo(this.width, y);
     ctx.stroke();
     ctx.setLineDash([]);
 
     // Price Tracking Pill
     const price = this.toDataY(mouseY);
-    ctx.fillStyle = '#7c3aed';
+    ctx.fillStyle = '#c49a3a';
     ctx.fillRect(this.width - 60, mouseY - 10, 56, 20);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#14253e';
     ctx.font = '10px monospace';
     ctx.fillText(price.toFixed(2), this.width - 54, mouseY + 4);
 
-    // Find nearest point
+    // Fast O(log N) binary search hover detection
     const dataX = this.toDataX(mouseX);
     if (this.isCandlestick && this.candlestickData.length > 0) {
-      let nearest = this.candlestickData[0];
-      let minDiff = Infinity;
-      this.candlestickData.forEach(c => {
-        const diff = Math.abs(c.time - dataX);
-        if (diff < minDiff) {
-          minDiff = diff;
-          nearest = c;
-        }
-      });
+      const nearest = binarySearchNearest(this.candlestickData, dataX);
       this.options.onHoverPoint?.(nearest);
-    } else if (this.seriesList.length > 0) {
-      let nearest = this.seriesList[0].data[0];
-      let minDiff = Infinity;
-      this.seriesList[0].data.forEach(p => {
-        const diff = Math.abs(p.x - dataX);
-        if (diff < minDiff) {
-          minDiff = diff;
-          nearest = p;
-        }
-      });
+    } else if (this.seriesList.length > 0 && this.seriesList[0].data.length > 0) {
+      const nearest = binarySearchNearest(this.seriesList[0].data, dataX);
       this.options.onHoverPoint?.(nearest);
     }
+  }
+
+  public destroy(): void {
+    for (const { element, event, handler } of this.boundListeners) {
+      element.removeEventListener(event, handler);
+    }
+    this.boundListeners = [];
   }
 }
