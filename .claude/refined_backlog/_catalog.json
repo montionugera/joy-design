@@ -298,5 +298,14 @@
     "claimed_at": "2026-09-20T04:34:27.566016+00:00",
     "shipped_at": "2026-09-20T04:36:15.656232+00:00",
     "promoted_at": "2026-09-20T04:36:40.989393+00:00"
+  },
+  {
+    "id": "F-026",
+    "title": "wave-10a-image-preview-and-accessible-overlay-stack",
+    "from_idea": "I-026",
+    "created_at": "2026-09-20T04:37:12.780800+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
