@@ -24,7 +24,7 @@ export const Filter: React.FC<IconProps> = ({
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>

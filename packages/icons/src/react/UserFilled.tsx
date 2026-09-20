@@ -24,7 +24,7 @@ export const UserFilled: React.FC<IconProps> = ({
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <circle cx="12" cy="8" r="4" fill=color /><path

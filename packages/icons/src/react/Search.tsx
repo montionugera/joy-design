@@ -24,7 +24,7 @@ export const Search: React.FC<IconProps> = ({
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <circle cx="11" cy="11" r="7" stroke=color strokeWidth="1.5" /><path

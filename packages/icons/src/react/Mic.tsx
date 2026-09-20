@@ -24,7 +24,7 @@ export const Mic: React.FC<IconProps> = ({
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <rect x="9" y="3" width="6" height="10" rx="3" stroke=color strokeWidth="1.5" /><path
