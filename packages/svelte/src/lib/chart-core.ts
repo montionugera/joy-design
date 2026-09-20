@@ -522,6 +522,21 @@ export class JoyChartCore {
 
       if (points.length === 0) return;
 
+      if (series.type === 'bar') {
+        const barWidth = Math.max(2, (this.width / Math.max(1, points.length)) * 0.7);
+        ctx.fillStyle = color;
+        const zeroY = this.toPixelY(Math.max(0, this.viewMinY));
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i];
+          const px = this.toPixelX(p.x);
+          const py = this.toPixelY(p.y);
+          const top = Math.min(py, zeroY);
+          const barHeight = Math.max(1, Math.abs(zeroY - py));
+          ctx.fillRect(px - barWidth / 2, top, barWidth, barHeight);
+        }
+        return;
+      }
+
       const color = series.color || '#c49a3a';
       ctx.strokeStyle = color;
       ctx.lineWidth = series.lineWidth || 2;
@@ -550,6 +565,23 @@ export class JoyChartCore {
         ctx.fill();
       }
     });
+  }
+
+  public zoom(factor: number, centerRatio = 0.5): void {
+    const range = this.viewMaxX - this.viewMinX;
+    const centerX = this.viewMinX + range * centerRatio;
+    const newRange = range * factor;
+    this.viewMinX = centerX - newRange * centerRatio;
+    this.viewMaxX = centerX + newRange * (1 - centerRatio);
+    this.render();
+  }
+
+  public pan(deltaRatio: number): void {
+    const range = this.viewMaxX - this.viewMinX;
+    const shift = range * deltaRatio;
+    this.viewMinX += shift;
+    this.viewMaxX += shift;
+    this.render();
   }
 
   private toPixelX(x: number): number {
