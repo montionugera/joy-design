@@ -262,5 +262,14 @@
     "claimed_at": "2026-09-20T04:06:32.292270+00:00",
     "shipped_at": "2026-09-20T04:08:36.023570+00:00",
     "promoted_at": "2026-09-20T04:09:03.839335+00:00"
+  },
+  {
+    "id": "F-023",
+    "title": "Wave 11R: Icon Ecosystem Compliance, Provenance & Storybook Zero-Emoji Enforcement",
+    "from_idea": "I-023",
+    "created_at": "2026-09-20T04:27:53.632044+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
