@@ -2126,7 +2126,7 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
           <div style="padding: 24px;">
             <div class="joy-bento-grid">
-              <div class="joy-bento-card joy-bento-card--col-span-2">
+              <div class="joy-bento-card joy-bento-card--col-6">
                 <div class="joy-bento-card__badge">Latency Metric</div>
                 <h4 class="joy-bento-card__title">Sub-millisecond Order Routing</h4>
                 <p class="joy-bento-card__desc">Co-located matching engine gateway with continuous FPGA hardware acceleration and zero-allocation socket rings.</p>
@@ -2135,25 +2135,41 @@ export async function executeHedge(symbol: string, size: number) {
                   <span class="joy-badge joy-badge--brand joy-badge--subtle">DPDK Enabled</span>
                 </div>
               </div>
-              <div class="joy-bento-card">
+              <div class="joy-bento-card joy-bento-card--col-6">
                 <div class="joy-bento-card__badge">Cross-Chain</div>
                 <h4 class="joy-bento-card__title">Unified Liquidity</h4>
-                <p class="joy-bento-card__desc">Continuous aggregation across 14 EVM & SVM settlement layers.</p>
+                <p class="joy-bento-card__desc">Continuous aggregation across 14 EVM & SVM settlement layers with automated route splits.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--info joy-badge--subtle">14 Chains Live</span>
+                  <span class="joy-badge joy-badge--subtle">Zero Slippage</span>
+                </div>
               </div>
-              <div class="joy-bento-card">
-                <div class="joy-bento-card__badge">Security</div>
-                <h4 class="joy-bento-card__title">MPC Vaults</h4>
-                <p class="joy-bento-card__desc">Hardware-isolated multi-party threshold signatures.</p>
-              </div>
-              <div class="joy-bento-card joy-bento-card--col-span-3">
+              <div class="joy-bento-card joy-bento-card--col-8">
                 <div class="joy-bento-card__badge">Deep Analytics</div>
                 <h4 class="joy-bento-card__title">Real-Time Risk & Telemetry Visualizer</h4>
                 <p class="joy-bento-card__desc">Granular Greeks calculations, portfolio VAR distributions, and live liquidation distance metrics streaming at 60fps.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--warning joy-badge--subtle">VAR 99.9%</span>
+                  <span class="joy-badge joy-badge--brand joy-badge--subtle">60 FPS WebGL</span>
+                </div>
               </div>
-              <div class="joy-bento-card">
-                <div class="joy-bento-card__badge">Compliance</div>
-                <h4 class="joy-bento-card__title">Automated Audit</h4>
-                <p class="joy-bento-card__desc">WORM storage log trails.</p>
+              <div class="joy-bento-card joy-bento-card--col-4">
+                <div class="joy-bento-card__badge">Security</div>
+                <h4 class="joy-bento-card__title">MPC Vaults</h4>
+                <p class="joy-bento-card__desc">Hardware-isolated multi-party threshold signatures with zero single points of failure.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--success joy-badge--subtle">FIPS 140-3</span>
+                </div>
+              </div>
+              <div class="joy-bento-card joy-bento-card--col-12">
+                <div class="joy-bento-card__badge">Compliance & Observability</div>
+                <h4 class="joy-bento-card__title">Automated Cryptographic Audit Trails</h4>
+                <p class="joy-bento-card__desc">WORM-compliant immutable ledger log trails with cryptographic proof verification and sub-second compliance export.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--brand joy-badge--subtle">WORM Compliant</span>
+                  <span class="joy-badge joy-badge--success joy-badge--subtle">SOC2 Type II</span>
+                  <span class="joy-badge joy-badge--subtle">Real-Time Attestation</span>
+                </div>
               </div>
             </div>
           </div>

@@ -43,6 +43,10 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
 
   // Wave 5 Assertions (Landing Page Architecture & Enterprise Workflow Suite)
   assert.ok(css.includes('.joy-bento-grid'), 'bento grid styles must exist');
+  assert.ok(css.includes('.joy-bento-card--col-6'), 'bento card col-6 must exist');
+  assert.ok(css.includes('.joy-bento-card--col-8'), 'bento card col-8 must exist');
+  assert.ok(css.includes('.joy-bento-card--col-12'), 'bento card col-12 must exist');
+  assert.ok(css.includes('.joy-bento-card--col-span-2'), 'bento card col-span-2 compatibility must exist');
   assert.ok(css.includes('.joy-hero'), 'hero section styles must exist');
   assert.ok(css.includes('.joy-pricing-matrix'), 'pricing matrix styles must exist');
   assert.ok(css.includes('.joy-testimonial-card'), 'testimonial card styles must exist');
