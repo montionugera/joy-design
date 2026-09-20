@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BentoColSpan = 4 | 6 | 8 | 12;
+export type BentoColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export interface BentoCardProps extends React.HTMLAttributes<HTMLDivElement> {
   colSpan?: BentoColSpan;
