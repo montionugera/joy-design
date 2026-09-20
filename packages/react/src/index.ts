@@ -55,3 +55,13 @@ export { Statistic, type StatisticProps } from './Statistic.js';
 export { Tag, type TagProps } from './Tag.js';
 export { Segmented, type SegmentedProps, type SegmentedOption } from './Segmented.js';
 export { JoyChartCore, lttbDownsample, type ChartPoint, type CandlestickDataPoint, type SeriesConfig } from './chart-core.js';
+
+// Wave 7: Form Suite & Advanced Data Entry Parity
+export { Form, type FormProps } from './Form.js';
+export { FormItem, type FormItemProps, type ValidationRule } from './FormItem.js';
+export { InputNumber, type InputNumberProps } from './InputNumber.js';
+export { Rate, type RateProps } from './Rate.js';
+export { Mentions, type MentionsProps, type MentionOption } from './Mentions.js';
+export { TimePicker, type TimePickerProps } from './TimePicker.js';
+export { Transfer, type TransferProps, type TransferItem } from './Transfer.js';
+

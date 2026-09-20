@@ -60,6 +60,14 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-statistic'), 'statistic styles must exist');
   assert.ok(css.includes('.joy-tag'), 'tag styles must exist');
   assert.ok(css.includes('.joy-segmented'), 'segmented styles must exist');
+
+  // Wave 7 Assertions (Form Suite & Advanced Data Entry)
+  assert.ok(css.includes('.joy-form'), 'form styles must exist');
+  assert.ok(css.includes('.joy-input-number'), 'input-number styles must exist');
+  assert.ok(css.includes('.joy-rate'), 'rate styles must exist');
+  assert.ok(css.includes('.joy-mentions'), 'mentions styles must exist');
+  assert.ok(css.includes('.joy-time-picker'), 'time-picker styles must exist');
+  assert.ok(css.includes('.joy-transfer'), 'transfer styles must exist');
 });
 
 
