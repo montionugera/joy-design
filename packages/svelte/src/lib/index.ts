@@ -65,3 +65,12 @@ export { default as Mentions, type MentionOption } from './Mentions.svelte';
 export { default as TimePicker } from './TimePicker.svelte';
 export { default as Transfer, type TransferItem } from './Transfer.svelte';
 
+// Wave 8: Navigation & Feedback Suite Parity
+export { default as Menu, type MenuItem } from './Menu.svelte';
+export { default as Anchor, type AnchorItem } from './Anchor.svelte';
+export { default as Message } from './Message.svelte';
+export { default as Notification } from './Notification.svelte';
+export { default as Popconfirm } from './Popconfirm.svelte';
+export { default as Spin } from './Spin.svelte';
+
+

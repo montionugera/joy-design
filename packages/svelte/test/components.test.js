@@ -184,5 +184,31 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const transfer = fs.readFileSync(path.resolve('./src/lib/Transfer.svelte'), 'utf8');
   assert.ok(transfer.includes('joy-transfer'), 'Transfer must have joy-transfer class');
+
+  // Wave 8 Assertions (Navigation & Feedback Suite)
+  const menu = fs.readFileSync(path.resolve('./src/lib/Menu.svelte'), 'utf8');
+  assert.ok(menu.includes('joy-menu'), 'Menu must have joy-menu class');
+  assert.ok(menu.includes('role="menu"'), 'Menu must implement role=menu');
+
+  const anchor = fs.readFileSync(path.resolve('./src/lib/Anchor.svelte'), 'utf8');
+  assert.ok(anchor.includes('joy-anchor'), 'Anchor must have joy-anchor class');
+  assert.ok(anchor.includes('role="navigation"'), 'Anchor must implement role=navigation');
+
+  const message = fs.readFileSync(path.resolve('./src/lib/Message.svelte'), 'utf8');
+  assert.ok(message.includes('joy-message'), 'Message must have joy-message class');
+  assert.ok(message.includes('role="alert"'), 'Message must implement role=alert');
+
+  const notification = fs.readFileSync(path.resolve('./src/lib/Notification.svelte'), 'utf8');
+  assert.ok(notification.includes('joy-notification'), 'Notification must have joy-notification class');
+  assert.ok(notification.includes('role="alert"'), 'Notification must implement role=alert');
+
+  const popconfirm = fs.readFileSync(path.resolve('./src/lib/Popconfirm.svelte'), 'utf8');
+  assert.ok(popconfirm.includes('joy-popconfirm'), 'Popconfirm must have joy-popconfirm class');
+  assert.ok(popconfirm.includes('role="dialog"'), 'Popconfirm panel must implement role=dialog');
+
+  const spin = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
+  assert.ok(spin.includes('joy-spin'), 'Spin must have joy-spin class');
+  assert.ok(spin.includes('role="status"'), 'Spin must implement role=status');
 });
+
 

@@ -68,6 +68,14 @@ test('compiled tokens exist and contain critical joy variables and enterprise co
   assert.ok(css.includes('.joy-mentions'), 'mentions styles must exist');
   assert.ok(css.includes('.joy-time-picker'), 'time-picker styles must exist');
   assert.ok(css.includes('.joy-transfer'), 'transfer styles must exist');
+
+  // Wave 8 Assertions (Navigation & Feedback Suite)
+  assert.ok(css.includes('.joy-menu'), 'menu styles must exist');
+  assert.ok(css.includes('.joy-anchor'), 'anchor styles must exist');
+  assert.ok(css.includes('.joy-message'), 'message styles must exist');
+  assert.ok(css.includes('.joy-notification'), 'notification styles must exist');
+  assert.ok(css.includes('.joy-popconfirm'), 'popconfirm styles must exist');
+  assert.ok(css.includes('.joy-spin'), 'spin styles must exist');
 });
 
 

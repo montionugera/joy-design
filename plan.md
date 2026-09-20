@@ -1,14 +1,14 @@
-# [F-019] Form Suite & Advanced Data Entry Parity
+# [F-020] Enterprise Navigation & Feedback Suite Parity
 
 > **Autonomous Execution Standard**: Zero mid-turn interruptions. Verify evidence before assertions. Zero OS emojis.
 
-**Goal**: Deliver complete Ant Design parity for Data Entry:
-1. `Form` & `Form.Item` with client/async validation engine (`rules`: `required`, `min`, `max`, `pattern`, `validator`).
-2. `InputNumber`: High-density numeric stepper with min, max, step, precision, spinbutton ARIA traits, and keyboard arrows.
-3. `Rate`: Interactive star rating scale with half-star granularity, hover feedback, and radiogroup ARIA semantics.
-4. `Mentions`: Trigger-based `@` and `#` autocomplete tagging input with dropdown menu.
-5. `TimePicker`: Column-based hour/minute/second picker with 24-hour and 12-hour presets.
-6. `Transfer`: Dual-panel list migration component with selection counts, search filter, and directional action buttons (matching Ant Design Screenshot 5).
+**Goal**: Deliver complete Ant Design parity for Navigation & Feedback:
+1. `Menu`: Comprehensive navigation menu supporting `horizontal`, `vertical`, and `inline` modes with submenus, selection state, and collapsible sidebar support.
+2. `Anchor`: Smooth in-page section scrolling navigation with active marker track and links.
+3. `Message`: Imperative & declarative top-centered transient feedback notifications (`message.success()`, `message.error()`, `message.info()`, `message.warning()`).
+4. `Notification`: Rich corner alert banner with title, description, status vector SVGs, and auto-dismiss timer.
+5. `Popconfirm`: Compact confirmation popover triggered on buttons/links before destructive actions.
+6. `Spin`: Crisp SVG loading spinner supporting standalone and wrapped container loading states.
 
 Dual-framework exports (`@joymify/svelte` + `@joymify/react`), Storybook Hub interactive showcases, and live Kubernetes deployment.
 
@@ -16,34 +16,34 @@ Dual-framework exports (`@joymify/svelte` + `@joymify/react`), Storybook Hub int
 
 ## Phase 1: Tokens & Styling Engine Expansion
 - [x] Add CSS classes in `packages/tokens/build.js`:
-  - `.joy-form`, `.joy-form-item`, `.joy-form-item__label`, `.joy-form-item__explain`, `.joy-form-item--error`
-  - `.joy-input-number`, `.joy-input-number__handler-wrap`, `.joy-input-number__handler-up`, `.joy-input-number__handler-down`
-  - `.joy-rate`, `.joy-rate__star`, `.joy-rate__star--half`, `.joy-rate__star--full`
-  - `.joy-mentions`, `.joy-mentions__dropdown`, `.joy-mentions__item`
-  - `.joy-time-picker`, `.joy-time-picker__panel`, `.joy-time-picker__column`
-  - `.joy-transfer`, `.joy-transfer__list`, `.joy-transfer__header`, `.joy-transfer__body`, `.joy-transfer__operations`
+  - `.joy-menu`, `.joy-menu--horizontal`, `.joy-menu--vertical`, `.joy-menu--inline`, `.joy-menu__item`, `.joy-menu__item--active`, `.joy-menu__submenu`
+  - `.joy-anchor`, `.joy-anchor__ink`, `.joy-anchor__link`, `.joy-anchor__link--active`
+  - `.joy-message`, `.joy-message__notice`, `.joy-message__content`
+  - `.joy-notification`, `.joy-notification__notice`, `.joy-notification__title`, `.joy-notification__desc`
+  - `.joy-popconfirm`, `.joy-popconfirm__panel`, `.joy-popconfirm__buttons`
+  - `.joy-spin`, `.joy-spin--spinning`, `.joy-spin__container`, `.joy-spin__mask`
 - [x] Compile tokens and verify `packages/tokens/test/tokens.test.js`
 
 ## Phase 2: Svelte 5 Runes Implementation
-- [x] `Form.svelte` & `FormItem.svelte`
-- [x] `InputNumber.svelte`
-- [x] `Rate.svelte`
-- [x] `Mentions.svelte`
-- [x] `TimePicker.svelte`
-- [x] `Transfer.svelte`
+- [x] `Menu.svelte`
+- [x] `Anchor.svelte`
+- [x] `Message.svelte`
+- [x] `Notification.svelte`
+- [x] `Popconfirm.svelte`
+- [x] `Spin.svelte`
 - [x] Export in `packages/svelte/src/lib/index.ts` and test in `packages/svelte/test/components.test.js`
 
 ## Phase 3: React 19 Implementation
-- [x] `Form.tsx` & `FormItem.tsx`
-- [x] `InputNumber.tsx`
-- [x] `Rate.tsx`
-- [x] `Mentions.tsx`
-- [x] `TimePicker.tsx`
-- [x] `Transfer.tsx`
+- [x] `Menu.tsx`
+- [x] `Anchor.tsx`
+- [x] `Message.tsx`
+- [x] `Notification.tsx`
+- [x] `Popconfirm.tsx`
+- [x] `Spin.tsx`
 - [x] Export in `packages/react/src/index.ts` and test in `packages/react/test/components.test.js`
 
 ## Phase 4: Storybook Hub Integration & Zero Emoji Audit
-- [x] Add Form & Advanced Data Entry showcase tab (`#view-forms`) in `apps/storybook-hub/build.js`
+- [x] Add Navigation & Feedback showcase tab (`#view-nav-feedback`) in `apps/storybook-hub/build.js`
 - [x] Verify zero raw OS emojis
 
 ## Phase 5: Verification & Promotion
