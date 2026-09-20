@@ -286,5 +286,14 @@
     "claimed_at": "2026-09-20T04:31:01.267735+00:00",
     "shipped_at": "2026-09-20T04:33:12.082953+00:00",
     "promoted_at": "2026-09-20T04:33:37.388729+00:00"
+  },
+  {
+    "id": "F-025",
+    "title": "wave-9b-chart-canvas-adapters-and-benchmarks",
+    "from_idea": "I-025",
+    "created_at": "2026-09-20T04:34:23.803137+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
