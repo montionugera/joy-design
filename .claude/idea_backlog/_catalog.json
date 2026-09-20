@@ -124,5 +124,11 @@
     "title": "Form Suite Optical Alignment and Visual Audit Standard",
     "created_at": "2026-09-20T02:09:05.332333+00:00",
     "promoted_to": "F-021"
+  },
+  {
+    "id": "I-022",
+    "title": "Gate 0: Brand Invariants, Zero Emoji Policy, and Optical Audit Remediation",
+    "created_at": "2026-09-20T04:06:26.144304+00:00",
+    "promoted_to": null
   }
 ]
