@@ -136,5 +136,11 @@
     "title": "Wave 11R: Icon Ecosystem Compliance, Provenance & Storybook Zero-Emoji Enforcement",
     "created_at": "2026-09-20T04:27:49.472590+00:00",
     "promoted_to": "F-023"
+  },
+  {
+    "id": "I-024",
+    "title": "Wave 9A: Headless Financial Chart Engine Core with OHLC Binning and Float64 Buffers",
+    "created_at": "2026-09-20T04:30:53.448691+00:00",
+    "promoted_to": "F-024"
   }
 ]

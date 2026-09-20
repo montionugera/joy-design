@@ -274,5 +274,16 @@
     "claimed_at": "2026-09-20T04:27:58.216109+00:00",
     "shipped_at": "2026-09-20T04:29:42.112642+00:00",
     "promoted_at": "2026-09-20T04:30:14.930591+00:00"
+  },
+  {
+    "id": "F-024",
+    "title": "Wave 9A: Headless Financial Chart Engine Core with OHLC Binning and Float64 Buffers",
+    "from_idea": "I-024",
+    "created_at": "2026-09-20T04:30:57.006076+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.14",
+    "claimed_at": "2026-09-20T04:31:01.267735+00:00",
+    "shipped_at": "2026-09-20T04:33:12.082953+00:00"
   }
 ]
