@@ -197,5 +197,37 @@ test('React standard library components implement accessible traits and forwardR
   const transfer = fs.readFileSync(path.resolve('./src/Transfer.tsx'), 'utf8');
   assert.ok(transfer.includes('joy-transfer'), 'Transfer must render joy-transfer class');
   assert.ok(transfer.includes('React.forwardRef'), 'Transfer must implement forwardRef');
+
+  // Wave 8 Assertions (Navigation & Feedback Suite)
+  const menu = fs.readFileSync(path.resolve('./src/Menu.tsx'), 'utf8');
+  assert.ok(menu.includes('joy-menu'), 'Menu must render joy-menu class');
+  assert.ok(menu.includes('role="menu"'), 'Menu must implement role=menu');
+  assert.ok(menu.includes('React.forwardRef'), 'Menu must implement forwardRef');
+
+  const anchor = fs.readFileSync(path.resolve('./src/Anchor.tsx'), 'utf8');
+  assert.ok(anchor.includes('joy-anchor'), 'Anchor must render joy-anchor class');
+  assert.ok(anchor.includes('role="navigation"'), 'Anchor must implement role=navigation');
+  assert.ok(anchor.includes('React.forwardRef'), 'Anchor must implement forwardRef');
+
+  const message = fs.readFileSync(path.resolve('./src/Message.tsx'), 'utf8');
+  assert.ok(message.includes('joy-message'), 'Message must render joy-message class');
+  assert.ok(message.includes('role="alert"'), 'Message must implement role=alert');
+  assert.ok(message.includes('React.forwardRef'), 'Message must implement forwardRef');
+
+  const notification = fs.readFileSync(path.resolve('./src/Notification.tsx'), 'utf8');
+  assert.ok(notification.includes('joy-notification'), 'Notification must render joy-notification class');
+  assert.ok(notification.includes('role="alert"'), 'Notification must implement role=alert');
+  assert.ok(notification.includes('React.forwardRef'), 'Notification must implement forwardRef');
+
+  const popconfirm = fs.readFileSync(path.resolve('./src/Popconfirm.tsx'), 'utf8');
+  assert.ok(popconfirm.includes('joy-popconfirm'), 'Popconfirm must render joy-popconfirm class');
+  assert.ok(popconfirm.includes('role="dialog"'), 'Popconfirm must implement role=dialog');
+  assert.ok(popconfirm.includes('React.forwardRef'), 'Popconfirm must implement forwardRef');
+
+  const spin = fs.readFileSync(path.resolve('./src/Spin.tsx'), 'utf8');
+  assert.ok(spin.includes('joy-spin'), 'Spin must render joy-spin class');
+  assert.ok(spin.includes('role="status"'), 'Spin must implement role=status');
+  assert.ok(spin.includes('React.forwardRef'), 'Spin must implement forwardRef');
 });
+
 

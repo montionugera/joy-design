@@ -65,3 +65,12 @@ export { Mentions, type MentionsProps, type MentionOption } from './Mentions.js'
 export { TimePicker, type TimePickerProps } from './TimePicker.js';
 export { Transfer, type TransferProps, type TransferItem } from './Transfer.js';
 
+// Wave 8: Navigation & Feedback Suite Parity
+export { Menu, type MenuProps, type MenuItem } from './Menu.js';
+export { Anchor, type AnchorProps, type AnchorItem } from './Anchor.js';
+export { Message, type MessageProps } from './Message.js';
+export { Notification, type NotificationProps } from './Notification.js';
+export { Popconfirm, type PopconfirmProps } from './Popconfirm.js';
+export { Spin, type SpinProps } from './Spin.js';
+
+
