@@ -32,6 +32,19 @@ echo "2. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js
 
 echo "3. Running Playwright Quality Contracts..."
-pnpm --filter storybook-hub exec playwright test
+if command -v playwright >/dev/null 2>&1; then
+  (cd apps/storybook-hub && playwright test)
+elif [ -f "node_modules/.bin/playwright" ]; then
+  (cd apps/storybook-hub && ../../node_modules/.bin/playwright test)
+elif [ -f "apps/storybook-hub/node_modules/.bin/playwright" ]; then
+  (cd apps/storybook-hub && ./node_modules/.bin/playwright test)
+elif pnpm --filter storybook-hub exec playwright --version >/dev/null 2>&1; then
+  pnpm --filter storybook-hub exec playwright test
+else
+  # Self-install playwright in worktree from global pnpm store if missing
+  echo "   Installing @playwright/test in workspace..."
+  pnpm add -D @playwright/test --filter storybook-hub --prefer-offline >/dev/null 2>&1 || true
+  pnpm --filter storybook-hub exec playwright test
+fi
 
 echo "==> Gate 1 Precheck passed successfully! <=="
