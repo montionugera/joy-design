@@ -220,8 +220,9 @@
     "title": "Form Suite and Advanced Data Entry with Async Validation Engine InputNumber Rate Mentions Transfer and TimePicker",
     "from_idea": "I-019",
     "created_at": "2026-09-20T00:24:55.057246+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-09-20T00:24:59.837845+00:00"
   }
 ]
