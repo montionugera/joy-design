@@ -228,6 +228,18 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(spin.includes('joy-spin'), 'Spin must render joy-spin class');
   assert.ok(spin.includes('role="status"'), 'Spin must implement role=status');
   assert.ok(spin.includes('React.forwardRef'), 'Spin must implement forwardRef');
+
+  // Wave 10 Assertions (Image Preview & Accessible Overlay Suite)
+  const imagePreview = fs.readFileSync(path.resolve('./src/ImagePreview.tsx'), 'utf8');
+  assert.ok(imagePreview.includes('joy-image-preview-mask'), 'ImagePreview must render preview mask');
+  assert.ok(imagePreview.includes('role="dialog"'), 'ImagePreview must implement role=dialog');
+  assert.ok(imagePreview.includes('aria-modal="true"'), 'ImagePreview must set aria-modal=true');
+  assert.ok(imagePreview.includes('lockBodyScroll'), 'ImagePreview must invoke lockBodyScroll');
+  assert.ok(imagePreview.includes('trapFocus'), 'ImagePreview must invoke trapFocus');
+
+  const overlayUtils = fs.readFileSync(path.resolve('./src/overlay-utils.ts'), 'utf8');
+  assert.ok(overlayUtils.includes('lockBodyScroll'), 'overlay-utils must export lockBodyScroll');
+  assert.ok(overlayUtils.includes('trapFocus'), 'overlay-utils must export trapFocus');
 });
 
 

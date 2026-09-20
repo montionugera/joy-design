@@ -209,6 +209,18 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const spin = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
   assert.ok(spin.includes('joy-spin'), 'Spin must have joy-spin class');
   assert.ok(spin.includes('role="status"'), 'Spin must implement role=status');
+
+  // Wave 10 Assertions (Image Preview & Accessible Overlay Suite)
+  const imagePreview = fs.readFileSync(path.resolve('./src/lib/ImagePreview.svelte'), 'utf8');
+  assert.ok(imagePreview.includes('joy-image-preview-mask'), 'ImagePreview must render preview mask');
+  assert.ok(imagePreview.includes('role="dialog"'), 'ImagePreview must implement role=dialog');
+  assert.ok(imagePreview.includes('aria-modal="true"'), 'ImagePreview must set aria-modal=true');
+  assert.ok(imagePreview.includes('lockBodyScroll'), 'ImagePreview must invoke lockBodyScroll');
+  assert.ok(imagePreview.includes('trapFocus'), 'ImagePreview must invoke trapFocus');
+
+  const overlayUtils = fs.readFileSync(path.resolve('./src/lib/overlay-utils.ts'), 'utf8');
+  assert.ok(overlayUtils.includes('lockBodyScroll'), 'overlay-utils must export lockBodyScroll');
+  assert.ok(overlayUtils.includes('trapFocus'), 'overlay-utils must export trapFocus');
 });
 
 

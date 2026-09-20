@@ -71,6 +71,8 @@ export { Anchor, type AnchorProps, type AnchorItem } from './Anchor.js';
 export { Message, type MessageProps } from './Message.js';
 export { Notification, type NotificationProps } from './Notification.js';
 export { Popconfirm, type PopconfirmProps } from './Popconfirm.js';
-export { Spin, type SpinProps } from './Spin.js';
+// Wave 10: Accessible Overlay Suite & Rich Media Parity
+export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
+export { lockBodyScroll, trapFocus } from './overlay-utils.js';
 
 
