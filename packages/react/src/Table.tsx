@@ -12,6 +12,7 @@ export interface TableProps<T> {
   columns: Column<T>[];
   data: T[];
   density?: 'compact' | 'normal';
+  responsive?: 'scroll' | 'stack' | boolean;
   sortKey?: string;
   sortDirection?: 'asc' | 'desc';
   onSort?: (key: string, direction: 'asc' | 'desc') => void;
@@ -22,6 +23,7 @@ export function Table<T extends Record<string, any>>({
   columns,
   data,
   density = 'compact',
+  responsive = 'stack',
   sortKey: controlledSortKey,
   sortDirection: controlledSortDirection,
   onSort,
@@ -32,6 +34,8 @@ export function Table<T extends Record<string, any>>({
 
   const activeSortKey = controlledSortKey !== undefined ? controlledSortKey : internalSortKey;
   const activeSortDir = controlledSortDirection !== undefined ? controlledSortDirection : internalSortDir;
+
+  const isStack = responsive === 'stack' || responsive === true;
 
   const handleHeaderClick = (col: Column<T>) => {
     if (!col.sortable) return;
@@ -48,8 +52,8 @@ export function Table<T extends Record<string, any>>({
   };
 
   return (
-    <div className={`joy-table-container ${className}`}>
-      <table className={`joy-table joy-table--${density}`}>
+    <div className={`joy-table-container ${isStack ? 'joy-table-container--responsive-stack' : ''} ${className}`}>
+      <table className={`joy-table joy-table--${density} ${isStack ? 'joy-table--responsive-stack' : ''}`}>
         <thead>
           <tr>
             {columns.map((col, idx) => {
@@ -74,7 +78,22 @@ export function Table<T extends Record<string, any>>({
                   <span>{col.title}</span>
                   {col.sortable && (
                     <span className="joy-table-sort-icon">
-                      {isSorted ? (activeSortDir === 'asc' ? '▲' : '▼') : '⇅'}
+                      {isSorted ? (
+                        activeSortDir === 'asc' ? (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Sorted ascending">
+                            <polyline points="18 15 12 9 6 15" />
+                          </svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Sorted descending">
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        )
+                      ) : (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Sortable">
+                          <path d="m7 15 5 5 5-5" />
+                          <path d="m7 9 5-5 5 5" />
+                        </svg>
+                      )}
                     </span>
                   )}
                 </th>
@@ -96,6 +115,7 @@ export function Table<T extends Record<string, any>>({
                 return (
                   <td
                     key={String(col.key) || cIdx}
+                    data-label={col.title}
                     className={tdClass}
                     style={{ textAlign: col.align || 'left' }}
                   >
