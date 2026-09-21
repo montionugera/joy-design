@@ -264,6 +264,34 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(cascader.includes('joy-cascader'), 'Cascader must render joy-cascader class');
   assert.ok(cascader.includes('role="listbox"'), 'Cascader must implement role=listbox');
   assert.ok(cascader.includes('React.forwardRef'), 'Cascader must implement forwardRef');
+
+  // Wave 13B: Landing Page Component Suite
+  const featureCard = fs.readFileSync(path.resolve('./src/FeatureCard.tsx'), 'utf8');
+  assert.ok(featureCard.includes('joy-feature-card'), 'FeatureCard must render joy-feature-card class');
+  assert.ok(featureCard.includes('React.forwardRef'), 'FeatureCard must implement forwardRef');
+
+  const featureGrid = fs.readFileSync(path.resolve('./src/FeatureGrid.tsx'), 'utf8');
+  assert.ok(featureGrid.includes('joy-feature-grid'), 'FeatureGrid must render joy-feature-grid class');
+
+  const logoCloud = fs.readFileSync(path.resolve('./src/LogoCloud.tsx'), 'utf8');
+  assert.ok(logoCloud.includes('joy-logo-cloud'), 'LogoCloud must render joy-logo-cloud class');
+
+  const statsSection = fs.readFileSync(path.resolve('./src/StatsSection.tsx'), 'utf8');
+  assert.ok(statsSection.includes('joy-stats-section'), 'StatsSection must render joy-stats-section class');
+  assert.ok(statsSection.includes('joy-stat-item__value'), 'StatsSection must render metric values');
+
+  const ctaSection = fs.readFileSync(path.resolve('./src/CTASection.tsx'), 'utf8');
+  assert.ok(ctaSection.includes('joy-cta-section'), 'CTASection must render joy-cta-section class');
+  assert.ok(ctaSection.includes('joy-button--glass'), 'CTASection must use glass button for contrast safety');
+
+  const faqSection = fs.readFileSync(path.resolve('./src/FAQSection.tsx'), 'utf8');
+  assert.ok(faqSection.includes('joy-faq-section'), 'FAQSection must render joy-faq-section class');
+  assert.ok(faqSection.includes('aria-expanded'), 'FAQSection must implement accessible aria-expanded state');
+  assert.ok(faqSection.includes('role="region"'), 'FAQSection must implement accessible role=region for panel');
+
+  const siteFooter = fs.readFileSync(path.resolve('./src/SiteFooter.tsx'), 'utf8');
+  assert.ok(siteFooter.includes('joy-site-footer'), 'SiteFooter must render joy-site-footer class');
+  assert.ok(siteFooter.includes('role="contentinfo"'), 'SiteFooter must implement accessible role=contentinfo');
 });
 
 

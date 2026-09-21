@@ -78,5 +78,11 @@ export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type Imag
 export { TreeSelect, type TreeSelectProps, type TreeNode } from './TreeSelect.js';
 export { Cascader, type CascaderProps, type CascaderOption } from './Cascader.js';
 export { lockBodyScroll, trapFocus } from './overlay-utils.js';
-
-
+// Wave 13B: Landing Page Component Suite
+export { FeatureCard, type FeatureCardProps } from './FeatureCard.js';
+export { FeatureGrid, type FeatureGridProps } from './FeatureGrid.js';
+export { LogoCloud, type LogoCloudProps, type LogoItem } from './LogoCloud.js';
+export { StatsSection, type StatsSectionProps, type StatItem } from './StatsSection.js';
+export { CTASection, type CTASectionProps } from './CTASection.js';
+export { FAQSection, type FAQSectionProps, type FAQItem } from './FAQSection.js';
+export { SiteFooter, type SiteFooterProps, type FooterColumn, type FooterLink, type SocialLink } from './SiteFooter.js';
