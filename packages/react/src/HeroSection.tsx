@@ -64,7 +64,7 @@ export const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(({
         {secondaryCtaText && (
           <button
             type="button"
-            className="joy-button joy-button--outline joy-button--lg"
+            className="joy-button joy-button--outline joy-hero__secondary-cta joy-button--lg"
             onClick={onSecondaryClick}
           >
             {secondaryCtaText}

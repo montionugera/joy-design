@@ -58,6 +58,9 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(tbl.includes('joy-table-th--sortable'), 'Table must support sortable columns');
   assert.ok(tbl.includes('joy-table-cell--flash-up'), 'Table must support ticker flash up');
   assert.ok(tbl.includes('joy-table-cell--flash-down'), 'Table must support ticker flash down');
+  assert.ok(tbl.includes('joy-table--responsive-stack'), 'Table must support responsive stack card mode for mobile');
+  assert.ok(tbl.includes('data-label'), 'Table cells must provide data-label attributes for mobile card rendering');
+  assert.ok(tbl.includes('<svg width="12" height="12"'), 'Table sort indicators must use vector SVG icons');
 
   const pagination = fs.readFileSync(path.resolve('./src/lib/Pagination.svelte'), 'utf8');
   assert.ok(pagination.includes('role="navigation"'), 'Pagination must implement role=navigation');
@@ -110,6 +113,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const hero = fs.readFileSync(path.resolve('./src/lib/HeroSection.svelte'), 'utf8');
   assert.ok(hero.includes('joy-hero'), 'HeroSection must have joy-hero class');
+  assert.ok(hero.includes('joy-hero__secondary-cta'), 'HeroSection secondary action must use dedicated joy-hero__secondary-cta class');
 
   const pricing = fs.readFileSync(path.resolve('./src/lib/PricingCard.svelte'), 'utf8');
   assert.ok(pricing.includes('joy-pricing-card'), 'PricingCard must have joy-pricing-card class');

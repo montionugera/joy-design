@@ -56,6 +56,9 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(tbl.includes('joy-table-th--sortable'), 'Table must support sortable columns');
   assert.ok(tbl.includes('joy-table-cell--flash-up'), 'Table must support ticker flash up');
   assert.ok(tbl.includes('joy-table-cell--flash-down'), 'Table must support ticker flash down');
+  assert.ok(tbl.includes('joy-table--responsive-stack'), 'Table must support responsive stack card mode for mobile');
+  assert.ok(tbl.includes('data-label'), 'Table cells must provide data-label attributes for mobile card rendering');
+  assert.ok(tbl.includes('<svg width="12" height="12"'), 'Table sort indicators must use vector SVG icons');
 
   const pagination = fs.readFileSync(path.resolve('./src/Pagination.tsx'), 'utf8');
   assert.ok(pagination.includes('role="navigation"'), 'Pagination must implement accessible role=navigation');
@@ -109,6 +112,7 @@ test('React standard library components implement accessible traits and forwardR
 
   const hero = fs.readFileSync(path.resolve('./src/HeroSection.tsx'), 'utf8');
   assert.ok(hero.includes('joy-hero'), 'HeroSection must render joy-hero class');
+  assert.ok(hero.includes('joy-hero__secondary-cta'), 'HeroSection secondary action must use dedicated joy-hero__secondary-cta class');
 
   const pricingCard = fs.readFileSync(path.resolve('./src/PricingCard.tsx'), 'utf8');
   assert.ok(pricingCard.includes('joy-pricing-card'), 'PricingCard must render joy-pricing-card class');

@@ -1516,8 +1516,8 @@ ${navigationHtml}
             <h4>Execution Ledger</h4>
           </div>
           <div style="padding: 20px;">
-            <div class="joy-table-container">
-              <table class="joy-table joy-table--compact">
+            <div class="joy-table-container joy-table-container--responsive-stack">
+              <table class="joy-table joy-table--compact joy-table--responsive-stack">
                 <thead>
                   <tr>
                     <th>ORDER ID</th>
@@ -1530,20 +1530,20 @@ ${navigationHtml}
                 </thead>
                 <tbody>
                   <tr>
-                    <td><code>#ORD-8921</code></td>
-                    <td><strong>BTC/USDT</strong></td>
-                    <td><span style="color: #10b981; font-weight: 600;">BUY</span></td>
-                    <td>$67,820.50</td>
-                    <td>0.45 BTC</td>
-                    <td><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
+                    <td data-label="ORDER ID"><code>#ORD-8921</code></td>
+                    <td data-label="ASSET"><strong>BTC/USDT</strong></td>
+                    <td data-label="SIDE"><span style="color: #10b981; font-weight: 600;">BUY</span></td>
+                    <td data-label="PRICE">$67,820.50</td>
+                    <td data-label="SIZE">0.45 BTC</td>
+                    <td data-label="STATUS"><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
                   </tr>
                   <tr>
-                    <td><code>#ORD-8922</code></td>
-                    <td><strong>ETH/USDT</strong></td>
-                    <td><span style="color: #ef4444; font-weight: 600;">SELL</span></td>
-                    <td>$3,510.20</td>
-                    <td>4.20 ETH</td>
-                    <td><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
+                    <td data-label="ORDER ID"><code>#ORD-8922</code></td>
+                    <td data-label="ASSET"><strong>ETH/USDT</strong></td>
+                    <td data-label="SIDE"><span style="color: #ef4444; font-weight: 600;">SELL</span></td>
+                    <td data-label="PRICE">$3,510.20</td>
+                    <td data-label="SIZE">4.20 ETH</td>
+                    <td data-label="STATUS"><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1836,8 +1836,8 @@ ${navigationHtml}
             </div>
           </div>
           <div style="padding: 16px;">
-            <div class="joy-table-container">
-              <table class="joy-table joy-table--compact" id="financial-order-table">
+            <div class="joy-table-container joy-table-container--responsive-stack">
+              <table class="joy-table joy-table--compact joy-table--responsive-stack" id="financial-order-table">
                 <thead>
                   <tr>
                     <th class="joy-table-th--sortable" onclick="sortMarketTable('pair')">Pair <span class="joy-table-sort-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; opacity: 0.6;"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span></th>
@@ -2322,7 +2322,7 @@ export async function executeHedge(symbol: string, size: number) {
             <p class="kinetic-subtitle">Institutional order routing, dark-mode financial telemetry, and deterministic UI components engineered for maximum density and accessibility.</p>
             <div class="kinetic-actions">
               <button class="joy-button joy-button--solid joy-button--md" onclick="triggerCanvasBurst(event); showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy Solution</button>
-              <button class="joy-button joy-button--outline joy-button--md" style="border-color: rgba(255, 255, 255, 0.35); color: #ffffff;" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
+              <button class="joy-button joy-button--glass joy-button--md" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
             </div>
             <div class="kinetic-hint">Move cursor or touch to perturb 3D particle constellation &bull; Click to pulse shockwave</div>
           </div>
@@ -3485,17 +3485,17 @@ export async function executeHedge(symbol: string, size: number) {
         let changeColor = r.change >= 0 ? 'var(--joy-color-status-success, #10b981)' : 'var(--joy-color-status-danger, #ef4444)';
         let changeSign = r.change >= 0 ? '+' : '';
         return '<tr>' +
-          '<td style="font-weight: 600;">' + r.pair + '</td>' +
-          '<td style="text-align: right; font-family: var(--joy-font-family-mono, monospace);" class="' + flashClass + '">' +
+          '<td data-label="Pair" style="font-weight: 600;">' + r.pair + '</td>' +
+          '<td data-label="Price (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono, monospace);" class="' + flashClass + '">' +
             '$' + r.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
           '</td>' +
-          '<td style="text-align: right; font-weight: 600; color: ' + changeColor + ';">' +
+          '<td data-label="24h Change" style="text-align: right; font-weight: 600; color: ' + changeColor + ';">' +
             changeSign + r.change.toFixed(2) + '%' +
           '</td>' +
-          '<td style="text-align: right; font-family: var(--joy-font-family-mono, monospace); color: #64748b;">' +
+          '<td data-label="24h Vol (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono, monospace); color: #64748b;">' +
             '$' + (r.volume / 1e6).toFixed(1) + 'M' +
           '</td>' +
-          '<td style="text-align: center;">' +
+          '<td data-label="Status" style="text-align: center;">' +
             '<span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> ' + r.status + '</span>' +
           '</td>' +
         '</tr>';
