@@ -3679,3 +3679,89 @@ h1, h2, h3, .joy-display {
 .joy-site-footer__social-link:hover {
   color: var(--gold-400, #c49a3a);
 }
+
+/* ── Institutional Color Palette Engine ── */
+[data-palette="joymify"], :root[data-palette="joymify"] {
+  --navy-500: #14253e;
+  --gold-400: #c49a3a;
+  --cream-100: #f8f3e8;
+  --ink-500: #1f1c13;
+  --joy-color-brand-primary: #c49a3a;
+  --joy-color-brand-primary-hover: #d4ab4b;
+  --joy-surface-canvas: #0d1829;
+  --joy-surface-card: #14253e;
+  --joy-border: #23354e;
+  --joy-text-primary: #f8f3e8;
+  --joy-color-surface-canvas: #0d1829;
+  --joy-color-surface-card: #14253e;
+  --joy-color-border-subtle: #23354e;
+  --joy-color-text-primary: #f8f3e8;
+}
+
+[data-palette="obsidian"], :root[data-palette="obsidian"] {
+  --navy-500: #090d16;
+  --gold-400: #10b981;
+  --cream-100: #ecfdf5;
+  --ink-500: #052e16;
+  --joy-color-brand-primary: #10b981;
+  --joy-color-brand-primary-hover: #34d399;
+  --joy-surface-canvas: #090d16;
+  --joy-surface-card: #0f172a;
+  --joy-border: #1e293b;
+  --joy-text-primary: #ecfdf5;
+  --joy-color-surface-canvas: #090d16;
+  --joy-color-surface-card: #0f172a;
+  --joy-color-border-subtle: #1e293b;
+  --joy-color-text-primary: #ecfdf5;
+}
+
+[data-palette="quantum"], :root[data-palette="quantum"] {
+  --navy-500: #0a192f;
+  --gold-400: #06b6d4;
+  --cream-100: #f0f9ff;
+  --ink-500: #082f49;
+  --joy-color-brand-primary: #06b6d4;
+  --joy-color-brand-primary-hover: #22d3ee;
+  --joy-surface-canvas: #0a192f;
+  --joy-surface-card: #0f2744;
+  --joy-border: #1a365d;
+  --joy-text-primary: #f0f9ff;
+  --joy-color-surface-canvas: #0a192f;
+  --joy-color-surface-card: #0f2744;
+  --joy-color-border-subtle: #1a365d;
+  --joy-color-text-primary: #f0f9ff;
+}
+
+[data-palette="cyberpunk"], :root[data-palette="cyberpunk"] {
+  --navy-500: #13091f;
+  --gold-400: #a855f7;
+  --cream-100: #faf5ff;
+  --ink-500: #3b0764;
+  --joy-color-brand-primary: #a855f7;
+  --joy-color-brand-primary-hover: #c084fc;
+  --joy-surface-canvas: #13091f;
+  --joy-surface-card: #1e1030;
+  --joy-border: #3b1d5a;
+  --joy-text-primary: #faf5ff;
+  --joy-color-surface-canvas: #13091f;
+  --joy-color-surface-card: #1e1030;
+  --joy-color-border-subtle: #3b1d5a;
+  --joy-color-text-primary: #faf5ff;
+}
+
+[data-palette="titanium"], :root[data-palette="titanium"] {
+  --navy-500: #18181b;
+  --gold-400: #f59e0b;
+  --cream-100: #fafaf9;
+  --ink-500: #1c1917;
+  --joy-color-brand-primary: #f59e0b;
+  --joy-color-brand-primary-hover: #fbbf24;
+  --joy-surface-canvas: #18181b;
+  --joy-surface-card: #27272a;
+  --joy-border: #3f3f46;
+  --joy-text-primary: #fafaf9;
+  --joy-color-surface-canvas: #18181b;
+  --joy-color-surface-card: #27272a;
+  --joy-color-border-subtle: #3f3f46;
+  --joy-color-text-primary: #fafaf9;
+}

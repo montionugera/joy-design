@@ -292,6 +292,18 @@ test('React standard library components implement accessible traits and forwardR
   const siteFooter = fs.readFileSync(path.resolve('./src/SiteFooter.tsx'), 'utf8');
   assert.ok(siteFooter.includes('joy-site-footer'), 'SiteFooter must render joy-site-footer class');
   assert.ok(siteFooter.includes('role="contentinfo"'), 'SiteFooter must implement accessible role=contentinfo');
+
+  // Wave 13C: Full Page Combine Component & Theme Palettes
+  const landingPage = fs.readFileSync(path.resolve('./src/LandingPage.tsx'), 'utf8');
+  assert.ok(landingPage.includes('joy-landing-page'), 'LandingPage must render joy-landing-page class');
+  assert.ok(landingPage.includes('data-palette'), 'LandingPage must support data-palette attribute');
+  assert.ok(landingPage.includes('HeroSection'), 'LandingPage must embed HeroSection');
+  assert.ok(landingPage.includes('LogoCloud'), 'LandingPage must embed LogoCloud');
+  assert.ok(landingPage.includes('FeatureGrid'), 'LandingPage must embed FeatureGrid');
+  assert.ok(landingPage.includes('StatsSection'), 'LandingPage must embed StatsSection');
+  assert.ok(landingPage.includes('FAQSection'), 'LandingPage must embed FAQSection');
+  assert.ok(landingPage.includes('CTASection'), 'LandingPage must embed CTASection');
+  assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
 
