@@ -2517,6 +2517,278 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
             </div>
           </div>
+        <!-- Logo Cloud Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Institutional Ecosystem & Partner Cloud (LogoCloud)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-logo-cloud">
+              <p class="joy-logo-cloud__title">Trusted by Institutional Trading Desks & Tier-1 Liquidity Providers</p>
+              <div class="joy-logo-cloud__logos">
+                <div class="joy-logo-cloud__item">
+                  <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+                    <rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="110" height="32" viewBox="0 0 110 32" fill="none">
+                    <polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/>
+                    <text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+                    <circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="16" r="4" fill="currentColor"/>
+                    <text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">NEXUS CAP</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="115" height="32" viewBox="0 0 115 32" fill="none">
+                    <rect x="4" y="6" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">FLOW DESK</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="125" height="32" viewBox="0 0 125 32" fill="none">
+                    <path d="M4 22L12 8L20 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">APEX ALPHA</text>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FeatureGrid Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Modular Architecture & Feature Grid (FeatureGrid)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-feature-grid joy-feature-grid--cols-3">
+              <div class="joy-feature-card">
+                <span class="joy-badge joy-badge--brand joy-feature-card__badge">Hardware Level</span>
+                <div class="joy-feature-card__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+                    <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+                    <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/>
+                    <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/>
+                  </svg>
+                </div>
+                <h3 class="joy-feature-card__title">Sub-Microsecond Order Matching</h3>
+                <p class="joy-feature-card__desc">Co-located kernel bypass rings with DPDK socket streaming, processing up to 2.4 million orders per second with zero garbage collection spikes.</p>
+                <a href="#view-financial-suite" class="joy-feature-card__link">
+                  Explore telemetry
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+
+              <div class="joy-feature-card">
+                <span class="joy-badge joy-badge--success joy-feature-card__badge">WCAG 2.2 AA</span>
+                <div class="joy-feature-card__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  </svg>
+                </div>
+                <h3 class="joy-feature-card__title">Adaptive Dark-Mode Contrast</h3>
+                <p class="joy-feature-card__desc">Strict mathematical contrast verification across institutional Navy, Obsidian, and Quantum color models, eliminating white-on-white button regressions.</p>
+                <a href="#view-tokens" class="joy-feature-card__link">
+                  Inspect color tokens
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+
+              <div class="joy-feature-card">
+                <span class="joy-badge joy-badge--warning joy-feature-card__badge">100% Parity</span>
+                <div class="joy-feature-card__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"/>
+                    <polyline points="8 6 2 12 8 18"/>
+                  </svg>
+                </div>
+                <h3 class="joy-feature-card__title">Svelte 5 Runes + React 19 Parity</h3>
+                <p class="joy-feature-card__desc">Complete dual framework coverage with unified CSS token architecture, keyboard navigation, and headless financial canvas charts.</p>
+                <a href="#view-charts" class="joy-feature-card__link">
+                  View dual chart engine
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- StatsSection Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Live Quantitative Telemetry & Key Metrics (StatsSection)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-stats-section" style="padding: 0;">
+              <div class="joy-stats-grid">
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">4.2 &mu;s</div>
+                  <div class="joy-stat-item__label">P99 Order Latency</div>
+                  <p class="joy-stat-item__desc">FPGA colocation execution window</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    -14% vs benchmark
+                  </div>
+                </div>
+
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">99.999%</div>
+                  <div class="joy-stat-item__label">Gateway Uptime</div>
+                  <p class="joy-stat-item__desc">Continuous active-active failover</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    Zero unplanned downtime
+                  </div>
+                </div>
+
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">$48.2B</div>
+                  <div class="joy-stat-item__label">Monthly Volume</div>
+                  <p class="joy-stat-item__desc">Aggregated order routing throughput</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    +32% MoM growth
+                  </div>
+                </div>
+
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">14 Chains</div>
+                  <div class="joy-stat-item__label">Settlement Networks</div>
+                  <p class="joy-stat-item__desc">Unified cross-L1 & L2 bridging</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    Instant finality
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQSection Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Institutional Knowledge Base & Accordion (FAQSection)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-faq-section" style="padding: 0;">
+              <div class="joy-faq-list">
+                <div class="joy-faq-item joy-faq-item--open" id="faq-item-1">
+                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-1')">
+                    <span>How does Joymify guarantee 60 FPS rendering under 100k candlestick points?</span>
+                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="joy-faq-item__content">
+                    Through dual-layer canvas decoupling, O(log N) binary search viewport culling, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers that prevent garbage collection thrashing during real-time tick streaming.
+                  </div>
+                </div>
+
+                <div class="joy-faq-item" id="faq-item-2">
+                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-2')">
+                    <span>Can we hot-swap institutional theme palettes without re-rendering?</span>
+                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="joy-faq-item__content">
+                    Yes. All styling is driven by CSS custom properties (--joy-surface-*, --joy-border, --joy-text-primary, --gold-400). Swapping theme attributes dynamically updates the entire layout instantly with zero layout shifts and verified WCAG contrast.
+                  </div>
+                </div>
+
+                <div class="joy-faq-item" id="faq-item-3">
+                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-3')">
+                    <span>How do financial tables adapt to mobile smartphone viewports?</span>
+                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="joy-faq-item__content">
+                    With responsive stack mode enabled (.joy-table--responsive-stack), tables below 768px transform rows into individual card layouts, utilizing data-label attributes to present column keys alongside ticker values with zero horizontal cutoff.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTASection Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Conversion Banner (CTASection)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-cta-section" style="padding: 0;">
+              <div class="joy-cta-section__container">
+                <h2 class="joy-cta-section__title">Ready to Elevate Your Quantitative Interface?</h2>
+                <p class="joy-cta-section__desc">Join premier market makers and trading desks deploying Joymify's deterministic design tokens and low-latency financial chart suite.</p>
+                <div class="joy-cta-section__actions">
+                  <button type="button" class="joy-button joy-button--solid joy-button--lg" onclick="showDemoToast('Initiating Enterprise deployment pipeline', 'success')">Deploy Solution</button>
+                  <button type="button" class="joy-button joy-button--glass joy-button--lg" onclick="showDemoToast('Institutional Demo schedule opened', 'info')">Schedule Institutional Demo</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SiteFooter Showcase -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Enterprise Portal Footer (SiteFooter)</h4>
+          </div>
+          <div style="padding: 0; overflow: hidden; border-radius: 0 0 var(--joy-radius-md, 8px) var(--joy-radius-md, 8px);">
+            <footer class="joy-site-footer" style="border: none; padding: 40px 24px 24px 24px;">
+              <div class="joy-site-footer__inner">
+                <div class="joy-site-footer__brand">
+                  <div class="joy-site-footer__brand-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold-400, #c49a3a);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span>Joymify Design</span>
+                  </div>
+                  <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
+                </div>
+                <div class="joy-site-footer__column">
+                  <h4 class="joy-site-footer__col-title">Architecture</h4>
+                  <ul class="joy-site-footer__links">
+                    <li><a href="#view-charts" class="joy-site-footer__link">Financial Charts</a></li>
+                    <li><a href="#view-table" class="joy-site-footer__link">Adaptive Tables</a></li>
+                    <li><a href="#view-landing-blocks" class="joy-site-footer__link">Bento Grid</a></li>
+                    <li><a href="#view-tokens" class="joy-site-footer__link">Design Tokens</a></li>
+                  </ul>
+                </div>
+                <div class="joy-site-footer__column">
+                  <h4 class="joy-site-footer__col-title">Frameworks</h4>
+                  <ul class="joy-site-footer__links">
+                    <li><a href="#" class="joy-site-footer__link">React 19 Hooks</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Svelte 5 Runes</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Tailwind Tokens</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Playwright E2E</a></li>
+                  </ul>
+                </div>
+                <div class="joy-site-footer__column">
+                  <h4 class="joy-site-footer__col-title">Security & Compliance</h4>
+                  <ul class="joy-site-footer__links">
+                    <li><a href="#" class="joy-site-footer__link">WCAG 2.2 AA</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Zero OS Emojis</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Audit Logs</a></li>
+                    <li><a href="#" class="joy-site-footer__link">SOC 2 Type II</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="joy-site-footer__bottom">
+                <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
+                <div class="joy-site-footer__socials">
+                  <span style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b);">Institutional Grade Telemetry</span>
+                </div>
+              </div>
+            </footer>
+          </div>
         </div>
       </section>
 
@@ -3438,6 +3710,13 @@ export async function executeHedge(symbol: string, size: number) {
     function closeDemoDrawer(e) {
       if (e && e.target !== e.currentTarget) return;
       document.getElementById('demo-drawer-container').style.display = 'none';
+    }
+
+    function toggleFaq(id) {
+      const item = document.getElementById(id);
+      if (item) {
+        item.classList.toggle('joy-faq-item--open');
+      }
     }
 
     function showDemoToast(msg, variant = 'info') {

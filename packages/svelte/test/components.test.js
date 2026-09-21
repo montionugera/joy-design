@@ -243,6 +243,34 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   const cascader = fs.readFileSync(path.resolve('./src/lib/Cascader.svelte'), 'utf8');
   assert.ok(cascader.includes('joy-cascader'), 'Cascader must have joy-cascader class');
   assert.ok(cascader.includes('role="listbox"'), 'Cascader must implement role=listbox');
+
+  // Wave 13B: Landing Page Component Suite
+  const featureCard = fs.readFileSync(path.resolve('./src/lib/FeatureCard.svelte'), 'utf8');
+  assert.ok(featureCard.includes('joy-feature-card'), 'FeatureCard must render joy-feature-card class');
+  assert.ok(featureCard.includes('$props()'), 'FeatureCard must use Svelte 5 runes');
+
+  const featureGrid = fs.readFileSync(path.resolve('./src/lib/FeatureGrid.svelte'), 'utf8');
+  assert.ok(featureGrid.includes('joy-feature-grid'), 'FeatureGrid must render joy-feature-grid class');
+
+  const logoCloud = fs.readFileSync(path.resolve('./src/lib/LogoCloud.svelte'), 'utf8');
+  assert.ok(logoCloud.includes('joy-logo-cloud'), 'LogoCloud must render joy-logo-cloud class');
+
+  const statsSection = fs.readFileSync(path.resolve('./src/lib/StatsSection.svelte'), 'utf8');
+  assert.ok(statsSection.includes('joy-stats-section'), 'StatsSection must render joy-stats-section class');
+  assert.ok(statsSection.includes('joy-stat-item__value'), 'StatsSection must render metric values');
+
+  const ctaSection = fs.readFileSync(path.resolve('./src/lib/CTASection.svelte'), 'utf8');
+  assert.ok(ctaSection.includes('joy-cta-section'), 'CTASection must render joy-cta-section class');
+  assert.ok(ctaSection.includes('joy-button--glass'), 'CTASection must use glass button for contrast safety');
+
+  const faqSection = fs.readFileSync(path.resolve('./src/lib/FAQSection.svelte'), 'utf8');
+  assert.ok(faqSection.includes('joy-faq-section'), 'FAQSection must render joy-faq-section class');
+  assert.ok(faqSection.includes('aria-expanded'), 'FAQSection must implement accessible aria-expanded state');
+  assert.ok(faqSection.includes('role="region"'), 'FAQSection must implement accessible role=region for panel');
+
+  const siteFooter = fs.readFileSync(path.resolve('./src/lib/SiteFooter.svelte'), 'utf8');
+  assert.ok(siteFooter.includes('joy-site-footer'), 'SiteFooter must render joy-site-footer class');
+  assert.ok(siteFooter.includes('role="contentinfo"'), 'SiteFooter must implement accessible role=contentinfo');
 });
 
 

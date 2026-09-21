@@ -3280,9 +3280,373 @@ h1, h2, h3, .joy-display {
   border-radius: 0 !important;
 }
 
-/* ── Image Preview Overlay ── */
-.joy-image-preview-mask {
-  animation: joy-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* ── Landing Page Suite: FeatureGrid ── */
+.joy-feature-grid {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.joy-feature-grid--cols-2 {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.joy-feature-grid--cols-3 {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.joy-feature-grid--cols-4 {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.joy-feature-card {
+  position: relative;
+  background-color: var(--joy-surface-card, #ffffff);
+  border: 1px solid var(--joy-border, #e2e8f0);
+  border-radius: var(--joy-radius-lg, 12px);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+.joy-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.12);
+  border-color: var(--gold-400, #c49a3a);
+}
+.joy-feature-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--joy-radius-md, 8px);
+  background: rgba(196, 154, 58, 0.12);
+  color: var(--gold-400, #c49a3a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.joy-feature-card__badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.joy-feature-card__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--joy-text-primary, #0f172a);
+  margin: 0 0 10px 0;
+  line-height: 1.35;
+}
+.joy-feature-card__desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--joy-color-text-muted, #64748b);
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+.joy-feature-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gold-400, #c49a3a);
+  text-decoration: none;
+  transition: gap 0.15s ease;
+}
+.joy-feature-card__link:hover {
+  gap: 10px;
+}
+
+/* ── Landing Page Suite: LogoCloud ── */
+.joy-logo-cloud {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  text-align: center;
+}
+.joy-logo-cloud__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--joy-color-text-muted, #64748b);
+  margin: 0 0 28px 0;
+}
+.joy-logo-cloud__logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 36px 48px;
+}
+.joy-logo-cloud__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.65;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  filter: grayscale(100%);
+  color: var(--joy-text-primary, #1e293b);
+  text-decoration: none;
+}
+.joy-logo-cloud__item:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.04);
+}
+
+/* ── Landing Page Suite: StatsSection ── */
+.joy-stats-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+.joy-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+.joy-stat-item {
+  background-color: var(--joy-surface-card, #ffffff);
+  border: 1px solid var(--joy-border, #e2e8f0);
+  border-radius: var(--joy-radius-lg, 12px);
+  padding: 24px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.joy-stat-item__value {
+  font-family: var(--joy-font-family-mono, monospace);
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--gold-400, #c49a3a);
+  margin-bottom: 8px;
+}
+.joy-stat-item__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--joy-text-primary, #0f172a);
+  margin-bottom: 4px;
+}
+.joy-stat-item__desc {
+  font-size: 0.8125rem;
+  color: var(--joy-color-text-muted, #64748b);
+  margin: 0;
+}
+.joy-stat-item__change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+.joy-stat-item__change--positive {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+.joy-stat-item__change--negative {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+/* ── Landing Page Suite: CTASection ── */
+.joy-cta-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+.joy-cta-section__container {
+  position: relative;
+  background: linear-gradient(135deg, var(--navy-500, #14253e) 0%, #0d1a2d 100%);
+  border: 1px solid var(--joy-border, #2d4566);
+  border-radius: var(--joy-radius-xl, 16px);
+  padding: 64px 32px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+}
+.joy-cta-section__title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #f8f3e8;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+}
+.joy-cta-section__desc {
+  font-size: 1.125rem;
+  color: rgba(248, 243, 232, 0.8);
+  max-width: 640px;
+  margin: 0 auto 36px auto;
+  line-height: 1.6;
+}
+.joy-cta-section__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Landing Page Suite: FAQSection ── */
+.joy-faq-section {
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+.joy-faq-section__header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.joy-faq-section__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--joy-text-primary, #0f172a);
+  margin: 0 0 12px 0;
+}
+.joy-faq-section__subtitle {
+  font-size: 1rem;
+  color: var(--joy-color-text-muted, #64748b);
+  margin: 0;
+}
+.joy-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.joy-faq-item {
+  border: 1px solid var(--joy-border, #e2e8f0);
+  border-radius: var(--joy-radius-md, 8px);
+  background-color: var(--joy-surface-card, #ffffff);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+.joy-faq-item--open {
+  border-color: var(--gold-400, #c49a3a);
+}
+.joy-faq-item__trigger {
+  width: 100%;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--joy-text-primary, #0f172a);
+  transition: color 0.15s ease;
+}
+.joy-faq-item__trigger:hover {
+  color: var(--gold-400, #c49a3a);
+}
+.joy-faq-item__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--gold-400, #c49a3a);
+}
+.joy-faq-item--open .joy-faq-item__icon {
+  transform: rotate(180deg);
+}
+.joy-faq-item__content {
+  padding: 0 20px 20px 20px;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--joy-color-text-muted, #64748b);
+}
+
+/* ── Landing Page Suite: SiteFooter ── */
+.joy-site-footer {
+  width: 100%;
+  background-color: var(--joy-surface-card, #ffffff);
+  border-top: 1px solid var(--joy-border, #e2e8f0);
+  padding: 64px 24px 32px 24px;
+}
+.joy-site-footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr repeat(auto-fit, minmax(160px, 1fr));
+  gap: 48px 32px;
+}
+.joy-site-footer__brand-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--joy-text-primary, #0f172a);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.joy-site-footer__brand-desc {
+  font-size: 0.875rem;
+  color: var(--joy-color-text-muted, #64748b);
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 0 0 20px 0;
+}
+.joy-site-footer__col-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--joy-text-primary, #0f172a);
+  margin: 0 0 16px 0;
+}
+.joy-site-footer__links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.joy-site-footer__link {
+  font-size: 0.875rem;
+  color: var(--joy-color-text-muted, #64748b);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.joy-site-footer__link:hover {
+  color: var(--gold-400, #c49a3a);
+}
+.joy-site-footer__bottom {
+  max-width: 1200px;
+  margin: 48px auto 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--joy-border, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.8125rem;
+  color: var(--joy-color-text-muted, #64748b);
+}
+.joy-site-footer__socials {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.joy-site-footer__social-link {
+  color: var(--joy-color-text-muted, #64748b);
+  transition: color 0.15s ease;
+  display: inline-flex;
+}
+.joy-site-footer__social-link:hover {
+  color: var(--gold-400, #c49a3a);
 }
 `;
 
