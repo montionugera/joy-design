@@ -72,6 +72,7 @@
       "label": "Enterprise & Telemetry",
       "views": [
         { "id": "landing-blocks", "label": "Bento & Landing Suite", "icon": "landing" },
+        { "id": "landing-preview", "label": "Full Page Simulator (Preview the Look)", "icon": "landing" },
         { "id": "charts", "label": "High-Perf Financial Charts", "icon": "charts" }
       ]
     }

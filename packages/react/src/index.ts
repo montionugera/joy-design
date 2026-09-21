@@ -86,3 +86,4 @@ export { StatsSection, type StatsSectionProps, type StatItem } from './StatsSect
 export { CTASection, type CTASectionProps } from './CTASection.js';
 export { FAQSection, type FAQSectionProps, type FAQItem } from './FAQSection.js';
 export { SiteFooter, type SiteFooterProps, type FooterColumn, type FooterLink, type SocialLink } from './SiteFooter.js';
+export { LandingPage, type LandingPageProps } from './LandingPage.js';

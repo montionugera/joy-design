@@ -87,3 +87,4 @@ export { default as StatsSection } from './StatsSection.svelte';
 export { default as CTASection } from './CTASection.svelte';
 export { default as FAQSection } from './FAQSection.svelte';
 export { default as SiteFooter } from './SiteFooter.svelte';
+export { default as LandingPage } from './LandingPage.svelte';
