@@ -399,9 +399,10 @@
     "title": "Landing page component suite (FeatureGrid, LogoCloud, StatsSection, CTASection, FAQSection, SiteFooter)",
     "from_idea": "I-034",
     "created_at": "2026-09-21T01:24:06.753945+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-09-21T01:28:30.849030+00:00"
   },
   {
     "id": "F-035",
