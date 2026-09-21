@@ -888,6 +888,101 @@ ${inlinedThemeCss}
         padding: 8px 0 !important;
       }
     }
+
+    /* Full Page Simulator & Palette Engine */
+    .simulator-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--joy-surface-card, #ffffff);
+      border: 1px solid var(--joy-border, #e2e8f0);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .simulator-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .simulator-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--joy-text-secondary, #64748b);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .simulator-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--joy-surface-subtle, #f1f5f9);
+      border: 1px solid var(--joy-border, #e2e8f0);
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      color: var(--joy-text-secondary, #64748b);
+      margin-bottom: 16px;
+    }
+    .simulator-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      padding: 16px 0 48px;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 16px;
+    }
+    [data-theme="dark"] .simulator-wrapper {
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .simulator-frame {
+      width: 100%;
+      max-width: 100%;
+      transition: max-width 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms ease;
+      background: var(--joy-surface-canvas, #f8f3e8);
+      border-radius: 16px;
+      border: 1px solid var(--joy-border, #e2e8f0);
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+    }
+    [data-theme="dark"] .simulator-frame {
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    }
+    .palette-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--joy-border, #e2e8f0);
+      background: var(--joy-surface-card, #ffffff);
+      color: var(--joy-text-primary, #1e293b);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 150ms ease;
+      font-family: inherit;
+    }
+    .palette-btn:hover {
+      border-color: var(--joy-brand-primary, #c49a3a);
+    }
+    .palette-btn.active {
+      border-color: var(--joy-brand-primary, #c49a3a);
+      background: rgba(196, 154, 58, 0.08);
+      font-weight: 600;
+    }
+    .palette-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -1516,8 +1611,8 @@ ${navigationHtml}
             <h4>Execution Ledger</h4>
           </div>
           <div style="padding: 20px;">
-            <div class="joy-table-container">
-              <table class="joy-table joy-table--compact">
+            <div class="joy-table-container joy-table-container--responsive-stack">
+              <table class="joy-table joy-table--compact joy-table--responsive-stack">
                 <thead>
                   <tr>
                     <th>ORDER ID</th>
@@ -1530,20 +1625,20 @@ ${navigationHtml}
                 </thead>
                 <tbody>
                   <tr>
-                    <td><code>#ORD-8921</code></td>
-                    <td><strong>BTC/USDT</strong></td>
-                    <td><span style="color: #10b981; font-weight: 600;">BUY</span></td>
-                    <td>$67,820.50</td>
-                    <td>0.45 BTC</td>
-                    <td><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
+                    <td data-label="ORDER ID"><code>#ORD-8921</code></td>
+                    <td data-label="ASSET"><strong>BTC/USDT</strong></td>
+                    <td data-label="SIDE"><span style="color: #10b981; font-weight: 600;">BUY</span></td>
+                    <td data-label="PRICE">$67,820.50</td>
+                    <td data-label="SIZE">0.45 BTC</td>
+                    <td data-label="STATUS"><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
                   </tr>
                   <tr>
-                    <td><code>#ORD-8922</code></td>
-                    <td><strong>ETH/USDT</strong></td>
-                    <td><span style="color: #ef4444; font-weight: 600;">SELL</span></td>
-                    <td>$3,510.20</td>
-                    <td>4.20 ETH</td>
-                    <td><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
+                    <td data-label="ORDER ID"><code>#ORD-8922</code></td>
+                    <td data-label="ASSET"><strong>ETH/USDT</strong></td>
+                    <td data-label="SIDE"><span style="color: #ef4444; font-weight: 600;">SELL</span></td>
+                    <td data-label="PRICE">$3,510.20</td>
+                    <td data-label="SIZE">4.20 ETH</td>
+                    <td data-label="STATUS"><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1836,8 +1931,8 @@ ${navigationHtml}
             </div>
           </div>
           <div style="padding: 16px;">
-            <div class="joy-table-container">
-              <table class="joy-table joy-table--compact" id="financial-order-table">
+            <div class="joy-table-container joy-table-container--responsive-stack">
+              <table class="joy-table joy-table--compact joy-table--responsive-stack" id="financial-order-table">
                 <thead>
                   <tr>
                     <th class="joy-table-th--sortable" onclick="sortMarketTable('pair')">Pair <span class="joy-table-sort-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; opacity: 0.6;"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span></th>
@@ -2322,7 +2417,7 @@ export async function executeHedge(symbol: string, size: number) {
             <p class="kinetic-subtitle">Institutional order routing, dark-mode financial telemetry, and deterministic UI components engineered for maximum density and accessibility.</p>
             <div class="kinetic-actions">
               <button class="joy-button joy-button--solid joy-button--md" onclick="triggerCanvasBurst(event); showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy Solution</button>
-              <button class="joy-button joy-button--outline joy-button--md" style="border-color: rgba(255, 255, 255, 0.35); color: #ffffff;" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
+              <button class="joy-button joy-button--glass joy-button--md" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
             </div>
             <div class="kinetic-hint">Move cursor or touch to perturb 3D particle constellation &bull; Click to pulse shockwave</div>
           </div>
@@ -2515,6 +2610,627 @@ export async function executeHedge(symbol: string, size: number) {
                   <p>Design Director, JoyPortal</p>
                 </div>
               </div>
+            </div>
+          </div>
+        <!-- Logo Cloud Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Institutional Ecosystem & Partner Cloud (LogoCloud)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-logo-cloud">
+              <p class="joy-logo-cloud__title">Trusted by Institutional Trading Desks & Tier-1 Liquidity Providers</p>
+              <div class="joy-logo-cloud__logos">
+                <div class="joy-logo-cloud__item">
+                  <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+                    <rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="110" height="32" viewBox="0 0 110 32" fill="none">
+                    <polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/>
+                    <text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
+                    <circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="16" r="4" fill="currentColor"/>
+                    <text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">NEXUS CAP</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="115" height="32" viewBox="0 0 115 32" fill="none">
+                    <rect x="4" y="6" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">FLOW DESK</text>
+                  </svg>
+                </div>
+                <div class="joy-logo-cloud__item">
+                  <svg width="125" height="32" viewBox="0 0 125 32" fill="none">
+                    <path d="M4 22L12 8L20 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">APEX ALPHA</text>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FeatureGrid Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Modular Architecture & Feature Grid (FeatureGrid)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-feature-grid joy-feature-grid--cols-3">
+              <div class="joy-feature-card">
+                <span class="joy-badge joy-badge--brand joy-feature-card__badge">Hardware Level</span>
+                <div class="joy-feature-card__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+                    <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+                    <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/>
+                    <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/>
+                  </svg>
+                </div>
+                <h3 class="joy-feature-card__title">Sub-Microsecond Order Matching</h3>
+                <p class="joy-feature-card__desc">Co-located kernel bypass rings with DPDK socket streaming, processing up to 2.4 million orders per second with zero garbage collection spikes.</p>
+                <a href="#view-financial-suite" class="joy-feature-card__link">
+                  Explore telemetry
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+
+              <div class="joy-feature-card">
+                <span class="joy-badge joy-badge--success joy-feature-card__badge">WCAG 2.2 AA</span>
+                <div class="joy-feature-card__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  </svg>
+                </div>
+                <h3 class="joy-feature-card__title">Adaptive Dark-Mode Contrast</h3>
+                <p class="joy-feature-card__desc">Strict mathematical contrast verification across institutional Navy, Obsidian, and Quantum color models, eliminating white-on-white button regressions.</p>
+                <a href="#view-tokens" class="joy-feature-card__link">
+                  Inspect color tokens
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+
+              <div class="joy-feature-card">
+                <span class="joy-badge joy-badge--warning joy-feature-card__badge">100% Parity</span>
+                <div class="joy-feature-card__icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"/>
+                    <polyline points="8 6 2 12 8 18"/>
+                  </svg>
+                </div>
+                <h3 class="joy-feature-card__title">Svelte 5 Runes + React 19 Parity</h3>
+                <p class="joy-feature-card__desc">Complete dual framework coverage with unified CSS token architecture, keyboard navigation, and headless financial canvas charts.</p>
+                <a href="#view-charts" class="joy-feature-card__link">
+                  View dual chart engine
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- StatsSection Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Live Quantitative Telemetry & Key Metrics (StatsSection)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-stats-section" style="padding: 0;">
+              <div class="joy-stats-grid">
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">4.2 &mu;s</div>
+                  <div class="joy-stat-item__label">P99 Order Latency</div>
+                  <p class="joy-stat-item__desc">FPGA colocation execution window</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    -14% vs benchmark
+                  </div>
+                </div>
+
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">99.999%</div>
+                  <div class="joy-stat-item__label">Gateway Uptime</div>
+                  <p class="joy-stat-item__desc">Continuous active-active failover</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    Zero unplanned downtime
+                  </div>
+                </div>
+
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">$48.2B</div>
+                  <div class="joy-stat-item__label">Monthly Volume</div>
+                  <p class="joy-stat-item__desc">Aggregated order routing throughput</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    +32% MoM growth
+                  </div>
+                </div>
+
+                <div class="joy-stat-item">
+                  <div class="joy-stat-item__value">14 Chains</div>
+                  <div class="joy-stat-item__label">Settlement Networks</div>
+                  <p class="joy-stat-item__desc">Unified cross-L1 & L2 bridging</p>
+                  <div class="joy-stat-item__change joy-stat-item__change--positive">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                    Instant finality
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQSection Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Institutional Knowledge Base & Accordion (FAQSection)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-faq-section" style="padding: 0;">
+              <div class="joy-faq-list">
+                <div class="joy-faq-item joy-faq-item--open" id="faq-item-1">
+                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-1')">
+                    <span>How does Joymify guarantee 60 FPS rendering under 100k candlestick points?</span>
+                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="joy-faq-item__content">
+                    Through dual-layer canvas decoupling, O(log N) binary search viewport culling, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers that prevent garbage collection thrashing during real-time tick streaming.
+                  </div>
+                </div>
+
+                <div class="joy-faq-item" id="faq-item-2">
+                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-2')">
+                    <span>Can we hot-swap institutional theme palettes without re-rendering?</span>
+                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="joy-faq-item__content">
+                    Yes. All styling is driven by CSS custom properties (--joy-surface-*, --joy-border, --joy-text-primary, --gold-400). Swapping theme attributes dynamically updates the entire layout instantly with zero layout shifts and verified WCAG contrast.
+                  </div>
+                </div>
+
+                <div class="joy-faq-item" id="faq-item-3">
+                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-3')">
+                    <span>How do financial tables adapt to mobile smartphone viewports?</span>
+                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="joy-faq-item__content">
+                    With responsive stack mode enabled (.joy-table--responsive-stack), tables below 768px transform rows into individual card layouts, utilizing data-label attributes to present column keys alongside ticker values with zero horizontal cutoff.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTASection Showcase -->
+        <div class="playground-box" style="margin-bottom: 24px;">
+          <div class="playground-header">
+            <h4>Conversion Banner (CTASection)</h4>
+          </div>
+          <div style="padding: 24px;">
+            <div class="joy-cta-section" style="padding: 0;">
+              <div class="joy-cta-section__container">
+                <h2 class="joy-cta-section__title">Ready to Elevate Your Quantitative Interface?</h2>
+                <p class="joy-cta-section__desc">Join premier market makers and trading desks deploying Joymify's deterministic design tokens and low-latency financial chart suite.</p>
+                <div class="joy-cta-section__actions">
+                  <button type="button" class="joy-button joy-button--solid joy-button--lg" onclick="showDemoToast('Initiating Enterprise deployment pipeline', 'success')">Deploy Solution</button>
+                  <button type="button" class="joy-button joy-button--glass joy-button--lg" onclick="showDemoToast('Institutional Demo schedule opened', 'info')">Schedule Institutional Demo</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SiteFooter Showcase -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>Enterprise Portal Footer (SiteFooter)</h4>
+          </div>
+          <div style="padding: 0; overflow: hidden; border-radius: 0 0 var(--joy-radius-md, 8px) var(--joy-radius-md, 8px);">
+            <footer class="joy-site-footer" style="border: none; padding: 40px 24px 24px 24px;">
+              <div class="joy-site-footer__inner">
+                <div class="joy-site-footer__brand">
+                  <div class="joy-site-footer__brand-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold-400, #c49a3a);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span>Joymify Design</span>
+                  </div>
+                  <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
+                </div>
+                <div class="joy-site-footer__column">
+                  <h4 class="joy-site-footer__col-title">Architecture</h4>
+                  <ul class="joy-site-footer__links">
+                    <li><a href="#view-charts" class="joy-site-footer__link">Financial Charts</a></li>
+                    <li><a href="#view-table" class="joy-site-footer__link">Adaptive Tables</a></li>
+                    <li><a href="#view-landing-blocks" class="joy-site-footer__link">Bento Grid</a></li>
+                    <li><a href="#view-tokens" class="joy-site-footer__link">Design Tokens</a></li>
+                  </ul>
+                </div>
+                <div class="joy-site-footer__column">
+                  <h4 class="joy-site-footer__col-title">Frameworks</h4>
+                  <ul class="joy-site-footer__links">
+                    <li><a href="#" class="joy-site-footer__link">React 19 Hooks</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Svelte 5 Runes</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Tailwind Tokens</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Playwright E2E</a></li>
+                  </ul>
+                </div>
+                <div class="joy-site-footer__column">
+                  <h4 class="joy-site-footer__col-title">Security & Compliance</h4>
+                  <ul class="joy-site-footer__links">
+                    <li><a href="#" class="joy-site-footer__link">WCAG 2.2 AA</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Zero OS Emojis</a></li>
+                    <li><a href="#" class="joy-site-footer__link">Audit Logs</a></li>
+                    <li><a href="#" class="joy-site-footer__link">SOC 2 Type II</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="joy-site-footer__bottom">
+                <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
+                <div class="joy-site-footer__socials">
+                  <span style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b);">Institutional Grade Telemetry</span>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Full Page Simulator (Preview the Look) -->
+      <section id="view-landing-preview" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Full Page Simulator (Preview the Look)</h2>
+        <p class="header-tagline">Simulate an end-to-end institutional landing page. Test hot-swappable institutional color palettes and responsive behavior across Desktop, Tablet, and Mobile viewports.</p>
+
+        <!-- Top Simulator Controls Toolbar -->
+        <div class="simulator-toolbar">
+          <!-- Viewport Controller -->
+          <div class="simulator-group">
+            <span class="simulator-label">Viewport:</span>
+            <div class="segmented-control" id="simulator-viewport-ctrl">
+              <button type="button" class="segment-btn active" onclick="switchSimulatorViewport('100%', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -2px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Desktop (1440px)
+              </button>
+              <button type="button" class="segment-btn" onclick="switchSimulatorViewport('768px', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -2px;"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                Tablet (768px)
+              </button>
+              <button type="button" class="segment-btn" onclick="switchSimulatorViewport('375px', this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -2px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                Mobile (375px)
+              </button>
+            </div>
+          </div>
+
+          <!-- Institutional Palette Switcher -->
+          <div class="simulator-group">
+            <span class="simulator-label">Institutional Palette:</span>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="palette-btn active" onclick="switchSimulatorPalette('joymify', this)">
+                <span class="palette-dot" style="background: #c49a3a;"></span>
+                Joymify Gold
+              </button>
+              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('obsidian', this)">
+                <span class="palette-dot" style="background: #10b981;"></span>
+                Obsidian Emerald
+              </button>
+              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('quantum', this)">
+                <span class="palette-dot" style="background: #3b82f6;"></span>
+                Quantum Cobalt
+              </button>
+              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('cyberpunk', this)">
+                <span class="palette-dot" style="background: #a855f7;"></span>
+                Cyberpunk Amethyst
+              </button>
+              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('titanium', this)">
+                <span class="palette-dot" style="background: #f59e0b;"></span>
+                Titanium Steel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulator Status Bar -->
+        <div class="simulator-status-bar">
+          <div>
+            Active Viewport: <strong id="simulator-viewport-info">Desktop (Fluid / 1440px)</strong>
+          </div>
+          <div>
+            Applied Palette: <strong id="simulator-palette-info">Joymify (Gold / Navy)</strong> &bull; Zero OS Emojis &bull; Fully Adaptive Mobile Grid
+          </div>
+        </div>
+
+        <!-- Live Page Simulator Wrapper Frame -->
+        <div class="simulator-wrapper">
+          <div class="simulator-frame" id="simulator-viewport-frame" style="max-width: 100%;">
+            <!-- Simulated Combined Landing Page -->
+            <div id="simulator-page-container" class="joy-landing-page" data-palette="joymify">
+              
+              <!-- 1. Header / Navigation Bar -->
+              <header style="display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; background: rgba(20, 37, 62, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: sticky; top: 0; z-index: 100;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--joy-brand-primary, #c49a3a); display: flex; align-items: center; justify-content: center; color: #14253e;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </div>
+                  <span style="font-weight: 700; font-size: 1.05rem; letter-spacing: 0.05em; color: #ffffff;">JOYMIFY PROTOCOL</span>
+                </div>
+                <nav style="display: flex; align-items: center; gap: 20px;">
+                  <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); cursor: pointer;">Markets</span>
+                  <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); cursor: pointer;">Analytics</span>
+                  <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); cursor: pointer;">Documentation</span>
+                  <button type="button" class="joy-button joy-button--solid joy-button--sm" style="margin-left: 8px; font-weight: 600;">Launch Terminal</button>
+                </nav>
+              </header>
+
+              <!-- 2. HeroSection -->
+              <section class="joy-hero" style="position: relative; overflow: hidden; padding: 72px 24px; text-align: center; background: radial-gradient(circle at 50% 20%, rgba(196, 154, 58, 0.15), transparent 70%), var(--joy-surface-canvas, #14253e); color: #ffffff;">
+                <div style="max-width: 900px; margin: 0 auto; position: relative; z-index: 2;">
+                  <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 24px; font-size: 0.8125rem;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--joy-brand-primary, #c49a3a);"></span>
+                    <span>Institutional Execution Stack 2.23 &bull; Sub-5ms Finality</span>
+                  </div>
+                  <h1 class="joy-hero__title" style="font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.15; margin: 0 0 20px 0; color: #ffffff;">
+                    Zero-Latency Liquidity Architecture for Algorithmic Desks
+                  </h1>
+                  <p class="joy-hero__subtitle" style="font-size: clamp(1rem, 2vw, 1.2rem); color: rgba(255, 255, 255, 0.8); max-width: 680px; margin: 0 auto 36px auto; line-height: 1.6;">
+                    Deploy high-frequency institutional trading terminals with canvas-accelerated market telemetry, deterministic risk circuits, and dual-framework React 19 / Svelte 5 parity.
+                  </p>
+                  <div class="joy-hero__actions" style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      Deploy Production Node
+                    </button>
+                    <button type="button" class="joy-button joy-button--glass joy-button--lg joy-hero__secondary-cta">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                      Read Protocol Spec
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 3. LogoCloud -->
+              <section class="joy-logo-cloud" style="padding: 40px 24px;">
+                <p class="joy-logo-cloud__title">Trusted by Institutional Desks & Liquidity Providers Worldwide</p>
+                <div class="joy-logo-cloud__grid">
+                  <div class="joy-logo-cloud__item">
+                    <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text></svg>
+                  </div>
+                  <div class="joy-logo-cloud__item">
+                    <svg width="120" height="32" viewBox="0 0 110 32" fill="none"><polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text></svg>
+                  </div>
+                  <div class="joy-logo-cloud__item">
+                    <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="4" fill="currentColor"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">NEXUS CAP</text></svg>
+                  </div>
+                  <div class="joy-logo-cloud__item">
+                    <svg width="125" height="32" viewBox="0 0 115 32" fill="none"><rect x="4" y="6" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">FLOW DESK</text></svg>
+                  </div>
+                  <div class="joy-logo-cloud__item">
+                    <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><polygon points="12,4 20,16 12,28 4,16" stroke="currentColor" stroke-width="2"/><text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="13" fill="currentColor">PARADIGM</text></svg>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 4. StatsSection -->
+              <section class="joy-stats-section" style="padding: 48px 24px;">
+                <div class="joy-stats-section__grid">
+                  <div class="joy-stat-item">
+                    <div class="joy-stat-item__value">4.2 μs</div>
+                    <div class="joy-stat-item__label">P99 Order Latency</div>
+                    <div class="joy-stat-item__desc">Kernel bypass colocation &bull; 0 GC pauses</div>
+                  </div>
+                  <div class="joy-stat-item">
+                    <div class="joy-stat-item__value">99.999%</div>
+                    <div class="joy-stat-item__label">Historical Uptime</div>
+                    <div class="joy-stat-item__desc">Dual active-active failover mesh</div>
+                  </div>
+                  <div class="joy-stat-item">
+                    <div class="joy-stat-item__value">$48.2B</div>
+                    <div class="joy-stat-item__label">Monthly Volume</div>
+                    <div class="joy-stat-item__desc">Settled across 14 networks (+32% MoM)</div>
+                  </div>
+                  <div class="joy-stat-item">
+                    <div class="joy-stat-item__value">14 Chains</div>
+                    <div class="joy-stat-item__label">Settlement Mesh</div>
+                    <div class="joy-stat-item__desc">Atomic cross-L2 instant finality</div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 5. FeatureGrid -->
+              <section style="padding: 48px 24px;">
+                <div style="text-align: center; max-width: 640px; margin: 0 auto 36px auto;">
+                  <h2 style="font-size: 1.875rem; font-weight: 700; margin: 0 0 12px 0;">Architected for High-Stakes Financial Systems</h2>
+                  <p style="color: var(--joy-text-secondary, #64748b); font-size: 0.95rem; margin: 0;">Combining high-performance execution primitives with unyielding design consistency.</p>
+                </div>
+                <div class="joy-feature-grid joy-feature-grid--2col">
+                  <div class="joy-feature-card">
+                    <div class="joy-feature-card__icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <h3 class="joy-feature-card__title">Sub-5ms Execution Engine</h3>
+                    <p class="joy-feature-card__description">Zero-garbage-collection circular RingBuffers and memory-mapped state machines deliver microsecond determinism under peak order volumes.</p>
+                  </div>
+                  <div class="joy-feature-card">
+                    <div class="joy-feature-card__icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3 class="joy-feature-card__title">Quant Algorithmic Arbitrage</h3>
+                    <p class="joy-feature-card__description">Real-time delta-neutral hedging algorithms continuously monitor spread imbalances across centralized and decentralized venues.</p>
+                  </div>
+                  <div class="joy-feature-card">
+                    <div class="joy-feature-card__icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+                    </div>
+                    <h3 class="joy-feature-card__title">Multi-Chain Liquidity Mesh</h3>
+                    <p class="joy-feature-card__description">Native atomic settlement bridges 14 EVM and SVM networks with consolidated cryptographic audit trails and zero slippage traps.</p>
+                  </div>
+                  <div class="joy-feature-card">
+                    <div class="joy-feature-card__icon-box">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3 class="joy-feature-card__title">SOC 2 Type II & Institutional Custody</h3>
+                    <p class="joy-feature-card__description">Multi-party computation (MPC) key shards and hardware security modules enforce cryptographically verifiable authorization policies.</p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 6. Adaptive Mobile Table Section (Demonstrating Stacking) -->
+              <section style="padding: 32px 24px;">
+                <div style="background: var(--joy-surface-card, #ffffff); border: 1px solid var(--joy-border, #e2e8f0); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                      <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700;">Live Execution Ledger &bull; Adaptive Table</h3>
+                      <p style="margin: 0; font-size: 0.8125rem; color: var(--joy-text-secondary, #64748b);">Automatically stacks into individual cards below 768px with full WCAG 2.2 AA contrast.</p>
+                    </div>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600;">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+                      STREAMING (LIVE P99)
+                    </div>
+                  </div>
+                  <div class="joy-table-container">
+                    <table class="joy-table joy-table--striped joy-table--responsive-stack" style="width: 100%;">
+                      <thead>
+                        <tr>
+                          <th>Asset Pair</th>
+                          <th>Order Side</th>
+                          <th>Fill Price</th>
+                          <th>Volume</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td data-label="Asset Pair"><strong>BTC-USDC-PERP</strong></td>
+                          <td data-label="Order Side"><span class="joy-badge joy-badge--success">BUY / LONG</span></td>
+                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono, monospace);">$68,492.50</td>
+                          <td data-label="Volume">14.250 BTC</td>
+                          <td data-label="Status"><span style="color: #10b981; font-weight: 600;">CONFIRMED</span></td>
+                        </tr>
+                        <tr>
+                          <td data-label="Asset Pair"><strong>ETH-USDT-PERP</strong></td>
+                          <td data-label="Order Side"><span class="joy-badge joy-badge--danger">SELL / SHORT</span></td>
+                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono, monospace);">$3,584.10</td>
+                          <td data-label="Volume">120.000 ETH</td>
+                          <td data-label="Status"><span style="color: #10b981; font-weight: 600;">CONFIRMED</span></td>
+                        </tr>
+                        <tr>
+                          <td data-label="Asset Pair"><strong>SOL-USDC-SPOT</strong></td>
+                          <td data-label="Order Side"><span class="joy-badge joy-badge--success">BUY / SPOT</span></td>
+                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono, monospace);">$182.45</td>
+                          <td data-label="Volume">540.20 SOL</td>
+                          <td data-label="Status"><span style="color: #10b981; font-weight: 600;">CONFIRMED</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 7. FAQSection -->
+              <section class="joy-faq-section" style="padding: 48px 24px;">
+                <div style="text-align: center; max-width: 600px; margin: 0 auto 36px auto;">
+                  <h2 style="font-size: 1.875rem; font-weight: 700; margin: 0 0 12px 0;">Frequently Asked Questions</h2>
+                  <p style="color: var(--joy-text-secondary, #64748b); font-size: 0.95rem; margin: 0;">Everything engineering teams need to know about our deterministic architecture.</p>
+                </div>
+                <div class="joy-faq-section__list">
+                  <div class="joy-faq-item joy-faq-item--open">
+                    <button type="button" class="joy-faq-item__question" onclick="toggleFaq(this)" aria-expanded="true">
+                      <span>How are sub-5ms chart rendering benchmarks maintained?</span>
+                      <svg class="joy-faq-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="joy-faq-item__answer" role="region">
+                      <p>Decoupled double-buffered canvas layers, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers eliminate garbage-collection pauses even under bursts of 100k points/sec.</p>
+                    </div>
+                  </div>
+                  <div class="joy-faq-item">
+                    <button type="button" class="joy-faq-item__question" onclick="toggleFaq(this)" aria-expanded="false">
+                      <span>Is there full functional parity between React 19 and Svelte 5?</span>
+                      <svg class="joy-faq-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="joy-faq-item__answer" role="region" style="display: none;">
+                      <p>Yes. Every component exists in both packages with identical visual appearance, accessibility traits, design token binding, and keyboard navigation semantics.</p>
+                    </div>
+                  </div>
+                  <div class="joy-faq-item">
+                    <button type="button" class="joy-faq-item__question" onclick="toggleFaq(this)" aria-expanded="false">
+                      <span>How does the institutional color palette system work?</span>
+                      <svg class="joy-faq-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="joy-faq-item__answer" role="region" style="display: none;">
+                      <p>Palettes are applied dynamically via the data-palette attribute on root or page containers, instantly recalibrating primary surfaces, borders, text contrast, and brand accents without CSS bundle duplication.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 8. CTASection -->
+              <section class="joy-cta-section" style="margin: 0 24px 48px; border-radius: 16px;">
+                <h2 class="joy-cta-section__title">Ready to Deploy Institutional Infrastructure?</h2>
+                <p class="joy-cta-section__description">Access high-performance execution primitives, Canvas charting engines, and institutional risk guards today.</p>
+                <div class="joy-cta-section__actions">
+                  <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);">
+                    Start Free Trial
+                  </button>
+                  <button type="button" class="joy-button joy-button--glass joy-button--lg">
+                    Contact Institutional Sales
+                  </button>
+                </div>
+              </section>
+
+              <!-- 9. SiteFooter -->
+              <footer class="joy-site-footer">
+                <div class="joy-site-footer__grid">
+                  <div class="joy-site-footer__brand">
+                    <div class="joy-site-footer__brand-title">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-brand-primary, #c49a3a);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>JOYMIFY PROTOCOL</span>
+                    </div>
+                    <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
+                  </div>
+                  <div class="joy-site-footer__column">
+                    <h4 class="joy-site-footer__col-title">Architecture</h4>
+                    <ul class="joy-site-footer__links">
+                      <li><a href="#view-charts" class="joy-site-footer__link">Financial Charts</a></li>
+                      <li><a href="#view-table" class="joy-site-footer__link">Adaptive Tables</a></li>
+                      <li><a href="#view-landing-preview" class="joy-site-footer__link">Page Simulator</a></li>
+                    </ul>
+                  </div>
+                  <div class="joy-site-footer__column">
+                    <h4 class="joy-site-footer__col-title">Frameworks</h4>
+                    <ul class="joy-site-footer__links">
+                      <li><a href="#" class="joy-site-footer__link">React 19 Hooks</a></li>
+                      <li><a href="#" class="joy-site-footer__link">Svelte 5 Runes</a></li>
+                      <li><a href="#" class="joy-site-footer__link">Tailwind Tokens</a></li>
+                    </ul>
+                  </div>
+                  <div class="joy-site-footer__column">
+                    <h4 class="joy-site-footer__col-title">Compliance</h4>
+                    <ul class="joy-site-footer__links">
+                      <li><a href="#" class="joy-site-footer__link">WCAG 2.2 AA</a></li>
+                      <li><a href="#" class="joy-site-footer__link">Zero OS Emojis</a></li>
+                      <li><a href="#" class="joy-site-footer__link">SOC 2 Type II</a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="joy-site-footer__bottom">
+                  <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
+                  <div class="joy-site-footer__socials">
+                    <span style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b);">Institutional Grade Telemetry</span>
+                  </div>
+                </div>
+              </footer>
+
             </div>
           </div>
         </div>
@@ -3440,6 +4156,13 @@ export async function executeHedge(symbol: string, size: number) {
       document.getElementById('demo-drawer-container').style.display = 'none';
     }
 
+    function toggleFaq(id) {
+      const item = document.getElementById(id);
+      if (item) {
+        item.classList.toggle('joy-faq-item--open');
+      }
+    }
+
     function showDemoToast(msg, variant = 'info') {
       const container = document.getElementById('demo-toast-container');
       const toast = document.createElement('div');
@@ -3485,17 +4208,17 @@ export async function executeHedge(symbol: string, size: number) {
         let changeColor = r.change >= 0 ? 'var(--joy-color-status-success, #10b981)' : 'var(--joy-color-status-danger, #ef4444)';
         let changeSign = r.change >= 0 ? '+' : '';
         return '<tr>' +
-          '<td style="font-weight: 600;">' + r.pair + '</td>' +
-          '<td style="text-align: right; font-family: var(--joy-font-family-mono, monospace);" class="' + flashClass + '">' +
+          '<td data-label="Pair" style="font-weight: 600;">' + r.pair + '</td>' +
+          '<td data-label="Price (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono, monospace);" class="' + flashClass + '">' +
             '$' + r.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
           '</td>' +
-          '<td style="text-align: right; font-weight: 600; color: ' + changeColor + ';">' +
+          '<td data-label="24h Change" style="text-align: right; font-weight: 600; color: ' + changeColor + ';">' +
             changeSign + r.change.toFixed(2) + '%' +
           '</td>' +
-          '<td style="text-align: right; font-family: var(--joy-font-family-mono, monospace); color: #64748b;">' +
+          '<td data-label="24h Vol (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono, monospace); color: #64748b;">' +
             '$' + (r.volume / 1e6).toFixed(1) + 'M' +
           '</td>' +
-          '<td style="text-align: center;">' +
+          '<td data-label="Status" style="text-align: center;">' +
             '<span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> ' + r.status + '</span>' +
           '</td>' +
         '</tr>';
@@ -4354,6 +5077,43 @@ export async function executeHedge(symbol: string, size: number) {
       initKineticCanvas();
       syncViewFromHash();
     }, 100);
+
+    function switchSimulatorViewport(width, btn) {
+      const frame = document.getElementById('simulator-viewport-frame');
+      const info = document.getElementById('simulator-viewport-info');
+      if (frame) {
+        frame.style.maxWidth = width;
+      }
+      if (info) {
+        info.textContent = width === '100%' ? 'Desktop (Fluid / 1440px)' : width === '768px' ? 'Tablet (768px)' : 'Mobile (375px)';
+      }
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    }
+
+    function switchSimulatorPalette(palette, btn) {
+      const container = document.getElementById('simulator-page-container');
+      const info = document.getElementById('simulator-palette-info');
+      if (container) {
+        container.setAttribute('data-palette', palette);
+      }
+      if (info) {
+        const names = {
+          joymify: 'Joymify (Gold / Navy)',
+          obsidian: 'Obsidian (Emerald / Slate)',
+          quantum: 'Quantum (Cobalt / Midnight)',
+          cyberpunk: 'Cyberpunk (Amethyst / Violet)',
+          titanium: 'Titanium (Amber / Steel)'
+        };
+        info.textContent = names[palette] || palette;
+      }
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    }
 
     function updateCodeSnippets() {
       const btnSnippet = document.getElementById('button-code');

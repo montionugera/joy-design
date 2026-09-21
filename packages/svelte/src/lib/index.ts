@@ -79,5 +79,12 @@ export { default as ImagePreview, type ImageItem } from './ImagePreview.svelte';
 export { default as TreeSelect, type TreeNode } from './TreeSelect.svelte';
 export { default as Cascader, type CascaderOption } from './Cascader.svelte';
 export { lockBodyScroll, trapFocus } from './overlay-utils.js';
-
-
+// Wave 13B: Landing Page Component Suite
+export { default as FeatureCard } from './FeatureCard.svelte';
+export { default as FeatureGrid } from './FeatureGrid.svelte';
+export { default as LogoCloud } from './LogoCloud.svelte';
+export { default as StatsSection } from './StatsSection.svelte';
+export { default as CTASection } from './CTASection.svelte';
+export { default as FAQSection } from './FAQSection.svelte';
+export { default as SiteFooter } from './SiteFooter.svelte';
+export { default as LandingPage } from './LandingPage.svelte';

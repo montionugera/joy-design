@@ -56,6 +56,9 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(tbl.includes('joy-table-th--sortable'), 'Table must support sortable columns');
   assert.ok(tbl.includes('joy-table-cell--flash-up'), 'Table must support ticker flash up');
   assert.ok(tbl.includes('joy-table-cell--flash-down'), 'Table must support ticker flash down');
+  assert.ok(tbl.includes('joy-table--responsive-stack'), 'Table must support responsive stack card mode for mobile');
+  assert.ok(tbl.includes('data-label'), 'Table cells must provide data-label attributes for mobile card rendering');
+  assert.ok(tbl.includes('<svg width="12" height="12"'), 'Table sort indicators must use vector SVG icons');
 
   const pagination = fs.readFileSync(path.resolve('./src/Pagination.tsx'), 'utf8');
   assert.ok(pagination.includes('role="navigation"'), 'Pagination must implement accessible role=navigation');
@@ -109,6 +112,7 @@ test('React standard library components implement accessible traits and forwardR
 
   const hero = fs.readFileSync(path.resolve('./src/HeroSection.tsx'), 'utf8');
   assert.ok(hero.includes('joy-hero'), 'HeroSection must render joy-hero class');
+  assert.ok(hero.includes('joy-hero__secondary-cta'), 'HeroSection secondary action must use dedicated joy-hero__secondary-cta class');
 
   const pricingCard = fs.readFileSync(path.resolve('./src/PricingCard.tsx'), 'utf8');
   assert.ok(pricingCard.includes('joy-pricing-card'), 'PricingCard must render joy-pricing-card class');
@@ -260,6 +264,46 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(cascader.includes('joy-cascader'), 'Cascader must render joy-cascader class');
   assert.ok(cascader.includes('role="listbox"'), 'Cascader must implement role=listbox');
   assert.ok(cascader.includes('React.forwardRef'), 'Cascader must implement forwardRef');
+
+  // Wave 13B: Landing Page Component Suite
+  const featureCard = fs.readFileSync(path.resolve('./src/FeatureCard.tsx'), 'utf8');
+  assert.ok(featureCard.includes('joy-feature-card'), 'FeatureCard must render joy-feature-card class');
+  assert.ok(featureCard.includes('React.forwardRef'), 'FeatureCard must implement forwardRef');
+
+  const featureGrid = fs.readFileSync(path.resolve('./src/FeatureGrid.tsx'), 'utf8');
+  assert.ok(featureGrid.includes('joy-feature-grid'), 'FeatureGrid must render joy-feature-grid class');
+
+  const logoCloud = fs.readFileSync(path.resolve('./src/LogoCloud.tsx'), 'utf8');
+  assert.ok(logoCloud.includes('joy-logo-cloud'), 'LogoCloud must render joy-logo-cloud class');
+
+  const statsSection = fs.readFileSync(path.resolve('./src/StatsSection.tsx'), 'utf8');
+  assert.ok(statsSection.includes('joy-stats-section'), 'StatsSection must render joy-stats-section class');
+  assert.ok(statsSection.includes('joy-stat-item__value'), 'StatsSection must render metric values');
+
+  const ctaSection = fs.readFileSync(path.resolve('./src/CTASection.tsx'), 'utf8');
+  assert.ok(ctaSection.includes('joy-cta-section'), 'CTASection must render joy-cta-section class');
+  assert.ok(ctaSection.includes('joy-button--glass'), 'CTASection must use glass button for contrast safety');
+
+  const faqSection = fs.readFileSync(path.resolve('./src/FAQSection.tsx'), 'utf8');
+  assert.ok(faqSection.includes('joy-faq-section'), 'FAQSection must render joy-faq-section class');
+  assert.ok(faqSection.includes('aria-expanded'), 'FAQSection must implement accessible aria-expanded state');
+  assert.ok(faqSection.includes('role="region"'), 'FAQSection must implement accessible role=region for panel');
+
+  const siteFooter = fs.readFileSync(path.resolve('./src/SiteFooter.tsx'), 'utf8');
+  assert.ok(siteFooter.includes('joy-site-footer'), 'SiteFooter must render joy-site-footer class');
+  assert.ok(siteFooter.includes('role="contentinfo"'), 'SiteFooter must implement accessible role=contentinfo');
+
+  // Wave 13C: Full Page Combine Component & Theme Palettes
+  const landingPage = fs.readFileSync(path.resolve('./src/LandingPage.tsx'), 'utf8');
+  assert.ok(landingPage.includes('joy-landing-page'), 'LandingPage must render joy-landing-page class');
+  assert.ok(landingPage.includes('data-palette'), 'LandingPage must support data-palette attribute');
+  assert.ok(landingPage.includes('HeroSection'), 'LandingPage must embed HeroSection');
+  assert.ok(landingPage.includes('LogoCloud'), 'LandingPage must embed LogoCloud');
+  assert.ok(landingPage.includes('FeatureGrid'), 'LandingPage must embed FeatureGrid');
+  assert.ok(landingPage.includes('StatsSection'), 'LandingPage must embed StatsSection');
+  assert.ok(landingPage.includes('FAQSection'), 'LandingPage must embed FAQSection');
+  assert.ok(landingPage.includes('CTASection'), 'LandingPage must embed CTASection');
+  assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
 

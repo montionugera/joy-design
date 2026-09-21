@@ -382,5 +382,38 @@
     "claimed_at": "2026-09-20T13:30:24.963978+00:00",
     "shipped_at": "2026-09-20T13:39:15.930929+00:00",
     "promoted_at": "2026-09-20T13:40:03.322881+00:00"
+  },
+  {
+    "id": "F-033",
+    "title": "Adaptive mobile table suite and secondary button contrast fix",
+    "from_idea": "I-033",
+    "created_at": "2026-09-21T01:24:06.536565+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.23",
+    "claimed_at": "2026-09-21T01:24:26.774518+00:00",
+    "shipped_at": "2026-09-21T01:28:23.414868+00:00"
+  },
+  {
+    "id": "F-034",
+    "title": "Landing page component suite (FeatureGrid, LogoCloud, StatsSection, CTASection, FAQSection, SiteFooter)",
+    "from_idea": "I-034",
+    "created_at": "2026-09-21T01:24:06.753945+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.23",
+    "claimed_at": "2026-09-21T01:28:30.849030+00:00",
+    "shipped_at": "2026-09-21T01:33:02.940177+00:00"
+  },
+  {
+    "id": "F-035",
+    "title": "Multi-theme color palette engine and full landing page preview simulator",
+    "from_idea": "I-035",
+    "created_at": "2026-09-21T01:24:06.968011+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.23",
+    "claimed_at": "2026-09-21T01:33:08.417782+00:00",
+    "shipped_at": "2026-09-21T01:37:56.859351+00:00"
   }
 ]

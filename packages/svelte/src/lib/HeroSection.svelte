@@ -68,7 +68,7 @@
 		{#if secondaryCtaText}
 			<button
 				type="button"
-				class="joy-button joy-button--outline joy-button--lg"
+				class="joy-button joy-button--outline joy-hero__secondary-cta joy-button--lg"
 				onclick={onsecondaryclick}
 			>
 				{secondaryCtaText}
