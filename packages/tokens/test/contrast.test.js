@@ -3,47 +3,25 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  hexToRgb,
+  srgbToLinear,
+  relativeLuminance,
+  contrastRatio as computeContrast
+} from '../scripts/color.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-function hexToRgb(hex) {
-  const clean = hex.replace('#', '').trim();
-  if (clean.length === 3) {
-    return [
-      parseInt(clean[0] + clean[0], 16),
-      parseInt(clean[1] + clean[1], 16),
-      parseInt(clean[2] + clean[2], 16)
-    ];
-  }
-  const n = parseInt(clean, 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-function srgbToLinear(c) {
-  const v = c / 255;
-  return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-}
-
-function relativeLuminance(hex) {
-  const [r, g, b] = hexToRgb(hex);
-  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
-}
-
-function computeContrast(hex1, hex2) {
-  const l1 = relativeLuminance(hex1);
-  const l2 = relativeLuminance(hex2);
-  const hi = Math.max(l1, l2);
-  const lo = Math.min(l1, l2);
-  return (hi + 0.05) / (lo + 0.05);
-}
 
 function parseCssTokens(css) {
   const lightVars = {};
   const darkVars = {};
+  const darkVarCounts = {};
+  const duplicateDarkVars = [];
 
-  // Extract :root block
-  const rootMatch = css.match(/:root\s*\{([^}]+)\}/);
-  if (rootMatch) {
+  // 1. Extract and parse all :root blocks in document order
+  const rootRegex = /:root\s*\{([^}]+)\}/g;
+  let rootMatch;
+  while ((rootMatch = rootRegex.exec(css)) !== null) {
     const lines = rootMatch[1].split(';');
     for (const line of lines) {
       const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
@@ -53,14 +31,42 @@ function parseCssTokens(css) {
     }
   }
 
-  // Extract [data-theme="dark"] block
-  const darkMatch = css.match(/\[data-theme="dark"\]\s*\{([^}]+)\}/);
-  if (darkMatch) {
+  // 2. Extract and parse ALL [data-theme="dark"] blocks in document order (last wins)
+  const darkBlockRegex = /\[data-theme="dark"\]\s*\{([^}]+)\}/g;
+  let darkMatch;
+  let darkBlockCount = 0;
+  while ((darkMatch = darkBlockRegex.exec(css)) !== null) {
+    darkBlockCount++;
     const lines = darkMatch[1].split(';');
     for (const line of lines) {
       const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
       if (match) {
-        darkVars[match[1].trim()] = match[2].trim();
+        const varName = match[1].trim();
+        const varVal = match[2].trim();
+        if (varName.startsWith('--joy-')) {
+          darkVarCounts[varName] = (darkVarCounts[varName] || 0) + 1;
+        }
+        darkVars[varName] = varVal;
+      }
+    }
+  }
+
+  for (const [varName, count] of Object.entries(darkVarCounts)) {
+    if (count > 1) {
+      duplicateDarkVars.push(`${varName} (declared ${count} times in dark theme)`);
+    }
+  }
+
+  // 3. Extract and parse @media (prefers-color-scheme: dark) block
+  const mediaDarkRegex = /@media\s*\(\s*prefers-color-scheme:\s*dark\s*\)\s*\{\s*:root:not\(\[data-theme="light"\]\)\s*\{([^}]+)\}/g;
+  let mediaMatch;
+  const mediaDarkVars = {};
+  while ((mediaMatch = mediaDarkRegex.exec(css)) !== null) {
+    const lines = mediaMatch[1].split(';');
+    for (const line of lines) {
+      const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
+      if (match) {
+        mediaDarkVars[match[1].trim()] = match[2].trim();
       }
     }
   }
@@ -101,7 +107,13 @@ function parseCssTokens(css) {
   const combinedDark = { ...lightVars, ...darkVars };
   const resolvedDark = resolveStore(combinedDark);
 
-  return { light: resolvedLight, dark: resolvedDark };
+  return {
+    light: resolvedLight,
+    dark: resolvedDark,
+    darkBlockCount,
+    duplicateDarkVars,
+    mediaDarkVars
+  };
 }
 
 test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
@@ -109,7 +121,20 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
   assert.ok(fs.existsSync(cssPath), 'dist/theme.css must exist before running contrast tests');
   const css = fs.readFileSync(cssPath, 'utf8');
 
-  const { light, dark } = parseCssTokens(css);
+  const { light, dark, duplicateDarkVars, mediaDarkVars } = parseCssTokens(css);
+
+  // Assertion: no --joy-* variable may be declared more than once across dark blocks
+  assert.strictEqual(
+    duplicateDarkVars.length,
+    0,
+    `Duplicate --joy-* variable declarations found in dark mode blocks:\n${duplicateDarkVars.join('\n')}`
+  );
+
+  // Assertion: media prefers-color-scheme: dark must be populated
+  assert.ok(
+    Object.keys(mediaDarkVars).length > 0,
+    'media prefers-color-scheme: dark block must contain semantic token declarations'
+  );
 
   const testPairs = [
     // Light text on surfaces

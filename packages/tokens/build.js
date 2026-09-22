@@ -10,20 +10,30 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
 
 // Resolve reference like "{color.gold.600}"
-function resolveRef(refStr, rootTokens, depth = 0) {
-  if (depth > 10 || typeof refStr !== 'string') return refStr;
+function resolveRef(refStr, rootTokens, depth = 0, seen = new Set()) {
+  if (typeof refStr !== 'string') return refStr;
   const match = refStr.match(/^\{([^}]+)\}$/);
   if (!match) return refStr;
-  const parts = match[1].split('.');
+  const refPath = match[1];
+  if (seen.has(refPath) || depth > 15) {
+    throw new Error(`Cyclic token reference detected: ${refStr}`);
+  }
+  seen.add(refPath);
+  const parts = refPath.split('.');
   let current = rootTokens;
   for (const part of parts) {
-    if (!current || typeof current !== 'object') return refStr;
+    if (!current || typeof current !== 'object') {
+      throw new Error(`Unknown token reference: ${refStr} at part '${part}'`);
+    }
     current = current[part];
   }
-  if (current && typeof current === 'object' && 'value' in current) {
-    return resolveRef(current.value, rootTokens, depth + 1);
+  if (!current) {
+    throw new Error(`Unknown token reference: ${refStr}`);
   }
-  return typeof current === 'string' ? resolveRef(current, rootTokens, depth + 1) : refStr;
+  if (typeof current === 'object' && 'value' in current) {
+    return resolveRef(current.value, rootTokens, depth + 1, seen);
+  }
+  return typeof current === 'string' ? resolveRef(current, rootTokens, depth + 1, seen) : refStr;
 }
 
 // Extract primitives, light semantics, dark semantics
@@ -3341,79 +3351,83 @@ const canonicalVars = [
   '  --ink-500: #1f1c13;',
 ].join('\n');
 
+const legacyAliasesMap = {
+  'color-brand-primary': { target: 'accent-default', cssVal: 'var(--joy-accent-default)' },
+  'color-brand-primary-hover': { target: 'accent-hover', cssVal: 'var(--joy-accent-hover)' },
+  'color-brand-secondary': { target: 'color-navy-500', cssVal: 'var(--joy-color-navy-500)' },
+  'color-brand-accent': { target: 'accent-default', cssVal: 'var(--joy-accent-default)' },
+  'color-brand-navy': { target: 'color-navy-500', cssVal: 'var(--joy-color-navy-500)' },
+  'color-brand-gold': { target: 'color-gold-400', cssVal: 'var(--joy-color-gold-400)' },
+  'color-brand-cream': { target: 'color-cream-100', cssVal: 'var(--joy-color-cream-100)' },
+  'color-brand-ink': { target: 'color-ink-500', cssVal: 'var(--joy-color-ink-500)' },
+
+  'color-surface-base': { target: 'surface-card', cssVal: 'var(--joy-surface-card)' },
+  'color-surface-canvas': { target: 'surface-canvas', cssVal: 'var(--joy-surface-canvas)' },
+  'color-surface-card': { target: 'surface-card', cssVal: 'var(--joy-surface-card)' },
+  'color-surface-subtle': { target: 'surface-sunken', cssVal: 'var(--joy-surface-sunken)' },
+  'color-surface-muted': { target: 'surface-sunken', cssVal: 'var(--joy-surface-sunken)' },
+  'color-surface-elevated': { target: 'surface-raised', cssVal: 'var(--joy-surface-raised)' },
+  'color-surface-dark-base': { target: 'color-navy-950', cssVal: 'var(--joy-color-navy-950)' },
+  'color-surface-dark-card': { target: 'color-navy-900', cssVal: 'var(--joy-color-navy-900)' },
+  'color-surface-dark-subtle': { target: 'color-navy-800', cssVal: 'var(--joy-color-navy-800)' },
+  'surface-frosted': { target: null, cssVal: 'rgba(255, 255, 255, 0.82)' },
+  'backdrop-blur': { target: null, cssVal: 'blur(12px)' },
+
+  'color-border-base': { target: 'border-default', cssVal: 'var(--joy-border-default)' },
+  'color-border-subtle': { target: 'border-subtle', cssVal: 'var(--joy-border-subtle)' },
+  'color-border-default': { target: 'border-default', cssVal: 'var(--joy-border-default)' },
+  'color-border-dark': { target: 'border-strong', cssVal: 'var(--joy-border-strong)' },
+  'border': { target: 'border-default', cssVal: 'var(--joy-border-default)' },
+  'border-hairline': { target: 'border-subtle', cssVal: 'var(--joy-border-subtle)' },
+
+  'color-text-primary': { target: 'text-primary', cssVal: 'var(--joy-text-primary)' },
+  'color-text-secondary': { target: 'text-secondary', cssVal: 'var(--joy-text-secondary)' },
+  'color-text-muted': { target: 'text-muted', cssVal: 'var(--joy-text-muted)' },
+  'color-text-inverse': { target: 'text-inverse', cssVal: 'var(--joy-text-inverse)' },
+
+  'color-status-success': { target: 'status-success-fg', cssVal: 'var(--joy-status-success-fg)' },
+  'color-status-warning': { target: 'status-warning-fg', cssVal: 'var(--joy-status-warning-fg)' },
+  'color-status-danger': { target: 'status-danger-fg', cssVal: 'var(--joy-status-danger-fg)' },
+  'color-status-info': { target: 'status-info-fg', cssVal: 'var(--joy-status-info-fg)' },
+
+  'spacing-1': { target: 'space-1', cssVal: 'var(--joy-space-1)' },
+  'spacing-2': { target: 'space-2', cssVal: 'var(--joy-space-2)' },
+  'spacing-3': { target: 'space-3', cssVal: 'var(--joy-space-3)' },
+  'spacing-4': { target: 'space-4', cssVal: 'var(--joy-space-4)' },
+  'spacing-6': { target: 'space-6', cssVal: 'var(--joy-space-6)' },
+  'spacing-8': { target: 'space-8', cssVal: 'var(--joy-space-8)' },
+
+  'radius-sm': { target: null, cssVal: '4px' },
+  'radius-md': { target: 'radius-control', cssVal: 'var(--joy-radius-control)' },
+  'radius-lg': { target: 'radius-card', cssVal: 'var(--joy-radius-card)' },
+  'radius-xl': { target: 'radius-overlay', cssVal: 'var(--joy-radius-overlay)' },
+  'radius-full': { target: 'radius-pill', cssVal: 'var(--joy-radius-pill)' },
+
+  'motion-duration-fast': { target: 'duration-fast', cssVal: 'var(--joy-duration-fast)' },
+  'motion-duration-normal': { target: 'duration-normal', cssVal: 'var(--joy-duration-normal)' },
+  'motion-duration-slow': { target: 'duration-slow', cssVal: 'var(--joy-duration-slow)' },
+  'motion-easing-standard': { target: 'ease-in-out', cssVal: 'var(--joy-ease-in-out)' },
+  'motion-easing-decelerate': { target: 'ease-out', cssVal: 'var(--joy-ease-out)' },
+  'motion-easing-accelerate': { target: null, cssVal: 'cubic-bezier(0.4, 0.0, 1, 1)' },
+  'motion-easing-spring': { target: null, cssVal: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' },
+
+  'shadow-sm': { target: 'elevation-1', cssVal: 'var(--joy-elevation-1)' },
+  'shadow-md': { target: 'elevation-2', cssVal: 'var(--joy-elevation-2)' },
+  'shadow-lg': { target: 'elevation-3', cssVal: 'var(--joy-elevation-3)' },
+  'shadow-overlay': { target: null, cssVal: '0 20px 25px -5px rgba(20, 37, 62, 0.15), 0 8px 10px -6px rgba(20, 37, 62, 0.1)' },
+
+  'z-index-dropdown': { target: 'z-dropdown', cssVal: 'var(--joy-z-dropdown)' },
+  'z-index-modal': { target: 'z-modal', cssVal: 'var(--joy-z-modal)' },
+  'z-index-tooltip': { target: 'z-tooltip', cssVal: 'var(--joy-z-tooltip)' },
+
+  'font-display-letter-spacing': { target: null, cssVal: '-0.02em' },
+  'font-variant-numeric': { target: null, cssVal: 'tabular-nums' },
+  'form-label-width': { target: null, cssVal: '120px' },
+};
+
 const legacyAliases = [
   '  /* ── Legacy Variable Compatibility Layer ── */',
-  '  --joy-color-brand-primary: var(--joy-accent-default);',
-  '  --joy-color-brand-primary-hover: var(--joy-accent-hover);',
-  '  --joy-color-brand-secondary: var(--joy-color-navy-500);',
-  '  --joy-color-brand-accent: var(--joy-accent-default);',
-  '  --joy-color-brand-navy: var(--joy-color-navy-500);',
-  '  --joy-color-brand-gold: var(--joy-color-gold-400);',
-  '  --joy-color-brand-cream: var(--joy-color-cream-100);',
-  '  --joy-color-brand-ink: var(--joy-color-ink-500);',
-
-  '  --joy-color-surface-base: var(--joy-surface-card);',
-  '  --joy-color-surface-canvas: var(--joy-surface-canvas);',
-  '  --joy-color-surface-card: var(--joy-surface-card);',
-  '  --joy-color-surface-subtle: var(--joy-surface-sunken);',
-  '  --joy-color-surface-muted: var(--joy-surface-sunken);',
-  '  --joy-color-surface-elevated: var(--joy-surface-raised);',
-  '  --joy-color-surface-dark-base: var(--joy-color-navy-950);',
-  '  --joy-color-surface-dark-card: var(--joy-color-navy-900);',
-  '  --joy-color-surface-dark-subtle: var(--joy-color-navy-800);',
-  '  --joy-surface-frosted: rgba(255, 255, 255, 0.82);',
-  '  --joy-backdrop-blur: blur(12px);',
-
-  '  --joy-color-border-base: var(--joy-border-default);',
-  '  --joy-color-border-subtle: var(--joy-border-subtle);',
-  '  --joy-color-border-default: var(--joy-border-default);',
-  '  --joy-color-border-dark: var(--joy-border-strong);',
-  '  --joy-border: var(--joy-border-default);',
-  '  --joy-border-hairline: var(--joy-border-subtle);',
-
-  '  --joy-color-text-primary: var(--joy-text-primary);',
-  '  --joy-color-text-secondary: var(--joy-text-secondary);',
-  '  --joy-color-text-muted: var(--joy-text-muted);',
-  '  --joy-color-text-inverse: var(--joy-text-inverse);',
-
-  '  --joy-color-status-success: var(--joy-status-success-fg);',
-  '  --joy-color-status-warning: var(--joy-status-warning-fg);',
-  '  --joy-color-status-danger: var(--joy-status-danger-fg);',
-  '  --joy-color-status-info: var(--joy-status-info-fg);',
-
-  '  --joy-spacing-1: var(--joy-space-1);',
-  '  --joy-spacing-2: var(--joy-space-2);',
-  '  --joy-spacing-3: var(--joy-space-3);',
-  '  --joy-spacing-4: var(--joy-space-4);',
-  '  --joy-spacing-6: var(--joy-space-6);',
-  '  --joy-spacing-8: var(--joy-space-8);',
-
-  '  --joy-radius-sm: 4px;',
-  '  --joy-radius-md: var(--joy-radius-control);',
-  '  --joy-radius-lg: var(--joy-radius-card);',
-  '  --joy-radius-xl: var(--joy-radius-overlay);',
-  '  --joy-radius-full: var(--joy-radius-pill);',
-
-  '  --joy-motion-duration-fast: var(--joy-duration-fast);',
-  '  --joy-motion-duration-normal: var(--joy-duration-normal);',
-  '  --joy-motion-duration-slow: var(--joy-duration-slow);',
-  '  --joy-motion-easing-standard: var(--joy-ease-in-out);',
-  '  --joy-motion-easing-decelerate: var(--joy-ease-out);',
-  '  --joy-motion-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);',
-  '  --joy-motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);',
-
-  '  --joy-shadow-sm: var(--joy-elevation-1);',
-  '  --joy-shadow-md: var(--joy-elevation-2);',
-  '  --joy-shadow-lg: var(--joy-elevation-3);',
-  '  --joy-shadow-overlay: 0 20px 25px -5px rgba(20, 37, 62, 0.15), 0 8px 10px -6px rgba(20, 37, 62, 0.1);',
-
-  '  --joy-z-index-dropdown: var(--joy-z-dropdown);',
-  '  --joy-z-index-modal: var(--joy-z-modal);',
-  '  --joy-z-index-tooltip: var(--joy-z-tooltip);',
-
-  '  --joy-font-display-letter-spacing: -0.02em;',
-  '  --joy-font-variant-numeric: tabular-nums;',
-  '  --joy-form-label-width: 120px;',
+  ...Object.entries(legacyAliasesMap).map(([k, cfg]) => `  --joy-${k}: ${cfg.cssVal};`)
 ].join('\n');
 
 const darkLegacyRemap = [
@@ -3428,13 +3442,15 @@ const darkLegacyRemap = [
 
 const mediaReducedMotion = `
 @media (prefers-reduced-motion: reduce) {
-  .joy-*,
-  .joy-*::before,
-  .joy-*::after {
+  html {
+    scroll-behavior: auto !important;
+  }
+  [class*="joy-"],
+  [class*="joy-"]::before,
+  [class*="joy-"]::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 `;
@@ -3524,6 +3540,15 @@ const twThemeCss = `@theme {\n${twEntries.join('\n')}\n}\n`;
 fs.writeFileSync(path.join(outDir, 'tailwind-theme.css'), twThemeCss);
 
 // 3. index.js (ESM) & index.cjs (CJS) & index.d.ts
+// Populate legacy alias values in jsObj
+for (const [k, cfg] of Object.entries(legacyAliasesMap)) {
+  if (cfg.target && jsObj[cfg.target]) {
+    jsObj[k] = jsObj[cfg.target];
+  } else if (cfg.cssVal && !cfg.cssVal.startsWith('var(')) {
+    jsObj[k] = cfg.cssVal;
+  }
+}
+
 const jsContent = `export const tokens = ${JSON.stringify(jsObj, null, 2)};\nexport default tokens;\n`;
 fs.writeFileSync(path.join(outDir, 'index.js'), jsContent);
 
@@ -3531,19 +3556,24 @@ const cjsContent = `exports.tokens = ${JSON.stringify(jsObj, null, 2)};\nexports
 fs.writeFileSync(path.join(outDir, 'index.cjs'), cjsContent);
 
 // Strongly typed token declaration
-const tokenKeys = Object.keys(jsObj).map(k => `  | '${k}'`).join('\n');
+const standardKeys = Object.keys(jsObj).filter(k => !(k in legacyAliasesMap));
+const standardDts = standardKeys.map(k => `  '${k}': string;`).join('\n');
+const legacyDts = Object.entries(legacyAliasesMap).map(([k, cfg]) => {
+  const depComment = cfg.target
+    ? `  /**\n   * @deprecated Use '${cfg.target}' instead\n   */`
+    : `  /**\n   * @deprecated Legacy alias token\n   */`;
+  return `${depComment}\n  '${k}': string;`;
+}).join('\n');
+
 const dtsContent = `/**
  * Joymify Design Tokens
  */
-export type JoyTokenName =
-${tokenKeys};
-
-export interface JoyTokens extends Record<string, string> {
-  /**
-   * @deprecated Use new semantic tokens (--joy-accent-default, etc.) instead
-   */
-  [key: string]: string;
+export interface JoyTokens {
+${standardDts}
+${legacyDts}
 }
+
+export type JoyTokenName = keyof JoyTokens;
 
 export declare const tokens: JoyTokens;
 export default tokens;

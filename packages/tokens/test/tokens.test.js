@@ -121,5 +121,20 @@ test('zero raw OS emojis across all packages source code', () => {
   assert.strictEqual(violations.length, 0, `Violations of Zero Emoji Policy found in: ${violations.join(', ')}`);
 });
 
+test('reduced motion uses valid CSS selectors and zero invalid .joy-* wildcards', () => {
+  const css = fs.readFileSync(path.resolve('./dist/theme.css'), 'utf8');
+  assert.ok(!css.includes('.joy-*'), 'theme.css must not contain invalid .joy-* wildcard selector');
+  assert.ok(css.includes('[class*="joy-"]'), 'theme.css must use valid [class*="joy-"] selector in reduced motion');
+});
+
+test('index.d.ts provides strongly typed tokens without loose index signature and deprecates aliases', () => {
+  const dts = fs.readFileSync(path.resolve('./dist/index.d.ts'), 'utf8');
+  assert.ok(!dts.includes('[key: string]: string;'), 'index.d.ts must not contain [key: string]: string index signature');
+  assert.ok(dts.includes('export interface JoyTokens {'), 'index.d.ts must declare JoyTokens interface');
+  assert.ok(dts.includes('export type JoyTokenName = keyof JoyTokens;'), 'JoyTokenName must be keyof JoyTokens');
+  assert.ok(dts.includes("'color-brand-primary': string;"), 'legacy alias color-brand-primary must exist');
+  assert.ok(dts.includes("@deprecated Use 'accent-default' instead"), 'legacy alias must have @deprecated JSDoc pointing to new token');
+});
+
 
 

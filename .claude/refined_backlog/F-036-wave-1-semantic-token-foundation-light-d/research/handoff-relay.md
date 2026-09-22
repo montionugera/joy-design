@@ -33,3 +33,13 @@ Confirmed clean: all 62 legacy `--joy-*` names survive; Tailwind export correct 
 - build.js -1738/+... lines; sweep script packages/tokens/scripts/sweep-literals.mjs; new test phase-b.test.js.
 - `pnpm --filter @joymify/tokens test`: 4 tests, 4 pass, 0 fail. `node apps/storybook-hub/build.js` exit 0.
 - dist/theme.css now has exactly one `[data-theme="dark"]` block and zero `#0d1829` -> code-reviewer CRITICAL item is already resolved by Phase B; the fix worker only needs to confirm it.
+
+## Phase B worker result (relayed)
+- Commits after edf98a0: a3c234f docs(F-036): A6 review verdicts and Phase B verification relay;13d7805 refactor(tokens): component css reads semantic tokens only; drop per-component dark overrides and banned patterns;
+- My verification: tokens test exit + counts below (run at 2026-09-22T08:47:36+07:00)
+```
+ℹ pass 4
+ℹ fail 0
+purple=0 hex-literals-in-build.js=4 dark-joy-selectors=0 background-clip-text=0 slate-94a3b8=0
+```
+- Next: dispatch the fix commit (recipe above), then Phase C.

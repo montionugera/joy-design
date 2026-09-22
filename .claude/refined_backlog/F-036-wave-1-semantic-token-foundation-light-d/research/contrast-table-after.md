@@ -3,48 +3,48 @@
 | --joy-text-primary (#1f1c13) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 15.38:1 | ≥ 4.5:1 | PASS |
 | --joy-text-primary (#1f1c13) on --joy-surface-card (#ffffff) | Light | Text / Surface | 17.02:1 | ≥ 4.5:1 | PASS |
 | --joy-text-primary (#1f1c13) on --joy-surface-raised (#ffffff) | Light | Text / Surface | 17.02:1 | ≥ 4.5:1 | PASS |
-| --joy-text-secondary (#474136) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 9.14:1 | ≥ 4.5:1 | PASS |
-| --joy-text-secondary (#474136) on --joy-surface-card (#ffffff) | Light | Text / Surface | 10.11:1 | ≥ 4.5:1 | PASS |
-| --joy-text-muted (#6c6557) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 5.22:1 | ≥ 4.5:1 | PASS |
-| --joy-text-muted (#6c6557) on --joy-surface-card (#ffffff) | Light | Text / Surface | 5.77:1 | ≥ 4.5:1 | PASS |
-| --joy-text-link (#8c671a) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 4.66:1 | ≥ 4.5:1 | PASS |
-| --joy-text-link (#8c671a) on --joy-surface-card (#ffffff) | Light | Text / Surface | 5.16:1 | ≥ 4.5:1 | PASS |
-| --joy-accent-text (#8c671a) on --joy-surface-canvas (#f8f3e8) | Light | Accent Text / Surface | 4.66:1 | ≥ 4.5:1 | PASS |
-| --joy-accent-text (#8c671a) on --joy-surface-card (#ffffff) | Light | Accent Text / Surface | 5.16:1 | ≥ 4.5:1 | PASS |
+| --joy-text-secondary (#3c3a35) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 10.26:1 | ≥ 4.5:1 | PASS |
+| --joy-text-secondary (#3c3a35) on --joy-surface-card (#ffffff) | Light | Text / Surface | 11.36:1 | ≥ 4.5:1 | PASS |
+| --joy-text-muted (#686660) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 5.19:1 | ≥ 4.5:1 | PASS |
+| --joy-text-muted (#686660) on --joy-surface-card (#ffffff) | Light | Text / Surface | 5.74:1 | ≥ 4.5:1 | PASS |
+| --joy-text-link (#856515) on --joy-surface-canvas (#f8f3e8) | Light | Text / Surface | 4.90:1 | ≥ 4.5:1 | PASS |
+| --joy-text-link (#856515) on --joy-surface-card (#ffffff) | Light | Text / Surface | 5.43:1 | ≥ 4.5:1 | PASS |
+| --joy-accent-text (#856515) on --joy-surface-canvas (#f8f3e8) | Light | Accent Text / Surface | 4.90:1 | ≥ 4.5:1 | PASS |
+| --joy-accent-text (#856515) on --joy-surface-card (#ffffff) | Light | Accent Text / Surface | 5.43:1 | ≥ 4.5:1 | PASS |
 | --joy-text-on-accent (#14253e) on --joy-accent-default (#c49a3a) | Light | Text / Surface | 5.89:1 | ≥ 4.5:1 | PASS |
-| --joy-border-default (#938a79) on --joy-surface-canvas (#f8f3e8) | Light | Border / Surface | 3.08:1 | ≥ 3:1 | PASS |
-| --joy-border-default (#938a79) on --joy-surface-card (#ffffff) | Light | Border / Surface | 3.41:1 | ≥ 3:1 | PASS |
-| --joy-focus-ring (#8c671a) on --joy-surface-canvas (#f8f3e8) | Light | Focus Ring | 4.66:1 | ≥ 3:1 | PASS |
-| --joy-focus-ring (#8c671a) on --joy-surface-card (#ffffff) | Light | Focus Ring | 5.16:1 | ≥ 3:1 | PASS |
-| --joy-status-success-fg (#0f5132) on --joy-status-success-bg (#eef8f2) | Light | Status Text / Surface | 8.62:1 | ≥ 4.5:1 | PASS |
-| --joy-status-success-fg (#0f5132) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 8.46:1 | ≥ 4.5:1 | PASS |
-| --joy-status-warning-fg (#873b06) on --joy-status-warning-bg (#fef6e7) | Light | Status Text / Surface | 7.35:1 | ≥ 4.5:1 | PASS |
-| --joy-status-warning-fg (#873b06) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 7.14:1 | ≥ 4.5:1 | PASS |
-| --joy-status-danger-fg (#8f1414) on --joy-status-danger-bg (#fef2f2) | Light | Status Text / Surface | 8.43:1 | ≥ 4.5:1 | PASS |
-| --joy-status-danger-fg (#8f1414) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 8.33:1 | ≥ 4.5:1 | PASS |
-| --joy-status-info-fg (#0f3d70) on --joy-status-info-bg (#edf5fd) | Light | Status Text / Surface | 9.93:1 | ≥ 4.5:1 | PASS |
-| --joy-status-info-fg (#0f3d70) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 9.87:1 | ≥ 4.5:1 | PASS |
-| --joy-text-primary (#f8f3e8) on --joy-surface-canvas (#09111e) | Dark | Text / Surface | 17.09:1 | ≥ 4.5:1 | PASS |
-| --joy-text-primary (#f8f3e8) on --joy-surface-card (#0f1b2e) | Dark | Text / Surface | 15.60:1 | ≥ 4.5:1 | PASS |
-| --joy-text-primary (#f8f3e8) on --joy-surface-raised (#15243b) | Dark | Text / Surface | 14.08:1 | ≥ 4.5:1 | PASS |
-| --joy-text-secondary (#d5cdbd) on --joy-surface-canvas (#09111e) | Dark | Text / Surface | 11.97:1 | ≥ 4.5:1 | PASS |
-| --joy-text-secondary (#d5cdbd) on --joy-surface-card (#0f1b2e) | Dark | Text / Surface | 10.93:1 | ≥ 4.5:1 | PASS |
-| --joy-text-muted (#938a79) on --joy-surface-canvas (#09111e) | Dark | Text / Surface | 5.54:1 | ≥ 4.5:1 | PASS |
-| --joy-text-muted (#938a79) on --joy-surface-card (#0f1b2e) | Dark | Text / Surface | 5.06:1 | ≥ 4.5:1 | PASS |
-| --joy-text-link (#deb853) on --joy-surface-canvas (#09111e) | Dark | Text / Surface | 9.98:1 | ≥ 4.5:1 | PASS |
-| --joy-text-link (#deb853) on --joy-surface-card (#0f1b2e) | Dark | Text / Surface | 9.11:1 | ≥ 4.5:1 | PASS |
-| --joy-accent-text (#deb853) on --joy-surface-canvas (#09111e) | Dark | Accent Text / Surface | 9.98:1 | ≥ 4.5:1 | PASS |
-| --joy-accent-text (#deb853) on --joy-surface-card (#0f1b2e) | Dark | Accent Text / Surface | 9.11:1 | ≥ 4.5:1 | PASS |
-| --joy-text-on-accent (#09111e) on --joy-accent-default (#deb853) | Dark | Text / Surface | 9.98:1 | ≥ 4.5:1 | PASS |
-| --joy-border-default (#4c6e9f) on --joy-surface-canvas (#09111e) | Dark | Border / Surface | 3.64:1 | ≥ 3:1 | PASS |
-| --joy-border-default (#4c6e9f) on --joy-surface-card (#0f1b2e) | Dark | Border / Surface | 3.32:1 | ≥ 3:1 | PASS |
-| --joy-focus-ring (#deb853) on --joy-surface-canvas (#09111e) | Dark | Focus Ring | 9.98:1 | ≥ 3:1 | PASS |
-| --joy-focus-ring (#deb853) on --joy-surface-card (#0f1b2e) | Dark | Focus Ring | 9.11:1 | ≥ 3:1 | PASS |
-| --joy-status-success-fg (#6ee7b7) on --joy-status-success-bg (#062817) | Dark | Status Text / Surface | 10.41:1 | ≥ 4.5:1 | PASS |
-| --joy-status-success-fg (#6ee7b7) on --joy-surface-canvas (#09111e) | Dark | Status Text / Surface | 12.41:1 | ≥ 4.5:1 | PASS |
-| --joy-status-warning-fg (#fcd34d) on --joy-status-warning-bg (#361603) | Dark | Status Text / Surface | 11.44:1 | ≥ 4.5:1 | PASS |
-| --joy-status-warning-fg (#fcd34d) on --joy-surface-canvas (#09111e) | Dark | Status Text / Surface | 13.11:1 | ≥ 4.5:1 | PASS |
-| --joy-status-danger-fg (#fca5a5) on --joy-status-danger-bg (#3a0909) | Dark | Status Text / Surface | 9.05:1 | ≥ 4.5:1 | PASS |
-| --joy-status-danger-fg (#fca5a5) on --joy-surface-canvas (#09111e) | Dark | Status Text / Surface | 9.96:1 | ≥ 4.5:1 | PASS |
-| --joy-status-info-fg (#93c5fd) on --joy-status-info-bg (#091e3a) | Dark | Status Text / Surface | 9.25:1 | ≥ 4.5:1 | PASS |
-| --joy-status-info-fg (#93c5fd) on --joy-surface-canvas (#09111e) | Dark | Status Text / Surface | 10.49:1 | ≥ 4.5:1 | PASS |
+| --joy-border-default (#88867f) on --joy-surface-canvas (#f8f3e8) | Light | Border / Surface | 3.29:1 | ≥ 3:1 | PASS |
+| --joy-border-default (#88867f) on --joy-surface-card (#ffffff) | Light | Border / Surface | 3.64:1 | ≥ 3:1 | PASS |
+| --joy-focus-ring (#856515) on --joy-surface-canvas (#f8f3e8) | Light | Focus Ring | 4.90:1 | ≥ 3:1 | PASS |
+| --joy-focus-ring (#856515) on --joy-surface-card (#ffffff) | Light | Focus Ring | 5.43:1 | ≥ 3:1 | PASS |
+| --joy-status-success-fg (#1a4f1f) on --joy-status-success-bg (#e7f2e7) | Light | Status Text / Surface | 8.36:1 | ≥ 4.5:1 | PASS |
+| --joy-status-success-fg (#1a4f1f) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 8.70:1 | ≥ 4.5:1 | PASS |
+| --joy-status-warning-fg (#643600) on --joy-status-warning-bg (#f7eddf) | Light | Status Text / Surface | 8.76:1 | ≥ 4.5:1 | PASS |
+| --joy-status-warning-fg (#643600) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 9.17:1 | ≥ 4.5:1 | PASS |
+| --joy-status-danger-fg (#781b1c) on --joy-status-danger-bg (#fee9e6) | Light | Status Text / Surface | 9.13:1 | ≥ 4.5:1 | PASS |
+| --joy-status-danger-fg (#781b1c) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 9.62:1 | ≥ 4.5:1 | PASS |
+| --joy-status-info-fg (#17446f) on --joy-status-info-bg (#e6f0f9) | Light | Status Text / Surface | 8.69:1 | ≥ 4.5:1 | PASS |
+| --joy-status-info-fg (#17446f) on --joy-surface-canvas (#f8f3e8) | Light | Status Text / Surface | 9.07:1 | ≥ 4.5:1 | PASS |
+| --joy-text-primary (#f8f3e8) on --joy-surface-canvas (#03050a) | Dark | Text / Surface | 18.42:1 | ≥ 4.5:1 | PASS |
+| --joy-text-primary (#f8f3e8) on --joy-surface-card (#050a13) | Dark | Text / Surface | 17.91:1 | ≥ 4.5:1 | PASS |
+| --joy-text-primary (#f8f3e8) on --joy-surface-raised (#08101d) | Dark | Text / Surface | 17.22:1 | ≥ 4.5:1 | PASS |
+| --joy-text-secondary (#bab7b0) on --joy-surface-canvas (#03050a) | Dark | Text / Surface | 10.18:1 | ≥ 4.5:1 | PASS |
+| --joy-text-secondary (#bab7b0) on --joy-surface-card (#050a13) | Dark | Text / Surface | 9.90:1 | ≥ 4.5:1 | PASS |
+| --joy-text-muted (#88867f) on --joy-surface-canvas (#03050a) | Dark | Text / Surface | 5.60:1 | ≥ 4.5:1 | PASS |
+| --joy-text-muted (#88867f) on --joy-surface-card (#050a13) | Dark | Text / Surface | 5.44:1 | ≥ 4.5:1 | PASS |
+| --joy-text-link (#dab362) on --joy-surface-canvas (#03050a) | Dark | Text / Surface | 10.30:1 | ≥ 4.5:1 | PASS |
+| --joy-text-link (#dab362) on --joy-surface-card (#050a13) | Dark | Text / Surface | 10.01:1 | ≥ 4.5:1 | PASS |
+| --joy-accent-text (#dab362) on --joy-surface-canvas (#03050a) | Dark | Accent Text / Surface | 10.30:1 | ≥ 4.5:1 | PASS |
+| --joy-accent-text (#dab362) on --joy-surface-card (#050a13) | Dark | Accent Text / Surface | 10.01:1 | ≥ 4.5:1 | PASS |
+| --joy-text-on-accent (#03050a) on --joy-accent-default (#dab362) | Dark | Text / Surface | 10.30:1 | ≥ 4.5:1 | PASS |
+| --joy-border-default (#4d607d) on --joy-surface-canvas (#03050a) | Dark | Border / Surface | 3.19:1 | ≥ 3:1 | PASS |
+| --joy-border-default (#4d607d) on --joy-surface-card (#050a13) | Dark | Border / Surface | 3.10:1 | ≥ 3:1 | PASS |
+| --joy-focus-ring (#dab362) on --joy-surface-canvas (#03050a) | Dark | Focus Ring | 10.30:1 | ≥ 3:1 | PASS |
+| --joy-focus-ring (#dab362) on --joy-surface-card (#050a13) | Dark | Focus Ring | 10.01:1 | ≥ 3:1 | PASS |
+| --joy-status-success-fg (#93c794) on --joy-status-success-bg (#061b07) | Dark | Status Text / Surface | 9.28:1 | ≥ 4.5:1 | PASS |
+| --joy-status-success-fg (#93c794) on --joy-surface-canvas (#03050a) | Dark | Status Text / Surface | 10.52:1 | ≥ 4.5:1 | PASS |
+| --joy-status-warning-fg (#dfae68) on --joy-status-warning-bg (#241100) | Dark | Status Text / Surface | 9.00:1 | ≥ 4.5:1 | PASS |
+| --joy-status-warning-fg (#dfae68) on --joy-surface-canvas (#03050a) | Dark | Status Text / Surface | 10.09:1 | ≥ 4.5:1 | PASS |
+| --joy-status-danger-fg (#fb9890) on --joy-status-danger-bg (#2d0606) | Dark | Status Text / Surface | 8.77:1 | ≥ 4.5:1 | PASS |
+| --joy-status-danger-fg (#fb9890) on --joy-surface-canvas (#03050a) | Dark | Status Text / Surface | 9.71:1 | ≥ 4.5:1 | PASS |
+| --joy-status-info-fg (#8fbceb) on --joy-status-info-bg (#051729) | Dark | Status Text / Surface | 9.10:1 | ≥ 4.5:1 | PASS |
+| --joy-status-info-fg (#8fbceb) on --joy-surface-canvas (#03050a) | Dark | Status Text / Surface | 10.25:1 | ≥ 4.5:1 | PASS |

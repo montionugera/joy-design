@@ -2,200 +2,171 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  srgbToLinear,
+  linearToSrgb,
+  hexToRgb,
+  rgbToHex,
+  hexToOklch,
+  oklchToHex,
+  relativeLuminance,
+  contrastRatio
+} from './color.mjs';
+
+export {
+  srgbToLinear,
+  linearToSrgb,
+  hexToRgb,
+  rgbToHex,
+  hexToOklch,
+  oklchToHex,
+  relativeLuminance,
+  contrastRatio
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-function srgbToLinear(c) {
-  const v = c / 255;
-  return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-}
-
-function linearToSrgb(c) {
-  const clamped = Math.max(0, Math.min(1, c));
-  return clamped <= 0.0031308
-    ? 12.92 * clamped
-    : 1.055 * Math.pow(clamped, 1 / 2.4) - 0.055;
-}
-
-export function hexToRgb(hex) {
-  const clean = hex.replace('#', '').trim();
-  const n = parseInt(clean, 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-export function rgbToHex(r, g, b) {
-  const toHex = (n) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, '0');
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-export function hexToOklch(hex) {
-  const [r255, g255, b255] = hexToRgb(hex);
-  const r = srgbToLinear(r255);
-  const g = srgbToLinear(g255);
-  const b = srgbToLinear(b255);
-
-  const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
-  const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
-  const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
-
-  const l_ = Math.cbrt(l);
-  const m_ = Math.cbrt(m);
-  const s_ = Math.cbrt(s);
-
-  const L = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
-  const a = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
-  const bOklch = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
-
-  const C = Math.hypot(a, bOklch);
-  let H = (Math.atan2(bOklch, a) * 180) / Math.PI;
-  if (H < 0) H += 360;
-
-  return { L, C, H };
-}
-
-export function oklchToHex(L, C, H) {
-  const hRad = (H * Math.PI) / 180;
-  const a = C * Math.cos(hRad);
-  const b = C * Math.sin(hRad);
-
-  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
-  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
-  const s_ = L - 0.0894841775 * a - 1.291485548 * b;
-
-  const l = l_ * l_ * l_;
-  const m = m_ * m_ * m_;
-  const s = s_ * s_ * s_;
-
-  const rLin = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
-  const gLin = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
-  const bLin = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
-
-  const r = linearToSrgb(rLin) * 255;
-  const g = linearToSrgb(gLin) * 255;
-  const bRgb = linearToSrgb(bLin) * 255;
-
-  return rgbToHex(r, g, bRgb);
-}
-
-export function relativeLuminance(hex) {
-  const [r, g, b] = hexToRgb(hex);
-  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
-}
-
-export function contrastRatio(hex1, hex2) {
-  const l1 = relativeLuminance(hex1);
-  const l2 = relativeLuminance(hex2);
-  const hi = Math.max(l1, l2);
-  const lo = Math.min(l1, l2);
-  return (hi + 0.05) / (lo + 0.05);
-}
-
 export function generateAllTokens() {
   // Primitives with anchors:
-  // navy-500: #14253e
-  // gold-400: #c49a3a
-  // ink-500:  #1f1c13
-  // cream-100: #f8f3e8
-  // gold-600: #8c671a (≥ 4.5:1 on white and cream)
-  // gold-300: #deb853 (≥ 4.5:1 on navy-900)
+  // navy-500: #14253e (fixed)
+  // gold-400: #c49a3a (fixed)
+  // ink-500:  #1f1c13 (fixed)
+  // cream-100: #f8f3e8 (fixed)
+  // gold-600: ≥ 4.5:1 on white and cream (text/link use)
+  // gold-300: ≥ 4.5:1 on navy-900 (dark accent)
 
-  const navyRamp = {
-    "50": { "value": "#f2f5f9", "type": "color" },
-    "100": { "value": "#e1e8f2", "type": "color" },
-    "200": { "value": "#c4d3e5", "type": "color" },
-    "300": { "value": "#9cb5d3", "type": "color" },
-    "400": { "value": "#4c6e9f", "type": "color" },
-    "500": { "value": "#14253e", "type": "color" },
-    "600": { "value": "#182c47", "type": "color" },
-    "700": { "value": "#16273e", "type": "color" },
-    "800": { "value": "#15243b", "type": "color" },
-    "900": { "value": "#0f1b2e", "type": "color" },
-    "950": { "value": "#09111e", "type": "color" }
+  // 1. Navy ramp anchored at navy-500 #14253e
+  const { L: lNavyAnchor, C: cNavyAnchor, H: hNavy } = hexToOklch('#14253e');
+  const navySteps = [
+    { step: '50', L: 0.96, C: 0.015 },
+    { step: '100', L: 0.88, C: 0.025 },
+    { step: '200', L: 0.76, C: 0.040 },
+    { step: '300', L: 0.62, C: 0.050 },
+    { step: '400', L: 0.485, C: 0.052 }, // Dark border.default >= 3:1 vs dark card & canvas
+    { step: '500', L: lNavyAnchor, C: cNavyAnchor, hex: '#14253e' },
+    { step: '600', L: 0.234, C: 0.045 },
+    { step: '700', L: 0.204, C: 0.038 },
+    { step: '800', L: 0.174, C: 0.030 },
+    { step: '900', L: 0.144, C: 0.022 },
+    { step: '950', L: 0.114, C: 0.015 }
+  ];
+  const navyRamp = {};
+  for (const s of navySteps) {
+    navyRamp[s.step] = {
+      value: s.hex || oklchToHex(s.L, s.C, hNavy),
+      type: 'color'
+    };
+  }
+
+  // 2. Gold ramp anchored at gold-400 #c49a3a
+  const { L: lGoldAnchor, C: cGoldAnchor, H: hGold } = hexToOklch('#c49a3a');
+  const goldSteps = [
+    { step: '50', L: 0.97, C: 0.02 },
+    { step: '100', L: 0.93, C: 0.04 },
+    { step: '200', L: 0.86, C: 0.08 },
+    { step: '300', L: 0.785, C: 0.11 }, // Dark accent (>= 4.5:1 on dark surfaces)
+    { step: '400', L: lGoldAnchor, C: cGoldAnchor, hex: '#c49a3a' },
+    { step: '500', L: 0.62, C: 0.11 },
+    { step: '600', L: 0.525, C: 0.10 }, // Text link (>= 4.5:1 on white and cream-100)
+    { step: '700', L: 0.43, C: 0.09 },
+    { step: '800', L: 0.34, C: 0.08 },
+    { step: '900', L: 0.25, C: 0.06 },
+    { step: '950', L: 0.16, C: 0.04 }
+  ];
+  const goldRamp = {};
+  for (const s of goldSteps) {
+    goldRamp[s.step] = {
+      value: s.hex || oklchToHex(s.L, s.C, hGold),
+      type: 'color'
+    };
+  }
+
+  // 3. Ink ramp anchored at ink-500 #1f1c13
+  const { L: lInkAnchor, C: cInkAnchor, H: hInk } = hexToOklch('#1f1c13');
+  const inkSteps = [
+    { step: '50', L: 0.96, C: 0.008 },
+    { step: '100', L: 0.88, C: 0.012 },
+    { step: '200', L: 0.74, C: 0.015 },
+    { step: '300', L: 0.58, C: 0.016 },
+    { step: '400', L: 0.40, C: 0.017 },
+    { step: '500', L: lInkAnchor, C: cInkAnchor, hex: '#1f1c13' },
+    { step: '600', L: 0.200, C: 0.015 },
+    { step: '700', L: 0.175, C: 0.013 },
+    { step: '800', L: 0.150, C: 0.011 },
+    { step: '900', L: 0.125, C: 0.009 },
+    { step: '950', L: 0.100, C: 0.007 }
+  ];
+  const inkRamp = {};
+  for (const s of inkSteps) {
+    inkRamp[s.step] = {
+      value: s.hex || oklchToHex(s.L, s.C, hInk),
+      type: 'color'
+    };
+  }
+
+  // 4. Cream ramp anchored at cream-100 #f8f3e8
+  const { L: lCreamAnchor, C: cCreamAnchor, H: hCream } = hexToOklch('#f8f3e8');
+  const creamSteps = [
+    { step: '50', L: 0.985, C: 0.010 },
+    { step: '100', L: lCreamAnchor, C: cCreamAnchor, hex: '#f8f3e8' },
+    { step: '200', L: 0.935, C: 0.018 },
+    { step: '300', L: 0.895, C: 0.022 }
+  ];
+  const creamRamp = {};
+  for (const s of creamSteps) {
+    creamRamp[s.step] = {
+      value: s.hex || oklchToHex(s.L, s.C, hCream),
+      type: 'color'
+    };
+  }
+
+  // 5. Neutral ramp tinted toward warm ink/navy hue (H=90, Chroma in 0.005-0.015)
+  const neutralSteps = [
+    { step: '50', L: 0.97 },
+    { step: '100', L: 0.93 },
+    { step: '200', L: 0.86 },
+    { step: '300', L: 0.78 },
+    { step: '400', L: 0.62 }, // Light border.default & Dark text.muted
+    { step: '500', L: 0.51 }, // Light text.muted (>= 4.5:1 on cream-100)
+    { step: '600', L: 0.43 }, // Light border.strong
+    { step: '700', L: 0.35 }, // Light text.secondary
+    { step: '800', L: 0.26 },
+    { step: '900', L: 0.18 },
+    { step: '950', L: 0.11 }
+  ];
+  const neutralRamp = {};
+  for (const s of neutralSteps) {
+    neutralRamp[s.step] = {
+      value: oklchToHex(s.L, 0.010, 90.0),
+      type: 'color'
+    };
+  }
+
+  // 6. Status ramps hue-tuned to brand with even OKLCH steps
+  const statusSpecs = {
+    success: { H: 145, cMax: 0.12 },
+    warning: { H: 75, cMax: 0.14 },
+    danger: { H: 25, cMax: 0.16 },
+    info: { H: 250, cMax: 0.11 }
   };
-
-  const goldRamp = {
-    "50": { "value": "#fdf9ee", "type": "color" },
-    "100": { "value": "#fbf2db", "type": "color" },
-    "200": { "value": "#f4e2b0", "type": "color" },
-    "300": { "value": "#deb853", "type": "color" },
-    "400": { "value": "#c49a3a", "type": "color" },
-    "500": { "value": "#b3892f", "type": "color" },
-    "600": { "value": "#8c671a", "type": "color" },
-    "700": { "value": "#6e4f10", "type": "color" },
-    "800": { "value": "#503908", "type": "color" },
-    "900": { "value": "#352403", "type": "color" },
-    "950": { "value": "#1e1400", "type": "color" }
+  const statusLSteps = {
+    '100': { L: 0.95, cScale: 0.15 },
+    '300': { L: 0.78, cScale: 0.75 },
+    '500': { L: 0.58, cScale: 1.00 },
+    '600': { L: 0.48, cScale: 0.90 },
+    '700': { L: 0.38, cScale: 0.80 },
+    '900': { L: 0.20, cScale: 0.40 }
   };
-
-  const inkRamp = {
-    "50": { "value": "#f8f6f0", "type": "color" },
-    "100": { "value": "#ede8dd", "type": "color" },
-    "200": { "value": "#dad2c0", "type": "color" },
-    "300": { "value": "#bfb49e", "type": "color" },
-    "400": { "value": "#9a8d75", "type": "color" },
-    "500": { "value": "#1f1c13", "type": "color" },
-    "600": { "value": "#1b1810", "type": "color" },
-    "700": { "value": "#17140e", "type": "color" },
-    "800": { "value": "#13100b", "type": "color" },
-    "900": { "value": "#0e0c08", "type": "color" },
-    "950": { "value": "#080705", "type": "color" }
-  };
-
-  const creamRamp = {
-    "50": { "value": "#fcfaf4", "type": "color" },
-    "100": { "value": "#f8f3e8", "type": "color" },
-    "200": { "value": "#f3ede0", "type": "color" },
-    "300": { "value": "#ece4d2", "type": "color" }
-  };
-
-  const neutralRamp = {
-    "50": { "value": "#faf8f5", "type": "color" },
-    "100": { "value": "#f3ede2", "type": "color" },
-    "200": { "value": "#e5ded0", "type": "color" },
-    "300": { "value": "#d5cdbd", "type": "color" },
-    "400": { "value": "#938a79", "type": "color" },
-    "500": { "value": "#6c6557", "type": "color" },
-    "600": { "value": "#5f574a", "type": "color" },
-    "700": { "value": "#474136", "type": "color" },
-    "800": { "value": "#312c24", "type": "color" },
-    "900": { "value": "#201c16", "type": "color" },
-    "950": { "value": "#14120e", "type": "color" }
-  };
-
-  const statusRamps = {
-    "success": {
-      "100": { "value": "#eef8f2", "type": "color" },
-      "300": { "value": "#6ee7b7", "type": "color" },
-      "500": { "value": "#198754", "type": "color" },
-      "600": { "value": "#146c43", "type": "color" },
-      "700": { "value": "#0f5132", "type": "color" },
-      "900": { "value": "#062817", "type": "color" }
-    },
-    "warning": {
-      "100": { "value": "#fef6e7", "type": "color" },
-      "300": { "value": "#fcd34d", "type": "color" },
-      "500": { "value": "#d97706", "type": "color" },
-      "600": { "value": "#b45309", "type": "color" },
-      "700": { "value": "#873b06", "type": "color" },
-      "900": { "value": "#361603", "type": "color" }
-    },
-    "danger": {
-      "100": { "value": "#fef2f2", "type": "color" },
-      "300": { "value": "#fca5a5", "type": "color" },
-      "500": { "value": "#dc2626", "type": "color" },
-      "600": { "value": "#b91c1c", "type": "color" },
-      "700": { "value": "#8f1414", "type": "color" },
-      "900": { "value": "#3a0909", "type": "color" }
-    },
-    "info": {
-      "100": { "value": "#edf5fd", "type": "color" },
-      "300": { "value": "#93c5fd", "type": "color" },
-      "500": { "value": "#1d6ec6", "type": "color" },
-      "600": { "value": "#15549a", "type": "color" },
-      "700": { "value": "#0f3d70", "type": "color" },
-      "900": { "value": "#091e3a", "type": "color" }
+  const statusRamps = {};
+  for (const [name, cfg] of Object.entries(statusSpecs)) {
+    statusRamps[name] = {};
+    for (const [step, lCfg] of Object.entries(statusLSteps)) {
+      statusRamps[name][step] = {
+        value: oklchToHex(lCfg.L, cfg.cMax * lCfg.cScale, cfg.H),
+        type: 'color'
+      };
     }
-  };
+  }
 
   const semanticLight = {
     // Surfaces
@@ -247,7 +218,7 @@ export function generateAllTokens() {
       "info-border": { "value": "{color.status.info.300}", "type": "color" }
     },
     // Focus ring
-    "focus-ring": { "value": "2px solid #8c671a", "type": "border" },
+    "focus-ring": { "value": "2px solid #856515", "type": "border" },
     // Elevation
     "elevation": {
       "0": { "value": "none", "type": "shadow" },
@@ -263,7 +234,7 @@ export function generateAllTokens() {
       "canvas": { "value": "{color.navy.950}", "type": "color" },
       "card": { "value": "{color.navy.900}", "type": "color" },
       "raised": { "value": "{color.navy.800}", "type": "color" },
-      "sunken": { "value": "#060b14", "type": "color" },
+      "sunken": { "value": "#020408", "type": "color" },
       "overlay": { "value": "{color.navy.800}", "type": "color" },
       "inverse": { "value": "{color.cream.100}", "type": "color" }
     },
@@ -307,13 +278,13 @@ export function generateAllTokens() {
       "info-border": { "value": "{color.status.info.700}", "type": "color" }
     },
     // Focus ring
-    "focus-ring": { "value": "2px solid #deb853", "type": "border" },
+    "focus-ring": { "value": "2px solid #dab362", "type": "border" },
     // Elevation
     "elevation": {
       "0": { "value": "none", "type": "shadow" },
-      "1": { "value": "0 0 0 1px rgba(76, 110, 159, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
-      "2": { "value": "0 0 0 1px rgba(76, 110, 159, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5)", "type": "shadow" },
-      "3": { "value": "0 0 0 1px rgba(76, 110, 159, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6)", "type": "shadow" }
+      "1": { "value": "0 0 0 1px rgba(77, 96, 125, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
+      "2": { "value": "0 0 0 1px rgba(77, 96, 125, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5)", "type": "shadow" },
+      "3": { "value": "0 0 0 1px rgba(77, 96, 125, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6)", "type": "shadow" }
     }
   };
 
