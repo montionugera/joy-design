@@ -12,7 +12,6 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   success?: boolean;
   message?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
-  type?: string;
   id?: string;
   name?: string;
   prefix?: React.ReactNode;

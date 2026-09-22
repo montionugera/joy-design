@@ -70,6 +70,11 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     const listboxId = `${selectId}-listbox`;
     const messageId = `${selectId}-message`;
 
+    const activeDescendantId =
+      open && activeIndex >= 0 && activeIndex < options.length
+        ? `${listboxId}-opt-${activeIndex}`
+        : undefined;
+
     const selectedOption = options.find((opt) => opt.value === currentValue);
 
     const handleSelectOption = (opt: SelectOption) => {
@@ -168,6 +173,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls={open ? listboxId : undefined}
+          aria-activedescendant={activeDescendantId}
           aria-invalid={error ? true : undefined}
           disabled={disabled}
           className={cx('joy-select', className)}
@@ -210,6 +216,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
               return (
                 <li
                   key={opt.value}
+                  id={`${listboxId}-opt-${i}`}
                   role="option"
                   aria-selected={isSelected}
                   className={cx(

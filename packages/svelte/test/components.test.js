@@ -436,3 +436,48 @@ test('Wave 2 B-L4: TreeSelect, Cascader, Transfer, Upload', () => {
   const upload = read('Upload');
   assert.ok(upload.includes('@joymify/icons'), 'Upload must import from @joymify/icons');
 });
+
+test('F-037 lane review: Mentions per-instance id, Rate readonly semantics, Select activedescendant', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+
+  const mentions = read('Mentions');
+  assert.ok(
+    !mentions.includes('id="mentions-dropdown"') && !mentions.includes("id='mentions-dropdown'"),
+    'Mentions dropdown id must not be a hardcoded literal'
+  );
+  assert.ok(mentions.includes('$props.id()'), 'Mentions must derive a per-instance id via $props.id()');
+  assert.ok(
+    mentions.includes('aria-controls={isOpen && filteredOptions.length > 0 ? dropdownId : undefined}'),
+    'Mentions textarea must wire aria-controls to the per-instance dropdown id'
+  );
+  assert.ok(mentions.includes('id={dropdownId}'), 'Mentions dropdown must render the per-instance id');
+  assert.ok(
+    mentions.includes('class="joy-textarea joy-mentions__textarea"'),
+    'Mentions textarea must carry both joy-textarea and joy-mentions__textarea classes'
+  );
+
+  const rate = read('Rate');
+  assert.ok(
+    !rate.includes('disabled={effectiveDisabled || readonly}'),
+    'Rate stars must not set native disabled from readonly'
+  );
+  assert.ok(rate.includes('disabled={effectiveDisabled}'), 'Rate stars disabled must reflect only real disabled');
+  assert.ok(
+    !rate.includes('effectiveDisabled || readonly ? -1'),
+    'Rate readonly must not remove stars from the tab order'
+  );
+  assert.ok(
+    rate.includes(`aria-readonly={readonly ? 'true' : undefined}`),
+    'Rate radiogroup must expose aria-readonly when readonly'
+  );
+
+  const select = read('Select');
+  assert.ok(
+    select.includes('aria-activedescendant={activeDescendantId}'),
+    'Select combobox must wire aria-activedescendant to the active option'
+  );
+  assert.ok(
+    select.includes('id="{listboxId}-opt-{i}"'),
+    'Select options must expose stable ids derived from the listbox id'
+  );
+});

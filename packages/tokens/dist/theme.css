@@ -3196,6 +3196,9 @@ h1, h2, h3, .joy-display {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.joy-mentions__textarea {
+  width: 100%;
+}
 .joy-mentions__dropdown {
   list-style: none;
   margin: 0;

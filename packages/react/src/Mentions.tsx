@@ -143,7 +143,7 @@ export const Mentions = React.forwardRef<HTMLDivElement, MentionsProps>(
       >
         <textarea
           ref={textareaRef}
-          className="joy-textarea"
+          className="joy-textarea joy-mentions__textarea"
           rows={rows}
           placeholder={placeholder}
           disabled={disabled}

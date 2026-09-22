@@ -431,3 +431,50 @@ test('Wave 2 C-L4: TreeSelect, Cascader, Transfer, Upload match contract', () =>
   assert.ok(upload.includes('@joymify/icons/react'), 'Upload must import @joymify/icons/react');
   assert.ok(!upload.includes('\u{1F4C1}'), 'Upload must not include emoji');
 });
+
+test('F-037 lane review: Mentions/Rate/Select twin parity, Input type, Segmented uncontrolled default', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('React.useId()'), 'Mentions must derive a per-instance id via React.useId()');
+  assert.ok(
+    mentions.includes("className=\"joy-textarea joy-mentions__textarea\""),
+    'Mentions textarea must carry both joy-textarea and joy-mentions__textarea classes'
+  );
+
+  const rate = read('Rate');
+  assert.ok(
+    !rate.includes('tabIndex={!isInteractive ? -1'),
+    'Rate readonly must not remove stars from the tab order'
+  );
+  assert.ok(rate.includes('tabIndex={disabled ? -1'), 'Rate tab order must depend only on real disabled');
+  assert.ok(rate.includes('disabled={disabled}'), 'Rate stars disabled must reflect only real disabled');
+  assert.ok(
+    rate.includes('aria-readonly={isReadOnly ? true : undefined}'),
+    'Rate radiogroup must expose aria-readonly when readonly'
+  );
+
+  const select = read('Select');
+  assert.ok(
+    select.includes('aria-activedescendant={activeDescendantId}'),
+    'Select combobox must wire aria-activedescendant to the active option'
+  );
+  assert.ok(
+    select.includes('id={`${listboxId}-opt-${i}`}'),
+    'Select options must expose stable ids derived from the listbox id'
+  );
+
+  const input = read('Input');
+  assert.ok(!input.includes('type?: string'), 'Input must not widen type to string');
+  assert.ok(!input.includes('type: string'), 'Input must not widen type to string');
+
+  const segmented = read('Segmented');
+  assert.ok(
+    !segmented.includes("normalizedOptions[0]?.value ?? ''"),
+    'Segmented must not auto-select the first option when uncontrolled'
+  );
+  assert.ok(
+    segmented.includes('React.useState<string | undefined>(defaultValue)'),
+    'Segmented uncontrolled state must start from defaultValue only'
+  );
+});

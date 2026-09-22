@@ -110,6 +110,7 @@ export const Rate = React.forwardRef<HTMLDivElement, RateProps>(
         )}
         role="radiogroup"
         aria-label={label || 'Rating'}
+        aria-readonly={isReadOnly ? true : undefined}
         onKeyDown={handleKeyDown}
         onMouseLeave={() => {
           if (isInteractive) setHoverValue(null);
@@ -138,7 +139,7 @@ export const Rate = React.forwardRef<HTMLDivElement, RateProps>(
                 activeValue === starNumber || (allowHalf && activeValue === starNumber - 0.5)
               }
               aria-label={`${starNumber} of ${count}`}
-              tabIndex={!isInteractive ? -1 : starNumber === activeFocusStar ? 0 : -1}
+              tabIndex={disabled ? -1 : starNumber === activeFocusStar ? 0 : -1}
               disabled={disabled}
               onMouseMove={(e) => handleMouseMove(e, starNumber)}
               onClick={(e) => {

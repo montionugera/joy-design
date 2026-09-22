@@ -90,6 +90,7 @@
   class="joy-rate {effectiveDisabled ? 'joy-rate--disabled' : ''} {readonly ? 'joy-rate--readonly' : ''} {className}"
   role="radiogroup"
   aria-label={label || 'Rating'}
+  aria-readonly={readonly ? 'true' : undefined}
   onmouseleave={handleMouseLeave}
   onkeydown={handleKeyDown}
   {...rest}
@@ -100,7 +101,7 @@
     {@const isHalf = !isFull && displayValue >= starVal - 0.5}
     {@const isChecked = value === starVal || (allowHalf && value === starVal - 0.5)}
     {@const activeStar = Math.ceil(value || 1)}
-    {@const tabIndex = effectiveDisabled || readonly ? -1 : (starVal === activeStar ? 0 : -1)}
+    {@const tabIndex = effectiveDisabled ? -1 : (starVal === activeStar ? 0 : -1)}
     <button
       type="button"
       role="radio"
@@ -108,7 +109,7 @@
       aria-checked={isChecked}
       aria-label={`${starVal} of ${count}`}
       tabindex={tabIndex}
-      disabled={effectiveDisabled || readonly}
+      disabled={effectiveDisabled}
       onmousemove={(e) => handleMouseMove(e, i)}
       onclick={() => {
         if (!allowHalf) {

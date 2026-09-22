@@ -295,7 +295,7 @@ export function svelteProps(src) {
   return names;
 }
 
-export function reactProps(componentName, src) {
+export function reactPropsExplicit(componentName, src) {
   const declRegex = new RegExp(`export\\s+interface\\s+${componentName}Props\\b`);
   const match = src.match(declRegex);
   const startIdx = match ? match.index : -1;
@@ -307,6 +307,11 @@ export function reactProps(componentName, src) {
     const raw = m[1];
     names.add(NORMALISE[raw] || raw);
   }
+  return names;
+}
+
+export function reactProps(componentName, src) {
+  const names = new Set(reactPropsExplicit(componentName, src));
   const extendsRegex = new RegExp(
     `export\\s+interface\\s+${componentName}Props\\s+extends\\s+[^{]*React\\.\\w*HTMLAttributes`
   );
@@ -346,6 +351,7 @@ export function runParityCheck(options = {}) {
 
     const sProps = svelteProps(svelteSrc);
     const rProps = reactProps(comp, reactSrc);
+    const rPropsExplicit = reactPropsExplicit(comp, reactSrc);
 
     const contractProps = CONTRACT[comp] || [];
 
@@ -377,7 +383,10 @@ export function runParityCheck(options = {}) {
       const classesOnlySvelte = [...sClasses].filter((c) => !rClasses.has(c)).sort();
       const classesOnlyReact = [...rClasses].filter((c) => !sClasses.has(c)).sort();
       const propsOnlySvelte = [...sProps].filter((p) => !rProps.has(p)).sort();
-      const propsOnlyReact = [...rProps].filter((p) => !sProps.has(p)).sort();
+      const propsOnlyReact = [...rProps]
+        .filter((p) => !sProps.has(p))
+        .filter((p) => !HTML_INHERITED.includes(p) || rPropsExplicit.has(p))
+        .sort();
 
       const violationsCount =
         sUndefined.length +

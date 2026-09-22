@@ -42,9 +42,15 @@
   let activeIndex = $state(-1);
   let panelEl = $state<HTMLElement | null>(null);
 
+  const generatedId = $props.id();
   const selectedOption = $derived(options.find((o) => o.value === value));
   const selectedLabel = $derived(selectedOption ? selectedOption.label : '');
-  const listboxId = $derived(id ? `${id}-listbox` : undefined);
+  const listboxId = $derived(`${id || generatedId}-listbox`);
+  const activeDescendantId = $derived(
+    open && activeIndex >= 0 && activeIndex < options.length
+      ? `${listboxId}-opt-${activeIndex}`
+      : undefined
+  );
 
   function getFirstIndex(): number {
     return options.findIndex((o) => !o.disabled);
@@ -144,6 +150,7 @@
     aria-haspopup="listbox"
     aria-controls={listboxId}
     aria-invalid={error || undefined}
+    aria-activedescendant={activeDescendantId}
     onclick={toggleOpen}
     onkeydown={handleKeydown}
     {...rest}
@@ -164,6 +171,7 @@
     <ul bind:this={panelEl} id={listboxId} class="joy-select__listbox joy-overlay" role="listbox">
       {#each options as opt, i}
         <li
+          id="{listboxId}-opt-{i}"
           role="option"
           class="joy-select__option {i === activeIndex ? 'joy-select__option--active' : ''} {opt.disabled ? 'joy-select__option--disabled' : ''}"
           aria-selected={opt.value === value}

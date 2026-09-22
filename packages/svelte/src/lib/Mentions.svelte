@@ -13,6 +13,7 @@
     placeholder?: string;
     rows?: number;
     disabled?: boolean;
+    id?: string;
     onchange?: (val: string) => void;
     onselect?: (option: MentionOption) => void;
     class?: string;
@@ -28,6 +29,7 @@
     placeholder = '',
     rows = 3,
     disabled = false,
+    id,
     onchange,
     onselect,
     class: className = '',
@@ -35,6 +37,9 @@
     ref = $bindable(null),
     ...rest
   }: Props = $props();
+
+  const generatedId = $props.id();
+  const dropdownId = $derived(`${id || generatedId}-listbox`);
 
   let isOpen = $state(false);
   let filterText = $state('');
@@ -127,13 +132,14 @@
 
 <div
   bind:this={ref}
+  {id}
   class="joy-mentions {disabled ? 'joy-mentions--disabled' : ''} {className}"
   {style}
   {...rest}
 >
   <textarea
     bind:this={textareaEl}
-    class="joy-textarea"
+    class="joy-textarea joy-mentions__textarea"
     {rows}
     {placeholder}
     {disabled}
@@ -142,13 +148,13 @@
     onkeydown={handleKeyDown}
     aria-autocomplete="list"
     aria-expanded={isOpen}
-    aria-controls={isOpen && filteredOptions.length > 0 ? 'mentions-dropdown' : undefined}
+    aria-controls={isOpen && filteredOptions.length > 0 ? dropdownId : undefined}
   ></textarea>
 
   {#if isOpen && filteredOptions.length > 0}
     <ul
       bind:this={panelEl}
-      id="mentions-dropdown"
+      id={dropdownId}
       class="joy-mentions__dropdown"
       role="listbox"
     >

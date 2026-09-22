@@ -37,9 +37,7 @@ export const Segmented = React.forwardRef<HTMLDivElement, SegmentedProps>(
         : { label: String(opt), value: String(opt), disabled: false }
     );
 
-    const [internalValue, setInternalValue] = React.useState(
-      defaultValue ?? (normalizedOptions[0]?.value ?? '')
-    );
+    const [internalValue, setInternalValue] = React.useState<string | undefined>(defaultValue);
     const currentValue = value !== undefined ? value : internalValue;
 
     const buttonRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
