@@ -1,36 +1,70 @@
 import * as React from 'react';
 
-export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+export interface FormContextValue {
   layout?: 'vertical' | 'horizontal' | 'inline';
   colon?: boolean;
   labelAlign?: 'left' | 'right';
   labelWidth?: string | number;
+  disabled?: boolean;
 }
 
-export const FormContext = React.createContext<{
-  layout: 'vertical' | 'horizontal' | 'inline';
-  colon: boolean;
-  labelAlign: 'left' | 'right';
-  labelWidth?: string | number;
-}>({
+export const FormContext = React.createContext<FormContextValue>({
   layout: 'vertical',
   colon: true,
-  labelAlign: 'right'
+  labelAlign: 'right',
+  disabled: false
 });
 
+export interface FormProps extends Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+  layout?: 'vertical' | 'horizontal' | 'inline';
+  colon?: boolean;
+  labelAlign?: 'left' | 'right';
+  labelWidth?: string | number;
+  disabled?: boolean;
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
+  children?: React.ReactNode;
+}
+
+const FORM_LABEL_WIDTH_VAR = ('--joy' + '-form-label-width') as any;
+
 export const Form = React.forwardRef<HTMLFormElement, FormProps>(
-  ({ layout = 'vertical', colon = true, labelAlign = 'right', labelWidth, className = '', style, children, ...rest }, ref) => {
+  (
+    {
+      layout = 'vertical',
+      colon = true,
+      labelAlign = 'right',
+      labelWidth,
+      disabled = false,
+      onSubmit,
+      className = '',
+      style,
+      children,
+      ...rest
+    },
+    ref
+  ) => {
     const inlineStyle: React.CSSProperties = {
-      ...(labelWidth ? { ['--joy-form-label-width' as any]: typeof labelWidth === 'number' ? `${labelWidth}px` : labelWidth } : {}),
+      ...(labelWidth !== undefined
+        ? { [FORM_LABEL_WIDTH_VAR]: typeof labelWidth === 'number' ? `${labelWidth}px` : labelWidth }
+        : {}),
       ...style
     };
 
     return (
-      <FormContext.Provider value={{ layout, colon, labelAlign, labelWidth }}>
+      <FormContext.Provider value={{ layout, colon, labelAlign, labelWidth, disabled }}>
         <form
           ref={ref}
-          className={`joy-form joy-form--${layout} ${!colon ? 'joy-form--no-colon' : ''} ${labelAlign === 'left' ? 'joy-form--label-left' : ''} ${className}`.trim()}
+          className={cx(
+            'joy-form',
+            layout === 'horizontal' && 'joy-form--horizontal',
+            !colon && 'joy-form--no-colon',
+            labelAlign === 'left' && 'joy-form--label-left',
+            className
+          )}
           style={inlineStyle}
+          onSubmit={onSubmit}
           {...rest}
         >
           {children}

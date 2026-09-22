@@ -38,7 +38,7 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(select.includes('joy-select'), 'Select must render joy-select class');
 
   const checkbox = fs.readFileSync(path.resolve('./src/Checkbox.tsx'), 'utf8');
-  assert.ok(checkbox.includes('role="checkbox"'), 'Checkbox must implement accessible role=checkbox');
+  assert.ok(!checkbox.includes('role="checkbox"'), 'Checkbox must not duplicate native role=checkbox');
   assert.ok(checkbox.includes('React.forwardRef'), 'Checkbox must forwardRef to native input');
 
   const radio = fs.readFileSync(path.resolve('./src/RadioGroup.tsx'), 'utf8');
@@ -304,6 +304,38 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(landingPage.includes('FAQSection'), 'LandingPage must embed FAQSection');
   assert.ok(landingPage.includes('CTASection'), 'LandingPage must embed CTASection');
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
+});
+
+const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+const assertWave2 = (name) => {
+  const src = read(name);
+  assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+  assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+  assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+  assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+};
+
+test('Wave 2 C-L3: Checkbox, Switch, RadioGroup, Slider, Rate, Segmented, Form, FormItem', () => {
+  const c3Files = ['Checkbox', 'Switch', 'RadioGroup', 'Slider', 'Rate', 'Segmented', 'Form', 'FormItem'];
+  c3Files.forEach(assertWave2);
+
+  const checkbox = read('Checkbox');
+  assert.ok(checkbox.includes('indeterminate'), 'Checkbox must support indeterminate state');
+
+  const rate = read('Rate');
+  assert.ok(!rate.includes('★'), 'Rate must not include ★ glyph');
+
+  const radio = read('RadioGroup');
+  assert.ok(radio.includes('ArrowRight'), 'RadioGroup must support ArrowRight');
+
+  const segmented = read('Segmented');
+  assert.ok(segmented.includes('ArrowRight'), 'Segmented must support ArrowRight');
+
+  assert.ok(rate.includes('ArrowRight'), 'Rate must support ArrowRight');
+
+  const form = read('Form');
+  assert.ok(form.includes('createContext'), 'Form must export createContext FormContext');
+  assert.ok(form.includes('cx('), 'Form must use cx helper');
 });
 
 
