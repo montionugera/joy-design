@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { ChevronDown, ChevronRight, Close } from '@joymify/icons';
+	import { openOverlay } from './overlay-utils.js';
+
 	export interface CascaderOption {
 		value: string;
 		label: string;
@@ -17,8 +20,10 @@
 		changeOnSelect?: boolean;
 		class?: string;
 		style?: string;
+		ref?: HTMLDivElement | null;
 		displayRender?: (labels: string[]) => string;
 		onchange?: (value: string[], selectedOptions: CascaderOption[]) => void;
+		[key: string]: any;
 	}
 
 	let {
@@ -31,15 +36,33 @@
 		changeOnSelect = false,
 		class: className = '',
 		style = '',
+		ref = $bindable(null),
 		displayRender,
-		onchange
+		onchange,
+		...rest
 	}: Props = $props();
 
 	let open = $state(false);
 	let internalValue = $state<string[]>(defaultValue);
 	let selectedValue = $derived(value !== undefined ? value : internalValue);
 	let activePath = $state<CascaderOption[]>([]);
-	let containerEl: HTMLDivElement;
+	let focusedCol = $state(0);
+	let focusedVal = $state<string | null>(null);
+
+	let controlEl = $state<HTMLDivElement | null>(null);
+	let panelEl = $state<HTMLDivElement | null>(null);
+
+	$effect(() => {
+		if (!open || !controlEl || !panelEl) return;
+		const handle = openOverlay({
+			anchor: controlEl,
+			panel: panelEl,
+			onClose: () => {
+				open = false;
+			}
+		});
+		return () => handle.dispose();
+	});
 
 	$effect(() => {
 		if (open) {
@@ -55,6 +78,8 @@
 				}
 			}
 			activePath = path;
+			focusedCol = path.length > 0 ? Math.min(path.length - 1, columns.length - 1) : 0;
+			focusedVal = path.length > 0 ? path[focusedCol]?.value ?? null : (options[0]?.value ?? null);
 		}
 	});
 
@@ -73,6 +98,8 @@
 
 		const nextPath = [...activePath.slice(0, colIndex), option];
 		activePath = nextPath;
+		focusedCol = colIndex;
+		focusedVal = option.value;
 
 		const hasChildren = Boolean(option.children && option.children.length > 0);
 		if (!hasChildren || changeOnSelect) {
@@ -91,12 +118,69 @@
 		internalValue = [];
 		value = [];
 		activePath = [];
+		focusedVal = null;
 		onchange?.([], []);
 	}
 
-	function handleOutsideClick(e: MouseEvent) {
-		if (containerEl && !containerEl.contains(e.target as Node)) {
-			open = false;
+	function handleKeyDown(e: KeyboardEvent) {
+		if (disabled) return;
+
+		if (!open) {
+			if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+				e.preventDefault();
+				open = true;
+			}
+			return;
+		}
+
+		const currentColOptions = columns[focusedCol] || [];
+		const currentIdx = currentColOptions.findIndex((opt) => opt.value === focusedVal);
+
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			const nextIdx = currentIdx < currentColOptions.length - 1 ? currentIdx + 1 : 0;
+			const nextOpt = currentColOptions[nextIdx];
+			if (nextOpt) {
+				focusedVal = nextOpt.value;
+				if (changeOnSelect) {
+					handleSelectOption(nextOpt, focusedCol);
+				}
+			}
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			const prevIdx = currentIdx > 0 ? currentIdx - 1 : currentColOptions.length - 1;
+			const prevOpt = currentColOptions[prevIdx];
+			if (prevOpt) {
+				focusedVal = prevOpt.value;
+				if (changeOnSelect) {
+					handleSelectOption(prevOpt, focusedCol);
+				}
+			}
+		} else if (e.key === 'ArrowRight') {
+			e.preventDefault();
+			const currentOpt = currentColOptions[currentIdx];
+			if (currentOpt && currentOpt.children && currentOpt.children.length > 0) {
+				if (activePath[focusedCol]?.value !== currentOpt.value) {
+					handleSelectOption(currentOpt, focusedCol);
+				}
+				if (columns.length > focusedCol + 1) {
+					focusedCol = focusedCol + 1;
+					const nextColOptions = columns[focusedCol] || [];
+					focusedVal = nextColOptions[0]?.value ?? null;
+				}
+			}
+		} else if (e.key === 'ArrowLeft') {
+			e.preventDefault();
+			if (focusedCol > 0) {
+				focusedCol = focusedCol - 1;
+				focusedVal = activePath[focusedCol]?.value ?? (columns[focusedCol]?.[0]?.value ?? null);
+			}
+		} else if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			const currentOpt = currentColOptions[currentIdx];
+			if (currentOpt) {
+				handleSelectOption(currentOpt, focusedCol);
+			}
 		}
 	}
 
@@ -117,100 +201,83 @@
 	});
 </script>
 
-<svelte:window onmousedown={handleOutsideClick} />
-
 <div
-	bind:this={containerEl}
-	class="joy-cascader {disabled ? 'joy-cascader--disabled' : ''} {className}"
-	style="position: relative; display: inline-block; width: 100%; {style}"
+	bind:this={ref}
+	class="joy-cascader {disabled ? 'joy-cascader--disabled' : ''} {open ? 'joy-cascader--open' : ''} {className}"
+	{style}
+	{...rest}
 >
 	<!-- Selector Input Trigger -->
 	<div
+		bind:this={controlEl}
 		role="combobox"
 		aria-expanded={open}
 		aria-haspopup="listbox"
 		tabindex={disabled ? -1 : 0}
+		class="joy-cascader__control"
 		onclick={() => !disabled && (open = !open)}
-		onkeydown={(e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				e.preventDefault();
-				open = !open;
-			} else if (e.key === 'Escape') {
-				open = false;
-			}
-		}}
-		style="display: flex; align-items: center; justify-content: space-between; min-height: 36px; padding: 4px 10px; border: 1px solid var(--joy-border, #23354e); border-radius: 6px; background-color: var(--joy-surface-card, #14253e); color: var(--joy-text-primary, #f8f3e8); cursor: {disabled ? 'not-allowed' : 'pointer'}; box-sizing: border-box;"
+		onkeydown={handleKeyDown}
 	>
-		<span style="font-size: 13px; color: {displayLabel ? 'inherit' : '#94a3b8'};">
-			{displayLabel || placeholder}
-		</span>
+		{#if displayLabel}
+			<span class="joy-cascader__value">{displayLabel}</span>
+		{:else}
+			<span class="joy-cascader__placeholder">{placeholder}</span>
+		{/if}
 
-		<div style="display: flex; align-items: center; gap: 6px;">
-			{#if allowClear && selectedValue.length > 0 && !disabled}
-				<button
-					type="button"
-					onclick={handleClear}
-					title="Clear selection"
-					aria-label="Clear selection"
-					style="border: none; background: transparent; color: #94a3b8; cursor: pointer; padding: 0;"
-				>
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-						<line x1="18" y1="6" x2="6" y2="18" />
-						<line x1="6" y1="6" x2="18" y2="18" />
-					</svg>
-				</button>
-			{/if}
-
-			<svg
-				width="14"
-				height="14"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				aria-hidden="true"
-				style="transform: {open ? 'rotate(180deg)' : 'none'}; transition: transform 0.2s ease; color: #94a3b8;"
+		{#if allowClear && selectedValue.length > 0 && !disabled}
+			<button
+				type="button"
+				class="joy-cascader__clear"
+				aria-label="Clear selection"
+				onclick={handleClear}
 			>
-				<polyline points="6 9 12 15 18 9" />
-			</svg>
-		</div>
+				<Close />
+			</button>
+		{/if}
+
+		<span class="joy-cascader__arrow">
+			<ChevronDown />
+		</span>
 	</div>
 
 	<!-- Multi-column Cascader Panels -->
 	{#if open}
 		<div
+			bind:this={panelEl}
 			role="listbox"
-			aria-label="Cascader option panels"
-			class="joy-cascader-menus"
-			style="position: absolute; top: calc(100% + 4px); left: 0; z-index: 1000; display: flex; border-radius: 6px; background-color: var(--joy-surface-card, #14253e); border: 1px solid var(--joy-border, #23354e); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); overflow: hidden;"
+			aria-label="Cascader options"
+			class="joy-cascader__panel"
+			tabindex="-1"
+			onkeydown={handleKeyDown}
 		>
-			{#each columns as colOptions, colIdx}
-				<ul
-					role="group"
-					style="list-style: none; margin: 0; padding: 4px; min-width: 140px; max-height: 220px; overflow-y: auto; border-right: {colIdx < columns.length - 1 ? '1px solid var(--joy-border, #23354e)' : 'none'};"
-				>
-					{#each colOptions as option (option.value)}
-						{@const isActive = activePath[colIdx]?.value === option.value}
-						{@const hasChildren = Boolean(option.children && option.children.length > 0)}
+			<div class="joy-cascader__columns">
+				{#each columns as colOptions, colIdx}
+					<ul role="menu" class="joy-cascader__column">
+						{#each colOptions as option (option.value)}
+							{@const isActive = activePath[colIdx]?.value === option.value}
+							{@const isFocused = focusedCol === colIdx && focusedVal === option.value}
+							{@const hasChildren = Boolean(option.children && option.children.length > 0)}
 
-						<li
-							role="option"
-							aria-selected={isActive}
-							onclick={() => handleSelectOption(option, colIdx)}
-							style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 4px; font-size: 13px; cursor: {option.disabled ? 'not-allowed' : 'pointer'}; opacity: {option.disabled ? 0.5 : 1}; background-color: {isActive ? 'rgba(196, 154, 58, 0.15)' : 'transparent'}; color: {isActive ? 'var(--gold-400, #c49a3a)' : 'var(--joy-text-primary, #f8f3e8)'}; transition: background-color 0.15s ease;"
-						>
-							<span>{option.label}</span>
-							{#if hasChildren}
-								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<polyline points="9 18 15 12 9 6" />
-								</svg>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/each}
+							<li
+								role="menuitem"
+								tabindex={isFocused || isActive ? 0 : -1}
+								aria-expanded={hasChildren ? isActive : undefined}
+								aria-disabled={option.disabled ? true : undefined}
+								class="joy-cascader__item {isActive || isFocused ? 'joy-cascader__item--active' : ''}"
+								onclick={() => handleSelectOption(option, colIdx)}
+							>
+								<span>{option.label}</span>
+								{#if hasChildren}
+									<span class="joy-cascader__item-arrow">
+										<ChevronRight />
+									</span>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				{/each}
+			</div>
 		</div>
 	{/if}
 </div>
+
