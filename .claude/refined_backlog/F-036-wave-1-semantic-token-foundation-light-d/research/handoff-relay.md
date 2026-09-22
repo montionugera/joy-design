@@ -43,3 +43,14 @@ Confirmed clean: all 62 legacy `--joy-*` names survive; Tailwind export correct 
 purple=0 hex-literals-in-build.js=4 dark-joy-selectors=0 background-clip-text=0 slate-94a3b8=0
 ```
 - Next: dispatch the fix commit (recipe above), then Phase C.
+
+## Wave-level reviews on 9768557..72ee718 (2026-09-22)
+- code-reviewer: SHIP. All 5 spec acceptance criteria PASS (8/8 token tests, lint --strict exit 0, tailwind export names, hub build + 10/10 Playwright contracts, 4 screenshots). lint-colors.allow has no active lines.
+- visual taste (impeccable lens): FIX. Dark navy ramp compressed against black (navy-950 #03050a, sunken #020408) -> inset surfaces read as black holes. Light mode production-grade; gold button and cream text on dark pass. Fixed in the follow-up commit.
+
+## typescript-reviewer (wave-level)
+- MEDIUM | packages/tokens/build.js:34-36 | `resolveRef` silently returns the raw `{ref}` string when a ref resolves to a group/non-value node. Fix: throw an Error naming the ref and the token path so a malformed ref fails the build.
+- MEDIUM | apps/storybook-hub/playwright.config.ts:6 | default PLAYWRIGHT_PORT 6006 collides with the zen-ui Storybook dev port and `reuseExistingServer: !CI` can attach to an unrelated server. Fix: default to an uncommon port (6116) in the config, keep the env override, and have scripts/precheck.sh and scripts/epic-check.sh export PLAYWRIGHT_PORT=6116 explicitly.
+- LOW | packages/tokens/scripts/sweep-literals.mjs:511-516 | catch-all rgba -> elevation-1 remap is property-blind. One-shot migration script; add a header comment stating it is not re-runnable and leave the logic.
+- LOW | screens-f036.spec.ts skips without F036_SCREENS=1 by design (plan C3). No change.
+- OK: OKLCH round-trip exact for #14253e; contrast gate last-wins parsing; index.d.ts passes `tsc --noEmit --strict`.
