@@ -36,6 +36,7 @@ run_playwright_contracts() {
 
 echo "==> Epic design-system check <=="
 run_step "color lint" bash scripts/lint-colors.sh
+run_step "parity check" node scripts/parity-check.mjs
 run_step "pnpm workspace tests" pnpm -r test
 run_step "Storybook Hub build" node apps/storybook-hub/build.js
 if ! run_playwright_contracts; then

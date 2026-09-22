@@ -212,4 +212,51 @@ Verdict: **PASS (Clean)**
 
 Verdict: **PASS (Clean)**
 
+---
+
+# Quality Gate Review: Phase A (Task A6)
+
+## Scope
+- Task A6: Parity contract script (`scripts/parity-check.mjs`), gate wiring in `scripts/epic-check.sh`, wave-2 test assertions in `packages/tokens/test/wave-2.test.js`.
+
+## Reviewers
+- code-reviewer (adversarial review: class regex boundaries, hole replacement safety, contract completeness)
+- typescript-reviewer (prop normalization, AST/interface regex robustness, HTMLAttributes inheritance)
+
+## Findings & Verifications
+
+### 1. Parity Contract Completeness & Accuracy
+- `COMPONENTS` array contains exactly 21 Wave 2 controls in canonical order.
+- `CONTRACT` defines exact framework-neutral prop lists for all 21 components (matching `plan.md` lines 68-88).
+- `NORMALISE` maps event handlers and `class` (`onchange` -> `onChange`, `oninput` -> `onInput`, `class` -> `className`, etc.).
+- `HTML_INHERITED` accurately credits props inherited when React components declare `extends ... React.<X>HTMLAttributes` (including `Omit<React.InputHTMLAttributes, 'type'>`).
+
+### 2. Class Name Extraction & Hole Sanitization
+- `classes(src)` safely replaces variable interpolation holes (`${...}`, `{...}`) with `*` without stripping class literals inside ternary/quoted expressions.
+- Dropping tokens ending in `-` or `--` cleanly avoids false positives on dynamic prefixes like `joy-button--` or `joy-form--`.
+- Correctly surfaces missing classes from `theme.css` across both frameworks (`joy-color-text-muted`, `joy-border`, `joy-surface-card`, `joy-button--primary`, `joy-form-label-width`, `joy-editor-btn`, etc.), reproducing the documented issues in RXF-054..077 and RXF-094..106.
+
+### 3. Dual-Mode Reporting & Exit Codes
+- `--side svelte`: reports Svelte-side undefined classes and missing contract props (exits 1 on current pre-lane codebase, 64 violations found).
+- `--side react`: reports React-side undefined classes and missing contract props (exits 1 on current pre-lane codebase, 52 violations found).
+- Twin mode (default): reports undefined classes, missing contract props, and bidirectional differences (classes/props only in Svelte or React).
+- `--json`: outputs machine-readable JSON structure.
+- Markdown table output renders structured, scannable tables.
+
+### 4. Gate Integration & Test Suite
+- `scripts/epic-check.sh` incorporates `run_step "parity check" node scripts/parity-check.mjs` immediately following color lint.
+- `packages/tokens/test/wave-2.test.js` asserts `scripts/parity-check.mjs` exists, exports `COMPONENTS`, and verifies length is exactly 21.
+
+### 5. Automated Verification Verdict
+- `node scripts/parity-check.mjs --side svelte`: exit code 1 (clean failure with 64 actionable violations)
+- `node scripts/parity-check.mjs --side react`: exit code 1 (clean failure with 52 actionable violations)
+- `pnpm --filter @joymify/tokens test`: 18/18 tests pass (exit code 0)
+- `bash scripts/lint-colors.sh`: clean, strict checks pass (exit code 0)
+- `node apps/storybook-hub/build.js`: exit code 0
+- `pnpm --filter @joymify/svelte test`: 16/16 tests pass (exit code 0)
+- `pnpm --filter @joymify/react test`: 16/16 tests pass (exit code 0)
+
+Verdict: **PASS (Clean)**
+
+
 
