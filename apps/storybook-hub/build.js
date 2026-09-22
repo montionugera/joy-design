@@ -153,15 +153,15 @@ ${inlinedThemeCss}
     .brand-logo {
       width: 34px;
       height: 34px;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      background: var(--joy-accent-default);
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
+      color: var(--joy-text-on-accent);
       font-weight: 700;
       font-size: 1.1rem;
-      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+      box-shadow: var(--joy-elevation-1);
     }
     .brand-info h2 {
       margin: 0;
@@ -207,8 +207,8 @@ ${inlinedThemeCss}
       color: var(--joy-color-text-primary, #0f172a);
     }
     .nav-item.active {
-      background: #ede9fe;
-      color: var(--joy-color-brand-primary, #7c3aed);
+      background: var(--joy-accent-subtle);
+      color: var(--joy-accent-text);
       font-weight: 600;
     }
     .nav-item .icon {
@@ -528,8 +528,8 @@ ${inlinedThemeCss}
       color: #f8fafc;
     }
     [data-theme="dark"] .nav-item.active {
-      background: #2e1065;
-      color: #c084fc;
+      background: var(--joy-accent-subtle);
+      color: var(--joy-accent-text);
     }
     [data-theme="dark"] .topbar {
       background: rgba(15, 23, 42, 0.85);

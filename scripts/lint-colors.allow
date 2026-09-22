@@ -1,0 +1,3 @@
+# One regex per line. Keep entries narrow and explain the CSS-variable source.
+# chart-core.ts has no getComputedStyle-derived canvas colors in Wave 1, so it
+# intentionally has no allowlist entry yet.

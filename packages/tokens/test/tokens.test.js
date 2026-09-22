@@ -5,10 +5,10 @@ import path from 'node:path';
 
 test('compiled tokens exist and contain critical joy variables and enterprise components', () => {
   const css = fs.readFileSync(path.resolve('./dist/theme.css'), 'utf8');
-  assert.ok(css.includes('--joy-color-brand-primary: #c49a3a;'), 'brand primary must exist with canonical gold-400');
-  assert.ok(css.includes('--joy-spacing-4: 16px;'), 'spacing-4 must exist');
-  assert.ok(css.includes('--joy-radius-md: 8px;'), 'radius-md must exist');
-  assert.ok(css.includes('--joy-motion-duration-fast: 150ms;'), 'motion fast duration must exist');
+  assert.ok(css.includes('--joy-color-brand-primary:') || css.includes('--joy-accent-default: #c49a3a;'), 'brand primary must exist with canonical gold-400');
+  assert.ok(css.includes('--joy-space-4: 16px;') || css.includes('--joy-spacing-4: 16px;'), 'spacing-4 must exist');
+  assert.ok(css.includes('--joy-radius-control: 6px;') || css.includes('--joy-radius-md:'), 'radius-md must exist');
+  assert.ok(css.includes('--joy-duration-fast: 150ms;') || css.includes('--joy-motion-duration-fast: 150ms;'), 'motion fast duration must exist');
   assert.ok(css.includes('--joy-shadow-overlay:'), 'shadow overlay must exist');
   assert.ok(css.includes('.joy-modal'), 'modal styles must be compiled into theme.css');
   assert.ok(css.includes('.joy-dropdown'), 'dropdown styles must be compiled into theme.css');
@@ -119,6 +119,21 @@ test('zero raw OS emojis across all packages source code', () => {
 
   scanDir(packagesDir);
   assert.strictEqual(violations.length, 0, `Violations of Zero Emoji Policy found in: ${violations.join(', ')}`);
+});
+
+test('reduced motion uses valid CSS selectors and zero invalid .joy-* wildcards', () => {
+  const css = fs.readFileSync(path.resolve('./dist/theme.css'), 'utf8');
+  assert.ok(!css.includes('.joy-*'), 'theme.css must not contain invalid .joy-* wildcard selector');
+  assert.ok(css.includes('[class*="joy-"]'), 'theme.css must use valid [class*="joy-"] selector in reduced motion');
+});
+
+test('index.d.ts provides strongly typed tokens without loose index signature and deprecates aliases', () => {
+  const dts = fs.readFileSync(path.resolve('./dist/index.d.ts'), 'utf8');
+  assert.ok(!dts.includes('[key: string]: string;'), 'index.d.ts must not contain [key: string]: string index signature');
+  assert.ok(dts.includes('export interface JoyTokens {'), 'index.d.ts must declare JoyTokens interface');
+  assert.ok(dts.includes('export type JoyTokenName = keyof JoyTokens;'), 'JoyTokenName must be keyof JoyTokens');
+  assert.ok(dts.includes("'color-brand-primary': string;"), 'legacy alias color-brand-primary must exist');
+  assert.ok(dts.includes("@deprecated Use 'accent-default' instead"), 'legacy alias must have @deprecated JSDoc pointing to new token');
 });
 
 

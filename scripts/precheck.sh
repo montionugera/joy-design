@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-6116}"
+
 echo "==> Gate 1: Deterministic Precheck <=="
 
 echo "1. Validating Zero Emoji Policy in source files..."
@@ -28,10 +30,13 @@ if violations:
 "
 echo "   Zero emoji policy verified."
 
-echo "2. Compiling Storybook Hub..."
+echo "2. Checking color-token integrity..."
+bash scripts/lint-colors.sh
+
+echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js
 
-echo "3. Running Playwright Quality Contracts..."
+echo "4. Running Playwright Quality Contracts..."
 if command -v playwright >/dev/null 2>&1; then
   (cd apps/storybook-hub && playwright test)
 elif [ -f "node_modules/.bin/playwright" ]; then
