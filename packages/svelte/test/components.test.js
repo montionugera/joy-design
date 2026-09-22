@@ -286,6 +286,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 });
 
 test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker', () => {
+test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
   const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
   const assertWave2 = (name) => {
     const src = read(name);
@@ -329,5 +330,22 @@ test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePick
   const dateRangePicker = read('DateRangePicker');
   assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
 });
+
+  for (const comp of ['TimePicker', 'Mentions', 'MarkdownEditor']) {
+    assertWave2(comp);
+  }
+
+  const timePicker = read('TimePicker');
+  assert.ok(timePicker.includes('openOverlay'), 'TimePicker must include openOverlay');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('openOverlay'), 'Mentions must include openOverlay');
+  assert.ok(!mentions.includes('setTimeout'), 'Mentions must not include setTimeout');
+
+  const md = read('MarkdownEditor');
+  assert.ok(md.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
+  assert.ok(md.includes('@joymify/icons'), 'MarkdownEditor must include @joymify/icons');
+});
+
 
 
