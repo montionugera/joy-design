@@ -260,3 +260,8 @@ Verdict: **PASS (Clean)**
 
 
 
+
+## Phase A gate (A1-A6, diff 72e77bf..dd8dc06) — 2026-09-22 23:35
+- code-reviewer: APPROVE, 0 CRITICAL/HIGH/MEDIUM. LOW process note: dark surface.raised/border.subtle remap in ramps.mjs came from the F-036 sync (69572f6, 7287f28), not A1; contrast tests green.
+- typescript-reviewer: overlay-utils byte-identical, useOverlay cleanup/StrictMode safe, SSR guards present. Flagged epic-check.sh red due to the parity step: by design (A6.3 baseline exit 1; lanes B/C close it, D3 wires precheck). No code change.
+- Refactor: none required. Re-verify at dd8dc06: tokens 18/18, svelte 16/16, react 16/16, lint-colors 0, hub build 0.

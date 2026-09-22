@@ -2,7 +2,7 @@
 # usage: dispatch-f037.sh <TASK_ID> <agent: codex|agy|auto> [extra note]
 set -uo pipefail
 TASK="$1"; AGENT="${2:-codex}"; NOTE="${3:-}"
-W=/Users/pasitnusso/workspace/repos/joy-design/.claude/worktrees/F-037-wave-2-hero-grade-button-and-form-contro
+W="${LANE_W:-/Users/pasitnusso/workspace/repos/joy-design/.claude/worktrees/F-037-wave-2-hero-grade-button-and-form-contro}"
 F=$W/.claude/refined_backlog/F-037-wave-2-hero-grade-button-and-form-contro
 S=$(dirname "$0")
 LOG=/tmp/f037-$TASK-$(date +%H%M%S).log
