@@ -291,7 +291,7 @@ test('Wave 2 B-L4: TreeSelect, Cascader, Transfer, Upload', () => {
     const src = read(name);
     assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
     assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
-    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2605}\u{2606}→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
     assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
   };
 
