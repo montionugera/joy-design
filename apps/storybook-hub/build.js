@@ -37,6 +37,104 @@ const iconCardsHtml = fs.existsSync(iconsSrcDir)
 const manifestPath = path.join(__dirname, 'src/navigation.manifest.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
+const chevronRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+const chevronDown = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+const closeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>`;
+const star = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 8.9 8.3 12 2"/></svg>`;
+const spinner = `<span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg></span>`;
+
+function renderButtonMatrix() {
+  const variants = ["solid", "outline", "ghost", "danger", "link"];
+  const sizes = ["sm", "md", "lg"];
+  const states = ["default", "hover", "focus", "active", "disabled", "loading"];
+  const buttons = variants
+    .flatMap((variant) =>
+      sizes.flatMap((size) =>
+        states.map((state) => {
+          const loading = state === "loading";
+          const disabled = state === "disabled" ? " disabled" : "";
+          return `<button type="button" class="joy-button joy-button--${variant} joy-button--${size}${loading ? " joy-button--loading" : ""}"${loading ? ' aria-busy="true"' : ""}${disabled} data-state="${state}"><span class="joy-button__label">${variant} ${size} ${state}</span>${loading ? spinner : ""}</button>`;
+        }),
+      ),
+    )
+    .join("");
+
+  return `<div class="component-canvas" data-matrix="button" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: var(--joy-space-3);">
+    ${buttons}
+    <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--icon-only" aria-label="Continue"><span class="joy-button__icon joy-button__icon--end">${chevronRight}</span></button>
+    <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--block"><span class="joy-button__label">Block action</span></button>
+  </div>`;
+}
+
+function renderFormsMatrix() {
+  const inputStates = ["default", "error", "success", "disabled", "readonly"];
+  const inputSizes = ["sm", "md", "lg"];
+  const inputRows = inputSizes
+    .flatMap((size) =>
+      inputStates.map((state) => {
+        const stateClass =
+          state === "default" ? "" : ` joy-input-wrapper--${state}`;
+        const disabled = state === "disabled" ? " disabled" : "";
+        const readonly = state === "readonly" ? " readonly" : "";
+        const message =
+          state === "error" || state === "success"
+            ? `<p class="joy-input-wrapper__message" id="input-${size}-${state}-message">${state === "error" ? "Enter a valid value" : "Value confirmed"}</p>`
+            : "";
+        return `<div class="joy-input-wrapper joy-input-wrapper--${size}${stateClass}">
+      <span class="joy-input-wrapper__prefix" aria-hidden="true">$</span>
+      <input class="joy-input" id="input-${size}-${state}" placeholder="${size} ${state}"${disabled}${readonly}${state === "error" ? ' aria-invalid="true" aria-describedby="input-' + size + "-" + state + '-message"' : ""}>
+      <span class="joy-input-wrapper__suffix" aria-hidden="true">USD</span>${message}
+    </div>`;
+      }),
+    )
+    .join("");
+
+  const numberControl = (
+    label,
+    state = "",
+  ) => `<div><p>${label}</p><div class="joy-input-number joy-input-number--md${state ? ` joy-input-number--${state}` : ""}">
+    <input class="joy-input-number__input" type="text" inputmode="decimal" role="spinbutton" aria-valuenow="10" aria-valuemin="1" aria-valuemax="100" value="10">
+    <div class="joy-input-number__handler-wrap"><button type="button" class="joy-input-number__handler-up" aria-label="Increase" tabindex="-1">${chevronDown}</button><button type="button" class="joy-input-number__handler-down" aria-label="Decrease" tabindex="-1">${chevronDown}</button></div>
+  </div></div>`;
+  const option = (text, selected = false, disabled = false) =>
+    `<li class="joy-select__option${selected ? " joy-select__option--active" : ""}${disabled ? " joy-select__option--disabled" : ""}" role="option" aria-selected="${selected}"${disabled ? ' aria-disabled="true"' : ""}>${text}</li>`;
+  const checkbox = (label, attrs = "", modifier = "") =>
+    `<label class="joy-checkbox${modifier}"><input type="checkbox"${attrs}><span class="joy-checkbox__box"></span><span class="joy-checkbox__label">${label}</span></label>`;
+  const radio = (label, checked = false, disabled = false) =>
+    `<label class="joy-radio${disabled ? " joy-radio--disabled" : ""}"><input type="radio" name="matrix-radio"${checked ? ' checked tabindex="0"' : ' tabindex="-1"'}${disabled ? " disabled" : ""}><span class="joy-radio__circle"></span><span class="joy-radio__label">${label}</span></label>`;
+  const switchControl = (
+    label,
+    checked = false,
+    disabled = false,
+    size = "md",
+  ) =>
+    `<button type="button" class="joy-switch joy-switch--${size}${checked ? " joy-switch--checked" : ""}" role="switch" aria-checked="${checked}"${disabled ? " disabled" : ""}><span class="joy-switch__thumb"></span><span class="joy-switch__label">${label}</span></button>`;
+  const sheetDemo = (content, sheet = false) =>
+    `<div class="hub-sheet-demo"${sheet ? " data-sheet-demo" : ""} style="position: relative; min-height: 360px; transform: translateZ(0);">${content}</div>`;
+
+  return `<div class="component-canvas" data-matrix="forms" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: var(--joy-space-3); align-items: start;">
+    <section><h3>Input states and sizes</h3>${inputRows}</section>
+    <section><h3>InputNumber</h3>${numberControl("Default")}${numberControl("Error", "error")}</section>
+    <section><h3>Select</h3>
+      <div class="joy-select-wrapper joy-select-wrapper--md"><button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox"><span class="joy-select__value">Balanced</span><span class="joy-select__arrow">${chevronDown}</span></button></div>
+      <div class="joy-select-wrapper joy-select-wrapper--md joy-select-wrapper--error"><button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-invalid="true"><span class="joy-select__placeholder">Choose a strategy</span><span class="joy-select__arrow">${chevronDown}</span></button><p class="joy-select-wrapper__message">Select a strategy</p></div>
+      <div class="joy-select-wrapper joy-select-wrapper--md joy-select-wrapper--disabled"><button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox" disabled><span class="joy-select__value">Disabled</span><span class="joy-select__arrow">${chevronDown}</span></button></div>
+      ${sheetDemo(`<div class="joy-select-wrapper joy-select-wrapper--md joy-select-wrapper--open"><button type="button" class="joy-select" role="combobox" aria-expanded="true" aria-haspopup="listbox" aria-controls="matrix-select-listbox"><span class="joy-select__value">Balanced</span><span class="joy-select__arrow">${chevronDown}</span></button><ul class="joy-select__listbox joy-overlay joy-overlay--sheet" id="matrix-select-listbox" role="listbox">${option("Balanced", true)}${option("Conservative")}${option("Unavailable", false, true)}</ul></div>`, true)}
+    </section>
+    <section><h3>Checkbox and switch</h3>${checkbox("Unchecked")}${checkbox("Checked", " checked")}${checkbox("Indeterminate", ' data-indeterminate="true"', " joy-checkbox--indeterminate")}${checkbox("Disabled", " disabled", " joy-checkbox--disabled")}${switchControl("Off")}${switchControl("On", true)}${switchControl("Disabled", false, true)}${switchControl("Small", true, false, "sm")}</section>
+    <section><h3>RadioGroup and slider</h3><div class="joy-radio-group" role="radiogroup">${radio("Market")}${radio("Limit", true)}</div><div class="joy-radio-group joy-radio-group--vertical joy-radio-group--error" role="radiogroup" aria-invalid="true">${radio("Vertical", true)}${radio("Disabled", false, true)}<p class="joy-radio-group__message">Choose an order type</p></div><div class="joy-slider"><div class="joy-slider__rail"><div class="joy-slider__track" style="width: 60%;"></div><div class="joy-slider__handle" role="slider" tabindex="0" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-disabled="false" style="left: 60%;"><span class="joy-slider__tooltip">60</span></div></div></div></section>
+    <section><h3>Rate and segmented</h3><div class="joy-rate" role="radiogroup">${[1, 2, 3, 4, 5].map((value) => `<button type="button" class="joy-rate__star${value <= 3 ? " joy-rate__star--full" : ""}" role="radio" aria-checked="${value === 3}" aria-label="${value} of 5" tabindex="${value === 3 ? "0" : "-1"}">${star}</button>`).join("")}</div><div class="joy-rate joy-rate--readonly" role="radiogroup">${[1, 2, 3, 4, 5].map((value) => `<button type="button" class="joy-rate__star${value <= 3 ? " joy-rate__star--full" : value === 4 ? " joy-rate__star--half" : ""}" role="radio" aria-checked="${value === 3}" aria-label="${value} of 5" tabindex="-1">${star}</button>`).join("")}</div><div class="joy-rate joy-rate--disabled" role="radiogroup">${[1, 2, 3, 4, 5].map((value) => `<button type="button" class="joy-rate__star" role="radio" aria-checked="false" aria-label="${value} of 5" tabindex="-1">${star}</button>`).join("")}</div><div class="joy-segmented" role="radiogroup"><button type="button" class="joy-segmented__item joy-segmented__item--active" role="radio" aria-checked="true" tabindex="0">Daily</button><button type="button" class="joy-segmented__item" role="radio" aria-checked="false" tabindex="-1">Weekly</button><button type="button" class="joy-segmented__item" role="radio" aria-checked="false" tabindex="-1" disabled>Monthly</button></div></section>
+    <section><h3>Form layouts</h3><form class="joy-form joy-form--vertical"><div class="joy-form-item joy-form-item--required"><label class="joy-form-item__label" for="vertical-name"><span class="joy-form-item__required">*</span>Name</label><div class="joy-form-item__control"><div class="joy-input-wrapper"><input class="joy-input" id="vertical-name" value="Mina"></div></div></div></form><form class="joy-form joy-form--horizontal joy-form--label-left" style="--joy-form-label-width: 10rem;"><div class="joy-form-item joy-form-item--horizontal joy-form-item--error"><label class="joy-form-item__label" for="horizontal-email"><span class="joy-form-item__required">*</span>Email</label><div class="joy-form-item__control"><div class="joy-input-wrapper joy-input-wrapper--error"><input class="joy-input" id="horizontal-email" aria-invalid="true" value="invalid"></div><p class="joy-form-item__explain" role="alert">Enter a valid email address</p></div></div></form></section>
+    <section><h3>Date and time</h3><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-23"><span class="joy-date-picker__icon" aria-hidden="true">${chevronDown}</span></div><div class="joy-date-range-picker"><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-23"></div><span class="joy-date-range-picker__sep">to</span><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-30"></div></div>${sheetDemo(`<div class="joy-time-picker"><div class="joy-input-wrapper"><input class="joy-input" readonly value="09:30"><span class="joy-input-wrapper__suffix">${chevronDown}</span></div><div class="joy-time-picker__panel joy-overlay" role="listbox"><div class="joy-time-picker__column"><button type="button" class="joy-time-picker__cell joy-time-picker__cell--selected" aria-selected="true">09</button><button type="button" class="joy-time-picker__cell" aria-selected="false">10</button></div><div class="joy-time-picker__column"><button type="button" class="joy-time-picker__cell joy-time-picker__cell--selected" aria-selected="true">30</button><button type="button" class="joy-time-picker__cell" aria-selected="false">45</button></div></div></div>`)}</section>
+    <section><h3>Mentions</h3>${sheetDemo(`<div class="joy-mentions"><textarea class="joy-textarea joy-mentions__textarea" aria-autocomplete="list" aria-expanded="true" aria-controls="mentions-list">@mi</textarea><ul class="joy-mentions__dropdown joy-overlay" id="mentions-list" role="listbox"><li class="joy-mentions__item joy-mentions__item--active" role="option" aria-selected="true"><span class="joy-mentions__item-label">Mina Lee</span></li><li class="joy-mentions__item" role="option" aria-selected="false"><span class="joy-mentions__item-label">Milo Chen</span></li></ul></div>`)}</section>
+    <section><h3>Upload</h3><div class="joy-upload"><input type="file" hidden><div class="joy-upload-dragger" role="button" tabindex="0"><span class="joy-upload-dragger__icon">${chevronDown}</span><p class="joy-upload-dragger__text">Drop a file here</p><p class="joy-upload-dragger__hint">or browse your device</p></div><ul class="joy-upload-list"><li class="joy-upload-list__item"><span class="joy-upload-list__item-icon">${chevronRight}</span><span class="joy-upload-list__item-info">portfolio.csv</span><button type="button" class="joy-upload-list__item-remove" aria-label="Remove portfolio.csv">${closeIcon}</button></li></ul></div></section>
+    <section><h3>TreeSelect</h3>${sheetDemo(`<div class="joy-treeselect joy-treeselect--open"><div class="joy-treeselect__control" role="combobox" aria-expanded="true" aria-haspopup="tree" tabindex="0"><span class="joy-treeselect__tags"><span class="joy-treeselect__tag">Research<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove Research">${closeIcon}</button></span></span><span class="joy-treeselect__arrow">${chevronDown}</span></div><div class="joy-treeselect__panel joy-overlay joy-overlay--sheet" role="tree"><div class="joy-treeselect__node joy-treeselect__node--selected" role="treeitem" aria-expanded="true" aria-selected="true"><button type="button" class="joy-treeselect__node-toggle">${chevronDown}</button><span class="joy-treeselect__node-label">Research</span></div></div></div>`, true)}</section>
+    <section><h3>Cascader</h3>${sheetDemo(`<div class="joy-cascader joy-cascader--open"><div class="joy-cascader__control" role="combobox" aria-expanded="true" tabindex="0"><span class="joy-cascader__value">Markets / Futures</span><span class="joy-cascader__arrow">${chevronDown}</span></div><div class="joy-cascader__panel joy-overlay joy-overlay--sheet"><div class="joy-cascader__columns"><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" aria-expanded="true">Markets<span class="joy-cascader__item-arrow">${chevronRight}</span></li></ul><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item" role="menuitem" tabindex="-1">Futures</li></ul></div></div></div>`, true)}</section>
+    <section><h3>Transfer</h3><div class="joy-transfer"><div class="joy-transfer__list"><div class="joy-transfer__header">${checkbox("Source")}<span class="joy-transfer__header-title">Available</span><span class="joy-transfer__header-count">1 item</span></div><div class="joy-transfer__body"><div class="joy-transfer__item joy-transfer__item--selected">${checkbox("Balanced")}</div></div></div><div class="joy-transfer__operations"><button type="button" class="joy-button joy-button--solid joy-button--sm joy-button--icon-only" aria-label="Move right">${chevronRight}</button><button type="button" class="joy-button joy-button--solid joy-button--sm joy-button--icon-only" aria-label="Move left">${chevronRight}</button></div><div class="joy-transfer__list"><div class="joy-transfer__header"><span class="joy-transfer__header-title">Selected</span><span class="joy-transfer__header-count">0 items</span></div><div class="joy-transfer__empty">No selected items</div></div></div></section>
+    <section><h3>MarkdownEditor</h3><div class="joy-markdown-editor"><div class="joy-markdown-editor__toolbar" role="toolbar"><button type="button" class="joy-markdown-editor__tool" aria-label="Bold" aria-pressed="true">B</button><button type="button" class="joy-markdown-editor__tool" aria-label="Preview" aria-pressed="false">${chevronRight}</button></div><div class="joy-markdown-editor__panes joy-markdown-editor__panes--split"><textarea class="joy-textarea joy-markdown-editor__textarea"># Review</textarea><div class="joy-markdown-editor__preview"><h4>Review</h4><p>Semantic token coverage.</p></div></div></div></section>
+    <script>document.querySelectorAll('[data-indeterminate="true"]').forEach((input) => { input.indeterminate = true; });</script>
+  </div>`;
+}
 
 const navIcons = {
   overview: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
@@ -88,8 +186,6 @@ const navigationHtml = manifest.categories.map(cat => {
   }).join('\n');
   return `      <div class="nav-section">${cat.label}</div>\n${items}`;
 }).join('\n\n');
-
-
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -1461,6 +1557,9 @@ ${navigationHtml}
             </tr>
           </table>
         </div>
+
+        <h3>State matrix</h3>
+        ${renderButtonMatrix()}
 
         <h3>Code Usage</h3>
         <div class="code-snippet" id="button-code">
@@ -3515,6 +3614,8 @@ export async function executeHedge(symbol: string, size: number) {
         <h2 style="margin: 0 0 8px 0;">Form Suite & Advanced Data Entry Parity</h2>
         <p class="header-tagline">Ant Design v5 / v6 data entry parity: Form with validation rules & explains, InputNumber spinbutton stepper, Rate interactive star rating, Mentions autocomplete, TimePicker column selector, and Transfer dual-panel list migration.</p>
 
+        ${renderFormsMatrix()}
+
         <!-- Form & Validation Showcase -->
         <div class="component-card">
           <div class="component-header">
@@ -3552,12 +3653,11 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-form-item">
                   <label class="joy-form-item__label">Execution Strategy</label>
                   <div class="joy-form-item__control">
-                    <div class="joy-select-wrapper">
-                      <select class="joy-select">
-                        <option>TWAP (Time-Weighted Average Price)</option>
-                        <option>VWAP (Volume-Weighted Average Price)</option>
-                        <option>POV (Percentage of Volume)</option>
-                      </select>
+                    <div class="joy-select-wrapper joy-select-wrapper--md">
+                      <button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                        <span class="joy-select__value">TWAP (Time-Weighted Average Price)</span>
+                        <span class="joy-select__arrow" aria-hidden="true">${chevronDown}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
