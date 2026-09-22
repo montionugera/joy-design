@@ -312,7 +312,7 @@ test('Wave 2 C-L2: TimePicker, Mentions, MarkdownEditor', () => {
     const src = read(name);
     assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
     assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
-    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
     assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
   };
 
