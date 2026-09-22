@@ -82,3 +82,48 @@ Verdict: **PASS (Clean)**
 - `pnpm --filter @joymify/react test`: 10/10 tests pass (exit code 0)
 
 Verdict: **PASS (Clean)**
+
+---
+
+# Quality Gate Review: Phase A (Task A3)
+
+## Scope
+- Task A3: Choice controls CSS in `packages/tokens/build.js` (`.joy-checkbox*`, `.joy-radio*`, `.joy-switch*`, `.joy-slider*`, `.joy-segmented*`, `.joy-rate*`) and test suite in `packages/tokens/test/wave-2.test.js`.
+
+## Reviewers
+- code-reviewer (adversarial review)
+- typescript-reviewer (type contracts & CSS compilation)
+
+## Findings & Verifications
+
+### 1. Token Usage & Color Invariants
+- Strictly token-driven color references:
+  - Base borders: `--joy-border-subtle`, `--joy-border-strong`
+  - Active accents: `--joy-accent-default`, `--joy-text-on-accent`
+  - Surfaces: `--joy-surface-card`, `--joy-surface-sunken`, `--joy-surface-inverse`
+  - Focus rings: `--joy-focus-ring` (2px outline offset)
+  - Error/validation: `--joy-status-danger-border` on `aria-invalid="true"`
+- Removed all legacy hardcoded purple/gradient fills (`linear-gradient(90deg, ...)`) from choice controls (SVF-044, SVF-045, RXF-015).
+- Zero raw OS emojis across all choice controls; Rate uses inline vector polygon SVG with `currentColor`.
+
+### 2. Touch Hit Target Standards (>= 44px)
+- Checkbox & Radio root labels enforce `min-height: var(--joy-control-height-md)` and `min-width: var(--joy-control-height-md)` (44px under coarse pointer) around 20px visual boxes/circles.
+- Switch uses `min-height: var(--joy-control-height-md)` (44px) with `--sm` size modifier (`min-height: var(--joy-control-height-sm)`).
+- Slider handle provides 44px hit target via `__handle::before { inset: -12px; }` on 20px circle.
+- Rate stars size to `width: var(--joy-control-height-md); height: var(--joy-control-height-md);` (44px on touch).
+- Segmented items provide `min-height: var(--joy-control-height-md)` with `--sm` size modifier (`min-height: var(--joy-control-height-sm)`).
+
+### 3. State Coverage & Transitions
+- Complete state coverage: default, hover (border accent), active (elevation lift / inset), focus-visible (`--joy-focus-ring`), disabled (opacity 0.5, cursor not-allowed), readonly (Rate), indeterminate (Checkbox square bar).
+- Motion transitions strictly bounded to `--joy-duration-fast` and `--joy-ease-out` with explicit properties; zero `transition: all`.
+
+### 4. Automated Verification Verdict
+- `pnpm --filter @joymify/tokens build`: exit code 0
+- `pnpm --filter @joymify/tokens test`: 16/16 tests pass (exit code 0)
+- `bash scripts/lint-colors.sh`: clean, strict checks pass (exit code 0)
+- `node apps/storybook-hub/build.js`: exit code 0
+- `pnpm --filter @joymify/svelte test`: 10/10 tests pass (exit code 0)
+- `pnpm --filter @joymify/react test`: 10/10 tests pass (exit code 0)
+
+Verdict: **PASS (Clean)**
+

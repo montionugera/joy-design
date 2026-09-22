@@ -152,3 +152,35 @@ test('Wave 2 text-like inputs, select, and form state matrix compiled in theme.c
   }
 });
 
+test('Wave 2 choice controls (checkbox, radio, switch, slider, rate, segmented) state matrix in theme.css', () => {
+  const expectedPatterns = [
+    '.joy-checkbox input[type="checkbox"]:indeterminate',
+    '.joy-rate--readonly',
+    '.joy-segmented__item:focus-visible',
+    '.joy-slider__handle::before',
+    '.joy-switch--sm'
+  ];
+
+  for (const pattern of expectedPatterns) {
+    assert.ok(css.includes(pattern), `${pattern} must be compiled in theme.css`);
+  }
+
+  // Choice controls must not contain linear-gradient(90deg
+  const sliderSection = css.slice(css.indexOf('/* Slider */'), css.indexOf('/* MarkdownViewer'));
+  assert.ok(!sliderSection.includes('linear-gradient(90deg'), '.joy-slider must not contain linear-gradient(90deg');
+
+  const choiceControlsCss = [
+    css.slice(css.indexOf('/* Switch */'), css.indexOf('/* Alert */')),
+    css.slice(css.indexOf('/* ── Checkbox ── */'), css.indexOf('/* ── Drawer')),
+    css.slice(css.indexOf('/* Slider */'), css.indexOf('/* MarkdownViewer')),
+    css.slice(css.indexOf('/* Segmented */'), css.indexOf('/* ── Ant Design Form')),
+    css.slice(css.indexOf('/* Rate */'), css.indexOf('/* Mentions */'))
+  ].join('\n');
+  assert.ok(!choiceControlsCss.includes('linear-gradient(90deg'), 'choice controls must not contain linear-gradient(90deg');
+
+  // 44px touch target rules
+  assert.ok(css.includes('inset: -12px'), 'slider handle hit area must be 44px via inset -12px');
+  assert.ok(css.includes('.joy-radio-group[aria-invalid="true"] .joy-radio__circle'), 'radio group aria-invalid must style circle border');
+  assert.ok(css.includes('.joy-switch--sm .joy-switch__thumb'), 'small switch thumb styles must exist');
+});
+
