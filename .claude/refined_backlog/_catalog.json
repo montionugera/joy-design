@@ -418,5 +418,15 @@
     "claimed_at": "2026-09-21T01:33:08.417782+00:00",
     "shipped_at": "2026-09-21T01:37:56.859351+00:00",
     "promoted_at": "2026-09-21T01:38:49.249414+00:00"
+  },
+  {
+    "id": "F-036",
+    "title": "Wave 1: semantic token foundation \u2014 light/dark remaps, brand-tinted ramps, type/space/z/shadow scales, reduced motion, foreign-hex lint and epic-check gate",
+    "from_idea": "I-036",
+    "created_at": "2026-09-22T01:04:13.061067+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null,
+    "epic": "E-001"
   }
 ]
