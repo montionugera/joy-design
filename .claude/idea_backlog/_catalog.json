@@ -208,5 +208,47 @@
     "title": "Multi-theme color palette engine and full landing page preview simulator",
     "created_at": "2026-09-21T01:23:56.275928+00:00",
     "promoted_to": "F-035"
+  },
+  {
+    "id": "I-036",
+    "title": "Wave 1: semantic token foundation \u2014 light/dark remaps, brand-tinted ramps, type/space/z/shadow scales, reduced motion, foreign-hex lint and epic-check gate",
+    "created_at": "2026-09-22T01:02:02.028502+00:00",
+    "promoted_to": null,
+    "epic": "E-001"
+  },
+  {
+    "id": "I-037",
+    "title": "Wave 2: hero-grade Button and form controls with full state coverage, Svelte + React parity",
+    "created_at": "2026-09-22T01:02:02.030142+00:00",
+    "promoted_to": null,
+    "epic": "E-001"
+  },
+  {
+    "id": "I-038",
+    "title": "Wave 3: display, feedback, navigation and overlay components \u2014 dark mode, mobile, z-index, states, parity",
+    "created_at": "2026-09-22T01:02:02.030845+00:00",
+    "promoted_to": null,
+    "epic": "E-001"
+  },
+  {
+    "id": "I-039",
+    "title": "Wave 4: landing suite \u2014 hero and CTA depth, mobile navigation, fluid headings, slop removal, dark treatment",
+    "created_at": "2026-09-22T01:02:02.031405+00:00",
+    "promoted_to": null,
+    "epic": "E-001"
+  },
+  {
+    "id": "I-040",
+    "title": "Wave 5: Storybook hub \u2014 mobile layout, dark mode, hero, token-only colors, visual contracts",
+    "created_at": "2026-09-22T01:02:02.032168+00:00",
+    "promoted_to": null,
+    "epic": "E-001"
+  },
+  {
+    "id": "I-041",
+    "title": "Wave 6: design rules, DESIGN.md and PRODUCT.md, README, AGENTS.md and enforcement gates",
+    "created_at": "2026-09-22T01:02:02.032920+00:00",
+    "promoted_to": null,
+    "epic": "E-001"
   }
 ]
