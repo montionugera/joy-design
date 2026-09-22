@@ -66,6 +66,7 @@ export function generateAllTokens() {
     { step: '200', L: 0.86, C: 0.08 },
     { step: '300', L: 0.785, C: 0.11 }, // Dark accent (>= 4.5:1 on dark surfaces)
     { step: '400', L: lGoldAnchor, C: cGoldAnchor, hex: '#c49a3a' },
+    { step: '450', L: 0.67, C: 0.105 },
     { step: '500', L: 0.62, C: 0.11 },
     { step: '600', L: 0.525, C: 0.10 }, // Text link (>= 4.5:1 on white and cream-100)
     { step: '700', L: 0.43, C: 0.09 },
@@ -200,7 +201,9 @@ export function generateAllTokens() {
       "hover": { "value": "{color.gold.500}", "type": "color" },
       "active": { "value": "{color.gold.600}", "type": "color" },
       "subtle": { "value": "{color.gold.50}", "type": "color" },
-      "text": { "value": "{color.gold.600}", "type": "color" }
+      "text": { "value": "{color.gold.600}", "type": "color" },
+      "gradient-end": { "value": "{color.gold.450}", "type": "color" },
+      "highlight": { "value": "{color.gold.200}", "type": "color" }
     },
     // Status
     "status": {
@@ -224,7 +227,10 @@ export function generateAllTokens() {
       "0": { "value": "none", "type": "shadow" },
       "1": { "value": "0 1px 3px rgba(20, 37, 62, 0.08), 0 1px 2px rgba(20, 37, 62, 0.04)", "type": "shadow" },
       "2": { "value": "0 4px 8px -2px rgba(20, 37, 62, 0.1), 0 2px 4px -2px rgba(20, 37, 62, 0.06)", "type": "shadow" },
-      "3": { "value": "0 12px 20px -4px rgba(20, 37, 62, 0.12), 0 4px 6px -2px rgba(20, 37, 62, 0.04)", "type": "shadow" }
+      "3": { "value": "0 12px 20px -4px rgba(20, 37, 62, 0.12), 0 4px 6px -2px rgba(20, 37, 62, 0.04)", "type": "shadow" },
+      "accent-1": { "value": "0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)", "type": "shadow" },
+      "accent-2": { "value": "0 4px 10px -2px rgba(196, 154, 58, 0.35), 0 2px 4px -2px rgba(20, 37, 62, 0.08)", "type": "shadow" },
+      "accent-inset": { "value": "inset 0 2px 4px rgba(133, 101, 21, 0.35)", "type": "shadow" }
     }
   };
 
@@ -233,7 +239,7 @@ export function generateAllTokens() {
     "surface": {
       "canvas": { "value": "{color.navy.900}", "type": "color" },
       "card": { "value": "{color.navy.800}", "type": "color" },
-      "raised": { "value": "{color.navy.700}", "type": "color" },
+      "raised": { "value": "{color.navy.500}", "type": "color" },
       "sunken": { "value": "{color.navy.950}", "type": "color" },
       "overlay": { "value": "{color.navy.800}", "type": "color" },
       "inverse": { "value": "{color.cream.100}", "type": "color" }
@@ -249,7 +255,7 @@ export function generateAllTokens() {
     },
     // Border
     "border": {
-      "subtle": { "value": "{color.navy.600}", "type": "color" },
+      "subtle": { "value": "{color.navy.700}", "type": "color" },
       "default": { "value": "{color.navy.400}", "type": "color" },
       "strong": { "value": "{color.navy.300}", "type": "color" },
       "focus": { "value": "{color.gold.300}", "type": "color" }
@@ -260,7 +266,9 @@ export function generateAllTokens() {
       "hover": { "value": "{color.gold.200}", "type": "color" },
       "active": { "value": "{color.gold.400}", "type": "color" },
       "subtle": { "value": "#2a2211", "type": "color" },
-      "text": { "value": "{color.gold.300}", "type": "color" }
+      "text": { "value": "{color.gold.300}", "type": "color" },
+      "gradient-end": { "value": "{color.gold.400}", "type": "color" },
+      "highlight": { "value": "{color.gold.200}", "type": "color" }
     },
     // Status
     "status": {
@@ -284,7 +292,10 @@ export function generateAllTokens() {
       "0": { "value": "none", "type": "shadow" },
       "1": { "value": "0 0 0 1px rgba(77, 96, 125, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
       "2": { "value": "0 0 0 1px rgba(77, 96, 125, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5)", "type": "shadow" },
-      "3": { "value": "0 0 0 1px rgba(77, 96, 125, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6)", "type": "shadow" }
+      "3": { "value": "0 0 0 1px rgba(77, 96, 125, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6)", "type": "shadow" },
+      "accent-1": { "value": "0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
+      "accent-2": { "value": "0 0 0 1px rgba(218, 179, 98, 0.45), 0 4px 12px rgba(0, 0, 0, 0.5)", "type": "shadow" },
+      "accent-inset": { "value": "inset 0 2px 4px rgba(0, 0, 0, 0.45)", "type": "shadow" }
     }
   };
 

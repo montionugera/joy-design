@@ -35,6 +35,9 @@ importers:
 
   packages/react:
     dependencies:
+      '@joymify/icons':
+        specifier: workspace:*
+        version: link:../icons
       '@joymify/tokens':
         specifier: workspace:*
         version: link:../tokens
@@ -47,6 +50,9 @@ importers:
 
   packages/svelte:
     dependencies:
+      '@joymify/icons':
+        specifier: workspace:*
+        version: link:../icons
       '@joymify/tokens':
         specifier: workspace:*
         version: link:../tokens

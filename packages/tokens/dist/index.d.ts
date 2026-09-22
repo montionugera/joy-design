@@ -18,6 +18,7 @@ export interface JoyTokens {
   'color-gold-200': string;
   'color-gold-300': string;
   'color-gold-400': string;
+  'color-gold-450': string;
   'color-gold-500': string;
   'color-gold-600': string;
   'color-gold-700': string;
@@ -130,6 +131,8 @@ export interface JoyTokens {
   'accent-active': string;
   'accent-subtle': string;
   'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
   'status-success-fg': string;
   'status-success-bg': string;
   'status-success-border': string;
@@ -147,6 +150,9 @@ export interface JoyTokens {
   'elevation-1': string;
   'elevation-2': string;
   'elevation-3': string;
+  'elevation-accent-1': string;
+  'elevation-accent-2': string;
+  'elevation-accent-inset': string;
   /**
    * @deprecated Use 'accent-default' instead
    */
