@@ -285,4 +285,35 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
+test('Wave 2 B-L4: TreeSelect, Cascader, Transfer, Upload', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  const files = ['TreeSelect', 'Cascader', 'Transfer', 'Upload'];
+  files.forEach(assertWave2);
+
+  const treeSelect = read('TreeSelect');
+  assert.ok(treeSelect.includes('openOverlay'), 'TreeSelect must include openOverlay');
+  const treeSelectStyles = treeSelect.match(/style="[^"]*"/g) || [];
+  assert.strictEqual(treeSelectStyles.filter((s) => !s.includes('{style}')).length, 0, 'TreeSelect must not include style="..." other than root passthrough');
+
+  const cascader = read('Cascader');
+  assert.ok(cascader.includes('openOverlay'), 'Cascader must include openOverlay');
+  const cascaderStyles = cascader.match(/style="[^"]*"/g) || [];
+  assert.strictEqual(cascaderStyles.filter((s) => !s.includes('{style}')).length, 0, 'Cascader must not include style="..." other than root passthrough');
+
+  const transfer = read('Transfer');
+  assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
+  assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
+
+  const upload = read('Upload');
+  assert.ok(upload.includes('@joymify/icons'), 'Upload must import from @joymify/icons');
+});
+
 
