@@ -1,67 +1,66 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   interface Props {
     checked?: boolean;
     disabled?: boolean;
     label?: string;
+    size?: 'sm' | 'md';
+    id?: string;
+    name?: string;
     onchange?: (checked: boolean) => void;
+    class?: string;
+    ref?: HTMLButtonElement | null;
+    [key: string]: any;
   }
 
-  let { checked = $bindable(false), disabled = false, label, onchange }: Props = $props();
+  let {
+    checked = $bindable(false),
+    disabled = false,
+    label,
+    size = 'md',
+    id,
+    name,
+    onchange,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
+  }: Props = $props();
+
+  const formCtx = getContext<any>('joy-form');
+  const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
+  const effectiveDisabled = $derived(disabled || formDisabled);
 
   function toggle() {
-    if (disabled) return;
+    if (effectiveDisabled) return;
     checked = !checked;
     onchange?.(checked);
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (effectiveDisabled) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      toggle();
+    }
   }
 </script>
 
 <button
+  bind:this={ref}
   type="button"
   role="switch"
   aria-checked={checked}
-  {disabled}
-  class="joy-switch"
-  class:joy-switch--checked={checked}
+  disabled={effectiveDisabled}
+  {id}
+  {name}
+  class="joy-switch {size === 'sm' ? 'joy-switch--sm' : ''} {checked ? 'joy-switch--checked' : ''} {effectiveDisabled ? 'joy-switch--disabled' : ''} {className}"
   onclick={toggle}
+  onkeydown={handleKeyDown}
+  {...rest}
 >
   <span class="joy-switch__thumb"></span>
   {#if label}
     <span class="joy-switch__label">{label}</span>
   {/if}
 </button>
-
-<style>
-  .joy-switch {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--joy-spacing-2, 8px);
-    background: #cbd5e1;
-    border: none;
-    border-radius: 9999px;
-    width: 44px;
-    height: 24px;
-    padding: 2px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    position: relative;
-  }
-  .joy-switch--checked {
-    background-color: var(--joy-color-brand-primary, #7c3aed);
-  }
-  .joy-switch__thumb {
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
-  }
-  .joy-switch--checked .joy-switch__thumb {
-    transform: translateX(20px);
-  }
-  .joy-switch:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-</style>

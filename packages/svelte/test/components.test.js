@@ -40,7 +40,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(select.includes('$bindable'), 'Select must support bindable value');
 
   const checkbox = fs.readFileSync(path.resolve('./src/lib/Checkbox.svelte'), 'utf8');
-  assert.ok(checkbox.includes('role="checkbox"'), 'Checkbox must implement role=checkbox');
+  assert.ok(!checkbox.includes('role="checkbox"'), 'Checkbox must not duplicate the native role');
   assert.ok(checkbox.includes('joy-checkbox'), 'Checkbox must have joy-checkbox class');
 
   const radio = fs.readFileSync(path.resolve('./src/lib/RadioGroup.svelte'), 'utf8');
@@ -287,6 +287,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
 test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker', () => {
 test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
+test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkbox, form context', () => {
   const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
   const assertWave2 = (name) => {
     const src = read(name);
@@ -348,4 +349,42 @@ test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
 });
 
 
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2605}\u{2606}→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
 
+  const bL3Components = [
+    'Checkbox',
+    'Switch',
+    'RadioGroup',
+    'Slider',
+    'Rate',
+    'Segmented',
+    'Form',
+    'FormItem'
+  ];
+
+  for (const comp of bL3Components) {
+    assertWave2(comp);
+  }
+
+  const checkbox = read('Checkbox');
+  assert.ok(!checkbox.includes('role="checkbox"'), 'Checkbox must not duplicate the native role');
+  assert.ok(checkbox.includes('indeterminate'), 'Checkbox must support indeterminate state');
+
+  const radio = read('RadioGroup');
+  assert.ok(radio.includes('ArrowRight'), 'RadioGroup must support arrow key navigation');
+
+  const segmented = read('Segmented');
+  assert.ok(segmented.includes('ArrowRight'), 'Segmented must support arrow key navigation');
+
+  const rate = read('Rate');
+  assert.ok(rate.includes('ArrowRight'), 'Rate must support arrow key navigation');
+  assert.ok(rate.includes('role="radio"'), 'Rate stars must implement role=radio');
+
+  const form = read('Form');
+  assert.ok(form.includes("setContext('joy-form'"), 'Form must cascade context via joy-form');
+
+  const formItem = read('FormItem');
+  assert.ok(formItem.includes('joy-form-item__explain'), 'FormItem must render joy-form-item__explain');
+});
