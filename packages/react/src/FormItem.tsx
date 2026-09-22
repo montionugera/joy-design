@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { FormContext } from './Form';
 
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
 export interface ValidationRule {
   required?: boolean;
   message?: string;
@@ -10,46 +12,54 @@ export interface ValidationRule {
   validator?: (value: any) => boolean | Promise<boolean>;
 }
 
-export interface FormItemProps {
+export interface FormItemProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: React.ReactNode;
   name?: string;
   required?: boolean;
   colon?: boolean;
   labelAlign?: 'left' | 'right';
   labelWidth?: string | number;
-  error?: string;
+  error?: React.ReactNode;
+  help?: React.ReactNode;
   rules?: ValidationRule[];
   layout?: 'vertical' | 'horizontal' | 'inline';
-  className?: string;
-  style?: React.CSSProperties;
   children?: React.ReactNode;
 }
 
+const FORM_LABEL_WIDTH_VAR = ('--joy' + '-form-label-width') as any;
+
 export const FormItem = React.forwardRef<HTMLDivElement, FormItemProps>(
-  ({
-    label,
-    name,
-    required = false,
-    colon,
-    labelAlign,
-    labelWidth,
-    error,
-    rules = [],
-    layout,
-    className = '',
-    style,
-    children
-  }, ref) => {
+  (
+    {
+      label,
+      name,
+      required = false,
+      colon,
+      labelAlign,
+      labelWidth,
+      error,
+      help,
+      rules = [],
+      layout,
+      className = '',
+      style,
+      children,
+      ...rest
+    },
+    ref
+  ) => {
     const context = React.useContext(FormContext);
     const effectiveLayout = layout ?? context.layout ?? 'vertical';
     const effectiveColon = colon ?? context.colon ?? true;
     const effectiveAlign = labelAlign ?? context.labelAlign ?? 'right';
     const effectiveWidth = labelWidth ?? context.labelWidth;
 
-    const isRequired = required || rules.some(r => r.required);
+    const isRequired = required || rules.some((r) => r.required);
 
     const itemStyle: React.CSSProperties = {
-      ...(effectiveWidth ? { ['--joy-form-label-width' as any]: typeof effectiveWidth === 'number' ? `${effectiveWidth}px` : effectiveWidth } : {}),
+      ...(effectiveWidth !== undefined
+        ? { [FORM_LABEL_WIDTH_VAR]: typeof effectiveWidth === 'number' ? `${effectiveWidth}px` : effectiveWidth }
+        : {}),
       ...style
     };
 
@@ -57,21 +67,35 @@ export const FormItem = React.forwardRef<HTMLDivElement, FormItemProps>(
       <div
         ref={ref}
         style={itemStyle}
-        className={`joy-form-item joy-form-item--${effectiveLayout} ${!effectiveColon ? 'joy-form-item--no-colon' : ''} ${effectiveAlign === 'left' ? 'joy-form-item--label-left' : ''} ${error ? 'joy-form-item--error' : ''} ${className}`.trim()}
+        className={cx(
+          'joy-form-item',
+          effectiveLayout === 'horizontal' && 'joy-form-item--horizontal',
+          !effectiveColon && 'joy-form-item--no-colon',
+          effectiveAlign === 'left' && 'joy-form-item--label-left',
+          error && 'joy-form-item--error',
+          className
+        )}
+        {...rest}
       >
         {label && (
-          <label className="joy-form-item__label" htmlFor={name}>
-            {isRequired && <span className="joy-form-item__required" aria-hidden="true">*</span>}
+          <label className="joy-form-item__label" htmlFor={name || undefined}>
+            {isRequired && (
+              <span className="joy-form-item__required" aria-hidden="true">
+                *
+              </span>
+            )}
             {label}
           </label>
         )}
         <div className="joy-form-item__control">
           {children}
-          {error && (
-            <div className="joy-form-item__explain" role="alert">
+          {error ? (
+            <p className="joy-form-item__explain" role="alert">
               {error}
-            </div>
-          )}
+            </p>
+          ) : help ? (
+            <p className="joy-form-item__explain">{help}</p>
+          ) : null}
         </div>
       </div>
     );
