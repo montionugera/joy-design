@@ -330,7 +330,7 @@ test('Wave 2 C-L4: TreeSelect, Cascader, Transfer, Upload match contract', () =>
   assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
   assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
   assert.ok(upload.includes('@joymify/icons/react'), 'Upload must import @joymify/icons/react');
-  assert.ok(!upload.includes('📁'), 'Upload must not include emoji');
+  assert.ok(!upload.includes('\u{1F4C1}'), 'Upload must not include emoji');
 });
 
 
