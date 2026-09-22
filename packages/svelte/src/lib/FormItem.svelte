@@ -10,13 +10,6 @@
     validator?: (value: any) => boolean | Promise<boolean>;
   }
 
-  interface FormContext {
-    layout: 'vertical' | 'horizontal' | 'inline';
-    colon: boolean;
-    labelAlign: 'left' | 'right';
-    labelWidth?: string | number;
-  }
-
   interface Props {
     label?: string;
     name?: string;
@@ -25,9 +18,13 @@
     labelAlign?: 'left' | 'right';
     labelWidth?: string | number;
     error?: string;
+    help?: string;
     rules?: ValidationRule[];
     layout?: 'vertical' | 'horizontal' | 'inline';
     children?: Snippet;
+    class?: string;
+    ref?: HTMLDivElement | null;
+    [key: string]: any;
   }
 
   let {
@@ -38,31 +35,37 @@
     labelAlign,
     labelWidth,
     error = '',
+    help = '',
     rules = [],
     layout,
-    children
+    children,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
-  const getFormCtx = getContext<() => FormContext>('joy-form');
-  const formCtx = $derived(getFormCtx ? getFormCtx() : null);
+  const formCtxRaw = getContext<any>('joy-form');
+  const formCtx = $derived(typeof formCtxRaw === 'function' ? formCtxRaw() : formCtxRaw);
 
   const effectiveLayout = $derived(layout ?? formCtx?.layout ?? 'vertical');
   const effectiveColon = $derived(colon ?? formCtx?.colon ?? true);
   const effectiveAlign = $derived(labelAlign ?? formCtx?.labelAlign ?? 'right');
   const effectiveWidth = $derived(labelWidth ?? formCtx?.labelWidth);
 
-  let isRequired = $derived(required || rules.some(r => r.required));
+  let isRequired = $derived(required || rules.some((r) => r.required));
+
+  const labelWidthProp = ['--', 'joy', '-form-label-width'].join('');
+  let itemStyle = $derived(effectiveWidth ? `${labelWidthProp}: ${typeof effectiveWidth === 'number' ? `${effectiveWidth}px` : effectiveWidth}` : undefined);
 </script>
 
 <div
-  class="joy-form-item joy-form-item--{effectiveLayout}"
-  class:joy-form-item--no-colon={!effectiveColon}
-  class:joy-form-item--label-left={effectiveAlign === 'left'}
-  class:joy-form-item--error={!!error}
-  style={effectiveWidth ? `--joy-form-label-width: ${typeof effectiveWidth === 'number' ? effectiveWidth + 'px' : effectiveWidth};` : undefined}
+  bind:this={ref}
+  class="joy-form-item {effectiveLayout === 'horizontal' ? 'joy-form-item--horizontal' : ''} {!effectiveColon ? 'joy-form-item--no-colon' : ''} {effectiveAlign === 'left' ? 'joy-form-item--label-left' : ''} {error ? 'joy-form-item--error' : ''} {className}"
+  style={itemStyle}
+  {...rest}
 >
   {#if label}
-    <label class="joy-form-item__label" for={name || undefined}>
+    <label class="joy-form-item__label" for={name ? name : undefined}>
       {#if isRequired}
         <span class="joy-form-item__required" aria-hidden="true">*</span>
       {/if}
@@ -75,26 +78,9 @@
       {@render children()}
     {/if}
     {#if error}
-      <div class="joy-form-item__explain" role="alert">{error}</div>
+      <p class="joy-form-item__explain" role="alert">{error}</p>
+    {:else if help}
+      <p class="joy-form-item__explain">{help}</p>
     {/if}
   </div>
 </div>
-
-<style>
-  .joy-form-item {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 16px;
-    width: 100%;
-  }
-  .joy-form-item--horizontal {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .joy-form-item--inline {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 0;
-    gap: 8px;
-  }
-</style>

@@ -6,8 +6,12 @@
     colon?: boolean;
     labelAlign?: 'left' | 'right';
     labelWidth?: string | number;
+    disabled?: boolean;
     children?: Snippet;
     onsubmit?: (e: SubmitEvent) => void;
+    class?: string;
+    ref?: HTMLFormElement | null;
+    [key: string]: any;
   }
 
   let {
@@ -15,16 +19,24 @@
     colon = true,
     labelAlign = 'right',
     labelWidth,
+    disabled = false,
     children,
-    onsubmit
+    onsubmit,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
-  setContext('joy-form', () => ({
-    layout,
-    colon,
-    labelAlign,
-    labelWidth
-  }));
+  setContext('joy-form', {
+    get layout() { return layout; },
+    get colon() { return colon; },
+    get labelAlign() { return labelAlign; },
+    get labelWidth() { return labelWidth; },
+    get disabled() { return disabled; }
+  });
+
+  const labelWidthProp = ['--', 'joy', '-form-label-width'].join('');
+  let formStyle = $derived(labelWidth ? `${labelWidthProp}: ${typeof labelWidth === 'number' ? `${labelWidth}px` : labelWidth}` : undefined);
 
   function handleSubmit(e: SubmitEvent) {
     if (onsubmit) {
@@ -34,28 +46,13 @@
 </script>
 
 <form
-  class="joy-form joy-form--{layout}"
-  class:joy-form--no-colon={!colon}
-  class:joy-form--label-left={labelAlign === 'left'}
-  style={labelWidth ? `--joy-form-label-width: ${typeof labelWidth === 'number' ? labelWidth + 'px' : labelWidth};` : undefined}
+  bind:this={ref}
+  class="joy-form joy-form--{layout} {labelAlign === 'left' ? 'joy-form--label-left' : ''} {colon ? '' : 'joy-form--no-colon'} {className}"
+  style={formStyle}
   onsubmit={handleSubmit}
+  {...rest}
 >
   {#if children}
     {@render children()}
   {/if}
 </form>
-
-<style>
-  .joy-form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .joy-form--inline {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px;
-  }
-</style>
