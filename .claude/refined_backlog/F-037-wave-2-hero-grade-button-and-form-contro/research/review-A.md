@@ -43,3 +43,42 @@
 - `pnpm --filter @joymify/react test`: 10/10 tests pass (exit code 0)
 
 Verdict: **PASS (Clean)**
+
+---
+
+# Quality Gate Review: Phase A (Task A2)
+
+## Scope
+- Task A2: Text-like inputs, Select listbox, Form and FormItem layout, InputNumber, DatePicker, DateRangePicker, TimePicker, Mentions, MarkdownEditor state matrix and responsive rules in `packages/tokens/build.js`.
+
+## Reviewers
+- code-reviewer (adversarial review)
+- typescript-reviewer (type contracts & CSS compilation)
+
+## Findings & Verifications
+
+### 1. Token Usage & Color Integrity
+- All colors mapped strictly to semantic tokens (`--joy-surface-card`, `--joy-surface-sunken`, `--joy-surface-raised`, `--joy-border-default`, `--joy-border-strong`, `--joy-border-focus`, `--joy-text-primary`, `--joy-text-secondary`, `--joy-text-muted`, `--joy-accent-subtle`, `--joy-accent-text`, `--joy-status-danger-fg`, `--joy-status-danger-border`, `--joy-status-success-fg`, `--joy-status-success-border`).
+- Zero hardcoded hex, rgb, or hsl values introduced in `componentStyles`.
+- Removed phantom `--joy-color-surface-elevated` reference and `z-index: 50;` literal from TimePicker and Mentions.
+- Removed `SimSun` font reference in required form item marker in favor of `--joy-font-family-sans`.
+
+### 2. Typography & Touch Targets
+- All text inputs use `--joy-font-size-md` (16px) on touch devices via `@media (pointer: coarse)` to prevent iOS auto-zoom.
+- Removed legacy fixed `font-size: 0.875rem` from base text control definitions.
+- Control heights bound to `--joy-control-height-sm`, `--joy-control-height-md`, `--joy-control-height-lg`.
+
+### 3. Responsive & Overlay Layouts
+- Form horizontal layout activates at `>= 640px` (`@media (min-width: 640px)`) and stacks below 640px. Removed fixed widths/margins.
+- DateRangePicker stacks vertically under 640px (`@media (max-width: 640px)`).
+- MarkdownEditor split panes stack under 640px (`@media (max-width: 640px)`).
+
+### 4. Automated Verification Verdict
+- `pnpm --filter @joymify/tokens build`: exit code 0
+- `pnpm --filter @joymify/tokens test`: 15/15 tests pass (exit code 0)
+- `bash scripts/lint-colors.sh`: clean, strict checks pass (exit code 0)
+- `node apps/storybook-hub/build.js`: exit code 0
+- `pnpm --filter @joymify/svelte test`: 10/10 tests pass (exit code 0)
+- `pnpm --filter @joymify/react test`: 10/10 tests pass (exit code 0)
+
+Verdict: **PASS (Clean)**

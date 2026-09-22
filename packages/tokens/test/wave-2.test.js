@@ -100,3 +100,55 @@ test('Wave 2 hero button full state and variant matrix coverage in theme.css', (
   assert.ok(css.includes('min-height: var(--joy-control-height-lg)'));
 });
 
+test('Wave 2 text-like inputs, select, and form state matrix compiled in theme.css', () => {
+  const expectedPatterns = [
+    '.joy-input-wrapper--success',
+    '.joy-select__listbox',
+    '.joy-select__option[aria-selected="true"]',
+    '.joy-textarea'
+  ];
+  for (const pattern of expectedPatterns) {
+    assert.ok(css.includes(pattern), `${pattern} must be compiled in theme.css`);
+  }
+
+  // Media queries
+  assert.ok(
+    /@media\s*\([^)]*max-width:\s*640px[^)]*\)[^{]*\{[\s\S]*?\.joy-date-range-picker/m.test(css),
+    '@media (max-width: 640px) block for .joy-date-range-picker must exist'
+  );
+  assert.ok(
+    /@media\s*\([^)]*max-width:\s*640px[^)]*\)[^{]*\{[\s\S]*?\.joy-markdown-editor__panes--split/m.test(css),
+    '@media (max-width: 640px) block for .joy-markdown-editor__panes--split must exist'
+  );
+
+  // Forbidden patterns
+  assert.ok(!css.includes('SimSun'), 'theme.css must not contain SimSun');
+  assert.ok(!css.includes('var(--joy-color-surface-elevated'), 'theme.css must not contain phantom --joy-color-surface-elevated reference');
+  assert.ok(!css.slice(css.indexOf('.joy-button')).includes('--joy-color-surface-elevated'), 'component rules must not contain --joy-color-surface-elevated');
+  assert.ok(!css.includes('z-index: 50;'), 'theme.css must not contain z-index: 50;');
+
+  // No font-size: 0.875rem in base rules and all use var(--joy-control-height-
+  const baseSelectors = [
+    '\\.joy-input',
+    '\\.joy-select',
+    '\\.joy-textarea',
+    '\\.joy-input-number__input',
+    '\\.joy-date-picker__input'
+  ];
+
+  for (const sel of baseSelectors) {
+    // Find all rules declaring this selector
+    const re = new RegExp(`(?:^|[},])\\s*([^}]*?${sel}[^{]*)\\{([^}]*)\\}`, 'g');
+    let match;
+    let found = false;
+    while ((match = re.exec(css)) !== null) {
+      found = true;
+      assert.ok(!match[2].includes('0.875rem'), `${sel} rule must not contain font-size: 0.875rem`);
+      if (/(?:^|[;\s])(?:min-)?height\s*:\s*[^;]+/.test(match[2])) {
+        assert.ok(match[2].includes('var(--joy-control-height-'), `${sel} rule height must use var(--joy-control-height-`);
+      }
+    }
+    assert.ok(found, `rule for ${sel} must exist`);
+  }
+});
+
