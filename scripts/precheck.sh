@@ -38,13 +38,15 @@ elif [ -f "node_modules/.bin/playwright" ]; then
   (cd apps/storybook-hub && ../../node_modules/.bin/playwright test)
 elif [ -f "apps/storybook-hub/node_modules/.bin/playwright" ]; then
   (cd apps/storybook-hub && ./node_modules/.bin/playwright test)
-elif pnpm --filter storybook-hub exec playwright --version >/dev/null 2>&1; then
+elif command -v pnpm >/dev/null 2>&1 && pnpm --filter storybook-hub exec playwright --version >/dev/null 2>&1; then
   pnpm --filter storybook-hub exec playwright test
-else
+elif command -v pnpm >/dev/null 2>&1; then
   # Self-install playwright in worktree from global pnpm store if missing
   echo "   Installing @playwright/test in workspace..."
   pnpm add -D @playwright/test --filter storybook-hub --prefer-offline >/dev/null 2>&1 || true
   pnpm --filter storybook-hub exec playwright test
+elif command -v npx >/dev/null 2>&1; then
+  (cd apps/storybook-hub && npx playwright test)
 fi
 
 echo "==> Gate 1 Precheck passed successfully! <=="
