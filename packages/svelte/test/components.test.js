@@ -285,9 +285,8 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
+
 test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker', () => {
-test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
-test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkbox, form context', () => {
   const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
   const assertWave2 = (name) => {
     const src = read(name);
@@ -332,6 +331,17 @@ test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkb
   assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
 });
 
+
+test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
   for (const comp of ['TimePicker', 'Mentions', 'MarkdownEditor']) {
     assertWave2(comp);
   }
@@ -349,6 +359,12 @@ test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkb
 });
 
 
+test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkbox, form context', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
     assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2605}\u{2606}→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
     assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
   };
