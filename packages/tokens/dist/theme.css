@@ -1,65 +1,341 @@
 :root {
-  --joy-color-brand-primary: #c49a3a;
-  --joy-color-brand-primary-hover: #b3892f;
-  --joy-color-brand-secondary: #14253e;
-  --joy-color-brand-accent: #c49a3a;
-  --joy-color-brand-navy: #14253e;
-  --joy-color-brand-gold: #c49a3a;
-  --joy-color-brand-cream: #f8f3e8;
-  --joy-color-brand-ink: #1f1c13;
-  --joy-color-surface-base: #ffffff;
-  --joy-color-surface-canvas: #f8f3e8;
-  --joy-color-surface-card: #ffffff;
-  --joy-color-surface-subtle: #f8fafc;
-  --joy-color-surface-muted: #f1f5f9;
-  --joy-color-surface-dark-base: #0d1829;
-  --joy-color-surface-dark-subtle: #14253e;
-  --joy-color-surface-dark-card: #14253e;
-  --joy-color-border-base: #e2d9c8;
-  --joy-color-border-subtle: #cbd5e1;
-  --joy-color-border-dark: #23354e;
-  --joy-color-text-primary: #1f1c13;
-  --joy-color-text-muted: #64748b;
-  --joy-color-text-inverse: #ffffff;
-  --joy-color-status-success: #10b981;
-  --joy-color-status-warning: #f59e0b;
-  --joy-color-status-danger: #ef4444;
-  --joy-color-status-info: #3b82f6;
-  --joy-spacing-1: 4px;
-  --joy-spacing-2: 8px;
-  --joy-spacing-3: 12px;
-  --joy-spacing-4: 16px;
-  --joy-spacing-6: 24px;
-  --joy-spacing-8: 32px;
-  --joy-radius-sm: 4px;
-  --joy-radius-md: 8px;
-  --joy-radius-lg: 12px;
-  --joy-radius-full: 9999px;
+  --joy-color-navy-50: #f2f5f9;
+  --joy-color-navy-100: #e1e8f2;
+  --joy-color-navy-200: #c4d3e5;
+  --joy-color-navy-300: #9cb5d3;
+  --joy-color-navy-400: #4c6e9f;
+  --joy-color-navy-500: #14253e;
+  --joy-color-navy-600: #182c47;
+  --joy-color-navy-700: #16273e;
+  --joy-color-navy-800: #15243b;
+  --joy-color-navy-900: #0f1b2e;
+  --joy-color-navy-950: #09111e;
+  --joy-color-gold-50: #fdf9ee;
+  --joy-color-gold-100: #fbf2db;
+  --joy-color-gold-200: #f4e2b0;
+  --joy-color-gold-300: #deb853;
+  --joy-color-gold-400: #c49a3a;
+  --joy-color-gold-500: #b3892f;
+  --joy-color-gold-600: #8c671a;
+  --joy-color-gold-700: #6e4f10;
+  --joy-color-gold-800: #503908;
+  --joy-color-gold-900: #352403;
+  --joy-color-gold-950: #1e1400;
+  --joy-color-ink-50: #f8f6f0;
+  --joy-color-ink-100: #ede8dd;
+  --joy-color-ink-200: #dad2c0;
+  --joy-color-ink-300: #bfb49e;
+  --joy-color-ink-400: #9a8d75;
+  --joy-color-ink-500: #1f1c13;
+  --joy-color-ink-600: #1b1810;
+  --joy-color-ink-700: #17140e;
+  --joy-color-ink-800: #13100b;
+  --joy-color-ink-900: #0e0c08;
+  --joy-color-ink-950: #080705;
+  --joy-color-cream-50: #fcfaf4;
+  --joy-color-cream-100: #f8f3e8;
+  --joy-color-cream-200: #f3ede0;
+  --joy-color-cream-300: #ece4d2;
+  --joy-color-neutral-50: #faf8f5;
+  --joy-color-neutral-100: #f3ede2;
+  --joy-color-neutral-200: #e5ded0;
+  --joy-color-neutral-300: #d5cdbd;
+  --joy-color-neutral-400: #938a79;
+  --joy-color-neutral-500: #6c6557;
+  --joy-color-neutral-600: #5f574a;
+  --joy-color-neutral-700: #474136;
+  --joy-color-neutral-800: #312c24;
+  --joy-color-neutral-900: #201c16;
+  --joy-color-neutral-950: #14120e;
+  --joy-color-status-success: undefined;
+  --joy-color-status-warning: undefined;
+  --joy-color-status-danger: undefined;
+  --joy-color-status-info: undefined;
+  --joy-z-base: 0;
+  --joy-z-sticky: 100;
+  --joy-z-backdrop: 900;
+  --joy-z-dropdown: 1000;
+  --joy-z-drawer: 1020;
+  --joy-z-modal: 1050;
+  --joy-z-popover: 1060;
+  --joy-z-toast: 1100;
+  --joy-z-tooltip: 1200;
+  --joy-font-size-xs: 0.75rem;
+  --joy-font-size-sm: 0.875rem;
+  --joy-font-size-md: 1rem;
+  --joy-font-size-lg: 1.2rem;
+  --joy-font-size-xl: 1.44rem;
+  --joy-font-size-2xl: 1.728rem;
+  --joy-font-size-3xl: 2.074rem;
+  --joy-font-size-4xl: 2.488rem;
+  --joy-font-size-5xl: 2.986rem;
+  --joy-font-size-display-sm: clamp(2rem, 4vw + 1rem, 2.5rem);
+  --joy-font-size-display-md: clamp(2.5rem, 5vw + 1rem, 3.25rem);
+  --joy-font-size-display-lg: clamp(3rem, 6vw + 1rem, 4rem);
+  --joy-line-height-tight: 1.15;
+  --joy-line-height-snug: 1.375;
+  --joy-line-height-normal: 1.5;
+  --joy-line-height-relaxed: 1.625;
+  --joy-font-weight-regular: 400;
+  --joy-font-weight-medium: 500;
+  --joy-font-weight-semibold: 600;
+  --joy-font-weight-bold: 700;
+  --joy-letter-spacing-tight: -0.015em;
+  --joy-letter-spacing-normal: 0em;
+  --joy-space-1: 4px;
+  --joy-space-2: 8px;
+  --joy-space-3: 12px;
+  --joy-space-4: 16px;
+  --joy-space-5: 20px;
+  --joy-space-6: 24px;
+  --joy-space-8: 32px;
+  --joy-space-10: 40px;
+  --joy-space-12: 48px;
+  --joy-space-16: 64px;
+  --joy-space-20: 80px;
+  --joy-space-24: 96px;
+  --joy-space-0-5: 2px;
+  --joy-radius-control: 6px;
+  --joy-radius-card: 12px;
+  --joy-radius-overlay: 16px;
+  --joy-radius-pill: 9999px;
+  --joy-duration-fast: 150ms;
+  --joy-duration-normal: 250ms;
+  --joy-duration-slow: 400ms;
+  --joy-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --joy-ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --joy-ease-emphasized: cubic-bezier(0.2, 0.0, 0, 1);
+  --joy-control-height-sm: 32px;
+  --joy-control-height-md: 40px;
+  --joy-control-height-lg: 48px;
   --joy-font-family-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   --joy-font-family-mono: JetBrains Mono, Menlo, monospace;
-  --joy-motion-duration-fast: 150ms;
-  --joy-motion-duration-normal: 250ms;
-  --joy-motion-duration-slow: 400ms;
-  --joy-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
-  --joy-motion-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
-  --joy-motion-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
-  --joy-motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --joy-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --joy-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --joy-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --joy-shadow-overlay: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --joy-z-index-dropdown: 1000;
-  --joy-z-index-modal: 1050;
-  --joy-z-index-tooltip: 1100;
+  --joy-surface-canvas: #f8f3e8;
+  --joy-surface-card: #ffffff;
+  --joy-surface-raised: #ffffff;
+  --joy-surface-sunken: #f3ede0;
+  --joy-surface-overlay: #ffffff;
+  --joy-surface-inverse: #14253e;
+  --joy-text-primary: #1f1c13;
+  --joy-text-secondary: #474136;
+  --joy-text-muted: #6c6557;
+  --joy-text-inverse: #ffffff;
+  --joy-text-link: #8c671a;
+  --joy-text-on-accent: #14253e;
+  --joy-border-subtle: #ece4d2;
+  --joy-border-default: #938a79;
+  --joy-border-strong: #5f574a;
+  --joy-border-focus: #8c671a;
+  --joy-accent-default: #c49a3a;
+  --joy-accent-hover: #b3892f;
+  --joy-accent-active: #8c671a;
+  --joy-accent-subtle: #fdf9ee;
+  --joy-accent-text: #8c671a;
+  --joy-status-success-fg: #0f5132;
+  --joy-status-success-bg: #eef8f2;
+  --joy-status-success-border: #6ee7b7;
+  --joy-status-warning-fg: #873b06;
+  --joy-status-warning-bg: #fef6e7;
+  --joy-status-warning-border: #fcd34d;
+  --joy-status-danger-fg: #8f1414;
+  --joy-status-danger-bg: #fef2f2;
+  --joy-status-danger-border: #fca5a5;
+  --joy-status-info-fg: #0f3d70;
+  --joy-status-info-bg: #edf5fd;
+  --joy-status-info-border: #93c5fd;
+  --joy-focus-ring: 2px solid #8c671a;
+  --joy-elevation-0: none;
+  --joy-elevation-1: 0 1px 3px rgba(20, 37, 62, 0.08), 0 1px 2px rgba(20, 37, 62, 0.04);
+  --joy-elevation-2: 0 4px 8px -2px rgba(20, 37, 62, 0.1), 0 2px 4px -2px rgba(20, 37, 62, 0.06);
+  --joy-elevation-3: 0 12px 20px -4px rgba(20, 37, 62, 0.12), 0 4px 6px -2px rgba(20, 37, 62, 0.04);
+  /* ── Canonical Brand Invariants ── */
   --navy-500: #14253e;
   --gold-400: #c49a3a;
   --cream-100: #f8f3e8;
   --ink-500: #1f1c13;
-  --joy-surface-canvas: var(--joy-color-surface-canvas, #f8f3e8);
-  --joy-surface-card: var(--joy-color-surface-card, #ffffff);
-  --joy-border: var(--joy-color-border-base, #e2d9c8);
-  --joy-text-primary: var(--joy-color-text-primary, #1f1c13);
+  /* ── Legacy Variable Compatibility Layer ── */
+  --joy-color-brand-primary: var(--joy-accent-default);
+  --joy-color-brand-primary-hover: var(--joy-accent-hover);
+  --joy-color-brand-secondary: var(--joy-color-navy-500);
+  --joy-color-brand-accent: var(--joy-accent-default);
+  --joy-color-brand-navy: var(--joy-color-navy-500);
+  --joy-color-brand-gold: var(--joy-color-gold-400);
+  --joy-color-brand-cream: var(--joy-color-cream-100);
+  --joy-color-brand-ink: var(--joy-color-ink-500);
+  --joy-color-surface-base: var(--joy-surface-card);
+  --joy-color-surface-canvas: var(--joy-surface-canvas);
+  --joy-color-surface-card: var(--joy-surface-card);
+  --joy-color-surface-subtle: var(--joy-surface-sunken);
+  --joy-color-surface-muted: var(--joy-surface-sunken);
+  --joy-color-surface-elevated: var(--joy-surface-raised);
+  --joy-color-surface-dark-base: var(--joy-color-navy-950);
+  --joy-color-surface-dark-card: var(--joy-color-navy-900);
+  --joy-color-surface-dark-subtle: var(--joy-color-navy-800);
+  --joy-surface-frosted: rgba(255, 255, 255, 0.82);
+  --joy-backdrop-blur: blur(12px);
+  --joy-color-border-base: var(--joy-border-default);
+  --joy-color-border-subtle: var(--joy-border-subtle);
+  --joy-color-border-default: var(--joy-border-default);
+  --joy-color-border-dark: var(--joy-border-strong);
+  --joy-border: var(--joy-border-default);
+  --joy-border-hairline: var(--joy-border-subtle);
+  --joy-color-text-primary: var(--joy-text-primary);
+  --joy-color-text-secondary: var(--joy-text-secondary);
+  --joy-color-text-muted: var(--joy-text-muted);
+  --joy-color-text-inverse: var(--joy-text-inverse);
+  --joy-color-status-success: var(--joy-status-success-fg);
+  --joy-color-status-warning: var(--joy-status-warning-fg);
+  --joy-color-status-danger: var(--joy-status-danger-fg);
+  --joy-color-status-info: var(--joy-status-info-fg);
+  --joy-spacing-1: var(--joy-space-1);
+  --joy-spacing-2: var(--joy-space-2);
+  --joy-spacing-3: var(--joy-space-3);
+  --joy-spacing-4: var(--joy-space-4);
+  --joy-spacing-6: var(--joy-space-6);
+  --joy-spacing-8: var(--joy-space-8);
+  --joy-radius-sm: 4px;
+  --joy-radius-md: var(--joy-radius-control);
+  --joy-radius-lg: var(--joy-radius-card);
+  --joy-radius-xl: var(--joy-radius-overlay);
+  --joy-radius-full: var(--joy-radius-pill);
+  --joy-motion-duration-fast: var(--joy-duration-fast);
+  --joy-motion-duration-normal: var(--joy-duration-normal);
+  --joy-motion-duration-slow: var(--joy-duration-slow);
+  --joy-motion-easing-standard: var(--joy-ease-in-out);
+  --joy-motion-easing-decelerate: var(--joy-ease-out);
+  --joy-motion-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+  --joy-motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --joy-shadow-sm: var(--joy-elevation-1);
+  --joy-shadow-md: var(--joy-elevation-2);
+  --joy-shadow-lg: var(--joy-elevation-3);
+  --joy-shadow-overlay: 0 20px 25px -5px rgba(20, 37, 62, 0.15), 0 8px 10px -6px rgba(20, 37, 62, 0.1);
+  --joy-z-index-dropdown: var(--joy-z-dropdown);
+  --joy-z-index-modal: var(--joy-z-modal);
+  --joy-z-index-tooltip: var(--joy-z-tooltip);
+  --joy-font-display-letter-spacing: -0.02em;
+  --joy-font-variant-numeric: tabular-nums;
+  --joy-form-label-width: 120px;
 }
+
+[data-theme="dark"] {
+  --joy-surface-canvas: #09111e;
+  --joy-surface-card: #0f1b2e;
+  --joy-surface-raised: #15243b;
+  --joy-surface-sunken: #060b14;
+  --joy-surface-overlay: #15243b;
+  --joy-surface-inverse: #f8f3e8;
+  --joy-text-primary: #f8f3e8;
+  --joy-text-secondary: #d5cdbd;
+  --joy-text-muted: #938a79;
+  --joy-text-inverse: #1f1c13;
+  --joy-text-link: #deb853;
+  --joy-text-on-accent: #09111e;
+  --joy-border-subtle: #182c47;
+  --joy-border-default: #4c6e9f;
+  --joy-border-strong: #9cb5d3;
+  --joy-border-focus: #deb853;
+  --joy-accent-default: #deb853;
+  --joy-accent-hover: #f4e2b0;
+  --joy-accent-active: #c49a3a;
+  --joy-accent-subtle: #2a2211;
+  --joy-accent-text: #deb853;
+  --joy-status-success-fg: #6ee7b7;
+  --joy-status-success-bg: #062817;
+  --joy-status-success-border: #0f5132;
+  --joy-status-warning-fg: #fcd34d;
+  --joy-status-warning-bg: #361603;
+  --joy-status-warning-border: #873b06;
+  --joy-status-danger-fg: #fca5a5;
+  --joy-status-danger-bg: #3a0909;
+  --joy-status-danger-border: #8f1414;
+  --joy-status-info-fg: #93c5fd;
+  --joy-status-info-bg: #091e3a;
+  --joy-status-info-border: #0f3d70;
+  --joy-focus-ring: 2px solid #deb853;
+  --joy-elevation-0: none;
+  --joy-elevation-1: 0 0 0 1px rgba(76, 110, 159, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --joy-elevation-2: 0 0 0 1px rgba(76, 110, 159, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5);
+  --joy-elevation-3: 0 0 0 1px rgba(76, 110, 159, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+  --joy-color-surface-canvas: var(--joy-surface-canvas);
+  --joy-color-surface-card: var(--joy-surface-card);
+  --joy-color-border-subtle: var(--joy-border-subtle);
+  --joy-color-border-default: var(--joy-border-default);
+  --joy-color-text-primary: var(--joy-text-primary);
+  --joy-color-text-secondary: var(--joy-text-secondary);
+  --joy-color-text-muted: var(--joy-text-muted);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --joy-surface-canvas: #09111e;
+  --joy-surface-card: #0f1b2e;
+  --joy-surface-raised: #15243b;
+  --joy-surface-sunken: #060b14;
+  --joy-surface-overlay: #15243b;
+  --joy-surface-inverse: #f8f3e8;
+  --joy-text-primary: #f8f3e8;
+  --joy-text-secondary: #d5cdbd;
+  --joy-text-muted: #938a79;
+  --joy-text-inverse: #1f1c13;
+  --joy-text-link: #deb853;
+  --joy-text-on-accent: #09111e;
+  --joy-border-subtle: #182c47;
+  --joy-border-default: #4c6e9f;
+  --joy-border-strong: #9cb5d3;
+  --joy-border-focus: #deb853;
+  --joy-accent-default: #deb853;
+  --joy-accent-hover: #f4e2b0;
+  --joy-accent-active: #c49a3a;
+  --joy-accent-subtle: #2a2211;
+  --joy-accent-text: #deb853;
+  --joy-status-success-fg: #6ee7b7;
+  --joy-status-success-bg: #062817;
+  --joy-status-success-border: #0f5132;
+  --joy-status-warning-fg: #fcd34d;
+  --joy-status-warning-bg: #361603;
+  --joy-status-warning-border: #873b06;
+  --joy-status-danger-fg: #fca5a5;
+  --joy-status-danger-bg: #3a0909;
+  --joy-status-danger-border: #8f1414;
+  --joy-status-info-fg: #93c5fd;
+  --joy-status-info-bg: #091e3a;
+  --joy-status-info-border: #0f3d70;
+  --joy-focus-ring: 2px solid #deb853;
+  --joy-elevation-0: none;
+  --joy-elevation-1: 0 0 0 1px rgba(76, 110, 159, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --joy-elevation-2: 0 0 0 1px rgba(76, 110, 159, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5);
+  --joy-elevation-3: 0 0 0 1px rgba(76, 110, 159, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+  --joy-color-surface-canvas: var(--joy-surface-canvas);
+  --joy-color-surface-card: var(--joy-surface-card);
+  --joy-color-border-subtle: var(--joy-border-subtle);
+  --joy-color-border-default: var(--joy-border-default);
+  --joy-color-text-primary: var(--joy-text-primary);
+  --joy-color-text-secondary: var(--joy-text-secondary);
+  --joy-color-text-muted: var(--joy-text-muted);
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .joy-*,
+  .joy-*::before,
+  .joy-*::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+@media (pointer: coarse) {
+  :root {
+    --joy-control-height-sm: 44px;
+    --joy-control-height-md: 44px;
+    --joy-control-height-lg: 48px;
+  }
+}
+
 
 
 /* ── Joymify Component Base Styling & Motion Engine ── */
@@ -1102,7 +1378,7 @@ select.joy-select__input {
 
 /* ── WCAG 2.2 AA Focus Indicators ── */
 :focus-visible {
-  outline: 2px solid var(--joy-color-brand-primary, #7c3aed);
+  outline: var(--joy-focus-ring);
   outline-offset: 2px;
 }
 
@@ -3681,23 +3957,6 @@ h1, h2, h3, .joy-display {
 }
 
 /* ── Institutional Color Palette Engine ── */
-[data-palette="joymify"], :root[data-palette="joymify"] {
-  --navy-500: #14253e;
-  --gold-400: #c49a3a;
-  --cream-100: #f8f3e8;
-  --ink-500: #1f1c13;
-  --joy-color-brand-primary: #c49a3a;
-  --joy-color-brand-primary-hover: #d4ab4b;
-  --joy-surface-canvas: #0d1829;
-  --joy-surface-card: #14253e;
-  --joy-border: #23354e;
-  --joy-text-primary: #f8f3e8;
-  --joy-color-surface-canvas: #0d1829;
-  --joy-color-surface-card: #14253e;
-  --joy-color-border-subtle: #23354e;
-  --joy-color-text-primary: #f8f3e8;
-}
-
 [data-palette="obsidian"], :root[data-palette="obsidian"] {
   --navy-500: #090d16;
   --gold-400: #10b981;

@@ -9,25 +9,115 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
 const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
 
-function flattenTokens(obj, prefix = '') {
-  let cssVars = [];
-  let jsObj = {};
-  for (const key of Object.keys(obj)) {
-    const val = obj[key];
-    const newPrefix = prefix ? `${prefix}-${key}` : key;
-    if (val && typeof val === 'object' && 'value' in val) {
-      cssVars.push(`  --joy-${newPrefix}: ${val.value};`);
-      jsObj[newPrefix] = val.value;
-    } else if (val && typeof val === 'object') {
-      const nested = flattenTokens(val, newPrefix);
-      cssVars.push(...nested.cssVars);
-      Object.assign(jsObj, nested.jsObj);
-    }
+// Resolve reference like "{color.gold.600}"
+function resolveRef(refStr, rootTokens, depth = 0) {
+  if (depth > 10 || typeof refStr !== 'string') return refStr;
+  const match = refStr.match(/^\{([^}]+)\}$/);
+  if (!match) return refStr;
+  const parts = match[1].split('.');
+  let current = rootTokens;
+  for (const part of parts) {
+    if (!current || typeof current !== 'object') return refStr;
+    current = current[part];
   }
-  return { cssVars, jsObj };
+  if (current && typeof current === 'object' && 'value' in current) {
+    return resolveRef(current.value, rootTokens, depth + 1);
+  }
+  return typeof current === 'string' ? resolveRef(current, rootTokens, depth + 1) : refStr;
 }
 
-const { cssVars, jsObj } = flattenTokens(tokens);
+// Extract primitives, light semantics, dark semantics
+function extractTokens(rootTokens) {
+  const primitiveVars = [];
+  const lightVars = [];
+  const darkVars = [];
+  const jsObj = {};
+
+  // 1. Primitive colors
+  if (rootTokens.color) {
+    for (const [rampName, rampObj] of Object.entries(rootTokens.color)) {
+      for (const [step, token] of Object.entries(rampObj)) {
+        const val = resolveRef(token.value, rootTokens);
+        primitiveVars.push(`  --joy-color-${rampName}-${step}: ${val};`);
+        jsObj[`color-${rampName}-${step}`] = val;
+      }
+    }
+  }
+
+  // 2. Dimension and motion scales
+  const scales = [
+    { key: 'z', prefix: 'z' },
+    { key: 'font-size', prefix: 'font-size' },
+    { key: 'line-height', prefix: 'line-height' },
+    { key: 'font-weight', prefix: 'font-weight' },
+    { key: 'letter-spacing', prefix: 'letter-spacing' },
+    { key: 'space', prefix: 'space' },
+    { key: 'radius', prefix: 'radius' },
+    { key: 'duration', prefix: 'duration' },
+    { key: 'ease', prefix: 'ease' },
+    { key: 'control-height', prefix: 'control-height' }
+  ];
+
+  for (const { key, prefix } of scales) {
+    if (rootTokens[key]) {
+      for (const [name, token] of Object.entries(rootTokens[key])) {
+        const val = resolveRef(token.value, rootTokens);
+        const cleanName = name.replace('.', '-');
+        primitiveVars.push(`  --joy-${prefix}-${cleanName}: ${val};`);
+        jsObj[`${prefix}-${cleanName}`] = val;
+      }
+    }
+  }
+
+  // 3. Font families
+  if (rootTokens.font && rootTokens.font.family) {
+    for (const [name, token] of Object.entries(rootTokens.font.family)) {
+      const val = resolveRef(token.value, rootTokens);
+      primitiveVars.push(`  --joy-font-family-${name}: ${val};`);
+      jsObj[`font-family-${name}`] = val;
+    }
+  }
+
+  // 4. Semantic Light
+  if (rootTokens.semantic && rootTokens.semantic.light) {
+    const light = rootTokens.semantic.light;
+    for (const [group, groupObj] of Object.entries(light)) {
+      if (group === 'focus-ring') {
+        const val = resolveRef(groupObj.value, rootTokens);
+        lightVars.push(`  --joy-focus-ring: ${val};`);
+        jsObj['focus-ring'] = val;
+      } else if (typeof groupObj === 'object') {
+        for (const [name, token] of Object.entries(groupObj)) {
+          const val = resolveRef(token.value, rootTokens);
+          const varName = group === 'status' ? `status-${name}` : `${group}-${name}`;
+          lightVars.push(`  --joy-${varName}: ${val};`);
+          jsObj[varName] = val;
+        }
+      }
+    }
+  }
+
+  // 5. Semantic Dark
+  if (rootTokens.semantic && rootTokens.semantic.dark) {
+    const dark = rootTokens.semantic.dark;
+    for (const [group, groupObj] of Object.entries(dark)) {
+      if (group === 'focus-ring') {
+        const val = resolveRef(groupObj.value, rootTokens);
+        darkVars.push(`  --joy-focus-ring: ${val};`);
+      } else if (typeof groupObj === 'object') {
+        for (const [name, token] of Object.entries(groupObj)) {
+          const val = resolveRef(token.value, rootTokens);
+          const varName = group === 'status' ? `status-${name}` : `${group}-${name}`;
+          darkVars.push(`  --joy-${varName}: ${val};`);
+        }
+      }
+    }
+  }
+
+  return { primitiveVars, lightVars, darkVars, jsObj };
+}
+
+const { primitiveVars, lightVars, darkVars, jsObj } = extractTokens(tokens);
 
 // 1. theme.css with unified component classes
 const componentStyles = `
@@ -1071,7 +1161,7 @@ select.joy-select__input {
 
 /* ── WCAG 2.2 AA Focus Indicators ── */
 :focus-visible {
-  outline: 2px solid var(--joy-color-brand-primary, #7c3aed);
+  outline: var(--joy-focus-ring);
   outline-offset: 2px;
 }
 
@@ -3650,23 +3740,6 @@ h1, h2, h3, .joy-display {
 }
 
 /* ── Institutional Color Palette Engine ── */
-[data-palette="joymify"], :root[data-palette="joymify"] {
-  --navy-500: #14253e;
-  --gold-400: #c49a3a;
-  --cream-100: #f8f3e8;
-  --ink-500: #1f1c13;
-  --joy-color-brand-primary: #c49a3a;
-  --joy-color-brand-primary-hover: #d4ab4b;
-  --joy-surface-canvas: #0d1829;
-  --joy-surface-card: #14253e;
-  --joy-border: #23354e;
-  --joy-text-primary: #f8f3e8;
-  --joy-color-surface-canvas: #0d1829;
-  --joy-color-surface-card: #14253e;
-  --joy-color-border-subtle: #23354e;
-  --joy-color-text-primary: #f8f3e8;
-}
-
 [data-palette="obsidian"], :root[data-palette="obsidian"] {
   --navy-500: #090d16;
   --gold-400: #10b981;
@@ -3737,21 +3810,193 @@ h1, h2, h3, .joy-display {
 `;
 
 const canonicalVars = [
+  '  /* ── Canonical Brand Invariants ── */',
   '  --navy-500: #14253e;',
   '  --gold-400: #c49a3a;',
   '  --cream-100: #f8f3e8;',
   '  --ink-500: #1f1c13;',
-  '  --joy-surface-canvas: var(--joy-color-surface-canvas, #f8f3e8);',
-  '  --joy-surface-card: var(--joy-color-surface-card, #ffffff);',
-  '  --joy-border: var(--joy-color-border-base, #e2d9c8);',
-  '  --joy-text-primary: var(--joy-color-text-primary, #1f1c13);',
 ].join('\n');
 
-const themeCss = `:root {\n${cssVars.join('\n')}\n${canonicalVars}\n}\n\n${componentStyles}`;
+const legacyAliases = [
+  '  /* ── Legacy Variable Compatibility Layer ── */',
+  '  --joy-color-brand-primary: var(--joy-accent-default);',
+  '  --joy-color-brand-primary-hover: var(--joy-accent-hover);',
+  '  --joy-color-brand-secondary: var(--joy-color-navy-500);',
+  '  --joy-color-brand-accent: var(--joy-accent-default);',
+  '  --joy-color-brand-navy: var(--joy-color-navy-500);',
+  '  --joy-color-brand-gold: var(--joy-color-gold-400);',
+  '  --joy-color-brand-cream: var(--joy-color-cream-100);',
+  '  --joy-color-brand-ink: var(--joy-color-ink-500);',
+
+  '  --joy-color-surface-base: var(--joy-surface-card);',
+  '  --joy-color-surface-canvas: var(--joy-surface-canvas);',
+  '  --joy-color-surface-card: var(--joy-surface-card);',
+  '  --joy-color-surface-subtle: var(--joy-surface-sunken);',
+  '  --joy-color-surface-muted: var(--joy-surface-sunken);',
+  '  --joy-color-surface-elevated: var(--joy-surface-raised);',
+  '  --joy-color-surface-dark-base: var(--joy-color-navy-950);',
+  '  --joy-color-surface-dark-card: var(--joy-color-navy-900);',
+  '  --joy-color-surface-dark-subtle: var(--joy-color-navy-800);',
+  '  --joy-surface-frosted: rgba(255, 255, 255, 0.82);',
+  '  --joy-backdrop-blur: blur(12px);',
+
+  '  --joy-color-border-base: var(--joy-border-default);',
+  '  --joy-color-border-subtle: var(--joy-border-subtle);',
+  '  --joy-color-border-default: var(--joy-border-default);',
+  '  --joy-color-border-dark: var(--joy-border-strong);',
+  '  --joy-border: var(--joy-border-default);',
+  '  --joy-border-hairline: var(--joy-border-subtle);',
+
+  '  --joy-color-text-primary: var(--joy-text-primary);',
+  '  --joy-color-text-secondary: var(--joy-text-secondary);',
+  '  --joy-color-text-muted: var(--joy-text-muted);',
+  '  --joy-color-text-inverse: var(--joy-text-inverse);',
+
+  '  --joy-color-status-success: var(--joy-status-success-fg);',
+  '  --joy-color-status-warning: var(--joy-status-warning-fg);',
+  '  --joy-color-status-danger: var(--joy-status-danger-fg);',
+  '  --joy-color-status-info: var(--joy-status-info-fg);',
+
+  '  --joy-spacing-1: var(--joy-space-1);',
+  '  --joy-spacing-2: var(--joy-space-2);',
+  '  --joy-spacing-3: var(--joy-space-3);',
+  '  --joy-spacing-4: var(--joy-space-4);',
+  '  --joy-spacing-6: var(--joy-space-6);',
+  '  --joy-spacing-8: var(--joy-space-8);',
+
+  '  --joy-radius-sm: 4px;',
+  '  --joy-radius-md: var(--joy-radius-control);',
+  '  --joy-radius-lg: var(--joy-radius-card);',
+  '  --joy-radius-xl: var(--joy-radius-overlay);',
+  '  --joy-radius-full: var(--joy-radius-pill);',
+
+  '  --joy-motion-duration-fast: var(--joy-duration-fast);',
+  '  --joy-motion-duration-normal: var(--joy-duration-normal);',
+  '  --joy-motion-duration-slow: var(--joy-duration-slow);',
+  '  --joy-motion-easing-standard: var(--joy-ease-in-out);',
+  '  --joy-motion-easing-decelerate: var(--joy-ease-out);',
+  '  --joy-motion-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);',
+  '  --joy-motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);',
+
+  '  --joy-shadow-sm: var(--joy-elevation-1);',
+  '  --joy-shadow-md: var(--joy-elevation-2);',
+  '  --joy-shadow-lg: var(--joy-elevation-3);',
+  '  --joy-shadow-overlay: 0 20px 25px -5px rgba(20, 37, 62, 0.15), 0 8px 10px -6px rgba(20, 37, 62, 0.1);',
+
+  '  --joy-z-index-dropdown: var(--joy-z-dropdown);',
+  '  --joy-z-index-modal: var(--joy-z-modal);',
+  '  --joy-z-index-tooltip: var(--joy-z-tooltip);',
+
+  '  --joy-font-display-letter-spacing: -0.02em;',
+  '  --joy-font-variant-numeric: tabular-nums;',
+  '  --joy-form-label-width: 120px;',
+].join('\n');
+
+const darkLegacyRemap = [
+  '  --joy-color-surface-canvas: var(--joy-surface-canvas);',
+  '  --joy-color-surface-card: var(--joy-surface-card);',
+  '  --joy-color-border-subtle: var(--joy-border-subtle);',
+  '  --joy-color-border-default: var(--joy-border-default);',
+  '  --joy-color-text-primary: var(--joy-text-primary);',
+  '  --joy-color-text-secondary: var(--joy-text-secondary);',
+  '  --joy-color-text-muted: var(--joy-text-muted);',
+].join('\n');
+
+const mediaReducedMotion = `
+@media (prefers-reduced-motion: reduce) {
+  .joy-*,
+  .joy-*::before,
+  .joy-*::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+`;
+
+const mediaCoarsePointer = `
+@media (pointer: coarse) {
+  :root {
+    --joy-control-height-sm: 44px;
+    --joy-control-height-md: 44px;
+    --joy-control-height-lg: 48px;
+  }
+}
+`;
+
+const rootBlock = `:root {\n${primitiveVars.join('\n')}\n${lightVars.join('\n')}\n${canonicalVars}\n${legacyAliases}\n}\n`;
+const darkBlock = `[data-theme="dark"] {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n}\n`;
+const mediaDarkBlock = `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n  }\n}\n`;
+
+const themeCss = `${rootBlock}\n${darkBlock}\n${mediaDarkBlock}\n${mediaReducedMotion}\n${mediaCoarsePointer}\n\n${componentStyles}`;
 fs.writeFileSync(path.join(outDir, 'theme.css'), themeCss);
 
-// 2. tailwind-theme.css
-const twThemeCss = `@theme {\n${cssVars.map(v => v.replace('--joy-', '--color-joy-')).join('\n')}\n}\n`;
+// 2. tailwind-theme.css with semantic category mapping
+const twEntries = [];
+
+if (tokens.color) {
+  for (const [rampName, rampObj] of Object.entries(tokens.color)) {
+    for (const [step, token] of Object.entries(rampObj)) {
+      twEntries.push(`  --color-joy-${rampName}-${step}: ${resolveRef(token.value, tokens)};`);
+    }
+  }
+}
+if (tokens.semantic && tokens.semantic.light) {
+  const light = tokens.semantic.light;
+  for (const [group, groupObj] of Object.entries(light)) {
+    if (group !== 'elevation' && group !== 'focus-ring') {
+      for (const [name, token] of Object.entries(groupObj)) {
+        const key = group === 'status' ? `status-${name}` : `${group}-${name}`;
+        twEntries.push(`  --color-joy-${key}: ${resolveRef(token.value, tokens)};`);
+      }
+    }
+  }
+}
+
+if (tokens.space) {
+  for (const [k, v] of Object.entries(tokens.space)) {
+    twEntries.push(`  --spacing-joy-${k.replace('.', '-')}: ${v.value};`);
+  }
+}
+
+if (tokens.radius) {
+  for (const [k, v] of Object.entries(tokens.radius)) {
+    twEntries.push(`  --radius-joy-${k}: ${v.value};`);
+  }
+}
+
+if (tokens.font && tokens.font.family) {
+  for (const [k, v] of Object.entries(tokens.font.family)) {
+    twEntries.push(`  --font-joy-${k}: ${v.value};`);
+  }
+}
+
+if (tokens['font-size']) {
+  for (const [k, v] of Object.entries(tokens['font-size'])) {
+    twEntries.push(`  --text-joy-${k}: ${v.value};`);
+  }
+}
+
+if (tokens.semantic && tokens.semantic.light && tokens.semantic.light.elevation) {
+  for (const [k, v] of Object.entries(tokens.semantic.light.elevation)) {
+    twEntries.push(`  --shadow-joy-${k}: ${v.value};`);
+  }
+}
+
+if (tokens.ease) {
+  for (const [k, v] of Object.entries(tokens.ease)) {
+    twEntries.push(`  --ease-joy-${k}: ${v.value};`);
+  }
+}
+
+if (tokens.duration) {
+  for (const [k, v] of Object.entries(tokens.duration)) {
+    twEntries.push(`  --animate-joy-${k}: ${v.value};`);
+  }
+}
+
+const twThemeCss = `@theme {\n${twEntries.join('\n')}\n}\n`;
 fs.writeFileSync(path.join(outDir, 'tailwind-theme.css'), twThemeCss);
 
 // 3. index.js (ESM) & index.cjs (CJS) & index.d.ts
@@ -3761,7 +4006,24 @@ fs.writeFileSync(path.join(outDir, 'index.js'), jsContent);
 const cjsContent = `exports.tokens = ${JSON.stringify(jsObj, null, 2)};\nexports.default = exports.tokens;\n`;
 fs.writeFileSync(path.join(outDir, 'index.cjs'), cjsContent);
 
-const dtsContent = `export declare const tokens: Record<string, string>;\nexport default tokens;\n`;
+// Strongly typed token declaration
+const tokenKeys = Object.keys(jsObj).map(k => `  | '${k}'`).join('\n');
+const dtsContent = `/**
+ * Joymify Design Tokens
+ */
+export type JoyTokenName =
+${tokenKeys};
+
+export interface JoyTokens extends Record<string, string> {
+  /**
+   * @deprecated Use new semantic tokens (--joy-accent-default, etc.) instead
+   */
+  [key: string]: string;
+}
+
+export declare const tokens: JoyTokens;
+export default tokens;
+`;
 fs.writeFileSync(path.join(outDir, 'index.d.ts'), dtsContent);
 
 console.log("Tokens compiled successfully to", outDir);
