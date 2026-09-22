@@ -285,4 +285,49 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
+test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  ['Button', 'Input', 'InputNumber', 'Select', 'DatePicker', 'DateRangePicker'].forEach(assertWave2);
+
+  const button = read('Button');
+  assert.ok(button.includes("'link'"), "Button must include 'link' variant");
+  assert.ok(button.includes('joy-button__label'), 'Button must include joy-button__label');
+  assert.ok(button.includes('joy-button--block'), 'Button must include joy-button--block');
+  assert.ok(button.includes('joy-button--icon-only'), 'Button must include joy-button--icon-only');
+  assert.ok(button.includes('aria-busy'), 'Button must include aria-busy');
+  assert.ok(button.includes('iconStart'), 'Button must include iconStart');
+  assert.ok(button.includes('iconEnd'), 'Button must include iconEnd');
+
+  const input = read('Input');
+  assert.ok(input.includes('joy-input-wrapper__message'), 'Input must include joy-input-wrapper__message');
+  assert.ok(input.includes('readonly'), 'Input must include readonly');
+
+  const inputNumber = read('InputNumber');
+  assert.ok(inputNumber.includes('inputmode="decimal"'), 'InputNumber must include inputmode="decimal"');
+  assert.ok(
+    inputNumber.split('\n').some((line) => line.includes('<input') && line.includes('role="spinbutton"')),
+    'InputNumber must include role="spinbutton" on the input line'
+  );
+
+  const select = read('Select');
+  assert.ok(select.includes('role="combobox"'), 'Select must include role="combobox"');
+  assert.ok(select.includes('joy-select__listbox'), 'Select must include joy-select__listbox');
+  assert.ok(select.includes('openOverlay'), 'Select must include openOverlay');
+  assert.ok(select.includes('type="hidden"'), 'Select must include type="hidden"');
+
+  const datePicker = read('DatePicker');
+  assert.ok(datePicker.includes('@joymify/icons'), 'DatePicker must include @joymify/icons');
+
+  const dateRangePicker = read('DateRangePicker');
+  assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
+});
+
 

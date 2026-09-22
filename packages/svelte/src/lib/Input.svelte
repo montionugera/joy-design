@@ -1,66 +1,74 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
     value?: string;
     placeholder?: string;
     disabled?: boolean;
+    readonly?: boolean;
     error?: boolean;
+    success?: boolean;
+    message?: string;
+    size?: 'sm' | 'md' | 'lg';
     type?: string;
+    id?: string;
+    name?: string;
+    prefix?: Snippet;
+    suffix?: Snippet;
     oninput?: (e: Event) => void;
+    onchange?: (e: Event) => void;
+    class?: string;
+    ref?: HTMLInputElement | null;
   }
 
   let {
     value = $bindable(''),
     placeholder = '',
     disabled = false,
+    readonly = false,
     error = false,
+    success = false,
+    message,
+    size = 'md',
     type = 'text',
-    oninput
+    id,
+    name,
+    prefix,
+    suffix,
+    oninput,
+    onchange,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 </script>
 
-<div class="joy-input-wrapper" class:joy-input-wrapper--error={error}>
+<div
+  class="joy-input-wrapper joy-input-wrapper--{size} {error ? 'joy-input-wrapper--error' : ''} {success ? 'joy-input-wrapper--success' : ''} {disabled ? 'joy-input-wrapper--disabled' : ''} {readonly ? 'joy-input-wrapper--readonly' : ''} {className}"
+>
+  {#if prefix}
+    <span class="joy-input-wrapper__prefix">{@render prefix()}</span>
+  {/if}
   <input
+    bind:this={ref}
+    {id}
+    {name}
     {type}
     {disabled}
+    {readonly}
     {placeholder}
     bind:value
     {oninput}
+    {onchange}
     class="joy-input"
+    aria-invalid={error || undefined}
+    aria-describedby={message ? (id ? `${id}-message` : undefined) : undefined}
+    {...rest}
   />
+  {#if suffix}
+    <span class="joy-input-wrapper__suffix">{@render suffix()}</span>
+  {/if}
+  {#if message}
+    <p class="joy-input-wrapper__message" id={id ? `${id}-message` : undefined}>{message}</p>
+  {/if}
 </div>
-
-<style>
-  .joy-input-wrapper {
-    display: inline-flex;
-    width: 100%;
-    border: 1px solid var(--joy-color-surface-muted, #cbd5e1);
-    border-radius: var(--joy-radius-md, 8px);
-    background: var(--joy-color-surface-base, #ffffff);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-  .joy-input-wrapper:focus-within {
-    border-color: var(--joy-color-brand-primary, #7c3aed);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
-  }
-  .joy-input-wrapper--error {
-    border-color: var(--joy-color-status-danger, #ef4444);
-  }
-  .joy-input-wrapper--error:focus-within {
-    border-color: var(--joy-color-status-danger, #ef4444);
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
-  }
-  .joy-input {
-    width: 100%;
-    padding: var(--joy-spacing-2, 8px) var(--joy-spacing-3, 12px);
-    font-family: var(--joy-font-family-sans, sans-serif);
-    font-size: 0.875rem;
-    color: var(--joy-color-text-primary, #0f172a);
-    border: none;
-    background: transparent;
-    outline: none;
-  }
-  .joy-input:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-</style>
