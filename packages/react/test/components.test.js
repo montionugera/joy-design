@@ -306,4 +306,31 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
+test('Wave 2 C-L4: TreeSelect, Cascader, Transfer, Upload match contract', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+  };
+
+  for (const comp of ['TreeSelect', 'Cascader', 'Transfer', 'Upload']) {
+    assertWave2(comp);
+  }
+
+  const treeSelect = read('TreeSelect');
+  const cascader = read('Cascader');
+  const transfer = read('Transfer');
+  const upload = read('Upload');
+
+  assert.ok(treeSelect.includes('useOverlay('), 'TreeSelect must include useOverlay(');
+  assert.ok(cascader.includes('useOverlay('), 'Cascader must include useOverlay(');
+  assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
+  assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
+  assert.ok(upload.includes('@joymify/icons/react'), 'Upload must import @joymify/icons/react');
+  assert.ok(!upload.includes('📁'), 'Upload must not include emoji');
+});
+
 

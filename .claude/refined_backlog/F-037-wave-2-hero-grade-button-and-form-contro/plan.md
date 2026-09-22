@@ -420,10 +420,10 @@ Lane verify: `pnpm --filter @joymify/react test` exit 0; `bash scripts/lint-colo
 
 **Owns:** `packages/react/src/{TreeSelect,Cascader,Transfer,Upload}.tsx`, test block `Wave 2 C-L4`.
 
-- [ ] C-L4.1 TreeSelect.tsx: delete the `joy-border`/`joy-surface-card`/`joy-text-primary` utilities and every inline colour and `z-index`; `useOverlay`; selected text via `joy-treeselect__node--selected`; tree keyboard as B-L4.1. (RXF-012, RXF-074, RXF-104, RXF-143, RXF-144, RXF-158.) Cascader.tsx: same; column keyboard. (RXF-053, RXF-075, RXF-105, RXF-145, RXF-146, RXF-159.)
-- [ ] C-L4.2 Transfer.tsx: delete `#ffffff` list surfaces and `joy-button--primary`; icon-only Buttons with `ChevronRight`/`ChevronLeft`; `onChange(targetKeys, direction, moveKeys)` kept and documented; rows as `label.joy-transfer__item`. (RXF-076, RXF-106, RXF-126.) Upload.tsx: `📁` -> `Upload` icon; `File`/`Close` icons in the list; delete `joy-color-brand-primary`/`joy-color-text-muted` utilities; `forwardRef<HTMLDivElement>`. (RXF-032, RXF-073, RXF-103.)
-- [ ] C-L4.3 Test block `Wave 2 C-L4`: `assertWave2` for the four files; TreeSelect and Cascader include `useOverlay(`; Transfer includes `joy-button--icon-only` and not `joy-button--primary`; Upload imports `@joymify/icons/react` and does not include `📁`.
-- [ ] C-L4.4 Verify (lane verify). Commit: `feat(react): TreeSelect, Cascader, Transfer, Upload on useOverlay with real classes`. Lane gate.
+- [x] C-L4.1 TreeSelect.tsx: delete the `joy-border`/`joy-surface-card`/`joy-text-primary` utilities and every inline colour and `z-index`; `useOverlay`; selected text via `joy-treeselect__node--selected`; tree keyboard as B-L4.1. (RXF-012, RXF-074, RXF-104, RXF-143, RXF-144, RXF-158.) Cascader.tsx: same; column keyboard. (RXF-053, RXF-075, RXF-105, RXF-145, RXF-146, RXF-159.)
+- [x] C-L4.2 Transfer.tsx: delete `#ffffff` list surfaces and `joy-button--primary`; icon-only Buttons with `ChevronRight`/`ChevronLeft`; `onChange(targetKeys, direction, moveKeys)` kept and documented; rows as `label.joy-transfer__item`. (RXF-076, RXF-106, RXF-126.) Upload.tsx: `📁` -> `Upload` icon; `File`/`Close` icons in the list; delete `joy-color-brand-primary`/`joy-color-text-muted` utilities; `forwardRef<HTMLDivElement>`. (RXF-032, RXF-073, RXF-103.)
+- [x] C-L4.3 Test block `Wave 2 C-L4`: `assertWave2` for the four files; TreeSelect and Cascader include `useOverlay(`; Transfer includes `joy-button--icon-only` and not `joy-button--primary`; Upload imports `@joymify/icons/react` and does not include `📁`.
+- [x] C-L4.4 Verify (lane verify). Commit: `feat(react): TreeSelect, Cascader, Transfer, Upload on useOverlay with real classes`. Lane gate.
 
 ## Phase D — hub stories, contracts, evidence, gates, docs (sequential D1 -> D3, after all eight lanes are merged into `feat/F-037`)
 
