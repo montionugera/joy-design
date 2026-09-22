@@ -308,6 +308,7 @@ test('React standard library components implement accessible traits and forwardR
 
 test('Wave 2 C-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker match contract', () => {
 test('Wave 2 C-L2: TimePicker, Mentions, MarkdownEditor', () => {
+test('Wave 2 C-L4: TreeSelect, Cascader, Transfer, Upload match contract', () => {
   const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
   const assertWave2 = (name) => {
     const src = read(name);
@@ -390,6 +391,21 @@ test('Wave 2 C-L3: Checkbox, Switch, RadioGroup, Slider, Rate, Segmented, Form, 
   const form = read('Form');
   assert.ok(form.includes('createContext'), 'Form must export createContext FormContext');
   assert.ok(form.includes('cx('), 'Form must use cx helper');
+  for (const comp of ['TreeSelect', 'Cascader', 'Transfer', 'Upload']) {
+    assertWave2(comp);
+  }
+
+  const treeSelect = read('TreeSelect');
+  const cascader = read('Cascader');
+  const transfer = read('Transfer');
+  const upload = read('Upload');
+
+  assert.ok(treeSelect.includes('useOverlay('), 'TreeSelect must include useOverlay(');
+  assert.ok(cascader.includes('useOverlay('), 'Cascader must include useOverlay(');
+  assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
+  assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
+  assert.ok(upload.includes('@joymify/icons/react'), 'Upload must import @joymify/icons/react');
+  assert.ok(!upload.includes('\u{1F4C1}'), 'Upload must not include emoji');
 });
 
 
