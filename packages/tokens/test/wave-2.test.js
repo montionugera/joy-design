@@ -184,3 +184,31 @@ test('Wave 2 choice controls (checkbox, radio, switch, slider, rate, segmented) 
   assert.ok(css.includes('.joy-switch--sm .joy-switch__thumb'), 'small switch thumb styles must exist');
 });
 
+test('Wave 2 overlay primitive, upload, treeselect, cascader, and transfer in theme.css', () => {
+  const expectedPatterns = [
+    '.joy-overlay',
+    '.joy-overlay--sheet',
+    '.joy-overlay--sheet .joy-cascader__columns',
+    '.joy-treeselect__panel',
+    '.joy-transfer__empty',
+    '.joy-upload-dragger',
+    '.joy-upload-list'
+  ];
+
+  for (const pattern of expectedPatterns) {
+    assert.ok(css.includes(pattern), `${pattern} must be compiled in theme.css`);
+  }
+
+  // Media queries
+  assert.ok(
+    /@media\s*\([^)]*max-width:\s*640px[^)]*\)[^{]*\{[\s\S]*?\.joy-transfer/m.test(css),
+    '@media (max-width: 640px) block for .joy-transfer must exist'
+  );
+
+  // Forbidden patterns
+  assert.ok(!css.includes('.joy-cascader-menus'), 'theme.css must not contain .joy-cascader-menus');
+  assert.ok(!css.includes('z-index: 1000'), 'theme.css must not contain z-index: 1000');
+  assert.ok(!css.includes('z-index: 1050'), 'theme.css must not contain z-index: 1050');
+  assert.ok(!css.includes('z-index: 1100'), 'theme.css must not contain z-index: 1100');
+});
+

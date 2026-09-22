@@ -127,3 +127,43 @@ Verdict: **PASS (Clean)**
 
 Verdict: **PASS (Clean)**
 
+---
+
+# Quality Gate Review: Phase A (Task A4)
+
+## Scope
+- Task A4: Overlay primitive (`.joy-overlay`, `.joy-overlay--sheet`, `.joy-overlay--above`), TreeSelect, Cascader, Transfer, and Upload CSS in `packages/tokens/build.js`, tokenized z-index removal, and test suite in `packages/tokens/test/wave-2.test.js`.
+
+## Reviewers
+- code-reviewer (adversarial review)
+- typescript-reviewer (type contracts & CSS compilation)
+
+## Findings & Verifications
+
+### 1. Token Usage & Color Integrity
+- All styles compiled strictly using semantic tokens (`--joy-surface-overlay`, `--joy-surface-card`, `--joy-surface-raised`, `--joy-surface-sunken`, `--joy-border-default`, `--joy-border-subtle`, `--joy-border-strong`, `--joy-border-focus`, `--joy-text-primary`, `--joy-text-secondary`, `--joy-text-muted`, `--joy-accent-default`, `--joy-accent-subtle`, `--joy-accent-text`, `--joy-status-danger-fg`, `--joy-status-danger-bg`, `--joy-elevation-3`, `--joy-radius-overlay`, `--joy-radius-card`, `--joy-radius-control`, `--joy-radius-pill`, `--joy-z-dropdown`).
+- Zero hardcoded hex, rgb, or hsl color literals in touched blocks.
+- Zero var() fallbacks.
+- Deleted legacy `.joy-cascader-menus` and `.joy-treeselect__node--selected` with hardcoded `!important` color rules.
+
+### 2. Z-Index Tokenization & Overlay Contract
+- Wave 2 dropdown panels and overlay primitive bound to `position: fixed` and `z-index: var(--joy-z-dropdown)`.
+- Verified zero instances of arbitrary `z-index: 1000`, `z-index: 1050`, or `z-index: 1100` literals across Wave 2 components.
+- Overlay primitive supports fixed anchoring, bottom-sheet layout under 480px or coarse pointers (`.joy-overlay--sheet`), and flipped direction (`.joy-overlay--above`).
+
+### 3. Responsive & Touch Target Coverage
+- TreeSelect and Cascader controls share standard text-input min-height (`--joy-control-height-md`) and 16px font size on touch to eliminate iOS zoom.
+- Cascader columns stack vertically in mobile sheet layout (`.joy-overlay--sheet .joy-cascader__columns { flex-direction: column }`).
+- Transfer switches to vertical stacking with horizontal operation buttons under 640px (`@media (max-width: 640px)`).
+- TreeSelect remove tag, clear buttons, node toggles, and Upload remove button enforce hit targets conforming to control height standards.
+
+### 4. Automated Verification Verdict
+- `pnpm --filter @joymify/tokens build`: exit code 0
+- `pnpm --filter @joymify/tokens test`: 17/17 tests pass (exit code 0)
+- `bash scripts/lint-colors.sh`: clean, strict checks pass (exit code 0)
+- `node apps/storybook-hub/build.js`: exit code 0
+- `pnpm --filter @joymify/svelte test`: 10/10 tests pass (exit code 0)
+- `pnpm --filter @joymify/react test`: 10/10 tests pass (exit code 0)
+
+Verdict: **PASS (Clean)**
+
