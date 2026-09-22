@@ -285,4 +285,31 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
+test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  for (const comp of ['TimePicker', 'Mentions', 'MarkdownEditor']) {
+    assertWave2(comp);
+  }
+
+  const timePicker = read('TimePicker');
+  assert.ok(timePicker.includes('openOverlay'), 'TimePicker must include openOverlay');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('openOverlay'), 'Mentions must include openOverlay');
+  assert.ok(!mentions.includes('setTimeout'), 'Mentions must not include setTimeout');
+
+  const md = read('MarkdownEditor');
+  assert.ok(md.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
+  assert.ok(md.includes('@joymify/icons'), 'MarkdownEditor must include @joymify/icons');
+});
+
+
 
