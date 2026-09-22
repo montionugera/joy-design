@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { test, expect, type Page } from "@playwright/test";
 
 const themes = ["light", "dark"] as const;
@@ -108,6 +109,54 @@ test.describe("F-037 form control contracts", () => {
       ).toBe(false);
     });
 
+    test(`hub chrome and demo controls fit at 375px in ${theme}`, async ({
+      page,
+    }) => {
+      await open(page, "button", theme);
+
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth <=
+            document.documentElement.clientWidth,
+        ),
+      ).toBe(true);
+
+      for (const selector of [".topbar", "#seg-variant", "#seg-size"]) {
+        await expect(page.locator(selector)).toBeVisible();
+        expect(
+          await page.locator(selector).evaluate((element) => {
+            const { right } = element.getBoundingClientRect();
+            return right <= document.documentElement.clientWidth;
+          }),
+          `${selector} stays within the mobile viewport`,
+        ).toBe(true);
+      }
+    });
+
+    test(`canvas grid uses the visible border token in ${theme}`, async ({
+      page,
+    }) => {
+      await open(page, "button", theme);
+
+      const borderColor = await page.evaluate(() => {
+        const probe = document.createElement("span");
+        probe.style.color = "var(--joy-border-default)";
+        document.body.append(probe);
+        const color = getComputedStyle(probe).color;
+        probe.remove();
+        return color;
+      });
+
+      await expect(page.locator(".canvas").first()).toBeVisible();
+      expect(
+        await page
+          .locator(".canvas")
+          .first()
+          .evaluate((element) => getComputedStyle(element).backgroundImage),
+      ).toContain(borderColor);
+    });
+
     test(`Select and Cascader panels are bottom sheets under 480px in ${theme}`, async ({
       page,
     }) => {
@@ -130,5 +179,16 @@ test.describe("F-037 form control contracts", () => {
         ).toBe("1000");
       }
     });
+  }
+});
+
+test("built hub does not contain hardcoded slate palette values", () => {
+  const builtHub = readFileSync(
+    new URL("../dist/index.html", import.meta.url),
+    "utf8",
+  );
+
+  for (const color of ["#0b0f19", "#0f172a", "#090d16", "#00d8ff"]) {
+    expect(builtHub.toLowerCase()).not.toContain(color);
   }
 });
