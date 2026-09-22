@@ -439,7 +439,7 @@ Lane verify: `pnpm --filter @joymify/react test` exit 0; `bash scripts/lint-colo
 
 **Files:** `apps/storybook-hub/tests/forms-contracts.spec.ts` (new), `apps/storybook-hub/tests/screens-f037.spec.ts` (new), `research/screens/*.png`, `research/screens/README.md`, `packages/tokens/build.js` only if the taste review returns FIX.
 
-- [ ] D2.1 `forms-contracts.spec.ts`:
+- [x] D2.1 `forms-contracts.spec.ts`:
 
 ```ts
 import { test, expect, type Page } from '@playwright/test';
@@ -491,7 +491,7 @@ test.describe('F-037 form control contracts', () => {
 });
 ```
   Run `PLAYWRIGHT_PORT=6116 pnpm --filter storybook-hub exec playwright test tests/forms-contracts.spec.ts`; expect green on both projects (the sheet's width is measured against the `hub-sheet-demo` containing block, which must be full-width at 375px).
-- [ ] D2.2 `screens-f037.spec.ts` mirroring `screens-f036.spec.ts` (env flag `F037_SCREENS=1`, `screenshotsDir` = `../../../.claude/refined_backlog/F-037-wave-2-hero-grade-button-and-form-contro/research/screens`, views `button` and `forms`, themes light/dark, viewports 375x812 and 1280x800, files `{view}-{theme}-{w}x{h}.png`, full-page). Run `F037_SCREENS=1 PLAYWRIGHT_PORT=6116 pnpm --filter storybook-hub exec playwright test tests/screens-f037.spec.ts --project=desktop-chrome`; expect 8 PNGs.
+- [x] D2.2 `screens-f037.spec.ts` mirroring `screens-f036.spec.ts` (env flag `F037_SCREENS=1`, `screenshotsDir` = `../../../.claude/refined_backlog/F-037-wave-2-hero-grade-button-and-form-contro/research/screens`, views `button` and `forms`, themes light/dark, viewports 375x812 and 1280x800, files `{view}-{theme}-{w}x{h}.png`, full-page). Run `F037_SCREENS=1 PLAYWRIGHT_PORT=6116 pnpm --filter storybook-hub exec playwright test tests/screens-f037.spec.ts --project=desktop-chrome`; expect 8 PNGs.
 - [ ] D2.3 Dispatch a Claude reviewer with the `impeccable` skill loaded on the four `button-*.png` (taste verdict on depth, hover lift, focus ring, dark gold, 375px layout) and a `code-reviewer` pass on the four `forms-*.png` (no purple, no white flashes in dark, no overflow, 44px targets visually plausible); write both verdicts to `research/screens/README.md`; a FIX verdict is applied in `packages/tokens/build.js` (CSS only), rebuilt, and screenshots regenerated before D2.4.
 - [ ] D2.4 Verify: `PLAYWRIGHT_PORT=6116 pnpm --filter storybook-hub exec playwright test` exit 0 (all specs, both projects); `pnpm --filter @joymify/tokens test` exit 0. Commit: `test(hub): F-037 form-control contracts and visual evidence`.
 - [ ] D2.5 Quality gate: `code-reviewer` + `typescript-reviewer` on the two spec files; refactor; re-run D2.4. Verdict appended to `research/review-D.md`.

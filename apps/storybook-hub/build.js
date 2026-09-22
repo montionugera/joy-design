@@ -453,6 +453,15 @@ ${inlinedThemeCss}
       min-width: 0;
       overflow-x: auto;
     }
+    .hub-sheet-demo {
+      min-width: 0;
+    }
+    @media (max-width: 480px) {
+      .hub-sheet-demo[data-sheet-demo] {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+      }
+    }
     .canvas {
       padding: 44px 32px;
       display: flex;
