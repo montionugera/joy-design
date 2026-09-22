@@ -306,4 +306,29 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(landingPage.includes('SiteFooter'), 'LandingPage must embed SiteFooter');
 });
 
+test('Wave 2 C-L2: TimePicker, Mentions, MarkdownEditor', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}★☆→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+  };
+
+  assertWave2('TimePicker');
+  assertWave2('Mentions');
+  assertWave2('MarkdownEditor');
+
+  const timePicker = read('TimePicker');
+  assert.ok(timePicker.includes('useOverlay('), 'TimePicker must include useOverlay(');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('useOverlay('), 'Mentions must include useOverlay(');
+
+  const mdEditor = read('MarkdownEditor');
+  assert.ok(mdEditor.includes('@joymify/icons/react'), 'MarkdownEditor must import @joymify/icons/react');
+  assert.ok(mdEditor.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
+});
+
 

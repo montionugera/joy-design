@@ -400,11 +400,11 @@ Lane verify: `pnpm --filter @joymify/react test` exit 0; `bash scripts/lint-colo
 
 **Owns:** `packages/react/src/{TimePicker,Mentions,MarkdownEditor}.tsx`, test block `Wave 2 C-L2`.
 
-- [ ] C-L2.1 TimePicker.tsx: drop `#64748b`, use `span.joy-input-wrapper__suffix` + `Clock` icon; `useOverlay`; `value`/`onChange` controlled with `defaultValue` fallback; delete `joy-color-text-muted`; keyboard as B-L2.1. (RXF-008, RXF-070, RXF-101, RXF-135.)
-- [ ] C-L2.2 Mentions.tsx: `value`/`onChange`/`onSelect`; `useOverlay`; `aria-selected={index === activeIndex}`; ArrowUp/ArrowDown/Enter/Tab. (RXF-072, RXF-102, RXF-142.)
-- [ ] C-L2.3 MarkdownEditor.tsx: toolbar icons from `@joymify/icons/react` replacing the emoji; class names per contract (`__tool`, `__panes--{mode}`, `__textarea`); delete inline `#ffffff`; `forwardRef<HTMLDivElement>`. (RXF-030, RXF-077, RXF-127.)
-- [ ] C-L2.4 Test block `Wave 2 C-L2`: `assertWave2` for the three files; TimePicker and Mentions include `useOverlay(`; MarkdownEditor imports `@joymify/icons/react` and includes `joy-markdown-editor__tool`.
-- [ ] C-L2.5 Verify (lane verify). Commit: `feat(react): TimePicker, Mentions, MarkdownEditor use useOverlay and icons`. Lane gate.
+- [x] C-L2.1 TimePicker.tsx: drop `#64748b`, use `span.joy-input-wrapper__suffix` + `Clock` icon; `useOverlay`; `value`/`onChange` controlled with `defaultValue` fallback; delete `joy-color-text-muted`; keyboard as B-L2.1. (RXF-008, RXF-070, RXF-101, RXF-135.)
+- [x] C-L2.2 Mentions.tsx: `value`/`onChange`/`onSelect`; `useOverlay`; `aria-selected={index === activeIndex}`; ArrowUp/ArrowDown/Enter/Tab. (RXF-072, RXF-102, RXF-142.)
+- [x] C-L2.3 MarkdownEditor.tsx: toolbar icons from `@joymify/icons/react` replacing the emoji; class names per contract (`__tool`, `__panes--{mode}`, `__textarea`); delete inline `#ffffff`; `forwardRef<HTMLDivElement>`. (RXF-030, RXF-077, RXF-127.)
+- [x] C-L2.4 Test block `Wave 2 C-L2`: `assertWave2` for the three files; TimePicker and Mentions include `useOverlay(`; MarkdownEditor imports `@joymify/icons/react` and includes `joy-markdown-editor__tool`.
+- [x] C-L2.5 Verify (lane verify). Commit: `feat(react): TimePicker, Mentions, MarkdownEditor use useOverlay and icons`. Lane gate.
 
 ### C-L3 — Checkbox, Switch, RadioGroup, Slider, Rate, Segmented, Form, FormItem
 
