@@ -54,3 +54,8 @@ purple=0 hex-literals-in-build.js=4 dark-joy-selectors=0 background-clip-text=0 
 - LOW | packages/tokens/scripts/sweep-literals.mjs:511-516 | catch-all rgba -> elevation-1 remap is property-blind. One-shot migration script; add a header comment stating it is not re-runnable and leave the logic.
 - LOW | screens-f036.spec.ts skips without F036_SCREENS=1 by design (plan C3). No change.
 - OK: OKLCH round-trip exact for #14253e; contrast gate last-wins parsing; index.d.ts passes `tsc --noEmit --strict`.
+
+## Post-fix visual re-check (2026-09-22) and orchestrator follow-up
+- Re-check verdict: inset surfaces now navy, no black holes; borders visible not heavy. Two follow-ups:
+  1. Rendered hub chrome samples as Tailwind slate (#0b0f19/#0f172a/#1e293b): those literals live in apps/storybook-hub/build.js (334 lint WARNs, Wave 5 / I-040) and 11 component sources (Waves 2-3), not in the tokens (0 slate hexes in dist). Deferred by plan design; lint-colors flips to strict per wave.
+  2. card (#101b2b) vs raised (#111d30) too close once actually consumed. Fixed here: dark raised -> navy-500 (#14253e, brand navy), border-subtle -> navy-700, navy 600/700/800 L widened to 0.252/0.242/0.222. 11/11 token tests, epic-check exit 0, dark screenshots regenerated.

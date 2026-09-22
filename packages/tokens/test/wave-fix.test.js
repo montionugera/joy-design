@@ -14,7 +14,7 @@ test('dark surfaces use distinct navy steps rather than a near-black literal', (
   assert.equal(surface.sunken.value, '{color.navy.950}');
   assert.equal(surface.canvas.value, '{color.navy.900}');
   assert.equal(surface.card.value, '{color.navy.800}');
-  assert.equal(surface.raised.value, '{color.navy.700}');
+  assert.equal(surface.raised.value, '{color.navy.500}');
 });
 
 test('navy-950 retains a visible navy floor for sunken dark surfaces', () => {

@@ -44,9 +44,9 @@ export function generateAllTokens() {
     { step: '300', L: 0.62, C: 0.050 },
     { step: '400', L: 0.520, C: 0.052 }, // Dark border.default >= 3:1 vs dark card & canvas
     { step: '500', L: lNavyAnchor, C: cNavyAnchor, hex: '#14253e' },
-    { step: '600', L: 0.240, C: 0.045 },
-    { step: '700', L: 0.230, C: 0.040 },
-    { step: '800', L: 0.220, C: 0.035 },
+    { step: '600', L: 0.252, C: 0.045 },
+    { step: '700', L: 0.242, C: 0.040 },
+    { step: '800', L: 0.222, C: 0.035 },
     { step: '900', L: 0.200, C: 0.030 },
     { step: '950', L: 0.183, C: 0.030 }
   ];

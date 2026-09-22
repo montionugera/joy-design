@@ -26,4 +26,4 @@ Spec: `spec.md` (same folder). Evidence: `research/audit-tokens.md`, `research/c
 - [x] C3. Evidence: with the hub built, take Playwright screenshots of `#view-primitives` (or the "General & Primitives" view) at 375×812 and 1280×800 in light and dark into `.claude/refined_backlog/F-036-*/research/screens/`; confirm visually no purple, visible borders on dark, no black shadow halos. Attach paths to this plan.
   - Evidence: `research/screens/primitives-{light,dark}-{375x812,1280x800}.png`; visual verdict: `research/screens/README.md`.
 - [x] C4. Verify: `bash scripts/precheck.sh` exit 0; `bash scripts/epic-check.sh` exit 0. Commit: `chore(gates): color lint, epic-check, precheck wiring, wave 1 evidence`.
-- [ ] C5. Quality gate as A6; then hand back (do not ship).
+- [x] C5. Quality gate as A6; then hand back (do not ship).

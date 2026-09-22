@@ -5,9 +5,9 @@
   --joy-color-navy-300: #7487a5;
   --joy-color-navy-400: #566a87;
   --joy-color-navy-500: #14253e;
-  --joy-color-navy-600: #111f34;
-  --joy-color-navy-700: #111d30;
-  --joy-color-navy-800: #101b2b;
+  --joy-color-navy-600: #142238;
+  --joy-color-navy-700: #132033;
+  --joy-color-navy-800: #111b2b;
   --joy-color-navy-900: #0d1624;
   --joy-color-navy-950: #0a121f;
   --joy-color-gold-50: #fbf4e6;
@@ -219,10 +219,10 @@
 
 [data-theme="dark"] {
   --joy-surface-canvas: #0d1624;
-  --joy-surface-card: #101b2b;
-  --joy-surface-raised: #111d30;
+  --joy-surface-card: #111b2b;
+  --joy-surface-raised: #14253e;
   --joy-surface-sunken: #0a121f;
-  --joy-surface-overlay: #101b2b;
+  --joy-surface-overlay: #111b2b;
   --joy-surface-inverse: #f8f3e8;
   --joy-text-primary: #f8f3e8;
   --joy-text-secondary: #bab7b0;
@@ -230,7 +230,7 @@
   --joy-text-inverse: #1f1c13;
   --joy-text-link: #dab362;
   --joy-text-on-accent: #0a121f;
-  --joy-border-subtle: #111f34;
+  --joy-border-subtle: #132033;
   --joy-border-default: #566a87;
   --joy-border-strong: #7487a5;
   --joy-border-focus: #dab362;
@@ -268,10 +268,10 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
   --joy-surface-canvas: #0d1624;
-  --joy-surface-card: #101b2b;
-  --joy-surface-raised: #111d30;
+  --joy-surface-card: #111b2b;
+  --joy-surface-raised: #14253e;
   --joy-surface-sunken: #0a121f;
-  --joy-surface-overlay: #101b2b;
+  --joy-surface-overlay: #111b2b;
   --joy-surface-inverse: #f8f3e8;
   --joy-text-primary: #f8f3e8;
   --joy-text-secondary: #bab7b0;
@@ -279,7 +279,7 @@
   --joy-text-inverse: #1f1c13;
   --joy-text-link: #dab362;
   --joy-text-on-accent: #0a121f;
-  --joy-border-subtle: #111f34;
+  --joy-border-subtle: #132033;
   --joy-border-default: #566a87;
   --joy-border-strong: #7487a5;
   --joy-border-focus: #dab362;
