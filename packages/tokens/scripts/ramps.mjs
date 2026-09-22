@@ -42,13 +42,13 @@ export function generateAllTokens() {
     { step: '100', L: 0.88, C: 0.025 },
     { step: '200', L: 0.76, C: 0.040 },
     { step: '300', L: 0.62, C: 0.050 },
-    { step: '400', L: 0.485, C: 0.052 }, // Dark border.default >= 3:1 vs dark card & canvas
+    { step: '400', L: 0.520, C: 0.052 }, // Dark border.default >= 3:1 vs dark card & canvas
     { step: '500', L: lNavyAnchor, C: cNavyAnchor, hex: '#14253e' },
-    { step: '600', L: 0.234, C: 0.045 },
-    { step: '700', L: 0.204, C: 0.038 },
-    { step: '800', L: 0.174, C: 0.030 },
-    { step: '900', L: 0.144, C: 0.022 },
-    { step: '950', L: 0.114, C: 0.015 }
+    { step: '600', L: 0.240, C: 0.045 },
+    { step: '700', L: 0.230, C: 0.040 },
+    { step: '800', L: 0.220, C: 0.035 },
+    { step: '900', L: 0.200, C: 0.030 },
+    { step: '950', L: 0.183, C: 0.030 }
   ];
   const navyRamp = {};
   for (const s of navySteps) {
@@ -231,10 +231,10 @@ export function generateAllTokens() {
   const semanticDark = {
     // Surfaces
     "surface": {
-      "canvas": { "value": "{color.navy.950}", "type": "color" },
-      "card": { "value": "{color.navy.900}", "type": "color" },
-      "raised": { "value": "{color.navy.800}", "type": "color" },
-      "sunken": { "value": "#020408", "type": "color" },
+      "canvas": { "value": "{color.navy.900}", "type": "color" },
+      "card": { "value": "{color.navy.800}", "type": "color" },
+      "raised": { "value": "{color.navy.700}", "type": "color" },
+      "sunken": { "value": "{color.navy.950}", "type": "color" },
       "overlay": { "value": "{color.navy.800}", "type": "color" },
       "inverse": { "value": "{color.cream.100}", "type": "color" }
     },

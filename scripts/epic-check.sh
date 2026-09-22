@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-6116}"
+
 run_step() {
   local label=$1
   shift

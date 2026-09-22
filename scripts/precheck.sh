@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-6116}"
+
 echo "==> Gate 1: Deterministic Precheck <=="
 
 echo "1. Validating Zero Emoji Policy in source files..."

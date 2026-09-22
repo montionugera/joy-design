@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const requestedPort = process.env.PLAYWRIGHT_PORT ?? "6006";
+const requestedPort = process.env.PLAYWRIGHT_PORT ?? "6116";
 const portNumber = Number(requestedPort);
 if (
   !/^\d+$/.test(requestedPort) ||

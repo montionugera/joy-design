@@ -5,6 +5,7 @@
  * B1: Literal-to-token role table and replacement of all hex, rgb, rgba literals and var() fallbacks.
  * B2: Removal of stale dark root blocks and per-component [data-theme="dark"] overrides.
  * B3: Removal of banned patterns (gradient text, side stripes >= 2px, decorative backdrop-filter, tracked uppercase eyebrows).
+ * This migration script is one-shot and not safe to re-run after its Phase B transformation.
  */
 
 import fs from 'node:fs';

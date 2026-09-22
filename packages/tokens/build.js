@@ -10,7 +10,7 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
 
 // Resolve reference like "{color.gold.600}"
-function resolveRef(refStr, rootTokens, depth = 0, seen = new Set()) {
+export function resolveRef(refStr, rootTokens, depth = 0, seen = new Set()) {
   if (typeof refStr !== 'string') return refStr;
   const match = refStr.match(/^\{([^}]+)\}$/);
   if (!match) return refStr;
@@ -33,7 +33,10 @@ function resolveRef(refStr, rootTokens, depth = 0, seen = new Set()) {
   if (typeof current === 'object' && 'value' in current) {
     return resolveRef(current.value, rootTokens, depth + 1, seen);
   }
-  return typeof current === 'string' ? resolveRef(current, rootTokens, depth + 1, seen) : refStr;
+  if (typeof current === 'string') {
+    return resolveRef(current, rootTokens, depth + 1, seen);
+  }
+  throw new Error(`Token reference does not resolve to a token value: ${refStr}`);
 }
 
 // Extract primitives, light semantics, dark semantics
