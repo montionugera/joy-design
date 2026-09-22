@@ -21,8 +21,9 @@ Spec: `spec.md` (same folder). Evidence: `research/audit-tokens.md`, `research/c
 
 ## Phase C — gates and evidence
 
-- [ ] C1. `scripts/lint-colors.sh`: flags hex/rgb/rgba/hsl literals and `var(--joy-[^,)]+,\s*[^)]+)` fallbacks in `packages/svelte/src`, `packages/react/src`, `apps/storybook-hub/build.js`, `packages/tokens/build.js`; `--strict <paths>` exits 1 on any hit, default mode exits 1 only for `packages/tokens/build.js` and warns for the rest (Waves 2–5 flip them). Allowlist file `scripts/lint-colors.allow` for `chart-core.ts` canvas strings that read CSS variables.
-- [ ] C2. `scripts/epic-check.sh`: runs `scripts/lint-colors.sh`, `pnpm -r test`, `node apps/storybook-hub/build.js`, Playwright contracts; exits non-zero on the first failure; prints a summary. `scripts/precheck.sh` gains a step calling `scripts/lint-colors.sh`.
-- [ ] C3. Evidence: with the hub built, take Playwright screenshots of `#view-primitives` (or the "General & Primitives" view) at 375×812 and 1280×800 in light and dark into `.claude/refined_backlog/F-036-*/research/screens/`; confirm visually no purple, visible borders on dark, no black shadow halos. Attach paths to this plan.
-- [ ] C4. Verify: `bash scripts/precheck.sh` exit 0; `bash scripts/epic-check.sh` exit 0. Commit: `chore(gates): color lint, epic-check, precheck wiring, wave 1 evidence`.
+- [x] C1. `scripts/lint-colors.sh`: flags hex/rgb/rgba/hsl literals and `var(--joy-[^,)]+,\s*[^)]+)` fallbacks in `packages/svelte/src`, `packages/react/src`, `apps/storybook-hub/build.js`, `packages/tokens/build.js`; `--strict <paths>` exits 1 on any hit, default mode exits 1 only for `packages/tokens/build.js` and warns for the rest (Waves 2–5 flip them). Allowlist file `scripts/lint-colors.allow` for `chart-core.ts` canvas strings that read CSS variables.
+- [x] C2. `scripts/epic-check.sh`: runs `scripts/lint-colors.sh`, `pnpm -r test`, `node apps/storybook-hub/build.js`, Playwright contracts; exits non-zero on the first failure; prints a summary. `scripts/precheck.sh` gains a step calling `scripts/lint-colors.sh`.
+- [x] C3. Evidence: with the hub built, take Playwright screenshots of `#view-primitives` (or the "General & Primitives" view) at 375×812 and 1280×800 in light and dark into `.claude/refined_backlog/F-036-*/research/screens/`; confirm visually no purple, visible borders on dark, no black shadow halos. Attach paths to this plan.
+  - Evidence: `research/screens/primitives-{light,dark}-{375x812,1280x800}.png`; visual verdict: `research/screens/README.md`.
+- [x] C4. Verify: `bash scripts/precheck.sh` exit 0; `bash scripts/epic-check.sh` exit 0. Commit: `chore(gates): color lint, epic-check, precheck wiring, wave 1 evidence`.
 - [ ] C5. Quality gate as A6; then hand back (do not ship).
