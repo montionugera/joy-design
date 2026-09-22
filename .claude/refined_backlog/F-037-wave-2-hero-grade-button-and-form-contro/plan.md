@@ -236,8 +236,8 @@ Svelte usage: `$effect(() => { if (!open || !anchorEl || !panelEl) return; const
 
 **Files:** `packages/svelte/src/lib/overlay-utils.ts` (extend), `packages/react/src/overlay-utils.ts` (extend, byte-identical), `packages/react/src/useOverlay.ts` (new), `packages/svelte/src/lib/index.ts`, `packages/react/src/index.ts`, `packages/svelte/test/overlay-utils.test.js` (new), `packages/react/test/overlay-utils.test.js` (new).
 
-- [ ] A5.1 Append the API above to the Svelte file; `positionPanel`: `left = clamp(anchor.left, 8, viewport.width - panel.width - 8)`, `top = anchor.bottom + gap`; if `top + panel.height > viewport.height - 8` and `anchor.top - gap - panel.height >= 8` then `top = anchor.top - gap - panel.height`, `above = true`. `isSheet(win)` = `win.innerWidth < sheetMaxWidth || Boolean(win.matchMedia?.('(pointer: coarse)').matches)`. Copy byte-for-byte to the React file (`cmp` exit 0); create `useOverlay.ts` exactly as written above; export `openOverlay, positionPanel, isOutside, isSheet, SHEET_MAX_WIDTH` from both `index.ts` and `useOverlay` from the React index.
-- [ ] A5.2 Tests (`packages/svelte/test/overlay-utils.test.js`; the React copy changes only the import path to `../src/overlay-utils.ts`):
+- [x] A5.1 Append the API above to the Svelte file; `positionPanel`: `left = clamp(anchor.left, 8, viewport.width - panel.width - 8)`, `top = anchor.bottom + gap`; if `top + panel.height > viewport.height - 8` and `anchor.top - gap - panel.height >= 8` then `top = anchor.top - gap - panel.height`, `above = true`. `isSheet(win)` = `win.innerWidth < sheetMaxWidth || Boolean(win.matchMedia?.('(pointer: coarse)').matches)`. Copy byte-for-byte to the React file (`cmp` exit 0); create `useOverlay.ts` exactly as written above; export `openOverlay, positionPanel, isOutside, isSheet, SHEET_MAX_WIDTH` from both `index.ts` and `useOverlay` from the React index.
+- [x] A5.2 Tests (`packages/svelte/test/overlay-utils.test.js`; the React copy changes only the import path to `../src/overlay-utils.ts`):
 
 ```js
 import test from 'node:test';
@@ -299,8 +299,8 @@ test('narrow viewports get the sheet class and fixed positioning; dispose never 
 });
 ```
   (Closes the mechanism for: SVF-073, SVF-074, SVF-078, SVF-084, SVF-085, SVF-097, SVF-101; RXF-135, RXF-143, RXF-144, RXF-145; wiring happens in B-L2/B-L4/C-L2/C-L4.)
-- [ ] A5.3 Verify: `pnpm --filter @joymify/svelte test && pnpm --filter @joymify/react test` exit 0 (6 new tests pass in each package); `cmp packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts` exit 0; `bash scripts/lint-colors.sh --strict packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts packages/react/src/useOverlay.ts` exit 0. Commit: `feat(overlay): shared fixed-position overlay primitive with escape, outside-click, focus return and sheet mode`.
-- [ ] A5.4 Quality gate: `code-reviewer` + `typescript-reviewer` (listener cleanup, capture-phase scroll, ref stability in `useOverlay`); refactor; re-run A5.3.
+- [x] A5.3 Verify: `pnpm --filter @joymify/svelte test && pnpm --filter @joymify/react test` exit 0 (6 new tests pass in each package); `cmp packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts` exit 0; `bash scripts/lint-colors.sh --strict packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts packages/react/src/useOverlay.ts` exit 0. Commit: `feat(overlay): shared fixed-position overlay primitive with escape, outside-click, focus return and sheet mode`.
+- [x] A5.4 Quality gate: `code-reviewer` + `typescript-reviewer` (listener cleanup, capture-phase scroll, ref stability in `useOverlay`); refactor; re-run A5.3.
 
 ### A6 — parity contract script + gate wiring
 

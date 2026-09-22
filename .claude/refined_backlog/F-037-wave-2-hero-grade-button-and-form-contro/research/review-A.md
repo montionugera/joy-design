@@ -167,3 +167,49 @@ Verdict: **PASS (Clean)**
 
 Verdict: **PASS (Clean)**
 
+---
+
+# Quality Gate Review: Phase A (Task A5)
+
+## Scope
+- Task A5: Overlay primitive (`openOverlay`, `positionPanel`, `isOutside`, `isSheet`, `SHEET_MAX_WIDTH`) in `packages/svelte/src/lib/overlay-utils.ts` and `packages/react/src/overlay-utils.ts`, React hook `useOverlay` in `packages/react/src/useOverlay.ts`, re-exports in package indices, and test suites in `packages/svelte/test/overlay-utils.test.js` and `packages/react/test/overlay-utils.test.js`.
+
+## Reviewers
+- code-reviewer (adversarial review: listener cleanup, capture-phase scroll, outside-click semantics)
+- typescript-reviewer (type contracts & ref stability in useOverlay)
+
+## Findings & Verifications
+
+### 1. Overlay Lifecycle & Listener Cleanup
+- `openOverlay` attaches 4 event listeners:
+  - `doc.addEventListener('keydown', handleKeyDown)`: handles Escape key.
+  - `doc.addEventListener('pointerdown', handlePointerDown)`: handles outside clicks.
+  - `win.addEventListener('resize', handleResize)`: recalculates position or sheet mode.
+  - `win.addEventListener('scroll', handleScroll, { capture: true })`: catches scroll events from any nested scrollable container via capture phase.
+- In both internal close (`close()`) and external dispose (`dispose()`), all 4 event listeners are symmetrically detached via `removeEventListener`.
+- Double cleanup or race conditions prevented via boolean `disposed` guard.
+- Focus restoration: on internal close (`Escape` or outside pointerdown), `anchor.focus()` is invoked prior to `onClose()` notification. Calling `dispose()` directly (e.g. effect unmount) cleans up listeners and classes without triggering focus return or `onClose()`. PASS.
+
+### 2. React Ref Stability & Hook Lifecycle (`useOverlay`)
+- `onClose` callback reference stored in `useRef(onClose)` and refreshed on each render, eliminating stale closures without triggering effect re-execution.
+- `useEffect` dependencies restricted strictly to `[open]`. Prevents unwanted overlay re-disposal and listener re-binding during caller re-renders.
+- Cleanup return cleanly executes `handle.dispose()`. PASS.
+
+### 3. Responsive Sheet Detection & Placement Logic
+- `isSheet` reliably triggers when viewport width `< 480px` (`SHEET_MAX_WIDTH`) OR on touch devices via `@media (pointer: coarse)`.
+- In sheet mode, `.joy-overlay--sheet` is applied and inline coordinates (`top`, `left`, `minWidth`) are cleared to delegate responsive positioning to CSS (`bottom: 0; left: 0; right: 0; max-height: 70vh`).
+- In dropdown mode, `positionPanel` bounds horizontal positioning within viewport padding (8px) and flips vertically (`above: true`, `.joy-overlay--above`) when insufficient clearance below. PASS.
+
+### 4. Parity & Lint Standards
+- `cmp packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts`: byte-identical (exit code 0).
+- `bash scripts/lint-colors.sh --strict packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts packages/react/src/useOverlay.ts`: zero color literals, zero `var()` fallbacks across touched files. PASS.
+
+### 5. Automated Verification Verdict
+- `pnpm --filter @joymify/svelte test`: 16/16 tests pass (6 new tests in overlay-utils.test.js) (exit code 0)
+- `pnpm --filter @joymify/react test`: 16/16 tests pass (6 new tests in overlay-utils.test.js) (exit code 0)
+- `cmp packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts`: exit code 0
+- `bash scripts/lint-colors.sh --strict packages/svelte/src/lib/overlay-utils.ts packages/react/src/overlay-utils.ts packages/react/src/useOverlay.ts`: exit code 0
+
+Verdict: **PASS (Clean)**
+
+

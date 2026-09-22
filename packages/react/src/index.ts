@@ -77,7 +77,21 @@ export { Spin, type SpinProps } from './Spin.js';
 export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
 export { TreeSelect, type TreeSelectProps, type TreeNode } from './TreeSelect.js';
 export { Cascader, type CascaderProps, type CascaderOption } from './Cascader.js';
-export { lockBodyScroll, trapFocus } from './overlay-utils.js';
+export {
+  lockBodyScroll,
+  trapFocus,
+  openOverlay,
+  positionPanel,
+  isOutside,
+  isSheet,
+  SHEET_MAX_WIDTH,
+  type OverlayRect,
+  type OverlayNode,
+  type OverlayWindow,
+  type OverlayOptions,
+  type OverlayHandle
+} from './overlay-utils.js';
+export { useOverlay } from './useOverlay.js';
 // Wave 13B: Landing Page Component Suite
 export { FeatureCard, type FeatureCardProps } from './FeatureCard.js';
 export { FeatureGrid, type FeatureGridProps } from './FeatureGrid.js';
