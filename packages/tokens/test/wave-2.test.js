@@ -222,3 +222,66 @@ test('Wave 2 parity-check script exists and defines 21 components', async () => 
   assert.strictEqual(mod.COMPONENTS.length, 21, 'COMPONENTS must contain exactly 21 names');
 });
 
+test('Taste review design fixes: focus ring, disabled & danger tokens, deeper gradient, sheet & touch gating', () => {
+  // (a) 44px control bump gated with max-width: 640px
+  assert.ok(
+    /@media\s*\([^)]*max-width:\s*640px[^)]*\)[^{]*\{[\s\S]*?--joy-control-height-sm:\s*44px/m.test(css),
+    'max-width: 640px media query must include 44px control height bump'
+  );
+
+  // (b) .joy-overlay--sheet gated to max-width: 640px
+  assert.ok(
+    /@media\s*\([^)]*max-width:\s*640px[^)]*\)[^{]*\{[\s\S]*?\.joy-overlay--sheet\s*\{/m.test(css),
+    '.joy-overlay--sheet rules must be gated within max-width: 640px'
+  );
+
+  // (d) input wrapper prefix/suffix constrained to control height
+  assert.ok(
+    css.includes('height: var(--joy-control-height-md);'),
+    '.joy-input-wrapper__prefix/__suffix must be constrained to control height'
+  );
+  const prefixBlock = css.match(/\.joy-input-wrapper__prefix,\s*\.joy-input-wrapper__suffix\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.ok(!prefixBlock.includes('bottom: 0'), 'prefix/suffix must not have unconstrained bottom: 0');
+
+  // (h) two-tone focus ring on button
+  assert.ok(
+    css.includes('box-shadow: 0 0 0 2px var(--joy-surface-canvas), 0 0 0 4px var(--joy-border-focus)'),
+    '.joy-button:focus-visible must use two-tone focus ring'
+  );
+
+  // (i) disabled tokens and no opacity hack
+  for (const token of ['surface-disabled', 'text-disabled', 'border-disabled']) {
+    assert.ok(blockContains(':root', `--joy-${token}:`), `${token} must be declared in :root`);
+    assert.ok(blockContains('\\[data-theme="dark"\\]', `--joy-${token}:`), `${token} must be declared in dark theme`);
+    assert.ok(dts.includes(`'${token}': string;`), `${token} must be in JoyTokens union`);
+  }
+  const disabledButtonRule = css.match(/\.joy-button:disabled\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.ok(disabledButtonRule.includes('var(--joy-surface-disabled)'), 'disabled button must use surface-disabled');
+  assert.ok(disabledButtonRule.includes('var(--joy-text-disabled)'), 'disabled button must use text-disabled');
+  assert.ok(!disabledButtonRule.includes('opacity: 0.5'), 'disabled button must not use opacity: 0.5 hack');
+
+  // (j) danger-solid tokens
+  for (const token of ['status-danger-solid-bg', 'status-danger-solid-fg', 'status-danger-solid-border']) {
+    assert.ok(blockContains(':root', `--joy-${token}:`), `${token} must be declared in :root`);
+    assert.ok(blockContains('\\[data-theme="dark"\\]', `--joy-${token}:`), `${token} must be declared in dark theme`);
+    assert.ok(dts.includes(`'${token}': string;`), `${token} must be in JoyTokens union`);
+  }
+  const dangerButtonRule = css.match(/\.joy-button--danger\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.ok(dangerButtonRule.includes('var(--joy-status-danger-solid-bg)'), 'danger button must use status-danger-solid-bg');
+  assert.ok(dangerButtonRule.includes('var(--joy-status-danger-solid-fg)'), 'danger button must use status-danger-solid-fg');
+
+  // (k) hover translateY(-2px)
+  assert.ok(
+    css.includes('transform: translateY(-2px)'),
+    '.joy-button--solid:hover must lift -2px'
+  );
+
+  // (l) ghost resting affordance
+  const ghostRule = css.match(/\.joy-button--ghost\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.ok(ghostRule.includes('var(--joy-border-subtle)'), 'ghost button must have subtle resting border');
+
+  // (m) loading spinner stroke
+  const spinnerSvgRule = css.match(/\.joy-button__spinner-svg\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.ok(spinnerSvgRule.includes('stroke-width: 3px'), 'spinner svg must have 3px stroke');
+});
+
