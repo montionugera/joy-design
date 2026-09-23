@@ -225,7 +225,7 @@ test('React standard library components implement accessible traits and forwardR
 
   const popconfirm = fs.readFileSync(path.resolve('./src/Popconfirm.tsx'), 'utf8');
   assert.ok(popconfirm.includes('joy-popconfirm'), 'Popconfirm must render joy-popconfirm class');
-  assert.ok(popconfirm.includes('role="dialog"'), 'Popconfirm must implement role=dialog');
+  assert.ok(popconfirm.includes('role="alertdialog"'), 'Popconfirm must implement role=alertdialog');
   assert.ok(popconfirm.includes('React.forwardRef'), 'Popconfirm must implement forwardRef');
 
   const spin = fs.readFileSync(path.resolve('./src/Spin.tsx'), 'utf8');
@@ -1127,4 +1127,668 @@ test('F-038 C-L5: Pagination collapses under 480px via matchMedia state set in u
   b.find((x) => x.props['aria-label'] === 'Page 10').props.onClick();
   assert.deepStrictEqual(calls, [[2, 10], [10, 10]]);
   assert.ok(React); // React shim restored: a plain render still works
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// F-038 Wave 3 lane C-L6: Drawer, Modal, Popconfirm, Dropdown, Tooltip, ImagePreview, Image (rendered markup + lifecycle)
+// ---------------------------------------------------------------------------------------------------------------------
+
+/** Run `fn` with a fake window/document so effects that touch the DOM (scroll lock, focus, overlay listeners) can execute. */
+function withDom(fn) {
+  const saved = { window: globalThis.window, document: globalThis.document };
+  const counted = (target, label) => {
+    const add = target.addEventListener.bind(target);
+    const remove = target.removeEventListener.bind(target);
+    target.listeners = 0;
+    target.addEventListener = (t, f, o) => { target.listeners++; add(t, f, o); };
+    target.removeEventListener = (t, f, o) => { target.listeners--; remove(t, f, o); };
+    target.label = label;
+    return target;
+  };
+  const doc = counted(Object.assign(new EventTarget(), { body: { style: { overflow: '', paddingRight: '' } }, documentElement: { clientWidth: 1024 }, activeElement: null }), 'document');
+  const win = counted(Object.assign(new EventTarget(), { innerWidth: 1024, innerHeight: 768, matchMedia: () => ({ matches: false }) }), 'window');
+  const mk = (extra = {}) => {
+    const n = counted(new EventTarget(), 'node');
+    const classes = new Set();
+    return Object.assign(n, {
+      isConnected: true, focused: 0, style: {}, attrs: {}, classes, id: '', firstElementChild: null,
+      classList: { add: (...c) => c.forEach((x) => classes.add(x)), remove: (...c) => c.forEach((x) => classes.delete(x)) },
+      getBoundingClientRect: () => ({ top: 100, left: 40, width: 200, height: 40, bottom: 140, right: 240 }),
+      focus() { n.focused++; doc.activeElement = n; },
+      contains(x) { return x === n; },
+      getAttribute(k) { return k in n.attrs ? n.attrs[k] : null; },
+      setAttribute(k, v) { n.attrs[k] = String(v); },
+      removeAttribute(k) { delete n.attrs[k]; },
+      querySelector: () => null,
+      querySelectorAll: () => [],
+    }, extra);
+  };
+  globalThis.window = win;
+  globalThis.document = doc;
+  try {
+    return fn({ doc, win, mk });
+  } finally {
+    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete globalThis[k]; else globalThis[k] = v; }
+  }
+}
+
+/**
+ * Minimal hook runtime for calling a forwardRef component's render function outside a DOM: persistent useState/useRef/useMemo
+ * slots, useEffect with dependency comparison and cleanups, and object refs bound to `refNode(element)` fakes after each render.
+ * `flush()` runs the effects the way React does after commit; `unmount()` runs every cleanup.
+ */
+function mount(name, initialProps, { refNode = () => null } = {}) {
+  const React = requireFromHere('react');
+  const C = loadComponent(name)[name];
+  const slots = [];
+  const nodes = new Map();
+  let props = initialProps;
+  let pending = [];
+  const h = { tree: null };
+  h.rerender = (next) => {
+    if (next) props = next;
+    const saved = { useState: React.useState, useRef: React.useRef, useMemo: React.useMemo, useId: React.useId, useEffect: React.useEffect, useImperativeHandle: React.useImperativeHandle };
+    let i = 0;
+    pending = [];
+    React.useState = (init) => { const s = (slots[i] ??= { v: typeof init === 'function' ? init() : init }); i++; return [s.v, (nv) => { s.v = typeof nv === 'function' ? nv(s.v) : nv; }]; };
+    React.useRef = (init) => { const s = (slots[i] ??= { v: { current: init } }); i++; return s.v; };
+    React.useMemo = (fn, deps) => { const s = (slots[i] ??= {}); i++; if (!s.deps || deps.some((d, k) => !Object.is(d, s.deps[k]))) { s.deps = deps; s.val = fn(); } return s.val; };
+    React.useId = () => 'uid';
+    React.useImperativeHandle = () => { i++; };
+    React.useEffect = (fn, deps) => { pending.push({ slot: (slots[i] ??= {}), fn, deps }); i++; };
+    try {
+      h.tree = C.render(props, null);
+    } finally {
+      Object.assign(React, saved);
+    }
+    // bind object refs the way commit does: refs of elements still in the tree get a node, the others are cleared
+    const seen = new Set();
+    walk(h.tree, (el) => {
+      const r = el.props.ref;
+      if (r && typeof r === 'object' && 'current' in r) {
+        seen.add(r);
+        if (!nodes.has(r)) nodes.set(r, refNode(el));
+        r.current = nodes.get(r);
+      }
+    });
+    for (const [r] of nodes) if (!seen.has(r)) { r.current = null; nodes.delete(r); }
+    return h;
+  };
+  h.flush = () => {
+    for (const eff of pending) {
+      const s = eff.slot;
+      const changed = !s.deps || !eff.deps || eff.deps.some((d, k) => !Object.is(d, s.deps[k]));
+      if (!changed) continue;
+      s.cleanup?.();
+      s.deps = eff.deps;
+      s.cleanup = eff.fn();
+    }
+    return h;
+  };
+  h.update = (next) => h.rerender(next).flush();
+  h.unmount = () => { for (const s of slots) { s?.cleanup?.(); if (s) s.cleanup = undefined; } };
+  h.find = (pred) => findAll(h.tree, pred);
+  h.byClass = (c) => findAll(h.tree, (n) => typeof n.props.className === 'string' && n.props.className.split(/\s+/).includes(c));
+  return h.rerender();
+}
+const keydown = (key, extra = {}) => { const e = new Event('keydown', { cancelable: true }); Object.defineProperty(e, 'key', { value: key }); Object.assign(e, extra); return e; };
+const evtWith = (type, props) => { const e = new Event(type, { cancelable: true }); for (const [k, v] of Object.entries(props)) Object.defineProperty(e, k, { value: v }); return e; };
+const reactKey = (key, extra = {}) => { const calls = { prevented: 0 }; return Object.assign({ key, preventDefault: () => calls.prevented++, stopPropagation: () => {}, calls }, extra); };
+const idOf = (html, re) => (html.match(re) || [])[1];
+// React 19 hoists <link rel=preload> for <img> into the SSR output, and the icon SVGs carry their own inline style: strip both
+// when asserting on the component's own markup.
+const bare = (html) => html.replace(/^(<link [^>]*\/>)+/, '');
+const noSvg = (html) => html.replace(/<svg[\s\S]*?<\/svg>/g, '<svg/>');
+
+test('F-038 C-L6: Modal renders the Svelte contract (unique label id, aria-label fallback, Close icon, no &times;, rest ordering)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Modal } = loadComponent('Modal');
+  const html = (props, ...kids) => renderToStaticMarkup(React.createElement(Modal, props, ...kids));
+
+  assert.strictEqual(Modal.$$typeof, Symbol.for('react.forward_ref'));
+  assert.strictEqual(html({ open: false, title: 'x' }), '', 'renders nothing when closed');
+
+  const titled = html({ open: true, title: 'Delete?', footer: React.createElement('button', null, 'ok'), className: 'mine', 'data-x': '1' }, 'body');
+  assert.match(titled, /^<div class="joy-modal-backdrop" role="presentation"><div [^>]*class="joy-modal mine"/);
+  assert.ok(titled.includes('role="dialog"') && titled.includes('aria-modal="true"'));
+  const labelledby = idOf(titled, /aria-labelledby="([^"]+)"/);
+  assert.ok(labelledby && titled.includes(`<h3 id="${labelledby}" class="joy-modal__title">Delete?</h3>`), 'aria-labelledby resolves to the title');
+  assert.ok(labelledby.endsWith('-title') && labelledby !== 'modal-title', 'unique per instance, not the hard-coded id');
+  assert.ok(!titled.includes('aria-label="Dialog"'));
+  assert.ok(titled.includes('data-x="1"'), 'rest lands on the dialog element');
+  assert.match(titled, /<button type="button" class="joy-modal__close" aria-label="Close dialog"><svg /);
+  assert.ok(!titled.includes('&times;') && !titled.includes('×'));
+  assert.ok(titled.includes('<div class="joy-modal__body">body</div>') && titled.includes('<div class="joy-modal__footer"><button>ok</button></div>'));
+
+  const bare = html({ open: true });
+  assert.ok(bare.includes('aria-label="Dialog"') && !bare.includes('aria-labelledby') && !bare.includes('<h3') && !bare.includes('joy-modal__footer'));
+  // rest cannot clobber component-owned attributes
+  const clobber = html({ open: true, role: 'alert', 'aria-modal': 'false', 'aria-label': 'nope' });
+  assert.ok(clobber.includes('role="dialog"') && clobber.includes('aria-modal="true"') && clobber.includes('aria-label="Dialog"') && !clobber.includes('nope'));
+  // two instances never share a label id
+  const two = renderToStaticMarkup(React.createElement('div', null, React.createElement(Modal, { open: true, title: 'a' }), React.createElement(Modal, { open: true, title: 'b' })));
+  const ids = [...two.matchAll(/aria-labelledby="([^"]+)"/g)].map((m) => m[1]);
+  assert.strictEqual(new Set(ids).size, 2);
+});
+
+test('F-038 C-L6: Drawer renders the Svelte contract (placement is a backdrop class, no inline style, label fallback, Close icon)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Drawer } = loadComponent('Drawer');
+  const html = (props, ...kids) => renderToStaticMarkup(React.createElement(Drawer, props, ...kids));
+  assert.strictEqual(Drawer.$$typeof, Symbol.for('react.forward_ref'));
+  assert.strictEqual(html({ open: false }), '');
+
+  const right = html({ open: true, title: 'Filters', 'data-x': '1' });
+  const rightNoSvg = noSvg(right);
+  assert.match(right, /^<div class="joy-drawer-backdrop" role="presentation"><div [^>]*class="joy-drawer"/);
+  assert.ok(!rightNoSvg.includes('style=') && !right.includes('joy-drawer--left') && !right.includes('joy-drawer-backdrop--left'));
+  const id = idOf(right, /aria-labelledby="([^"]+)"/);
+  assert.ok(id && right.includes(`id="${id}" class="joy-drawer__title"`) && id !== 'drawer-title');
+  assert.ok(right.includes('data-x="1"') && right.includes('aria-label="Close drawer"') && !right.includes('&times;'));
+
+  const left = html({ open: true, placement: 'left', className: 'mine' });
+  assert.ok(left.includes('class="joy-drawer-backdrop joy-drawer-backdrop--left"'), left);
+  assert.ok(left.includes('class="joy-drawer mine joy-drawer--left"'), left);
+  assert.ok(left.includes('aria-label="Drawer"') && !left.includes('aria-labelledby') && !left.includes('<h3'));
+  assert.ok(!noSvg(left).includes('style='));
+});
+
+test('F-038 C-L6: Popconfirm renders role=alertdialog with a labelled title, AlertCircle icon in a tone span, no inline colour', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Popconfirm } = loadComponent('Popconfirm');
+  const html = (props, kid = 'Delete') => renderToStaticMarkup(React.createElement(Popconfirm, props, React.createElement('button', null, kid)));
+  assert.strictEqual(Popconfirm.$$typeof, Symbol.for('react.forward_ref'));
+
+  const closed = html({ 'data-x': '1', className: 'mine' });
+  assert.match(closed, /^<div [^>]*class="joy-popconfirm mine"/);
+  assert.ok(closed.includes('data-x="1"') && closed.includes('<div class="joy-popconfirm__trigger"><button>Delete</button></div>'));
+  assert.ok(!closed.includes('joy-popconfirm__panel'));
+
+  const open = html({ open: true, title: 'Sure?', okText: 'Yes', cancelText: 'No' });
+  assert.match(open, /<div class="joy-popconfirm__panel" role="alertdialog" aria-labelledby="([^"]+)">/);
+  const id = idOf(open, /aria-labelledby="([^"]+)"/);
+  assert.ok(open.includes(`<span id="${id}">Sure?</span>`) && !open.includes('aria-modal'));
+  assert.match(open, /<span class="joy-popconfirm__icon"><svg [^>]*width="1rem"/);
+  assert.ok(!open.includes('#f59e0b') && !open.includes('stroke="var('), 'no inline warning colour');
+  assert.match(open, /joy-button--ghost joy-button--sm">No<\/button><button type="button" class="joy-button joy-button--primary joy-button--sm">Yes</);
+  const clobber = html({ open: true, role: 'presentation', className: 'x' });
+  assert.ok(clobber.includes('role="alertdialog"'));
+});
+
+test('F-038 C-L6: Dropdown and Tooltip render the Svelte contract (aria wiring, classes, refs, rest)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Dropdown } = loadComponent('Dropdown');
+  const { Tooltip } = loadComponent('Tooltip');
+  for (const C of [Dropdown, Tooltip]) assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${C.displayName} forwards refs`);
+
+  const dd = renderToStaticMarkup(React.createElement(Dropdown, { items: [{ key: 'a', label: 'A' }], className: 'mine', 'data-x': '1' }, 'Menu'));
+  assert.match(dd, /^<div [^>]*class="joy-dropdown-wrapper mine"/);
+  assert.ok(dd.includes('data-x="1"'));
+  assert.match(dd, /<div class="joy-dropdown-trigger" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false">Menu<\/div>/);
+  assert.ok(!dd.includes('aria-controls') && !dd.includes('role="menu"'));
+
+  const tip = renderToStaticMarkup(React.createElement(Tooltip, { title: 'Hint', className: 'mine', 'data-x': '1' }, React.createElement('button', null, 'b')));
+  assert.strictEqual(tip, '<div data-x="1" class="joy-tooltip-wrapper mine"><button>b</button></div>');
+});
+
+test('F-038 C-L6: ImagePreview renders the Svelte class/aria contract with no inline colours and icons from @joymify/icons', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { ImagePreview } = loadComponent('ImagePreview');
+  assert.strictEqual(ImagePreview.$$typeof, Symbol.for('react.forward_ref'));
+  const html = (props) => bare(renderToStaticMarkup(React.createElement(ImagePreview, { onClose() {}, ...props })));
+  assert.strictEqual(html({ open: false, src: 'a.png' }), '');
+
+  const one = html({ open: true, src: 'a.png', className: 'mine', 'data-x': '1' });
+  assert.match(one, /^<div [^>]*class="joy-image-preview-mask mine"/);
+  const oneNoSvg = noSvg(one);
+  assert.ok(one.includes('role="dialog"') && one.includes('aria-modal="true"') && one.includes('aria-label="Image preview"') && one.includes('data-x="1"'));
+  assert.ok(one.includes('<div class="joy-image-preview-toolbar" role="toolbar" aria-label="Preview tools">'));
+  const labels = [...one.matchAll(/<button [^>]*class="joy-image-preview-btn[ "]/g)];
+  assert.strictEqual(labels.length, 6);
+  for (const l of ['Zoom in', 'Zoom out', 'Rotate left', 'Rotate right', 'Reset zoom and rotation', 'Close preview']) assert.ok(one.includes(`aria-label="${l}"`), l);
+  assert.ok(one.includes('class="joy-image-preview-btn joy-image-preview-btn--close"') && one.includes('<span class="joy-image-preview-btn__icon--flip"><svg'));
+  assert.ok(!one.includes('joy-image-preview-counter') && !one.includes('joy-image-preview-nav'), 'single image has no gallery controls');
+  assert.match(one, /<div class="joy-image-preview-stage"><img class="joy-image-preview-img" src="a.png" alt="Preview image" draggable="false" style="transform:translate\(0px, 0px\) scale\(1\) rotate\(0deg\)"\/>/);
+  // style attributes: the image transform only; nothing coloured, blurred or sized inline
+  assert.strictEqual([...oneNoSvg.matchAll(/style="/g)].length, 1);
+  assert.ok(!/rgba?\(|#[0-9a-f]{3,8}\b|blur|z-index/i.test(oneNoSvg), 'no hard-coded colours');
+  assert.ok(!one.includes('Zoom In') && !one.includes('Rotate Counterclockwise'), 'old label spellings are gone');
+
+  const gallery = html({ open: true, items: ['a.png', { src: 'b.png', alt: 'Second' }] });
+  assert.ok(gallery.includes('<div class="joy-image-preview-counter">1 / 2</div>'), gallery);
+  assert.ok(gallery.includes('class="joy-image-preview-nav joy-image-preview-nav--prev"') && gallery.includes('aria-label="Previous image"'));
+  assert.ok(gallery.includes('class="joy-image-preview-nav joy-image-preview-nav--next"') && gallery.includes('aria-label="Next image"'));
+  assert.ok(html({ open: true, items: ['a.png', { src: 'b.png', alt: 'Second' }], current: 1 }).includes('alt="Second"'));
+  const clobber = html({ open: true, src: 'a.png', role: 'presentation', 'aria-modal': 'false' });
+  assert.ok(clobber.includes('role="dialog"') && clobber.includes('aria-modal="true"'));
+});
+
+test('F-038 C-L6: Image is its own module (ref on the wrapper, rest on the img), and index.ts exports it from Image.js', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Image } = loadComponent('Image');
+  assert.strictEqual(Image.$$typeof, Symbol.for('react.forward_ref'));
+  assert.strictEqual(Image.displayName, 'Image');
+  assert.ok(!('Image' in loadComponent('ImagePreview')), 'ImagePreview.tsx no longer bundles Image');
+  const index = readSrc('../src/index.ts');
+  assert.ok(index.includes("export { Image, type ImageProps } from './Image.js';"));
+  assert.ok(index.includes("export { ImagePreview, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';"));
+  assert.ok(readSrc('../src/Image.tsx').includes("from './ImagePreview.js'"), 'Image imports ImagePreview');
+
+  const html = (props) => bare(renderToStaticMarkup(React.createElement(Image, props)));
+  const on = html({ src: 'a.png', alt: 'A', className: 'mine', style: { width: 40 }, 'data-x': '1' });
+  assert.ok(on.startsWith('<div class="joy-image-wrapper mine joy-image-wrapper--previewable" style="width:40px" role="button" tabindex="0">'), on);
+  assert.ok(on.includes('<img data-x="1" src="a.png" alt="A" class="joy-image__img"/>'), 'rest goes to the img, class stays joy-image__img');
+  const off = html({ src: 'a.png', preview: false });
+  assert.ok(off.startsWith('<div class="joy-image-wrapper">') && !off.includes('role=') && !off.includes('tabindex') && !off.includes('previewable'), off);
+});
+
+test('F-038 C-L6: Modal and Drawer effects lock scroll, trap focus, register in the dialog stack and tear everything down', () => {
+  const overlay = loadFile(fileURLToPath(new URL('../src/overlay-utils.ts', import.meta.url)));
+  for (const name of ['Modal', 'Drawer']) {
+    withDom(({ doc, win, mk }) => {
+      const opener = mk(); doc.activeElement = opener;
+      const firstFocusable = mk();
+      const dialogNode = mk({ querySelector: () => firstFocusable });
+      const closed = [];
+      const h = mount(name, { open: true, title: 'T', onClose: () => closed.push(1) }, { refNode: (el) => (el.props.role === 'dialog' ? dialogNode : mk()) });
+      // before flush nothing has happened: effects run after commit
+      assert.strictEqual(doc.body.style.overflow, '');
+      h.flush();
+      assert.strictEqual(doc.body.style.overflow, 'hidden', `${name}: scroll locked`);
+      assert.strictEqual(firstFocusable.focused, 1, `${name}: trapFocus moved focus into the dialog`);
+      assert.strictEqual(dialogNode.listeners, 1, `${name}: Tab trap attached to the dialog`);
+      assert.strictEqual(win.listeners, 1, `${name}: one window keydown listener`);
+
+      // Escape closes; a popover that already claimed the key (preventDefault) keeps the dialog open
+      win.dispatchEvent(keydown('Escape'));
+      assert.strictEqual(closed.length, 1, `${name}: Escape closes`);
+      const claimed = keydown('Escape'); claimed.preventDefault();
+      win.dispatchEvent(claimed);
+      assert.strictEqual(closed.length, 1, `${name}: an Escape already claimed by a popover/menu/tooltip does not close the dialog`);
+      win.dispatchEvent(keydown('a'));
+      win.dispatchEvent(keydown('Enter'));
+      assert.strictEqual(closed.length, 1, `${name}: other keys ignored`);
+
+      // registerDialog wiring: a dialog opened later is the topmost, so this one ignores Escape until it unregisters
+      const inner = overlay.registerDialog();
+      win.dispatchEvent(keydown('Escape'));
+      assert.strictEqual(closed.length, 1, `${name}: not topmost -> Escape ignored`);
+      inner.unregister();
+      win.dispatchEvent(keydown('Escape'));
+      assert.strictEqual(closed.length, 2, `${name}: topmost again -> Escape closes`);
+
+      // a re-render with a new onClose must not re-run the effect (no relock, no listener churn) and Escape uses the latest callback
+      const later = [];
+      h.update({ open: true, title: 'T', onClose: () => later.push(1) });
+      assert.strictEqual(win.listeners, 1);
+      win.dispatchEvent(keydown('Escape'));
+      assert.deepStrictEqual([closed.length, later.length], [2, 1]);
+
+      // closing releases everything: scroll, listeners, dialog stack, and focus goes back to the opener
+      h.update({ open: false, onClose: () => later.push(1) });
+      assert.strictEqual(h.tree, null, `${name}: renders nothing when closed`);
+      assert.strictEqual(doc.body.style.overflow, '', `${name}: scroll released`);
+      assert.strictEqual(win.listeners, 0);
+      assert.strictEqual(dialogNode.listeners, 0);
+      assert.strictEqual(opener.focused, 1, `${name}: focus returned to the opener`);
+      const probe = overlay.registerDialog();
+      assert.ok(probe.isTopmost(), `${name}: unregistered from the dialog stack`);
+      probe.unregister();
+      win.dispatchEvent(keydown('Escape'));
+      assert.strictEqual(later.length, 1, `${name}: no Escape handling after close`);
+
+      // unmounting while open runs the same teardown
+      const h2 = mount(name, { open: true, onClose() {} }, { refNode: (el) => (el.props.role === 'dialog' ? mk({ querySelector: () => mk() }) : mk()) });
+      h2.flush();
+      assert.strictEqual(doc.body.style.overflow, 'hidden');
+      h2.unmount();
+      assert.strictEqual(doc.body.style.overflow, '');
+      assert.strictEqual(win.listeners, 0);
+    });
+  }
+});
+
+test('F-038 C-L6: Modal/Drawer/ImagePreview source wires registerDialog + unregister and gates Escape on topmost and defaultPrevented', () => {
+  for (const name of ['Modal', 'Drawer', 'ImagePreview']) {
+    const src = readSrc(`../src/${name}.tsx`);
+    assert.ok(/registerDialog\(\)/.test(src) && /\.unregister\(\)/.test(src), `${name}: registerDialog + unregister`);
+    assert.ok(/isTopmost\(\)/.test(src) && /defaultPrevented/.test(src), `${name}: Escape acts only when topmost and not defaultPrevented`);
+    assert.ok(/lockBodyScroll\(\)/.test(src) && /trapFocus\(/.test(src), `${name}: scroll lock + focus trap`);
+    assert.ok(!/style=\{\{/.test(src.replace(/style=\{\{ transform:/, '')), `${name}: no inline style objects`);
+    assert.ok(!/modal-title|drawer-title|&times;/.test(src), `${name}: no hard-coded label id or glyph close`);
+  }
+  for (const name of ['Popconfirm', 'Dropdown']) assert.ok(readSrc(`../src/${name}.tsx`).includes('useOverlay('), `${name} uses useOverlay`);
+  for (const name of ['Modal', 'Drawer', 'Popconfirm', 'Dropdown', 'Tooltip', 'ImagePreview', 'Image']) {
+    const src = readSrc(`../src/${name}.tsx`);
+    assert.ok(src.includes('React.forwardRef') && /\{\.\.\.rest\}/.test(src) && src.includes('.displayName'), `${name}: forwardRef + rest + displayName`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(/.test(src), `${name}: no colour literals`);
+  }
+});
+
+test('F-038 C-L6: Popconfirm opens/closes through useOverlay, focuses the first button, returns focus, and reports every change via onOpenChange', () => {
+  withDom(({ doc, win, mk }) => {
+    const triggerBtn = mk(); const cancelBtn = mk(); const panelNode = mk({ querySelector: () => cancelBtn });
+    const triggerNode = mk({ querySelector: () => triggerBtn });
+    const refNode = (el) => (el.props.className === 'joy-popconfirm__trigger' ? triggerNode : el.props.className === 'joy-popconfirm__panel' ? panelNode : mk());
+    const changes = []; const confirmed = []; const cancelled = [];
+    const props = (extra) => ({ children: 'x', onOpenChange: (o) => changes.push(o), onConfirm: () => confirmed.push(1), onCancel: () => cancelled.push(1), ...extra });
+
+    // controlled + open: overlay wiring and first-button focus happen after commit
+    const h = mount('Popconfirm', props({ open: true }), { refNode });
+    h.flush();
+    assert.ok(panelNode.classes.has('joy-overlay') && panelNode.style.position === 'fixed', 'openOverlay positioned the panel');
+    assert.strictEqual(cancelBtn.focused, 1, 'first button focused on open');
+    assert.strictEqual(doc.listeners, 2, 'Escape + outside-click listeners');
+
+    // outside pointerdown closes (reports false, focus back to the control inside the trigger); inside does not
+    doc.dispatchEvent(evtWith('pointerdown', { target: panelNode }));
+    assert.deepStrictEqual(changes, []);
+    doc.dispatchEvent(evtWith('pointerdown', { target: {} }));
+    assert.deepStrictEqual(changes, [false]);
+    assert.strictEqual(triggerBtn.focused, 1, 'focus returned to the trigger control');
+    assert.strictEqual(doc.listeners, 0, 'overlay disposed');
+
+    // Escape
+    const h2 = mount('Popconfirm', props({ open: true }), { refNode });
+    h2.flush();
+    doc.dispatchEvent(keydown('Escape'));
+    assert.deepStrictEqual(changes, [false, false]);
+    assert.strictEqual(triggerBtn.focused, 2);
+
+    // trigger click asks to toggle; confirm/cancel call their handler then close
+    changes.length = 0;
+    const h3 = mount('Popconfirm', props({ open: true }), { refNode });
+    h3.byClass('joy-popconfirm__trigger')[0].props.onClick();
+    assert.deepStrictEqual(changes, [false]);
+    const [cancel, ok] = h3.find((n) => n.type === 'button');
+    let stopped = 0;
+    ok.props.onClick({ stopPropagation: () => stopped++ });
+    cancel.props.onClick({ stopPropagation: () => stopped++ });
+    assert.deepStrictEqual([confirmed.length, cancelled.length, changes, stopped], [1, 1, [false, false, false], 2]);
+    h.unmount(); h2.unmount(); h3.unmount();
+
+    // uncontrolled: trigger click opens, the panel appears, cancel closes
+    const u = mount('Popconfirm', { children: 'x', onCancel: () => cancelled.push(1) }, { refNode });
+    assert.strictEqual(u.byClass('joy-popconfirm__panel').length, 0);
+    u.byClass('joy-popconfirm__trigger')[0].props.onClick();
+    u.update();
+    assert.strictEqual(u.byClass('joy-popconfirm__panel').length, 1);
+    u.find((n) => n.type === 'button')[0].props.onClick({ stopPropagation() {} });
+    u.update();
+    assert.strictEqual(u.byClass('joy-popconfirm__panel').length, 0);
+    assert.strictEqual(win.listeners, 0);
+  });
+});
+
+test('F-038 C-L6: Dropdown - aria state, roving keyboard nav skipping disabled items, Tab/Escape/select close and return focus, items changing while open does not refocus', () => {
+  withDom(({ doc, mk }) => {
+    const items = [{ key: 'a', label: 'A', disabled: true }, { key: 'b', label: 'B' }, { key: 'c', label: 'C' }, { key: 'd', label: 'D', danger: true }];
+    const itemNodes = items.map(() => mk());
+    const triggerNode = mk(); const panelNode = mk({ querySelectorAll: () => itemNodes });
+    const refNode = (el) => (el.props.className === 'joy-dropdown-trigger' ? triggerNode : el.props.className === 'joy-dropdown' ? panelNode : mk());
+    const selected = [];
+    const h = mount('Dropdown', { items, onSelect: (k) => selected.push(k), children: 'Menu' }, { refNode });
+    const trigger = () => h.byClass('joy-dropdown-trigger')[0];
+    const menu = () => h.byClass('joy-dropdown')[0];
+    const key = (target, k, extra) => { const e = reactKey(k, extra); target.props.onKeyDown(e); h.update(); return e; };
+
+    assert.deepStrictEqual([trigger().props['aria-expanded'], trigger().props['aria-haspopup'], trigger().props['aria-controls'], trigger().props.role, trigger().props.tabIndex], [false, 'menu', undefined, 'button', 0]);
+
+    // ArrowUp opens on the last enabled item, through useOverlay (fixed panel in the overlay layer)
+    const up = key(trigger(), 'ArrowUp');
+    assert.strictEqual(up.calls.prevented, 1);
+    assert.ok(menu(), 'menu rendered');
+    assert.deepStrictEqual([menu().props.role, menu().props.tabIndex, menu().props['aria-orientation']], ['menu', -1, 'vertical']);
+    assert.strictEqual(trigger().props['aria-expanded'], true);
+    assert.strictEqual(trigger().props['aria-controls'], menu().props.id);
+    assert.ok(menu().props.id.endsWith('-menu'));
+    assert.ok(panelNode.classes.has('joy-overlay') && panelNode.style.position === 'fixed');
+    assert.strictEqual(itemNodes[3].focused, 1, 'ArrowUp -> last item focused');
+    const rendered = h.find((n) => n.props.role === 'menuitem');
+    assert.deepStrictEqual(rendered.map((n) => n.props.className), ['joy-dropdown__item', 'joy-dropdown__item', 'joy-dropdown__item', 'joy-dropdown__item joy-dropdown__item--danger']);
+    assert.deepStrictEqual(rendered.map((n) => n.props.disabled), [true, undefined, undefined, undefined]);
+
+    // items changing while open must not refocus or reopen
+    const focusedBefore = itemNodes.map((n) => n.focused);
+    h.update({ items: [...items, { key: 'e', label: 'E' }], onSelect: (k) => selected.push(k), children: 'Menu' });
+    assert.deepStrictEqual(itemNodes.map((n) => n.focused), focusedBefore);
+    h.update({ items, onSelect: (k) => selected.push(k), children: 'Menu' });
+
+    // roving: Home/End/Arrows skip the disabled item and wrap
+    key(menu(), 'Home'); assert.strictEqual(itemNodes[1].focused, 1);
+    key(menu(), 'ArrowDown'); assert.strictEqual(itemNodes[2].focused, 1);
+    key(menu(), 'End'); assert.strictEqual(itemNodes[3].focused, 2);
+    key(menu(), 'ArrowDown'); assert.strictEqual(itemNodes[1].focused, 2, 'wraps past the disabled first item');
+    key(menu(), 'ArrowUp'); assert.strictEqual(itemNodes[3].focused, 3, 'wraps back to the last');
+    const other = key(menu(), 'a'); assert.strictEqual(other.calls.prevented, 0, 'other keys are not consumed');
+
+    // Tab closes and puts focus on the trigger
+    const before = triggerNode.focused;
+    key(menu(), 'Tab');
+    assert.strictEqual(menu(), undefined);
+    assert.strictEqual(triggerNode.focused, before + 1);
+    assert.strictEqual(doc.listeners, 0, 'overlay disposed on close');
+
+    // Enter/Space toggle only when the wrapper itself is the target
+    key(trigger(), 'Enter', { target: {}, currentTarget: { x: 1 } });
+    assert.strictEqual(menu(), undefined, 'Enter bubbling from a child button is ignored (its click opens)');
+    const self = {};
+    key(trigger(), ' ', { target: self, currentTarget: self });
+    assert.ok(menu(), 'Space on the wrapper opens');
+    assert.strictEqual(itemNodes[1].focused, 3, 'keyboard open focuses the first enabled item');
+    key(trigger(), 'Enter', { target: self, currentTarget: self });
+    assert.strictEqual(menu(), undefined, 'Enter on the wrapper closes');
+
+    // click toggles; selecting closes, focuses the trigger, then reports the key; disabled items do nothing
+    trigger().props.onClick(); h.update();
+    assert.ok(menu());
+    const btns = h.find((n) => n.props.role === 'menuitem');
+    btns[0].props.onClick(); h.update();
+    assert.deepStrictEqual(selected, []);
+    assert.ok(menu(), 'disabled item leaves the menu open');
+    const f = triggerNode.focused;
+    btns[2].props.onClick(); h.update();
+    assert.deepStrictEqual(selected, ['c']);
+    assert.strictEqual(menu(), undefined);
+    assert.strictEqual(triggerNode.focused, f + 1);
+
+    // Escape (through the shared overlay primitive) closes and returns focus to the trigger
+    trigger().props.onClick(); h.update();
+    const f2 = triggerNode.focused;
+    doc.dispatchEvent(keydown('Escape')); h.update();
+    assert.strictEqual(menu(), undefined);
+    assert.strictEqual(triggerNode.focused, f2 + 1);
+    // outside pointerdown closes
+    trigger().props.onClick(); h.update();
+    doc.dispatchEvent(evtWith('pointerdown', { target: {} })); h.update();
+    assert.strictEqual(menu(), undefined);
+    assert.strictEqual(doc.listeners, 0);
+    h.unmount();
+  });
+});
+
+test('F-038 C-L6: Tooltip - hover ignores touch, tap pins/unpins, focus shows, aria-describedby is added and removed, Escape and outside taps dismiss', () => {
+  withDom(({ doc, mk }) => {
+    const trigger = mk();
+    const wrapper = mk({ firstElementChild: trigger, contains: (n) => n === wrapper || n === trigger });
+    const h = mount('Tooltip', { title: 'Hint', children: 'x', className: 'mine' }, { refNode: (el) => (el.props.className.includes('joy-tooltip-wrapper') ? wrapper : mk()) });
+    const root = () => h.tree;
+    const tip = () => h.byClass('joy-tooltip')[0];
+    const step = (fn) => { fn(); h.update(); };
+
+    assert.strictEqual(root().props.className, 'joy-tooltip-wrapper mine');
+    assert.strictEqual(tip(), undefined);
+
+    // mouse hover shows, leaving hides; a click with a mouse never pins
+    step(() => root().props.onPointerEnter({ pointerType: 'mouse' }));
+    assert.ok(tip());
+    assert.deepStrictEqual([tip().props.role, tip().props.id.endsWith('-tip')], ['tooltip', true]);
+    assert.strictEqual(trigger.attrs['aria-describedby'], tip().props.id, 'trigger described by the tooltip');
+    assert.strictEqual(doc.listeners, 2, 'Escape + outside pointerdown only while visible');
+    step(() => root().props.onPointerLeave({ pointerType: 'mouse' }));
+    assert.strictEqual(tip(), undefined);
+    assert.strictEqual(trigger.attrs['aria-describedby'], undefined, 'aria-describedby removed on hide');
+    assert.strictEqual(doc.listeners, 0);
+    step(() => { root().props.onPointerDown({ pointerType: 'mouse' }); root().props.onClick({}); });
+    assert.strictEqual(tip(), undefined, 'mouse click does not pin');
+
+    // touch: pointerenter does not hover; tap pins; second tap unpins
+    step(() => root().props.onPointerEnter({ pointerType: 'touch' }));
+    assert.strictEqual(tip(), undefined, 'touch does not hover');
+    step(() => { root().props.onPointerDown({ pointerType: 'touch' }); root().props.onClick({}); });
+    assert.ok(tip(), 'tap pins');
+    step(() => root().props.onPointerLeave({ pointerType: 'touch' }));
+    assert.ok(tip(), 'a touch pointerleave does not unpin');
+    step(() => { root().props.onPointerDown({ pointerType: 'touch' }); root().props.onClick({}); });
+    assert.strictEqual(tip(), undefined, 'second tap dismisses');
+
+    // outside tap and Escape dismiss (Escape is claimed so a surrounding dialog stays open); taps inside do not
+    step(() => { root().props.onPointerDown({ pointerType: 'touch' }); root().props.onClick({}); });
+    assert.ok(tip());
+    doc.dispatchEvent(evtWith('pointerdown', { target: trigger })); h.update();
+    assert.ok(tip(), 'a tap inside the wrapper keeps it');
+    doc.dispatchEvent(evtWith('pointerdown', { target: {} })); h.update();
+    assert.strictEqual(tip(), undefined, 'outside tap dismisses');
+    step(() => root().props.onFocus({}));
+    assert.ok(tip(), 'keyboard focus shows');
+    const esc = keydown('Escape'); doc.dispatchEvent(esc); h.update();
+    assert.strictEqual(esc.defaultPrevented, true, 'Escape claimed for the tooltip');
+    assert.strictEqual(tip(), undefined);
+    step(() => root().props.onFocus({}));
+    step(() => root().props.onBlur({}));
+    assert.strictEqual(tip(), undefined, 'blur hides');
+
+    // existing tokens are preserved and restored; consumer handlers still run
+    trigger.attrs['aria-describedby'] = 'other';
+    const seen = [];
+    h.update({ title: 'Hint', children: 'x', onFocus: () => seen.push('f'), onClick: () => seen.push('c') });
+    step(() => root().props.onFocus({}));
+    assert.strictEqual(trigger.attrs['aria-describedby'], `other ${tip().props.id}`);
+    root().props.onPointerDown({ pointerType: 'mouse' });
+    root().props.onClick({});
+    assert.deepStrictEqual(seen, ['f', 'c']);
+    step(() => root().props.onBlur({}));
+    assert.strictEqual(trigger.attrs['aria-describedby'], 'other');
+    h.unmount();
+    assert.strictEqual(doc.listeners, 0);
+  });
+});
+
+test('F-038 C-L6: ImagePreview keys act only on the topmost dialog; arrows/zoom/rotate/reset update the transform; teardown releases scroll and focus', () => {
+  const overlay = loadFile(fileURLToPath(new URL('../src/overlay-utils.ts', import.meta.url)));
+  withDom(({ doc, win, mk }) => {
+    const opener = mk(); doc.activeElement = opener;
+    const maskNode = mk({ querySelector: () => mk() });
+    const closed = []; const changed = [];
+    const base = { open: true, items: ['a.png', 'b.png', 'c.png'], onClose: () => closed.push(1), onChange: (i) => changed.push(i) };
+    const h = mount('ImagePreview', base, { refNode: (el) => (el.props.role === 'dialog' ? maskNode : mk()) });
+    h.flush();
+    assert.strictEqual(doc.body.style.overflow, 'hidden');
+    assert.strictEqual(win.listeners, 1);
+    const img = () => h.byClass('joy-image-preview-img')[0];
+    const transform = () => img().props.style.transform;
+    assert.strictEqual(transform(), 'translate(0px, 0px) scale(1) rotate(0deg)');
+
+    const press = (k) => { win.dispatchEvent(keydown(k)); h.update(); };
+    press('+'); assert.strictEqual(transform(), 'translate(0px, 0px) scale(1.25) rotate(0deg)');
+    assert.ok(h.byClass('joy-image-preview-stage')[0].props.className.includes('joy-image-preview-stage--zoomed'));
+    press('-'); press('-'); assert.ok(transform().includes('scale(0.75)'));
+    press('r'); assert.ok(transform().includes('rotate(90deg)'));
+    const btn = (label) => h.find((n) => n.props['aria-label'] === label)[0];
+    btn('Rotate left').props.onClick(); h.update(); assert.ok(transform().includes('rotate(0deg)'));
+    btn('Zoom in').props.onClick(); h.update(); btn('Reset zoom and rotation').props.onClick(); h.update();
+    assert.strictEqual(transform(), 'translate(0px, 0px) scale(1) rotate(0deg)');
+    press('ArrowRight'); assert.deepStrictEqual(changed, [1]);
+    assert.ok(h.byClass('joy-image-preview-counter')[0].props.children.includes('2 / 3'));
+    btn('Previous image').props.onClick(); h.update(); btn('Previous image').props.onClick(); h.update();
+    assert.deepStrictEqual(changed, [1, 0, 2], 'previous wraps');
+    btn('Close preview').props.onClick(); assert.strictEqual(closed.length, 1);
+
+    // a topmost dialog opened later (e.g. a Modal from the preview) owns the keys
+    const top = overlay.registerDialog();
+    press('Escape'); press('+');
+    assert.strictEqual(closed.length, 1);
+    assert.ok(!transform().includes('scale(1.25)'));
+    top.unregister();
+    press('Escape');
+    assert.strictEqual(closed.length, 2);
+
+    // drag pans only when zoomed; window mousemove/mouseup are attached just while dragging
+    const stage = () => h.byClass('joy-image-preview-stage')[0];
+    const md = { clientX: 10, clientY: 10, preventDefault() {} };
+    stage().props.onMouseDown(md); h.update();
+    assert.strictEqual(win.listeners, 1, 'not zoomed: no drag');
+    press('+');
+    stage().props.onMouseDown(md); h.update();
+    assert.strictEqual(win.listeners, 3);
+    assert.ok(stage().props.className.includes('joy-image-preview-stage--dragging'));
+    win.dispatchEvent(evtWith('mousemove', { clientX: 30, clientY: 25 })); h.update();
+    assert.ok(transform().startsWith('translate(20px, 15px)'), transform());
+    win.dispatchEvent(new Event('mouseup')); h.update();
+    assert.strictEqual(win.listeners, 1);
+    assert.ok(!stage().props.className.includes('--dragging'));
+
+    // mask backdrop click closes, clicks that bubble from children do not; rest onClick still runs
+    const seen = [];
+    h.update({ ...base, onClick: () => seen.push(1) });
+    const mask = h.tree;
+    const n = closed.length;
+    mask.props.onClick({ target: {}, currentTarget: maskNode });
+    assert.strictEqual(closed.length, n);
+    mask.props.onClick({ target: maskNode, currentTarget: maskNode });
+    assert.deepStrictEqual([closed.length, seen.length], [n + 1, 2]);
+
+    h.update({ ...base, open: false });
+    assert.strictEqual(doc.body.style.overflow, '');
+    assert.strictEqual(win.listeners, 0);
+    assert.strictEqual(opener.focused, 1, 'focus returned');
+  });
+});
+
+test('F-038 C-L6: Image opens the preview on click and Enter/Space, falls back on error, shows the hover overlay only when previewable', () => {
+  withDom(() => {
+    const h = mount('Image', { src: 'a.png', alt: 'A', fallback: 'fb.png' });
+    const wrapper = () => h.byClass('joy-image-wrapper')[0];
+    const previewEl = () => h.tree.props.children[1];
+    assert.strictEqual(previewEl().props.open, false);
+    assert.strictEqual(previewEl().props.src, 'a.png');
+    assert.strictEqual(h.byClass('joy-image__overlay').length, 0);
+    wrapper().props.onMouseEnter(); h.update();
+    assert.strictEqual(h.byClass('joy-image__overlay').length, 1);
+    wrapper().props.onMouseLeave(); h.update();
+    assert.strictEqual(h.byClass('joy-image__overlay').length, 0);
+
+    const other = reactKey('a');
+    wrapper().props.onKeyDown(other); h.update();
+    assert.deepStrictEqual([previewEl().props.open, other.calls.prevented], [false, 0]);
+    const enter = reactKey('Enter');
+    wrapper().props.onKeyDown(enter); h.update();
+    assert.deepStrictEqual([previewEl().props.open, enter.calls.prevented], [true, 1]);
+    previewEl().props.onClose(); h.update();
+    assert.strictEqual(previewEl().props.open, false);
+    wrapper().props.onKeyDown(reactKey(' ')); h.update();
+    assert.strictEqual(previewEl().props.open, true);
+    previewEl().props.onClose(); h.update();
+    wrapper().props.onClick(); h.update();
+    assert.strictEqual(previewEl().props.open, true);
+
+    // fallback swaps the src (also used as the preview src); a preview={{src}} override wins
+    const seen = [];
+    const g = mount('Image', { src: 'a.png', fallback: 'fb.png', onError: () => seen.push(1), preview: { src: 'big.png' } });
+    g.byClass('joy-image__img')[0].props.onError({}); g.update();
+    assert.deepStrictEqual([g.byClass('joy-image__img')[0].props.src, g.tree.props.children[1].props.src, seen.length], ['fb.png', 'big.png', 1]);
+
+    // preview=false: inert wrapper, no hover overlay, no ImagePreview
+    const off = mount('Image', { src: 'a.png', preview: false });
+    const w = off.byClass('joy-image-wrapper')[0];
+    assert.deepStrictEqual([w.props.role, w.props.tabIndex, off.tree.props.children[1]], [undefined, undefined, false]);
+    w.props.onMouseEnter(); off.update();
+    assert.strictEqual(off.byClass('joy-image__overlay').length, 0);
+  });
 });

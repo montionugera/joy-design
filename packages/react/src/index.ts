@@ -74,7 +74,8 @@ export { Notification, type NotificationProps } from './Notification.js';
 export { Popconfirm, type PopconfirmProps } from './Popconfirm.js';
 export { Spin, type SpinProps } from './Spin.js';
 // Wave 10: Rich Media, Hierarchical Select & Accessible Overlay Suite
-export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
+export { Image, type ImageProps } from './Image.js';
+export { ImagePreview, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
 export { TreeSelect, type TreeSelectProps, type TreeNode } from './TreeSelect.js';
 export { Cascader, type CascaderProps, type CascaderOption } from './Cascader.js';
 export {
