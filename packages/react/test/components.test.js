@@ -1177,7 +1177,7 @@ function withDom(fn) {
  * slots, useEffect with dependency comparison and cleanups, and object refs bound to `refNode(element)` fakes after each render.
  * `flush()` runs the effects the way React does after commit; `unmount()` runs every cleanup.
  */
-function mount(name, initialProps, { refNode = () => null } = {}) {
+function mount(name, initialProps, { refNode = () => null, forwardedRef = null } = {}) {
   const React = requireFromHere('react');
   const C = loadComponent(name)[name];
   const slots = [];
@@ -1187,17 +1187,18 @@ function mount(name, initialProps, { refNode = () => null } = {}) {
   const h = { tree: null };
   h.rerender = (next) => {
     if (next) props = next;
-    const saved = { useState: React.useState, useRef: React.useRef, useMemo: React.useMemo, useId: React.useId, useEffect: React.useEffect, useImperativeHandle: React.useImperativeHandle };
+    const saved = { useState: React.useState, useRef: React.useRef, useMemo: React.useMemo, useCallback: React.useCallback, useId: React.useId, useEffect: React.useEffect, useImperativeHandle: React.useImperativeHandle };
     let i = 0;
     pending = [];
     React.useState = (init) => { const s = (slots[i] ??= { v: typeof init === 'function' ? init() : init }); i++; return [s.v, (nv) => { s.v = typeof nv === 'function' ? nv(s.v) : nv; }]; };
     React.useRef = (init) => { const s = (slots[i] ??= { v: { current: init } }); i++; return s.v; };
     React.useMemo = (fn, deps) => { const s = (slots[i] ??= {}); i++; if (!s.deps || deps.some((d, k) => !Object.is(d, s.deps[k]))) { s.deps = deps; s.val = fn(); } return s.val; };
+    React.useCallback = (fn, deps) => { const s = (slots[i] ??= {}); i++; if (!s.deps || deps.some((d, k) => !Object.is(d, s.deps[k]))) { s.deps = deps; s.val = fn; } return s.val; };
     React.useId = () => 'uid';
     React.useImperativeHandle = () => { i++; };
     React.useEffect = (fn, deps) => { pending.push({ slot: (slots[i] ??= {}), fn, deps }); i++; };
     try {
-      h.tree = C.render(props, null);
+      h.tree = C.render(props, forwardedRef);
     } finally {
       Object.assign(React, saved);
     }
@@ -1205,13 +1206,16 @@ function mount(name, initialProps, { refNode = () => null } = {}) {
     const seen = new Set();
     walk(h.tree, (el) => {
       const r = el.props.ref;
-      if (r && typeof r === 'object' && 'current' in r) {
+      if (r && (typeof r === 'function' || (typeof r === 'object' && 'current' in r))) {
         seen.add(r);
-        if (!nodes.has(r)) nodes.set(r, refNode(el));
-        r.current = nodes.get(r);
+        if (!nodes.has(r)) {
+          nodes.set(r, refNode(el));
+          if (typeof r === 'function') r(nodes.get(r));
+        }
+        if (typeof r !== 'function') r.current = nodes.get(r);
       }
     });
-    for (const [r] of nodes) if (!seen.has(r)) { r.current = null; nodes.delete(r); }
+    for (const [r] of nodes) if (!seen.has(r)) { if (typeof r === 'function') r(null); else r.current = null; nodes.delete(r); }
     return h;
   };
   h.flush = () => {
@@ -1264,8 +1268,8 @@ test('F-038 C-L6: Modal renders the Svelte contract (unique label id, aria-label
   const bare = html({ open: true });
   assert.ok(bare.includes('aria-label="Dialog"') && !bare.includes('aria-labelledby') && !bare.includes('<h3') && !bare.includes('joy-modal__footer'));
   // rest cannot clobber component-owned attributes
-  const clobber = html({ open: true, role: 'alert', 'aria-modal': 'false', 'aria-label': 'nope' });
-  assert.ok(clobber.includes('role="dialog"') && clobber.includes('aria-modal="true"') && clobber.includes('aria-label="Dialog"') && !clobber.includes('nope'));
+  const clobber = html({ open: true, role: 'alert', 'aria-modal': 'false' });
+  assert.ok(clobber.includes('role="dialog"') && clobber.includes('aria-modal="true"') && clobber.includes('aria-label="Dialog"'));
   // two instances never share a label id
   const two = renderToStaticMarkup(React.createElement('div', null, React.createElement(Modal, { open: true, title: 'a' }), React.createElement(Modal, { open: true, title: 'b' })));
   const ids = [...two.matchAll(/aria-labelledby="([^"]+)"/g)].map((m) => m[1]);
@@ -1313,7 +1317,7 @@ test('F-038 C-L6: Popconfirm renders role=alertdialog with a labelled title, Ale
   assert.ok(open.includes(`<span id="${id}">Sure?</span>`) && !open.includes('aria-modal'));
   assert.match(open, /<span class="joy-popconfirm__icon"><svg [^>]*width="1rem"/);
   assert.ok(!open.includes('#f59e0b') && !open.includes('stroke="var('), 'no inline warning colour');
-  assert.match(open, /joy-button--ghost joy-button--sm">No<\/button><button type="button" class="joy-button joy-button--primary joy-button--sm">Yes</);
+  assert.match(open, /joy-button--ghost joy-button--sm">No<\/button><button type="button" class="joy-button joy-button--solid joy-button--sm">Yes</);
   const clobber = html({ open: true, role: 'presentation', className: 'x' });
   assert.ok(clobber.includes('role="alertdialog"'));
 });
@@ -1791,4 +1795,119 @@ test('F-038 C-L6: Image opens the preview on click and Enter/Space, falls back o
     w.props.onMouseEnter(); off.update();
     assert.strictEqual(off.byClass('joy-image__overlay').length, 0);
   });
+});
+
+test('F-038 C-L6 fix: a consumer aria-label / aria-labelledby wins over the default fallback exactly like the Svelte twins, role and aria-modal stay owned', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const render = (name, props) => bare(renderToStaticMarkup(React.createElement(loadComponent(name)[name], { onClose() {}, ...props }, 'x')));
+  for (const [name, fallback] of [['Modal', 'Dialog'], ['Drawer', 'Drawer']]) {
+    const untitled = render(name, { open: true, 'aria-label': 'Einstellungen' });
+    assert.ok(untitled.includes('aria-label="Einstellungen"') && !untitled.includes(`aria-label="${fallback}"`), `${name}: consumer aria-label replaces the fallback`);
+    assert.ok(!untitled.includes('aria-labelledby'));
+    const titled = render(name, { open: true, title: 'T', 'aria-label': 'Custom' });
+    assert.match(titled, /aria-labelledby="[^"]+-title"/, `${name}: title-derived labelledby stays`);
+    assert.ok(titled.includes('aria-label="Custom"'), `${name}: consumer aria-label is kept alongside (same as Svelte)`);
+    const labelled = render(name, { open: true, 'aria-labelledby': 'mine' });
+    assert.ok(labelled.includes('aria-labelledby="mine"') && labelled.includes(`aria-label="${fallback}"`), `${name}: consumer aria-labelledby wins, fallback label kept as in Svelte`);
+    const owned = render(name, { open: true, role: 'alert', 'aria-modal': 'false' });
+    assert.ok(owned.includes('role="dialog"') && owned.includes('aria-modal="true"'), `${name}: role/aria-modal cannot be clobbered`);
+  }
+  const preview = render('ImagePreview', { open: true, src: 'a.png', 'aria-label': 'Bildvorschau' });
+  assert.ok(preview.includes('aria-label="Bildvorschau"') && !preview.includes('aria-label="Image preview"'));
+  assert.ok(render('ImagePreview', { open: true, src: 'a.png' }).includes('aria-label="Image preview"'));
+});
+
+test('F-038 C-L6 fix: focus returns to the opener even when the dialog content autoFocuses (opener captured in the render that opens)', () => {
+  const dialogProps = { Modal: { title: 'T' }, Drawer: { title: 'T' }, ImagePreview: { src: 'a.png' } };
+  for (const name of ['Modal', 'Drawer', 'ImagePreview']) {
+    withDom(({ doc, mk }) => {
+      const opener = mk(); doc.activeElement = opener;
+      const autoInput = mk();
+      const base = { onClose() {}, ...dialogProps[name] };
+      const h = mount(name, { ...base, open: false }, { refNode: (el) => (el.props.role === 'dialog' ? mk({ querySelector: () => autoInput }) : mk()) });
+      h.flush();
+      // render with open=true (twice, as StrictMode does), THEN the child's autoFocus moves focus during commit, THEN effects run
+      h.rerender({ ...base, open: true });
+      h.rerender();
+      autoInput.focus();
+      assert.strictEqual(doc.activeElement, autoInput);
+      h.flush();
+      // a later re-render while open must not re-capture the (now inner) focused element
+      h.update({ ...base, open: true, onClose() {} });
+      h.update({ ...base, open: false });
+      assert.strictEqual(opener.focused, 1, `${name}: focus returned to the opener, not dropped to <body>`);
+      assert.strictEqual(doc.activeElement, opener);
+      // re-opening captures the current opener again
+      const opener2 = mk(); doc.activeElement = opener2;
+      h.rerender({ ...base, open: true }); autoInput.focus(); h.flush();
+      h.update({ ...base, open: false });
+      assert.strictEqual(opener2.focused, 1, `${name}: second open returns to its own opener`);
+      h.unmount();
+    });
+  }
+});
+
+test('F-038 C-L6 fix: forwarded refs attach once per mount and are null while closed (no per-render churn, no cast)', () => {
+  for (const name of ['Modal', 'Drawer', 'ImagePreview']) {
+    withDom(({ mk }) => {
+      const calls = [];
+      const spy = (n) => calls.push(n === null ? null : 'node');
+      const node = mk({ querySelector: () => mk() });
+      const base = { onClose() {}, src: 'a.png', title: 'T' };
+      const h = mount(name, { ...base, open: true }, { forwardedRef: spy, refNode: (el) => (el.props.role === 'dialog' ? node : mk()) });
+      h.flush(); h.update(); h.update({ ...base, open: true, onClose() {} });
+      assert.deepStrictEqual(calls, ['node'], `${name}: callback ref called once across re-renders`);
+      h.update({ ...base, open: false });
+      assert.deepStrictEqual(calls, ['node', null], `${name}: ref cleared when the dialog closes`);
+      const objRef = { current: 'unset' };
+      const g = mount(name, { ...base, open: false }, { forwardedRef: objRef, refNode: (el) => (el.props.role === 'dialog' ? mk({ querySelector: () => mk() }) : mk()) });
+      assert.strictEqual(objRef.current, 'unset', 'closed dialogs never touch an object ref');
+      g.rerender({ ...base, open: true });
+      assert.ok(objRef.current, `${name}: object ref points at the dialog element while open`);
+      g.update({ ...base, open: false });
+      assert.strictEqual(objRef.current, null);
+      h.unmount(); g.unmount();
+    });
+  }
+  // Tooltip: wrapper is always rendered, ref stays attached
+  withDom(({ mk }) => {
+    const calls = []; const wrapper = mk();
+    const h = mount('Tooltip', { title: 't', children: 'x' }, { forwardedRef: (n) => calls.push(n === null ? null : 'node'), refNode: () => wrapper });
+    h.update(); h.update();
+    assert.deepStrictEqual(calls, ['node']);
+  });
+});
+
+test('F-038 C-L6 fix: ImagePreview clamps the index into range and closing mid-drag releases the window drag listeners', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { ImagePreview } = loadComponent('ImagePreview');
+  const html = bare(renderToStaticMarkup(React.createElement(ImagePreview, { open: true, items: ['a.png', 'b.png'], current: 5, onClose() {} })));
+  assert.ok(html.includes('<div class="joy-image-preview-counter">2 / 2</div>') && html.includes('src="b.png"'), html);
+  assert.ok(bare(renderToStaticMarkup(React.createElement(ImagePreview, { open: true, items: ['a.png', 'b.png'], current: -3, onClose() {} }))).includes('1 / 2'));
+
+  withDom(({ win, mk }) => {
+    const mask = mk({ querySelector: () => mk() });
+    const base = { items: ['a.png'], onClose() {} };
+    const h = mount('ImagePreview', { ...base, open: true }, { refNode: (el) => (el.props.role === 'dialog' ? mask : mk()) });
+    h.flush();
+    win.dispatchEvent(keydown('+')); h.update();
+    h.byClass('joy-image-preview-stage')[0].props.onMouseDown({ clientX: 1, clientY: 1, preventDefault() {} }); h.update();
+    assert.strictEqual(win.listeners, 3, 'keydown + mousemove + mouseup while dragging');
+    h.update({ ...base, open: false });
+    h.update();
+    assert.strictEqual(win.listeners, 0, 'closing mid-drag detaches the drag listeners');
+  });
+});
+
+test('F-038 C-L6 fix: neither Popconfirm twin uses the dead joy-button--primary class and every joy-button modifier they use exists in theme.css', () => {
+  const css = readSrc('../../tokens/dist/theme.css');
+  const twins = { react: readSrc('../src/Popconfirm.tsx'), svelte: readSrc('../../svelte/src/lib/Popconfirm.svelte') };
+  for (const [side, src] of Object.entries(twins)) {
+    assert.ok(!src.includes('joy-button--primary'), `${side} Popconfirm must not use joy-button--primary (no CSS)`);
+    const used = [...new Set([...src.matchAll(/joy-button--[a-z]+/g)].map((m) => m[0]))];
+    assert.ok(used.includes('joy-button--solid') && used.includes('joy-button--ghost'), `${side}: confirm is solid, cancel is ghost`);
+    for (const cls of used) assert.ok(css.includes(`.${cls}`), `${side}: ${cls} is styled in theme.css`);
+  }
 });

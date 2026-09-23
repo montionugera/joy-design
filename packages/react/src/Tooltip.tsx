@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useMergedRef } from './dialog-hooks.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -18,7 +19,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
   ) => {
     const tooltipId = `${React.useId()}-tip`;
     const wrapperRef = React.useRef<HTMLDivElement | null>(null);
-    React.useImperativeHandle(ref, () => wrapperRef.current as HTMLDivElement);
+    const setWrapperRef = useMergedRef(ref, wrapperRef);
 
     // Three independent reasons to be visible. Mouse hover and keyboard focus behave as before; a tap on a
     // touch/pen device has no hover, so it pins the tooltip until the next tap on the trigger, an outside
@@ -66,7 +67,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
     return (
       <div
         {...rest}
-        ref={wrapperRef}
+        ref={setWrapperRef}
         className={cx('joy-tooltip-wrapper', className)}
         onPointerEnter={(e) => {
           onPointerEnter?.(e);

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Close } from '@joymify/icons/react';
+import { useMergedRef, useOpener } from './dialog-hooks.js';
 import { lockBodyScroll, registerDialog, trapFocus } from './overlay-utils.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
@@ -21,12 +22,13 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
     const dialogRef = React.useRef<HTMLDivElement | null>(null);
     const onCloseRef = React.useRef(onClose);
     onCloseRef.current = onClose;
-    React.useImperativeHandle(ref, () => dialogRef.current as HTMLDivElement);
+    const setDialogRef = useMergedRef(ref, dialogRef);
+    const openerRef = useOpener(open);
 
     React.useEffect(() => {
       const dialog = dialogRef.current;
       if (!open || !dialog) return;
-      const previouslyFocused = document.activeElement as HTMLElement | null;
+      const previouslyFocused = openerRef.current;
       const unlock = lockBodyScroll();
       const handle = registerDialog();
       const cleanupTrap = trapFocus(dialog);
@@ -60,12 +62,12 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       >
         <div
           {...rest}
-          ref={dialogRef}
+          ref={setDialogRef}
           className={cx('joy-modal', className)}
           role="dialog"
           aria-modal="true"
-          aria-labelledby={title ? titleId : undefined}
-          aria-label={title ? undefined : 'Dialog'}
+          aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}
+          aria-label={rest['aria-label'] ?? (title ? undefined : 'Dialog')}
         >
           <div className="joy-modal__header">
             {title ? (

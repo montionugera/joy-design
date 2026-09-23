@@ -806,3 +806,11 @@ test('F-038 B-L6 fix round: Modal, Drawer and ImagePreview register on the dialo
   const u = fs.readFileSync(path.resolve('./src/lib/overlay-utils.ts'), 'utf8');
   assert.ok(u.includes('export function registerDialog()') && !/^(window|document)\b/m.test(u.slice(u.indexOf('const dialogStack'))), 'dialog stack is SSR-safe');
 });
+
+test('F-038 C-L6 fix: Popconfirm confirm button uses the styled joy-button--solid class (joy-button--primary has no CSS)', () => {
+  const src = readLib('Popconfirm.svelte');
+  const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
+  assert.ok(!src.includes('joy-button--primary'));
+  for (const cls of new Set(src.match(/joy-button--[a-z]+/g))) assert.ok(css.includes(`.${cls}`), `${cls} is styled in theme.css`);
+  assert.ok(src.includes('joy-button joy-button--solid joy-button--sm'));
+});

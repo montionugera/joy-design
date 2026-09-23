@@ -97,7 +97,7 @@
         </button>
         <button
           type="button"
-          class="joy-button joy-button--primary joy-button--sm"
+          class="joy-button joy-button--solid joy-button--sm"
           onclick={handleConfirm}
         >
           {okText}

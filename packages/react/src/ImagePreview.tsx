@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons/react';
+import { useMergedRef, useOpener } from './dialog-hooks.js';
 import { lockBodyScroll, registerDialog, trapFocus } from './overlay-utils.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
@@ -33,7 +34,9 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
     }, [items, src]);
 
     const [internalCurrent, setInternalCurrent] = React.useState(0);
-    const currentIndex = controlledCurrent !== undefined ? controlledCurrent : internalCurrent;
+    // Clamped, so a stale `current` past the end never shows "5 / 2" next to the first image.
+    const requestedIndex = controlledCurrent !== undefined ? controlledCurrent : internalCurrent;
+    const currentIndex = Math.min(Math.max(0, requestedIndex), Math.max(0, normalizedItems.length - 1));
     const currentItem = normalizedItems[currentIndex] || normalizedItems[0] || { src: '' };
 
     const [scale, setScale] = React.useState(1);
@@ -42,7 +45,8 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
     const [isDragging, setIsDragging] = React.useState(false);
     const dragStartRef = React.useRef({ x: 0, y: 0, posX: 0, posY: 0 });
     const dialogRef = React.useRef<HTMLDivElement | null>(null);
-    React.useImperativeHandle(ref, () => dialogRef.current as HTMLDivElement);
+    const setDialogRef = useMergedRef(ref, dialogRef);
+    const openerRef = useOpener(open);
 
     // Reset transforms on image change
     React.useEffect(() => {
@@ -83,7 +87,7 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
     React.useEffect(() => {
       const dialog = dialogRef.current;
       if (!open || !dialog) return;
-      const previouslyFocused = document.activeElement as HTMLElement | null;
+      const previouslyFocused = openerRef.current;
       const unlock = lockBodyScroll();
       const handle = registerDialog();
       const cleanupTrap = trapFocus(dialog);
@@ -113,6 +117,7 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
       window.addEventListener('keydown', onKeyDown);
       return () => {
         window.removeEventListener('keydown', onKeyDown);
+        setIsDragging(false); // closing mid-drag must not leave the window mousemove/mouseup listeners attached
         cleanupTrap();
         handle.unregister();
         unlock();
@@ -148,10 +153,10 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
     return (
       <div
         {...rest}
-        ref={dialogRef}
+        ref={setDialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Image preview"
+        aria-label={rest['aria-label'] ?? 'Image preview'}
         className={cx('joy-image-preview-mask', className)}
         onClick={(e) => {
           onClick?.(e);

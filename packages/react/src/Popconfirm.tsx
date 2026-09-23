@@ -15,7 +15,8 @@ export interface PopconfirmProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   /**
    * Called with the next open state whenever the panel wants to open or close: trigger click,
    * Escape, outside click, confirm and cancel. Required to drive a controlled `open`
-   * (the Svelte twin's bindable `open`).
+   * (the Svelte twin's bindable `open`): the panel stays rendered until the parent sets `open` to false,
+   * so a controlled popconfirm without `onOpenChange` cannot be dismissed by Escape or an outside click.
    */
   onOpenChange?: (open: boolean) => void;
   className?: string;
@@ -109,7 +110,7 @@ export const Popconfirm = React.forwardRef<HTMLDivElement, PopconfirmProps>(
               </button>
               <button
                 type="button"
-                className="joy-button joy-button--primary joy-button--sm"
+                className="joy-button joy-button--solid joy-button--sm"
                 onClick={handleConfirm}
               >
                 {okText}
