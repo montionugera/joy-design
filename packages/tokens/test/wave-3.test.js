@@ -7,17 +7,16 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const scriptPath = path.resolve(__dirname, '../../../scripts/parity-check.mjs');
+const mod = await import(pathToFileURL(scriptPath).href);
 
-test('Wave 3 parity-check script exports COMPONENTS with at least 60 entries', async () => {
+test('Wave 3 parity-check script exports COMPONENTS with at least 60 entries', () => {
   assert.ok(fs.existsSync(scriptPath), 'scripts/parity-check.mjs must exist');
-  const mod = await import(pathToFileURL(scriptPath).href);
   assert.ok(Array.isArray(mod.COMPONENTS), 'COMPONENTS must be exported as an array');
   assert.ok(mod.COMPONENTS.length >= 60, 'COMPONENTS must contain at least 60 names (21 Wave 2 + 39 Wave 3)');
   assert.strictEqual(new Set(mod.COMPONENTS).size, mod.COMPONENTS.length, 'COMPONENTS must not contain duplicates');
 });
 
-test('Wave 3 parity-check script exports REF_FORWARDING with exactly 19 entries', async () => {
-  const mod = await import(pathToFileURL(scriptPath).href);
+test('Wave 3 parity-check script exports REF_FORWARDING with exactly 19 entries', () => {
   assert.ok(Array.isArray(mod.REF_FORWARDING), 'REF_FORWARDING must be exported as an array');
   assert.strictEqual(mod.REF_FORWARDING.length, 19, 'REF_FORWARDING must contain exactly 19 names');
   for (const name of ['Notification', 'Popconfirm']) {
@@ -47,16 +46,14 @@ export const Alert = React.forwardRef<HTMLDivElement, P>(({ onClose, ...rest }, 
   <div ref={ref} onClick={() => onClose?.()} {...rest} />
 ));`;
 
-test('checkRefForwarding passes forwardRef + {...rest} after an arrow handler in the same tag', async () => {
-  const mod = await import(pathToFileURL(scriptPath).href);
+test('checkRefForwarding passes forwardRef + {...rest} after an arrow handler in the same tag', () => {
   withTempReactDir({ Alert: GOOD }, (root) => {
     const alert = mod.checkRefForwarding(root).find((f) => f.component === 'Alert');
     assert.strictEqual(alert, undefined, 'Alert with forwardRef and rest spread must not be flagged');
   });
 });
 
-test('checkRefForwarding fails when forwardRef only appears in a comment', async () => {
-  const mod = await import(pathToFileURL(scriptPath).href);
+test('checkRefForwarding fails when forwardRef only appears in a comment', () => {
   const src = `// TODO: React.forwardRef(...)\n/* forwardRef<HTMLDivElement>( */\nexport const Alert = (props) => <div {...props} />;`;
   withTempReactDir({ Alert: src }, (root) => {
     const alert = mod.checkRefForwarding(root).find((f) => f.component === 'Alert');
@@ -64,8 +61,7 @@ test('checkRefForwarding fails when forwardRef only appears in a comment', async
   });
 });
 
-test('checkRefForwarding fails when forwardRef is present but there is no rest spread', async () => {
-  const mod = await import(pathToFileURL(scriptPath).href);
+test('checkRefForwarding fails when forwardRef is present but there is no rest spread', () => {
   const src = `export const Alert = React.forwardRef((p, ref) => <div ref={ref} />);`;
   withTempReactDir({ Alert: src }, (root) => {
     const alert = mod.checkRefForwarding(root).find((f) => f.component === 'Alert');
@@ -73,16 +69,14 @@ test('checkRefForwarding fails when forwardRef is present but there is no rest s
   });
 });
 
-test('checkRefForwarding reports a missing file once and does not throw', async () => {
-  const mod = await import(pathToFileURL(scriptPath).href);
+test('checkRefForwarding reports a missing file once and does not throw', () => {
   withTempReactDir({}, (root) => {
     const failures = mod.checkRefForwarding(root).filter((f) => f.component === 'Alert');
     assert.deepStrictEqual(failures, [{ component: 'Alert', missing: ['file'] }]);
   });
 });
 
-test('runParityCheck counts a missing REF_FORWARDING React file once, not twice', async () => {
-  const mod = await import(pathToFileURL(scriptPath).href);
+test('runParityCheck counts a missing REF_FORWARDING React file once, not twice', () => {
   // Temp root with the real theme.css and no React sources: every component's React file is absent.
   const repoRoot = path.resolve(__dirname, '../../..');
   withTempReactDir({}, (root) => {
@@ -99,10 +93,8 @@ test('runParityCheck counts a missing REF_FORWARDING React file once, not twice'
 
 test('hasRestSpread does not false-fail real components that spread rest after inline handlers', () => {
   const reactSrc = path.resolve(__dirname, '../../react/src');
-  return import(pathToFileURL(scriptPath).href).then((mod) => {
-    for (const name of ['Rate', 'Switch', 'Tag']) {
-      const src = fs.readFileSync(path.join(reactSrc, `${name}.tsx`), 'utf8');
-      assert.ok(mod.hasRestSpread(src), `${name}.tsx spreads rest props and must not be flagged`);
-    }
-  });
+  for (const name of ['Rate', 'Switch', 'Tag']) {
+    const src = fs.readFileSync(path.join(reactSrc, `${name}.tsx`), 'utf8');
+    assert.ok(mod.hasRestSpread(src), `${name}.tsx spreads rest props and must not be flagged`);
+  }
 });
