@@ -645,9 +645,21 @@ test('F-038 B-L4: Progress exposes role=progressbar with aria-valuenow/min/max o
   assert.ok(root.includes('role="progressbar"') && root.includes('aria-valuenow={valueNow}') && root.includes('aria-valuemin="0"') && root.includes('aria-valuemax="100"'), 'role and aria values live on the root');
   assert.ok(root.indexOf('role="progressbar"') < root.indexOf('{...rest}'), 'rest comes after role so consumer aria-label/labelledby name the progressbar');
   assert.ok(!/class="joy-progress__inner"[^>]*role=/.test(p), 'the track carries no role');
-  assert.ok(p.includes('Math.min(100, Math.max(0, percent))'), 'aria-valuenow is clamped to 0..100');
+  assert.ok(p.includes('Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0'), 'aria-valuenow is clamped to 0..100 and non-finite is 0');
+  assert.ok(p.includes('width: {valueNow}%'), 'bar width uses the same clamped value');
   const s = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
   assert.ok(s.includes('class="joy-spin__tip"'), 'Spin tip uses the tokenized joy-spin__tip class');
   assert.ok(s.includes('aria-hidden="true"'), 'Spin indicator svg is decorative');
   assert.strictEqual((s.match(/role="status"/g) || []).length, 2, 'one status role per branch, never nested');
+});
+
+test('F-038 C-L4 fix: Message/Notification auto-dismiss goes through the shared createAutoDismiss (clear on dismiss, once)', () => {
+  const read = (f) => fs.readFileSync(path.resolve(`./src/lib/${f}`), 'utf8');
+  assert.strictEqual(read('auto-dismiss.ts'), fs.readFileSync(path.resolve('../react/src/auto-dismiss.ts'), 'utf8'), 'helper is byte-identical to the React copy');
+  for (const f of ['Message', 'Notification']) {
+    const src = read(`${f}.svelte`);
+    assert.ok(src.includes("import { createAutoDismiss } from './auto-dismiss.js'") && src.includes('autoDismiss.start(duration)') && src.includes('return autoDismiss.cancel'), `${f} arms/cancels via the helper`);
+    assert.ok(!/setTimeout/.test(src), `${f} has no raw timer left`);
+  }
+  assert.ok(/function close\(\) \{\s*autoDismiss\.dismiss\(\);/.test(read('Notification.svelte')), 'close button dismisses via the helper (clears the timer)');
 });

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { createAutoDismiss } from './auto-dismiss.js';
   import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@joymify/icons';
 
   interface Props {
@@ -26,19 +27,19 @@
     ...rest
   }: Props = $props();
 
+  // dismiss() clears the pending timer, so onclose fires once (manual close or countdown, never both).
+  const autoDismiss = createAutoDismiss(
+    () => (visible = false),
+    () => onclose
+  );
+
   onMount(() => {
-    if (duration > 0) {
-      const timer = setTimeout(() => {
-        visible = false;
-        onclose?.();
-      }, duration);
-      return () => clearTimeout(timer);
-    }
+    autoDismiss.start(duration);
+    return autoDismiss.cancel;
   });
 
   function close() {
-    visible = false;
-    onclose?.();
+    autoDismiss.dismiss();
   }
 </script>
 

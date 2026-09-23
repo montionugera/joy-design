@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@joymify/icons/react';
+import { createAutoDismiss } from './auto-dismiss.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -26,24 +27,22 @@ export const Notification = React.forwardRef<HTMLDivElement, NotificationProps>(
     ref
   ) => {
     const [isVisible, setIsVisible] = React.useState(visible);
+    // Latest-callback ref: an inline `onClose` must not restart the countdown on every parent render.
+    const onCloseRef = React.useRef(onClose);
+    onCloseRef.current = onClose;
+    const autoDismiss = React.useMemo(
+      () => createAutoDismiss(() => setIsVisible(false), () => onCloseRef.current),
+      []
+    );
 
     React.useEffect(() => {
       setIsVisible(visible);
-      if (visible && duration > 0) {
-        const timer = setTimeout(() => {
-          setIsVisible(false);
-          onClose?.();
-        }, duration);
-        return () => clearTimeout(timer);
-      }
-    }, [visible, duration, onClose]);
+      if (!visible) return;
+      autoDismiss.start(duration);
+      return autoDismiss.cancel;
+    }, [visible, duration, autoDismiss]);
 
     if (!isVisible) return null;
-
-    const handleClose = () => {
-      setIsVisible(false);
-      onClose?.();
-    };
 
     const Icon = TYPE_ICONS[type] ?? Info;
 
@@ -64,7 +63,7 @@ export const Notification = React.forwardRef<HTMLDivElement, NotificationProps>(
               type="button"
               className="joy-notification__close"
               aria-label="Dismiss notification"
-              onClick={handleClose}
+              onClick={autoDismiss.dismiss}
             >
               <Close size="1em" />
             </button>

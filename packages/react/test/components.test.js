@@ -818,3 +818,72 @@ test('F-038 C-L4: Message/Notification/Toast/Progress/Spin render the Svelte DOM
     assert.ok(!/style=\{\{/.test(fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8')), `${f} has an inline style`);
   }
 });
+
+test('F-038 C-L4 fix: auto-dismiss fires onClose once, dismiss clears the timer, latest onClose wins, no re-arm on re-render', async (t) => {
+  const { createAutoDismiss } = loadFile(fileURLToPath(new URL('../src/auto-dismiss.ts', import.meta.url)));
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+
+  // countdown hides and notifies exactly once
+  let hidden = 0; const calls = [];
+  let onClose = () => calls.push('a');
+  const d = createAutoDismiss(() => { hidden += 1; }, () => onClose);
+  d.start(1000);
+  t.mock.timers.tick(999);
+  assert.deepStrictEqual([hidden, calls.length], [0, 0]);
+  t.mock.timers.tick(1);
+  assert.deepStrictEqual([hidden, calls], [1, ['a']]);
+  t.mock.timers.tick(10000);
+  assert.strictEqual(calls.length, 1, 'countdown never fires twice');
+
+  // manual dismiss (close button) before the countdown: onClose once, timer cleared (RXD I-1)
+  calls.length = 0;
+  d.start(4500);
+  t.mock.timers.tick(1000);
+  d.dismiss();
+  t.mock.timers.tick(10000);
+  assert.deepStrictEqual(calls, ['a'], 'dismiss clears the pending timer so onClose is not called again');
+
+  // the callback is read at fire time: a swapped (inline) onClose does not need a re-arm (RXD I-2)
+  calls.length = 0;
+  d.start(1000);
+  t.mock.timers.tick(500);
+  onClose = () => calls.push('b');
+  t.mock.timers.tick(500);
+  assert.deepStrictEqual(calls, ['b']);
+
+  // cancel (unmount) and non-positive duration never fire
+  calls.length = 0;
+  d.start(1000); d.cancel(); t.mock.timers.tick(5000);
+  d.start(0); t.mock.timers.tick(5000);
+  d.start(-1); t.mock.timers.tick(5000);
+  assert.strictEqual(calls.length, 0);
+  // restart replaces the previous timer
+  d.start(1000); t.mock.timers.tick(600); d.start(1000); t.mock.timers.tick(600);
+  assert.strictEqual(calls.length, 0);
+  t.mock.timers.tick(400);
+  assert.strictEqual(calls.length, 1);
+
+  // the two packages share one byte-identical helper
+  assert.strictEqual(fs.readFileSync(fileURLToPath(new URL('../src/auto-dismiss.ts', import.meta.url)), 'utf8'), fs.readFileSync(fileURLToPath(new URL('../../svelte/src/lib/auto-dismiss.ts', import.meta.url)), 'utf8'));
+
+  // React wiring: onClose lives in a ref and is NOT an effect dependency; Notification's button dismisses via the helper
+  const rd = (f) => fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8');
+  for (const f of ['Message', 'Notification']) {
+    const src = rd(f);
+    assert.ok(src.includes('onCloseRef.current = onClose') && src.includes('[visible, duration, autoDismiss]') && !/\[[^\]]*\bonClose\b[^\]]*\]/.test(src), `${f}: onClose is not an effect dependency`);
+    assert.ok(!/setTimeout/.test(src), `${f} has no raw timer left`);
+  }
+  assert.ok(rd('Notification').includes('onClick={autoDismiss.dismiss}'));
+
+  // Progress: non-finite percent never reaches aria-valuenow / width / text as NaN
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Progress } = loadComponent('Progress');
+  for (const bad of [NaN, Infinity, -Infinity, undefined]) {
+    const h = renderToStaticMarkup(React.createElement(Progress, { percent: bad }));
+    assert.ok(h.includes('aria-valuenow="0"') && h.includes('width:0%') && !/NaN|Infinity/.test(h), h);
+  }
+  const over = renderToStaticMarkup(React.createElement(Progress, { percent: 250 }));
+  assert.ok(over.includes('aria-valuenow="100"') && over.includes('width:100%'), over);
+  assert.ok(renderToStaticMarkup(React.createElement(Progress, { percent: 40 })).includes('40%</span>'));
+});

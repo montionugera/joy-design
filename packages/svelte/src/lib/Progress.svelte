@@ -23,12 +23,13 @@
 		...rest
 	}: Props = $props();
 
+	// Non-finite input (NaN/Infinity) is treated as 0; aria-valuenow, bar width and text share one clamped value.
+	const valueNow = $derived(Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0);
+
 	const computedStatus = $derived.by(() => {
-		if (percent >= 100) return 'success';
+		if (valueNow >= 100) return 'success';
 		return status;
 	});
-
-	const valueNow = $derived(Math.min(100, Math.max(0, percent)));
 </script>
 
 <div
@@ -44,7 +45,7 @@
 		<div class="joy-progress__inner">
 			<div
 				class="joy-progress__bg"
-				style="width: {percent}%; height: {strokeWidth}px; background-color: {strokeColor || ''}"
+				style="width: {valueNow}%; height: {strokeWidth}px; background-color: {strokeColor || ''}"
 			></div>
 		</div>
 	</div>
@@ -60,7 +61,7 @@
 					<line x1="6" y1="6" x2="18" y2="18"></line>
 				</svg>
 			{:else}
-				{percent}%
+				{valueNow}%
 			{/if}
 		</span>
 	{/if}

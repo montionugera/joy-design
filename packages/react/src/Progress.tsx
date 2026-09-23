@@ -18,8 +18,9 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     { percent = 0, status = 'normal', showInfo = true, strokeWidth = 8, strokeColor, className = '', ...rest },
     ref
   ) => {
-    const computedStatus = percent >= 100 ? 'success' : status;
-    const valueNow = Math.min(100, Math.max(0, percent));
+    // Non-finite input (NaN/Infinity) is treated as 0; aria-valuenow, bar width and text share one clamped value.
+    const valueNow = Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0;
+    const computedStatus = valueNow >= 100 ? 'success' : status;
 
     return (
       <div
@@ -36,7 +37,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
             <div
               className="joy-progress__bg"
               style={{
-                width: `${percent}%`,
+                width: `${valueNow}%`,
                 height: `${strokeWidth}px`,
                 backgroundColor: strokeColor || undefined
               }}
@@ -55,7 +56,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             ) : (
-              `${percent}%`
+              `${valueNow}%`
             )}
           </span>
         )}

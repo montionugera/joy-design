@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from '@joymify/icons/react';
+import { createAutoDismiss } from './auto-dismiss.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -22,17 +23,20 @@ const TYPE_ICONS = {
 export const Message = React.forwardRef<HTMLDivElement, MessageProps>(
   ({ content, type = 'info', duration = 3000, visible = true, className = '', onClose, ...rest }, ref) => {
     const [isVisible, setIsVisible] = React.useState(visible);
+    // Latest-callback ref: an inline `onClose` must not restart the countdown on every parent render.
+    const onCloseRef = React.useRef(onClose);
+    onCloseRef.current = onClose;
+    const autoDismiss = React.useMemo(
+      () => createAutoDismiss(() => setIsVisible(false), () => onCloseRef.current),
+      []
+    );
 
     React.useEffect(() => {
       setIsVisible(visible);
-      if (visible && duration > 0) {
-        const timer = setTimeout(() => {
-          setIsVisible(false);
-          onClose?.();
-        }, duration);
-        return () => clearTimeout(timer);
-      }
-    }, [visible, duration, onClose]);
+      if (!visible) return;
+      autoDismiss.start(duration);
+      return autoDismiss.cancel;
+    }, [visible, duration, autoDismiss]);
 
     if (!isVisible) return null;
 
