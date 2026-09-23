@@ -31,3 +31,17 @@ Open (fix before ship):
 
 ### Orchestrator note
 Both verdicts agree the remaining blockers are hub-chrome + demo-fidelity, not component CSS. Suggested order for the D3 tab: (1) the two P0s + the InputNumber ordering P0, (2) the demo-focus/demo-hover fidelity fix then re-shoot and re-review, (3) D3.1-D3.6, (4) wave review, (5) ship.
+
+## 2026-09-23 relay: D3.7 wave-level acceptance verdict (D3/D3.7 tab -> shipping tab)
+
+`code-reviewer` reviewed `git diff release/2.24...feat/F-037` (91 files, 49 commits) against `spec.md`'s Acceptance section, independent of plan.md's ticked boxes. Verdict: **WARNING** (0 CRITICAL/HIGH, 2 MEDIUM, not blocking).
+
+- **Criterion 1 (lint-colors --strict + parity-check zero divergence): MET.** Both re-run directly, exit 0.
+- **Criterion 2 (`pnpm -r test` incl. overlay primitive tests): MET.** 0 failures across all three packages; overlay-utils tests confirmed present and passing in both twins.
+- **Criterion 3 (Playwright: 44px hit areas, no overflow, bottom sheets at 375px): MET, with a flake caveat.** Full serialized suite (`epic-check.sh`) green, 34/0/26. One isolated 7-parallel-worker run hairline-failed `.joy-input` at 43.99993896484375px (sub-pixel rounding under CPU contention, not a real regression — `--joy-control-height-md: 44px` token itself is correct). 3 repeats + the full suite all passed. CI pins `workers: 1` so unlikely to surface there. **MEDIUM, non-blocking**, optional follow-up: add ~0.5px tolerance or await `fonts.ready` before measuring in `apps/storybook-hub/tests/forms-contracts.spec.ts:70-97`.
+- **Criterion 4 (screenshots attached + Button matrix taste-reviewed): PARTIALLY MET — real gap.** The 8 PNGs exist and two independent `impeccable` reviews did happen (see verdicts above) — but both returned **FIX**, and although those findings were folded into the D3.6 fix + re-shoot (commit `791a969`), **no reviewer has passed judgment on the final post-fix screenshots**. `research/screens/README.md:12` still says the taste verdict is "deferred to the orchestrator," a note written before the fix/re-shoot cycle and never updated. **MEDIUM, non-blocking per the reviewer, but closes the loop this feature has been chasing all session** — recommend one more `impeccable` pass on the current 4 `button-*.png` files before shipping, verdict recorded in `research/screens/README.md`.
+- Dist staleness spot-check: **not stale** — `packages/tokens/build.js` rebuilt output is byte-identical to the committed `dist/` files.
+
+**D3.7 is otherwise done** (see the D3.7 section in `research/review-D.md` for the code-reviewer/typescript-reviewer diff review and its fixes, commit `5e73df2`). This wave-acceptance pass is the second half of D3.7's requirement ("wave-level review of `git diff release/2.24...feat/F-037` against the spec's Acceptance list").
+
+**Recommendation for the shipping tab:** dispatch one more `impeccable` review on `research/screens/button-{light,dark}-{375x812,1280x800}.png` at current HEAD, record the verdict in `research/screens/README.md`, then tick D3.7 in plan.md and proceed to `psrw ship --no-deploy`. If you judge the two MEDIUM findings acceptable to ship without that extra pass, that's a legitimate call too — they're both explicitly non-blocking per the reviewer.
