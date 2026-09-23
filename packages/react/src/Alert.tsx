@@ -19,6 +19,13 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   className?: string;
 }
 
+const VARIANT_ICONS = {
+  info: Info,
+  success: CheckCircle,
+  warning: AlertTriangle,
+  danger: AlertCircle
+};
+
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   (
     {
@@ -43,6 +50,8 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 
     if (dismissed) return null;
 
+    const Icon = VARIANT_ICONS[variant] ?? Info;
+
     return (
       <div
         ref={ref}
@@ -51,15 +60,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         {...rest}
       >
         <span className="joy-alert__icon" aria-hidden="true">
-          {variant === 'success' ? (
-            <CheckCircle size="1em" />
-          ) : variant === 'warning' ? (
-            <AlertTriangle size="1em" />
-          ) : variant === 'danger' ? (
-            <AlertCircle size="1em" />
-          ) : (
-            <Info size="1em" />
-          )}
+          <Icon size="1em" />
         </span>
         <div className="joy-alert__body">
           {title && <div className="joy-alert__title">{title}</div>}

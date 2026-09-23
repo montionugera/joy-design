@@ -675,8 +675,19 @@ test('F-038 C-L3: Alert/EmptyState/Result/Skeleton render the Svelte DOM contrac
     assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${n} must be forwardRef`);
     assert.strictEqual(C.displayName, n);
   }
+  // dismiss: the close button's real onClick fires onClose exactly once. Called inside the render
+  // (hooks need a context), so the state update re-renders Probe hidden; only click on the first pass.
+  let closed = 0;
+  let clicked = false;
+  html(React.createElement(function Probe() {
+    const root = Alert.render({ closable: true, onClose: () => closed++ }, null);
+    if (clicked) return root; // re-render after dismiss: alert is hidden
+    clicked = true;
+    React.Children.toArray(root.props.children).find((n) => n.props?.className === 'joy-alert__close').props.onClick();
+    return null;
+  }));
+  assert.strictEqual(closed, 1, 'close button onClick calls onClose exactly once');
   const alertSrc = fs.readFileSync(fileURLToPath(new URL('../src/Alert.tsx', import.meta.url)), 'utf8');
-  assert.ok(/Uncontrolled/.test(alertSrc) && alertSrc.indexOf('setDismissed(true)') < alertSrc.indexOf('onClose?.()'), 'dismiss hides then notifies, documented');
 
   // EmptyState: markup matches Svelte, rest + className on root
   const e = html(React.createElement(EmptyState, { title: 'None', description: 'd', icon: 'i', action: 'go', id: 'e1', className: 'k' }));
