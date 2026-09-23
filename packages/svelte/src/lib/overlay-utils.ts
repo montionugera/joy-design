@@ -68,9 +68,14 @@ export function trapFocus(container: HTMLElement): () => void {
 
   container.addEventListener('keydown', handleKeyDown);
 
-  // Set initial focus to first focusable element
-  const initial = container.querySelector<HTMLElement>(focusableSelector);
-  initial?.focus();
+  // Set initial focus to first focusable element, unless focus is already inside the container
+  // (e.g. a body input with autofocus) - that must not be stolen by the header Close button.
+  const active = typeof document !== 'undefined' ? document.activeElement : null;
+  const focusAlreadyInside = !!active && active !== container && container.contains(active);
+  if (!focusAlreadyInside) {
+    const initial = container.querySelector<HTMLElement>(focusableSelector);
+    initial?.focus();
+  }
 
   return () => {
     container.removeEventListener('keydown', handleKeyDown);

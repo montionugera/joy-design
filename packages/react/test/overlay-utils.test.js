@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { positionPanel, isOutside, isSheet, openOverlay, registerDialog, SHEET_MAX_WIDTH } from '../src/overlay-utils.ts';
+import { positionPanel, isOutside, isSheet, openOverlay, registerDialog, trapFocus, SHEET_MAX_WIDTH } from '../src/overlay-utils.ts';
 
 const rect = (top, left, width, height) => ({ top, left, width, height, bottom: top + height, right: left + width });
 const node = (r, name) => {
@@ -111,4 +111,20 @@ test('registerDialog + Escape claim: a popover inside a dialog closes alone, the
   assert.strictEqual(e.defaultPrevented, true, 'a dialog checking defaultPrevented skips this Escape');
   assert.strictEqual(dialog.isTopmost(), true);
   dialog.unregister();
+});
+
+test('trapFocus: does not steal focus from an element already focused inside the container (autoFocus input)', () => {
+  const first = node(rect(0, 0, 10, 10), 'close'); const input = node(rect(0, 0, 10, 10), 'input');
+  const container = node(rect(0, 0, 100, 100), 'dialog');
+  container.querySelector = () => first; container.addEventListener = () => {}; container.removeEventListener = () => {};
+  container.contains = (n) => n === container || n === input || n === first;
+  const prev = globalThis.document;
+  try {
+    globalThis.document = { activeElement: input };
+    trapFocus(container);
+    assert.strictEqual(first.focused, 0, 'first focusable (Close button) must not take focus');
+    globalThis.document = { activeElement: { name: 'opener' } };
+    trapFocus(container);
+    assert.strictEqual(first.focused, 1, 'focus outside the container still moves to the first focusable');
+  } finally { globalThis.document = prev; }
 });
