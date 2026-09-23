@@ -1,5 +1,11 @@
 import React, { forwardRef, useEffect, useRef, useState, useCallback } from 'react';
-import { JoyChartCore, type SeriesConfig, type ChartPoint } from './chart-core.js';
+import {
+  JoyChartCore,
+  describeSeriesChart,
+  summaryWindow,
+  type SeriesConfig,
+  type ChartPoint
+} from './chart-core.js';
 
 export interface LineChartProps extends React.HTMLAttributes<HTMLDivElement> {
   series: SeriesConfig[];
@@ -15,6 +21,8 @@ export const LineChart = forwardRef<HTMLDivElement, LineChartProps>(
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstanceRef = useRef<JoyChartCore | null>(null);
     const [hoveredPoint, setHoveredPoint] = useState<ChartPoint | null>(null);
+
+    const chartLabel = describeSeriesChart('Line', series);
 
     // Merge internal ref with forwarded ref
     const setRefs = useCallback(
@@ -107,7 +115,7 @@ export const LineChart = forwardRef<HTMLDivElement, LineChartProps>(
               </div>
               <div className="joy-chart__hud-item">
                 <span className="joy-chart__hud-label">Value:</span>
-                <span className="joy-chart__hud-value" style={{ color: 'var(--gold-400, #c49a3a)' }}>
+                <span className="joy-chart__hud-value joy-chart__hud-value--accent">
                   {hoveredPoint.y.toFixed(2)}
                 </span>
               </div>
@@ -115,14 +123,34 @@ export const LineChart = forwardRef<HTMLDivElement, LineChartProps>(
           ) : (
             <div className="joy-chart__hud-item">
               <span className="joy-chart__hud-label">Interactive</span>
-              <span className="joy-chart__hud-value" style={{ color: 'var(--navy-500, #14253e)' }}>Pan/Zoom Enabled</span>
+              <span className="joy-chart__hud-value">Pan/Zoom Enabled</span>
             </div>
           )}
         </div>
 
-        <div className="joy-chart__canvas-container">
+        <div className="joy-chart__canvas-container" role="img" aria-label={chartLabel}>
           <canvas ref={baseCanvasRef} className="joy-chart__canvas-base" />
           <canvas ref={overlayCanvasRef} className="joy-chart__canvas-overlay" />
+        </div>
+
+        <div className="joy-chart__sr">
+          {series.map((s) => {
+            if (s.data.length === 0) return null;
+            const win = summaryWindow(s.data);
+            return (
+              <table key={s.id}>
+                <caption>{s.name || s.id}: {win.note}</caption>
+                <thead>
+                  <tr><th scope="col">Index</th><th scope="col">Value</th></tr>
+                </thead>
+                <tbody>
+                  {win.rows.map((pt, i) => (
+                    <tr key={i}><th scope="row">{pt.x}</th><td>{pt.y.toFixed(2)}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            );
+          })}
         </div>
       </div>
     );

@@ -2177,3 +2177,42 @@ test('F-038 C-L7: MarkdownViewer copy - Check/Copied and live status only after 
     if (saved) Object.defineProperty(globalThis, 'navigator', saved); else delete globalThis.navigator;
   }
 });
+
+test('F-038 C-L8: BarChart/LineChart/CandlestickChart render the token-class HUD, role=img summary and capped data table (rest + ref forwarded)', () => {
+  const bar = ssr('BarChart', { series: [{ id: 'rev', name: 'Revenue', data: [{ x: 1, y: 5 }, { x: 2, y: 8.5 }] }], className: 'mine', 'data-x': '1' });
+  assert.ok(bar.startsWith('<div tabindex="0" class="joy-chart mine" style="height:360px" role="region"'), bar);
+  assert.ok(bar.includes('data-x="1"'), 'rest spread on the root');
+  assert.ok(bar.includes('<span class="joy-chart__hud-value">Bar Series</span>'), 'default HUD value has no inline colour');
+  assert.ok(bar.includes('<div class="joy-chart__canvas-container" role="img" aria-label="Bar chart, 1 series, 2 points">'), bar);
+  assert.ok(bar.includes('<div class="joy-chart__sr"><table><caption>Revenue: 2 points</caption><thead><tr><th scope="col">Category</th><th scope="col">Value</th></tr></thead><tbody><tr><th scope="row">1</th><td>5.00</td></tr><tr><th scope="row">2</th><td>8.50</td></tr></tbody></table></div>'), bar);
+
+  const override = ssr('LineChart', { series: [], 'aria-label': 'Custom label', style: { width: '50%' } });
+  assert.ok(override.includes('aria-label="Custom label"') && override.includes('height:360px;width:50%'), override);
+  assert.ok(override.includes('aria-label="Line chart, 0 series, 0 points"') && !override.includes('<table'), override);
+
+  const big = Array.from({ length: 30 }, (_, i) => ({ x: i, y: i }));
+  const line = ssr('LineChart', { series: [{ id: 's1', data: big }] });
+  assert.ok(line.includes('<caption>s1: last 20 of 30 points</caption>') && line.includes('<th scope="col">Index</th>'), 'series id is the caption fallback; capped to 20');
+  assert.strictEqual((line.match(/<tr><th scope="row">/g) || []).length, 20, 'exactly 20 data rows');
+  assert.ok(line.includes('<th scope="row">29</th>') && !line.includes('<th scope="row">9</th>'), 'keeps the most recent rows');
+
+  const t0 = Date.UTC(2026, 0, 2, 3, 4);
+  const candle = ssr('CandlestickChart', { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11, volume: 500 }] });
+  assert.ok(candle.includes('<div class="joy-chart__canvas-container" role="img" aria-label="Candlestick chart, 1 candle">'), candle);
+  assert.ok(candle.includes('<caption>Candlestick data: 1 candle</caption>'), candle);
+  assert.ok(candle.includes('<th scope="col">Volume</th>') && candle.includes('<th scope="row">2026-01-02 03:04 UTC</th><td>10.00</td><td>12.00</td><td>9.00</td><td>11.00</td><td>500</td>'), candle);
+  const noVol = ssr('CandlestickChart', { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11 }] });
+  assert.ok(!noVol.includes('Volume'), 'no Volume column without volume data');
+  assert.ok(candle.includes('<span class="joy-chart__hud-value">Candlestick Feed</span>'));
+});
+
+test('F-038 C-L8: chart components carry no inline colour: HUD colours come from the shared build.js classes (bull/bear/accent)', () => {
+  for (const f of ['BarChart', 'LineChart', 'CandlestickChart']) {
+    const src = readSrc(`../src/${f}.tsx`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|var\(--|color:/.test(src), `${f}.tsx has no colour literal / var() / inline color`);
+  }
+  const candle = readSrc('../src/CandlestickChart.tsx');
+  assert.ok(candle.includes("'joy-chart__hud-value--bull' : 'joy-chart__hud-value--bear'"), 'close and change use bull/bear classes');
+  assert.ok(!candle.includes('joy-color-'), 'no foreign --joy-color-* tokens');
+  for (const f of ['BarChart', 'LineChart']) assert.ok(readSrc(`../src/${f}.tsx`).includes('joy-chart__hud-value--accent'), `${f} hover value uses the accent class`);
+});
