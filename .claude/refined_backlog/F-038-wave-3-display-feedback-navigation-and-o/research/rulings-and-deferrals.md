@@ -114,6 +114,8 @@ The two deferred audit issues (SVD-032 Flex responsive direction, SVD-097 iOS sc
 - Hub Pagination demo arrows (`&larr;`/`&rarr;`) were replaced in D2.
 
 ### Modal, Drawer, Popconfirm, Dropdown, Tooltip, ImagePreview
+- **Overlay primitive coverage (final review m-1).** Tooltip, Message, Notification and Toast do not use `openOverlay` / `useOverlay` (they use `--joy-z-*` tokens and CSS positioning); only Popconfirm and Dropdown use the positioning primitive, and Modal, Drawer and ImagePreview use the dialog trio (`lockBodyScroll`, `trapFocus`, `registerDialog`). Tooltip can be clipped by `overflow: hidden` ancestors. README corrected accordingly.
+- **Removed DOM classes (final review m-3).** Svelte ImagePreview `joy-nav-btn` / `joy-preview-btn` (now `joy-image-preview-nav` / `-btn`) and React `joy-image-wrapper` leaving `ImagePreview.tsx` (now from `Image.tsx`); listed in README breaking changes.
 - Modal-in-Drawer registered in the same render can get the wrong stack order in `registerDialog` (both twins, shared primitive; parked backlog).
 - Focus-trap gap after a click on non-focusable content; safe-area strip colour on notched iPhones; Dropdown ArrowUp on an open trigger no longer jumps to the last item; `maskClosable` not added (backdrop click always closes).
 - `dialog-hooks` merged ref ignores React 19 callback-ref cleanup; concurrent-render edge cases; `theme.css` class check uses a prefix substring.

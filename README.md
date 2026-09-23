@@ -109,7 +109,13 @@ Handlers follow the casing rule (Svelte `onclose`, React `onClose`). All 19 Reac
 
 ### Overlay layer
 
-Modal, Drawer, ImagePreview, Popconfirm, Dropdown and Tooltip use the Wave 2 primitive in `overlay-utils.ts` (`openOverlay` in Svelte, `useOverlay` in React) plus the token scale below.
+Only some of this wave's overlays use the shared primitives in `overlay-utils.ts`:
+
+- **Positioned panels (`openOverlay` in Svelte, `useOverlay` in React):** Popconfirm and Dropdown (and, from Wave 2, Select, TreeSelect, Cascader, TimePicker, Mentions).
+- **Dialogs (`lockBodyScroll`, `trapFocus`, `registerDialog`):** Modal, Drawer and ImagePreview. Svelte calls the three functions directly; React goes through `useDialog` in `dialog-hooks.ts`.
+- **Token scale only (no primitive):** Tooltip is CSS-positioned (`.joy-tooltip { position: absolute; z-index: var(--joy-z-tooltip) }`); Message, Notification and Toast are fixed-position stacks using `--joy-z-toast`. None of them calls `openOverlay` / `useOverlay`.
+
+All of them use the token scale below.
 
 | Token | Value | Layer |
 | :--- | :--- | :--- |
@@ -178,12 +184,14 @@ The storybook hub has two aspect views for this wave: **Data Display & Feedback*
 - **Message, Notification, Toast** now stack at `--joy-z-toast` (1100), above Modal (1050) and Popconfirm (1060), and below Tooltip (1200).
 - **Close labels**: Notification and Toast close buttons are labelled "Dismiss notification" (was "Close notification" / raw text); Modal and Drawer close buttons are icon buttons labelled "Close dialog" / "Close drawer".
 - **Markup and class changes** for consumers that style internals or query the DOM: Alert (icon, close button, full border instead of a 4px stripe, `joy-alert__close`); Skeleton with `lines > 1` renders one wrapper around plain line elements (the wrapper no longer carries `joy-skeleton` classes); Pagination (windowed list, ellipsis spans, chevron icons, `Page N` labels, page-size select class `joy-pagination__size`); Tabs and Menu now carry `role="tablist"` / `role="menu"` with roving `tabindex`; Popconfirm panel is `role="alertdialog"` and its confirm button is `joy-button--solid` (the old `joy-button--primary` class had no CSS); Spin puts `className` on the root and removes inline styles; Notification, Toast and ImagePreview use classes instead of inline styles.
+- **Removed classes** (for consumers that query the DOM): Svelte `ImagePreview` no longer renders `joy-nav-btn` / `joy-preview-btn` (now `joy-image-preview-nav`, `joy-image-preview-btn`); React `joy-image-wrapper` no longer comes from `ImagePreview.tsx` (it is rendered by `Image.tsx`, as in Svelte); `joy-button--primary` on Popconfirm (see above). Everything else in the wave keeps its class names or adds new ones.
 - **Additive**: Alert `closable` / `onclose` / `onClose`, StatCard `trend`, Table `variant` (`'stack'` is the default, so existing Table usage is unchanged), AvatarGroup `items`, Popconfirm `onopenchange` (Svelte) / `onOpenChange` (React), React `Form` emits `joy-form--<layout>` like Svelte.
 
 ### Known deviations and deferred gaps
 
 Rationale for each lives in `.claude/refined_backlog/F-038-wave-3-display-feedback-navigation-and-o/research/rulings-and-deferrals.md`; the per-issue status of all 203 audit findings is in `research/issue-coverage.md` next to it.
 
+- **Tooltip, Message, Notification and Toast do not use the overlay primitive** (spec item 3 listed them): they only use the `--joy-z-*` tokens. Tooltip therefore is not viewport-aware and can be clipped by an `overflow: hidden` ancestor (for example the Table scroll region).
 - **No exit animation** for Modal and Drawer: they render conditionally, so only the enter animation exists (spec asked for enter and exit).
 - **iOS scroll lock (SVD-097)**: `lockBodyScroll` only sets `overflow: hidden` on the body; the `position: fixed` scroll-position technique is not implemented.
 - **Tag close hit area is 34x44, not 44x44**: it grows toward the right edge only, because a 44px-wide hit box would overlap neighbouring tags (8px gap). Alert and Toast close buttons get the full 44x44.
