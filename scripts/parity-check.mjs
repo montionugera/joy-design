@@ -24,7 +24,71 @@ export const COMPONENTS = [
   'TreeSelect',
   'Cascader',
   'Transfer',
-  'MarkdownEditor'
+  'MarkdownEditor',
+  // Wave 3 (F-038)
+  'Alert',
+  'Anchor',
+  'Avatar',
+  'AvatarGroup',
+  'Badge',
+  'Breadcrumb',
+  'Divider',
+  'Drawer',
+  'Dropdown',
+  'EmptyState',
+  'Flex',
+  'Image',
+  'ImagePreview',
+  'MarkdownViewer',
+  'Menu',
+  'Message',
+  'MetricTile',
+  'Modal',
+  'Notification',
+  'Pagination',
+  'Popconfirm',
+  'Progress',
+  'Result',
+  'Skeleton',
+  'Space',
+  'Spin',
+  'Splitter',
+  'StatCard',
+  'Statistic',
+  'Steps',
+  'Table',
+  'Tabs',
+  'Tag',
+  'Timeline',
+  'Toast',
+  'Tooltip',
+  'BarChart',
+  'LineChart',
+  'CandlestickChart'
+];
+
+// React components that must use React.forwardRef and spread rest props onto a
+// JSX element. Notification and Popconfirm already do, so they are excluded.
+export const REF_FORWARDING = [
+  'Alert',
+  'AvatarGroup',
+  'Badge',
+  'Breadcrumb',
+  'Drawer',
+  'Dropdown',
+  'EmptyState',
+  'ImagePreview',
+  'MarkdownViewer',
+  'MetricTile',
+  'Modal',
+  'Pagination',
+  'Progress',
+  'Skeleton',
+  'StatCard',
+  'Table',
+  'Tabs',
+  'Toast',
+  'Tooltip'
 ];
 
 export const NORMALISE = {
@@ -329,6 +393,23 @@ export function getDefinedClasses(themeCss) {
   return new Set(matches.map((s) => s.slice(1)));
 }
 
+export function checkRefForwarding(rootDir = process.cwd()) {
+  const failures = [];
+  for (const component of REF_FORWARDING) {
+    const file = path.resolve(rootDir, `packages/react/src/${component}.tsx`);
+    if (!fs.existsSync(file)) {
+      failures.push({ component, missing: ['file'] });
+      continue;
+    }
+    const src = fs.readFileSync(file, 'utf8');
+    const missing = [];
+    if (!/\bforwardRef\s*[<(]/.test(src)) missing.push('forwardRef');
+    if (!/<[A-Za-z][\w.]*\b[^<>]*\{\s*\.\.\.(?:rest|props)\b/.test(src)) missing.push('restSpread');
+    if (missing.length > 0) failures.push({ component, missing });
+  }
+  return failures;
+}
+
 export function runParityCheck(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const themeCssPath = path.resolve(rootDir, 'packages/tokens/dist/theme.css');
@@ -337,14 +418,28 @@ export function runParityCheck(options = {}) {
 
   const side = options.side || null; // 'svelte' | 'react' | null (twin mode)
   const results = {};
+  const checks = []; // structural checks: { component, check, status }
   let totalViolations = 0;
 
   for (const comp of COMPONENTS) {
     const svelteFile = path.resolve(rootDir, `packages/svelte/src/lib/${comp}.svelte`);
     const reactFile = path.resolve(rootDir, `packages/react/src/${comp}.tsx`);
 
-    const svelteSrc = fs.readFileSync(svelteFile, 'utf8');
-    const reactSrc = fs.readFileSync(reactFile, 'utf8');
+    const absent = [];
+    if (side !== 'react' && !fs.existsSync(svelteFile)) absent.push('svelte');
+    if (side !== 'svelte' && !fs.existsSync(reactFile)) absent.push('react');
+    if (absent.length > 0) {
+      for (const which of absent) {
+        checks.push({ component: comp, check: `${which} file exists`, status: 'FAIL' });
+        totalViolations += 1;
+      }
+      continue;
+    }
+
+    // In lane mode only the checked side must exist; the other side may be absent.
+    const readIfPresent = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '');
+    const svelteSrc = readIfPresent(svelteFile);
+    const reactSrc = readIfPresent(reactFile);
 
     const sClasses = classes(svelteSrc);
     const rClasses = classes(reactSrc);
@@ -412,16 +507,24 @@ export function runParityCheck(options = {}) {
     }
   }
 
+  if (side !== 'svelte') {
+    for (const { component, missing } of checkRefForwarding(rootDir)) {
+      checks.push({ component, check: `ref forwarding (${missing.join(', ')})`, status: 'FAIL' });
+      totalViolations += 1;
+    }
+  }
+
   return {
     side: side || 'twin',
     passed: totalViolations === 0,
     totalViolations,
-    results
+    results,
+    checks
   };
 }
 
 export function formatMarkdownTable(checkResult) {
-  const { side, results, passed, totalViolations } = checkResult;
+  const { side, results, passed, totalViolations, checks = [] } = checkResult;
   const rows = [];
 
   if (side === 'svelte' || side === 'react') {
@@ -449,6 +552,15 @@ export function formatMarkdownTable(checkResult) {
       const diffClass = `S: [${data.classesOnlyInSvelte.join(', ') || '-'}]<br>R: [${data.classesOnlyInReact.join(', ') || '-'}]`;
       const diffProp = `S: [${data.propsOnlyInSvelte.join(', ') || '-'}]<br>R: [${data.propsOnlyInReact.join(', ') || '-'}]`;
       rows.push(`| ${comp} | ${undef} | ${missing} | ${diffClass} | ${diffProp} |`);
+    }
+  }
+
+  if (checks.length > 0) {
+    rows.push('');
+    rows.push('| Component | Check | Status |');
+    rows.push('| :--- | :--- | :--- |');
+    for (const { component, check, status } of checks) {
+      rows.push(`| ${component} | ${check} | ${status} |`);
     }
   }
 

@@ -212,14 +212,14 @@ test('Wave 2 overlay primitive, upload, treeselect, cascader, and transfer in th
   assert.ok(!css.includes('z-index: 1100'), 'theme.css must not contain z-index: 1100');
 });
 
-test('Wave 2 parity-check script exists and defines 21 components', async () => {
+test('Wave 2 parity-check script exists and defines the Wave 2 components', async () => {
   const scriptPath = path.resolve(__dirname, '../../../scripts/parity-check.mjs');
   assert.ok(fs.existsSync(scriptPath), 'scripts/parity-check.mjs must exist');
   const content = fs.readFileSync(scriptPath, 'utf8');
   assert.ok(content.includes('export const COMPONENTS = ['), 'scripts/parity-check.mjs must export COMPONENTS');
   const mod = await import(pathToFileURL(scriptPath).href);
   assert.ok(Array.isArray(mod.COMPONENTS), 'COMPONENTS must be exported as an array');
-  assert.strictEqual(mod.COMPONENTS.length, 21, 'COMPONENTS must contain exactly 21 names');
+  assert.ok(mod.COMPONENTS.length >= 21, 'COMPONENTS must contain at least the 21 Wave 2 names');
 });
 
 test('Taste review design fixes: focus ring, disabled & danger tokens, deeper gradient, sheet & touch gating', () => {
