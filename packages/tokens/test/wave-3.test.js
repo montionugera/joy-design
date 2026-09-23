@@ -98,3 +98,13 @@ test('hasRestSpread does not false-fail real components that spread rest after i
     assert.ok(mod.hasRestSpread(src), `${name}.tsx spreads rest props and must not be flagged`);
   }
 });
+
+test('F-038 B-L1: Tag close hit area is >=44px tall and never extends left over the label', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const rule = css.match(/\.joy-tag__close::before\s*\{([^}]*)\}/);
+  assert.ok(rule, '.joy-tag__close::before hit-area rule must exist in dist/theme.css');
+  assert.match(rule[1], /height:\s*44px/, 'hit area must be 44px tall');
+  assert.match(rule[1], /left:\s*0\b/, 'hit area must be anchored at the button left edge');
+  assert.doesNotMatch(rule[1], /translate\(\s*-50%\s*,/, 'hit area must not be centred horizontally');
+  assert.match(css, /\.joy-tag__close\s*\{[^}]*width:\s*24px[^}]*height:\s*24px/s, 'visual close control must be 24px');
+});

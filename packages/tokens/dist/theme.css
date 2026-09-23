@@ -2982,15 +2982,17 @@ h1, h2, h3, .joy-display {
   cursor: pointer;
   border-radius: var(--joy-radius-control);
 }
-/* Transparent 44px hit area; the visual close control stays 24px. */
+/* Transparent hit area: 44px tall, growing above/below and toward the right edge only, never
+   left over the label (the button's left edge is the boundary). Tag lists need
+   gap >= var(--joy-space-2) so neighbouring hit areas do not overlap. */
 .joy-tag__close::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: 50%;
-  width: 44px;
+  left: 0;
+  width: 34px;
   height: 44px;
-  transform: translate(-50%, -50%);
+  transform: translateY(-50%);
 }
 .joy-tag__close:focus-visible {
   outline: var(--joy-focus-ring);
