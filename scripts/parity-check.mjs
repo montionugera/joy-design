@@ -393,17 +393,17 @@ export function needsThemeRule(token) {
 }
 
 // Raw (un-normalised) names declared in `interface Props` / `export interface <X>Props`.
+const propNames = (block) => [...block.matchAll(/^\s*([A-Za-z]+)\??\s*:/gm)].map((m) => m[1]);
+
 export function svelteRawProps(src) {
   const startIdx = src.indexOf('interface Props');
-  const block = startIdx !== -1 ? extractBraceBlock(src, startIdx) : '';
-  return [...block.matchAll(/^\s*([A-Za-z]+)\??\s*:/gm)].map((m) => m[1]);
+  return propNames(startIdx !== -1 ? extractBraceBlock(src, startIdx) : '');
 }
 
 export function reactRawProps(componentName, src) {
   const declRegex = new RegExp(`export\\s+interface\\s+${componentName}Props\\b`);
   const match = src.match(declRegex);
-  const block = match ? extractBraceBlock(src, match.index) : '';
-  return [...block.matchAll(/^\s*([A-Za-z]+)\??\s*:/gm)].map((m) => m[1]);
+  return propNames(match ? extractBraceBlock(src, match.index) : '');
 }
 
 export function svelteProps(src) {
@@ -533,25 +533,23 @@ export function runParityCheck(options = {}) {
     if (side === 'svelte') {
       const undefinedClasses = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
       const missingContractProps = contractProps.filter((p) => !sProps.has(p)).sort();
-      const handlerCasing = sHandlerCasing;
-      const violationsCount = undefinedClasses.length + missingContractProps.length + handlerCasing.length;
+      const violationsCount = undefinedClasses.length + missingContractProps.length + sHandlerCasing.length;
       totalViolations += violationsCount;
       results[comp] = {
         undefinedClasses,
         missingContractProps,
-        handlerCasing,
+        handlerCasing: sHandlerCasing,
         hasViolations: violationsCount > 0
       };
     } else if (side === 'react') {
       const undefinedClasses = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
       const missingContractProps = contractProps.filter((p) => !rProps.has(p)).sort();
-      const handlerCasing = rHandlerCasing;
-      const violationsCount = undefinedClasses.length + missingContractProps.length + handlerCasing.length;
+      const violationsCount = undefinedClasses.length + missingContractProps.length + rHandlerCasing.length;
       totalViolations += violationsCount;
       results[comp] = {
         undefinedClasses,
         missingContractProps,
-        handlerCasing,
+        handlerCasing: rHandlerCasing,
         hasViolations: violationsCount > 0
       };
     } else {

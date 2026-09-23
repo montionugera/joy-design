@@ -869,20 +869,8 @@ test('D3.1 fix: a dynamic class prefix that differs between the twins is reporte
 });
 
 test('D3.1 STRUCTURAL_CLASSES is exempt from the theme.css rule only when BOTH twins carry the class', () => {
-  const repoRoot = path.resolve(__dirname, '../../..');
   const cls = [...mod.STRUCTURAL_CLASSES][0];
-  const build = (svelte, react) => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-struct-'));
-    try {
-      for (const d of ['packages/tokens/dist', 'packages/svelte/src/lib', 'packages/react/src']) fs.mkdirSync(path.join(root, d), { recursive: true });
-      fs.copyFileSync(path.join(repoRoot, 'packages/tokens/dist/theme.css'), path.join(root, 'packages/tokens/dist/theme.css'));
-      fs.writeFileSync(path.join(root, 'packages/svelte/src/lib/Alert.svelte'), svelte);
-      fs.writeFileSync(path.join(root, 'packages/react/src/Alert.tsx'), react);
-      return mod.runParityCheck({ rootDir: root }).results.Alert;
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
-  };
+  const build = runTwinFixture;
   const both = build(`<div class="${cls}"></div>`, `export const Alert = () => <div className="${cls}" />;`);
   assert.deepStrictEqual(both.undefinedClasses, { svelte: [], react: [] }, 'present in both twins: exempt');
   const onlySvelte = build(`<div class="${cls}"></div>`, 'export const Alert = () => <div />;');
