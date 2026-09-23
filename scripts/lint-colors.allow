@@ -1,3 +1,10 @@
 # One regex per line. Keep entries narrow and explain the CSS-variable source.
 # chart-core.ts has no getComputedStyle-derived canvas colors in Wave 1, so it
 # intentionally has no allowlist entry yet.
+
+# Wave 3 A1: readChartPalette() in chart-core.ts reads live CSS custom
+# properties via getComputedStyle and only falls back to these hex literals
+# when a --joy-* variable is unset (e.g. non-browser test environments).
+# These are JS default-argument literals, not un-token-driven CSS, so they
+# are intentionally allowlisted narrowly to this call shape.
+v\('--joy-[a-z-]+', '#[0-9a-fA-F]{3,8}'\)

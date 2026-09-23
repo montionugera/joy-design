@@ -38,6 +38,33 @@ export interface ChartOptions {
 }
 
 /**
+ * Token-driven canvas color palette. Reads live CSS custom properties from the
+ * canvas element so chart rendering stays correct across light/dark themes
+ * without hardcoded hex. Called once per render and again on a
+ * 'joy-theme-change' CustomEvent so the canvas repaints immediately on theme
+ * toggle.
+ */
+export interface ChartPalette {
+  textSecondary: string;
+  textPrimary: string;
+  bull: string;
+  bear: string;
+  border: string;
+}
+
+export function readChartPalette(canvas: HTMLCanvasElement): ChartPalette {
+  const styles = getComputedStyle(canvas);
+  const v = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback;
+  return {
+    textSecondary: v('--joy-text-secondary', '#3c3a35'),
+    textPrimary: v('--joy-text-primary', '#1f1c13'),
+    bull: v('--joy-status-success-fg', '#1a4f1f'),
+    bear: v('--joy-status-danger-fg', '#9f3331'),
+    border: v('--joy-border-subtle', '#e3dccc'),
+  };
+}
+
+/**
  * Largest-Triangle-Three-Buckets (LTTB) Downsampling Algorithm (For 1D lines/areas)
  */
 export function lttbDownsample(data: ChartPoint[], threshold: number): ChartPoint[] {
@@ -409,19 +436,20 @@ export class JoyChartCore {
     if (this.width <= 0 || this.height <= 0) return;
     const ctx = this.baseCtx;
     ctx.clearRect(0, 0, this.width, this.height);
+    const palette = readChartPalette(this.baseCanvas);
 
     if (this.options.showGrid) {
-      this.drawGrid(ctx);
+      this.drawGrid(ctx, palette);
     }
 
     if (this.isCandlestick) {
-      this.drawCandlesticks(ctx);
+      this.drawCandlesticks(ctx, palette);
     } else {
       this.drawSeries(ctx);
     }
   }
 
-  private drawGrid(ctx: CanvasRenderingContext2D) {
+  private drawGrid(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
     const isDark = this.options.theme === 'dark';
     ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
     ctx.lineWidth = 1;
@@ -436,7 +464,7 @@ export class JoyChartCore {
       ctx.stroke();
 
       const price = this.viewMaxY - (i / ySteps) * (this.viewMaxY - this.viewMinY);
-      ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
+      ctx.fillStyle = palette.textSecondary;
       ctx.font = '10px monospace';
       ctx.fillText(price.toFixed(2), this.width - 55, y - 4);
     }
@@ -452,7 +480,7 @@ export class JoyChartCore {
     }
   }
 
-  private drawCandlesticks(ctx: CanvasRenderingContext2D) {
+  private drawCandlesticks(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
     if (this.candlestickData.length === 0) return;
 
     // Binary search visible range in O(log N) with 0 allocations
@@ -470,8 +498,8 @@ export class JoyChartCore {
     if (visible.length === 0) return;
 
     const candleWidth = Math.max(2, (this.width / visible.length) * 0.7);
-    const bullColor = '#10b981'; // Green
-    const bearColor = '#ef4444'; // Red
+    const bullColor = palette.bull;
+    const bearColor = palette.bear;
 
     for (let i = 0; i < visible.length; i++) {
       const c = visible[i];
@@ -618,6 +646,12 @@ export class JoyChartCore {
 
     this.addListener(window, 'mouseup', (() => {
       this.isDragging = false;
+    }) as EventListener);
+
+    // Re-read the token-driven palette and repaint on theme toggle so the
+    // canvas never lags a light/dark switch (see readChartPalette above).
+    this.addListener(window, 'joy-theme-change', (() => {
+      this.render();
     }) as EventListener);
 
     this.addListener(this.overlayCanvas, 'mousemove', ((e: MouseEvent) => {

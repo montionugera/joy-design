@@ -5,8 +5,26 @@ import {
   ohlcBinning,
   binarySearchNearest,
   snapToPhysicalPixel,
-  RingBuffer
+  RingBuffer,
+  readChartPalette
 } from '../src/lib/chart-core.ts';
+
+// Minimal fake HTMLCanvasElement-like object: readChartPalette only needs
+// something getComputedStyle(...) accepts, so a plain object stub is enough
+// (no jsdom / real canvas required).
+function fakeCanvas() {
+  return {};
+}
+
+function stubGetComputedStyle(values) {
+  const original = globalThis.getComputedStyle;
+  globalThis.getComputedStyle = () => ({
+    getPropertyValue: (name) => values[name] ?? ''
+  });
+  return () => {
+    globalThis.getComputedStyle = original;
+  };
+}
 
 test('findVisibleRange binary search locates window indices in O(log N)', () => {
   const times = new Float64Array([100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]);
@@ -111,4 +129,48 @@ test('RingBuffer supports circular zero-allocation push and rollover', () => {
   rb.clear();
   assert.strictEqual(rb.length(), 0);
   assert.deepStrictEqual(rb.toArray(), []);
+});
+
+test('readChartPalette resolves colors from CSS variables in light theme', () => {
+  const restore = stubGetComputedStyle({
+    '--joy-text-secondary': '#3c3a35',
+    '--joy-text-primary': '#1f1c13',
+    '--joy-status-success-fg': '#1a4f1f',
+    '--joy-status-danger-fg': '#9f3331',
+    '--joy-border-subtle': '#e3dccc'
+  });
+  try {
+    const palette = readChartPalette(fakeCanvas());
+    assert.deepStrictEqual(palette, {
+      textSecondary: '#3c3a35',
+      textPrimary: '#1f1c13',
+      bull: '#1a4f1f',
+      bear: '#9f3331',
+      border: '#e3dccc'
+    });
+  } finally {
+    restore();
+  }
+});
+
+test('readChartPalette resolves colors from CSS variables in dark theme', () => {
+  const restore = stubGetComputedStyle({
+    '--joy-text-secondary': '#c9c4b8',
+    '--joy-text-primary': '#f8f3e8',
+    '--joy-status-success-fg': '#5fbf6a',
+    '--joy-status-danger-fg': '#e2635f',
+    '--joy-border-subtle': '#3c3a35'
+  });
+  try {
+    const palette = readChartPalette(fakeCanvas());
+    assert.deepStrictEqual(palette, {
+      textSecondary: '#c9c4b8',
+      textPrimary: '#f8f3e8',
+      bull: '#5fbf6a',
+      bear: '#e2635f',
+      border: '#3c3a35'
+    });
+  } finally {
+    restore();
+  }
 });
