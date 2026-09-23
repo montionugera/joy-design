@@ -60,16 +60,10 @@
     return () => handle.dispose();
   });
 
-  function handleConfirm() {
+  function settle(callback?: () => void) {
     open = false;
     focusTrigger();
-    onconfirm?.();
-  }
-
-  function handleCancel() {
-    open = false;
-    focusTrigger();
-    oncancel?.();
+    callback?.();
   }
 </script>
 
@@ -91,14 +85,14 @@
         <button
           type="button"
           class="joy-button joy-button--ghost joy-button--sm"
-          onclick={handleCancel}
+          onclick={() => settle(oncancel)}
         >
           {cancelText}
         </button>
         <button
           type="button"
           class="joy-button joy-button--solid joy-button--sm"
-          onclick={handleConfirm}
+          onclick={() => settle(onconfirm)}
         >
           {okText}
         </button>

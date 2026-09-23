@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons/react';
-import { useMergedRef, useOpener } from './dialog-hooks.js';
-import { lockBodyScroll, registerDialog, trapFocus } from './overlay-utils.js';
+import { useDialog, useMergedRef } from './dialog-hooks.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -46,14 +45,15 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
     const dragStartRef = React.useRef({ x: 0, y: 0, posX: 0, posY: 0 });
     const dialogRef = React.useRef<HTMLDivElement | null>(null);
     const setDialogRef = useMergedRef(ref, dialogRef);
-    const openerRef = useOpener(open);
 
-    // Reset transforms on image change
-    React.useEffect(() => {
+    const handleReset = () => {
       setScale(1);
       setRotate(0);
       setPosition({ x: 0, y: 0 });
-    }, [currentIndex, open]);
+    };
+
+    // Reset transforms on image change
+    React.useEffect(handleReset, [currentIndex, open]);
 
     const handlePrev = () => {
       if (normalizedItems.length <= 1) return;
@@ -73,57 +73,23 @@ export const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(
     const handleZoomOut = () => setScale((s) => Math.max(0.2, s - 0.25));
     const handleRotateLeft = () => setRotate((r) => r - 90);
     const handleRotateRight = () => setRotate((r) => r + 90);
-    const handleReset = () => {
-      setScale(1);
-      setRotate(0);
-      setPosition({ x: 0, y: 0 });
-    };
-
-    // The key handler is registered once per open; it reads the latest handlers through this ref.
-    const keysRef = React.useRef({ onClose, handlePrev, handleNext, handleZoomIn, handleZoomOut, handleRotateRight });
-    keysRef.current = { onClose, handlePrev, handleNext, handleZoomIn, handleZoomOut, handleRotateRight };
-
     // Body scroll lock, focus trap + restore, and the dialog stack (a preview inside a modal closes alone).
-    React.useEffect(() => {
-      const dialog = dialogRef.current;
-      if (!open || !dialog) return;
-      const previouslyFocused = openerRef.current;
-      const unlock = lockBodyScroll();
-      const handle = registerDialog();
-      const cleanupTrap = trapFocus(dialog);
-      const onKeyDown = (e: KeyboardEvent) => {
-        if (e.defaultPrevented || !handle.isTopmost()) return;
-        const k = keysRef.current;
-        if (e.key === 'Escape') {
-          e.preventDefault();
-          k.onClose();
-        } else if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          k.handlePrev();
-        } else if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          k.handleNext();
-        } else if (e.key === '+' || e.key === '=') {
-          e.preventDefault();
-          k.handleZoomIn();
-        } else if (e.key === '-' || e.key === '_') {
-          e.preventDefault();
-          k.handleZoomOut();
-        } else if (e.key === 'r' || e.key === 'R') {
-          e.preventDefault();
-          k.handleRotateRight();
-        }
-      };
-      window.addEventListener('keydown', onKeyDown);
-      return () => {
-        window.removeEventListener('keydown', onKeyDown);
-        setIsDragging(false); // closing mid-drag must not leave the window mousemove/mouseup listeners attached
-        cleanupTrap();
-        handle.unregister();
-        unlock();
-        if (previouslyFocused?.isConnected) previouslyFocused.focus();
-      };
-    }, [open]);
+    // Closing mid-drag must not leave the window mousemove/mouseup listeners attached.
+    useDialog(
+      open,
+      dialogRef,
+      (e) => {
+        if (e.key === 'Escape') onClose();
+        else if (e.key === 'ArrowLeft') handlePrev();
+        else if (e.key === 'ArrowRight') handleNext();
+        else if (e.key === '+' || e.key === '=') handleZoomIn();
+        else if (e.key === '-' || e.key === '_') handleZoomOut();
+        else if (e.key === 'r' || e.key === 'R') handleRotateRight();
+        else return;
+        e.preventDefault();
+      },
+      () => setIsDragging(false)
+    );
 
     // Drag-to-pan tracks the pointer on the window, so it keeps working when it leaves the stage.
     React.useEffect(() => {

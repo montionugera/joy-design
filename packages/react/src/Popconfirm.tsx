@@ -72,19 +72,14 @@ export const Popconfirm = React.forwardRef<HTMLDivElement, PopconfirmProps>(
       panelRef.current?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
     }, [isOpen]);
 
-    const handleConfirm = (e: React.MouseEvent) => {
+    const settle = (callback?: () => void) => (e: React.MouseEvent) => {
       e.stopPropagation();
       setOpen(false);
       focusTrigger();
-      onConfirm?.();
+      callback?.();
     };
-
-    const handleCancel = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setOpen(false);
-      focusTrigger();
-      onCancel?.();
-    };
+    const handleConfirm = settle(onConfirm);
+    const handleCancel = settle(onCancel);
 
     return (
       <div {...rest} ref={ref} className={cx('joy-popconfirm', className)}>

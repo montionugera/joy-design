@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { lockBodyScroll, registerDialog, trapFocus } from './overlay-utils.js';
 
 /**
  * Forward a ref to a component-owned element that also needs an internal ref. A callback ref, so the forwarded
@@ -30,4 +31,45 @@ export function useOpener(open: boolean): React.MutableRefObject<HTMLElement | n
   }
   wasOpen.current = open;
   return opener;
+}
+
+/**
+ * The lifecycle every modal dialog shares (Modal, Drawer, ImagePreview): while `open`, lock body scroll, trap focus,
+ * join the dialog stack, and hand focus back to the opener on the way out. `onKeyDown` runs for window keydowns that
+ * no inner popover claimed (`defaultPrevented`) and only while this dialog is the topmost; the caller calls
+ * `preventDefault()` for the keys it handles. The handler (and `onTeardown`) are read through refs, so the
+ * effect is keyed on `open` alone. Must be called before the component's early `return null`.
+ */
+export function useDialog(
+  open: boolean,
+  dialogRef: React.MutableRefObject<HTMLElement | null>,
+  onKeyDown: (e: KeyboardEvent) => void,
+  onTeardown?: () => void
+) {
+  const openerRef = useOpener(open);
+  const keyRef = React.useRef(onKeyDown);
+  keyRef.current = onKeyDown;
+  const teardownRef = React.useRef(onTeardown);
+  teardownRef.current = onTeardown;
+
+  React.useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!open || !dialog) return;
+    const previouslyFocused = openerRef.current;
+    const unlock = lockBodyScroll();
+    const handle = registerDialog();
+    const cleanupTrap = trapFocus(dialog);
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.defaultPrevented && handle.isTopmost()) keyRef.current(e);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      teardownRef.current?.();
+      cleanupTrap();
+      handle.unregister();
+      unlock();
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+    };
+  }, [open]);
 }

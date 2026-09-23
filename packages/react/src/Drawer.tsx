@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Close } from '@joymify/icons/react';
-import { useMergedRef, useOpener } from './dialog-hooks.js';
-import { lockBodyScroll, registerDialog, trapFocus } from './overlay-utils.js';
+import { useDialog, useMergedRef } from './dialog-hooks.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -24,35 +23,15 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
     // Unique per instance, so several drawers/modals never share a label id.
     const titleId = `${React.useId()}-title`;
     const dialogRef = React.useRef<HTMLDivElement | null>(null);
-    const onCloseRef = React.useRef(onClose);
-    onCloseRef.current = onClose;
     const setDialogRef = useMergedRef(ref, dialogRef);
-    const openerRef = useOpener(open);
-
-    React.useEffect(() => {
-      const dialog = dialogRef.current;
-      if (!open || !dialog) return;
-      const previouslyFocused = openerRef.current;
-      const unlock = lockBodyScroll();
-      const handle = registerDialog();
-      const cleanupTrap = trapFocus(dialog);
-      // Only the topmost dialog answers Escape (a modal opened from a drawer closes alone), and a
-      // popover/menu/tooltip inside claims it first (preventDefault) so it closes alone too.
-      const onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !e.defaultPrevented && handle.isTopmost()) {
-          e.preventDefault();
-          onCloseRef.current?.();
-        }
-      };
-      window.addEventListener('keydown', onKeyDown);
-      return () => {
-        window.removeEventListener('keydown', onKeyDown);
-        cleanupTrap();
-        handle.unregister();
-        unlock();
-        if (previouslyFocused?.isConnected) previouslyFocused.focus();
-      };
-    }, [open]);
+    // Only the topmost dialog answers Escape, and a popover/menu/tooltip inside claims it first
+    // (preventDefault) so it closes alone; dialogs claim it too so an outer one does not also close.
+    useDialog(open, dialogRef, (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose?.();
+      }
+    });
 
     if (!open) return null;
 

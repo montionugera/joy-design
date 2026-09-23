@@ -57,12 +57,7 @@
 	let startPosY = 0;
 
 	$effect(() => {
-		if (open) {
-			scale = 1;
-			rotate = 0;
-			posX = 0;
-			posY = 0;
-		}
+		if (open) handleReset();
 	});
 
 	$effect(() => {
@@ -123,25 +118,14 @@
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (!open || e.defaultPrevented || !dialog?.isTopmost()) return;
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			onClose();
-		} else if (e.key === 'ArrowLeft') {
-			e.preventDefault();
-			handlePrev();
-		} else if (e.key === 'ArrowRight') {
-			e.preventDefault();
-			handleNext();
-		} else if (e.key === '+' || e.key === '=') {
-			e.preventDefault();
-			handleZoomIn();
-		} else if (e.key === '-' || e.key === '_') {
-			e.preventDefault();
-			handleZoomOut();
-		} else if (e.key === 'r' || e.key === 'R') {
-			e.preventDefault();
-			handleRotateRight();
-		}
+		if (e.key === 'Escape') onClose();
+		else if (e.key === 'ArrowLeft') handlePrev();
+		else if (e.key === 'ArrowRight') handleNext();
+		else if (e.key === '+' || e.key === '=') handleZoomIn();
+		else if (e.key === '-' || e.key === '_') handleZoomOut();
+		else if (e.key === 'r' || e.key === 'R') handleRotateRight();
+		else return;
+		e.preventDefault();
 	}
 
 	function handleMouseDown(e: MouseEvent) {

@@ -238,8 +238,11 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(imagePreview.includes('joy-image-preview-mask'), 'ImagePreview must render preview mask');
   assert.ok(imagePreview.includes('role="dialog"'), 'ImagePreview must implement role=dialog');
   assert.ok(imagePreview.includes('aria-modal="true"'), 'ImagePreview must set aria-modal=true');
-  assert.ok(imagePreview.includes('lockBodyScroll'), 'ImagePreview must invoke lockBodyScroll');
-  assert.ok(imagePreview.includes('trapFocus'), 'ImagePreview must invoke trapFocus');
+  // Scroll lock + focus trap live in the shared useDialog hook (asserted on dialog-hooks.ts below).
+  assert.ok(imagePreview.includes('useDialog('), 'ImagePreview must run the shared dialog lifecycle (lockBodyScroll + trapFocus)');
+
+  const dialogHooks = fs.readFileSync(path.resolve('./src/dialog-hooks.ts'), 'utf8');
+  assert.ok(dialogHooks.includes('lockBodyScroll()') && dialogHooks.includes('trapFocus('), 'useDialog must invoke lockBodyScroll and trapFocus');
 
   const overlayUtils = fs.readFileSync(path.resolve('./src/overlay-utils.ts'), 'utf8');
   assert.ok(overlayUtils.includes('lockBodyScroll'), 'overlay-utils must export lockBodyScroll');
@@ -1458,12 +1461,14 @@ test('F-038 C-L6: Modal and Drawer effects lock scroll, trap focus, register in 
   }
 });
 
-test('F-038 C-L6: Modal/Drawer/ImagePreview source wires registerDialog + unregister and gates Escape on topmost and defaultPrevented', () => {
+test('F-038 C-L6: Modal/Drawer/ImagePreview run the shared useDialog lifecycle, which registers in the dialog stack, gates keys on topmost and defaultPrevented, and locks scroll + traps focus', () => {
+  const hooks = readSrc('../src/dialog-hooks.ts');
+  assert.ok(/registerDialog\(\)/.test(hooks) && /\.unregister\(\)/.test(hooks), 'useDialog: registerDialog + unregister');
+  assert.ok(/isTopmost\(\)/.test(hooks) && /defaultPrevented/.test(hooks), 'useDialog: keys act only when topmost and not defaultPrevented');
+  assert.ok(/lockBodyScroll\(\)/.test(hooks) && /trapFocus\(/.test(hooks), 'useDialog: scroll lock + focus trap');
   for (const name of ['Modal', 'Drawer', 'ImagePreview']) {
     const src = readSrc(`../src/${name}.tsx`);
-    assert.ok(/registerDialog\(\)/.test(src) && /\.unregister\(\)/.test(src), `${name}: registerDialog + unregister`);
-    assert.ok(/isTopmost\(\)/.test(src) && /defaultPrevented/.test(src), `${name}: Escape acts only when topmost and not defaultPrevented`);
-    assert.ok(/lockBodyScroll\(\)/.test(src) && /trapFocus\(/.test(src), `${name}: scroll lock + focus trap`);
+    assert.ok(/useDialog\(/.test(src), `${name}: runs the shared dialog lifecycle`);
     assert.ok(!/style=\{\{/.test(src.replace(/style=\{\{ transform:/, '')), `${name}: no inline style objects`);
     assert.ok(!/modal-title|drawer-title|&times;/.test(src), `${name}: no hard-coded label id or glyph close`);
   }
