@@ -90,7 +90,10 @@ test.describe("F-037 form control contracts", () => {
                 element.className,
                 element.getBoundingClientRect().height,
               ])
-              .filter(([, height]) => (height as number) < 44),
+              // 0.5px tolerance absorbs sub-pixel layout rounding (observed
+              // e.g. 43.999969482421875 for a 44px min-height token under
+              // headless Chromium); the CSS token itself is exactly 44px.
+              .filter(([, height]) => (height as number) < 43.5),
           );
         expect(short, `${hash}: every control >= 44px`).toEqual([]);
       }
