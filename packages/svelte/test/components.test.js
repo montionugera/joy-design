@@ -756,7 +756,7 @@ test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and l
     assert.ok(s.includes('if (!open || !ref) return;') && s.includes('lockBodyScroll()') && s.includes('trapFocus(ref)'), `${name} locks + traps while open`);
     assert.ok(s.includes('const previouslyFocused = opener.current') && s.includes('previouslyFocused.focus()') && s.includes('$effect.pre(() => opener.sync(open))'), `${name} restores focus`);
     assert.ok(s.includes('role="dialog"') && s.includes('aria-modal="true"'), `${name} is a modal dialog`);
-    assert.ok(s.includes('const uid = $props.id()') && s.includes('aria-labelledby={title ? titleId : undefined}') && s.includes('aria-label={title ? undefined :'), `${name} label id is per-instance, with an aria-label fallback`);
+    assert.ok(s.includes('const uid = $props.id()') && s.includes("aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}") && s.includes("aria-label={rest['aria-label'] ?? (title ? undefined :"), `${name} label id is per-instance, with an aria-label fallback`);
     assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover or dialog already claimed it`);
     assert.ok(s.includes('e.target === e.currentTarget'), `${name} closes on backdrop click`);
     assert.ok(/import\s*\{\s*Close\s*\}\s*from\s*'@joymify\/icons'/.test(s) && !s.includes('&times;'), `${name} close button uses the Close icon`);
@@ -1005,5 +1005,41 @@ test('F-038 D3.1: ImagePreview is uncontrolled unless `current` is passed, clamp
   for (const generate of ['server', 'client']) {
     const out = compile(src, { filename: 'ImagePreview.svelte', generate, runes: true });
     assert.deepStrictEqual(out.warnings.map((w) => w.code), [], `ImagePreview (${generate}) compiles warning-free`);
+  }
+});
+
+test('F-038 fix: Modal, Drawer and ImagePreview keep role/aria-modal owned (rest spread first, like React); consumer aria-label/labelledby still win', async () => {
+  const { compile } = await import('svelte/compiler');
+  const { pathToFileURL } = await import('node:url');
+  const { render: renderSsr } = await import('svelte/server');
+  const dir = fs.mkdtempSync(path.resolve('./test/.rest-order-ssr-'));
+  try {
+    const lib = (f) => pathToFileURL(path.resolve(`./src/lib/${f}`)).href;
+    // The real icons package ships .svelte files Node cannot import; SSR only needs no-op components.
+    const iconsStub = path.join(dir, 'icons-stub.mjs');
+    fs.writeFileSync(iconsStub, ['Close', 'ChevronLeft', 'ChevronRight', 'Minimize2', 'RefreshCw', 'ZoomIn', 'ZoomOut'].map((n) => `export const ${n} = () => {};`).join('\n'));
+    const load = async (name) => {
+      const server = compile(readLib(`${name}.svelte`), { filename: `${name}.svelte`, generate: 'server', runes: true });
+      const code = server.js.code.replace("'./overlay-utils.js'", `'${lib('overlay-utils.ts')}'`).replace("'./dialog-opener.js'", `'${lib('dialog-opener.ts')}'`).replace("'@joymify/icons'", `'${pathToFileURL(iconsStub).href}'`);
+      const file = path.join(dir, `${name}.mjs`);
+      fs.writeFileSync(file, code);
+      return (await import(pathToFileURL(file).href)).default;
+    };
+    const html = (C, props) => renderSsr(C, { props }).body.replace(/<!--.*?-->/g, '');
+    for (const [name, fallback, extra] of [['Modal', 'Dialog', {}], ['Drawer', 'Drawer', {}], ['ImagePreview', 'Image preview', { src: 'a.png' }]]) {
+      const C = await load(name);
+      const owned = html(C, { open: true, ...extra, role: 'alert', 'aria-modal': 'false' });
+      assert.ok(owned.includes('role="dialog"') && owned.includes('aria-modal="true"'), `${name}: role/aria-modal cannot be clobbered: ${owned.slice(0, 200)}`);
+      assert.ok(!owned.includes('role="alert"') && !owned.includes('aria-modal="false"'), `${name}: clobbering values absent`);
+      assert.ok(html(C, { open: true, ...extra, 'aria-label': 'Einstellungen', 'data-x': '1' }).includes('aria-label="Einstellungen"'), `${name}: consumer aria-label wins`);
+      assert.ok(html(C, { open: true, ...extra }).includes(`aria-label="${fallback}"`), `${name}: default label kept`);
+      assert.ok(html(C, { open: true, ...extra, 'data-x': '1' }).includes('data-x="1"'), `${name}: other rest attributes forwarded`);
+    }
+    for (const name of ['Modal', 'Drawer']) {
+      const C = await load(name);
+      assert.ok(html(C, { open: true, 'aria-labelledby': 'mine' }).includes('aria-labelledby="mine"'), `${name}: consumer aria-labelledby wins`);
+    }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 });

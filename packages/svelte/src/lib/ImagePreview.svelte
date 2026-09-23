@@ -167,15 +167,16 @@
 
 {#if open}
 	<div
+		{...rest}
 		bind:this={ref}
 		role="dialog"
 		aria-modal="true"
-		aria-label="Image preview"
+		aria-label={rest['aria-label'] ?? 'Image preview'}
 		class="joy-image-preview-mask {className}"
 		onclick={(e) => {
+			rest.onclick?.(e);
 			if (e.target === e.currentTarget) onclose();
 		}}
-		{...rest}
 	>
 		<!-- Operations Toolbar -->
 		<div class="joy-image-preview-toolbar" role="toolbar" aria-label="Preview tools">

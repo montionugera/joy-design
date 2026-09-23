@@ -73,13 +73,13 @@
     onclick={(e) => { if (e.target === e.currentTarget) onclose?.(); }}
   >
     <div
+      {...rest}
       bind:this={ref}
       class="joy-modal {className}"
       role="dialog"
       aria-modal="true"
-      aria-labelledby={title ? titleId : undefined}
-      aria-label={title ? undefined : 'Dialog'}
-      {...rest}
+      aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}
+      aria-label={rest['aria-label'] ?? (title ? undefined : 'Dialog')}
     >
       <div class="joy-modal__header">
         {#if title}
