@@ -357,7 +357,7 @@ function renderDisplayView() {
   const statCard = hubCard(
     "statistic", "Statistic, MetricTile and StatCard", "Trend arrows are inline SVG; direction comes from the delta sign, tone only sets colour.",
     hubCell("Statistic", `<div class="joy-statistic"><div class="joy-statistic__title">Volume</div><div class="joy-statistic__content"><span class="joy-statistic__prefix">$</span> <span class="joy-statistic__value">1234.50</span> <span class="joy-statistic__suffix">USD</span></div></div>`) +
-      [["up", "PORTFOLIO SHARPE", "2.84", "+14.2% vs benchmark"], ["down", "MAX DRAWDOWN", "-4.12%", "-0.5% this session"], ["neutral", "ACTIVE STRATEGIES", "12", "3 pending review"]]
+      [["up", "Portfolio Sharpe", "2.84", "+14.2% vs benchmark"], ["down", "Max drawdown", "-4.12%", "-0.5% this session"], ["neutral", "Active strategies", "12", "3 pending review"]]
         .map(([t, title, value, change]) => hubCell(`MetricTile ${t}`, `<div class="joy-metric-tile joy-metric-tile--${t}"><div class="joy-metric-tile__title">${title}</div><div class="joy-metric-tile__value">${value}</div><div class="joy-metric-tile__change">${t === "up" ? iconSvg("TrendingUp") + '<span class="joy-metric-tile__sr">Increase: </span>' : t === "down" ? iconSvg("TrendingDown") + '<span class="joy-metric-tile__sr">Decrease: </span>' : ""}<span>${change}</span></div></div>`)).join("") +
       [["positive", "Portfolio Value", "$1,429,850", "+14.2% (30d)"], ["critical", "Max Drawdown", "1.84%", "-0.4% from peak"], ["info", "Active Workers", "32 Nodes", "99.99% uptime"]]
         .map(([tone, label, value, delta]) => hubCell(`StatCard ${tone}`, `<div class="joy-stat-card"><div class="joy-stat-card__label">${label}</div><div class="joy-stat-card__value">${value}</div><div class="joy-stat-card__delta joy-stat-card__delta--${tone}">${hubDelta("stat-card", delta)}</div></div>`)).join(""),
@@ -372,6 +372,18 @@ function renderDisplayView() {
       hubCell("circle and rect", `<div class="hub-row"><div class="joy-skeleton joy-skeleton--circle" role="progressbar" aria-busy="true" aria-label="Loading avatar"></div><div class="joy-skeleton joy-skeleton--rect" role="progressbar" aria-busy="true" aria-label="Loading card" style="height: 64px; flex: 1;"></div></div>`) +
       hubCell("Spin", `<div class="hub-row">${[["sm", 16], ["md", 24], ["lg", 36]].map(([s, px]) => `<div class="joy-spin" role="status" aria-busy="true">${hubSvg.spin(px)}<span class="joy-spin__tip">${s}</span></div>`).join("")}</div>`),
     "",
+  );
+  const imageCard = hubCard(
+    "image", "Image", "Previewable wrapper (role=button, Enter or Space opens the preview), the hover and focus overlay, a plain non-previewable image and the load-error fallback. Pictures are painted from theme tokens.",
+    hubCell("previewable (hover or focus)", hubImage({ kind: "a", index: 0 })) +
+      hubCell("overlay shown", hubImage({ kind: "b", index: 1, hover: true, alt: "Depth heatmap" })) +
+      hubCell("not previewable", hubImage({ kind: "a", preview: false })) +
+      hubCell("fallback after load error", hubImage({ broken: true, preview: false, alt: "Missing chart" })),
+  );
+  const imagePreviewCard = hubCard(
+    "image-preview", "ImagePreview", "Modal-layer mask with a labelled toolbar (zoom, rotate, reset, close); a gallery adds a counter and previous/next. Escape or the close button dismisses it and returns focus to the opener.",
+    hubCell("single image", `<button type="button" class="joy-button joy-button--solid joy-button--md" data-open="image-preview" aria-haspopup="dialog" onclick="openImagePreview(0, false)">Open preview</button>`) +
+      hubCell("gallery", `<button type="button" class="joy-button joy-button--outline joy-button--md" data-open="image-gallery" aria-haspopup="dialog" onclick="openImagePreview(0, true)">Open gallery</button>`),
   );
   const emptyCard = hubCard(
     "empty-state", "EmptyState", "Title, description and an action slot.",
@@ -404,7 +416,7 @@ function renderDisplayView() {
   return `<section id="view-data-display-feedback" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Data Display & Feedback</h2>
         <p class="header-tagline">State matrices for the display and feedback components: Alert, Badge, Tag, Avatar, Statistic and KPI tiles, Progress, Skeleton, Spin, EmptyState, Result, Toast, Message, Notification, Table and charts.</p>
-        ${alertCards}${badgeCard}${tagCard}${avatarCard}${statCard}${progressCard}${loadingCard}${emptyCard}${resultCard}${feedbackCard}${tableCard}${chartCard}
+        ${alertCards}${badgeCard}${tagCard}${avatarCard}${imageCard}${imagePreviewCard}${statCard}${progressCard}${loadingCard}${emptyCard}${resultCard}${feedbackCard}${tableCard}${chartCard}
       </section>`;
 }
 
@@ -444,19 +456,22 @@ const hubStepItem = (state, idx, title, desc = "", stepNo = 0) =>
 const hubSplitter = (layout, first, second, height = 180, id = "") =>
   `<div class="joy-splitter joy-splitter--${layout}"${id ? ` id="${id}"` : ""} role="group" aria-label="Resizable Splitter Panel" style="${layout === "horizontal" ? `height: ${height}px;` : ""}"><div class="joy-splitter__pane" style="--joy-splitter-size: 40;"><div class="hub-pane">${first}</div></div><div class="joy-splitter__bar" role="separator" aria-label="Resize panes" aria-orientation="${layout === "horizontal" ? "vertical" : "horizontal"}" aria-valuenow="40" aria-valuemin="10" aria-valuemax="90" tabindex="0" data-hub-splitter></div><div class="joy-splitter__pane" style="--joy-splitter-size: 60;"><div class="hub-pane">${second}</div></div></div>`;
 
+const hubImage = ({ kind = "a", preview = true, index = 0, hover = false, broken = false, w = 160, h = 120, alt = "Order flow chart" } = {}) =>
+  `<div class="joy-image-wrapper${preview ? " joy-image-wrapper--previewable" : ""}" style="width: ${w}px; height: ${h}px;"${preview ? ` role="button" tabindex="0" data-open="image-preview" onclick="openImagePreview(${index}, false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openImagePreview(${index}, false)}"${hover ? "" : ` onpointerenter="hubImageHover(this, true)" onpointerleave="hubImageHover(this, false)" onfocusin="hubImageHover(this, true)" onfocusout="hubImageHover(this, false)"`}` : ""}><img class="joy-image__img" alt="${alt}" data-hub-img="${broken ? "broken" : kind}"${broken ? ` src="data:image/gif;base64,AAAA"` : ""}>${preview ? `<div class="joy-image__overlay"${hover ? " data-static" : " hidden"}>${iconSvg("Eye", "16").replace("stroke-width=\"1.5\"", "stroke-width=\"2\"")}<span>Preview</span></div>` : ""}</div>`;
+
 const hubTimelineItem = (status, title, desc, time) =>
   `<li class="joy-timeline__item"><div class="joy-timeline__dot joy-timeline__dot--${status}"></div><div class="joy-timeline__content"><div class="joy-timeline__title">${title}</div><div class="joy-timeline__description">${desc}</div><div class="joy-timeline__time">${time}</div></div></li>`;
 
-const hubDropdown = (id, { icons = false } = {}) => {
-  const item = (key, label, cls = "", ic = "") => `<button type="button" role="menuitem" class="joy-dropdown__item${cls}" onclick="selectHubDropdownItem(this, '${key}')">${ic}${label}</button>`;
-  return `<div class="joy-dropdown-wrapper"><div class="joy-dropdown-trigger" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-controls="${id}" onclick="toggleHubDropdown(this)" onkeydown="if(event.key==='Enter'||event.key===' '||event.key==='ArrowDown'){event.preventDefault();toggleHubDropdown(this)}"><span class="joy-button joy-button--outline joy-button--md">Strategy options ${iconSvg("ChevronDown", "12")}</span></div><div id="${id}" class="joy-dropdown" role="menu" tabindex="-1" aria-orientation="vertical" data-hub-panel hidden>${item("dup", "Duplicate strategy", "", icons ? iconSvg("Copy", "14") + " " : "")}${item("csv", "Export CSV", "", icons ? iconSvg("Download", "14") + " " : "")}${item("arch", "Archive strategy", " joy-dropdown__item--danger", icons ? iconSvg("Trash", "14") + " " : "")}<button type="button" role="menuitem" class="joy-dropdown__item" disabled>Locked action</button></div></div>`;
+const hubDropdown = (id) => {
+  const item = (key, label, cls = "") => `<button type="button" role="menuitem" class="joy-dropdown__item${cls}" onclick="selectHubDropdownItem(this, '${key}')">${label}</button>`;
+  return `<div class="joy-dropdown-wrapper"><div class="joy-dropdown-trigger" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-controls="${id}" onclick="toggleHubDropdown(this)" onkeydown="if(event.key==='Enter'||event.key===' '||event.key==='ArrowDown'){event.preventDefault();toggleHubDropdown(this)}"><span class="joy-button joy-button--outline joy-button--md">Strategy options ${iconSvg("ChevronDown", "12")}</span></div><div id="${id}" class="joy-dropdown" role="menu" tabindex="-1" aria-orientation="vertical" data-hub-panel hidden>${item("dup", "Duplicate strategy")}${item("csv", "Export CSV")}${item("arch", "Archive strategy", " joy-dropdown__item--danger")}<button type="button" role="menuitem" class="joy-dropdown__item" disabled>Locked action</button></div></div>`;
 };
 
 const hubPopconfirm = (id, triggerLabel, title = "Revoke this key?", variant = "danger") =>
   `<div class="joy-popconfirm"><div class="joy-popconfirm__trigger"><button type="button" class="joy-button joy-button--${variant} joy-button--sm" aria-haspopup="dialog" aria-expanded="false" aria-controls="${id}" onclick="toggleHubPopconfirm(this)">${triggerLabel}</button></div><div id="${id}" class="joy-popconfirm__panel" role="alertdialog" aria-labelledby="${id}-title" data-hub-panel hidden><div class="joy-popconfirm__title"><span class="joy-popconfirm__icon">${iconSvg("AlertCircle", "1rem")}</span><span id="${id}-title">${title}</span></div><div class="joy-popconfirm__buttons"><button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="closeHubPopconfirm(this)">Cancel</button><button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="confirmHubPopconfirm(this)">Confirm</button></div></div></div>`;
 
 const hubTooltip = (id, label, visible = false) =>
-  `<div class="joy-tooltip-wrapper"${visible ? "" : ` onpointerenter="hubTip('${id}', true)" onpointerleave="hubTip('${id}', false)" onfocusin="hubTip('${id}', true)" onfocusout="hubTip('${id}', false)"`}><button type="button" class="joy-button joy-button--outline joy-button--md" aria-describedby="${id}">${label}</button><div id="${id}" class="joy-tooltip" role="tooltip"${visible ? "" : " hidden"}>Maker 0.01% | Taker 0.04%</div></div>`;
+  `<div class="joy-tooltip-wrapper"${visible ? "" : ` onpointerenter="hubTip('${id}', true)" onpointerleave="hubTip('${id}', false)" onfocusin="hubTip('${id}', true)" onfocusout="hubTip('${id}', false)"`}><button type="button" class="joy-button joy-button--outline joy-button--md" aria-describedby="${id}">${label}</button><div id="${id}" class="joy-tooltip" role="tooltip"${visible ? " data-static" : " hidden"}>Maker 0.01% | Taker 0.04%</div></div>`;
 
 function renderNavigationView() {
   const pagerCard = hubCard(
@@ -484,7 +499,7 @@ function renderNavigationView() {
   );
   const anchorCard = hubCard(
     "anchor", "Anchor", "In-page anchor track with an ink marker and aria-current on the active link.",
-    hubCell("default", `<nav class="joy-anchor" role="navigation" aria-label="Anchor Navigation"><div class="joy-anchor__ink"></div><a href="#menu" class="joy-anchor__link joy-anchor__link--active" aria-current="location" onclick="selectAnchor(this)">Overview</a><a href="#api" class="joy-anchor__link" onclick="selectAnchor(this)">API</a><a href="#a11y" class="joy-anchor__link" onclick="selectAnchor(this)">Accessibility</a></nav>`),
+    hubCell("default", `<nav class="joy-anchor" role="navigation" aria-label="Anchor Navigation"><div class="joy-anchor__ink"></div><a href="#menu" class="joy-anchor__link joy-anchor__link--active" aria-current="location" onclick="selectAnchor(this, event)">Overview</a><a href="#api" class="joy-anchor__link" onclick="selectAnchor(this, event)">API</a><a href="#a11y" class="joy-anchor__link" onclick="selectAnchor(this, event)">Accessibility</a></nav>`),
   );
   const timelineCard = hubCard(
     "timeline", "Timeline", "Event trail with dot statuses from success to danger.",
@@ -500,7 +515,7 @@ function renderNavigationView() {
     hubCell("Modal", `<button type="button" class="joy-button joy-button--solid joy-button--md" data-open="modal" aria-haspopup="dialog" onclick="openDemoModal()">Open modal</button>`) +
       hubCell("Drawer", `<div class="hub-row"><button type="button" class="joy-button joy-button--solid joy-button--md" data-open="drawer" aria-haspopup="dialog" onclick="openDemoDrawer('right')">Open drawer</button><button type="button" class="joy-button joy-button--outline joy-button--md" data-open="drawer-left" aria-haspopup="dialog" onclick="openDemoDrawer('left')">Open left drawer</button></div>`) +
       hubCell("Popconfirm", hubPopconfirm("hub-popconfirm-inline", "Revoke API key")) +
-      hubCell("Dropdown", hubDropdown("hub-dropdown-menu", { icons: true })) +
+      hubCell("Dropdown", hubDropdown("hub-dropdown-menu")) +
       hubCell("Tooltip (hover or focus)", hubTooltip("hub-tip-a", "Trading fee")) +
       hubCell("Tooltip (open state)", `<div style="padding-top: var(--joy-space-8);">${hubTooltip("hub-tip-b", "Always shown", true)}</div>`),
   );
@@ -2166,17 +2181,17 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%;">
             <div class="joy-metric-tile joy-metric-tile--up">
-              <div class="joy-metric-tile__title">PORTFOLIO SHARPE</div>
+              <div class="joy-metric-tile__title">Portfolio Sharpe</div>
               <div class="joy-metric-tile__value">2.84</div>
               <div class="joy-metric-tile__change">+14.2% vs benchmark</div>
             </div>
             <div class="joy-metric-tile joy-metric-tile--down">
-              <div class="joy-metric-tile__title">MAX DRAWDOWN</div>
+              <div class="joy-metric-tile__title">Max drawdown</div>
               <div class="joy-metric-tile__value">-4.12%</div>
               <div class="joy-metric-tile__change">-0.5% this session</div>
             </div>
             <div class="joy-metric-tile joy-metric-tile--neutral">
-              <div class="joy-metric-tile__title">ACTIVE STRATEGIES</div>
+              <div class="joy-metric-tile__title">Active strategies</div>
               <div class="joy-metric-tile__value">12</div>
               <div class="joy-metric-tile__change">3 pending review</div>
             </div>
@@ -2265,7 +2280,7 @@ ${navigationHtml}
             <h4>Interactive Dropdown</h4>
           </div>
           <div class="canvas" style="min-height: 220px;">
-            ${hubDropdown("demo-dropdown-menu", { icons: true })}
+            ${hubDropdown("demo-dropdown-menu")}
           </div>
           <div style="padding: 12px 20px; background: var(--joy-surface-raised); border-top: 1px solid var(--joy-border-default); font-size: 0.875rem;">
             Selected action: <strong id="dropdown-selection-text" style="color: var(--joy-accent-default);">None</strong>
@@ -4222,10 +4237,10 @@ export async function executeHedge(symbol: string, size: number) {
                 <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); margin-bottom: 10px;">Anchor Navigator</div>
                 <nav class="joy-anchor" role="navigation" aria-label="Demo Anchor">
                   <div class="joy-anchor__ink"></div>
-                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" onclick="selectAnchor(this)">#menu-demo</a>
-                  <a href="#feedback-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#feedback-demo</a>
-                  <a href="#popconfirm-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#popconfirm-demo</a>
-                  <a href="#spin-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#spin-demo</a>
+                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" onclick="selectAnchor(this, event)">#menu-demo</a>
+                  <a href="#feedback-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#feedback-demo</a>
+                  <a href="#popconfirm-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#popconfirm-demo</a>
+                  <a href="#spin-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#spin-demo</a>
                 </nav>
               </div>
             </div>
@@ -4235,8 +4250,8 @@ export async function executeHedge(symbol: string, size: number) {
   </main>
 
   <!-- Interactive Demo Modal (body level so any view can open it) -->
-  <div id="demo-modal-container" style="display: none;">
-    <div class="joy-modal-backdrop" onclick="closeDemoModal(event)">
+  <div id="demo-modal-container" data-hub-dialog style="display: none;">
+    <div class="joy-modal-backdrop" role="presentation" onclick="closeDemoModal(event)">
       <div class="joy-modal" role="dialog" aria-modal="true" aria-labelledby="demo-modal-title">
         <div class="joy-modal__header">
           <h3 id="demo-modal-title" class="joy-modal__title">Confirm Liquidation Order</h3>
@@ -4254,9 +4269,29 @@ export async function executeHedge(symbol: string, size: number) {
     </div>
   </div>
 
+  <!-- Interactive Demo ImagePreview -->
+  <div id="demo-image-preview-container" data-hub-dialog style="display: none;">
+    <div class="joy-image-preview-mask" role="dialog" aria-modal="true" aria-label="Image preview" onclick="if (event.target === this) closeImagePreview()">
+      <div class="joy-image-preview-toolbar" role="toolbar" aria-label="Preview tools">
+        <button type="button" title="Zoom in (+)" aria-label="Zoom in" class="joy-image-preview-btn" onclick="hubPreviewZoom(1.25)">${iconSvg("ZoomIn", "1.25rem")}</button>
+        <button type="button" title="Zoom out (-)" aria-label="Zoom out" class="joy-image-preview-btn" onclick="hubPreviewZoom(0.8)">${iconSvg("ZoomOut", "1.25rem")}</button>
+        <button type="button" title="Rotate left" aria-label="Rotate left" class="joy-image-preview-btn" onclick="hubPreviewRotate(-90)"><span class="joy-image-preview-btn__icon--flip">${iconSvg("RefreshCw", "1.25rem")}</span></button>
+        <button type="button" title="Rotate right (R)" aria-label="Rotate right" class="joy-image-preview-btn" onclick="hubPreviewRotate(90)">${iconSvg("RefreshCw", "1.25rem")}</button>
+        <button type="button" title="Reset" aria-label="Reset zoom and rotation" class="joy-image-preview-btn" onclick="hubPreviewReset()">${iconSvg("Minimize2", "1.25rem")}</button>
+        <button type="button" title="Close (Esc)" aria-label="Close preview" class="joy-image-preview-btn joy-image-preview-btn--close" onclick="closeImagePreview()">${iconSvg("Close", "1.25rem")}</button>
+      </div>
+      <div class="joy-image-preview-counter" id="hub-preview-counter" style="display: none;"></div>
+      <button type="button" aria-label="Previous image" class="joy-image-preview-nav joy-image-preview-nav--prev" id="hub-preview-prev" style="display: none;" onclick="hubPreviewStep(-1)">${iconSvg("ChevronLeft", "1.5rem")}</button>
+      <button type="button" aria-label="Next image" class="joy-image-preview-nav joy-image-preview-nav--next" id="hub-preview-next" style="display: none;" onclick="hubPreviewStep(1)">${iconSvg("ChevronRight", "1.5rem")}</button>
+      <div class="joy-image-preview-stage">
+        <img class="joy-image-preview-img" id="hub-preview-img" alt="Preview image" draggable="false">
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Demo Drawer -->
-  <div id="demo-drawer-container" style="display: none;">
-    <div class="joy-drawer-backdrop" id="demo-drawer-backdrop" onclick="closeDemoDrawer(event)">
+  <div id="demo-drawer-container" data-hub-dialog style="display: none;">
+    <div class="joy-drawer-backdrop" id="demo-drawer-backdrop" role="presentation" onclick="closeDemoDrawer(event)">
       <div class="joy-drawer" id="demo-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="demo-drawer-title">
         <div class="joy-drawer__header">
           <h3 class="joy-drawer__title" id="demo-drawer-title">Risk Engine Analysis</h3>
@@ -4508,7 +4543,7 @@ export async function executeHedge(symbol: string, size: number) {
     function openDemoDrawer(placement = 'right') {
       const panel = document.getElementById('demo-drawer-panel');
       const backdrop = document.getElementById('demo-drawer-backdrop');
-      backdrop.style.justifyContent = placement === 'left' ? 'flex-start' : 'flex-end';
+      backdrop.className = 'joy-drawer-backdrop' + (placement === 'left' ? ' joy-drawer-backdrop--left' : '');
       panel.className = 'joy-drawer ' + (placement === 'left' ? 'joy-drawer--left' : '');
       hubOpenDialog('demo-drawer-container', '.joy-drawer__close');
     }
@@ -4725,7 +4760,6 @@ export async function executeHedge(symbol: string, size: number) {
     // ── Wave 3 (F-038) hub handlers: aspect views, overlays and charts ──
     const HUB_ICONS = ${JSON.stringify({ close: iconSvg("Close"), chevronLeft: iconSvg("ChevronLeft"), chevronRight: iconSvg("ChevronRight"), sortNone: hubSvg.sortNone, sortAsc: hubSvg.sortAsc, sortDesc: hubSvg.sortDesc })};
     const HUB_MATRIX_CHARTS = ${JSON.stringify(hubMatrixCharts)};
-    let hubLastFocus = null;
 
     function toggleHubTag(el) {
       const on = el.getAttribute('aria-checked') !== 'true';
@@ -4816,19 +4850,22 @@ export async function executeHedge(symbol: string, size: number) {
       panel.style.minWidth = a.width + 'px';
     }
 
-    function hubClosePanel(panel) {
+    // restore: true refocuses the opener when focus was inside the panel; 'force' always refocuses it (Escape).
+    function hubClosePanel(panel, restore) {
+      const trigger = panel.parentElement.querySelector('[aria-expanded]');
+      const focusInside = panel.contains(document.activeElement);
       panel.hidden = true;
       panel.classList.remove('joy-overlay', 'joy-overlay--sheet', 'joy-overlay--above');
       ['position', 'top', 'left', 'minWidth'].forEach(function (k) { panel.style[k] = ''; });
-      const trigger = panel.parentElement.querySelector('[aria-expanded]');
       if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (restore && trigger && (restore === 'force' || focusInside)) trigger.focus();
     }
 
-    function hubClosePanels(except) {
+    function hubClosePanels(except, restore) {
       let any = false;
       document.querySelectorAll('[data-hub-panel]:not([hidden])').forEach(function (p) {
         if (p !== except) {
-          hubClosePanel(p);
+          hubClosePanel(p, restore);
           any = true;
         }
       });
@@ -4837,20 +4874,23 @@ export async function executeHedge(symbol: string, size: number) {
 
     function hubTogglePanel(trigger, panel) {
       if (!panel.hidden) {
-        hubClosePanel(panel);
+        hubClosePanel(panel, true);
         return;
       }
       hubClosePanels();
       panel.hidden = false;
       trigger.setAttribute('aria-expanded', 'true');
       hubPlaceOverlay(trigger, panel);
+      // Like the components: focus moves into the panel (first item / first button)
+      const first = panel.matches('.joy-dropdown') ? panel.querySelector('[role="menuitem"]:not([disabled])') : panel.querySelector('button:not([disabled])');
+      if (first) first.focus({ preventScroll: true });
     }
 
     function toggleHubPopconfirm(btn) {
       hubTogglePanel(btn, btn.closest('.joy-popconfirm').querySelector('.joy-popconfirm__panel'));
     }
     function closeHubPopconfirm(el) {
-      hubClosePanel(el.closest('.joy-popconfirm__panel'));
+      hubClosePanel(el.closest('.joy-popconfirm__panel'), true);
     }
     function confirmHubPopconfirm(el) {
       closeHubPopconfirm(el);
@@ -4860,7 +4900,7 @@ export async function executeHedge(symbol: string, size: number) {
       hubTogglePanel(trigger, trigger.parentElement.querySelector('.joy-dropdown'));
     }
     function selectHubDropdownItem(btn, key) {
-      hubClosePanel(btn.closest('.joy-dropdown'));
+      hubClosePanel(btn.closest('.joy-dropdown'), true);
       showDemoToast('Dropdown action: ' + key, 'info');
     }
 
@@ -4878,26 +4918,137 @@ export async function executeHedge(symbol: string, size: number) {
     }, true);
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
-      if (hubClosePanels()) return;
-      const modal = document.getElementById('demo-modal-container');
-      const drawer = document.getElementById('demo-drawer-container');
-      if (modal && modal.style.display === 'block') closeDemoModal();
-      else if (drawer && drawer.style.display === 'block') closeDemoDrawer();
+      let tipHidden = false;
+      document.querySelectorAll('.joy-tooltip[role="tooltip"]:not([hidden]):not([data-static])').forEach(function (t) {
+        t.hidden = true;
+        tipHidden = true;
+      });
+      if (tipHidden) return;
+      if (hubClosePanels(null, 'force')) return;
+      const open = Array.from(document.querySelectorAll('[data-hub-dialog]')).filter(function (c) { return c.style.display === 'block'; }).pop();
+      if (open) hubCloseDialog(open.id);
+    });
+
+    // Dropdown menu: arrow keys, Home/End; Tab leaves the menu (refocusing the trigger first)
+    document.addEventListener('keydown', function (e) {
+      const menu = e.target.closest && e.target.closest('.joy-dropdown[data-hub-panel]');
+      if (!menu) return;
+      const items = Array.from(menu.querySelectorAll('[role="menuitem"]:not([disabled])'));
+      const i = items.indexOf(document.activeElement);
+      let n;
+      if (e.key === 'ArrowDown') n = (i + 1) % items.length;
+      else if (e.key === 'ArrowUp') n = (i - 1 + items.length) % items.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = items.length - 1;
+      else if (e.key === 'Tab') { hubClosePanel(menu, 'force'); return; }
+      else return;
+      e.preventDefault();
+      items[n].focus();
+    });
+
+    // Modal, Drawer and ImagePreview trap Tab inside the open dialog
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      const open = Array.from(document.querySelectorAll('[data-hub-dialog]')).filter(function (c) { return c.style.display === 'block'; }).pop();
+      if (!open) return;
+      const root = open.querySelector('[role="dialog"]');
+      const focusable = Array.from(root.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(function (el) { return !el.closest('[hidden]') && el.getClientRects().length > 0; });
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (!root.contains(active)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
     });
 
     function hubOpenDialog(containerId, focusSelector) {
-      hubLastFocus = document.activeElement;
       const container = document.getElementById(containerId);
+      container._hubOpener = document.activeElement;
       container.style.display = 'block';
       const target = container.querySelector(focusSelector);
       if (target) target.focus();
     }
     function hubCloseDialog(containerId) {
       hubClosePanels();
-      document.getElementById(containerId).style.display = 'none';
-      if (hubLastFocus && hubLastFocus.focus) hubLastFocus.focus();
-      hubLastFocus = null;
+      const container = document.getElementById(containerId);
+      container.style.display = 'none';
+      const opener = container._hubOpener;
+      container._hubOpener = null;
+      if (opener && opener.isConnected && opener.focus) opener.focus();
     }
+
+    // Image and ImagePreview: pictures are SVG data URIs built from theme tokens (an img cannot resolve var()).
+    function hubImageUri(kind) {
+      const s = getComputedStyle(document.documentElement);
+      const v = function (name) { return s.getPropertyValue(name).trim(); };
+      const bg = v('--joy-surface-sunken');
+      const accent = v('--joy-accent-default');
+      const bull = v('--joy-status-success-fg');
+      const bear = v('--joy-status-danger-fg');
+      const line = v('--joy-border-default');
+      let art;
+      if (kind === 'b') {
+        art = '<rect x="30" y="40" width="70" height="160" fill="' + bull + '"/><rect x="110" y="90" width="70" height="110" fill="' + accent + '"/><rect x="190" y="60" width="70" height="140" fill="' + bear + '"/>';
+      } else if (kind === 'fallback') {
+        art = '<circle cx="160" cy="120" r="48" fill="none" stroke="' + line + '" stroke-width="10"/><path d="M128 152 L192 88" stroke="' + line + '" stroke-width="10"/>';
+      } else {
+        art = '<polyline points="20,180 80,120 130,150 190,70 300,40" fill="none" stroke="' + accent + '" stroke-width="10" stroke-linejoin="round"/><circle cx="190" cy="70" r="12" fill="' + bull + '"/>';
+      }
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid slice"><rect width="320" height="240" fill="' + bg + '"/>' + art + '</svg>';
+      return 'data:image/svg+xml,' + encodeURIComponent(svg);
+    }
+    function hubPaintImages() {
+      document.querySelectorAll('img[data-hub-img]').forEach(function (img) {
+        const kind = img.getAttribute('data-hub-img');
+        if (kind !== 'broken') img.src = hubImageUri(kind);
+      });
+      const preview = document.getElementById('hub-preview-img');
+      if (preview && document.getElementById('demo-image-preview-container').style.display === 'block') preview.src = hubImageUri(HUB_PREVIEW.items[HUB_PREVIEW.index]);
+    }
+    function hubImgError(img) {
+      img.onerror = null;
+      img.setAttribute('data-hub-img', 'fallback');
+      img.src = hubImageUri('fallback');
+    }
+    function hubImageHover(wrapper, show) {
+      const overlay = wrapper.querySelector('.joy-image__overlay');
+      if (overlay) overlay.hidden = !show;
+    }
+    const HUB_PREVIEW = { items: ['a'], index: 0, scale: 1, rotate: 0 };
+    function hubPreviewRender() {
+      const img = document.getElementById('hub-preview-img');
+      img.src = hubImageUri(HUB_PREVIEW.items[HUB_PREVIEW.index]);
+      img.style.transform = 'translate(0px, 0px) scale(' + HUB_PREVIEW.scale + ') rotate(' + HUB_PREVIEW.rotate + 'deg)';
+      const many = HUB_PREVIEW.items.length > 1;
+      document.getElementById('hub-preview-counter').style.display = many ? '' : 'none';
+      document.getElementById('hub-preview-prev').style.display = many ? '' : 'none';
+      document.getElementById('hub-preview-next').style.display = many ? '' : 'none';
+      document.getElementById('hub-preview-counter').textContent = (HUB_PREVIEW.index + 1) + ' / ' + HUB_PREVIEW.items.length;
+    }
+    function hubPreviewZoom(factor) { HUB_PREVIEW.scale = Math.max(0.5, Math.min(4, HUB_PREVIEW.scale * factor)); hubPreviewRender(); }
+    function hubPreviewRotate(deg) { HUB_PREVIEW.rotate += deg; hubPreviewRender(); }
+    function hubPreviewReset() { HUB_PREVIEW.scale = 1; HUB_PREVIEW.rotate = 0; hubPreviewRender(); }
+    function hubPreviewStep(delta) {
+      const n = HUB_PREVIEW.items.length;
+      HUB_PREVIEW.index = (HUB_PREVIEW.index + delta + n) % n;
+      hubPreviewReset();
+    }
+    function openImagePreview(index, gallery) {
+      HUB_PREVIEW.items = gallery ? ['a', 'b'] : [index === 1 ? 'b' : 'a'];
+      HUB_PREVIEW.index = 0;
+      HUB_PREVIEW.scale = 1;
+      HUB_PREVIEW.rotate = 0;
+      hubPreviewRender();
+      hubOpenDialog('demo-image-preview-container', '.joy-image-preview-btn');
+    }
+    function closeImagePreview() { hubCloseDialog('demo-image-preview-container'); }
+    // The broken source may already have failed while the page was parsing, before this script ran
+    document.querySelectorAll('img[data-hub-img="broken"]').forEach(function (img) {
+      if (img.complete && !img.naturalWidth) hubImgError(img);
+      else img.addEventListener('error', function () { hubImgError(img); }, { once: true });
+    });
+    hubPaintImages();
 
     function copyHubCode(btn) {
       const pre = btn.closest('pre');
@@ -5064,6 +5215,7 @@ export async function executeHedge(symbol: string, size: number) {
       drawCandlestickCanvas();
       drawLineCanvas();
       drawHubMatrixCharts();
+      hubPaintImages();
     }
     let hubResizeTimer = null;
     window.addEventListener('resize', function () {
@@ -5498,11 +5650,17 @@ export async function executeHedge(symbol: string, size: number) {
         showDemoToast('Navigated to ' + text, 'info');
       }
 
-      function selectAnchor(el) {
+      function selectAnchor(el, e) {
+        // Demo hrefs are not hub views: stay on the page and only move the active link
+        if (e) e.preventDefault();
         const parent = el.parentElement;
         if (!parent) return;
-        parent.querySelectorAll('.joy-anchor__link').forEach(a => a.classList.remove('joy-anchor__link--active'));
+        parent.querySelectorAll('.joy-anchor__link').forEach(a => {
+          a.classList.remove('joy-anchor__link--active');
+          a.removeAttribute('aria-current');
+        });
         el.classList.add('joy-anchor__link--active');
+        el.setAttribute('aria-current', 'location');
         showDemoToast('Scrolled to ' + el.innerText, 'info');
       }
 
