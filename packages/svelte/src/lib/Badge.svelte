@@ -6,12 +6,22 @@
     size?: 'sm' | 'md';
     dot?: boolean;
     children?: Snippet;
+    class?: string;
+    ref?: HTMLSpanElement | null;
   }
 
-  let { variant = 'neutral', size = 'md', dot = false, children }: Props = $props();
+  let {
+    variant = 'neutral',
+    size = 'md',
+    dot = false,
+    children,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
+  }: Props = $props();
 </script>
 
-<span class="joy-badge joy-badge--{variant} joy-badge--{size}">
+<span bind:this={ref} class="joy-badge joy-badge--{variant} joy-badge--{size} {className}" {...rest}>
   {#if dot}
     <span class="joy-badge__dot" aria-hidden="true"></span>
   {/if}
@@ -24,10 +34,10 @@
   .joy-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--joy-spacing-1, 4px);
-    font-family: var(--joy-font-family-sans, sans-serif);
+    gap: var(--joy-space-1);
+    font-family: var(--joy-font-family-sans);
     font-weight: 600;
-    border-radius: var(--joy-radius-full, 9999px);
+    border-radius: var(--joy-radius-pill);
     line-height: 1;
   }
   .joy-badge--sm {
@@ -45,23 +55,23 @@
     background-color: currentColor;
   }
   .joy-badge--brand {
-    background-color: #ede9fe;
-    color: var(--joy-color-brand-primary, #7c3aed);
+    background-color: var(--joy-accent-subtle);
+    color: var(--joy-accent-text);
   }
   .joy-badge--success {
-    background-color: #d1fae5;
-    color: var(--joy-color-status-success, #10b981);
+    background-color: var(--joy-status-success-bg);
+    color: var(--joy-status-success-fg);
   }
   .joy-badge--warning {
-    background-color: #fef3c7;
-    color: var(--joy-color-status-warning, #f59e0b);
+    background-color: var(--joy-status-warning-bg);
+    color: var(--joy-status-warning-fg);
   }
   .joy-badge--danger {
-    background-color: #fee2e2;
-    color: var(--joy-color-status-danger, #ef4444);
+    background-color: var(--joy-status-danger-bg);
+    color: var(--joy-status-danger-fg);
   }
   .joy-badge--neutral {
-    background-color: var(--joy-color-surface-muted, #f1f5f9);
-    color: var(--joy-color-text-muted, #64748b);
+    background-color: var(--joy-surface-sunken);
+    color: var(--joy-text-secondary);
   }
 </style>

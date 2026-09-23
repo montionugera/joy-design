@@ -483,3 +483,17 @@ test('F-037 lane review: Mentions per-instance id, Rate readonly semantics, Sele
     'Select options must expose stable ids derived from the listbox id'
   );
 });
+
+test('F-038 B-L1: Avatar/AvatarGroup/Badge/Tag/Divider use brand tokens, overflow avatar, no foreign literals', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const banned = ['#7c3aed', '#e2e8f0', '#334155', '#f1f5f9', '#64748b', '#ffffff'];
+  for (const name of ['Avatar', 'AvatarGroup', 'Badge', 'Tag', 'Divider']) {
+    const src = read(name);
+    for (const lit of banned) {
+      assert.ok(!src.includes(lit), `${name}.svelte must not contain the raw literal '${lit}'`);
+    }
+  }
+  assert.ok(read('AvatarGroup').includes('overflow'), 'AvatarGroup must implement an overflow avatar');
+  assert.ok(read('Avatar').includes('onerror'), 'Avatar must fall back when the image fails to load');
+  assert.ok(!read('Tag').includes('style="border: none'), 'Tag close button styling must live in CSS, not inline');
+});

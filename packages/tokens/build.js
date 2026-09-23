@@ -1819,8 +1819,8 @@ h1, h2, h3, .joy-display {
   justify-content: center;
   font-family: var(--joy-font-family-sans);
   font-weight: 600;
-  color: var(--joy-text-inverse);
-  background-color: var(--joy-accent-default);
+  color: var(--joy-text-secondary);
+  background-color: var(--joy-surface-sunken);
   user-select: none;
   overflow: visible;
 }
@@ -1858,7 +1858,7 @@ h1, h2, h3, .joy-display {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 2px solid var(--joy-surface-card);
+  border: 2px solid var(--joy-surface-canvas);
 }
 .joy-avatar__badge--online {
   background-color: var(--joy-status-success-fg);
@@ -1872,8 +1872,12 @@ h1, h2, h3, .joy-display {
 }
 .joy-avatar-group .joy-avatar {
   margin-right: -8px;
-  border: 2px solid var(--joy-surface-card);
+  border: 2px solid var(--joy-surface-canvas);
   box-shadow: var(--joy-elevation-1);
+}
+.joy-avatar-group__overflow {
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-secondary);
 }
 .joy-avatar-group .joy-avatar:hover {
   z-index: 2;
@@ -2707,6 +2711,39 @@ h1, h2, h3, .joy-display {
   background-color: var(--joy-accent-default);
   border-color: var(--joy-accent-default);
   color: var(--joy-text-on-accent);
+}
+.joy-tag--checkable:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+}
+.joy-tag__close {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -4px -6px -4px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--joy-radius-control);
+}
+/* Transparent 44px hit area; the visual close control stays 24px. */
+.joy-tag__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.joy-tag__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
 }
 
 /* Segmented */
