@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { TrendingUp, TrendingDown } from '@joymify/icons/react';
 
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
 export interface MetricTileProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string | number;
@@ -12,7 +14,7 @@ export interface MetricTileProps extends React.HTMLAttributes<HTMLDivElement> {
 export const MetricTile = React.forwardRef<HTMLDivElement, MetricTileProps>(
   ({ title, value, change, trend = 'neutral', className = '', ...rest }, ref) => {
     return (
-      <div ref={ref} className={`joy-metric-tile joy-metric-tile--${trend} ${className}`} {...rest}>
+      <div ref={ref} className={cx(`joy-metric-tile joy-metric-tile--${trend}`, className)} {...rest}>
         <div className="joy-metric-tile__title">{title}</div>
         <div className="joy-metric-tile__value">{value}</div>
         {change && (

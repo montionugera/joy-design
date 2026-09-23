@@ -2,6 +2,8 @@ import * as React from 'react';
 import { TrendingUp, TrendingDown } from '@joymify/icons/react';
 import { deltaDirection } from './delta-utils.js';
 
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
 export type StatCardTone = 'positive' | 'critical' | 'info' | 'neutral';
 
 export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,7 +21,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
     const direction = trend ?? deltaDirection(delta);
 
     return (
-      <div ref={ref} className={`joy-stat-card ${className}`} {...rest}>
+      <div ref={ref} className={cx('joy-stat-card', className)} {...rest}>
         <div className="joy-stat-card__label">{label}</div>
         <div className="joy-stat-card__value">{value}</div>
         {delta && (

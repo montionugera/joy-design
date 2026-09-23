@@ -486,7 +486,8 @@ import { fileURLToPath } from 'node:url';
 const requireFromHere = createRequire(import.meta.url);
 
 /** Transpile a source file (.tsx/.ts) to CJS on the fly and load it. Relative ./X.js imports resolve to sibling .tsx/.ts; `@joymify/icons/react` resolves to the icons package source. */
-function loadFile(file, cache) {
+const moduleCache = new Map();
+function loadFile(file, cache = moduleCache) {
   if (cache.has(file)) return cache.get(file);
   const ts = requireFromHere('typescript');
   const out = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -505,7 +506,7 @@ function loadFile(file, cache) {
   return mod.exports;
 }
 
-function loadComponent(name, cache = new Map()) {
+function loadComponent(name, cache = moduleCache) {
   return loadFile(fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url)), cache);
 }
 
@@ -590,7 +591,7 @@ test('F-038 C-L2: metric twins render SVG trend icons + sr text, forward refs, a
   const { Statistic } = loadComponent('Statistic');
   const { Flex } = loadComponent('Flex');
   const { Space } = loadComponent('Space');
-  const { deltaDirection } = loadFile(fileURLToPath(new URL('../src/delta-utils.ts', import.meta.url)), new Map());
+  const { deltaDirection } = loadFile(fileURLToPath(new URL('../src/delta-utils.ts', import.meta.url)));
 
   for (const C of [MetricTile, StatCard, Statistic, Flex, Space]) {
     assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${C.displayName} must be a forwardRef component`);
@@ -598,11 +599,11 @@ test('F-038 C-L2: metric twins render SVG trend icons + sr text, forward refs, a
 
   // rest props + className land on the root
   assert.match(html(React.createElement(MetricTile, { title: 'T', value: 1, 'data-x': '1', className: 'z' })), /^<div class="joy-metric-tile joy-metric-tile--neutral z"[^>]*data-x="1"/);
-  assert.match(html(React.createElement(StatCard, { label: 'L', value: '1', 'data-x': '1' })), /^<div class="joy-stat-card "[^>]*data-x="1"/);
+  assert.match(html(React.createElement(StatCard, { label: 'L', value: '1', 'data-x': '1' })), /^<div class="joy-stat-card"[^>]*data-x="1"/);
 
   // MetricTile: SVG icon + sr text, no unicode triangles, change wrapped in a span
   const up = html(React.createElement(MetricTile, { title: 'T', value: 1, change: '+2%', trend: 'up' }));
-  assert.ok(up.includes('<svg') && up.includes('<span class="joy-metric-tile__sr">Increase: </span><span>+2%</span>'), up);
+  assert.ok(up.includes('<svg') && /<svg[^>]*aria-hidden="true"/.test(up) && up.includes('<span class="joy-metric-tile__sr">Increase: </span><span>+2%</span>'), up);
   const down = html(React.createElement(MetricTile, { title: 'T', value: 1, change: '-2%', trend: 'down' }));
   assert.ok(down.includes('Decrease: ') && down.includes('<svg'), down);
   const flatTile = html(React.createElement(MetricTile, { title: 'T', value: 1, change: '0%' }));
