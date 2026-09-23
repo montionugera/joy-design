@@ -888,3 +888,243 @@ test('F-038 C-L4 fix: auto-dismiss fires onClose once, dismiss clears the timer,
   assert.ok(over.includes('aria-valuenow="100"') && over.includes('width:100%'), over);
   assert.ok(renderToStaticMarkup(React.createElement(Progress, { percent: 40 })).includes('40%</span>'));
 });
+
+// F-038 Wave 3 lane C-L5: Anchor, Breadcrumb, Menu, Pagination, Steps, Tabs (DOM identical to the Svelte twins)
+test('F-038 C-L5: roving-utils and pagination-utils are byte-identical to the Svelte copies (a missing copy fails)', () => {
+  for (const f of ['roving-utils.ts', 'pagination-utils.ts']) {
+    const react = fileURLToPath(new URL(`../src/${f}`, import.meta.url));
+    const svelte = fileURLToPath(new URL(`../../svelte/src/lib/${f}`, import.meta.url));
+    assert.ok(fs.existsSync(react), `${f} must exist in the React package`);
+    assert.strictEqual(fs.readFileSync(react, 'utf8'), fs.readFileSync(svelte, 'utf8'), `${f} matches the Svelte copy`);
+  }
+});
+
+test('F-038 C-L5: navigation twins forward refs, spread rest props, merge className and match the Svelte class/aria contract', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const html = (el) => renderToStaticMarkup(el);
+  const norm = (s) => s.replace(/\s+/g, ' ');
+  const { Anchor } = loadComponent('Anchor');
+  const { Breadcrumb } = loadComponent('Breadcrumb');
+  const { Menu } = loadComponent('Menu');
+  const { Pagination } = loadComponent('Pagination');
+  const { Steps } = loadComponent('Steps');
+  const { Tabs } = loadComponent('Tabs');
+
+  const fixtures = {
+    Anchor: [Anchor, { items: [{ key: 'a', href: '#a', title: 'A' }], activeKey: 'a' }, 'nav'],
+    Breadcrumb: [Breadcrumb, { items: [{ label: 'Home', href: '/' }, { label: 'Now' }] }, 'nav'],
+    Menu: [Menu, { items: [{ key: 'a', label: 'A' }] }, 'ul'],
+    Pagination: [Pagination, { total: 30 }, 'nav'],
+    Steps: [Steps, { items: [{ title: 'One' }] }, 'div'],
+    Tabs: [Tabs, { items: [{ key: 'a', label: 'A', content: 'x' }] }, 'div'],
+  };
+  for (const [name, [C, props, tag]] of Object.entries(fixtures)) {
+    assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${name} must be a forwardRef component`);
+    assert.match(html(React.createElement(C, { ...props, 'data-k': '1', className: 'extra' })), new RegExp(`^<${tag} [^>]*data-k="1"`), `${name} spreads rest onto the root`);
+    assert.match(html(React.createElement(C, { ...props, className: 'extra' })), /class="[^"]*\bextra\b/, `${name} merges className`);
+    assert.ok(!/class="[^"]* "/.test(html(React.createElement(C, props))), `${name} has no trailing space in class`);
+    const src = fs.readFileSync(fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url)), 'utf8');
+    assert.ok(!/style=\{\{[^}]*(#|rgb|hsl|color|background)/i.test(src) && !/&[lr]arr;/.test(src) && !/#[0-9a-f]{3,8}\b/i.test(src), `${name}: no inline colours, entities or hex`);
+  }
+
+  // Anchor: aria-current="location" on the active link only
+  const anchor = norm(html(React.createElement(Anchor, { items: [{ key: 'a', href: '#a', title: 'A' }, { key: 'b', href: '#b', title: 'B' }], activeKey: 'b' })));
+  assert.ok(anchor.includes('<nav class="joy-anchor" role="navigation" aria-label="Anchor Navigation"'), anchor);
+  assert.ok(anchor.includes('<div class="joy-anchor__ink"></div>'), anchor);
+  assert.ok(anchor.includes('<a href="#b" class="joy-anchor__link joy-anchor__link--active" aria-current="location">B</a>'), anchor);
+  assert.ok(anchor.includes('<a href="#a" class="joy-anchor__link">A</a>'), anchor);
+
+  // Breadcrumb: nav aria-label, aria-current="page" on the last crumb only, separator hidden
+  const crumb = norm(html(React.createElement(Breadcrumb, { items: [{ label: 'Home', href: '/' }, { label: 'Docs', href: '/d' }, { label: 'Now', href: '/n' }] })));
+  assert.ok(crumb.startsWith('<nav class="joy-breadcrumb" aria-label="Breadcrumb"><ol>'), crumb);
+  assert.strictEqual((crumb.match(/aria-current="page"/g) || []).length, 1);
+  assert.ok(crumb.includes('<span class="joy-breadcrumb__current" aria-current="page">Now</span>'), crumb);
+  assert.ok(crumb.includes('<a class="joy-breadcrumb__link" href="/">Home</a><span class="joy-breadcrumb__sep" aria-hidden="true">/</span>'), crumb);
+
+  // Steps: aria-current="step" follows index === current, not status === 'process'
+  const steps = html(React.createElement(Steps, { current: 1, items: [{ title: 'a' }, { title: 'b', status: 'error' }, { title: 'c', status: 'process' }] }));
+  assert.ok(steps.startsWith('<div class="joy-steps joy-steps--horizontal" role="navigation" aria-label="Steps progress"'), steps);
+  assert.strictEqual((steps.match(/aria-current="step"/g) || []).length, 1);
+  assert.match(steps, /joy-steps__item--error"[^>]*aria-current="step"/, 'the current index is marked even with an explicit error status');
+  assert.doesNotMatch(steps, /joy-steps__item--process"[^>]*aria-current/, 'an explicit process status elsewhere is not marked');
+  assert.match(steps, /joy-steps__item--finish" role="button" tabindex="0"/);
+  assert.match(steps, /<svg aria-hidden="true"/);
+});
+
+test('F-038 C-L5: Tabs is a WAI-ARIA tablist with useId ids, roving tabindex and a labelled panel', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Tabs } = loadComponent('Tabs');
+  const items = [{ key: 'a', label: 'A', content: 'panel-a' }, { key: 'b', label: 'B', content: 'panel-b' }, { key: 'c', label: 'C', content: 'panel-c' }];
+  const h = renderToStaticMarkup(React.createElement(Tabs, { items, activeKey: 'b' }));
+  const uid = h.match(/id="([^"]+)-tab-0"/)[1];
+  assert.ok(uid.length > 0);
+  assert.ok(h.includes('<div class="joy-tabs" role="tablist" aria-orientation="horizontal">'), h);
+  assert.ok(h.includes(`<button type="button" role="tab" id="${uid}-tab-1" aria-selected="true" aria-controls="${uid}-panel" tabindex="0" class="joy-tab-btn joy-tab-btn--active">B</button>`), h);
+  assert.ok(h.includes(`id="${uid}-tab-0" aria-selected="false" tabindex="-1" class="joy-tab-btn"`), h);
+  assert.strictEqual((h.match(/tabindex="0"/g) || []).length, 1, 'exactly one tab in the tab order');
+  assert.strictEqual((h.match(/aria-controls=/g) || []).length, 1, 'aria-controls only on the active tab');
+  assert.ok(h.includes(`<div class="joy-tab-content" role="tabpanel" id="${uid}-panel" aria-labelledby="${uid}-tab-1">panel-b</div>`), h);
+  // an unknown activeKey leaves no aria-labelledby and no panel content, and the first tab stays reachable
+  const none = renderToStaticMarkup(React.createElement(Tabs, { items, activeKey: 'zzz' }));
+  assert.ok(!none.includes('aria-labelledby') && !none.includes('panel-'), none);
+  assert.ok(none.includes('tabindex="0"'), 'a tab is still tabbable when nothing is selected');
+});
+
+// Run a component's render function outside React with hook shims so its handlers can be exercised without a DOM.
+function renderWithHooks(name, props, { state = [] } = {}) {
+  const React = requireFromHere('react');
+  const saved = { useState: React.useState, useId: React.useId, useEffect: React.useEffect };
+  const setters = [];
+  let i = 0;
+  React.useState = (init) => { const idx = i++; const v = idx in state ? state[idx] : init; const set = (nv) => setters.push([idx, nv]); return [v, set]; };
+  React.useId = () => 'uid';
+  React.useEffect = () => {};
+  try {
+    const C = loadComponent(name, new Map())[name];
+    return { tree: C.render(props, null), setters };
+  } finally {
+    Object.assign(React, saved);
+  }
+}
+const walk = (node, fn) => {
+  if (!node || typeof node !== 'object') return;
+  if (Array.isArray(node)) return node.forEach((n) => walk(n, fn));
+  if (node.props) { fn(node); walk(node.props.children, fn); }
+};
+const findAll = (tree, pred) => { const out = []; walk(tree, (n) => pred(n) && out.push(n)); return out; };
+const keyEvent = (key, siblings, index) => {
+  const calls = { prevented: 0, focused: [] };
+  const els = siblings.map((_, j) => ({ focus: () => calls.focused.push(j) }));
+  return { calls, e: { key, preventDefault: () => calls.prevented++, currentTarget: { parentElement: { querySelectorAll: () => els } } } };
+};
+
+test('F-038 C-L5: Tabs keyboard - arrows/Home/End select then focus the target tab (wrapping), other keys are ignored', () => {
+  const items = [{ key: 'a', label: 'A' }, { key: 'b', label: 'B' }, { key: 'c', label: 'C' }];
+  const changed = [];
+  const { tree, setters } = renderWithHooks('Tabs', { items, activeKey: 'a', onChange: (k) => changed.push(k) });
+  const tabs = findAll(tree, (n) => n.props.role === 'tab');
+  assert.strictEqual(tabs.length, 3);
+  const press = (idx, key) => { const { e, calls } = keyEvent(key, tabs, idx); tabs[idx].props.onKeyDown(e); return calls; };
+  let c = press(0, 'ArrowRight');
+  assert.deepStrictEqual([c.prevented, c.focused, changed.at(-1)], [1, [1], 'b']);
+  c = press(0, 'ArrowLeft');
+  assert.deepStrictEqual([c.prevented, c.focused, changed.at(-1)], [1, [2], 'c'], 'ArrowLeft wraps to the last tab');
+  c = press(1, 'End');
+  assert.deepStrictEqual([c.focused, changed.at(-1)], [[2], 'c']);
+  c = press(2, 'Home');
+  assert.deepStrictEqual([c.focused, changed.at(-1)], [[0], 'a']);
+  const before = changed.length;
+  c = press(0, 'ArrowDown');
+  c = press(0, 'a');
+  assert.deepStrictEqual([c.prevented, c.focused, changed.length], [0, [], before], 'non-navigation keys are not handled');
+  assert.ok(setters.some(([, v]) => v === 'b'), 'uncontrolled state follows the selection');
+});
+
+test('F-038 C-L5: Menu keyboard - roving tabindex, arrows move focus only, disabled items skipped, Enter/Space select', () => {
+  const items = [{ key: 'a', label: 'A', disabled: true }, { key: 'b', label: 'B' }, { key: 'c', label: 'C' }, { key: 'd', label: 'D', disabled: true }];
+  const selected = [];
+  const build = (mode, extra = {}) => renderWithHooks('Menu', { items, mode, selectedKey: 'c', onSelect: (k) => selected.push(k), ...extra }, extra.state ? { state: extra.state } : {});
+  const lis = (tree) => findAll(tree, (n) => n.props.role === 'menuitem');
+
+  // selected item is the single tabbable one; nothing focused yet
+  let { tree } = build('vertical');
+  assert.deepStrictEqual(lis(tree).map((n) => n.props.tabIndex), [-1, -1, 0, -1]);
+  assert.deepStrictEqual(lis(tree).map((n) => n.props['aria-current']), [undefined, undefined, 'page', undefined]);
+  assert.strictEqual(tree.props.role, 'menu');
+  assert.strictEqual(tree.props['aria-orientation'], 'vertical');
+
+  // focus moves the tab stop (focusIndex state slot 0)
+  ({ tree } = build('vertical', { state: [1] }));
+  assert.deepStrictEqual(lis(tree).map((n) => n.props.tabIndex), [-1, 0, -1, -1]);
+
+  // vertical: Up/Down only, focus only (no select), disabled skipped and wrapping
+  const items2 = lis(tree);
+  const press = (li, idx, key) => { const { e, calls } = keyEvent(key, items2, idx); li.props.onKeyDown(e); return calls; };
+  let c = press(items2[1], 1, 'ArrowDown');
+  assert.deepStrictEqual([c.prevented, c.focused, selected.length], [1, [2], 0]);
+  c = press(items2[2], 2, 'ArrowDown');
+  assert.deepStrictEqual(c.focused, [1], 'wraps past the disabled last item');
+  c = press(items2[1], 1, 'ArrowRight');
+  assert.deepStrictEqual([c.prevented, c.focused], [0, []], 'Left/Right ignored when vertical');
+
+  // horizontal: Left/Right also move
+  const h = build('horizontal').tree;
+  assert.strictEqual(h.props['aria-orientation'], 'horizontal');
+  const hi = lis(h);
+  c = (() => { const { e, calls } = keyEvent('ArrowRight', hi, 1); hi[1].props.onKeyDown(e); return calls; })();
+  assert.deepStrictEqual(c.focused, [2]);
+
+  // Enter/Space select (not disabled), disabled ignored, click likewise
+  const enter = keyEvent('Enter', hi, 1); hi[1].props.onKeyDown(enter.e);
+  const space = keyEvent(' ', hi, 2); hi[2].props.onKeyDown(space.e);
+  const dis = keyEvent('Enter', hi, 0); hi[0].props.onKeyDown(dis.e);
+  hi[0].props.onClick();
+  hi[3].props.onClick();
+  hi[1].props.onClick();
+  assert.deepStrictEqual(selected, ['b', 'c', 'b']);
+});
+
+test('F-038 C-L5: Pagination windows large totals, clamps stale current, uses chevron icons and the Svelte labels', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Pagination } = loadComponent('Pagination');
+  const page = (props) => renderToStaticMarkup(React.createElement(Pagination, props));
+  const labels = (h) => [...h.matchAll(/aria-label="(Page \d+)"/g)].map((m) => m[1]);
+
+  const big = page({ current: 50, total: 1000, pageSize: 10 });
+  assert.deepStrictEqual(labels(big), ['Page 1', 'Page 49', 'Page 50', 'Page 51', 'Page 100']);
+  assert.strictEqual((big.match(/joy-pagination__ellipsis" aria-hidden="true">…</g) || []).length, 2);
+  assert.ok(big.startsWith('<nav class="joy-pagination" role="navigation" aria-label="Pagination">'), big);
+  assert.ok(big.includes('aria-label="Previous page"') && big.includes('aria-label="Next page"'), big);
+  assert.ok(big.includes('<button type="button" class="joy-pagination__btn joy-pagination__btn--active" aria-label="Page 50" aria-current="page">50</button>'), big);
+  assert.strictEqual((big.match(/aria-current="page"/g) || []).length, 1);
+  assert.ok(!/&[lr]arr;|←|→/.test(big) && (big.match(/<svg/g) || []).length === 2 && big.includes('aria-hidden="true"'), 'chevron icons, not arrows');
+  assert.ok(big.includes('<span class="joy-pagination__info">Total: 1000 items</span>'));
+  assert.strictEqual((big.match(/joy-pagination__btn/g) || []).length, 5 + 2 + 1, 'never one button per page');
+
+  // small totals render in full without ellipsis
+  assert.deepStrictEqual(labels(page({ current: 2, total: 50, pageSize: 10 })), ['Page 1', 'Page 2', 'Page 3', 'Page 4', 'Page 5']);
+  // stale/out-of-range current is clamped: last page active, Next disabled
+  const stale = page({ current: 50, total: 30, pageSize: 10 });
+  assert.ok(stale.includes('joy-pagination__btn--active" aria-label="Page 3" aria-current="page"'), stale);
+  assert.match(stale, /<button type="button" class="joy-pagination__btn" disabled="" aria-label="Next page"/);
+  for (const bad of [0, -3, NaN]) {
+    const h = page({ current: bad, total: 30, pageSize: 10 });
+    assert.match(h, /joy-pagination__btn--active" aria-label="Page 1" aria-current="page"/, `current=${bad}`);
+    assert.match(h, /disabled="" aria-label="Previous page"/);
+  }
+  // empty total and zero page size stay finite
+  assert.ok(!/NaN|Infinity/.test(page({ total: 0, pageSize: 0 })));
+  // size changer keeps the Svelte markup
+  const sc = page({ total: 100, showSizeChanger: true });
+  assert.ok(sc.includes('aria-label="Items per page"') && sc.includes('<option value="20">20 / page</option>'), sc);
+});
+
+test('F-038 C-L5: Pagination collapses under 480px via matchMedia state set in useEffect with cleanup (SSR default false)', () => {
+  const React = requireFromHere('react');
+  const src = fs.readFileSync(fileURLToPath(new URL('../src/Pagination.tsx', import.meta.url)), 'utf8');
+  assert.ok(src.includes("matchMedia('(max-width: 480px)')") && src.includes('React.useState(false)') && src.includes('removeEventListener'), 'matchMedia effect with cleanup');
+  assert.ok(src.includes("typeof window === 'undefined'") && src.includes("typeof window.matchMedia !== 'function'"), 'SSR-safe guard');
+  assert.ok(src.includes('pageItems(page, totalPages, compact)') && src.includes('{!compact &&'), 'shared compact rule, Total hidden when compact');
+
+  // compact state (slot 0): only Previous, the current page and Next; Total hidden; size changer kept
+  const { tree } = renderWithHooks('Pagination', { current: 50, total: 1000, pageSize: 10, showSizeChanger: true }, { state: [true] });
+  const btns = findAll(tree, (n) => n.type === 'button');
+  assert.deepStrictEqual(btns.map((b) => b.props['aria-label']), ['Previous page', 'Page 50', 'Next page']);
+  assert.strictEqual(findAll(tree, (n) => n.props.className === 'joy-pagination__info').length, 0);
+  assert.strictEqual(findAll(tree, (n) => n.type === 'select').length, 1);
+  assert.strictEqual(findAll(tree, (n) => n.props.className === 'joy-pagination__ellipsis').length, 0);
+
+  // handlers: out-of-range and same-page navigation are ignored; prev/next/page call onChange(page, size)
+  const calls = [];
+  const r = renderWithHooks('Pagination', { current: 1, total: 100, pageSize: 10, onChange: (p, s) => calls.push([p, s]) }).tree;
+  const b = findAll(r, (n) => n.type === 'button');
+  b[0].props.onClick(); // Previous on page 1
+  b.find((x) => x.props['aria-label'] === 'Page 1').props.onClick(); // same page
+  b.find((x) => x.props['aria-label'] === 'Next page').props.onClick();
+  b.find((x) => x.props['aria-label'] === 'Page 10').props.onClick();
+  assert.deepStrictEqual(calls, [[2, 10], [10, 10]]);
+  assert.ok(React); // React shim restored: a plain render still works
+});
