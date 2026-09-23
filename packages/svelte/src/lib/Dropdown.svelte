@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import { openOverlay } from './overlay-utils.js';
   import { rovingNextIndex } from './roving-utils.js';
 
@@ -49,9 +49,11 @@
   $effect(() => {
     if (!open || !triggerEl || !panelEl) return;
     const handle = openOverlay({ anchor: triggerEl, panel: panelEl, onClose: () => (open = false) });
-    const els = menuItems();
-    const start = rovingNextIndex(openAt === 'last' ? 'End' : 'Home', -1, disabledFlags, 'vertical');
-    els[start]?.focus({ preventScroll: true });
+    // Untracked: a reactive `items` list changing while the menu is open must not re-open it or move focus.
+    untrack(() => {
+      const start = rovingNextIndex(openAt === 'last' ? 'End' : 'Home', -1, disabledFlags, 'vertical');
+      menuItems()[start]?.focus({ preventScroll: true });
+    });
     return () => handle.dispose();
   });
 

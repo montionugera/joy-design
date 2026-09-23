@@ -511,3 +511,24 @@ test('F-038 B-L6: modal, drawer, dropdown, popconfirm, tooltip and image-preview
   }
   assert.match(rm, /\.joy-image-preview-img[^}]*transition:\s*none/);
 });
+
+test('F-038 B-L6: Dropdown and Popconfirm panels keep an absolute-positioning fallback until openOverlay takes over (:not(.joy-overlay))', () => {
+  const dd = b6Rule('.joy-dropdown:not(.joy-overlay)');
+  assert.match(dd, /position:\s*absolute/);
+  assert.match(dd, /top:\s*100%/);
+  assert.match(dd, /left:\s*0/);
+  const pc = b6Rule('.joy-popconfirm__panel:not(.joy-overlay)');
+  assert.match(pc, /position:\s*absolute/);
+  assert.match(pc, /bottom:\s*calc\(100% \+ 8px\)/);
+  assert.match(pc, /transform:\s*translateX\(-50%\)/);
+  // The fallback must not leak into the openOverlay path: the base rules stay position-free (asserted above).
+  assert.match(b6Rule('.joy-dropdown'), /z-index:\s*var\(--joy-z-dropdown\)/);
+  assert.match(b6Rule('.joy-popconfirm__panel'), /z-index:\s*var\(--joy-z-popover\)/);
+});
+
+test('F-038 B-L6: safe-area insets are respected by the full-bleed modal and the bottom-sheet drawer', () => {
+  const m = mediaBlock('(max-width: 480px)', '.joy-modal');
+  assert.match(m, /\.joy-modal\s*\{[^}]*padding-bottom:\s*env\(safe-area-inset-bottom\)/);
+  assert.match(m, /\.joy-modal__header\s*\{[^}]*env\(safe-area-inset-top\)/);
+  assert.match(mediaBlock('(max-width: 480px)', '.joy-drawer'), /\.joy-drawer--left\s*\{[^}]*padding-bottom:\s*env\(safe-area-inset-bottom\)/);
+});

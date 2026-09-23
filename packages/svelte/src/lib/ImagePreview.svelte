@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons';
-	import { lockBodyScroll, trapFocus } from './overlay-utils.js';
+	import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
 
 	export interface ImageItem {
 		src: string;
@@ -69,9 +69,13 @@
 		if (!open || !ref) return;
 		const previouslyFocused = document.activeElement as HTMLElement | null;
 		const unlock = lockBodyScroll();
+		const handle = registerDialog();
+		dialog = handle;
 		const cleanupTrap = trapFocus(ref);
 		return () => {
 			cleanupTrap();
+			handle.unregister();
+			if (dialog === handle) dialog = null;
 			unlock();
 			if (previouslyFocused?.isConnected) previouslyFocused.focus();
 		};
@@ -114,8 +118,11 @@
 		posY = 0;
 	}
 
+	// Set while open; only the topmost dialog answers keys (a preview inside a modal closes alone).
+	let dialog: DialogHandle | null = null;
+
 	function handleKeyDown(e: KeyboardEvent) {
-		if (!open) return;
+		if (!open || e.defaultPrevented || !dialog?.isTopmost()) return;
 		if (e.key === 'Escape') {
 			e.preventDefault();
 			onClose();

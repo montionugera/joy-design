@@ -735,12 +735,12 @@ test('F-038 B-L5: Steps marks the current step, Breadcrumb marks the last crumb,
 test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and label the dialog with a unique id', () => {
   for (const [name, cls] of [['Modal', 'modal'], ['Drawer', 'drawer']]) {
     const s = readLib(`${name}.svelte`);
-    assert.ok(s.includes("import { lockBodyScroll, trapFocus } from './overlay-utils.js'"), `${name} imports the overlay primitive`);
+    assert.ok(/import \{[^}]*lockBodyScroll[^}]*trapFocus[^}]*\} from '\.\/overlay-utils\.js'/.test(s), `${name} imports the overlay primitive`);
     assert.ok(s.includes('if (!open || !ref) return;') && s.includes('lockBodyScroll()') && s.includes('trapFocus(ref)'), `${name} locks + traps while open`);
     assert.ok(s.includes('const previouslyFocused = document.activeElement') && s.includes('previouslyFocused.focus()'), `${name} restores focus`);
     assert.ok(s.includes('role="dialog"') && s.includes('aria-modal="true"'), `${name} is a modal dialog`);
     assert.ok(s.includes('const uid = $props.id()') && s.includes('aria-labelledby={title ? titleId : undefined}') && s.includes('aria-label={title ? undefined :'), `${name} label id is per-instance, with an aria-label fallback`);
-    assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover already claimed it`);
+    assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover or dialog already claimed it`);
     assert.ok(s.includes('e.target === e.currentTarget'), `${name} closes on backdrop click`);
     assert.ok(/import\s*\{\s*Close\s*\}\s*from\s*'@joymify\/icons'/.test(s) && !s.includes('&times;'), `${name} close button uses the Close icon`);
     assert.ok(s.includes(`class="joy-${cls}__close"`) && s.includes('type="button"'), `${name} close button`);
@@ -791,4 +791,18 @@ test('F-038 B-L6: ImagePreview and Image render classes owned by build.js (no sc
   assert.ok(ip.includes('bind:this={ref}') && ip.includes('{...rest}'), 'ref + rest on the mask');
   for (const cls of ['joy-image-preview-mask', 'joy-image-preview-toolbar', 'joy-image-preview-btn', 'joy-image-preview-nav', 'joy-image-preview-stage', 'joy-image-preview-img']) assert.ok(ip.includes(cls), cls);
   for (const cls of ['joy-image-wrapper', 'joy-image__img', 'joy-image__overlay']) assert.ok(im.includes(cls), cls);
+});
+
+test('F-038 B-L6 fix round: Modal, Drawer and ImagePreview register on the dialog stack and act on keys only when topmost; Dropdown focus start is untracked', () => {
+  for (const name of ['Modal', 'Drawer', 'ImagePreview']) {
+    const s = readLib(`${name}.svelte`);
+    assert.ok(/import \{[^}]*registerDialog[^}]*\} from '\.\/overlay-utils\.js'/.test(s), `${name} imports registerDialog`);
+    assert.ok(s.includes('const handle = registerDialog()') && s.includes('handle.unregister()'), `${name} registers in the scroll-lock effect and unregisters in its cleanup`);
+    assert.ok(s.includes('dialog?.isTopmost()') && /!e\.defaultPrevented|e\.defaultPrevented \|\|/.test(s), `${name} acts only when topmost and unclaimed`);
+    assert.ok(s.includes('e.preventDefault()'), `${name} claims the key it handles`);
+  }
+  const d = readLib('Dropdown.svelte');
+  assert.ok(d.includes('untrack(() => {') && d.includes("import { untrack, type Snippet } from 'svelte'"), 'items changing while open must not refocus');
+  const u = fs.readFileSync(path.resolve('./src/lib/overlay-utils.ts'), 'utf8');
+  assert.ok(u.includes('export function registerDialog()') && !/^(window|document)\b/m.test(u.slice(u.indexOf('const dialogStack'))), 'dialog stack is SSR-safe');
 });

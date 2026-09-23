@@ -1092,12 +1092,15 @@ select.joy-select:disabled,
     height: 100%;
     border: 0;
     border-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .joy-modal__header {
+    padding-top: calc(20px + env(safe-area-inset-top));
   }
   .joy-modal__footer {
     position: sticky;
     bottom: 0;
     background: var(--joy-surface-card);
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1125,6 +1128,14 @@ select.joy-select:disabled,
   overflow-x: hidden;
   overflow-y: auto;
   animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+/* Fallback for panels that openOverlay has not taken over (static demos, unmigrated twins): anchor under the
+   wrapper as before. openOverlay adds .joy-overlay and positions inline, which disables this. */
+.joy-dropdown:not(.joy-overlay) {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
 }
 .joy-dropdown__item {
   display: flex;
@@ -1605,9 +1616,7 @@ select.joy-select__input {
     border-top: 1px solid var(--joy-border-subtle);
     border-radius: var(--joy-radius-overlay) var(--joy-radius-overlay) 0 0;
     animation-name: joy-drawer-slide-up;
-  }
-  .joy-drawer__footer {
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3896,6 +3905,13 @@ h1, h2, h3, .joy-display {
   box-shadow: var(--joy-elevation-2);
   border: 1px solid var(--joy-border-subtle);
   z-index: var(--joy-z-popover);
+}
+/* Fallback for panels that openOverlay has not taken over: float above the trigger as before. */
+.joy-popconfirm__panel:not(.joy-overlay) {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
 }
 .joy-popconfirm__panel.joy-overlay--sheet {
   width: auto;

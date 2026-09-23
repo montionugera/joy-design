@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { positionPanel, isOutside, isSheet, openOverlay, SHEET_MAX_WIDTH } from '../src/overlay-utils.ts';
+import { positionPanel, isOutside, isSheet, openOverlay, registerDialog, SHEET_MAX_WIDTH } from '../src/overlay-utils.ts';
 
 const rect = (top, left, width, height) => ({ top, left, width, height, bottom: top + height, right: left + width });
 const node = (r, name) => {
@@ -78,4 +78,37 @@ test('Escape is claimed (defaultPrevented) so a dialog listening for Escape can 
   h.doc.dispatchEvent(e);
   assert.strictEqual(e.defaultPrevented, true);
   assert.strictEqual(h.closed(), 1);
+});
+
+test('registerDialog: the last registered dialog is topmost; the top switches when it unregisters', () => {
+  const a = registerDialog(); const b = registerDialog();
+  assert.strictEqual(a.isTopmost(), false); assert.strictEqual(b.isTopmost(), true);
+  b.unregister();
+  assert.strictEqual(a.isTopmost(), true);
+  a.unregister();
+});
+
+test('registerDialog: unregistering out of order keeps the remaining order; double unregister is a no-op', () => {
+  const a = registerDialog(); const b = registerDialog(); const c = registerDialog();
+  b.unregister();
+  assert.strictEqual(c.isTopmost(), true); assert.strictEqual(a.isTopmost(), false);
+  b.unregister(); b.unregister();
+  assert.strictEqual(c.isTopmost(), true, 'a second unregister must not remove another dialog');
+  c.unregister();
+  assert.strictEqual(a.isTopmost(), true);
+  a.unregister(); a.unregister();
+  const d = registerDialog();
+  assert.strictEqual(d.isTopmost(), true, 'stack is empty again after everything unregistered');
+  d.unregister();
+});
+
+test('registerDialog + Escape claim: a popover inside a dialog closes alone, the dialog stays topmost and sees defaultPrevented', () => {
+  const dialog = registerDialog();
+  const h = harness();
+  const e = new Event('keydown', { cancelable: true }); Object.defineProperty(e, 'key', { value: 'Escape' });
+  h.doc.dispatchEvent(e);
+  assert.strictEqual(h.closed(), 1);
+  assert.strictEqual(e.defaultPrevented, true, 'a dialog checking defaultPrevented skips this Escape');
+  assert.strictEqual(dialog.isTopmost(), true);
+  dialog.unregister();
 });

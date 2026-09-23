@@ -268,3 +268,30 @@ export function openOverlay(opts: OverlayOptions): OverlayHandle {
     dispose
   };
 }
+
+
+/**
+ * Dialog stack: modal dialogs (Modal, Drawer, ImagePreview) register while open so that keys such as Escape
+ * act only on the topmost one (a Modal opened from a Drawer, a preview inside a Modal). No window/document
+ * access, so it is SSR-safe; register inside the effect that locks scroll and unregister in its cleanup.
+ * Pair it with `event.defaultPrevented`: a dialog that handles Escape calls preventDefault(), so a dialog
+ * whose listener runs later in the same event (after a re-render already unregistered the first) still skips it.
+ */
+const dialogStack: object[] = [];
+
+export interface DialogHandle {
+  isTopmost(): boolean;
+  unregister(): void;
+}
+
+export function registerDialog(): DialogHandle {
+  const token = {};
+  dialogStack.push(token);
+  return {
+    isTopmost: () => dialogStack[dialogStack.length - 1] === token,
+    unregister() {
+      const i = dialogStack.indexOf(token);
+      if (i !== -1) dialogStack.splice(i, 1);
+    }
+  };
+}

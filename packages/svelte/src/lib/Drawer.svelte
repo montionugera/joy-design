@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { Close } from '@joymify/icons';
-  import { lockBodyScroll, trapFocus } from './overlay-utils.js';
+  import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
 
   interface Props {
     open?: boolean;
@@ -32,9 +32,14 @@
   const uid = $props.id();
   const titleId = `${uid}-title`;
 
+  // Set while open; only the topmost dialog answers Escape (a modal opened from a drawer closes alone).
+  let dialog: DialogHandle | null = null;
+
   function handleKeydown(e: KeyboardEvent) {
-    // A popover/menu/tooltip inside the drawer claims Escape (preventDefault) to close itself first.
-    if (e.key === 'Escape' && open && !e.defaultPrevented) {
+    // A popover/menu/tooltip inside the drawer claims Escape (preventDefault) to close itself first, and so do
+    // dialogs: the claim keeps an outer dialog listening later in the same event from closing too.
+    if (e.key === 'Escape' && open && !e.defaultPrevented && dialog?.isTopmost()) {
+      e.preventDefault();
       onclose?.();
     }
   }
@@ -43,9 +48,13 @@
     if (!open || !ref) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const unlock = lockBodyScroll();
+    const handle = registerDialog();
+    dialog = handle;
     const cleanupTrap = trapFocus(ref);
     return () => {
       cleanupTrap();
+      handle.unregister();
+      if (dialog === handle) dialog = null;
       unlock();
       if (previouslyFocused?.isConnected) previouslyFocused.focus();
     };
