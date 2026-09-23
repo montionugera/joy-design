@@ -519,9 +519,21 @@ test('F-038 B-L2: MetricTile/StatCard/Statistic/Image/Flex/Space use tokens, ico
     assert.ok(!/letter-spacing/.test(src), `${name} must not track its labels`);
     assert.ok(!src.includes('▲') && !src.includes('▼'), `${name} must not use unicode trend glyphs`);
     assert.ok(src.includes('TrendingUp') && src.includes('TrendingDown'), `${name} must use TrendingUp/TrendingDown icons`);
-    assert.ok(src.includes('var(--joy-surface-card)') && src.includes('var(--joy-border-default)'), `${name} must use card surface + default border tokens`);
-    assert.ok(src.includes('var(--joy-status-success-fg)') && src.includes('var(--joy-status-danger-fg)'), `${name} must use status delta tokens`);
+    assert.ok(!src.includes('<style'), `${name}.svelte must have no scoped <style>; packages/tokens/build.js is the single stylesheet shared with React`);
   }
+  const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
+  const ruleBody = (sel) => {
+    const m = css.match(new RegExp(`(^|\\n)${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`));
+    assert.ok(m, `theme.css must contain ${sel}`);
+    return m[2];
+  };
+  for (const sel of ['.joy-metric-tile', '.joy-stat-card']) {
+    const body = ruleBody(sel);
+    assert.ok(body.includes('var(--joy-surface-card)') && body.includes('var(--joy-border-default)'), `${sel} must use card surface + default border tokens`);
+  }
+  assert.ok(ruleBody('.joy-stat-card__delta--info').includes('var(--joy-status-info-fg)'), 'info delta uses status-info-fg');
+  assert.ok(ruleBody('.joy-stat-card__delta--positive').includes('var(--joy-status-success-fg)'), 'positive delta uses status-success-fg');
+  assert.ok(ruleBody('.joy-stat-card__delta--critical').includes('var(--joy-status-danger-fg)'), 'critical delta uses status-danger-fg');
 });
 
 test('F-038 B-L2 fix: deltaDirection follows the sign, never the tone', async () => {

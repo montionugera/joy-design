@@ -36,39 +36,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  .joy-metric-tile {
-    padding: var(--joy-space-4);
-    background: var(--joy-surface-card);
-    border: 1px solid var(--joy-border-default);
-    border-radius: var(--joy-radius-card);
-    display: flex;
-    flex-direction: column;
-    gap: var(--joy-space-1);
-    font-family: var(--joy-font-family-sans);
-  }
-  .joy-metric-tile__title {
-    font-size: var(--joy-font-size-sm);
-    color: var(--joy-text-muted);
-  }
-  .joy-metric-tile__value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--joy-text-primary);
-    font-family: var(--joy-font-family-mono);
-  }
-  .joy-metric-tile__change {
-    font-size: var(--joy-font-size-xs);
-    font-weight: 600;
-  }
-  .joy-metric-tile--up .joy-metric-tile__change {
-    color: var(--joy-status-success-fg);
-  }
-  .joy-metric-tile--down .joy-metric-tile__change {
-    color: var(--joy-status-danger-fg);
-  }
-  .joy-metric-tile--neutral .joy-metric-tile__change {
-    color: var(--joy-text-muted);
-  }
-</style>

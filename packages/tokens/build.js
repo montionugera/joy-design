@@ -639,8 +639,8 @@ select.joy-select:disabled,
 /* Metric Tile */
 .joy-metric-tile {
   background: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
-  border-radius: var(--joy-radius-control);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
   padding: 16px 20px;
   box-shadow: var(--joy-elevation-1);
   transition: transform var(--joy-duration-fast) ease, box-shadow var(--joy-duration-fast) ease;
