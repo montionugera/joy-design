@@ -923,12 +923,13 @@ test('F-038 B-L8: chart components compile warning-free and server-render the do
     assert.ok(line.includes('<th scope="row">29</th>') && !line.includes('<th scope="row">9</th>'), 'keeps the most recent rows');
 
     const t0 = Date.UTC(2026, 0, 2, 3, 4);
-    const candle = render((await load('CandlestickChart')).default, { props: { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11, volume: 500 }], 'aria-label': 'Custom', style: 'width: 50%;' } }).body;
+    const Candle = (await load('CandlestickChart')).default;
+    const candle = render(Candle, { props: { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11, volume: 500 }], 'aria-label': 'Custom', style: 'width: 50%;' } }).body;
     assert.ok(candle.includes('aria-label="Custom"') && candle.includes('style="height: 420px; width: 50%;"'), candle);
     assert.ok(candle.includes('role="img" aria-label="Candlestick chart, 1 candle"'), candle);
     assert.ok(candle.includes('<th scope="col">Volume</th>') && candle.includes('<th scope="row">2026-01-02 03:04 UTC</th><td>10.00</td><td>12.00</td><td>9.00</td><td>11.00</td><td>500</td>'), candle);
     assert.ok(candle.includes('<span class="joy-chart__hud-value">Candlestick Feed</span>'), candle);
-    const noVol = render((await load('CandlestickChart')).default, { props: { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11 }] } }).body;
+    const noVol = render(Candle, { props: { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11 }] } }).body;
     assert.ok(!noVol.includes('Volume'), 'no Volume column without volume data');
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

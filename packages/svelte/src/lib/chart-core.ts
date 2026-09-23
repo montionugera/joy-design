@@ -366,9 +366,7 @@ export class JoyChartCore {
   private dragStartViewMinX = 0;
   private dragStartViewMaxX = 0;
   private boundListeners: { element: HTMLElement; event: string; handler: EventListener }[] = [];
-  private themeObserver: MutationObserver | null = null;
-  private themeMedia: MediaQueryList | null = null;
-  private themeMediaHandler: (() => void) | null = null;
+  private themeCleanups: (() => void)[] = [];
 
   constructor(
     baseCanvas: HTMLCanvasElement,
@@ -686,15 +684,15 @@ export class JoyChartCore {
   private watchTheme() {
     const repaint = () => this.render();
     if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.documentElement) {
-      this.themeObserver = new MutationObserver(repaint);
-      this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      const observer = new MutationObserver(repaint);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      this.themeCleanups.push(() => observer.disconnect());
     }
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
       const media = window.matchMedia('(prefers-color-scheme: dark)');
       if (media && typeof media.addEventListener === 'function') {
         media.addEventListener('change', repaint);
-        this.themeMedia = media;
-        this.themeMediaHandler = repaint;
+        this.themeCleanups.push(() => media.removeEventListener('change', repaint));
       }
     }
   }
@@ -810,12 +808,7 @@ export class JoyChartCore {
       element.removeEventListener(event, handler);
     }
     this.boundListeners = [];
-    this.themeObserver?.disconnect();
-    this.themeObserver = null;
-    if (this.themeMedia && this.themeMediaHandler) {
-      this.themeMedia.removeEventListener('change', this.themeMediaHandler);
-    }
-    this.themeMedia = null;
-    this.themeMediaHandler = null;
+    for (const cleanup of this.themeCleanups) cleanup();
+    this.themeCleanups = [];
   }
 }
