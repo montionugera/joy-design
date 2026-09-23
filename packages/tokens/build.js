@@ -5164,7 +5164,15 @@ const darkBlock = `[data-theme="dark"] {\n${darkVars.join('\n')}\n${darkLegacyRe
 const mediaDarkBlock = `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n  }\n}\n`;
 
 const themeCss = `${rootBlock}\n${darkBlock}\n${mediaDarkBlock}\n${mediaReducedMotion}\n${mediaCoarsePointer}\n\n${componentStyles}`;
-fs.writeFileSync(path.join(outDir, 'theme.css'), themeCss);
+// Atomic write: parallel test runners import this module (which regenerates dist at load),
+// so readers must never observe a truncated file. Write to a same-dir temp, then rename.
+function writeFileAtomic(target, data) {
+  const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tmp, data);
+  fs.renameSync(tmp, target);
+}
+
+writeFileAtomic(path.join(outDir, 'theme.css'), themeCss);
 
 // 2. tailwind-theme.css with semantic category mapping
 const twEntries = [];
@@ -5231,7 +5239,7 @@ if (tokens.duration) {
 }
 
 const twThemeCss = `@theme {\n${twEntries.join('\n')}\n}\n`;
-fs.writeFileSync(path.join(outDir, 'tailwind-theme.css'), twThemeCss);
+writeFileAtomic(path.join(outDir, 'tailwind-theme.css'), twThemeCss);
 
 // 3. index.js (ESM) & index.cjs (CJS) & index.d.ts
 // Populate legacy alias values in jsObj
@@ -5244,10 +5252,10 @@ for (const [k, cfg] of Object.entries(legacyAliasesMap)) {
 }
 
 const jsContent = `export const tokens = ${JSON.stringify(jsObj, null, 2)};\nexport default tokens;\n`;
-fs.writeFileSync(path.join(outDir, 'index.js'), jsContent);
+writeFileAtomic(path.join(outDir, 'index.js'), jsContent);
 
 const cjsContent = `exports.tokens = ${JSON.stringify(jsObj, null, 2)};\nexports.default = exports.tokens;\n`;
-fs.writeFileSync(path.join(outDir, 'index.cjs'), cjsContent);
+writeFileAtomic(path.join(outDir, 'index.cjs'), cjsContent);
 
 // Strongly typed token declaration
 const standardKeys = Object.keys(jsObj).filter(k => !(k in legacyAliasesMap));
@@ -5272,6 +5280,6 @@ export type JoyTokenName = keyof JoyTokens;
 export declare const tokens: JoyTokens;
 export default tokens;
 `;
-fs.writeFileSync(path.join(outDir, 'index.d.ts'), dtsContent);
+writeFileAtomic(path.join(outDir, 'index.d.ts'), dtsContent);
 
 console.log("Tokens compiled successfully to", outDir);
