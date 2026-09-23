@@ -61,7 +61,7 @@ Totals: 203 issues = 148 closed, 53 verify-only (already clean), 2 deferred, 0 n
 | SVD-035 | P0 | closed | ImagePreview, B-L6 d765d2e | z-index uses --joy-z-modal / --joy-z-popover |
 | SVD-036 | P1 | closed | ImagePreview, B-L6 d765d2e | Toolbar on tokens |
 | SVD-037 | P1 | closed | ImagePreview, B-L6 d765d2e | Labelled toolbar buttons with @joymify/icons, 44px targets |
-| SVD-038 | P1 | verify-only (already clean) | Image, B-L2 | Covered by the global reduced-motion block; overlay is {#if}-mounted so the transition never runs |
+| SVD-038 | P1 | verify-only (already clean) | Image, B-L2 | The overlay element carries no `joy-*` class, so the global `[class*="joy-"]` reduced-motion block does not match it; the conclusion still holds because the overlay is mounted only while hovered/focused ({#if}) and its transition never runs (final review corrected the rationale) |
 | SVD-039 | P1 | closed | MarkdownViewer, B-L7 5eded48 | Inline hr style replaced by a class using --joy-border-default |
 | SVD-040 | P1 | closed | MarkdownViewer, B-L7 5eded48 | Copy button aria-label, focus ring, 44px coarse, live status; blockquote full border (spec item 6) |
 | SVD-041 | P1 | closed | Menu, B-L5 ea61e2e | Hover retinted to --joy-accent-subtle; build.js was already token-only |

@@ -1,0 +1,8 @@
+# Handoff — F-038 Wave 3 (final state)
+
+**Goal (verbatim):** Every Wave 3 component (Alert, Anchor, Avatar, AvatarGroup, Badge, Breadcrumb, Divider, Drawer, Dropdown, EmptyState, Flex, Image, ImagePreview, MarkdownViewer, Menu, Message, MetricTile, Modal, Notification, Pagination, Popconfirm, Progress, Result, Skeleton, Space, Spin, Splitter, StatCard, Statistic, Steps, Table, Tabs, Tag, Timeline, Toast, Tooltip, BarChart, LineChart, CandlestickChart, `chart-core.ts`) reads semantic tokens only, is fully dark-mode designed, uses the tokenized `--joy-z-*` scale and the Wave-2 overlay primitive for every floating surface, hits 44px on touch, is keyboard/ARIA complete, and produces parity-checked markup between `@joymify/svelte` and `@joymify/react`; every SVD- and RXD- issue is resolved or deferred with a reason.
+
+**Plan:** `.claude/refined_backlog/F-038-wave-3-display-feedback-navigation-and-o/plan.md` (all tasks ticked; as-built notes at the end).
+**State:** implementation, reviews and final verification complete at branch `feat/F-038` HEAD `35a23f4` (plus this docs commit). NOT shipped, NOT pushed.
+**Evidence/records:** `research/issue-coverage.md` (203/203 statuses; `node research/id-coverage.mjs`), `research/rulings-and-deferrals.md` (rulings, deferred items, backlog ideas, lessons), `research/screens/` (44 PNGs + README with verdicts and known deviations).
+**Next step (owner):** delete the git-ignored `.superpowers/` scratch dir, run `bash scripts/precheck.sh` (Gate 1) from that clean tree, then `psrw ship` from this worktree. Release notes must call out the breaking Svelte `ImagePreview`/`Image` handler rename (`onClose`/`onChange` to `onclose`/`onchange`) and the global dark token value changes.
