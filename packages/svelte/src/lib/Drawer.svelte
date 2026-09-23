@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { Close } from '@joymify/icons';
+  import { lockBodyScroll, trapFocus } from './overlay-utils.js';
 
   interface Props {
     open?: boolean;
@@ -8,6 +10,10 @@
     onclose?: () => void;
     children?: Snippet;
     footer?: Snippet;
+    class?: string;
+    /** The drawer panel (`.joy-drawer`). */
+    ref?: HTMLDivElement | null;
+    [key: string]: any;
   }
 
   let {
@@ -16,14 +22,34 @@
     placement = 'right',
     onclose,
     children,
-    footer
+    footer,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
+  // Unique per instance, so several drawers/modals never share a label id.
+  const uid = $props.id();
+  const titleId = `${uid}-title`;
+
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape' && open) {
+    // A popover/menu/tooltip inside the drawer claims Escape (preventDefault) to close itself first.
+    if (e.key === 'Escape' && open && !e.defaultPrevented) {
       onclose?.();
     }
   }
+
+  $effect(() => {
+    if (!open || !ref) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const unlock = lockBodyScroll();
+    const cleanupTrap = trapFocus(ref);
+    return () => {
+      cleanupTrap();
+      unlock();
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+    };
+  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -31,26 +57,31 @@
 {#if open}
   <div
     class="joy-drawer-backdrop"
+    class:joy-drawer-backdrop--left={placement === 'left'}
     role="presentation"
-    style="justify-content: {placement === 'left' ? 'flex-start' : 'flex-end'};"
     onclick={(e) => { if (e.target === e.currentTarget) onclose?.(); }}
   >
     <div
-      class="joy-drawer"
+      bind:this={ref}
+      class="joy-drawer {className}"
       class:joy-drawer--left={placement === 'left'}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="drawer-title"
+      aria-labelledby={title ? titleId : undefined}
+      aria-label={title ? undefined : 'Drawer'}
+      {...rest}
     >
       <div class="joy-drawer__header">
-        <h3 id="drawer-title" class="joy-drawer__title">{title}</h3>
+        {#if title}
+          <h3 id={titleId} class="joy-drawer__title">{title}</h3>
+        {/if}
         <button
           type="button"
           class="joy-drawer__close"
           onclick={() => onclose?.()}
           aria-label="Close drawer"
         >
-          &times;
+          <Close size="1.25rem" />
         </button>
       </div>
 

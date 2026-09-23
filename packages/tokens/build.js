@@ -990,61 +990,90 @@ select.joy-select:disabled,
 }
 
 /* ── Modal / Dialog ── */
+/* The backdrop is the dialog's positioning parent, so one stacking context carries both: it takes the
+   modal layer (above the drawer, below popovers/toasts/tooltips). The scrim is a solid, theme-invariant dark
+   tint: navy-900 is near-black in the light AND the dark theme, so the page dims in both (an inverse-surface
+   scrim would turn cream in dark mode). No backdrop-filter: blur is decorative, and costs paint on mobile. */
 .joy-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: color-mix(in srgb, var(--joy-color-navy-500) 60%, transparent);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background-color: color-mix(in srgb, var(--joy-color-navy-900) 60%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--joy-z-index-modal);
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  z-index: var(--joy-z-modal);
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
   padding: 20px;
 }
 .joy-modal {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
   background: var(--joy-surface-card);
-  border-radius: var(--joy-radius-card);
+  color: var(--joy-text-primary);
+  border: 1px solid var(--joy-border-subtle);
+  border-radius: var(--joy-radius-overlay);
   box-shadow: var(--joy-elevation-3);
   width: 100%;
   max-width: 520px;
+  max-height: 100%;
   overflow: hidden;
-  animation: joy-modal-pop var(--joy-duration-normal) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: joy-modal-pop var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-modal__header {
+  flex: none;
   padding: 20px 24px;
   border-bottom: 1px solid var(--joy-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--joy-space-3);
 }
 .joy-modal__title {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--joy-text-primary);
 }
-.joy-modal__close {
+/* Close buttons (modal + drawer): a real 44x44 hit area, pulled into the header padding so the header
+   does not grow. margin-left:auto keeps it on the right when there is no title. */
+.joy-modal__close,
+.joy-drawer__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -12px -10px auto;
+  padding: 0;
   background: transparent;
   border: none;
+  border-radius: var(--joy-radius-control);
   font-size: 1.25rem;
+  line-height: 1;
   cursor: pointer;
   color: var(--joy-text-muted);
-  transition: color var(--joy-duration-fast);
+  transition: color var(--joy-duration-fast) var(--joy-ease-out), background-color var(--joy-duration-fast) var(--joy-ease-out);
 }
-.joy-modal__close:hover {
+.joy-modal__close:hover,
+.joy-drawer__close:hover {
   color: var(--joy-text-primary);
+  background-color: var(--joy-surface-raised);
 }
 .joy-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   padding: 24px;
   font-size: 0.9375rem;
   line-height: 1.6;
   color: var(--joy-text-primary);
 }
 .joy-modal__footer {
+  flex: none;
   padding: 16px 24px;
   background: var(--joy-surface-sunken);
   border-top: 1px solid var(--joy-border-subtle);
@@ -1053,28 +1082,53 @@ select.joy-select:disabled,
   justify-content: flex-end;
   gap: 12px;
 }
+/* Phones: the dialog is a full-bleed screen; the footer stays reachable at the bottom edge. */
+@media (max-width: 480px) {
+  .joy-modal-backdrop {
+    padding: 0;
+  }
+  .joy-modal {
+    max-width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+  .joy-modal__footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--joy-surface-card);
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-modal-backdrop,
+  .joy-modal {
+    animation: none;
+  }
+}
 
 /* ── Dropdown Menu ── */
 .joy-dropdown-wrapper {
   position: relative;
   display: inline-block;
 }
+/* Positioned by openOverlay (position: fixed + top/left inline), which is what lets the menu escape
+   overflow:hidden ancestors; the rules here only skin it and set its layer. */
 .joy-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 6px;
+  box-sizing: border-box;
   background: var(--joy-surface-card);
   border: 1px solid var(--joy-border-subtle);
   border-radius: var(--joy-radius-control);
   box-shadow: var(--joy-elevation-3);
   min-width: 180px;
-  z-index: var(--joy-z-index-dropdown);
-  overflow: hidden;
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  z-index: var(--joy-z-dropdown);
+  overflow-x: hidden;
+  overflow-y: auto;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-dropdown__item {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   padding: 10px 16px;
   text-align: left;
@@ -1086,9 +1140,37 @@ select.joy-select:disabled,
   cursor: pointer;
   transition: background-color var(--joy-duration-fast);
 }
-.joy-dropdown__item:hover {
+.joy-dropdown__item:hover,
+.joy-dropdown__item:focus-visible {
   background-color: var(--joy-surface-raised);
   color: var(--joy-accent-default);
+}
+.joy-dropdown__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-dropdown__item--danger {
+  color: var(--joy-status-danger-fg);
+}
+.joy-dropdown__item--danger:hover,
+.joy-dropdown__item--danger:focus-visible {
+  background-color: var(--joy-status-danger-bg);
+  color: var(--joy-status-danger-fg);
+}
+.joy-dropdown__item:disabled {
+  color: var(--joy-text-disabled);
+  background: transparent;
+  cursor: not-allowed;
+}
+@media (pointer: coarse) {
+  .joy-dropdown__item {
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-dropdown {
+    animation: none;
+  }
 }
 
 /* ── Tabs ── */
@@ -1172,9 +1254,14 @@ select.joy-select:disabled,
   font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
-  z-index: var(--joy-z-index-tooltip);
+  z-index: var(--joy-z-tooltip);
   box-shadow: var(--joy-elevation-2);
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-tooltip {
+    animation: none;
+  }
 }
 .joy-tooltip::after {
   content: '';
@@ -1432,62 +1519,102 @@ select.joy-select__input {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
 }
+@keyframes joy-drawer-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+/* Like the modal, the backdrop is the panel's positioning parent and carries the drawer layer (below the
+   modal, so a modal opened from a drawer stacks above it). Same solid dark scrim, no backdrop-filter. */
 .joy-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background-color: color-mix(in srgb, var(--joy-color-navy-500) 50%, transparent);
-  backdrop-filter: blur(2px);
-  z-index: var(--joy-z-index-modal);
+  background-color: color-mix(in srgb, var(--joy-color-navy-900) 60%, transparent);
+  z-index: var(--joy-z-drawer);
   display: flex;
   justify-content: flex-end;
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-drawer-backdrop--left {
+  justify-content: flex-start;
 }
 .joy-drawer {
+  box-sizing: border-box;
   background: var(--joy-surface-card);
+  color: var(--joy-text-primary);
   width: 100%;
   max-width: 400px;
   height: 100%;
+  border-left: 1px solid var(--joy-border-subtle);
   box-shadow: var(--joy-elevation-3);
   display: flex;
   flex-direction: column;
-  animation: joy-drawer-slide-right var(--joy-duration-normal) cubic-bezier(0.16, 1, 0.3, 1);
+  animation: joy-drawer-slide-right var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-drawer--left {
+  border-left: 0;
+  border-right: 1px solid var(--joy-border-subtle);
   animation-name: joy-drawer-slide-left;
 }
 .joy-drawer__header {
+  flex: none;
   padding: 16px 20px;
   border-bottom: 1px solid var(--joy-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--joy-space-3);
 }
 .joy-drawer__title {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--joy-text-primary);
 }
-.joy-drawer__close {
-  background: transparent;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: var(--joy-text-muted);
-}
 .joy-drawer__body {
   padding: 20px;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   color: var(--joy-text-primary);
 }
 .joy-drawer__footer {
+  flex: none;
   padding: 16px 20px;
-  border-top: 1px solid var(--joy-surface-sunken);
+  border-top: 1px solid var(--joy-border-subtle);
   background: var(--joy-surface-raised);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+/* Phones: whichever side it opens from, the drawer becomes a bottom sheet (same shape as .joy-overlay--sheet). */
+@media (max-width: 480px) {
+  .joy-drawer-backdrop {
+    align-items: flex-end;
+  }
+  .joy-drawer,
+  .joy-drawer--left {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 70vh;
+    border: 0;
+    border-top: 1px solid var(--joy-border-subtle);
+    border-radius: var(--joy-radius-overlay) var(--joy-radius-overlay) 0 0;
+    animation-name: joy-drawer-slide-up;
+  }
+  .joy-drawer__footer {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-drawer-backdrop,
+  .joy-drawer {
+    animation: none;
+  }
 }
 
 /* ── Toast Notifications ── */
@@ -3758,18 +3885,25 @@ h1, h2, h3, .joy-display {
   position: relative;
   display: inline-block;
 }
+/* Positioned by openOverlay (position: fixed + top/left inline). The popover layer sits above the modal, so a
+   confirm opened from inside a Modal or Drawer is never hidden behind it. */
 .joy-popconfirm__panel {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  box-sizing: border-box;
   width: 220px;
   padding: 14px;
   background-color: var(--joy-surface-card);
   border-radius: var(--joy-radius-control);
   box-shadow: var(--joy-elevation-2);
   border: 1px solid var(--joy-border-subtle);
-  z-index: 100;
+  z-index: var(--joy-z-popover);
+}
+.joy-popconfirm__panel.joy-overlay--sheet {
+  width: auto;
+}
+.joy-popconfirm__icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--joy-status-warning-fg);
 }
 .joy-popconfirm__title {
   display: flex;
@@ -3784,6 +3918,166 @@ h1, h2, h3, .joy-display {
   display: flex;
   justify-content: flex-end;
   gap: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-popconfirm__panel {
+    animation: none;
+  }
+}
+
+/* ── Image / ImagePreview ── */
+.joy-image-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: var(--joy-radius-control);
+}
+.joy-image-wrapper--previewable {
+  cursor: pointer;
+}
+.joy-image__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.joy-image__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--joy-space-2);
+  background-color: color-mix(in srgb, var(--joy-surface-inverse) 65%, transparent);
+  color: var(--joy-text-inverse);
+  font-size: 0.8125rem;
+  font-family: var(--joy-font-family-sans);
+}
+/* The preview is a modal-layer overlay: same solid navy scrim as Modal (theme-invariant, no blur), a little
+   denser because the photo, not the page, is the subject. Toolbar and nav sit on the inverse surface so they
+   read against the scrim and against any photo in both themes. */
+.joy-image-preview-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--joy-z-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: color-mix(in srgb, var(--joy-color-navy-900) 85%, transparent);
+  user-select: none;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-image-preview-toolbar {
+  position: absolute;
+  bottom: var(--joy-space-6);
+  z-index: var(--joy-z-popover);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--joy-space-1);
+  max-width: calc(100% - var(--joy-space-6));
+  padding: var(--joy-space-2);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  border: 1px solid var(--joy-border-subtle);
+  box-shadow: var(--joy-elevation-3);
+}
+.joy-image-preview-btn,
+.joy-image-preview-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-image-preview-btn:hover {
+  background-color: color-mix(in srgb, var(--joy-text-inverse) 15%, transparent);
+}
+.joy-image-preview-btn--close {
+  background-color: color-mix(in srgb, var(--joy-text-inverse) 10%, transparent);
+}
+.joy-image-preview-btn__icon--flip {
+  display: inline-flex;
+  transform: scaleX(-1);
+}
+.joy-image-preview-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--joy-z-popover);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  border: 1px solid var(--joy-border-subtle);
+  box-shadow: var(--joy-elevation-2);
+}
+.joy-image-preview-nav--prev {
+  left: var(--joy-space-6);
+}
+.joy-image-preview-nav--next {
+  right: var(--joy-space-6);
+}
+.joy-image-preview-counter {
+  position: absolute;
+  top: var(--joy-space-6);
+  padding: var(--joy-space-1) var(--joy-space-3);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  font-family: var(--joy-font-family-mono);
+  font-size: 0.875rem;
+}
+.joy-image-preview-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.joy-image-preview-stage--zoomed {
+  cursor: grab;
+}
+.joy-image-preview-stage--dragging {
+  cursor: grabbing;
+}
+.joy-image-preview-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--joy-radius-control);
+  box-shadow: var(--joy-elevation-3);
+  transition: transform var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-image-preview-stage--dragging .joy-image-preview-img {
+  transition: none;
+}
+@media (max-width: 480px) {
+  .joy-image-preview-nav--prev {
+    left: var(--joy-space-2);
+  }
+  .joy-image-preview-nav--next {
+    right: var(--joy-space-2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-image-preview-mask {
+    animation: none;
+  }
+  .joy-image-preview-btn,
+  .joy-image-preview-img {
+    transition: none;
+  }
 }
 
 /* ── Spin ── */

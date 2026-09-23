@@ -398,3 +398,116 @@ test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both the
     }
   }
 });
+
+// ---- F-038 B-L6: Modal, Drawer, Popconfirm, Dropdown, Tooltip, Image, ImagePreview ----
+const noCommentsCss = css.replace(/\/\*[\s\S]*?\*\//g, '');
+/** Every simple rule (incl. @media-nested) whose selector list mentions a B-L6 component. */
+const b6Rules = () => {
+  const out = [];
+  for (const m of noCommentsCss.matchAll(/(^|\n)\s*([^{}@\n][^{}]*?)\s*\{([^{}]*)\}/g)) {
+    if (/\.joy-(modal|drawer|popconfirm|dropdown|tooltip|image)(-|_|\b)/.test(m[2])) out.push({ sel: m[2].trim(), body: m[3] });
+  }
+  return out;
+};
+const b6Rule = (sel) => {
+  const found = b6Rules().filter((r) => r.sel.split(',').map((x) => x.trim()).includes(sel));
+  assert.ok(found.length, `${sel} rule exists`);
+  return found.map((r) => r.body).join('\n');
+};
+/** Body of the top-level `@media <query> { ... }` block (closing brace in column 0) that contains `needle`. */
+const mediaBlock = (query, needle) => {
+  const blocks = [...noCommentsCss.matchAll(new RegExp(`@media ${query.replace(/[()]/g, '\\$&')} \\{([\\s\\S]*?)\\n\\}\\n`, 'g'))].map((m) => m[1]);
+  const hit = blocks.find((b) => b.includes(needle));
+  assert.ok(hit, `@media ${query} block containing ${needle}`);
+  return hit;
+};
+const zScale = () => Object.fromEntries([...css.matchAll(/--joy-z-(\w+):\s*(\d+);/g)].map((m) => [m[1], Number(m[2])]));
+
+test('F-038 B-L6: the z-index scale orders backdrop < dropdown < drawer < modal < popover < toast < tooltip', () => {
+  const z = zScale();
+  const order = ['backdrop', 'dropdown', 'drawer', 'modal', 'popover', 'toast', 'tooltip'];
+  for (let i = 1; i < order.length; i++) assert.ok(z[order[i]] > z[order[i - 1]], `--joy-z-${order[i]} (${z[order[i]]}) > --joy-z-${order[i - 1]} (${z[order[i - 1]]})`);
+  // Popconfirm opened from inside a Modal must render above it.
+  assert.ok(z.popover > z.modal);
+});
+
+test('F-038 B-L6: each overlay picks its layer from the scale, never a literal or a legacy alias', () => {
+  const expected = {
+    '.joy-modal-backdrop': 'modal',
+    '.joy-drawer-backdrop': 'drawer',
+    '.joy-popconfirm__panel': 'popover',
+    '.joy-dropdown': 'dropdown',
+    '.joy-tooltip': 'tooltip',
+    '.joy-image-preview-mask': 'modal',
+    '.joy-image-preview-toolbar': 'popover',
+    '.joy-image-preview-nav': 'popover'
+  };
+  for (const [sel, layer] of Object.entries(expected)) {
+    assert.match(b6Rule(sel), new RegExp(`z-index:\\s*var\\(--joy-z-${layer}\\)`), `${sel} sits on --joy-z-${layer}`);
+  }
+  for (const { sel, body } of b6Rules()) {
+    assert.doesNotMatch(body, /z-index:\s*-?\d/, `${sel} has a numeric z-index`);
+    assert.doesNotMatch(body, /--joy-z-index-/, `${sel} uses a legacy z-index alias`);
+  }
+});
+
+test('F-038 B-L6: no backdrop-filter, no colour literal, no bouncy easing in any B-L6 rule; scrims are token-derived color-mix', () => {
+  for (const { sel, body } of b6Rules()) {
+    assert.doesNotMatch(body, /backdrop-filter/, `${sel} has backdrop-filter`);
+    assert.doesNotMatch(body, /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/, `${sel} has a colour literal`);
+    assert.doesNotMatch(body, /cubic-bezier/, `${sel} has a literal easing curve`);
+  }
+  for (const [sel, pct] of [['.joy-modal-backdrop', 60], ['.joy-drawer-backdrop', 60], ['.joy-image-preview-mask', 85]]) {
+    assert.match(b6Rule(sel), new RegExp(`background-color:\\s*color-mix\\(in srgb, var\\(--joy-color-navy-900\\) ${pct}%, transparent\\)`), `${sel} scrim`);
+  }
+  // Modal surface and shape.
+  const modal = b6Rule('.joy-modal');
+  assert.match(modal, /background:\s*var\(--joy-surface-card\)/);
+  assert.match(modal, /border:\s*1px solid var\(--joy-border-subtle\)/);
+  assert.match(modal, /border-radius:\s*var\(--joy-radius-overlay\)/);
+  assert.match(modal, /box-shadow:\s*var\(--joy-elevation-3\)/);
+  assert.match(modal, /animation:\s*joy-modal-pop var\(--joy-duration-normal\) var\(--joy-ease-out\)/);
+  // Popconfirm warning glyph reads the status token.
+  assert.match(b6Rule('.joy-popconfirm__icon'), /color:\s*var\(--joy-status-warning-fg\)/);
+  // Toolbar + nav sit on the inverse surface.
+  assert.match(b6Rule('.joy-image-preview-toolbar'), /background-color:\s*var\(--joy-surface-inverse\)/);
+  assert.match(b6Rule('.joy-image-preview-toolbar'), /color:\s*var\(--joy-text-inverse\)/);
+});
+
+test('F-038 B-L6: Popconfirm and Dropdown panels leave positioning to openOverlay (no absolute/bottom/top/left in their rules)', () => {
+  for (const sel of ['.joy-popconfirm__panel', '.joy-dropdown']) {
+    const body = b6Rule(sel);
+    assert.doesNotMatch(body, /position:\s*absolute|(^|\s)(top|bottom|left|right):|transform:/, `${sel} must not fight the inline fixed positioning`);
+  }
+});
+
+test('F-038 B-L6: phones get a full-bleed modal with a sticky footer and a bottom-sheet drawer', () => {
+  const m = mediaBlock('(max-width: 480px)', '.joy-modal');
+  assert.match(m, /\.joy-modal-backdrop\s*\{[^}]*padding:\s*0/);
+  assert.match(m, /\.joy-modal\s*\{[^}]*max-width:\s*100%[^}]*height:\s*100%[^}]*border-radius:\s*0/);
+  assert.match(m, /\.joy-modal__footer\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*0[^}]*background:\s*var\(--joy-surface-card\)/);
+  const d = mediaBlock('(max-width: 480px)', '.joy-drawer');
+  assert.match(d, /\.joy-drawer,\s*\.joy-drawer--left\s*\{[^}]*inset:\s*auto 0 0 0/);
+  assert.match(d, /width:\s*100%/);
+  assert.match(d, /max-height:\s*70vh/);
+  assert.match(d, /border-radius:\s*var\(--joy-radius-overlay\) var\(--joy-radius-overlay\) 0 0/);
+  assert.match(d, /animation-name:\s*joy-drawer-slide-up/);
+  assert.match(css, /@keyframes joy-drawer-slide-up/);
+});
+
+test('F-038 B-L6: close, toolbar and dropdown controls have 44px hit areas', () => {
+  for (const sel of ['.joy-modal__close', '.joy-drawer__close', '.joy-image-preview-btn', '.joy-image-preview-nav']) {
+    const body = b6Rule(sel);
+    assert.match(body, /width:\s*44px/, `${sel} width`);
+    assert.match(body, /height:\s*44px/, `${sel} height`);
+  }
+  assert.match(mediaBlock('(pointer: coarse)', '.joy-dropdown__item'), /\.joy-dropdown__item\s*\{[^}]*min-height:\s*44px/);
+});
+
+test('F-038 B-L6: modal, drawer, dropdown, popconfirm, tooltip and image-preview animations are switched off under reduced motion', () => {
+  const rm = [...noCommentsCss.matchAll(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}\n/g)].map((m) => m[1]).join('\n');
+  for (const sel of ['.joy-modal', '.joy-drawer', '.joy-dropdown', '.joy-popconfirm__panel', '.joy-tooltip', '.joy-image-preview-mask']) {
+    assert.match(rm, new RegExp(`${sel.replace(/[.]/g, '\\.')}[,\\s{][^}]*animation:\\s*none`), `${sel} animation: none`);
+  }
+  assert.match(rm, /\.joy-image-preview-img[^}]*transition:\s*none/);
+});

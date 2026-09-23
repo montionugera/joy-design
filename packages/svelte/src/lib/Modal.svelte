@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { Close } from '@joymify/icons';
+  import { lockBodyScroll, trapFocus } from './overlay-utils.js';
 
   interface Props {
     open?: boolean;
@@ -7,6 +9,10 @@
     onclose?: () => void;
     children?: Snippet;
     footer?: Snippet;
+    class?: string;
+    /** The dialog element (`.joy-modal`). */
+    ref?: HTMLDivElement | null;
+    [key: string]: any;
   }
 
   let {
@@ -14,39 +20,64 @@
     title = '',
     onclose,
     children,
-    footer
+    footer,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
+  // Unique per instance, so several modals (or a modal plus a drawer) never share a label id.
+  const uid = $props.id();
+  const titleId = `${uid}-title`;
+
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape' && open) {
+    // A popover/menu/tooltip inside the dialog claims Escape (preventDefault) to close itself first.
+    if (e.key === 'Escape' && open && !e.defaultPrevented) {
       onclose?.();
     }
   }
+
+  $effect(() => {
+    if (!open || !ref) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const unlock = lockBodyScroll();
+    const cleanupTrap = trapFocus(ref);
+    return () => {
+      cleanupTrap();
+      unlock();
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+    };
+  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-  <div 
-    class="joy-modal-backdrop" 
+  <div
+    class="joy-modal-backdrop"
     role="presentation"
     onclick={(e) => { if (e.target === e.currentTarget) onclose?.(); }}
   >
-    <div 
-      class="joy-modal" 
-      role="dialog" 
-      aria-modal="true" 
-      aria-labelledby="modal-title"
+    <div
+      bind:this={ref}
+      class="joy-modal {className}"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? titleId : undefined}
+      aria-label={title ? undefined : 'Dialog'}
+      {...rest}
     >
       <div class="joy-modal__header">
-        <h3 id="modal-title" class="joy-modal__title">{title}</h3>
-        <button 
-          type="button" 
-          class="joy-modal__close" 
-          onclick={() => onclose?.()} 
+        {#if title}
+          <h3 id={titleId} class="joy-modal__title">{title}</h3>
+        {/if}
+        <button
+          type="button"
+          class="joy-modal__close"
+          onclick={() => onclose?.()}
           aria-label="Close dialog"
         >
-          &times;
+          <Close size="1.25rem" />
         </button>
       </div>
 

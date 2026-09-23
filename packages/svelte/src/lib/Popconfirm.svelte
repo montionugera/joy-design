@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { AlertCircle } from '@joymify/icons';
+  import { openOverlay } from './overlay-utils.js';
 
   interface Props {
     title?: string;
@@ -9,6 +11,10 @@
     onconfirm?: () => void;
     oncancel?: () => void;
     children?: Snippet;
+    class?: string;
+    /** The root element (`.joy-popconfirm`). */
+    ref?: HTMLDivElement | null;
+    [key: string]: any;
   }
 
   let {
@@ -18,36 +24,68 @@
     open = $bindable(false),
     onconfirm,
     oncancel,
-    children
+    children,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
+
+  const uid = $props.id();
+  const titleId = `${uid}-title`;
+
+  let triggerEl = $state<HTMLDivElement | null>(null);
+  let panelEl = $state<HTMLDivElement | null>(null);
+
+  const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  // The trigger wrapper is not focusable itself; focus goes back to the control inside it.
+  function focusTrigger() {
+    triggerEl?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+  }
+
+  // openOverlay gives Escape + outside-click dismissal and fixed positioning (above the trigger's
+  // overflow:hidden ancestors, in the popover layer). It does not focus anything, so focus the first
+  // button on open and hand focus back to the trigger on every way out.
+  $effect(() => {
+    if (!open || !triggerEl || !panelEl) return;
+    const handle = openOverlay({
+      anchor: triggerEl,
+      panel: panelEl,
+      onClose: () => {
+        open = false;
+        focusTrigger();
+      }
+    });
+    panelEl.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+    return () => handle.dispose();
+  });
 
   function handleConfirm() {
     open = false;
+    focusTrigger();
     onconfirm?.();
   }
 
   function handleCancel() {
     open = false;
+    focusTrigger();
     oncancel?.();
   }
 </script>
 
-<div class="joy-popconfirm">
-  <div onclick={() => { open = !open; }}>
+<div bind:this={ref} class="joy-popconfirm {className}" {...rest}>
+  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+  <div bind:this={triggerEl} class="joy-popconfirm__trigger" onclick={() => { open = !open; }}>
     {#if children}
       {@render children()}
     {/if}
   </div>
 
   {#if open}
-    <div class="joy-popconfirm__panel" role="dialog" aria-modal="true">
+    <div bind:this={panelEl} class="joy-popconfirm__panel" role="alertdialog" aria-labelledby={titleId}>
       <div class="joy-popconfirm__title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--joy-color-status-warning, #f59e0b)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span>{title}</span>
+        <span class="joy-popconfirm__icon"><AlertCircle size="1rem" /></span>
+        <span id={titleId}>{title}</span>
       </div>
       <div class="joy-popconfirm__buttons">
         <button

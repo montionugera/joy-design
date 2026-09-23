@@ -208,7 +208,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const popconfirm = fs.readFileSync(path.resolve('./src/lib/Popconfirm.svelte'), 'utf8');
   assert.ok(popconfirm.includes('joy-popconfirm'), 'Popconfirm must have joy-popconfirm class');
-  assert.ok(popconfirm.includes('role="dialog"'), 'Popconfirm panel must implement role=dialog');
+  assert.ok(popconfirm.includes('role="alertdialog"'), 'Popconfirm panel must implement role=alertdialog');
 
   const spin = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
   assert.ok(spin.includes('joy-spin'), 'Spin must have joy-spin class');
@@ -729,4 +729,66 @@ test('F-038 B-L5: Steps marks the current step, Breadcrumb marks the last crumb,
   const b = readLib('Breadcrumb.svelte');
   assert.ok(b.includes('aria-label="Breadcrumb"') && b.includes("aria-current={isLast ? 'page' : undefined}"));
   assert.ok(readLib('Anchor.svelte').includes("aria-current={activeKey === item.key ? 'location' : undefined}"));
+});
+
+// ---- F-038 B-L6: Modal, Drawer, Popconfirm, Dropdown, Tooltip, ImagePreview, Image ----
+test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and label the dialog with a unique id', () => {
+  for (const [name, cls] of [['Modal', 'modal'], ['Drawer', 'drawer']]) {
+    const s = readLib(`${name}.svelte`);
+    assert.ok(s.includes("import { lockBodyScroll, trapFocus } from './overlay-utils.js'"), `${name} imports the overlay primitive`);
+    assert.ok(s.includes('if (!open || !ref) return;') && s.includes('lockBodyScroll()') && s.includes('trapFocus(ref)'), `${name} locks + traps while open`);
+    assert.ok(s.includes('const previouslyFocused = document.activeElement') && s.includes('previouslyFocused.focus()'), `${name} restores focus`);
+    assert.ok(s.includes('role="dialog"') && s.includes('aria-modal="true"'), `${name} is a modal dialog`);
+    assert.ok(s.includes('const uid = $props.id()') && s.includes('aria-labelledby={title ? titleId : undefined}') && s.includes('aria-label={title ? undefined :'), `${name} label id is per-instance, with an aria-label fallback`);
+    assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover already claimed it`);
+    assert.ok(s.includes('e.target === e.currentTarget'), `${name} closes on backdrop click`);
+    assert.ok(/import\s*\{\s*Close\s*\}\s*from\s*'@joymify\/icons'/.test(s) && !s.includes('&times;'), `${name} close button uses the Close icon`);
+    assert.ok(s.includes(`class="joy-${cls}__close"`) && s.includes('type="button"'), `${name} close button`);
+    assert.ok(s.includes('bind:this={ref}') && s.includes('{...rest}') && s.includes('ref = $bindable(null)'), `${name} exposes ref + rest on the dialog element`);
+    assert.ok(!s.includes('<style>'), `${name} has no scoped style block`);
+  }
+  assert.ok(readLib('Modal.svelte').includes('aria-label="Close dialog"'));
+  assert.ok(readLib('Drawer.svelte').includes('aria-label="Close drawer"'));
+  assert.ok(readLib('Drawer.svelte').includes('class:joy-drawer-backdrop--left={placement === \'left\'}'), 'placement is a class, not an inline style');
+});
+
+test('F-038 B-L6: Popconfirm and Dropdown go through openOverlay; Popconfirm is an alertdialog, Dropdown a menu button', () => {
+  const p = readLib('Popconfirm.svelte');
+  assert.ok(p.includes("import { openOverlay } from './overlay-utils.js'") && p.includes('openOverlay({') && p.includes('handle.dispose()'));
+  assert.ok(p.includes('role="alertdialog"') && p.includes('aria-labelledby={titleId}') && !p.includes('aria-modal'), 'non-modal alertdialog labelled by its title');
+  assert.ok(p.includes("panelEl.querySelector<HTMLElement>('button')?.focus") && p.includes('focusTrigger()'), 'first button focused on open, focus returns to the trigger');
+  assert.ok(/import\s*\{\s*AlertCircle\s*\}\s*from\s*'@joymify\/icons'/.test(p) && !p.includes('#f59e0b') && !p.includes('joy-color-status-warning'), 'warning icon is a token-coloured icon');
+
+  const d = readLib('Dropdown.svelte');
+  assert.ok(d.includes('openOverlay({') && d.includes('handle.dispose()') && d.includes("import { rovingNextIndex } from './roving-utils.js'"));
+  assert.ok(d.includes('aria-haspopup="menu"') && d.includes('aria-expanded={open}') && d.includes('aria-controls='), 'trigger advertises the menu');
+  assert.ok(d.includes('role="menu"') && d.includes('role="menuitem"') && d.includes('aria-orientation="vertical"'));
+  assert.ok(d.includes("e.key === 'ArrowDown' || e.key === 'ArrowUp'") && d.includes('rovingNextIndex(e.key, current, disabledFlags, \'vertical\')') && d.includes("e.key === 'Tab'"), 'arrow/Home/End roving, Tab closes');
+  assert.ok(d.includes('e.target === e.currentTarget'), 'Enter/Space on the wrapper only, so an inner <button> is not toggled twice');
+  assert.ok(d.includes('triggerEl?.focus()'), 'selecting an item returns focus to the trigger');
+});
+
+test('F-038 B-L6: Tooltip keeps hover/focus, adds tap toggle with outside-tap + Escape dismissal, and describes the trigger by a unique id', () => {
+  const t = readLib('Tooltip.svelte');
+  assert.ok(t.includes('role="tooltip"') && t.includes('const uid = $props.id()') && t.includes('id={tooltipId}'));
+  assert.ok(t.includes('onpointerenter') && t.includes('onpointerleave') && t.includes('onfocusin') && t.includes('onfocusout'), 'hover + focus kept');
+  assert.ok(t.includes('onclick={handleClick}') && t.includes("lastPointerType === 'mouse'") && t.includes('pinned'), 'tap toggles a pinned state; mouse clicks do not pin');
+  assert.ok(t.includes("document.addEventListener('pointerdown', onPointerdown)") && t.includes("document.removeEventListener('pointerdown', onPointerdown)"), 'outside tap dismisses, listener cleaned up');
+  assert.ok(t.includes("e.key !== 'Escape'") && t.includes('e.preventDefault()'), 'Escape dismisses and is claimed');
+  assert.ok(t.includes("setAttribute('aria-describedby'") && t.includes("removeAttribute('aria-describedby')"), 'trigger aria-describedby added while visible and removed after');
+});
+
+test('F-038 B-L6: ImagePreview and Image render classes owned by build.js (no scoped style), with labelled icon buttons and focus management', () => {
+  const ip = readLib('ImagePreview.svelte');
+  const im = readLib('Image.svelte');
+  assert.ok(!ip.includes('<style>') && !im.includes('<style>'), 'scoped style blocks are gone');
+  assert.ok(!/style="[^"]*(rgba?\(|#[0-9a-f]{3,8}|z-index|backdrop-filter)/i.test(ip), 'no colour/z-index/blur in inline styles');
+  assert.ok(/import\s*\{[^}]*ZoomIn[^}]*ZoomOut[^}]*\}\s*from\s*'@joymify\/icons'/.test(ip) && ip.includes('Close') && ip.includes('RefreshCw'), 'toolbar icons come from @joymify/icons');
+  for (const label of ['Zoom in', 'Zoom out', 'Rotate left', 'Rotate right', 'Close preview', 'Previous image', 'Next image']) {
+    assert.ok(ip.includes(`aria-label="${label}"`), `${label} button is labelled`);
+  }
+  assert.ok(ip.includes('lockBodyScroll()') && ip.includes('trapFocus(ref)') && ip.includes('previouslyFocused.focus()'), 'scroll lock, focus trap and focus return');
+  assert.ok(ip.includes('bind:this={ref}') && ip.includes('{...rest}'), 'ref + rest on the mask');
+  for (const cls of ['joy-image-preview-mask', 'joy-image-preview-toolbar', 'joy-image-preview-btn', 'joy-image-preview-nav', 'joy-image-preview-stage', 'joy-image-preview-img']) assert.ok(ip.includes(cls), cls);
+  for (const cls of ['joy-image-wrapper', 'joy-image__img', 'joy-image__overlay']) assert.ok(im.includes(cls), cls);
 });

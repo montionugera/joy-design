@@ -71,3 +71,11 @@ test('narrow viewports get the sheet class and fixed positioning; dispose never 
   assert.ok(h.panel.classes.has('joy-overlay--sheet')); assert.strictEqual(h.panel.style.position, 'fixed');
   h.handle.dispose(); assert.strictEqual(h.closed(), 0);
 });
+
+test('Escape is claimed (defaultPrevented) so a dialog listening for Escape can skip it', () => {
+  const h = harness();
+  const e = new Event('keydown', { cancelable: true }); Object.defineProperty(e, 'key', { value: 'Escape' });
+  h.doc.dispatchEvent(e);
+  assert.strictEqual(e.defaultPrevented, true);
+  assert.strictEqual(h.closed(), 1);
+});

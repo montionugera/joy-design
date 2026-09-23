@@ -229,6 +229,9 @@ export function openOverlay(opts: OverlayOptions): OverlayHandle {
 
   function handleKeyDown(e: Event) {
     if ((e as KeyboardEvent).key === 'Escape') {
+      // Claim the key: a dialog/drawer that also listens for Escape checks defaultPrevented, so one
+      // press closes only the topmost overlay (e.g. a popconfirm inside a modal), not both.
+      e.preventDefault?.();
       close();
     }
   }

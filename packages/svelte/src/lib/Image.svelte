@@ -45,7 +45,8 @@
 <div
 	bind:this={ref}
 	class="joy-image-wrapper {className}"
-	style="cursor: {preview ? 'pointer' : 'default'}; {style}"
+	class:joy-image-wrapper--previewable={preview}
+	{style}
 	onmouseenter={() => (isHovered = true)}
 	onmouseleave={() => (isHovered = false)}
 	onclick={() => {
@@ -86,31 +87,3 @@
 		onClose={() => (openPreview = false)}
 	/>
 {/if}
-
-<style>
-	.joy-image-wrapper {
-		position: relative;
-		display: inline-block;
-		overflow: hidden;
-		border-radius: var(--joy-radius-control);
-	}
-	.joy-image__img {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-	.joy-image__overlay {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--joy-space-2);
-		background-color: color-mix(in srgb, var(--joy-surface-inverse) 65%, transparent);
-		color: var(--joy-text-inverse);
-		font-size: 0.8125rem;
-		font-family: var(--joy-font-family-sans);
-		transition: opacity var(--joy-duration-fast) var(--joy-ease-out);
-	}
-</style>
