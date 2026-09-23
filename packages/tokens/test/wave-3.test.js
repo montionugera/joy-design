@@ -19,6 +19,25 @@ const rule = (sel) => {
   return m[2];
 };
 
+/** Custom properties of the light and dark themes in theme.css (dark inherits light), and `resolve` to follow var(--x) chains. */
+const grabVars = (re) => {
+  const v = {};
+  for (const m of css.matchAll(re)) {
+    for (const l of m[1].split(';')) {
+      const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
+      if (x) v[x[1]] = x[2].trim();
+    }
+  }
+  return v;
+};
+const light = grabVars(/:root\s*\{([^}]+)\}/g);
+const dark = { ...light, ...grabVars(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
+const themes = [['light', light], ['dark', dark]];
+const resolve = (val, store, depth = 0) => {
+  const m = val && val.match(/^var\((--[\w-]+)\)$/);
+  return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
+};
+
 test('Wave 3 parity-check script exports COMPONENTS with at least 60 entries', () => {
   assert.ok(fs.existsSync(scriptPath), 'scripts/parity-check.mjs must exist');
   assert.ok(Array.isArray(mod.COMPONENTS), 'COMPONENTS must be exported as an array');
@@ -224,22 +243,6 @@ test('F-038 B-L4: Progress uses tokens and explicit transition properties; Spin 
 });
 
 test('F-038 B-L4 fix: Progress fills reach >= 3:1 (WCAG 1.4.11) against the track in both themes', () => {
-  const grab = (re) => {
-    const v = {};
-    for (const m of css.matchAll(re)) {
-      for (const l of m[1].split(';')) {
-        const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
-        if (x) v[x[1]] = x[2].trim();
-      }
-    }
-    return v;
-  };
-  const light = grab(/:root\s*\{([^}]+)\}/g);
-  const dark = { ...light, ...grab(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
-  const resolve = (val, store, depth = 0) => {
-    const m = val && val.match(/^var\((--[\w-]+)\)$/);
-    return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
-  };
   const tokenOf = (sel, prop) => {
     const m = css.match(new RegExp(`\\n${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`));
     assert.ok(m, `${sel} rule exists`);
@@ -253,7 +256,7 @@ test('F-038 B-L4 fix: Progress fills reach >= 3:1 (WCAG 1.4.11) against the trac
     success: tokenOf('.joy-progress--status-success .joy-progress__bg', 'background-color'),
     exception: tokenOf('.joy-progress--status-exception .joy-progress__bg', 'background-color'),
   };
-  for (const [theme, store] of [['light', light], ['dark', dark]]) {
+  for (const [theme, store] of themes) {
     const track = resolve(store[trackTok], store);
     for (const [name, tok] of Object.entries(fills)) {
       const ratio = contrastRatio(resolve(store[tok], store), track);
@@ -336,20 +339,6 @@ test('F-038 B-L5: the Pagination page-size select is sized by a token class, not
 });
 
 test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both themes (text 4.5:1, indicators 3:1)', () => {
-  const grab = (re) => {
-    const v = {};
-    for (const m of css.matchAll(re)) for (const l of m[1].split(';')) {
-      const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
-      if (x) v[x[1]] = x[2].trim();
-    }
-    return v;
-  };
-  const light = grab(/:root\s*\{([^}]+)\}/g);
-  const dark = { ...light, ...grab(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
-  const resolve = (val, store, depth = 0) => {
-    const m = val && val.match(/^var\((--[\w-]+)\)$/);
-    return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
-  };
   const exactRule = (sel) => {
     const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const m = css.match(new RegExp(`(^|\\n)${esc} \\{([^}]*)\\}`));
@@ -390,7 +379,7 @@ test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both the
     ['breadcrumb current on card', tok('.joy-breadcrumb__current', 'color'), '--joy-surface-card', 4.5],
     ['focus ring on card', '--joy-focus-ring', '--joy-surface-card', 3]
   ];
-  for (const [theme, store] of [['light', light], ['dark', dark]]) {
+  for (const [theme, store] of themes) {
     for (const [label, fg, bg, min] of checks) {
       const fgVal = fg === '--joy-focus-ring' ? store[fg].match(/#[0-9a-fA-F]{6}/)[0] : resolve(store[fg], store);
       const ratio = contrastRatio(fgVal, resolve(store[bg], store));
@@ -401,19 +390,26 @@ test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both the
 
 // ---- F-038 B-L6: Modal, Drawer, Popconfirm, Dropdown, Tooltip, Image, ImagePreview ----
 const noCommentsCss = css.replace(/\/\*[\s\S]*?\*\//g, '');
-/** Every simple rule (incl. @media-nested) whose selector list mentions a B-L6 component. */
-const b6Rules = () => {
-  const out = [];
-  for (const m of noCommentsCss.matchAll(/(^|\n)\s*([^{}@\n][^{}]*?)\s*\{([^{}]*)\}/g)) {
-    if (/\.joy-(modal|drawer|popconfirm|dropdown|tooltip|image)(-|_|\b)/.test(m[2])) out.push({ sel: m[2].trim(), body: m[3] });
-  }
-  return out;
+/**
+ * Rule finders for one lane's components: `rules()` lists every simple rule (incl. @media-nested) whose selector
+ * list matches `component`; `rule(sel)` is the merged body of the rules that list exactly `sel` (asserts one exists).
+ */
+const laneRules = (component, exclude) => {
+  const rules = () => {
+    const out = [];
+    for (const m of noCommentsCss.matchAll(/(^|\n)\s*([^{}@\n][^{}]*?)\s*\{([^{}]*)\}/g)) {
+      if (component.test(m[2]) && !(exclude && exclude.test(m[2]))) out.push({ sel: m[2].trim(), body: m[3] });
+    }
+    return out;
+  };
+  const rule = (sel) => {
+    const found = rules().filter((r) => r.sel.split(',').map((x) => x.trim()).includes(sel));
+    assert.ok(found.length, `${sel} rule exists`);
+    return found.map((r) => r.body).join('\n');
+  };
+  return { rules, rule };
 };
-const b6Rule = (sel) => {
-  const found = b6Rules().filter((r) => r.sel.split(',').map((x) => x.trim()).includes(sel));
-  assert.ok(found.length, `${sel} rule exists`);
-  return found.map((r) => r.body).join('\n');
-};
+const { rules: b6Rules, rule: b6Rule } = laneRules(/\.joy-(modal|drawer|popconfirm|dropdown|tooltip|image)(-|_|\b)/);
 /** Body of the top-level `@media <query> { ... }` block (closing brace in column 0) that contains `needle`. */
 const mediaBlock = (query, needle) => {
   const blocks = [...noCommentsCss.matchAll(new RegExp(`@media ${query.replace(/[()]/g, '\\$&')} \\{([\\s\\S]*?)\\n\\}\\n`, 'g'))].map((m) => m[1]);
@@ -534,36 +530,8 @@ test('F-038 B-L6: safe-area insets are respected by the full-bleed modal and the
 });
 
 // ---- F-038 B-L7: MarkdownViewer, Splitter, Table, Timeline ----
-/** Every simple rule (incl. @media-nested) whose selector list mentions a B-L7 component. */
-const b7Rules = () => {
-  const out = [];
-  for (const m of noCommentsCss.matchAll(/(^|\n)\s*([^{}@\n][^{}]*?)\s*\{([^{}]*)\}/g)) {
-    if (/\.joy-(table|splitter|timeline|markdown)(-|_|\b)/.test(m[2]) && !/joy-markdown-editor/.test(m[2])) out.push({ sel: m[2].trim(), body: m[3] });
-  }
-  return out;
-};
-const b7Rule = (sel) => {
-  const found = b7Rules().filter((r) => r.sel.split(',').map((x) => x.trim()).includes(sel));
-  assert.ok(found.length, `${sel} rule exists`);
-  return found.map((r) => r.body).join('\n');
-};
-const b7Themes = () => {
-  const grab = (re) => {
-    const v = {};
-    for (const m of css.matchAll(re)) for (const l of m[1].split(';')) {
-      const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
-      if (x) v[x[1]] = x[2].trim();
-    }
-    return v;
-  };
-  const light = grab(/:root\s*\{([^}]+)\}/g);
-  const dark = { ...light, ...grab(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
-  const resolve = (val, store, depth = 0) => {
-    const m = val && val.match(/^var\((--[\w-]+)\)$/);
-    return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
-  };
-  return { themes: [['light', light], ['dark', dark]], resolve };
-};
+// ---- lane B-L7 rule finders
+const { rules: b7Rules, rule: b7Rule } = laneRules(/\.joy-(table|splitter|timeline|markdown)(-|_|\b)/, /joy-markdown-editor/);
 const b7Tok = (sel, prop) => {
   const m = b7Rule(sel).match(new RegExp(`(?:^|[\\s;])${prop}:[^;]*var\\((--[\\w-]+)\\)`));
   assert.ok(m, `${sel} ${prop} is a token`);
@@ -612,7 +580,6 @@ test('F-038 B-L7: Table scroll variant scrolls sideways and pins an opaque first
   assert.match(b7Rule('.joy-table-container--scroll:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
   assert.match(b7Rule('.joy-table-container--scroll:focus-visible'), /outline-offset:\s*-2px/, 'inset ring, not clipped by the scroll container');
   {
-    const { themes, resolve } = b7Themes();
     const sepTok = b7Tok('.joy-table--scroll td:first-child', 'border-right');
     for (const [theme, store] of themes) {
       const r = contrastRatio(resolve(store[sepTok], store), resolve(store['--joy-surface-card'], store));
@@ -660,7 +627,6 @@ test('F-038 B-L7: Splitter stacks panes under 640px and sizes them by a flex rat
 });
 
 test('F-038 B-L7: Splitter bar reaches 3:1 against the pane surfaces in both themes (idle, hover, focus)', () => {
-  const { themes, resolve } = b7Themes();
   const idle = b7Tok('.joy-splitter__bar', 'background-color');
   const hover = b7Tok('.joy-splitter__bar--active', 'background-color');
   assert.strictEqual(idle, '--joy-border-default');
@@ -683,7 +649,6 @@ test('F-038 B-L7: Timeline text, connector and dots use tokens and stay legible 
   assert.match(b7Rule('.joy-timeline__dot'), /border:\s*2px solid var\(--joy-accent-text\)/);
   const dotToks = ['--joy-accent-text'];
   for (const s of ['success', 'warning', 'danger', 'info']) dotToks.push(b7Tok(`.joy-timeline__dot--${s}`, 'border-color'));
-  const { themes, resolve } = b7Themes();
   for (const [theme, store] of themes) {
     for (const t of dotToks) {
       const r = contrastRatio(resolve(store[t], store), resolve(store['--joy-surface-card'], store));
@@ -714,7 +679,6 @@ test('F-038 B-L7: MarkdownViewer uses tokens for hr, blockquote, links, code and
 });
 
 test('F-038 B-L7: MarkdownViewer text and copy button reach WCAG contrast in both themes', () => {
-  const { themes, resolve } = b7Themes();
   const checks = [
     ['blockquote text on tint', b7Tok('.joy-markdown blockquote', 'color'), b7Tok('.joy-markdown blockquote', 'background-color'), 4.5],
     ['inline code on sunken', b7Tok('.joy-markdown code', 'color'), b7Tok('.joy-markdown code', 'background-color'), 4.5],

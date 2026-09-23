@@ -1921,6 +1921,15 @@ test('F-038 C-L6 fix: neither Popconfirm twin uses the dead joy-button--primary 
 // F-038 Wave 3 lane C-L7: MarkdownViewer, Splitter, Table, Timeline (rendered markup + handlers vs the Svelte contract)
 // ---------------------------------------------------------------------------------------------------------------------
 
+/** Static markup of `<name {...props} />` from the compiled React source; also asserts the component forwards refs. */
+const ssr = (name, props) => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const Comp = loadComponent(name)[name];
+  assert.strictEqual(Comp.$$typeof, Symbol.for('react.forward_ref'), `${name} must be a forwardRef component`);
+  return renderToStaticMarkup(React.createElement(Comp, props));
+};
+
 test('F-038 C-L7: splitter-utils.ts and table-utils.ts are byte-identical to the Svelte helpers', () => {
   for (const f of ['splitter-utils.ts', 'table-utils.ts']) {
     assert.ok(readSrc(`../src/${f}`) === readSrc(`../../svelte/src/lib/${f}`), `${f} must not diverge from the Svelte copy`);
@@ -1928,13 +1937,9 @@ test('F-038 C-L7: splitter-utils.ts and table-utils.ts are byte-identical to the
 });
 
 test('F-038 C-L7: Table renders the Svelte class/aria contract (variants, aria-sort, hidden icons, region attributes, rest override)', () => {
-  const React = requireFromHere('react');
-  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
-  const { Table } = loadComponent('Table');
-  assert.strictEqual(Table.$$typeof, Symbol.for('react.forward_ref'));
   const columns = [{ key: 'a', title: 'A', sortable: true }, { key: 'b', title: 'B' }];
   const data = [{ a: 1, b: 2 }];
-  const html = (props) => renderToStaticMarkup(React.createElement(Table, { columns, data, ...props }));
+  const html = (props) => ssr('Table', { columns, data, ...props });
 
   const stack = html({});
   assert.ok(stack.startsWith('<div class="joy-table-container joy-table-container--responsive-stack"'), stack);
@@ -2011,11 +2016,7 @@ test('F-038 C-L7: Table header keyboard - Enter/Space sort like a click, other k
 });
 
 test('F-038 C-L7: Splitter renders the Svelte contract (separator aria, --joy-splitter-size panes, no inline width/height, repaired bounds)', () => {
-  const React = requireFromHere('react');
-  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
-  const { Splitter } = loadComponent('Splitter');
-  assert.strictEqual(Splitter.$$typeof, Symbol.for('react.forward_ref'));
-  const html = (props) => renderToStaticMarkup(React.createElement(Splitter, { firstPane: 'L', secondPane: 'R', ...props }));
+  const html = (props) => ssr('Splitter', { firstPane: 'L', secondPane: 'R', ...props });
 
   const out = html({ defaultSplit: 30, className: 'mine', 'data-x': '1' });
   assert.match(out, /^<div class="joy-splitter joy-splitter--horizontal mine" role="group" aria-label="Resizable Splitter Panel" data-x="1">/);
@@ -2119,12 +2120,8 @@ test('F-038 C-L7: Splitter keyboard, pointer capture drag and the stacked matchM
 });
 
 test('F-038 C-L7: Timeline renders title/description/time classes with no inline style', () => {
-  const React = requireFromHere('react');
-  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
-  const { Timeline } = loadComponent('Timeline');
-  assert.strictEqual(Timeline.$$typeof, Symbol.for('react.forward_ref'));
   const items = [{ title: 'Shipped', description: 'Live', time: '9:00', status: 'success' }, { title: 'Draft' }];
-  const out = renderToStaticMarkup(React.createElement(Timeline, { items, className: 'mine', 'data-x': '1' }));
+  const out = ssr('Timeline', { items, className: 'mine', 'data-x': '1' });
   assert.ok(out.startsWith('<ul class="joy-timeline mine" role="list" data-x="1">'), out);
   assert.ok(out.includes('<div class="joy-timeline__dot joy-timeline__dot--success"></div>') && out.includes('joy-timeline__dot--primary'), out);
   assert.ok(out.includes('<div class="joy-timeline__title">Shipped</div><div class="joy-timeline__description">Live</div><div class="joy-timeline__time">9:00</div>'), out);
@@ -2134,12 +2131,8 @@ test('F-038 C-L7: Timeline renders title/description/time classes with no inline
 });
 
 test('F-038 C-L7: MarkdownViewer renders the Svelte contract and escapes raw HTML (no dangerouslySetInnerHTML)', () => {
-  const React = requireFromHere('react');
-  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
-  const { MarkdownViewer } = loadComponent('MarkdownViewer');
-  assert.strictEqual(MarkdownViewer.$$typeof, Symbol.for('react.forward_ref'));
   const md = '# T <b>x</b>\n\n> quote **bold**\n\n---\n\n```js\nconst a = "<i>";\n```\n\n| H1 | H2 |\n|---|---|\n| a | b |\n\n<script>alert(1)</script>';
-  const out = renderToStaticMarkup(React.createElement(MarkdownViewer, { content: md, className: 'mine', 'data-x': '1' }));
+  const out = ssr('MarkdownViewer', { content: md, className: 'mine', 'data-x': '1' });
   assert.ok(out.startsWith('<div class="joy-markdown mine" role="region" aria-label="Markdown content" data-x="1">'), out);
   assert.ok(out.includes('<blockquote>quote <strong>bold</strong></blockquote>'), out);
   assert.ok(out.includes('<hr/>') && !/<hr[^>]*style/.test(out), 'hr has no inline style');
@@ -2150,7 +2143,7 @@ test('F-038 C-L7: MarkdownViewer renders the Svelte contract and escapes raw HTM
   const pre = out.match(/<pre class="joy-markdown__pre">[\s\S]*?<\/pre>/)[0];
   assert.ok(pre.includes('<button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard">'), pre);
   assert.ok(/<svg width="14" height="14"[^>]*aria-hidden="true"[\s\S]*<\/svg>Copy<\/button><span class="joy-markdown__status" role="status"><\/span><\/pre>$/.test(pre), pre);
-  assert.ok(!renderToStaticMarkup(React.createElement(MarkdownViewer, { content: '```\nx\n```', allowCopy: false })).includes('joy-markdown__copy-btn'));
+  assert.ok(!ssr('MarkdownViewer', { content: '```\nx\n```', allowCopy: false }).includes('joy-markdown__copy-btn'));
   const src = readSrc('../src/MarkdownViewer.tsx');
   assert.ok(!src.includes('dangerouslySetInnerHTML') && !/#e2e8f0|style=\{\{/.test(src), 'no raw-HTML sink, no inline styles');
 });
