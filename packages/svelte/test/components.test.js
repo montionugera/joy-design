@@ -399,7 +399,9 @@ test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkb
   assert.ok(rate.includes('role="radio"'), 'Rate stars must implement role=radio');
 
   const form = read('Form');
-  assert.ok(form.includes("setContext('joy-form'"), 'Form must cascade context via joy-form');
+  assert.ok(form.includes('setFormContext('), 'Form must cascade context via the shared form-context helper');
+  const formContextHelper = fs.readFileSync(path.resolve('./src/lib/form-context.ts'), 'utf8');
+  assert.ok(formContextHelper.includes("'joy-form'"), 'form-context helper must key the context as joy-form');
 
   const formItem = read('FormItem');
   assert.ok(formItem.includes('joy-form-item__explain'), 'FormItem must render joy-form-item__explain');

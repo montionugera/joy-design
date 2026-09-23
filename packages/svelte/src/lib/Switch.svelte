@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getFormContext } from './form-context.js';
 
   interface Props {
     checked?: boolean;
@@ -27,7 +27,7 @@
     ...rest
   }: Props = $props();
 
-  const formCtx = getContext<any>('joy' + '-form');
+  const formCtx = getFormContext();
   const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
   const effectiveDisabled = $derived(disabled || formDisabled);
 

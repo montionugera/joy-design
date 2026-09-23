@@ -22,7 +22,6 @@ export const Rate = React.forwardRef<HTMLDivElement, RateProps>(
       allowHalf = false,
       disabled = false,
       readonly = false,
-      readOnly = false,
       label,
       className = '',
       onChange,
@@ -30,7 +29,7 @@ export const Rate = React.forwardRef<HTMLDivElement, RateProps>(
     },
     ref
   ) => {
-    const isReadOnly = readonly || readOnly;
+    const isReadOnly = readonly;
     const isInteractive = !disabled && !isReadOnly;
 
     const [internalVal, setInternalVal] = React.useState<number>(

@@ -286,7 +286,8 @@ test('Taste review design fixes: focus ring, disabled & danger tokens, deeper gr
 });
 
 test('Taste review D3.6 punch list fixes: InputNumber modifier ordering, button demo-hover/focus classes', () => {
-  const baseIndex = css.indexOf('.joy-input-number {');
+  const baseMatch = css.match(/^\.joy-input-number \{/m);
+  const baseIndex = baseMatch ? baseMatch.index : -1;
   const errorIndex = css.indexOf('.joy-input-number--error');
   const successIndex = css.indexOf('.joy-input-number--success');
   assert.ok(baseIndex !== -1, '.joy-input-number base rule must exist');

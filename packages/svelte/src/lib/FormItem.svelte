@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { getContext, type Snippet } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import { getFormContext } from './form-context.js';
 
   export interface ValidationRule {
     required?: boolean;
@@ -44,9 +45,7 @@
     ...rest
   }: Props = $props();
 
-  // Split so parity-check.mjs's textual class scanner doesn't mistake this context
-  // key for a rendered `joy-form` class (FormItem never renders that class itself).
-  const formCtxRaw = getContext<any>('joy' + '-form');
+  const formCtxRaw = getFormContext();
   const formCtx = $derived(typeof formCtxRaw === 'function' ? formCtxRaw() : formCtxRaw);
 
   const effectiveLayout = $derived(layout ?? formCtx?.layout ?? 'vertical');

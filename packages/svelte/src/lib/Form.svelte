@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { setContext, type Snippet } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import { setFormContext } from './form-context.js';
 
   interface Props {
     layout?: 'vertical' | 'horizontal' | 'inline';
@@ -27,7 +28,7 @@
     ...rest
   }: Props = $props();
 
-  setContext('joy-form', {
+  setFormContext({
     get layout() { return layout; },
     get colon() { return colon; },
     get labelAlign() { return labelAlign; },
