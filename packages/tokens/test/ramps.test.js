@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { relativeLuminance, contrastRatio, hexToRgb } from '../scripts/color.mjs';
+import { generateAllTokens } from '../scripts/ramps.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -64,5 +65,24 @@ test('primitive ramps in tokens.json maintain exact anchors and strictly decreas
       );
       prevStatusY = y;
     }
+  }
+});
+
+test('src/tokens.json equals the generator output (it is GENERATED: edit scripts/ramps.mjs, never the JSON)', () => {
+  const committed = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../src/tokens.json'), 'utf8'));
+  assert.deepStrictEqual(committed, generateAllTokens(), 'run `node packages/tokens/scripts/ramps.mjs` and commit the result; hand edits and generator drift both fail here');
+});
+
+test('F-038 D2b: generator defines the dark hairline and status fills (survive regeneration)', () => {
+  const dark = generateAllTokens().semantic.dark;
+  assert.strictEqual(dark.border.subtle.value, '#22324b');
+  assert.deepStrictEqual(
+    ['success', 'warning', 'danger', 'info'].map((s) => dark.status[`${s}-bg`].value),
+    ['#0d2d0f', '#3a1e00', '#470d0e', '#0b2741']
+  );
+  // Same values reach the shipped CSS.
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  for (const hex of ['#22324b', '#0d2d0f', '#3a1e00', '#470d0e', '#0b2741']) {
+    assert.ok(css.includes(hex), `dist/theme.css contains ${hex}`);
   }
 });
