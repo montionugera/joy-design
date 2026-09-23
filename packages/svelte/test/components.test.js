@@ -828,6 +828,8 @@ test('F-038 B-L7: Table sortable headers are focusable, expose aria-sort and sor
   assert.ok((t.match(/aria-hidden="true"/g) || []).length === 3, 'three sort icons aria-hidden');
   assert.ok(t.includes("variant?: 'stack' | 'scroll'") && t.includes("let isScroll = $derived(variant === 'scroll')") && t.includes("variant ? variant === 'stack' : responsive === 'stack' || responsive === true"), 'variant prop; omitted variant keeps the responsive-driven default (stack)');
   assert.ok(t.includes('joy-table-container--scroll') && t.includes('joy-table--scroll'), 'scroll variant classes');
+  assert.ok(t.includes("tabindex={isScroll ? 0 : undefined}") && t.includes("role={isScroll ? 'region' : undefined}") && t.includes("aria-label={isScroll ? 'Scrollable table' : undefined}"), 'the scroll variant container is a focusable, named region (keyboard scrolling); the stack variant is not');
+  assert.ok(t.indexOf("aria-label={isScroll") < t.indexOf('{...rest}'), 'rest comes after so aria-label / role can be overridden');
   assert.ok(t.includes('bind:this={ref}') && t.includes('{...rest}') && t.includes('ref = $bindable(null)'), 'ref + rest on the container');
   for (const cls of ['joy-table-th--sortable', 'joy-table-cell--flash-up', 'joy-table--responsive-stack']) assert.ok(t.includes(cls), cls);
 });
@@ -837,10 +839,10 @@ test('F-038 B-L7: Splitter bar is a focusable, labelled separator driven by spli
   assert.ok(!s.includes('<style>'), 'no scoped style block');
   assert.ok(s.includes("from './splitter-utils.js'") && s.includes('splitKeyNext(e.key, ratio, arrangement, min, max, e.shiftKey)') && s.includes('splitFromPointer('), 'arithmetic is in the shared helper');
   assert.ok(s.includes('role="separator"') && s.includes('tabindex="0"') && s.includes('aria-orientation={barOrientation(arrangement)}'), 'separator, focusable, orientation follows the arrangement');
-  assert.ok(s.includes('aria-valuenow={Math.round(ratio)}') && s.includes('aria-valuemin={min}') && s.includes('aria-valuemax={max}'), 'value/min/max');
+  assert.ok(s.includes('aria-valuenow={Math.round(ratio)}') && s.includes('aria-valuemin={bounds[0]}') && s.includes('aria-valuemax={bounds[1]}') && s.includes('resolveBounds(min, max)'), 'value/min/max come from the repaired bounds, not the raw props');
   assert.ok(s.includes('aria-label="Resize panes"'), 'bar is labelled');
   assert.ok(s.includes('onkeydown={handleKeydown}') && s.includes('if (next === null) return;\n\t\te.preventDefault();'), 'preventDefault only when the key is handled');
-  assert.ok(s.includes('onpointerdown=') && s.includes('setPointerCapture') && !s.includes('mousedown') && !s.includes("window.addEventListener('mousemove'"), 'pointer events with capture (works for touch), no window listeners to leak');
+  assert.ok(s.includes('onpointerdown=') && s.includes('setPointerCapture') && s.includes('onlostpointercapture={handlePointerEnd}') && !s.includes('mousedown') && !s.includes("window.addEventListener('mousemove'"), 'pointer events with capture (works for touch), no window listeners to leak');
   assert.ok(s.includes('window.matchMedia(SPLIT_STACK_QUERY)') && s.includes("query.removeEventListener('change', sync)") && s.includes("typeof window === 'undefined'"), 'SSR-safe matchMedia flag with cleanup');
   assert.ok(s.includes('style="--joy-splitter-size: {ratio};"') && s.includes('style="--joy-splitter-size: {100 - ratio};"'), 'pane size is the ratio custom property');
   assert.ok(s.includes('bind:this={ref}') && s.includes('{...rest}') && s.includes('ref = $bindable(null)'), 'ref + rest on the root (ref also used to measure)');

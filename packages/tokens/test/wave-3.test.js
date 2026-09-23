@@ -607,7 +607,18 @@ test('F-038 B-L7: Table scroll variant scrolls sideways and pins an opaque first
   assert.match(first, /position:\s*sticky/);
   assert.match(first, /left:\s*0/);
   assert.match(first, /z-index:\s*var\(--joy-z-sticky\)/);
-  assert.match(first, /border-right:\s*1px solid var\(--joy-border-subtle\)/);
+  assert.match(first, /border-right:\s*1px solid var\(--joy-border-default\)/, 'pinned-column separator is visible in dark too (border-subtle was 1.05:1)');
+  assert.match(b7Rule('.joy-table-container--scroll'), /isolation:\s*isolate/, 'sticky z-index (100/101) stays inside the table and cannot paint over page-level sticky chrome');
+  assert.match(b7Rule('.joy-table-container--scroll:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  assert.match(b7Rule('.joy-table-container--scroll:focus-visible'), /outline-offset:\s*-2px/, 'inset ring, not clipped by the scroll container');
+  {
+    const { themes, resolve } = b7Themes();
+    const sepTok = b7Tok('.joy-table--scroll td:first-child', 'border-right');
+    for (const [theme, store] of themes) {
+      const r = contrastRatio(resolve(store[sepTok], store), resolve(store['--joy-surface-card'], store));
+      assert.ok(r >= 3, `${theme}: pinned-column separator ${sepTok} on card is ${r.toFixed(2)}:1 (< 3:1)`);
+    }
+  }
   assert.match(b7Rule('.joy-table--scroll td:first-child'), /background:\s*var\(--joy-surface-card\)/, 'the pinned body cell is opaque');
   assert.match(b7Rule('.joy-table--scroll th'), /background:\s*var\(--joy-surface-raised\)/, 'header cells are opaque');
   assert.match(b7Rule('.joy-table--scroll th'), /position:\s*sticky/);

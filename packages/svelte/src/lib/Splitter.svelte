@@ -6,6 +6,7 @@
 		clampSplit,
 		effectiveLayout,
 		splitFromPointer,
+		resolveBounds,
 		splitKeyNext,
 		type SplitLayout
 	} from './splitter-utils.js';
@@ -38,6 +39,8 @@
 	// svelte-ignore state_referenced_locally
 	let splitRatio = $state(defaultSplit);
 	let ratio = $derived(clampSplit(splitRatio, min, max));
+	// aria-valuemin/max report the bounds actually enforced (a reversed or out-of-range min/max is repaired).
+	let bounds = $derived(resolveBounds(min, max));
 	let isResizing = $state(false);
 
 	// Phones stack the panes whatever `layout` says. The drag axis and arrow keys must flip with it, so this is
@@ -105,13 +108,14 @@
 		aria-label="Resize panes"
 		aria-orientation={barOrientation(arrangement)}
 		aria-valuenow={Math.round(ratio)}
-		aria-valuemin={min}
-		aria-valuemax={max}
+		aria-valuemin={bounds[0]}
+		aria-valuemax={bounds[1]}
 		tabindex="0"
 		onpointerdown={handlePointerDown}
 		onpointermove={handlePointerMove}
 		onpointerup={handlePointerEnd}
 		onpointercancel={handlePointerEnd}
+		onlostpointercapture={handlePointerEnd}
 		onkeydown={handleKeydown}
 	></div>
 

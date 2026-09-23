@@ -5,6 +5,7 @@ import {
   SPLIT_STEP_LARGE,
   barOrientation,
   clampSplit,
+  resolveBounds,
   effectiveLayout,
   splitFromPointer,
   splitKeyNext
@@ -92,5 +93,19 @@ test('splitKeyNext returns null for keys it does not handle, so callers only pre
   for (const key of ['Enter', ' ', 'Tab', 'a', 'PageUp', 'Escape', 'Shift']) {
     assert.strictEqual(splitKeyNext(key, 50, 'horizontal', 10, 90), null, key);
     assert.strictEqual(splitKeyNext(key, 50, 'vertical', 10, 90), null, key);
+  }
+});
+
+test('resolveBounds returns the ordered, finite, 0..100 pair that clampSplit enforces (for aria-valuemin/max)', () => {
+  assert.deepStrictEqual(resolveBounds(10, 90), [10, 90]);
+  assert.deepStrictEqual(resolveBounds(90, 10), [10, 90], 'reversed bounds are swapped');
+  assert.deepStrictEqual(resolveBounds(-5, 300), [0, 100], 'out-of-range bounds are limited to 0..100');
+  assert.deepStrictEqual(resolveBounds(NaN, NaN), [0, 100], 'non-finite bounds become 0..100');
+  assert.deepStrictEqual(resolveBounds(NaN, 40), [0, 40]);
+  assert.deepStrictEqual(resolveBounds(40, 40), [40, 40]);
+  for (const [min, max] of [[90, 10], [-5, 300], [NaN, 40]]) {
+    const [lo, hi] = resolveBounds(min, max);
+    assert.strictEqual(clampSplit(-1000, min, max), lo, 'clampSplit floor is the reported min');
+    assert.strictEqual(clampSplit(1000, min, max), hi, 'clampSplit ceiling is the reported max');
   }
 });

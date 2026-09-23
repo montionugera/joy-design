@@ -12,8 +12,11 @@ export const SPLIT_STEP_LARGE = 10;
 /** Viewport width at or below which the Splitter stacks its panes (matches the CSS media query). */
 export const SPLIT_STACK_QUERY = '(max-width: 640px)';
 
-/** min/max as an ordered, finite pair inside [0, 100]; a reversed or non-finite pair is repaired, never thrown on. */
-function bounds(min: number, max: number): [number, number] {
+/**
+ * min/max as an ordered, finite pair inside [0, 100]; a reversed or non-finite pair is repaired, never thrown on.
+ * Use this for `aria-valuemin`/`aria-valuemax` so they always agree with what clampSplit enforces.
+ */
+export function resolveBounds(min: number, max: number): [number, number] {
 	const lo = Number.isFinite(min) ? Math.min(100, Math.max(0, min)) : 0;
 	const hi = Number.isFinite(max) ? Math.min(100, Math.max(0, max)) : 100;
 	return lo <= hi ? [lo, hi] : [hi, lo];
@@ -21,7 +24,7 @@ function bounds(min: number, max: number): [number, number] {
 
 /** `value` clamped into [min, max]. NaN falls back to the middle of the range. */
 export function clampSplit(value: number, min: number, max: number): number {
-	const [lo, hi] = bounds(min, max);
+	const [lo, hi] = resolveBounds(min, max);
 	if (Number.isNaN(value)) return (lo + hi) / 2;
 	return Math.min(hi, Math.max(lo, value));
 }
@@ -58,7 +61,7 @@ export function splitKeyNext(
 	max: number,
 	large = false
 ): number | null {
-	const [lo, hi] = bounds(min, max);
+	const [lo, hi] = resolveBounds(min, max);
 	if (key === 'Home') return lo;
 	if (key === 'End') return hi;
 	const step = large ? SPLIT_STEP_LARGE : SPLIT_STEP;

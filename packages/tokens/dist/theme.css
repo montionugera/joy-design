@@ -1141,6 +1141,11 @@ select.joy-select:disabled,
    border would scroll away from a sticky cell. */
 .joy-table-container--scroll {
   overflow-x: auto;
+  isolation: isolate;
+}
+.joy-table-container--scroll:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
 }
 .joy-table--scroll {
   width: max-content;
@@ -1160,7 +1165,7 @@ select.joy-select:disabled,
   position: sticky;
   left: 0;
   z-index: var(--joy-z-sticky);
-  border-right: 1px solid var(--joy-border-subtle);
+  border-right: 1px solid var(--joy-border-default);
 }
 .joy-table--scroll th:first-child {
   z-index: calc(var(--joy-z-sticky) + 1);

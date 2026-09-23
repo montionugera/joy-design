@@ -57,8 +57,13 @@
   }
 </script>
 
+<!-- A scrollable region must be keyboard-focusable (WCAG 2.1.1) or its off-screen columns are unreachable; Svelte's lint cannot see that the role is a dynamic region. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
   bind:this={ref}
+  tabindex={isScroll ? 0 : undefined}
+  role={isScroll ? 'region' : undefined}
+  aria-label={isScroll ? 'Scrollable table' : undefined}
   class="joy-table-container {isStack ? 'joy-table-container--responsive-stack' : ''} {isScroll ? 'joy-table-container--scroll' : ''} {className}"
   {...rest}
 >
