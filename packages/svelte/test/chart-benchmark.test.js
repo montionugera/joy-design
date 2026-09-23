@@ -9,6 +9,24 @@ import {
   snapToPhysicalPixel
 } from '../src/lib/chart-core.ts';
 
+// A single timed call is at the mercy of the scheduler: one GC pause or a busy neighbour under
+// `pnpm -r test` turns a 0.02ms search into 9ms. Each budget below is judged on the MEDIAN of
+// several runs after a warm-up, so a real regression (every run slow) still fails while one
+// stalled run does not. Budgets are unchanged.
+const RUNS = 9;
+function medianMs(fn) {
+  fn(); // warm-up: JIT + caches
+  const samples = [];
+  let result;
+  for (let i = 0; i < RUNS; i++) {
+    const t0 = performance.now();
+    result = fn();
+    samples.push(performance.now() - t0);
+  }
+  samples.sort((a, b) => a - b);
+  return { elapsed: samples[Math.floor(RUNS / 2)], result };
+}
+
 test('Benchmark: 100,000 candles OHLC binning executes in < 25ms (60fps budget)', () => {
   const count = 100000;
   const data = new Array(count);
@@ -32,12 +50,7 @@ test('Benchmark: 100,000 candles OHLC binning executes in < 25ms (60fps budget)'
     price = close;
   }
 
-  // Warmup
-  ohlcBinning(data, 0, 1000, 100);
-
-  const t0 = performance.now();
-  const binned = ohlcBinning(data, 0, count - 1, 500);
-  const elapsed = performance.now() - t0;
+  const { elapsed, result: binned } = medianMs(() => ohlcBinning(data, 0, count - 1, 500));
 
   assert.strictEqual(binned.length, 500);
   assert.ok(elapsed < 25, `OHLC binning took ${elapsed.toFixed(2)}ms, which exceeds 25ms budget`);
@@ -55,12 +68,8 @@ test('Benchmark: 100,000 points binary search range culling executes in < 5ms', 
   const minTime = times[25000];
   const maxTime = times[75000];
 
-  // Warmup
-  findVisibleRange(times, minTime, maxTime);
-
-  const t0 = performance.now();
-  const [start, end] = findVisibleRange(times, minTime, maxTime);
-  const elapsed = performance.now() - t0;
+  const { elapsed, result: range } = medianMs(() => findVisibleRange(times, minTime, maxTime));
+  const [start, end] = range;
 
   assert.ok(start <= 25000 && start >= 24998);
   assert.ok(end >= 75000 && end <= 75002);
@@ -75,12 +84,7 @@ test('Benchmark: 10,000 points LTTB downsampling executes in < 25ms', () => {
     data[i] = { x: i, y: Math.sin(i / 50) * 50 + 100 };
   }
 
-  // Warmup
-  lttbDownsample(data.slice(0, 1000), 50);
-
-  const t0 = performance.now();
-  const downsampled = lttbDownsample(data, 300);
-  const elapsed = performance.now() - t0;
+  const { elapsed, result: downsampled } = medianMs(() => lttbDownsample(data, 300));
 
   assert.strictEqual(downsampled.length, 300);
   assert.ok(elapsed < 25, `LTTB downsampling took ${elapsed.toFixed(2)}ms, should be < 25ms`);
@@ -88,16 +92,13 @@ test('Benchmark: 10,000 points LTTB downsampling executes in < 25ms', () => {
 });
 
 test('Benchmark: RingBuffer pushes 100,000 ticks in < 30ms with zero rollover leaks', () => {
-  const ring = new RingBuffer(1000);
-
-  // Warmup
-  for (let i = 0; i < 100; i++) ring.push({ tick: i, price: 100 });
-
-  const t0 = performance.now();
-  for (let i = 0; i < 100000; i++) {
-    ring.push({ tick: i, price: 100 + (i % 20) });
-  }
-  const elapsed = performance.now() - t0;
+  const { elapsed, result: ring } = medianMs(() => {
+    const buffer = new RingBuffer(1000);
+    for (let i = 0; i < 100000; i++) {
+      buffer.push({ tick: i, price: 100 + (i % 20) });
+    }
+    return buffer;
+  });
 
   assert.strictEqual(ring.length(), 1000);
   const snapshot = ring.toArray();
