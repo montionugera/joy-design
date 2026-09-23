@@ -27,12 +27,12 @@ export const FaceHappy: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="9" stroke=color strokeWidth="1.5" /><path
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5" /><path
 		d="M8 14H16C16 16.5 14 18 12 18C10 18 8 16.5 8 14Z"
-		fill=color
-	/><path d="M9 10C9 9 10 9 10 10" stroke=color strokeWidth="1.5" strokeLinecap="round" /><path
+		fill={color}
+	/><path d="M9 10C9 9 10 9 10 10" stroke={color} strokeWidth="1.5" strokeLinecap="round" /><path
 		d="M14 10C14 9 15 9 15 10"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 	/>

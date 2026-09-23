@@ -29,7 +29,7 @@ export const PlaceFilled: React.FC<IconProps> = ({
   >
     <path
 		d="M12 2C8.13401 2 5 5.13401 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13401 15.866 2 12 2Z"
-		fill=color
+		fill={color}
 	/><circle cx="12" cy="9" r="2.5" fill="var(--bg-canvas)" />
   </svg>
 );

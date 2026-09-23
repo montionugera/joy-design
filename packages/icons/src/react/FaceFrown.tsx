@@ -27,12 +27,12 @@ export const FaceFrown: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="9" stroke=color strokeWidth="1.5" /><path
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5" /><path
 		d="M8.5 16.5C8.5 16.5 10 14.5 12 14.5C14 14.5 15.5 16.5 15.5 16.5"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
-	/><circle cx="9" cy="10" r="1.2" fill=color /><circle cx="15" cy="10" r="1.2" fill=color />
+	/><circle cx="9" cy="10" r="1.2" fill={color} /><circle cx="15" cy="10" r="1.2" fill={color} />
   </svg>
 );
 

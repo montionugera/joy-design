@@ -29,7 +29,7 @@ export const ArrowRight: React.FC<IconProps> = ({
   >
     <path
 		d="M9 18L15 12L9 6"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"

@@ -29,11 +29,11 @@ export const Eye: React.FC<IconProps> = ({
   >
     <path
 		d="M12 5C7 5 3 12 3 12C3 12 7 19 12 19C17 19 21 12 21 12C21 12 17 5 12 5Z"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"
-	/><circle cx="12" cy="12" r="3" stroke=color strokeWidth="1.5" />
+	/><circle cx="12" cy="12" r="3" stroke={color} strokeWidth="1.5" />
   </svg>
 );
 

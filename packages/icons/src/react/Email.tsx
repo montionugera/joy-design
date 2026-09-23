@@ -29,13 +29,13 @@ export const Email: React.FC<IconProps> = ({
   >
     <path
 		d="M4 7H20V17H4V7Z"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/><path
 		d="M4 7L12 13L20 7"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"

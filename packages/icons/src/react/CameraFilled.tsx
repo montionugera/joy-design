@@ -27,9 +27,9 @@ export const CameraFilled: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <rect x="4" y="7" width="16" height="12" rx="2" fill=color /><path
+    <rect x="4" y="7" width="16" height="12" rx="2" fill={color} /><path
 		d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 	/><circle cx="12" cy="13" r="3" fill="var(--bg-canvas)" />

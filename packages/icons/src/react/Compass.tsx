@@ -27,9 +27,9 @@ export const Compass: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="9" stroke=color strokeWidth="1.5" /><path
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5" /><path
 		d="M10 14L15 9L14 10L9 15L10 14Z"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"

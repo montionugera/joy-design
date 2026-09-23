@@ -29,7 +29,7 @@ export const ArrowTop: React.FC<IconProps> = ({
   >
     <path
 		d="M6 15L12 9L18 15"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"
