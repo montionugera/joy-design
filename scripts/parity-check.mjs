@@ -93,15 +93,35 @@ export const REF_FORWARDING = [
   'Tooltip'
 ];
 
+// Non-handler aliases between the twins (Svelte `class` is React `className`).
 export const NORMALISE = {
-  onchange: 'onChange',
-  oninput: 'onInput',
-  onselect: 'onSelect',
-  onremove: 'onRemove',
-  onsubmit: 'onSubmit',
-  onclick: 'onClick',
   class: 'className'
 };
+
+// Structural hook classes: they exist identically in BOTH twins so consumers can
+// target them, but they are intentionally unstyled (no theme.css rule). The
+// "undefined class" check skips them only while the class is present in both
+// twins, so a hook that drifts into one twin still fails (twin class-diff and
+// undefined-class check). Do not add a class here to silence a missing style.
+export const STRUCTURAL_CLASSES = new Set([
+  'joy-dropdown-trigger',
+  'joy-popconfirm__trigger',
+  'joy-markdown__pre',
+  'joy-markdown__table',
+  'joy-menu__item-icon',
+  'joy-menu__item-text',
+  'joy-message__content',
+  'joy-statistic__value',
+  'joy-tab-content',
+  'joy-tabs-container'
+]);
+
+// Canonical prop name used for comparison. Handler props (`onX`) compare
+// case-insensitively because Svelte 5 spells them `onclose` and React `onClose`.
+export function normaliseProp(name) {
+  if (/^on[a-z]/i.test(name)) return name.toLowerCase();
+  return NORMALISE[name] || name;
+}
 
 export const HTML_INHERITED = [
   'value',
@@ -125,6 +145,12 @@ export const HTML_INHERITED = [
   'children',
   'ref'
 ];
+
+// Extra attributes inherited only from React.ImgHTMLAttributes (kept out of HTML_INHERITED
+// so a div-based component cannot satisfy a Svelte `src`/`alt` prop by accident).
+const IMG_INHERITED = ['alt', 'src'];
+
+const HTML_INHERITED_NORMALISED = new Set(HTML_INHERITED.map(normaliseProp));
 
 export const CONTRACT = {
   Button: [
@@ -344,8 +370,18 @@ export function classes(src) {
   const cleaned = src
     .replace(/\$\{[^"'`}]*\}/g, '*')
     .replace(/\{[^"'`}]*\}/g, '*');
-  const matches = cleaned.match(/\bjoy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g) || [];
-  return new Set(matches.filter((t) => !t.endsWith('-') && !t.endsWith('--')));
+  // `(?<![\w-])` skips CSS custom properties (`--joy-space-gap`); a match followed
+  // by `-`, `_` or a template hole (`*`) is only the prefix of a dynamic class
+  // (`joy-progress--status-${x}`) and is not a class name on its own.
+  const re = /(?<![\w-])joy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g;
+  const out = new Set();
+  let m;
+  while ((m = re.exec(cleaned)) !== null) {
+    const next = cleaned[m.index + m[0].length];
+    if (next === '-' || next === '_' || next === '*') continue;
+    out.add(m[0]);
+  }
+  return out;
 }
 
 export function svelteProps(src) {
@@ -356,7 +392,7 @@ export function svelteProps(src) {
   let m;
   while ((m = re.exec(block)) !== null) {
     const raw = m[1];
-    names.add(NORMALISE[raw] || raw);
+    names.add(normaliseProp(raw));
   }
   return names;
 }
@@ -371,21 +407,25 @@ export function reactPropsExplicit(componentName, src) {
   let m;
   while ((m = re.exec(block)) !== null) {
     const raw = m[1];
-    names.add(NORMALISE[raw] || raw);
+    names.add(normaliseProp(raw));
   }
   return names;
 }
 
 export function reactProps(componentName, src) {
   const names = new Set(reactPropsExplicit(componentName, src));
-  const extendsRegex = new RegExp(
-    `export\\s+interface\\s+${componentName}Props\\s+extends\\s+[^{]*React\\.\\w*HTMLAttributes`
-  );
-  if (extendsRegex.test(src)) {
-    for (const p of HTML_INHERITED) {
-      names.add(p);
-    }
+  const extendsClause = (base) =>
+    new RegExp(
+      `export\\s+interface\\s+${componentName}Props(?:<[^{]*?>)?\\s+extends\\s+[^{]*React\\.${base}`
+    ).test(src);
+  if (extendsClause('\\w*HTMLAttributes')) {
+    for (const p of HTML_INHERITED) names.add(normaliseProp(p));
   }
+  if (extendsClause('ImgHTMLAttributes')) {
+    for (const p of IMG_INHERITED) names.add(p);
+  }
+  // React `ref` arrives through forwardRef, not through props.
+  if (hasForwardRef(src)) names.add('ref');
   return names;
 }
 
@@ -466,10 +506,12 @@ export function runParityCheck(options = {}) {
     const rProps = reactProps(comp, reactSrc);
     const rPropsExplicit = reactPropsExplicit(comp, reactSrc);
 
-    const contractProps = CONTRACT[comp] || [];
+    const contractProps = (CONTRACT[comp] || []).map(normaliseProp);
+    // A structural hook is exempt from the theme.css rule only while both twins carry it.
+    const isUndefined = (c, other) => !defined.has(c) && !(STRUCTURAL_CLASSES.has(c) && other.has(c));
 
     if (side === 'svelte') {
-      const undefinedClasses = [...sClasses].filter((c) => !defined.has(c)).sort();
+      const undefinedClasses = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
       const missingContractProps = contractProps.filter((p) => !sProps.has(p)).sort();
       const violationsCount = undefinedClasses.length + missingContractProps.length;
       totalViolations += violationsCount;
@@ -479,7 +521,7 @@ export function runParityCheck(options = {}) {
         hasViolations: violationsCount > 0
       };
     } else if (side === 'react') {
-      const undefinedClasses = [...rClasses].filter((c) => !defined.has(c)).sort();
+      const undefinedClasses = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
       const missingContractProps = contractProps.filter((p) => !rProps.has(p)).sort();
       const violationsCount = undefinedClasses.length + missingContractProps.length;
       totalViolations += violationsCount;
@@ -489,8 +531,8 @@ export function runParityCheck(options = {}) {
         hasViolations: violationsCount > 0
       };
     } else {
-      const sUndefined = [...sClasses].filter((c) => !defined.has(c)).sort();
-      const rUndefined = [...rClasses].filter((c) => !defined.has(c)).sort();
+      const sUndefined = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
+      const rUndefined = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
       const sMissing = contractProps.filter((p) => !sProps.has(p)).sort();
       const rMissing = contractProps.filter((p) => !rProps.has(p)).sort();
       const classesOnlySvelte = [...sClasses].filter((c) => !rClasses.has(c)).sort();
@@ -498,7 +540,7 @@ export function runParityCheck(options = {}) {
       const propsOnlySvelte = [...sProps].filter((p) => !rProps.has(p)).sort();
       const propsOnlyReact = [...rProps]
         .filter((p) => !sProps.has(p))
-        .filter((p) => !HTML_INHERITED.includes(p) || rPropsExplicit.has(p))
+        .filter((p) => !HTML_INHERITED_NORMALISED.has(p) || rPropsExplicit.has(p))
         .sort();
 
       const violationsCount =

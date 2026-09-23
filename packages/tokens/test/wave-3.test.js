@@ -795,3 +795,79 @@ test('F-038 D2b: the Popconfirm sheet keeps the overlay primitive shape (top rad
   assert.match(sheet[1], /box-shadow:\s*var\(--joy-elevation-3\)/);
   assert.match(sheet[1], /padding-bottom:\s*calc\(14px \+ env\(safe-area-inset-bottom\)\)/);
 });
+
+// ---- F-038 D3.1: parity-check generic rules ----
+test('D3.1 normaliseProp compares handler props case-insensitively and maps class to className', () => {
+  for (const [s, r] of [['onclose', 'onClose'], ['onconfirm', 'onConfirm'], ['onprimaryaction', 'onPrimaryAction'], ['onsort', 'onSort'], ['onchange', 'onChange']]) {
+    assert.strictEqual(mod.normaliseProp(s), mod.normaliseProp(r), `${s} == ${r}`);
+  }
+  assert.strictEqual(mod.normaliseProp('class'), mod.normaliseProp('className'));
+  assert.notStrictEqual(mod.normaliseProp('onclose'), mod.normaliseProp('onconfirm'), 'different handlers stay different');
+  assert.strictEqual(mod.normaliseProp('once'), 'once', 'already lower-case names are unchanged');
+  assert.strictEqual(mod.normaliseProp('open'), 'open');
+  assert.strictEqual(mod.NORMALISE.class, 'className', 'NORMALISE stays exported');
+});
+
+test('D3.1 reactProps and svelteProps line up handler casing, forwardRef ref, generic Props and img-inherited attributes', () => {
+  const svelte = `interface Props {\n  onclose?: () => void;\n  onsort?: () => void;\n  class?: string;\n  ref?: HTMLDivElement | null;\n  src: string;\n  alt?: string;\n}`;
+  const react = `export interface TableProps<T> extends React.HTMLAttributes<HTMLDivElement> {\n  onClose?: () => void;\n  onSort?: () => void;\n}\nexport const Table = React.forwardRef(() => null);`;
+  const s = mod.svelteProps(svelte);
+  const r = mod.reactProps('Table', react);
+  for (const p of s) if (!['src', 'alt'].includes(p)) assert.ok(r.has(p), `React side satisfies ${p}`);
+  const img = mod.reactProps('Image', `export interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {\n  fallback?: string;\n}`);
+  assert.ok(img.has('alt') && img.has('src'), 'ImgHTMLAttributes inherits alt and src');
+  const div = mod.reactProps('Box', `export interface BoxProps extends React.HTMLAttributes<HTMLDivElement> {}`);
+  assert.ok(!div.has('alt') && !div.has('src'), 'div-based components do not inherit alt/src');
+  assert.ok(mod.reactProps('Box', 'export interface BoxProps { a?: string }\nexport const Box = forwardRef(() => null);').has('ref'), 'forwardRef satisfies ref');
+  assert.ok(!mod.reactProps('Box', 'export interface BoxProps { a?: string }').has('ref'), 'no forwardRef and no HTMLAttributes: no ref');
+});
+
+test('D3.1 classes() ignores custom properties and dynamic-prefix classes but keeps real classes', () => {
+  const src = 'style={{ "--joy-space-gap": g, "--joy-splitter-size": s }} className={cx("joy-space", `joy-progress--status-${x}`, `joy-badge-${y}`, "joy-real__el")} style="--joy-foo-bar: 1"';
+  assert.deepStrictEqual([...mod.classes(src)].sort(), ['joy-real__el', 'joy-space']);
+  assert.deepStrictEqual([...mod.classes('class="joy-a joy-a--b {cls}" class="joy-c-{x}"')].sort(), ['joy-a', 'joy-a--b']);
+});
+
+test('D3.1 STRUCTURAL_CLASSES is exempt from the theme.css rule only when BOTH twins carry the class', () => {
+  const repoRoot = path.resolve(__dirname, '../../..');
+  const cls = [...mod.STRUCTURAL_CLASSES][0];
+  const build = (svelte, react) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-struct-'));
+    try {
+      for (const d of ['packages/tokens/dist', 'packages/svelte/src/lib', 'packages/react/src']) fs.mkdirSync(path.join(root, d), { recursive: true });
+      fs.copyFileSync(path.join(repoRoot, 'packages/tokens/dist/theme.css'), path.join(root, 'packages/tokens/dist/theme.css'));
+      fs.writeFileSync(path.join(root, 'packages/svelte/src/lib/Alert.svelte'), svelte);
+      fs.writeFileSync(path.join(root, 'packages/react/src/Alert.tsx'), react);
+      return mod.runParityCheck({ rootDir: root }).results.Alert;
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  };
+  const both = build(`<div class="${cls}"></div>`, `export const Alert = () => <div className="${cls}" />;`);
+  assert.deepStrictEqual(both.undefinedClasses, { svelte: [], react: [] }, 'present in both twins: exempt');
+  const onlySvelte = build(`<div class="${cls}"></div>`, 'export const Alert = () => <div />;');
+  assert.deepStrictEqual(onlySvelte.undefinedClasses.svelte, [cls], 'missing in React: still flagged as undefined');
+  assert.deepStrictEqual(onlySvelte.classesOnlyInSvelte, [cls], 'and by the twin class diff');
+  const unlisted = build('<div class="joy-not-styled-anywhere"></div>', 'export const Alert = () => <div className="joy-not-styled-anywhere" />;');
+  assert.deepStrictEqual(unlisted.undefinedClasses.svelte, ['joy-not-styled-anywhere'], 'classes outside the allowlist are not exempt');
+});
+
+test('D3.1 every STRUCTURAL_CLASSES entry exists in both twins and still has no theme.css rule', () => {
+  const repoRoot = path.resolve(__dirname, '../../..');
+  const svelteSrc = mod.COMPONENTS.map((c) => path.join(repoRoot, `packages/svelte/src/lib/${c}.svelte`)).filter(fs.existsSync).map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+  const reactSrc = mod.COMPONENTS.map((c) => path.join(repoRoot, `packages/react/src/${c}.tsx`)).filter(fs.existsSync).map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+  const sClasses = mod.classes(svelteSrc);
+  const rClasses = mod.classes(reactSrc);
+  const defined = mod.getDefinedClasses(css);
+  for (const c of mod.STRUCTURAL_CLASSES) {
+    assert.ok(sClasses.has(c) && rClasses.has(c), `${c} must be used in both twins`);
+    assert.ok(!defined.has(c), `${c} now has a theme.css rule: drop it from STRUCTURAL_CLASSES`);
+  }
+});
+
+test('D3.1 the default twin check reports zero rows over every component', () => {
+  const result = mod.runParityCheck({ rootDir: path.resolve(__dirname, '../../..') });
+  assert.deepStrictEqual(result.checks, []);
+  assert.deepStrictEqual(Object.entries(result.results).filter(([, v]) => v.hasViolations).map(([k]) => k), []);
+  assert.strictEqual(result.totalViolations, 0);
+});
