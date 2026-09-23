@@ -637,10 +637,14 @@ test('F-038 B-L4: Toast and Notification close buttons are labelled icon buttons
   }
 });
 
-test('F-038 B-L4: Progress exposes role=progressbar with aria-valuenow/min/max on the track (once) and Spin marks its tip and indicator', () => {
+test('F-038 B-L4: Progress exposes role=progressbar with aria-valuenow/min/max on the ROOT (once, before rest) and Spin marks its tip and indicator', () => {
   const p = fs.readFileSync(path.resolve('./src/lib/Progress.svelte'), 'utf8');
   assert.strictEqual((p.match(/role="progressbar"/g) || []).length, 1, 'exactly one progressbar role');
-  assert.ok(/class="joy-progress__inner"\s+role="progressbar"\s+aria-valuenow=\{valueNow\}\s+aria-valuemin="0"\s+aria-valuemax="100"/.test(p), 'role and aria values live on the track element');
+  const root = p.match(/<div\s+bind:this=\{ref\}[\s\S]*?\n>/)[0];
+  assert.ok(root.includes('class="joy-progress '), 'the element carrying bind:this/class/rest is the .joy-progress root');
+  assert.ok(root.includes('role="progressbar"') && root.includes('aria-valuenow={valueNow}') && root.includes('aria-valuemin="0"') && root.includes('aria-valuemax="100"'), 'role and aria values live on the root');
+  assert.ok(root.indexOf('role="progressbar"') < root.indexOf('{...rest}'), 'rest comes after role so consumer aria-label/labelledby name the progressbar');
+  assert.ok(!/class="joy-progress__inner"[^>]*role=/.test(p), 'the track carries no role');
   assert.ok(p.includes('Math.min(100, Math.max(0, percent))'), 'aria-valuenow is clamped to 0..100');
   const s = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
   assert.ok(s.includes('class="joy-spin__tip"'), 'Spin tip uses the tokenized joy-spin__tip class');

@@ -2033,7 +2033,8 @@ h1, h2, h3, .joy-display {
 .joy-progress__bg {
   border-radius: 100px;
   transition: width var(--joy-duration-slow) var(--joy-ease-out), background-color var(--joy-duration-normal) var(--joy-ease-out);
-  background-color: var(--joy-accent-default);
+  /* accent-text, not accent-default: default gold is 2.16:1 on the light track (< 3:1 for UI graphics) */
+  background-color: var(--joy-accent-text);
   position: relative;
 }
 .joy-progress--status-success .joy-progress__bg {

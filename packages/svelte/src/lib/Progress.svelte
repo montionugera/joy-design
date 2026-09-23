@@ -31,15 +31,17 @@
 	const valueNow = $derived(Math.min(100, Math.max(0, percent)));
 </script>
 
-<div bind:this={ref} class="joy-progress joy-progress--status-{computedStatus} {className}" {...rest}>
+<div
+	bind:this={ref}
+	class="joy-progress joy-progress--status-{computedStatus} {className}"
+	role="progressbar"
+	aria-valuenow={valueNow}
+	aria-valuemin="0"
+	aria-valuemax="100"
+	{...rest}
+>
 	<div class="joy-progress__outer">
-		<div
-			class="joy-progress__inner"
-			role="progressbar"
-			aria-valuenow={valueNow}
-			aria-valuemin="0"
-			aria-valuemax="100"
-		>
+		<div class="joy-progress__inner">
 			<div
 				class="joy-progress__bg"
 				style="width: {percent}%; height: {strokeWidth}px; background-color: {strokeColor || ''}"

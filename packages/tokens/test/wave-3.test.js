@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { contrastRatio } from '../scripts/color.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const scriptPath = path.resolve(__dirname, '../../../scripts/parity-check.mjs');
@@ -218,7 +219,7 @@ test('F-038 B-L4: Progress uses tokens and explicit transition properties; Spin 
   const bg = rule('.joy-progress__bg');
   assert.doesNotMatch(bg, /transition:\s*all/, 'no transition: all');
   assert.match(bg, /transition:\s*width /);
-  assert.match(bg, /background-color:\s*var\(--joy-accent-default\)/);
+  assert.match(bg, /background-color:\s*var\(--joy-accent-text\)/, 'default fill is accent-text (accent-default is 2.16:1 on the light track)');
   assert.match(rule('.joy-progress__inner'), /background-color:\s*var\(--joy-surface-sunken\)/);
   assert.match(rule('.joy-progress--status-success .joy-progress__bg'), /var\(--joy-status-success-fg\)/);
   assert.match(rule('.joy-progress--status-exception .joy-progress__bg'), /var\(--joy-status-danger-fg\)/);
@@ -235,4 +236,44 @@ test('F-038 B-L4: Progress uses tokens and explicit transition properties; Spin 
   assert.match(block, /animation-duration:\s*4s !important/);
   assert.match(block, /animation-iteration-count:\s*infinite !important/);
   assert.doesNotMatch(css.slice(css.indexOf('\n.joy-spin {'), css.indexOf('\n.joy-spin__container')), /#[0-9a-fA-F]{3,8}\b|brand-primary/);
+});
+
+test('F-038 B-L4 fix: Progress fills reach >= 3:1 (WCAG 1.4.11) against the track in both themes', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const grab = (re) => {
+    const v = {};
+    for (const m of css.matchAll(re)) {
+      for (const l of m[1].split(';')) {
+        const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
+        if (x) v[x[1]] = x[2].trim();
+      }
+    }
+    return v;
+  };
+  const light = grab(/:root\s*\{([^}]+)\}/g);
+  const dark = { ...light, ...grab(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
+  const resolve = (val, store, depth = 0) => {
+    const m = val && val.match(/^var\((--[\w-]+)\)$/);
+    return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
+  };
+  const tokenOf = (sel, prop) => {
+    const m = css.match(new RegExp(`\\n${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`));
+    assert.ok(m, `${sel} rule exists`);
+    const d = m[1].match(new RegExp(`${prop}:\\s*var\\((--[\\w-]+)\\)`));
+    assert.ok(d, `${sel} ${prop} is a token`);
+    return d[1];
+  };
+  const trackTok = tokenOf('.joy-progress__inner', 'background-color');
+  const fills = {
+    default: tokenOf('.joy-progress__bg', 'background-color'),
+    success: tokenOf('.joy-progress--status-success .joy-progress__bg', 'background-color'),
+    exception: tokenOf('.joy-progress--status-exception .joy-progress__bg', 'background-color'),
+  };
+  for (const [theme, store] of [['light', light], ['dark', dark]]) {
+    const track = resolve(store[trackTok], store);
+    for (const [name, tok] of Object.entries(fills)) {
+      const ratio = contrastRatio(resolve(store[tok], store), track);
+      assert.ok(ratio >= 3, `${theme}: ${name} fill ${tok} vs track ${trackTok} is ${ratio.toFixed(2)}:1 (< 3:1)`);
+    }
+  }
 });
