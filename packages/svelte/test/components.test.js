@@ -496,7 +496,7 @@ test('F-038 B-L1: Avatar/AvatarGroup/Badge/Tag/Divider use brand tokens, overflo
   const group = read('AvatarGroup');
   assert.ok(!group.includes('MutationObserver'), 'AvatarGroup must not mutate the DOM to honour max');
   assert.ok(!group.includes('$effect'), 'AvatarGroup max must be pure derived state (SSR-safe)');
-  assert.ok(group.includes('items.slice(0, limit)'), 'AvatarGroup must slice items to max');
+  assert.ok(group.includes('items?.slice(0, limit)'), 'AvatarGroup must slice items to max');
   assert.ok(group.includes('+{overflow}'), 'AvatarGroup must render a +N overflow avatar');
   assert.ok(group.includes('joy-avatar-group__overflow'), 'AvatarGroup overflow avatar must carry its class');
   assert.ok(read('Avatar').includes('onerror'), 'Avatar must fall back when the image fails to load');

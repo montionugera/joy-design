@@ -19,16 +19,22 @@
 		ref = $bindable(null),
 		...rest
 	}: Props = $props();
+
+	const hasText = $derived(type !== 'vertical' && !!children);
+	const modifier = $derived(
+		type === 'vertical' ? 'joy-divider--vertical' : hasText ? `joy-divider--with-text joy-divider--${orientation}` : ''
+	);
 </script>
 
-{#if type === 'vertical'}
-	<div class="joy-divider joy-divider--vertical {dashed ? 'joy-divider--dashed' : ''} {className}" role="separator" bind:this={ref} {...rest}></div>
-{:else if children}
-	<div class="joy-divider joy-divider--with-text joy-divider--{orientation} {dashed ? 'joy-divider--dashed' : ''} {className}" role="separator" bind:this={ref} {...rest}>
+<div
+	class="joy-divider {modifier} {dashed ? 'joy-divider--dashed' : ''} {className}"
+	role="separator"
+	bind:this={ref}
+	{...rest}
+>
+	{#if hasText}
 		<span class="joy-divider__text">
-			{@render children()}
+			{@render children?.()}
 		</span>
-	</div>
-{:else}
-	<div class="joy-divider {dashed ? 'joy-divider--dashed' : ''} {className}" role="separator" bind:this={ref} {...rest}></div>
-{/if}
+	{/if}
+</div>

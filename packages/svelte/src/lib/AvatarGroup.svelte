@@ -34,7 +34,7 @@
 	}: Props = $props();
 
 	const limit = $derived(max === undefined ? undefined : Math.max(0, Math.floor(max)));
-	const visibleItems = $derived(items && limit !== undefined ? items.slice(0, limit) : (items ?? []));
+	const visibleItems = $derived(items?.slice(0, limit) ?? []);
 
 	const overflowSize = $derived(items?.[0]?.size ?? 'md');
 	const overflow = $derived(items && limit !== undefined ? Math.max(0, items.length - limit) : 0);
