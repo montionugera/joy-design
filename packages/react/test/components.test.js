@@ -727,6 +727,8 @@ test('F-038 C-L3: Alert/EmptyState/Result/Skeleton render the Svelte DOM contrac
   assert.ok(!/style=\{\{[^}]*(color|background|border)/i.test(alertSrc), 'Alert carries no inline colour styles');
 });
 
+const readSrc = (rel) => fs.readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
+
 test('F-038 C-L4: Message/Notification/Toast/Progress/Spin render the Svelte DOM contract, forward refs and spread rest', () => {
   const React = requireFromHere('react');
   const { renderToStaticMarkup } = requireFromHere('react-dom/server');
@@ -803,10 +805,10 @@ test('F-038 C-L4: Message/Notification/Toast/Progress/Spin render the Svelte DOM
   }
 
   // class strings/roles match the Svelte twins' markup (Svelte source is the contract)
-  const svelte = (f) => fs.readFileSync(fileURLToPath(new URL(`../../svelte/src/lib/${f}.svelte`, import.meta.url)), 'utf8');
+  const svelte = (f) => readSrc(`../../svelte/src/lib/${f}.svelte`);
   const classSet = (src) => new Set(src.match(/joy-[a-z][\w-]*/g) || []); // static names + dynamic prefixes (e.g. joy-toast--)
   for (const f of ['Message', 'Notification', 'Toast', 'Progress', 'Spin']) {
-    const tsx = fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8');
+    const tsx = readSrc(`../src/${f}.tsx`);
     const sv = svelte(f);
     assert.deepStrictEqual([...classSet(tsx)].sort(), [...classSet(sv)].sort(), `${f} class names match the Svelte twin`);
     assert.deepStrictEqual((tsx.match(/role="[a-z]+"/g) || []).sort(), (sv.match(/role="[a-z]+"/g) || []).sort(), `${f} roles match the Svelte twin`);
@@ -815,7 +817,7 @@ test('F-038 C-L4: Message/Notification/Toast/Progress/Spin render the Svelte DOM
   }
   // no inline colour/size styles in the five files (Progress keeps its data-driven width/height/strokeColor)
   for (const f of ['Message', 'Notification', 'Toast', 'Spin']) {
-    assert.ok(!/style=\{\{/.test(fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8')), `${f} has an inline style`);
+    assert.ok(!/style=\{\{/.test(readSrc(`../src/${f}.tsx`)), `${f} has an inline style`);
   }
 });
 
@@ -864,16 +866,15 @@ test('F-038 C-L4 fix: auto-dismiss fires onClose once, dismiss clears the timer,
   assert.strictEqual(calls.length, 1);
 
   // the two packages share one byte-identical helper
-  assert.strictEqual(fs.readFileSync(fileURLToPath(new URL('../src/auto-dismiss.ts', import.meta.url)), 'utf8'), fs.readFileSync(fileURLToPath(new URL('../../svelte/src/lib/auto-dismiss.ts', import.meta.url)), 'utf8'));
+  assert.strictEqual(readSrc('../src/auto-dismiss.ts'), readSrc('../../svelte/src/lib/auto-dismiss.ts'));
 
   // React wiring: onClose lives in a ref and is NOT an effect dependency; Notification's button dismisses via the helper
-  const rd = (f) => fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8');
   for (const f of ['Message', 'Notification']) {
-    const src = rd(f);
+    const src = readSrc(`../src/${f}.tsx`);
     assert.ok(src.includes('onCloseRef.current = onClose') && src.includes('[visible, duration, autoDismiss]') && !/\[[^\]]*\bonClose\b[^\]]*\]/.test(src), `${f}: onClose is not an effect dependency`);
     assert.ok(!/setTimeout/.test(src), `${f} has no raw timer left`);
   }
-  assert.ok(rd('Notification').includes('onClick={autoDismiss.dismiss}'));
+  assert.ok(readSrc('../src/Notification.tsx').includes('onClick={autoDismiss.dismiss}'));
 
   // Progress: non-finite percent never reaches aria-valuenow / width / text as NaN
   const React = requireFromHere('react');

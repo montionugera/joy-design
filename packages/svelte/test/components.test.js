@@ -601,10 +601,11 @@ test('F-038 B-L3 fix: Skeleton renders one progressbar root, merges consumer sty
   assert.ok(!/style=\{width/.test(src), 'no wholesale style replacement');
 });
 
+const readLib = (f) => fs.readFileSync(path.resolve(`./src/lib/${f}`), 'utf8');
+
 test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned styles, tokens only, icons from @joymify/icons, ref+rest+class', () => {
-  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
   for (const n of ['Message', 'Notification', 'Toast', 'Progress', 'Spin']) {
-    const s = read(n);
+    const s = readLib(`${n}.svelte`);
     assert.ok(!/<style[\s>]/.test(s), `${n} must not carry a scoped <style> (build.js owns the joy-* rules)`);
     assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|--joy-color-/.test(s), `${n} must contain no colour literals or legacy --joy-color-* fallbacks`);
     // Progress legitimately forwards the consumer's strokeColor prop as an inline background-color.
@@ -615,7 +616,7 @@ test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned st
     assert.ok(s.includes('class: className'), `${n} must accept class`);
   }
   for (const n of ['Message', 'Notification']) {
-    const s = read(n);
+    const s = readLib(`${n}.svelte`);
     assert.ok(/import\s*\{[^}]*Info[^}]*\}\s*from\s*'@joymify\/icons'/.test(s), `${n} imports status icons from @joymify/icons`);
     assert.ok(!/<svg/.test(s), `${n} must not inline raw svg markup`);
     assert.ok(s.includes(`joy-${n.toLowerCase()}__icon--{type}`) && s.includes('aria-hidden="true"'), `${n} icon is decorative and tone-classed`);
@@ -623,12 +624,12 @@ test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned st
 });
 
 test('F-038 B-L4: Toast and Notification close buttons are labelled icon buttons, Toast renders it only with onclose', () => {
-  const toast = fs.readFileSync(path.resolve('./src/lib/Toast.svelte'), 'utf8');
+  const toast = readLib('Toast.svelte');
   assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@joymify\/icons'/.test(toast), 'Toast imports Close');
   assert.ok(!toast.includes('&times;'), 'Toast must not use a raw entity as an icon');
   assert.ok(/<button type="button" class="joy-toast__close" aria-label="Dismiss notification" onclick=\{onclose\}>/.test(toast), 'Toast close is a labelled type=button');
   assert.ok(toast.includes('{#if onclose}'), 'Toast close renders only when onclose is provided');
-  const note = fs.readFileSync(path.resolve('./src/lib/Notification.svelte'), 'utf8');
+  const note = readLib('Notification.svelte');
   assert.ok(/<button type="button" class="joy-notification__close" aria-label="Dismiss notification" onclick=\{close\}>/.test(note), 'Notification close is a labelled type=button');
   assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@joymify\/icons'/.test(note), 'Notification imports Close');
   const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
@@ -638,7 +639,7 @@ test('F-038 B-L4: Toast and Notification close buttons are labelled icon buttons
 });
 
 test('F-038 B-L4: Progress exposes role=progressbar with aria-valuenow/min/max on the ROOT (once, before rest) and Spin marks its tip and indicator', () => {
-  const p = fs.readFileSync(path.resolve('./src/lib/Progress.svelte'), 'utf8');
+  const p = readLib('Progress.svelte');
   assert.strictEqual((p.match(/role="progressbar"/g) || []).length, 1, 'exactly one progressbar role');
   const root = p.match(/<div\s+bind:this=\{ref\}[\s\S]*?\n>/)[0];
   assert.ok(root.includes('class="joy-progress '), 'the element carrying bind:this/class/rest is the .joy-progress root');
@@ -647,19 +648,18 @@ test('F-038 B-L4: Progress exposes role=progressbar with aria-valuenow/min/max o
   assert.ok(!/class="joy-progress__inner"[^>]*role=/.test(p), 'the track carries no role');
   assert.ok(p.includes('Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0'), 'aria-valuenow is clamped to 0..100 and non-finite is 0');
   assert.ok(p.includes('width: {valueNow}%'), 'bar width uses the same clamped value');
-  const s = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
+  const s = readLib('Spin.svelte');
   assert.ok(s.includes('class="joy-spin__tip"'), 'Spin tip uses the tokenized joy-spin__tip class');
   assert.ok(s.includes('aria-hidden="true"'), 'Spin indicator svg is decorative');
   assert.strictEqual((s.match(/role="status"/g) || []).length, 2, 'one status role per branch, never nested');
 });
 
 test('F-038 C-L4 fix: Message/Notification auto-dismiss goes through the shared createAutoDismiss (clear on dismiss, once)', () => {
-  const read = (f) => fs.readFileSync(path.resolve(`./src/lib/${f}`), 'utf8');
-  assert.strictEqual(read('auto-dismiss.ts'), fs.readFileSync(path.resolve('../react/src/auto-dismiss.ts'), 'utf8'), 'helper is byte-identical to the React copy');
+  assert.strictEqual(readLib('auto-dismiss.ts'), fs.readFileSync(path.resolve('../react/src/auto-dismiss.ts'), 'utf8'), 'helper is byte-identical to the React copy');
   for (const f of ['Message', 'Notification']) {
-    const src = read(`${f}.svelte`);
+    const src = readLib(`${f}.svelte`);
     assert.ok(src.includes("import { createAutoDismiss } from './auto-dismiss.js'") && src.includes('autoDismiss.start(duration)') && src.includes('return autoDismiss.cancel'), `${f} arms/cancels via the helper`);
     assert.ok(!/setTimeout/.test(src), `${f} has no raw timer left`);
   }
-  assert.ok(/function close\(\) \{\s*autoDismiss\.dismiss\(\);/.test(read('Notification.svelte')), 'close button dismisses via the helper (clears the timer)');
+  assert.ok(/function close\(\) \{\s*autoDismiss\.dismiss\(\);/.test(readLib('Notification.svelte')), 'close button dismisses via the helper (clears the timer)');
 });

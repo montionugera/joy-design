@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from '@joymify/icons/react';
-import { createAutoDismiss } from './auto-dismiss.js';
+import { createAutoDismiss, type AutoDismiss } from './auto-dismiss.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -26,10 +26,12 @@ export const Message = React.forwardRef<HTMLDivElement, MessageProps>(
     // Latest-callback ref: an inline `onClose` must not restart the countdown on every parent render.
     const onCloseRef = React.useRef(onClose);
     onCloseRef.current = onClose;
-    const autoDismiss = React.useMemo(
-      () => createAutoDismiss(() => setIsVisible(false), () => onCloseRef.current),
-      []
-    );
+    // Held in a ref (lazy-init), not useMemo: React may discard a memo cache, which would re-arm the timer.
+    const autoDismissRef = React.useRef<AutoDismiss | null>(null);
+    if (autoDismissRef.current === null) {
+      autoDismissRef.current = createAutoDismiss(() => setIsVisible(false), () => onCloseRef.current);
+    }
+    const autoDismiss = autoDismissRef.current;
 
     React.useEffect(() => {
       setIsVisible(visible);
