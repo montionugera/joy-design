@@ -29,6 +29,7 @@
 <div
 	class="joy-divider {modifier} {dashed ? 'joy-divider--dashed' : ''} {className}"
 	role="separator"
+	aria-orientation={type === 'vertical' ? 'vertical' : undefined}
 	bind:this={ref}
 	{...rest}
 >

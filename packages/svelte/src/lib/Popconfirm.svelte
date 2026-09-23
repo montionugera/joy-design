@@ -8,6 +8,12 @@
     okText?: string;
     cancelText?: string;
     open?: boolean;
+    /**
+     * Called with the next open state whenever the user opens or closes the panel (trigger click,
+     * Escape, outside click, confirm, cancel). Not called on mount, nor when the parent changes
+     * `open` itself. Works alongside `bind:open`.
+     */
+    onopenchange?: (open: boolean) => void;
     onconfirm?: () => void;
     oncancel?: () => void;
     children?: Snippet;
@@ -22,6 +28,7 @@
     okText = 'Confirm',
     cancelText = 'Cancel',
     open = $bindable(false),
+    onopenchange,
     onconfirm,
     oncancel,
     children,
@@ -35,6 +42,13 @@
 
   let triggerEl = $state<HTMLDivElement | null>(null);
   let panelEl = $state<HTMLDivElement | null>(null);
+
+  // Single write path for user-driven open changes: keeps `bind:open` in sync and notifies once.
+  function setOpen(next: boolean) {
+    if (open === next) return;
+    open = next;
+    onopenchange?.(next);
+  }
 
   const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -52,7 +66,7 @@
       anchor: triggerEl,
       panel: panelEl,
       onClose: () => {
-        open = false;
+        setOpen(false);
         focusTrigger();
       }
     });
@@ -61,7 +75,7 @@
   });
 
   function settle(callback?: () => void) {
-    open = false;
+    setOpen(false);
     focusTrigger();
     callback?.();
   }
@@ -69,7 +83,7 @@
 
 <div bind:this={ref} class="joy-popconfirm {className}" {...rest}>
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div bind:this={triggerEl} class="joy-popconfirm__trigger" onclick={() => { open = !open; }}>
+  <div bind:this={triggerEl} class="joy-popconfirm__trigger" onclick={() => setOpen(!open)}>
     {#if children}
       {@render children()}
     {/if}

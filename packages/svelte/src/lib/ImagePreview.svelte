@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons';
 	import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
 
@@ -24,7 +25,7 @@
 		open = false,
 		src,
 		items = [],
-		current = 0,
+		current,
 		onClose,
 		onChange,
 		class: className = '',
@@ -43,7 +44,12 @@
 	});
 
 	let internalCurrent = $state(0);
-	let currentIndex = $derived(current !== undefined ? current : internalCurrent);
+	// Controlled when `current` is passed, uncontrolled otherwise (arrow keys and buttons advance
+	// `internalCurrent`). Clamped, so a stale `current` past the end never shows "5 / 2" next to the first image.
+	let requestedIndex = $derived(current !== undefined ? current : internalCurrent);
+	let currentIndex = $derived(
+		Math.min(Math.max(0, requestedIndex), Math.max(0, normalizedItems.length - 1))
+	);
 	let currentItem = $derived(normalizedItems[currentIndex] || normalizedItems[0] || { src: '' });
 
 	let scale = $state(1);
@@ -56,8 +62,11 @@
 	let startPosX = 0;
 	let startPosY = 0;
 
+	// Reset transforms on open and whenever the shown image changes, like the React twin.
 	$effect(() => {
-		if (open) handleReset();
+		void open;
+		void currentIndex;
+		untrack(handleReset);
 	});
 
 	$effect(() => {

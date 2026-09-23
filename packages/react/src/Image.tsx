@@ -6,7 +6,6 @@ const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(
 export interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   preview?: boolean | { src?: string; mask?: React.ReactNode };
   fallback?: string;
-  placeholder?: React.ReactNode;
 }
 
 /**
@@ -16,7 +15,7 @@ export interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
  */
 export const Image = React.forwardRef<HTMLDivElement, ImageProps>(
   (
-    { src, alt = '', preview = true, fallback, placeholder: _placeholder, className = '', style, onError, ...rest },
+    { src, alt = '', preview = true, fallback, className = '', style, onError, ...rest },
     ref
   ) => {
     const [openPreview, setOpenPreview] = React.useState(false);

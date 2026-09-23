@@ -935,3 +935,58 @@ test('F-038 B-L8: chart components compile warning-free and server-render the do
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// ---- F-038 D3.1: twin parity finalisation ----
+test('F-038 D3.1: Popconfirm exposes onopenchange through one write path, keeps bind:open, and never fires on mount', async () => {
+  const src = readLib('Popconfirm.svelte');
+  assert.ok(src.includes('onopenchange?: (open: boolean) => void;') && /open = \$bindable\(false\),\s*onopenchange,/.test(src), 'onopenchange prop next to the bindable open');
+  assert.ok(/function setOpen\(next: boolean\) \{\s*if \(open === next\) return;\s*open = next;\s*onopenchange\?\.\(next\);\s*\}/.test(src), 'setOpen dedupes, writes the bindable once and notifies once');
+  // Every user-driven way of changing the state goes through setOpen; no raw `open = ...` writes remain.
+  assert.ok(src.includes('onclick={() => setOpen(!open)}'), 'trigger toggle');
+  assert.strictEqual((src.match(/setOpen\(false\)/g) || []).length, 2, 'Escape/outside click (openOverlay onClose) and confirm/cancel (settle)');
+  assert.ok(!/^\s*open = (?!next)/m.test(src.replace(/let \{[\s\S]*?\}: Props/, '')), 'no direct writes to `open` outside setOpen');
+  assert.ok(!/\$effect\([^)]*onopenchange/.test(src), 'no effect calls it, so mounting never fires it');
+  const { compile } = await import('svelte/compiler');
+  for (const generate of ['server', 'client']) {
+    const out = compile(src, { filename: 'Popconfirm.svelte', generate, runes: true });
+    assert.deepStrictEqual(out.warnings.map((w) => w.code), [], `Popconfirm (${generate}) compiles warning-free`);
+  }
+});
+
+test('F-038 D3.1: Divider carries aria-orientation="vertical" only in the vertical variant, like React (RXD-101)', async () => {
+  const src = readLib('Divider.svelte');
+  const { compile } = await import('svelte/compiler');
+  const { pathToFileURL } = await import('node:url');
+  const dir = fs.mkdtempSync(path.resolve('./test/.d31-ssr-'));
+  try {
+    const server = compile(src, { filename: 'Divider.svelte', generate: 'server', runes: true });
+    const client = compile(src, { filename: 'Divider.svelte', generate: 'client', runes: true });
+    assert.deepStrictEqual(server.warnings.map((w) => w.code), [], 'compiles warning-free');
+    assert.deepStrictEqual(client.warnings.map((w) => w.code), [], 'client compiles warning-free');
+    const file = path.join(dir, 'Divider.mjs');
+    fs.writeFileSync(file, server.js.code);
+    const Divider = (await import(pathToFileURL(file).href)).default;
+    const { render } = await import('svelte/server');
+    const html = (props) => render(Divider, { props }).body.replace(/<!--.*?-->/g, '');
+    const vertical = html({ type: 'vertical', class: 'mine' });
+    assert.ok(vertical.includes('role="separator"') && vertical.includes('aria-orientation="vertical"') && vertical.includes('joy-divider--vertical'), vertical);
+    assert.ok(!html({}).includes('aria-orientation'), 'horizontal divider has no aria-orientation (implicit horizontal)');
+    assert.ok(!html({ orientation: 'left' }).includes('aria-orientation'), 'text orientation is not aria-orientation');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('F-038 D3.1: ImagePreview is uncontrolled unless `current` is passed, clamps the index and resets zoom/rotation on navigation', async () => {
+  const src = readLib('ImagePreview.svelte');
+  assert.ok(/^\s*current,$/m.test(src) && !/current = 0/.test(src), '`current` has no default, otherwise arrow keys never advance an uncontrolled preview');
+  assert.ok(src.includes('current !== undefined ? current : internalCurrent') && src.includes('Math.min(Math.max(0, requestedIndex), Math.max(0, normalizedItems.length - 1))'), 'controlled/uncontrolled index, clamped like React');
+  assert.ok(src.includes("e.key === 'ArrowLeft') handlePrev()") && src.includes("e.key === 'ArrowRight') handleNext()"), 'arrow keys navigate');
+  assert.ok(src.includes('internalCurrent = nextIdx;') && src.includes('onChange?.(nextIdx);'), 'navigation advances the internal index and notifies');
+  assert.ok(/\$effect\(\(\) => \{\s*void open;\s*void currentIndex;\s*untrack\(handleReset\);\s*\}\);/.test(src), 'zoom/rotation/pan reset when the open state or shown image changes');
+  const { compile } = await import('svelte/compiler');
+  for (const generate of ['server', 'client']) {
+    const out = compile(src, { filename: 'ImagePreview.svelte', generate, runes: true });
+    assert.deepStrictEqual(out.warnings.map((w) => w.code), [], `ImagePreview (${generate}) compiles warning-free`);
+  }
+});
