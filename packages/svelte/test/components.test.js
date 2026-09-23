@@ -535,11 +535,14 @@ test('F-038 B-L2 fix: deltaDirection follows the sign, never the tone', async ()
   assert.strictEqual(deltaDirection(''), 'flat');
   assert.strictEqual(deltaDirection(undefined), 'flat');
   const src = fs.readFileSync(path.resolve('./src/lib/StatCard.svelte'), 'utf8');
+  assert.ok(/import\s*\{\s*deltaDirection\s*\}\s*from\s*'\.\/delta-utils\.js'/.test(src), 'StatCard must import deltaDirection');
   assert.ok(src.includes('trend ?? deltaDirection(delta)'), 'StatCard direction = explicit trend, else derived from the delta text');
   assert.ok(src.includes("direction === 'up'") && src.includes("direction === 'down'"), 'StatCard icon and sr text must key off direction');
   assert.ok(!src.includes("deltaTone === 'positive'") && !src.includes("deltaTone === 'critical'"), 'tone must not drive the arrow');
   for (const n of ['StatCard', 'MetricTile']) {
     const s = fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
-    assert.ok(!/__sr\s*\{/.test(s) && !s.includes('inline-flex'), `${n} must not duplicate the build.js-owned sr/row styles`);
+    assert.ok(!/__sr\s*\{/.test(s), `${n} must not redefine the build.js-owned __sr rule`);
+    assert.ok(/import\s*\{[^}]*TrendingUp[^}]*TrendingDown[^}]*\}\s*from\s*'@joymify\/icons'/.test(s), `${n} must import the trend icons`);
+    assert.ok(!s.includes('▲') && !s.includes('▼'), `${n} must not use unicode trend glyphs`);
   }
 });
