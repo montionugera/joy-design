@@ -558,3 +558,30 @@ test('F-038 B-L2 fix: deltaDirection follows the sign, never the tone', async ()
     assert.ok(!s.includes('▲') && !s.includes('▼'), `${n} must not use unicode trend glyphs`);
   }
 });
+
+test('F-038 B-L3: Alert/EmptyState/Result/Skeleton use build.js-owned styles, tokens only, ref+rest, Alert is closable with icons', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  for (const n of ['Alert', 'EmptyState', 'Result', 'Skeleton']) {
+    const s = read(n);
+    assert.ok(!/<style[\s>]/.test(s), `${n} must not carry a scoped <style> (build.js owns the joy-* rules)`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(/.test(s), `${n} must contain no colour literals`);
+    assert.ok(s.includes('bind:this={ref}') && s.includes('$bindable(null)'), `${n} must bind ref`);
+    assert.ok(s.includes('{...rest}') && s.includes('...rest'), `${n} must spread rest props`);
+    assert.ok(s.includes('class: className'), `${n} must accept class`);
+  }
+  const alert = read('Alert');
+  assert.ok(!alert.includes('border-left'), 'Alert must not use a side stripe');
+  assert.ok(/import\s*\{[^}]*CheckCircle[^}]*\}\s*from\s*'@joymify\/icons'/.test(alert), 'Alert imports status icons from @joymify/icons');
+  assert.ok(alert.includes('class="joy-alert__icon" aria-hidden="true"'), 'Alert icon is decorative (aria-hidden)');
+  assert.ok(alert.includes('closable = false') && alert.includes('onclose'), 'Alert has closable (default false) and onclose');
+  assert.ok(alert.includes('aria-label="Dismiss alert"') && alert.includes('joy-alert__close'), 'close button is labelled');
+  assert.ok(alert.includes('{#if closable}'), 'close button renders only when closable');
+});
+
+test('F-038 B-L3: Alert dismiss hides the alert, then notifies the consumer', () => {
+  const alert = fs.readFileSync(path.resolve('./src/lib/Alert.svelte'), 'utf8');
+  const fn = alert.match(/function dismiss\(\)\s*\{([^}]*)\}/);
+  assert.ok(fn, 'dismiss handler exists');
+  assert.ok(fn[1].indexOf('dismissed = true') !== -1 && fn[1].indexOf('dismissed = true') < fn[1].indexOf('onclose?.()'), 'hide first, then call onclose');
+  assert.ok(alert.includes('{#if !dismissed}'), 'markup is gated on dismissed');
+});

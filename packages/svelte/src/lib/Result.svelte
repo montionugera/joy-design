@@ -13,6 +13,8 @@
 		onsecondaryaction?: () => void;
 		extra?: Snippet;
 		class?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
@@ -24,11 +26,13 @@
 		onprimaryaction,
 		onsecondaryaction,
 		extra,
-		class: className = ''
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 </script>
 
-<div class="joy-result joy-result--{status} {className}" role="alert">
+<div bind:this={ref} class="joy-result joy-result--{status} {className}" role="alert" {...rest}>
 	<div class="joy-result__icon">
 		{#if status === 'success'}
 			<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

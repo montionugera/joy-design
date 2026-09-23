@@ -126,3 +126,38 @@ test('F-038 B-L2: theme.css ships the visually-hidden trend label and delta row 
   assert.match(rule('.joy-metric-tile__change'), /display:\s*inline-flex/);
   assert.match(rule('.joy-stat-card__delta'), /display:\s*inline-flex/);
 });
+
+test('F-038 B-L3: Alert has no side stripe, uses status triads, card radius, a 44px close hit area, and a reduced-motion override', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const rule = (sel) => {
+    const m = css.match(new RegExp(`(^|\\n)${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`));
+    assert.ok(m, `theme.css must contain a ${sel} rule`);
+    return m[2];
+  };
+  assert.doesNotMatch(rule('.joy-alert'), /border-left/, 'no side stripe on the base rule');
+  assert.match(rule('.joy-alert'), /border-radius:\s*var\(--joy-radius-card\)/);
+  for (const v of ['info', 'success', 'warning', 'danger']) {
+    const body = rule(`.joy-alert--${v}`);
+    assert.doesNotMatch(body, /border-left/, `${v}: no side stripe`);
+    assert.match(body, new RegExp(`background:\\s*var\\(--joy-status-${v}-bg\\)`));
+    assert.match(body, new RegExp(`border-color:\\s*var\\(--joy-status-${v}-border\\)`));
+    assert.match(body, new RegExp(`color:\\s*var\\(--joy-status-${v}-fg\\)`));
+  }
+  assert.match(css, /\.joy-alert__close::before\s*\{[^}]*width:\s*44px[^}]*height:\s*44px/s, 'close hit area is 44x44');
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.joy-alert \{\s*animation: none;/, 'alert fade-in is disabled under reduced motion');
+});
+
+test('F-038 B-L3: Skeleton reduced-motion block comes after the shimmer rule and Result/EmptyState stay tokenized', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const base = css.indexOf('\n.joy-skeleton {');
+  const reduced = css.search(/@media \(prefers-reduced-motion: reduce\) \{\s*\.joy-skeleton \{/);
+  assert.ok(base !== -1 && reduced !== -1, 'skeleton base and reduced-motion rules must exist');
+  assert.ok(reduced > base, 'reduced-motion block must follow the base rule so it wins by source order');
+  assert.match(css.slice(reduced, reduced + 200), /animation:\s*none;\s*background:\s*var\(--joy-surface-sunken\)/);
+  const empty = css.match(/\n\.joy-empty-state \{([^}]*)\}/)[1];
+  assert.match(empty, /background:\s*var\(--joy-surface-card\)/);
+  assert.match(empty, /border:\s*1px dashed var\(--joy-border-default\)/);
+  assert.match(css, /\.joy-result__title \{[^}]*color:\s*var\(--joy-text-primary\)/s);
+  assert.match(css, /\.joy-result--warning \.joy-result__icon \{[^}]*color:\s*var\(--joy-status-warning-fg\)/s);
+  assert.doesNotMatch(css, /\.joy-(alert|empty-state|result|skeleton)[^{]*\{[^}]*#[0-9a-fA-F]{3,8}\b/, 'no hex literal in these rule blocks');
+});
