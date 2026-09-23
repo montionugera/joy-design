@@ -29,6 +29,10 @@ export interface SeriesConfig {
 }
 
 export interface ChartOptions {
+  /**
+   * Explicit override only. Leave unset (the default) so grid and crosshair
+   * strokes follow the live CSS-variable palette and therefore the active theme.
+   */
   theme?: 'light' | 'dark';
   smooth?: boolean; // Monotone cubic hermite spline
   showGrid?: boolean;
@@ -40,9 +44,10 @@ export interface ChartOptions {
 /**
  * Token-driven canvas color palette. Reads live CSS custom properties from the
  * canvas element so chart rendering stays correct across light/dark themes
- * without hardcoded hex. Read on every render and crosshair draw; a
- * 'joy-theme-change' event triggers a render so the canvas repaints
- * immediately on theme toggle.
+ * without hardcoded hex. Read once per render() and cached for pointer-driven
+ * repaints (mousemove / wheel / drag); the data-theme observer, the
+ * prefers-color-scheme listener and the 'joy-theme-change' event call render()
+ * so the canvas repaints, and re-reads the palette, immediately on theme toggle.
  */
 export interface ChartPalette {
   textSecondary: string;
@@ -367,6 +372,7 @@ export class JoyChartCore {
   private dragStartViewMaxX = 0;
   private boundListeners: { element: HTMLElement; event: string; handler: EventListener }[] = [];
   private themeCleanups: (() => void)[] = [];
+  private palette: ChartPalette | null = null;
 
   constructor(
     baseCanvas: HTMLCanvasElement,
@@ -378,7 +384,6 @@ export class JoyChartCore {
     this.baseCtx = baseCanvas.getContext('2d')!;
     this.overlayCtx = overlayCanvas.getContext('2d')!;
     this.options = {
-      theme: 'light',
       smooth: true,
       showGrid: true,
       showCrosshair: true,
@@ -473,11 +478,23 @@ export class JoyChartCore {
     }
   }
 
+  /** Cached palette; read from the DOM only on first use or after render() invalidated it. */
+  private getPalette(): ChartPalette {
+    return (this.palette ??= readChartPalette(this.baseCanvas));
+  }
+
+  /** Full repaint that re-reads the CSS-variable palette (once) first. */
   public render() {
+    this.palette = null;
+    this.paint();
+  }
+
+  /** Repaint with the cached palette (pointer-driven redraws must not hit getComputedStyle). */
+  private paint() {
     if (this.width <= 0 || this.height <= 0) return;
     const ctx = this.baseCtx;
     ctx.clearRect(0, 0, this.width, this.height);
-    const palette = readChartPalette(this.baseCanvas);
+    const palette = this.getPalette();
 
     if (this.options.showGrid) {
       this.drawGrid(ctx, palette);
@@ -491,8 +508,10 @@ export class JoyChartCore {
   }
 
   private drawGrid(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
-    const isDark = this.options.theme === 'dark';
-    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+    const override = this.options.theme;
+    ctx.strokeStyle = override
+      ? override === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'
+      : palette.border;
     ctx.lineWidth = 1;
 
     // Horizontal grid lines
@@ -728,11 +747,11 @@ export class JoyChartCore {
         const shift = (deltaX / this.width) * range;
         this.viewMinX = this.dragStartViewMinX - shift;
         this.viewMaxX = this.dragStartViewMaxX - shift;
-        this.render();
+        this.paint();
       }
 
       if (this.options.showCrosshair) {
-        this.drawCrosshair(mouseX, mouseY, readChartPalette(this.baseCanvas));
+        this.drawCrosshair(mouseX, mouseY, this.getPalette());
       }
     }) as EventListener);
 
@@ -751,8 +770,8 @@ export class JoyChartCore {
       this.viewMinX = mouseDataX - leftSpan * factor;
       this.viewMaxX = mouseDataX + rightSpan * factor;
 
-      this.render();
-      this.drawCrosshair(mouseX, e.clientY - rect.top, readChartPalette(this.baseCanvas));
+      this.paint();
+      this.drawCrosshair(mouseX, e.clientY - rect.top, this.getPalette());
     }) as EventListener);
 
     this.addListener(this.overlayCanvas, 'mouseleave', (() => {
@@ -765,7 +784,11 @@ export class JoyChartCore {
     const ctx = this.overlayCtx;
     ctx.clearRect(0, 0, this.width, this.height);
 
-    ctx.strokeStyle = this.options.theme === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)';
+    const override = this.options.theme;
+    ctx.strokeStyle = override
+      ? override === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'
+      : palette.textPrimary;
+    ctx.globalAlpha = override ? 1 : 0.4;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
 
@@ -783,6 +806,7 @@ export class JoyChartCore {
     ctx.lineTo(this.width, y);
     ctx.stroke();
     ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
 
     // Price Tracking Pill
     const price = this.toDataY(mouseY);

@@ -14,7 +14,7 @@ export interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const BarChart = forwardRef<HTMLDivElement, BarChartProps>(
-  ({ series = [], height = 360, theme = 'light', className = '', style, onKeyDown, ...props }, ref) => {
+  ({ series = [], height = 360, className = '', style, onKeyDown, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);

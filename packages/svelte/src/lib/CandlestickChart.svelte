@@ -21,7 +21,7 @@
 	let {
 		data = [],
 		height = 420,
-		theme = 'light',
+		theme,
 		class: className = '',
 		style = '',
 		ref = $bindable(null),

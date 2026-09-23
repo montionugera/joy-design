@@ -21,7 +21,7 @@
 	let {
 		series = [],
 		height = 360,
-		theme = 'light',
+		theme,
 		class: className = '',
 		style = '',
 		ref = $bindable(null),

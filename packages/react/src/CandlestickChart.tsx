@@ -14,7 +14,7 @@ export interface CandlestickChartProps extends React.HTMLAttributes<HTMLDivEleme
 }
 
 export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps>(
-  ({ data = [], height = 420, theme = 'light', className = '', style, onKeyDown, ...props }, ref) => {
+  ({ data = [], height = 420, className = '', style, onKeyDown, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);

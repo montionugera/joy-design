@@ -23,7 +23,7 @@
 		series = [],
 		height = 360,
 		smooth = true,
-		theme = 'light',
+		theme,
 		class: className = '',
 		style = '',
 		ref = $bindable(null),

@@ -376,3 +376,97 @@ test('formatCandleTime renders UTC timestamps and tolerates invalid input', () =
   assert.strictEqual(formatCandleTime(Date.UTC(2026, 0, 2, 3, 4)), '2026-01-02 03:04 UTC');
   assert.strictEqual(formatCandleTime(NaN), 'NaN');
 });
+
+// Grid + crosshair strokes must come from the resolved CSS-variable palette (not options.theme),
+// and pointer-driven redraws must reuse a cached palette instead of re-reading computed style.
+function recordingCanvas() {
+  const strokes = [];
+  const listeners = {};
+  const state = {};
+  const ctx = new Proxy(state, {
+    get(target, prop) {
+      if (prop === 'stroke') return () => strokes.push({ style: target.strokeStyle, alpha: target.globalAlpha ?? 1 });
+      if (prop in target) return target[prop];
+      return () => ({ addColorStop() {} });
+    },
+    set(target, prop, value) { target[prop] = value; return true; }
+  });
+  const canvas = {
+    getContext: () => ctx,
+    getBoundingClientRect: () => ({ width: 200, height: 100, left: 0, top: 0 }),
+    addEventListener(type, handler) { listeners[type] = handler; },
+    removeEventListener() {}
+  };
+  return { canvas, strokes, listeners };
+}
+
+function withCountingStyle(cssVars, fn) {
+  const original = globalThis.getComputedStyle;
+  const originalWindow = globalThis.window;
+  const counter = { reads: 0 };
+  globalThis.getComputedStyle = () => { counter.reads++; return { getPropertyValue: (n) => cssVars[n] ?? '' }; };
+  globalThis.window = { addEventListener() {}, removeEventListener() {}, devicePixelRatio: 1 };
+  try { return fn(counter); } finally { globalThis.getComputedStyle = original; globalThis.window = originalWindow; }
+}
+
+for (const [theme, expected] of Object.entries(THEME_PALETTES)) {
+  test(`grid and crosshair strokes resolve from CSS variables in ${theme} theme with no theme option`, () => {
+    const cssVars = Object.fromEntries(Object.entries(PALETTE_VARS).map(([k, name]) => [name, expected[k]]));
+    withCountingStyle(cssVars, () => {
+      const base = recordingCanvas(); const overlay = recordingCanvas();
+      const chart = new JoyChartCore(base.canvas, overlay.canvas, { showGrid: true, showCrosshair: true });
+      chart.setSeries([{ id: 's', type: 'line', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }] }]);
+      assert.ok(base.strokes.length > 0, 'grid drew');
+      assert.strictEqual(base.strokes[0].style, expected.border, 'grid stroke = --joy-border-subtle');
+      overlay.listeners.mousemove({ clientX: 50, clientY: 40 });
+      assert.strictEqual(overlay.strokes[0].style, expected.textPrimary, 'crosshair stroke = --joy-text-primary');
+      assert.ok(overlay.strokes[0].alpha < 1, 'crosshair is translucent via globalAlpha');
+    });
+  });
+}
+
+test('grid and crosshair follow a live theme switch (data-theme observer re-reads the palette)', () => {
+  withThemeEnv((env) => {
+    env.cssVars['--joy-border-subtle'] = '#e3dccc';
+    env.cssVars['--joy-text-primary'] = '#1f1c13';
+    const base = recordingCanvas(); const overlay = recordingCanvas();
+    const chart = new JoyChartCore(base.canvas, overlay.canvas, { showGrid: true, showCrosshair: true });
+    chart.setSeries([{ id: 's', type: 'line', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }] }]);
+    assert.strictEqual(base.strokes[0].style, '#e3dccc');
+    const painted = base.strokes.length;
+    env.cssVars['--joy-border-subtle'] = '#3c3a35';
+    env.cssVars['--joy-text-primary'] = '#f8f3e8';
+    env.observers[0].cb([{ type: 'attributes', attributeName: 'data-theme' }]);
+    assert.strictEqual(base.strokes[painted].style, '#3c3a35', 'grid repainted with dark border token');
+    overlay.listeners.mousemove({ clientX: 50, clientY: 40 });
+    assert.strictEqual(overlay.strokes[0].style, '#f8f3e8', 'crosshair uses the re-read dark palette');
+  });
+});
+
+test('an explicit theme option still overrides the palette for grid and crosshair', () => {
+  withCountingStyle({}, () => {
+    const base = recordingCanvas(); const overlay = recordingCanvas();
+    const chart = new JoyChartCore(base.canvas, overlay.canvas, { theme: 'dark', showGrid: true, showCrosshair: true });
+    chart.setSeries([{ id: 's', type: 'line', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }] }]);
+    assert.strictEqual(base.strokes[0].style, 'rgba(255, 255, 255, 0.05)');
+    overlay.listeners.mousemove({ clientX: 50, clientY: 40 });
+    assert.strictEqual(overlay.strokes[0].style, 'rgba(255,255,255,0.4)');
+  });
+});
+
+test('mousemove / wheel / drag redraws reuse the cached palette (no getComputedStyle re-read)', () => {
+  withCountingStyle({ '--joy-accent-default': '#b8862c' }, (counter) => {
+    const base = recordingCanvas(); const overlay = recordingCanvas();
+    const chart = new JoyChartCore(base.canvas, overlay.canvas, { showGrid: true, showCrosshair: true, enableZoomPan: true });
+    chart.setSeries([{ id: 's', type: 'line', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }, { x: 3, y: 2 }] }]);
+    const afterRender = counter.reads;
+    assert.ok(afterRender >= 1, 'render read the palette');
+    for (let i = 0; i < 10; i++) overlay.listeners.mousemove({ clientX: 10 + i, clientY: 40 });
+    overlay.listeners.wheel({ clientX: 50, clientY: 40, deltaY: -1, preventDefault() {} });
+    overlay.listeners.mousedown({ clientX: 50 });
+    overlay.listeners.mousemove({ clientX: 70, clientY: 40 });
+    assert.strictEqual(counter.reads, afterRender, 'pointer-driven redraws must not re-read computed style');
+    chart.render();
+    assert.strictEqual(counter.reads, afterRender + 1, 'an explicit render() re-reads exactly once');
+  });
+});
