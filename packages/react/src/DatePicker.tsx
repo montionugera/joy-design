@@ -1,33 +1,65 @@
-import React from 'react';
+import * as React from 'react';
+import { Calendar } from '@joymify/icons/react';
 
-export interface DatePickerProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+export interface DatePickerProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   value?: string;
+  min?: string;
+  max?: string;
+  placeholder?: string;
+  disabled?: boolean;
   error?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  id?: string;
+  className?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
-  ({ value = '', error = false, disabled = false, className = '', onChange, ...rest }, ref) => {
+  (
+    {
+      value,
+      min,
+      max,
+      placeholder,
+      disabled = false,
+      error = false,
+      size = 'md',
+      id,
+      className = '',
+      style,
+      onChange,
+      ...rest
+    },
+    ref
+  ) => {
     return (
       <div
-        className={`joy-date-picker ${disabled ? 'joy-date-picker--disabled' : ''} ${error ? 'joy-date-picker--error' : ''} ${className}`}
+        className={cx(
+          'joy-date-picker',
+          size && `joy-date-picker--${size}`,
+          disabled && 'joy-date-picker--disabled',
+          error && 'joy-date-picker--error',
+          className
+        )}
+        style={style}
       >
         <input
           ref={ref}
           type="date"
+          id={id}
           className="joy-date-picker__input"
           value={value}
+          min={min}
+          max={max}
+          placeholder={placeholder}
           disabled={disabled}
           onChange={onChange}
           {...rest}
         />
         <span className="joy-date-picker__icon" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
+          <Calendar size={16} />
         </span>
       </div>
     );

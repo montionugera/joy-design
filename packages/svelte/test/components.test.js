@@ -40,7 +40,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(select.includes('$bindable'), 'Select must support bindable value');
 
   const checkbox = fs.readFileSync(path.resolve('./src/lib/Checkbox.svelte'), 'utf8');
-  assert.ok(checkbox.includes('role="checkbox"'), 'Checkbox must implement role=checkbox');
+  assert.ok(!checkbox.includes('role="checkbox"'), 'Checkbox must not duplicate the native role');
   assert.ok(checkbox.includes('joy-checkbox'), 'Checkbox must have joy-checkbox class');
 
   const radio = fs.readFileSync(path.resolve('./src/lib/RadioGroup.svelte'), 'utf8');
@@ -286,3 +286,200 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 });
 
 
+test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  ['Button', 'Input', 'InputNumber', 'Select', 'DatePicker', 'DateRangePicker'].forEach(assertWave2);
+
+  const button = read('Button');
+  assert.ok(button.includes("'link'"), "Button must include 'link' variant");
+  assert.ok(button.includes('joy-button__label'), 'Button must include joy-button__label');
+  assert.ok(button.includes('joy-button--block'), 'Button must include joy-button--block');
+  assert.ok(button.includes('joy-button--icon-only'), 'Button must include joy-button--icon-only');
+  assert.ok(button.includes('aria-busy'), 'Button must include aria-busy');
+  assert.ok(button.includes('iconStart'), 'Button must include iconStart');
+  assert.ok(button.includes('iconEnd'), 'Button must include iconEnd');
+
+  const input = read('Input');
+  assert.ok(input.includes('joy-input-wrapper__message'), 'Input must include joy-input-wrapper__message');
+  assert.ok(input.includes('readonly'), 'Input must include readonly');
+
+  const inputNumber = read('InputNumber');
+  assert.ok(inputNumber.includes('inputmode="decimal"'), 'InputNumber must include inputmode="decimal"');
+  assert.ok(
+    inputNumber.split('\n').some((line) => line.includes('<input') && line.includes('role="spinbutton"')),
+    'InputNumber must include role="spinbutton" on the input line'
+  );
+
+  const select = read('Select');
+  assert.ok(select.includes('role="combobox"'), 'Select must include role="combobox"');
+  assert.ok(select.includes('joy-select__listbox'), 'Select must include joy-select__listbox');
+  assert.ok(select.includes('openOverlay'), 'Select must include openOverlay');
+  assert.ok(select.includes('type="hidden"'), 'Select must include type="hidden"');
+
+  const datePicker = read('DatePicker');
+  assert.ok(datePicker.includes('@joymify/icons'), 'DatePicker must include @joymify/icons');
+
+  const dateRangePicker = read('DateRangePicker');
+  assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
+});
+
+
+test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  for (const comp of ['TimePicker', 'Mentions', 'MarkdownEditor']) {
+    assertWave2(comp);
+  }
+
+  const timePicker = read('TimePicker');
+  assert.ok(timePicker.includes('openOverlay'), 'TimePicker must include openOverlay');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('openOverlay'), 'Mentions must include openOverlay');
+  assert.ok(!mentions.includes('setTimeout'), 'Mentions must not include setTimeout');
+
+  const md = read('MarkdownEditor');
+  assert.ok(md.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
+  assert.ok(md.includes('@joymify/icons'), 'MarkdownEditor must include @joymify/icons');
+});
+
+
+test('Wave 2 B-L3: choice controls with keyboard operation, indeterminate checkbox, form context', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2605}\u{2606}→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  const bL3Components = [
+    'Checkbox',
+    'Switch',
+    'RadioGroup',
+    'Slider',
+    'Rate',
+    'Segmented',
+    'Form',
+    'FormItem'
+  ];
+
+  for (const comp of bL3Components) {
+    assertWave2(comp);
+  }
+
+  const checkbox = read('Checkbox');
+  assert.ok(!checkbox.includes('role="checkbox"'), 'Checkbox must not duplicate the native role');
+  assert.ok(checkbox.includes('indeterminate'), 'Checkbox must support indeterminate state');
+
+  const radio = read('RadioGroup');
+  assert.ok(radio.includes('ArrowRight'), 'RadioGroup must support arrow key navigation');
+
+  const segmented = read('Segmented');
+  assert.ok(segmented.includes('ArrowRight'), 'Segmented must support arrow key navigation');
+
+  const rate = read('Rate');
+  assert.ok(rate.includes('ArrowRight'), 'Rate must support arrow key navigation');
+  assert.ok(rate.includes('role="radio"'), 'Rate stars must implement role=radio');
+
+  const form = read('Form');
+  assert.ok(form.includes('setFormContext('), 'Form must cascade context via the shared form-context helper');
+  const formContextHelper = fs.readFileSync(path.resolve('./src/lib/form-context.ts'), 'utf8');
+  assert.ok(formContextHelper.includes("'joy-form'"), 'form-context helper must key the context as joy-form');
+
+  const formItem = read('FormItem');
+  assert.ok(formItem.includes('joy-form-item__explain'), 'FormItem must render joy-form-item__explain');
+});
+
+
+test('Wave 2 B-L4: TreeSelect, Cascader, Transfer, Upload', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(!src.includes('<style'), `${name} must not carry a scoped style block`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2605}\u{2606}→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(src.includes('...rest') && src.includes('bind:this={ref}'), `${name} must spread rest props and expose bind:ref`);
+  };
+
+  const files = ['TreeSelect', 'Cascader', 'Transfer', 'Upload'];
+  files.forEach(assertWave2);
+
+  const treeSelect = read('TreeSelect');
+  assert.ok(treeSelect.includes('openOverlay'), 'TreeSelect must include openOverlay');
+  const treeSelectStyles = treeSelect.match(/style="[^"]*"/g) || [];
+  assert.strictEqual(treeSelectStyles.filter((s) => !s.includes('{style}')).length, 0, 'TreeSelect must not include style="..." other than root passthrough');
+
+  const cascader = read('Cascader');
+  assert.ok(cascader.includes('openOverlay'), 'Cascader must include openOverlay');
+  const cascaderStyles = cascader.match(/style="[^"]*"/g) || [];
+  assert.strictEqual(cascaderStyles.filter((s) => !s.includes('{style}')).length, 0, 'Cascader must not include style="..." other than root passthrough');
+
+  const transfer = read('Transfer');
+  assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
+  assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
+
+  const upload = read('Upload');
+  assert.ok(upload.includes('@joymify/icons'), 'Upload must import from @joymify/icons');
+});
+
+test('F-037 lane review: Mentions per-instance id, Rate readonly semantics, Select activedescendant', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+
+  const mentions = read('Mentions');
+  assert.ok(
+    !mentions.includes('id="mentions-dropdown"') && !mentions.includes("id='mentions-dropdown'"),
+    'Mentions dropdown id must not be a hardcoded literal'
+  );
+  assert.ok(mentions.includes('$props.id()'), 'Mentions must derive a per-instance id via $props.id()');
+  assert.ok(
+    mentions.includes('aria-controls={isOpen && filteredOptions.length > 0 ? dropdownId : undefined}'),
+    'Mentions textarea must wire aria-controls to the per-instance dropdown id'
+  );
+  assert.ok(mentions.includes('id={dropdownId}'), 'Mentions dropdown must render the per-instance id');
+  assert.ok(
+    mentions.includes('class="joy-textarea joy-mentions__textarea"'),
+    'Mentions textarea must carry both joy-textarea and joy-mentions__textarea classes'
+  );
+
+  const rate = read('Rate');
+  assert.ok(
+    !rate.includes('disabled={effectiveDisabled || readonly}'),
+    'Rate stars must not set native disabled from readonly'
+  );
+  assert.ok(rate.includes('disabled={effectiveDisabled}'), 'Rate stars disabled must reflect only real disabled');
+  assert.ok(
+    !rate.includes('effectiveDisabled || readonly ? -1'),
+    'Rate readonly must not remove stars from the tab order'
+  );
+  assert.ok(
+    rate.includes(`aria-readonly={readonly ? 'true' : undefined}`),
+    'Rate radiogroup must expose aria-readonly when readonly'
+  );
+
+  const select = read('Select');
+  assert.ok(
+    select.includes('aria-activedescendant={activeDescendantId}'),
+    'Select combobox must wire aria-activedescendant to the active option'
+  );
+  assert.ok(
+    select.includes('id="{listboxId}-opt-{i}"'),
+    'Select options must expose stable ids derived from the listbox id'
+  );
+});

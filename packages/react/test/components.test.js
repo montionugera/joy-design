@@ -38,7 +38,7 @@ test('React standard library components implement accessible traits and forwardR
   assert.ok(select.includes('joy-select'), 'Select must render joy-select class');
 
   const checkbox = fs.readFileSync(path.resolve('./src/Checkbox.tsx'), 'utf8');
-  assert.ok(checkbox.includes('role="checkbox"'), 'Checkbox must implement accessible role=checkbox');
+  assert.ok(!checkbox.includes('role="checkbox"'), 'Checkbox must not duplicate native role=checkbox');
   assert.ok(checkbox.includes('React.forwardRef'), 'Checkbox must forwardRef to native input');
 
   const radio = fs.readFileSync(path.resolve('./src/RadioGroup.tsx'), 'utf8');
@@ -307,3 +307,174 @@ test('React standard library components implement accessible traits and forwardR
 });
 
 
+test('Wave 2 C-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePicker match contract', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!new RegExp('[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}\\u2605\\u2606\\u2192]', 'u').test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+  };
+
+  const files = ['Button', 'Input', 'InputNumber', 'Select', 'DatePicker', 'DateRangePicker'];
+  for (const f of files) {
+    assertWave2(f);
+  }
+
+  const btn = read('Button');
+  assert.ok(btn.includes("'link'"), "Button must include 'link' variant");
+  assert.ok(btn.includes('joy-button__label'), 'Button must include joy-button__label');
+  assert.ok(btn.includes('aria-busy'), 'Button must include aria-busy');
+  assert.ok(btn.includes('iconStart'), 'Button must include iconStart');
+  assert.ok(btn.includes('iconEnd'), 'Button must include iconEnd');
+  assert.ok(btn.includes('cx('), 'Button must use cx(');
+
+  const select = read('Select');
+  assert.ok(select.includes('role="combobox"'), 'Select must include role="combobox"');
+  assert.ok(select.includes('useOverlay('), 'Select must include useOverlay(');
+  assert.ok(select.includes('type="hidden"'), 'Select must include type="hidden"');
+
+  const inputNumber = read('InputNumber');
+  assert.ok(inputNumber.includes('inputMode="decimal"'), 'InputNumber must include inputMode="decimal"');
+
+  const datePicker = read('DatePicker');
+  assert.ok(datePicker.includes('@joymify/icons/react'), 'DatePicker must import from @joymify/icons/react');
+
+  const dateRangePicker = read('DateRangePicker');
+  assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
+});
+
+
+test('Wave 2 C-L2: TimePicker, Mentions, MarkdownEditor', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+  };
+
+  assertWave2('TimePicker');
+  assertWave2('Mentions');
+  assertWave2('MarkdownEditor');
+
+  const timePicker = read('TimePicker');
+  assert.ok(timePicker.includes('useOverlay('), 'TimePicker must include useOverlay(');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('useOverlay('), 'Mentions must include useOverlay(');
+
+  const mdEditor = read('MarkdownEditor');
+  assert.ok(mdEditor.includes('@joymify/icons/react'), 'MarkdownEditor must import @joymify/icons/react');
+  assert.ok(mdEditor.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
+});
+
+
+const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+const assertWave2 = (name) => {
+  const src = read(name);
+  assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+  assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+  assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2605}\u{2606}→]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+  assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+};
+
+test('Wave 2 C-L3: Checkbox, Switch, RadioGroup, Slider, Rate, Segmented, Form, FormItem', () => {
+  const c3Files = ['Checkbox', 'Switch', 'RadioGroup', 'Slider', 'Rate', 'Segmented', 'Form', 'FormItem'];
+  c3Files.forEach(assertWave2);
+
+  const checkbox = read('Checkbox');
+  assert.ok(checkbox.includes('indeterminate'), 'Checkbox must support indeterminate state');
+
+  const rate = read('Rate');
+  assert.ok(!rate.includes('\u{2605}'), 'Rate must not include \u{2605} glyph');
+
+  const radio = read('RadioGroup');
+  assert.ok(radio.includes('ArrowRight'), 'RadioGroup must support ArrowRight');
+
+  const segmented = read('Segmented');
+  assert.ok(segmented.includes('ArrowRight'), 'Segmented must support ArrowRight');
+
+  assert.ok(rate.includes('ArrowRight'), 'Rate must support ArrowRight');
+
+  const form = read('Form');
+  assert.ok(form.includes('createContext'), 'Form must export createContext FormContext');
+  assert.ok(form.includes('cx('), 'Form must use cx helper');
+});
+
+
+test('Wave 2 C-L4: TreeSelect, Cascader, Transfer, Upload match contract', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+  const assertWave2 = (name) => {
+    const src = read(name);
+    assert.ok(src.includes('React.forwardRef') && src.includes('...rest'), `${name} must forwardRef and spread rest`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|var\(--joy-[^,)]*,/.test(src), `${name} must not contain colour literals or fallbacks`);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u2605\u2606\u2192]/u.test(src), `${name} must not contain emoji or arrow glyphs`);
+    assert.ok(!/--\$\{[^}]*\}\s*[`"']/.test(src) || src.includes('cx('), `${name} must not emit empty modifiers`);
+  };
+
+  for (const comp of ['TreeSelect', 'Cascader', 'Transfer', 'Upload']) {
+    assertWave2(comp);
+  }
+
+  const treeSelect = read('TreeSelect');
+  const cascader = read('Cascader');
+  const transfer = read('Transfer');
+  const upload = read('Upload');
+
+  assert.ok(treeSelect.includes('useOverlay('), 'TreeSelect must include useOverlay(');
+  assert.ok(cascader.includes('useOverlay('), 'Cascader must include useOverlay(');
+  assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
+  assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
+  assert.ok(upload.includes('@joymify/icons/react'), 'Upload must import @joymify/icons/react');
+  assert.ok(!upload.includes('\u{1F4C1}'), 'Upload must not include emoji');
+});
+
+test('F-037 lane review: Mentions/Rate/Select twin parity, Input type, Segmented uncontrolled default', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/${n}.tsx`), 'utf8');
+
+  const mentions = read('Mentions');
+  assert.ok(mentions.includes('React.useId()'), 'Mentions must derive a per-instance id via React.useId()');
+  assert.ok(
+    mentions.includes("className=\"joy-textarea joy-mentions__textarea\""),
+    'Mentions textarea must carry both joy-textarea and joy-mentions__textarea classes'
+  );
+
+  const rate = read('Rate');
+  assert.ok(
+    !rate.includes('tabIndex={!isInteractive ? -1'),
+    'Rate readonly must not remove stars from the tab order'
+  );
+  assert.ok(rate.includes('tabIndex={disabled ? -1'), 'Rate tab order must depend only on real disabled');
+  assert.ok(rate.includes('disabled={disabled}'), 'Rate stars disabled must reflect only real disabled');
+  assert.ok(
+    rate.includes('aria-readonly={isReadOnly ? true : undefined}'),
+    'Rate radiogroup must expose aria-readonly when readonly'
+  );
+
+  const select = read('Select');
+  assert.ok(
+    select.includes('aria-activedescendant={activeDescendantId}'),
+    'Select combobox must wire aria-activedescendant to the active option'
+  );
+  assert.ok(
+    select.includes('id={`${listboxId}-opt-${i}`}'),
+    'Select options must expose stable ids derived from the listbox id'
+  );
+
+  const input = read('Input');
+  assert.ok(!input.includes('type?: string'), 'Input must not widen type to string');
+  assert.ok(!input.includes('type: string'), 'Input must not widen type to string');
+
+  const segmented = read('Segmented');
+  assert.ok(
+    !segmented.includes("normalizedOptions[0]?.value ?? ''"),
+    'Segmented must not auto-select the first option when uncontrolled'
+  );
+  assert.ok(
+    segmented.includes('React.useState<string | undefined>(defaultValue)'),
+    'Segmented uncontrolled state must start from defaultValue only'
+  );
+});

@@ -1,42 +1,149 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.join(__dirname, 'dist');
+const outDir = path.join(__dirname, "dist");
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-const tokensSrcPath = path.join(__dirname, '../../packages/tokens/dist/theme.css');
-const inlinedThemeCss = fs.existsSync(tokensSrcPath) ? fs.readFileSync(tokensSrcPath, 'utf8') : '';
+const tokensSrcPath = path.join(
+  __dirname,
+  "../../packages/tokens/dist/theme.css",
+);
+const inlinedThemeCss = fs.existsSync(tokensSrcPath)
+  ? fs.readFileSync(tokensSrcPath, "utf8")
+  : "";
 
 // Extract vector SVGs from @joymify/icons
-const iconsSrcDir = path.join(__dirname, '../../packages/icons/src');
+const iconsSrcDir = path.join(__dirname, "../../packages/icons/src");
 const iconCardsHtml = fs.existsSync(iconsSrcDir)
-  ? fs.readdirSync(iconsSrcDir)
-      .filter(f => f.endsWith('.svelte'))
+  ? fs
+      .readdirSync(iconsSrcDir)
+      .filter((f) => f.endsWith(".svelte"))
       .sort()
-      .map(f => {
-        const name = f.replace('.svelte', '');
-        const content = fs.readFileSync(path.join(iconsSrcDir, f), 'utf8');
+      .map((f) => {
+        const name = f.replace(".svelte", "");
+        const content = fs.readFileSync(path.join(iconsSrcDir, f), "utf8");
         const svgMatch = content.match(/<svg[\s\S]*?<\/svg>/);
-        let svg = svgMatch ? svgMatch[0] : '';
-        svg = svg.replace(/width=\{size\}/g, 'width="24"')
-                 .replace(/height=\{size\}/g, 'height="24"')
-                 .replace(/stroke=\{color\}/g, 'stroke="currentColor"')
-                 .replace(/fill=\{color\}/g, 'fill="currentColor"');
+        let svg = svgMatch ? svgMatch[0] : "";
+        svg = svg
+          .replace(/width=\{size\}/g, 'width="24"')
+          .replace(/height=\{size\}/g, 'height="24"')
+          .replace(/stroke=\{color\}/g, 'stroke="currentColor"')
+          .replace(/fill=\{color\}/g, 'fill="currentColor"');
         return `
           <div class="icon-card" onclick="copyIconName('${name}')" title="Click to copy import">
             <div class="icon-preview">${svg}</div>
             <div class="icon-name">${name}</div>
           </div>
         `;
-      }).join('\n')
-  : '';
+      })
+      .join("\n")
+  : "";
 
 // Load semantic navigation manifest
-const manifestPath = path.join(__dirname, 'src/navigation.manifest.json');
-const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+const manifestPath = path.join(__dirname, "src/navigation.manifest.json");
+const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 
+const chevronRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+const chevronDown = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+const closeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>`;
+const star = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 8.9 8.3 12 2"/></svg>`;
+const spinner = `<span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg></span>`;
+
+function renderButtonMatrix() {
+  const variants = ["solid", "outline", "ghost", "danger", "link"];
+  const sizes = ["sm", "md", "lg"];
+  const states = ["default", "hover", "focus", "active", "disabled", "loading"];
+  const buttons = variants
+    .flatMap((variant) =>
+      sizes.flatMap((size) =>
+        states.map((state) => {
+          const loading = state === "loading";
+          const disabled = state === "disabled" ? " disabled" : "";
+          const demoClass = state === "hover" ? " joy-button--demo-hover" : state === "focus" ? " joy-button--demo-focus" : "";
+          return `<button type="button" class="joy-button joy-button--${variant} joy-button--${size}${loading ? " joy-button--loading" : ""}${demoClass}"${loading ? ' aria-busy="true"' : ""}${disabled} data-state="${state}"><span class="joy-button__label">${variant} ${size} ${state}</span>${loading ? spinner : ""}</button>`;
+        }),
+      ),
+    )
+    .join("");
+
+  return `<div class="component-canvas" data-matrix="button" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: var(--joy-space-3);">
+    ${buttons}
+    <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--icon-only" aria-label="Continue"><span class="joy-button__icon joy-button__icon--end">${chevronRight}</span></button>
+    <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--block"><span class="joy-button__label">Block action</span></button>
+  </div>`;
+}
+
+function renderFormsMatrix() {
+  const inputStates = ["default", "error", "success", "disabled", "readonly"];
+  const inputSizes = ["sm", "md", "lg"];
+  const inputRows = inputSizes
+    .flatMap((size) =>
+      inputStates.map((state) => {
+        const stateClass =
+          state === "default" ? "" : ` joy-input-wrapper--${state}`;
+        const disabled = state === "disabled" ? " disabled" : "";
+        const readonly = state === "readonly" ? " readonly" : "";
+        const message =
+          state === "error" || state === "success"
+            ? `<p class="joy-input-wrapper__message" id="input-${size}-${state}-message">${state === "error" ? "Enter a valid value" : "Value confirmed"}</p>`
+            : "";
+        return `<div class="joy-input-wrapper joy-input-wrapper--${size}${stateClass}">
+      <span class="joy-input-wrapper__prefix" aria-hidden="true">$</span>
+      <input class="joy-input" id="input-${size}-${state}" placeholder="${size} ${state}"${disabled}${readonly}${state === "error" ? ' aria-invalid="true" aria-describedby="input-' + size + "-" + state + '-message"' : ""}>
+      <span class="joy-input-wrapper__suffix" aria-hidden="true">USD</span>${message}
+    </div>`;
+      }),
+    )
+    .join("");
+
+  const numberControl = (
+    label,
+    state = "",
+  ) => `<div><p>${label}</p><div class="joy-input-number joy-input-number--md${state ? ` joy-input-number--${state}` : ""}">
+    <input class="joy-input-number__input" type="text" inputmode="decimal" role="spinbutton" aria-valuenow="10" aria-valuemin="1" aria-valuemax="100" value="10">
+    <div class="joy-input-number__handler-wrap"><button type="button" class="joy-input-number__handler-up" aria-label="Increase" tabindex="-1">${chevronDown}</button><button type="button" class="joy-input-number__handler-down" aria-label="Decrease" tabindex="-1">${chevronDown}</button></div>
+  </div></div>`;
+  const option = (text, selected = false, disabled = false) =>
+    `<li class="joy-select__option${selected ? " joy-select__option--active" : ""}${disabled ? " joy-select__option--disabled" : ""}" role="option" aria-selected="${selected}"${disabled ? ' aria-disabled="true"' : ""}>${text}</li>`;
+  const checkbox = (label, attrs = "", modifier = "") =>
+    `<label class="joy-checkbox${modifier}"><input type="checkbox"${attrs}><span class="joy-checkbox__box"></span><span class="joy-checkbox__label">${label}</span></label>`;
+  const radio = (label, checked = false, disabled = false) =>
+    `<label class="joy-radio${disabled ? " joy-radio--disabled" : ""}"><input type="radio" name="matrix-radio"${checked ? ' checked tabindex="0"' : ' tabindex="-1"'}${disabled ? " disabled" : ""}><span class="joy-radio__circle"></span><span class="joy-radio__label">${label}</span></label>`;
+  const switchControl = (
+    label,
+    checked = false,
+    disabled = false,
+    size = "md",
+  ) =>
+    `<button type="button" class="joy-switch joy-switch--${size}${checked ? " joy-switch--checked" : ""}" role="switch" aria-checked="${checked}"${disabled ? " disabled" : ""}><span class="joy-switch__thumb"></span><span class="joy-switch__label">${label}</span></button>`;
+  const sheetDemo = (content, sheet = false) =>
+    `<div class="hub-sheet-demo"${sheet ? " data-sheet-demo" : ""} style="position: relative; min-height: 360px; transform: translateZ(0);">${content}</div>`;
+
+  return `<div class="component-canvas" data-matrix="forms" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: var(--joy-space-3); align-items: start;">
+    <section><h3>Input states and sizes</h3>${inputRows}</section>
+    <section><h3>InputNumber</h3>${numberControl("Default")}${numberControl("Error", "error")}</section>
+    <section><h3>Select</h3>
+      <div class="joy-select-wrapper joy-select-wrapper--md"><button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox"><span class="joy-select__value">Balanced</span><span class="joy-select__arrow">${chevronDown}</span></button></div>
+      <div class="joy-select-wrapper joy-select-wrapper--md joy-select-wrapper--error"><button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-invalid="true"><span class="joy-select__placeholder">Choose a strategy</span><span class="joy-select__arrow">${chevronDown}</span></button><p class="joy-select-wrapper__message">Select a strategy</p></div>
+      <div class="joy-select-wrapper joy-select-wrapper--md joy-select-wrapper--disabled"><button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox" disabled><span class="joy-select__value">Disabled</span><span class="joy-select__arrow">${chevronDown}</span></button></div>
+      ${sheetDemo(`<div class="joy-select-wrapper joy-select-wrapper--md joy-select-wrapper--open"><button type="button" class="joy-select" role="combobox" aria-expanded="true" aria-haspopup="listbox" aria-controls="matrix-select-listbox"><span class="joy-select__value">Balanced</span><span class="joy-select__arrow">${chevronDown}</span></button><ul class="joy-select__listbox joy-overlay joy-overlay--sheet" id="matrix-select-listbox" role="listbox">${option("Balanced", true)}${option("Conservative")}${option("Unavailable", false, true)}</ul></div>`, true)}
+    </section>
+    <section><h3>Checkbox and switch</h3>${checkbox("Unchecked")}${checkbox("Checked", " checked")}${checkbox("Indeterminate", ' data-indeterminate="true"', " joy-checkbox--indeterminate")}${checkbox("Disabled", " disabled", " joy-checkbox--disabled")}${switchControl("Off")}${switchControl("On", true)}${switchControl("Disabled", false, true)}${switchControl("Small", true, false, "sm")}</section>
+    <section><h3>RadioGroup and slider</h3><div class="joy-radio-group" role="radiogroup">${radio("Market")}${radio("Limit", true)}</div><div class="joy-radio-group joy-radio-group--vertical joy-radio-group--error" role="radiogroup" aria-invalid="true">${radio("Vertical", true)}${radio("Disabled", false, true)}<p class="joy-radio-group__message">Choose an order type</p></div><div class="joy-slider"><div class="joy-slider__rail"><div class="joy-slider__track" style="width: 60%;"></div><div class="joy-slider__handle" role="slider" tabindex="0" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-disabled="false" style="left: 60%;"><span class="joy-slider__tooltip">60</span></div></div></div></section>
+    <section><h3>Rate and segmented</h3><div class="joy-rate" role="radiogroup">${[1, 2, 3, 4, 5].map((value) => `<button type="button" class="joy-rate__star${value <= 3 ? " joy-rate__star--full" : ""}" role="radio" aria-checked="${value === 3}" aria-label="${value} of 5" tabindex="${value === 3 ? "0" : "-1"}">${star}</button>`).join("")}</div><div class="joy-rate joy-rate--readonly" role="radiogroup">${[1, 2, 3, 4, 5].map((value) => `<button type="button" class="joy-rate__star${value <= 3 ? " joy-rate__star--full" : value === 4 ? " joy-rate__star--half" : ""}" role="radio" aria-checked="${value === 3}" aria-label="${value} of 5" tabindex="-1">${star}</button>`).join("")}</div><div class="joy-rate joy-rate--disabled" role="radiogroup">${[1, 2, 3, 4, 5].map((value) => `<button type="button" class="joy-rate__star" role="radio" aria-checked="false" aria-label="${value} of 5" tabindex="-1">${star}</button>`).join("")}</div><div class="joy-segmented" role="radiogroup"><button type="button" class="joy-segmented__item joy-segmented__item--active" role="radio" aria-checked="true" tabindex="0">Daily</button><button type="button" class="joy-segmented__item" role="radio" aria-checked="false" tabindex="-1">Weekly</button><button type="button" class="joy-segmented__item" role="radio" aria-checked="false" tabindex="-1" disabled>Monthly</button></div></section>
+    <section><h3>Form layouts</h3><form class="joy-form joy-form--vertical"><div class="joy-form-item joy-form-item--required"><label class="joy-form-item__label" for="vertical-name"><span class="joy-form-item__required">*</span>Name</label><div class="joy-form-item__control"><div class="joy-input-wrapper"><input class="joy-input" id="vertical-name" value="Mina"></div></div></div></form><form class="joy-form joy-form--horizontal joy-form--label-left" style="--joy-form-label-width: 10rem;"><div class="joy-form-item joy-form-item--horizontal joy-form-item--error"><label class="joy-form-item__label" for="horizontal-email"><span class="joy-form-item__required">*</span>Email</label><div class="joy-form-item__control"><div class="joy-input-wrapper joy-input-wrapper--error"><input class="joy-input" id="horizontal-email" aria-invalid="true" value="invalid"></div><p class="joy-form-item__explain" role="alert">Enter a valid email address</p></div></div></form></section>
+    <section><h3>Date and time</h3><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-23"><span class="joy-date-picker__icon" aria-hidden="true">${chevronDown}</span></div><div class="joy-date-range-picker"><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-23"></div><span class="joy-date-range-picker__sep">to</span><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-30"></div></div>${sheetDemo(`<div class="joy-time-picker"><div class="joy-input-wrapper"><input class="joy-input" readonly value="09:30"><span class="joy-input-wrapper__suffix">${chevronDown}</span></div><div class="joy-time-picker__panel joy-overlay" role="listbox"><div class="joy-time-picker__column"><button type="button" class="joy-time-picker__cell joy-time-picker__cell--selected" aria-selected="true">09</button><button type="button" class="joy-time-picker__cell" aria-selected="false">10</button></div><div class="joy-time-picker__column"><button type="button" class="joy-time-picker__cell joy-time-picker__cell--selected" aria-selected="true">30</button><button type="button" class="joy-time-picker__cell" aria-selected="false">45</button></div></div></div>`)}</section>
+    <section><h3>Mentions</h3>${sheetDemo(`<div class="joy-mentions"><textarea class="joy-textarea joy-mentions__textarea" aria-autocomplete="list" aria-expanded="true" aria-controls="mentions-list">@mi</textarea><ul class="joy-mentions__dropdown joy-overlay" id="mentions-list" role="listbox"><li class="joy-mentions__item joy-mentions__item--active" role="option" aria-selected="true"><span class="joy-mentions__item-label">Mina Lee</span></li><li class="joy-mentions__item" role="option" aria-selected="false"><span class="joy-mentions__item-label">Milo Chen</span></li></ul></div>`)}</section>
+    <section><h3>Upload</h3><div class="joy-upload"><input type="file" hidden><div class="joy-upload-dragger" role="button" tabindex="0"><span class="joy-upload-dragger__icon">${chevronDown}</span><p class="joy-upload-dragger__text">Drop a file here</p><p class="joy-upload-dragger__hint">or browse your device</p></div><ul class="joy-upload-list"><li class="joy-upload-list__item"><span class="joy-upload-list__item-icon">${chevronRight}</span><span class="joy-upload-list__item-info">portfolio.csv</span><button type="button" class="joy-upload-list__item-remove" aria-label="Remove portfolio.csv">${closeIcon}</button></li></ul></div></section>
+    <section><h3>TreeSelect</h3>${sheetDemo(`<div class="joy-treeselect joy-treeselect--open"><div class="joy-treeselect__control" role="combobox" aria-expanded="true" aria-haspopup="tree" tabindex="0"><span class="joy-treeselect__tags"><span class="joy-treeselect__tag">Research<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove Research">${closeIcon}</button></span></span><span class="joy-treeselect__arrow">${chevronDown}</span></div><div class="joy-treeselect__panel joy-overlay joy-overlay--sheet" role="tree"><div class="joy-treeselect__node joy-treeselect__node--selected" role="treeitem" aria-expanded="true" aria-selected="true"><button type="button" class="joy-treeselect__node-toggle">${chevronDown}</button><span class="joy-treeselect__node-label">Research</span></div></div></div>`, true)}</section>
+    <section><h3>Cascader</h3>${sheetDemo(`<div class="joy-cascader joy-cascader--open"><div class="joy-cascader__control" role="combobox" aria-expanded="true" tabindex="0"><span class="joy-cascader__value">Markets / Futures</span><span class="joy-cascader__arrow">${chevronDown}</span></div><div class="joy-cascader__panel joy-overlay joy-overlay--sheet"><div class="joy-cascader__columns"><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" aria-expanded="true">Markets<span class="joy-cascader__item-arrow">${chevronRight}</span></li></ul><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item" role="menuitem" tabindex="-1">Futures</li></ul></div></div></div>`, true)}</section>
+    <section><h3>Transfer</h3><div class="joy-transfer"><div class="joy-transfer__list"><div class="joy-transfer__header">${checkbox("Source")}<span class="joy-transfer__header-title">Available</span><span class="joy-transfer__header-count">1 item</span></div><div class="joy-transfer__body"><div class="joy-transfer__item joy-transfer__item--selected">${checkbox("Balanced")}</div></div></div><div class="joy-transfer__operations"><button type="button" class="joy-button joy-button--solid joy-button--sm joy-button--icon-only" aria-label="Move right">${chevronRight}</button><button type="button" class="joy-button joy-button--solid joy-button--sm joy-button--icon-only" aria-label="Move left">${chevronRight}</button></div><div class="joy-transfer__list"><div class="joy-transfer__header"><span class="joy-transfer__header-title">Selected</span><span class="joy-transfer__header-count">0 items</span></div><div class="joy-transfer__empty">No selected items</div></div></div></section>
+    <section><h3>MarkdownEditor</h3><div class="joy-markdown-editor"><div class="joy-markdown-editor__toolbar" role="toolbar"><button type="button" class="joy-markdown-editor__tool" aria-label="Bold" aria-pressed="true">B</button><button type="button" class="joy-markdown-editor__tool" aria-label="Preview" aria-pressed="false">${chevronRight}</button></div><div class="joy-markdown-editor__panes joy-markdown-editor__panes--split"><textarea class="joy-textarea joy-markdown-editor__textarea"># Review</textarea><div class="joy-markdown-editor__preview"><h4>Review</h4><p>Semantic token coverage.</p></div></div></div></section>
+    <script>document.querySelectorAll('[data-indeterminate="true"]').forEach((input) => { input.indeterminate = true; });</script>
+  </div>`;
+}
 
 const navIcons = {
   overview: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
@@ -75,21 +182,23 @@ const navIcons = {
   charts: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>`,
   primitives: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
   forms: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
-  navigation: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>`
+  navigation: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>`,
 };
 
 // Generate navigation HTML dynamically from manifest
-const navigationHtml = manifest.categories.map(cat => {
-  const items = cat.views.map(v => {
-    const iconSvg = navIcons[v.icon] || navIcons.overview;
-    return `      <a class="nav-item" onclick="switchView('${v.id}')">
+const navigationHtml = manifest.categories
+  .map((cat) => {
+    const items = cat.views
+      .map((v) => {
+        const iconSvg = navIcons[v.icon] || navIcons.overview;
+        return `      <a class="nav-item" onclick="switchView('${v.id}')">
         <span class="icon">${iconSvg}</span> ${v.label}
       </a>`;
-  }).join('\n');
-  return `      <div class="nav-section">${cat.label}</div>\n${items}`;
-}).join('\n\n');
-
-
+      })
+      .join("\n");
+    return `      <div class="nav-section">${cat.label}</div>\n${items}`;
+  })
+  .join("\n\n");
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -122,9 +231,9 @@ ${inlinedThemeCss}
       text-rendering: optimizeLegibility;
     }
     body {
-      font-family: var(--joy-font-family-sans, 'Inter', -apple-system, sans-serif);
-      background-color: var(--joy-color-surface-subtle, #f8fafc);
-      color: var(--joy-color-text-primary, #0f172a);
+      font-family: var(--joy-font-family-sans);
+      background-color: var(--joy-surface-canvas);
+      color: var(--joy-text-primary);
       margin: 0;
       padding: 0;
       display: flex;
@@ -136,8 +245,8 @@ ${inlinedThemeCss}
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background: #ffffff;
-      border-right: 1px solid #e2e8f0;
+      background: var(--joy-surface-card);
+      border-right: 1px solid var(--joy-border-default);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -145,7 +254,7 @@ ${inlinedThemeCss}
     }
     .brand {
       padding: 24px 20px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--joy-border-subtle);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -167,12 +276,12 @@ ${inlinedThemeCss}
       margin: 0;
       font-size: 1rem;
       font-weight: 700;
-      color: var(--joy-color-text-primary, #0f172a);
+      color: var(--joy-text-primary);
       letter-spacing: -0.01em;
     }
     .brand-info span {
       font-size: 0.75rem;
-      color: var(--joy-color-brand-primary, #7c3aed);
+      color: var(--joy-accent-default);
       font-weight: 600;
     }
     .nav {
@@ -185,7 +294,7 @@ ${inlinedThemeCss}
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--joy-color-text-muted, #64748b);
+      color: var(--joy-text-muted);
       padding: 10px 12px 6px;
       margin-top: 8px;
     }
@@ -197,14 +306,14 @@ ${inlinedThemeCss}
       border-radius: 6px;
       font-size: 0.875rem;
       font-weight: 500;
-      color: #334155;
+      color: var(--joy-text-secondary);
       text-decoration: none;
       cursor: pointer;
-      transition: all var(--joy-motion-duration-fast, 150ms);
+      transition: all var(--joy-duration-fast);
     }
     .nav-item:hover {
-      background: #f1f5f9;
-      color: var(--joy-color-text-primary, #0f172a);
+      background: var(--joy-surface-sunken);
+      color: var(--joy-text-primary);
     }
     .nav-item.active {
       background: var(--joy-accent-subtle);
@@ -223,22 +332,28 @@ ${inlinedThemeCss}
       flex-direction: column;
     }
     .topbar {
-      height: 60px;
-      border-bottom: var(--joy-border-hairline, 1px solid #e2e8f0);
-      background: var(--joy-surface-frosted, rgba(255, 255, 255, 0.82));
-      backdrop-filter: var(--joy-backdrop-blur, blur(12px));
-      -webkit-backdrop-filter: var(--joy-backdrop-blur, blur(12px));
+      min-height: 60px;
+      border-bottom: var(--joy-border-hairline);
+      background: var(--joy-surface-overlay);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 0 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: nowrap;
+      gap: var(--joy-space-2);
       position: sticky;
       top: 0;
       z-index: 10;
     }
+    #btn-theme-toggle {
+      flex-shrink: 0;
+    }
     .framework-pill {
       display: inline-flex;
-      background: #f1f5f9;
+      flex-wrap: nowrap;
+      background: var(--joy-surface-sunken);
       border-radius: 9999px;
       padding: 3px;
     }
@@ -250,13 +365,14 @@ ${inlinedThemeCss}
       font-weight: 600;
       border-radius: 9999px;
       cursor: pointer;
-      color: #64748b;
-      transition: all var(--joy-motion-duration-fast, 150ms);
+      color: var(--joy-text-muted);
+      transition: all var(--joy-duration-fast);
+      white-space: nowrap;
     }
     .framework-btn.active {
-      background: #ffffff;
-      color: var(--joy-color-brand-primary, #7c3aed);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      background: var(--joy-surface-card);
+      color: var(--joy-accent-default);
+      box-shadow: 0 1px 4px transparent;
     }
     .content-area {
       max-width: 1080px;
@@ -271,26 +387,26 @@ ${inlinedThemeCss}
     }
     .view-panel.active {
       display: block;
-      animation: joy-fade-in var(--joy-motion-duration-fast, 150ms) ease-out;
+      animation: joy-fade-in var(--joy-duration-fast) ease-out;
     }
     .header-tagline {
       margin-top: 4px;
-      color: var(--joy-color-text-muted, #64748b);
+      color: var(--joy-text-muted);
       font-size: 1rem;
       margin-bottom: 24px;
     }
     .playground-box {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      background: var(--joy-surface-card);
+      border: 1px solid var(--joy-border-default);
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px transparent;
       margin-bottom: 32px;
       overflow: hidden;
     }
     .playground-header {
       padding: 16px 20px;
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
+      background: var(--joy-surface-raised);
+      border-bottom: 1px solid var(--joy-border-default);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -302,7 +418,7 @@ ${inlinedThemeCss}
       margin: 0;
       font-size: 0.9375rem;
       font-weight: 600;
-      color: var(--joy-color-text-primary, #0f172a);
+      color: var(--joy-text-primary);
       min-width: 0;
       flex: 1 1 auto;
       overflow-wrap: break-word;
@@ -313,17 +429,17 @@ ${inlinedThemeCss}
       flex-shrink: 0;
     }
     .component-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      background: var(--joy-surface-card);
+      border: 1px solid var(--joy-border-default);
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px transparent;
       margin-bottom: 32px;
       overflow: hidden;
     }
     .component-header {
       padding: 16px 20px;
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
+      background: var(--joy-surface-raised);
+      border-bottom: 1px solid var(--joy-border-default);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -338,13 +454,13 @@ ${inlinedThemeCss}
     .component-title {
       font-size: 0.9375rem;
       font-weight: 600;
-      color: var(--joy-color-text-primary, #0f172a);
+      color: var(--joy-text-primary);
       overflow-wrap: break-word;
       word-break: break-word;
     }
     .component-desc {
       font-size: 0.8125rem;
-      color: var(--joy-color-text-muted, #64748b);
+      color: var(--joy-text-muted);
       margin-top: 4px;
       line-height: 1.4;
       overflow-wrap: break-word;
@@ -353,58 +469,77 @@ ${inlinedThemeCss}
     .component-canvas {
       padding: 24px;
       display: flex;
-      background: #ffffff;
+      background-color: var(--joy-surface-card);
+      background-image: radial-gradient(var(--joy-border-default) 1.2px, transparent 0);
+      background-size: 20px 20px;
       min-width: 0;
       overflow-x: auto;
+    }
+    .joy-select-wrapper--open .joy-select__listbox {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 100%;
+    }
+    .hub-sheet-demo {
+      min-width: 0;
+    }
+    @media (max-width: 480px) {
+      .hub-sheet-demo[data-sheet-demo] {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+      }
     }
     .canvas {
       padding: 44px 32px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 16px;
+      justify-content: flex-start;
+      gap: var(--joy-space-4);
       flex-wrap: wrap;
-      background: #fafafa;
-      background-image: radial-gradient(#cbd5e1 1.2px, transparent 0);
+      background: var(--joy-surface-canvas);
+      background-image: radial-gradient(var(--joy-border-default) 1.2px, transparent 0);
       background-size: 20px 20px;
       min-height: 180px;
       position: relative;
     }
     [data-theme="dark"] .canvas {
-      background: #090d16;
-      background-image: radial-gradient(#1e293b 1.2px, transparent 0);
+      background: var(--joy-surface-canvas);
+      background-image: radial-gradient(var(--joy-border-default) 1.2px, transparent 0);
     }
     .controls-table {
       width: 100%;
-      border-top: 1px solid #e2e8f0;
-      background: #ffffff;
+      border-top: 1px solid var(--joy-border-default);
+      background: var(--joy-surface-card);
       border-collapse: collapse;
       font-size: 0.875rem;
     }
     [data-theme="dark"] .controls-table {
-      background: #0f172a;
-      border-top-color: #334155;
+      background: var(--joy-surface-card);
+      border-top-color: var(--joy-text-secondary);
     }
     .controls-table td {
       padding: 14px 24px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--joy-surface-sunken);
       vertical-align: middle;
     }
     [data-theme="dark"] .controls-table td {
-      border-bottom-color: #1e293b;
+      border-bottom-color: var(--joy-surface-raised);
     }
     .controls-table td:first-child {
       font-weight: 600;
-      color: #334155;
+      color: var(--joy-text-secondary);
       width: 180px;
     }
     [data-theme="dark"] .controls-table td:first-child {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
     .segmented-control {
       display: inline-flex;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      max-width: 100%;
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-default);
       border-radius: 8px;
       padding: 3px;
       gap: 2px;
@@ -417,42 +552,43 @@ ${inlinedThemeCss}
       padding: 6px 14px;
       font-size: 0.8125rem;
       font-weight: 500;
-      color: #64748b;
+      color: var(--joy-text-muted);
       border-radius: 6px;
       cursor: pointer;
       transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
       font-family: inherit;
+      white-space: nowrap;
     }
     .segment-btn:hover {
-      color: #0f172a;
+      color: var(--joy-text-primary);
     }
     .segment-btn.active {
-      background: #ffffff;
-      color: #0f172a;
+      background: var(--joy-surface-card);
+      color: var(--joy-text-primary);
       font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 3px transparent, 0 1px 2px transparent;
     }
     [data-theme="dark"] .segmented-control {
-      background: #020617;
-      border-color: #334155;
+      background: var(--joy-surface-canvas);
+      border-color: var(--joy-text-secondary);
     }
     [data-theme="dark"] .segment-btn {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .segment-btn:hover {
-      color: #f8fafc;
+      color: var(--joy-text-primary);
     }
     [data-theme="dark"] .segment-btn.active {
-      background: #1e293b;
-      color: #f8fafc;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      background: var(--joy-surface-raised);
+      color: var(--joy-text-primary);
+      box-shadow: 0 1px 3px transparent;
     }
     .code-snippet {
-      background: #0f172a;
-      color: #f8fafc;
+      background: var(--joy-surface-inverse);
+      color: var(--joy-text-inverse);
       padding: 16px 20px;
       border-radius: 8px;
-      font-family: var(--joy-font-family-mono, monospace);
+      font-family: var(--joy-font-family-mono);
       font-size: 0.8125rem;
       overflow-x: auto;
       margin-top: 16px;
@@ -461,41 +597,41 @@ ${inlinedThemeCss}
     .tokens-table {
       width: 100%;
       border-collapse: collapse;
-      background: #ffffff;
+      background: var(--joy-surface-card);
       border-radius: 8px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--joy-border-default);
       overflow: hidden;
       font-size: 0.875rem;
     }
     .tokens-table th, .tokens-table td {
       padding: 12px 16px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--joy-surface-sunken);
       text-align: left;
     }
     .tokens-table th {
-      background: #f8fafc;
+      background: var(--joy-surface-raised);
       font-weight: 600;
     }
     .color-swatch {
       width: 24px;
       height: 24px;
       border-radius: 4px;
-      border: 1px solid rgba(0,0,0,0.1);
+      border: 1px solid transparent;
       display: inline-block;
       vertical-align: middle;
       margin-right: 8px;
     }
     .badge-runes {
-      background: #ff3e00;
-      color: #ffffff;
+      background: var(--joy-accent-default);
+      color: var(--joy-text-on-accent);
       font-size: 0.6875rem;
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: 700;
     }
     .badge-react {
-      background: #00d8ff;
-      color: #0f172a;
+      background: var(--joy-surface-inverse);
+      color: var(--joy-text-inverse);
       font-size: 0.6875rem;
       padding: 2px 6px;
       border-radius: 4px;
@@ -504,71 +640,71 @@ ${inlinedThemeCss}
 
     /* ── Coherent Dark Mode Overrides for Hub UI ── */
     [data-theme="dark"] body {
-      background-color: #0b0f19;
-      color: #f8fafc;
+      background-color: var(--joy-surface-canvas);
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .sidebar {
-      background: #0f172a;
-      border-right-color: #1e293b;
+      background: var(--joy-surface-card);
+      border-right-color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .brand {
-      border-bottom-color: #1e293b;
+      border-bottom-color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .brand-info h2 {
-      color: #f8fafc;
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .nav-section {
-      color: #64748b;
+      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .nav-item {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .nav-item:hover {
-      background: #1e293b;
-      color: #f8fafc;
+      background: var(--joy-surface-raised);
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .nav-item.active {
       background: var(--joy-accent-subtle);
       color: var(--joy-accent-text);
     }
     [data-theme="dark"] .topbar {
-      background: rgba(15, 23, 42, 0.85);
-      border-bottom-color: #1e293b;
+      background: transparent;
+      border-bottom-color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .framework-pill {
-      background: #1e293b;
+      background: var(--joy-surface-raised);
     }
     [data-theme="dark"] .framework-btn {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .framework-btn.active {
-      background: #0f172a;
-      color: #c084fc;
+      background: var(--joy-surface-card);
+      color: var(--joy-accent-text);
     }
     [data-theme="dark"] .playground-box {
-      background: #0f172a;
-      border-color: #1e293b;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      background: var(--joy-surface-card);
+      border-color: var(--joy-surface-raised);
+      box-shadow: 0 4px 12px transparent;
     }
     [data-theme="dark"] .playground-header {
-      background: #1e293b;
-      border-bottom-color: #334155;
+      background: var(--joy-surface-raised);
+      border-bottom-color: var(--joy-text-secondary);
     }
     [data-theme="dark"] .playground-header h4 {
-      color: #f8fafc;
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .tokens-table {
-      background: #0f172a;
-      border-color: #1e293b;
+      background: var(--joy-surface-card);
+      border-color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .tokens-table th {
-      background: #1e293b;
-      border-bottom-color: #334155;
-      color: #f8fafc;
+      background: var(--joy-surface-raised);
+      border-bottom-color: var(--joy-text-secondary);
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .tokens-table td {
-      border-bottom-color: #1e293b;
-      color: #cbd5e1;
+      border-bottom-color: var(--joy-surface-raised);
+      color: var(--joy-border-default);
     }
     /* Icon Gallery Styling */
     .icon-grid {
@@ -578,8 +714,8 @@ ${inlinedThemeCss}
       width: 100%;
     }
     .icon-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      background: var(--joy-surface-card);
+      border: 1px solid var(--joy-border-default);
       border-radius: 8px;
       padding: 16px 8px;
       display: flex;
@@ -591,73 +727,73 @@ ${inlinedThemeCss}
       transition: all 150ms ease;
     }
     .icon-card:hover {
-      border-color: #7c3aed;
+      border-color: var(--joy-accent-default);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+      box-shadow: 0 4px 12px transparent;
     }
     .icon-preview {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #334155;
+      color: var(--joy-text-secondary);
     }
     .icon-name {
       font-size: 0.75rem;
       font-weight: 500;
-      color: #64748b;
+      color: var(--joy-text-muted);
       text-align: center;
       word-break: break-all;
     }
     [data-theme="dark"] .icon-card {
-      background: #0f172a;
-      border-color: #1e293b;
+      background: var(--joy-surface-card);
+      border-color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .icon-card:hover {
-      border-color: #a855f7;
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+      border-color: var(--joy-accent-default);
+      box-shadow: 0 4px 12px transparent;
     }
     [data-theme="dark"] .icon-preview {
-      color: #f8fafc;
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .icon-name {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
 
     /* Coherent Dark Mode for All Containers & Component Cards */
     [data-theme="dark"] .header-tagline {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
-    [data-theme="dark"] .content-area div[style*="background: #ffffff"] {
-      background: #0f172a !important;
-      border-color: #1e293b !important;
+    [data-theme="dark"] .content-area div[style*="background: var(--joy-surface-card)"] {
+      background: var(--joy-surface-card) !important;
+      border-color: var(--joy-surface-raised) !important;
     }
-    [data-theme="dark"] .content-area div[style*="background: #f8fafc"] {
-      background: #1e293b !important;
-      border-color: #334155 !important;
+    [data-theme="dark"] .content-area div[style*="background: var(--joy-surface-raised)"] {
+      background: var(--joy-surface-raised) !important;
+      border-color: var(--joy-text-secondary) !important;
     }
     [data-theme="dark"] .component-card {
-      background: #0f172a;
-      border-color: #1e293b;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      background: var(--joy-surface-card);
+      border-color: var(--joy-surface-raised);
+      box-shadow: 0 4px 12px transparent;
     }
     [data-theme="dark"] .component-header {
-      background: #1e293b;
-      border-bottom-color: #334155;
+      background: var(--joy-surface-raised);
+      border-bottom-color: var(--joy-text-secondary);
     }
     [data-theme="dark"] .component-title {
-      color: #f8fafc;
+      color: var(--joy-surface-raised);
     }
     [data-theme="dark"] .component-desc {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .component-canvas {
-      background: #0b0f19;
+      background-color: var(--joy-surface-card);
     }
     [data-theme="dark"] .joy-toast {
-      background: #0f172a !important;
-      color: #f8fafc !important;
-      border-color: #1e293b !important;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+      background: var(--joy-surface-card) !important;
+      color: var(--joy-surface-raised) !important;
+      border-color: var(--joy-surface-raised) !important;
+      box-shadow: 0 10px 25px transparent !important;
     }
 
     /* ── Mobile Navigation Drawer & Backdrop ── */
@@ -665,7 +801,7 @@ ${inlinedThemeCss}
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
+      background: transparent;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       z-index: 998;
@@ -680,20 +816,20 @@ ${inlinedThemeCss}
       display: none;
       appearance: none;
       -webkit-appearance: none;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-default);
       border-radius: 8px;
       padding: 7px 10px;
       cursor: pointer;
-      color: #334155;
+      color: var(--joy-text-secondary);
       align-items: center;
       justify-content: center;
       margin-right: 12px;
       transition: all 150ms ease;
     }
     .mobile-menu-btn:hover {
-      background: #e2e8f0;
-      color: #0f172a;
+      background: var(--joy-border-default);
+      color: var(--joy-surface-card);
     }
     .sidebar-close-btn {
       display: none;
@@ -703,33 +839,33 @@ ${inlinedThemeCss}
       border: none;
       font-size: 1.25rem;
       cursor: pointer;
-      color: #64748b;
+      color: var(--joy-text-muted);
       padding: 4px 8px;
       border-radius: 6px;
       margin-left: auto;
     }
     .sidebar-close-btn:hover {
-      background: #f1f5f9;
-      color: #0f172a;
+      background: var(--joy-surface-sunken);
+      color: var(--joy-surface-card);
     }
     [data-theme="dark"] .sidebar-backdrop {
-      background: rgba(0, 0, 0, 0.75);
+      background: transparent;
     }
     [data-theme="dark"] .mobile-menu-btn {
-      background: #1e293b;
-      border-color: #334155;
-      color: #cbd5e1;
+      background: var(--joy-surface-raised);
+      border-color: var(--joy-text-secondary);
+      color: var(--joy-border-default);
     }
     [data-theme="dark"] .mobile-menu-btn:hover {
-      background: #334155;
-      color: #ffffff;
+      background: var(--joy-text-secondary);
+      color: var(--joy-surface-card);
     }
     [data-theme="dark"] .sidebar-close-btn {
-      color: #94a3b8;
+      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .sidebar-close-btn:hover {
-      background: #1e293b;
-      color: #ffffff;
+      background: var(--joy-surface-raised);
+      color: var(--joy-surface-card);
     }
 
     /* ── Interactive 3D Kinetic Particle Canvas ── */
@@ -739,10 +875,10 @@ ${inlinedThemeCss}
       min-height: 380px;
       border-radius: 14px;
       overflow: hidden;
-      border: 1px solid #e2e8f0;
-      background: #090d16;
+      border: 1px solid var(--joy-border-default);
+      background: var(--joy-surface-canvas);
       margin-bottom: 28px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 10px 30px transparent;
     }
     .kinetic-canvas {
       position: absolute;
@@ -762,7 +898,7 @@ ${inlinedThemeCss}
       padding: 48px 24px 40px;
       text-align: center;
       pointer-events: none;
-      background: radial-gradient(circle at center, transparent 35%, rgba(9, 13, 22, 0.75) 100%);
+      background: radial-gradient(circle at center, transparent 35%, transparent 100%);
     }
     .kinetic-overlay * {
       pointer-events: auto;
@@ -773,9 +909,9 @@ ${inlinedThemeCss}
       gap: 8px;
       padding: 6px 14px;
       border-radius: 9999px;
-      background: rgba(124, 58, 237, 0.2);
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      color: #c084fc;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--joy-accent-text);
       font-size: 0.75rem;
       font-weight: 600;
       margin-bottom: 18px;
@@ -786,26 +922,26 @@ ${inlinedThemeCss}
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      background: var(--joy-status-success-fg);
+      box-shadow: 0 0 8px var(--joy-status-success-fg);
     }
     .kinetic-title {
       font-size: 2.25rem;
       font-weight: 800;
       letter-spacing: -0.025em;
       line-height: 1.2;
-      color: #ffffff;
+      color: var(--joy-surface-card);
       margin: 0 0 14px 0;
       max-width: 720px;
     }
     .kinetic-title-gradient {
-      background: linear-gradient(135deg, #a855f7 0%, #38bdf8 50%, #c49a3a 100%);
+      background: linear-gradient(135deg, var(--joy-accent-default) 0%, var(--joy-status-info-fg) 50%, var(--joy-accent-default) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .kinetic-subtitle {
       font-size: 1rem;
-      color: #94a3b8;
+      color: var(--joy-text-muted);
       max-width: 620px;
       margin: 0 0 24px 0;
       line-height: 1.6;
@@ -820,12 +956,12 @@ ${inlinedThemeCss}
     .kinetic-hint {
       margin-top: 20px;
       font-size: 0.75rem;
-      color: #64748b;
+      color: var(--joy-text-muted);
       letter-spacing: 0.03em;
     }
     [data-theme="dark"] .kinetic-canvas-container {
-      border-color: #1e293b;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+      border-color: var(--joy-surface-raised);
+      box-shadow: 0 12px 36px transparent;
     }
 
     /* ── Responsive Mobile & Tablet Rules ── */
@@ -849,7 +985,7 @@ ${inlinedThemeCss}
       }
       .sidebar.open {
         transform: translateX(0);
-        box-shadow: 6px 0 28px rgba(0, 0, 0, 0.25);
+        box-shadow: 6px 0 28px transparent;
       }
       .main {
         width: 100vw;
@@ -857,6 +993,7 @@ ${inlinedThemeCss}
       }
       .topbar {
         padding: 0 16px;
+        flex-wrap: nowrap;
       }
       .topbar-target-label {
         display: none;
@@ -897,11 +1034,11 @@ ${inlinedThemeCss}
       justify-content: space-between;
       gap: 16px;
       padding: 16px 20px;
-      background: var(--joy-surface-card, #ffffff);
-      border: 1px solid var(--joy-border, #e2e8f0);
+      background: var(--joy-surface-card);
+      border: 1px solid var(--joy-border-default);
       border-radius: 12px;
       margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px transparent;
     }
     .simulator-group {
       display: flex;
@@ -912,7 +1049,7 @@ ${inlinedThemeCss}
     .simulator-label {
       font-size: 0.75rem;
       font-weight: 700;
-      color: var(--joy-text-secondary, #64748b);
+      color: var(--joy-text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       white-space: nowrap;
@@ -922,11 +1059,11 @@ ${inlinedThemeCss}
       align-items: center;
       justify-content: space-between;
       padding: 8px 14px;
-      background: var(--joy-surface-subtle, #f1f5f9);
-      border: 1px solid var(--joy-border, #e2e8f0);
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-default);
       border-radius: 8px;
       font-size: 0.8125rem;
-      color: var(--joy-text-secondary, #64748b);
+      color: var(--joy-text-secondary);
       margin-bottom: 16px;
     }
     .simulator-wrapper {
@@ -935,24 +1072,24 @@ ${inlinedThemeCss}
       justify-content: center;
       overflow-x: auto;
       padding: 16px 0 48px;
-      background: rgba(0, 0, 0, 0.03);
+      background: transparent;
       border-radius: 16px;
     }
     [data-theme="dark"] .simulator-wrapper {
-      background: rgba(0, 0, 0, 0.25);
+      background: transparent;
     }
     .simulator-frame {
       width: 100%;
       max-width: 100%;
       transition: max-width 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms ease;
-      background: var(--joy-surface-canvas, #f8f3e8);
+      background: var(--joy-surface-canvas);
       border-radius: 16px;
-      border: 1px solid var(--joy-border, #e2e8f0);
+      border: 1px solid var(--joy-border-default);
       overflow: hidden;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 12px 36px transparent;
     }
     [data-theme="dark"] .simulator-frame {
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 16px 48px transparent;
     }
     .palette-btn {
       display: inline-flex;
@@ -960,9 +1097,9 @@ ${inlinedThemeCss}
       gap: 6px;
       padding: 6px 12px;
       border-radius: 8px;
-      border: 1px solid var(--joy-border, #e2e8f0);
-      background: var(--joy-surface-card, #ffffff);
-      color: var(--joy-text-primary, #1e293b);
+      border: 1px solid var(--joy-border-default);
+      background: var(--joy-surface-card);
+      color: var(--joy-text-primary);
       font-size: 0.8125rem;
       font-weight: 500;
       cursor: pointer;
@@ -970,11 +1107,11 @@ ${inlinedThemeCss}
       font-family: inherit;
     }
     .palette-btn:hover {
-      border-color: var(--joy-brand-primary, #c49a3a);
+      border-color: var(--joy-accent-default);
     }
     .palette-btn.active {
-      border-color: var(--joy-brand-primary, #c49a3a);
-      background: rgba(196, 154, 58, 0.08);
+      border-color: var(--joy-accent-default);
+      background: transparent;
       font-weight: 600;
     }
     .palette-dot {
@@ -982,6 +1119,74 @@ ${inlinedThemeCss}
       height: 10px;
       border-radius: 50%;
       flex-shrink: 0;
+    }
+
+    /* Token-driven corrections keep the hub's chrome aligned with the component system. */
+    [data-theme="dark"] body,
+    [data-theme="dark"] .brand-info h2,
+    [data-theme="dark"] .nav-item:hover,
+    [data-theme="dark"] .playground-header h4,
+    [data-theme="dark"] .tokens-table th,
+    [data-theme="dark"] .icon-preview,
+    [data-theme="dark"] .component-title,
+    [data-theme="dark"] .joy-toast {
+      color: var(--joy-text-primary);
+    }
+    [data-theme="dark"] .topbar {
+      background: var(--joy-surface-overlay);
+      border-bottom-color: var(--joy-border-subtle);
+    }
+    [data-theme="dark"] .component-canvas {
+      background-color: var(--joy-surface-card);
+    }
+    @media (max-width: 640px) {
+      .topbar {
+        padding: var(--joy-space-2) var(--joy-space-3);
+        align-items: center;
+        flex-wrap: nowrap;
+      }
+      .topbar > div {
+        flex-wrap: nowrap;
+      }
+      #theme-label {
+        display: none;
+      }
+      #btn-theme-toggle {
+        padding: 0 var(--joy-space-2);
+        min-width: var(--joy-control-height-sm);
+        flex-shrink: 0;
+      }
+      .joy-select-wrapper--open .joy-select__listbox.joy-overlay--sheet {
+        position: fixed;
+      }
+      .framework-pill {
+        display: none;
+      }
+      .controls-table,
+      .controls-table tbody,
+      .controls-table tr,
+      .controls-table td {
+        display: block;
+        width: 100%;
+      }
+      .controls-table td:first-child {
+        width: auto;
+        padding-bottom: 0;
+      }
+      .controls-table td:last-child {
+        padding-top: var(--joy-space-2);
+      }
+      .segmented-control {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+      }
+      .segment-btn {
+        flex: 1 0 auto;
+        padding: 6px 4px;
+        font-size: 0.75rem;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -1015,8 +1220,8 @@ ${navigationHtml}
         <span class="topbar-target-label" style="font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Target Suite:</span>
         <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid #cbd5e1;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid var(--joy-border-default); flex-shrink: 0;">
           <span id="theme-icon" style="display:inline-flex;align-items:center;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </span>
@@ -1038,49 +1243,49 @@ ${navigationHtml}
       <!-- View: Overview -->
       <section id="view-overview" class="view-panel">
         <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Enterprise Component Architecture</div>
-        <h1 style="margin: 0; font-size: 2rem; color: var(--joy-color-brand-primary);">Joymify Design System</h1>
+        <h1 style="margin: 0; font-size: 2rem; color: var(--joy-accent-default);">Joymify Design System</h1>
         <p class="header-tagline">
           Enterprise multi-platform design tokens specification and production component library built for 
           <strong>Quant</strong>, <strong>JoyCoach</strong>, <strong>AssetStudio</strong>, and <strong>JoyQuest</strong>.
         </p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px;">
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('tokens')">
+          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('tokens')">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/tokens</h3>
-            <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
               W3C DTCG tokens with OpenDesign posture integration, GPU spring motion curves, and hairline borders.
             </p>
           </div>
 
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('button'); setFramework('svelte');">
+          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('button'); setFramework('svelte');">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Svelte 5 Runes</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/svelte</h3>
-            <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
               Zero-overhead Runes ($state, $props, $derived, $bindable) engineered for real-time order books and high-FPS canvases.
             </p>
           </div>
 
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('button'); setFramework('react');">
+          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('button'); setFramework('react');">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> React 19 Ready</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/react</h3>
-            <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
               Strict WAI-ARIA accessible React 19 component library with forwardRef support and zero runtime CSS overhead.
             </p>
           </div>
 
-          <div style="background: #ffffff; padding: 24px; border-radius: 10px; border: var(--joy-border-hairline, 1px solid #e2e8f0); cursor: pointer;" onclick="switchView('tokens')">
+          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('tokens')">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> OpenDesign Postures</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">Modern & Utility</h3>
-            <p style="color: #64748b; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
               Unified Linear/Vercel modern-minimal and Datadog/GitHub tech-utility postures with frosted surfaces & hairline borders.
             </p>
           </div>
@@ -1143,28 +1348,28 @@ ${navigationHtml}
           </thead>
           <tbody>
             <tr>
-              <td><code>color.brand.primary</code></td>
-              <td><code>--joy-color-brand-primary</code></td>
-              <td><span class="color-swatch" style="background: var(--joy-color-brand-primary);"></span>Primary</td>
-              <td><code>#7c3aed</code></td>
+              <td><code>accent.default</code></td>
+              <td><code>--joy-accent-default</code></td>
+              <td><span class="color-swatch" style="background: var(--joy-accent-default);"></span>Primary</td>
+              <td><code>var(--joy-accent-default)</code></td>
             </tr>
             <tr>
-              <td><code>color.brand.primary-hover</code></td>
-              <td><code>--joy-color-brand-primary-hover</code></td>
-              <td><span class="color-swatch" style="background: var(--joy-color-brand-primary-hover);"></span>Hover</td>
-              <td><code>#6d28d9</code></td>
+              <td><code>accent.hover</code></td>
+              <td><code>--joy-accent-hover</code></td>
+              <td><span class="color-swatch" style="background: var(--joy-accent-hover);"></span>Hover</td>
+              <td><code>var(--joy-accent-active)</code></td>
             </tr>
             <tr>
-              <td><code>color.status.success</code></td>
-              <td><code>--joy-color-status-success</code></td>
-              <td><span class="color-swatch" style="background: var(--joy-color-status-success);"></span>Success</td>
-              <td><code>#10b981</code></td>
+              <td><code>status.success.fg</code></td>
+              <td><code>--joy-status-success-fg</code></td>
+              <td><span class="color-swatch" style="background: var(--joy-status-success-fg);"></span>Success</td>
+              <td><code>var(--joy-status-success-fg)</code></td>
             </tr>
             <tr>
-              <td><code>color.status.danger</code></td>
-              <td><code>--joy-color-status-danger</code></td>
-              <td><span class="color-swatch" style="background: var(--joy-color-status-danger);"></span>Danger</td>
-              <td><code>#ef4444</code></td>
+              <td><code>status.danger.fg</code></td>
+              <td><code>--joy-status-danger-fg</code></td>
+              <td><span class="color-swatch" style="background: var(--joy-status-danger-fg);"></span>Danger</td>
+              <td><code>var(--joy-status-danger-fg)</code></td>
             </tr>
           </tbody>
         </table>
@@ -1198,7 +1403,7 @@ ${navigationHtml}
               <tbody>
                 <tr>
                   <td><span class="joy-prop-name">variant</span></td>
-                  <td><span class="joy-prop-type">'solid' | 'outline' | 'ghost' | 'danger'</span></td>
+                  <td><span class="joy-prop-type">'solid' | 'outline' | 'ghost' | 'danger' | 'link'</span></td>
                   <td><span class="joy-prop-default">'solid'</span></td>
                   <td>Visual hierarchy styling</td>
                 </tr>
@@ -1207,6 +1412,30 @@ ${navigationHtml}
                   <td><span class="joy-prop-type">'sm' | 'md' | 'lg'</span></td>
                   <td><span class="joy-prop-default">'md'</span></td>
                   <td>Padding and font size scale</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">block</span></td>
+                  <td><span class="joy-prop-type">boolean</span></td>
+                  <td><span class="joy-prop-default">false</span></td>
+                  <td>Expands button to full container width</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">iconOnly</span></td>
+                  <td><span class="joy-prop-type">boolean</span></td>
+                  <td><span class="joy-prop-default">false</span></td>
+                  <td>Equal width and height square icon button</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">iconStart</span></td>
+                  <td><span class="joy-prop-type">ReactNode / Snippet</span></td>
+                  <td><span class="joy-prop-default">undefined</span></td>
+                  <td>Leading icon slot</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">iconEnd</span></td>
+                  <td><span class="joy-prop-type">ReactNode / Snippet</span></td>
+                  <td><span class="joy-prop-default">undefined</span></td>
+                  <td>Trailing icon slot</td>
                 </tr>
                 <tr>
                   <td><span class="joy-prop-name">disabled</span></td>
@@ -1416,12 +1645,10 @@ ${navigationHtml}
               <h4>Live Interactive Canvas</h4>
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Active Preview</span>
             </div>
-            <div style="font-size: 0.8125rem; color: #64748b;">Click button or test controls below</div>
+            <div style="font-size: 0.8125rem; color: var(--joy-text-muted);">Click button or test controls below</div>
           </div>
           <div class="canvas" id="button-canvas">
-            <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()">
-              Click Me! (Clicked: <span id="click-counter">0</span>)
-            </button>
+            <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()"><span class="joy-button__label">Click Me! (Clicked: <span id="click-counter">0</span>)</span></button>
             <button class="joy-button joy-button--outline joy-button--md" onclick="setBtnVariant('outline')">Outline</button>
             <button class="joy-button joy-button--ghost joy-button--md" onclick="setBtnVariant('ghost')">Ghost</button>
             <button class="joy-button joy-button--danger joy-button--md" onclick="setBtnVariant('danger')">Danger</button>
@@ -1455,12 +1682,15 @@ ${navigationHtml}
                   <button class="joy-switch" id="btn-loading-switch" role="switch" aria-checked="false" onclick="toggleBtnLoading()">
                     <span class="joy-switch__thumb"></span>
                   </button>
-                  <span id="btn-loading-status" style="font-size: 0.8125rem; font-weight: 500; color: #64748b;">Idle</span>
+                  <span id="btn-loading-status" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-text-muted);">Idle</span>
                 </div>
               </td>
             </tr>
           </table>
         </div>
+
+        <h3>State matrix</h3>
+        ${renderButtonMatrix()}
 
         <h3>Code Usage</h3>
         <div class="code-snippet" id="button-code">
@@ -1504,8 +1734,8 @@ ${navigationHtml}
             <div class="joy-input-wrapper">
               <input class="joy-input" id="demo-input" placeholder="Type something here..." oninput="updateInputMirror(this.value)">
             </div>
-            <div style="font-size: 0.875rem; color: #64748b; margin-top: 8px;">
-              Live value: <strong id="input-mirror" style="color: #7c3aed;">(empty)</strong>
+            <div style="font-size: 0.875rem; color: var(--joy-text-muted); margin-top: 8px;">
+              Live value: <strong id="input-mirror" style="color: var(--joy-accent-default);">(empty)</strong>
             </div>
           </div>
           <table class="controls-table">
@@ -1516,7 +1746,7 @@ ${navigationHtml}
                   <button class="joy-switch" id="input-error-switch" role="switch" aria-checked="false" onclick="toggleInputError()">
                     <span class="joy-switch__thumb"></span>
                   </button>
-                  <span id="input-error-status" style="font-size: 0.8125rem; font-weight: 500; color: #64748b;">Normal (No Error)</span>
+                  <span id="input-error-status" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-text-muted);">Normal (No Error)</span>
                 </div>
               </td>
             </tr>
@@ -1627,7 +1857,7 @@ ${navigationHtml}
                   <tr>
                     <td data-label="ORDER ID"><code>#ORD-8921</code></td>
                     <td data-label="ASSET"><strong>BTC/USDT</strong></td>
-                    <td data-label="SIDE"><span style="color: #10b981; font-weight: 600;">BUY</span></td>
+                    <td data-label="SIDE"><span style="color: var(--joy-status-success-fg); font-weight: 600;">BUY</span></td>
                     <td data-label="PRICE">$67,820.50</td>
                     <td data-label="SIZE">0.45 BTC</td>
                     <td data-label="STATUS"><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
@@ -1635,7 +1865,7 @@ ${navigationHtml}
                   <tr>
                     <td data-label="ORDER ID"><code>#ORD-8922</code></td>
                     <td data-label="ASSET"><strong>ETH/USDT</strong></td>
-                    <td data-label="SIDE"><span style="color: #ef4444; font-weight: 600;">SELL</span></td>
+                    <td data-label="SIDE"><span style="color: var(--joy-status-danger-fg); font-weight: 600;">SELL</span></td>
                     <td data-label="PRICE">$3,510.20</td>
                     <td data-label="SIZE">4.20 ETH</td>
                     <td data-label="STATUS"><span class="joy-badge joy-badge--success joy-badge--sm">FILLED</span></td>
@@ -1708,12 +1938,12 @@ ${navigationHtml}
                 <button class="joy-dropdown__item" onclick="selectDropdownAction('Duplicate')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplicate Strategy</button>
                 <button class="joy-dropdown__item" onclick="selectDropdownAction('Export CSV')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export Performance CSV</button>
                 <button class="joy-dropdown__item" onclick="selectDropdownAction('Backtest')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Run Deep Backtest</button>
-                <button class="joy-dropdown__item joy-dropdown__item--danger" style="color: #ef4444;" onclick="selectDropdownAction('Archive')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Archive Strategy</button>
+                <button class="joy-dropdown__item joy-dropdown__item--danger" style="color: var(--joy-status-danger-fg);" onclick="selectDropdownAction('Archive')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Archive Strategy</button>
               </div>
             </div>
           </div>
-          <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 0.875rem;">
-            Selected action: <strong id="dropdown-selection-text" style="color: #7c3aed;">None</strong>
+          <div style="padding: 12px 20px; background: var(--joy-surface-raised); border-top: 1px solid var(--joy-border-default); font-size: 0.875rem;">
+            Selected action: <strong id="dropdown-selection-text" style="color: var(--joy-accent-default);">None</strong>
           </div>
         </div>
       </section>
@@ -1734,13 +1964,13 @@ ${navigationHtml}
               <button class="joy-tab-btn" id="tab-btn-3" onclick="switchDemoTab('tab-btn-3', 'tab-panel-3')">Risk Matrix</button>
             </div>
             <div id="tab-panel-1" class="tab-panel-demo">
-              <p style="margin: 0; color: #334155;">Showing 3 active live limit orders awaiting counter-party match.</p>
+              <p style="margin: 0; color: var(--joy-text-secondary);">Showing 3 active live limit orders awaiting counter-party match.</p>
             </div>
             <div id="tab-panel-2" class="tab-panel-demo" style="display: none;">
-              <p style="margin: 0; color: #334155;">12 fills executed in the last 24 hours with zero rejected packets.</p>
+              <p style="margin: 0; color: var(--joy-text-secondary);">12 fills executed in the last 24 hours with zero rejected packets.</p>
             </div>
             <div id="tab-panel-3" class="tab-panel-demo" style="display: none;">
-              <p style="margin: 0; color: #334155;">Value at Risk (VaR 99%): 1.42 BTC across delta-neutral positions.</p>
+              <p style="margin: 0; color: var(--joy-text-secondary);">Value at Risk (VaR 99%): 1.42 BTC across delta-neutral positions.</p>
             </div>
           </div>
         </div>
@@ -1791,8 +2021,8 @@ ${navigationHtml}
                 <option value="trailing">Trailing Dynamic Stop</option>
               </select>
             </div>
-            <div style="font-size: 0.875rem; color: #64748b; margin-top: 8px;">
-              Active Mode: <strong id="demo-select-feedback" style="color: var(--joy-color-brand-primary);">Limit Order</strong>
+            <div style="font-size: 0.875rem; color: var(--joy-text-muted); margin-top: 8px;">
+              Active Mode: <strong id="demo-select-feedback" style="color: var(--joy-accent-default);">Limit Order</strong>
             </div>
           </div>
         </div>
@@ -1892,7 +2122,7 @@ ${navigationHtml}
             <h4>Trigger Notification</h4>
           </div>
           <div class="canvas" style="gap: 16px;">
-            <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Limit order #89281 Filled at 68,420.00 USDT', 'success')">
+            <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Limit order 89281 Filled at 68,420.00 USDT', 'success')">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
               Fill Success
             </button>
@@ -1900,7 +2130,7 @@ ${navigationHtml}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
               Network Info
             </button>
-            <button class="joy-button joy-button--ghost joy-button--md" onclick="showDemoToast('Order latency warning: p99 spiked to 4.2ms', 'warning')" style="border: 1px solid #e2e8f0;">
+            <button class="joy-button joy-button--ghost joy-button--md" onclick="showDemoToast('Order latency warning: p99 spiked to 4.2ms', 'warning')" style="border: 1px solid var(--joy-border-default);">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
               Latency Warning
             </button>
@@ -1961,9 +2191,9 @@ ${navigationHtml}
             <h4>Trade Ledger Pagination</h4>
           </div>
           <div class="canvas" style="flex-direction: column; align-items: stretch; max-width: 680px; margin: 0 auto;">
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;" id="paged-content-box">
-              <div style="font-weight: 600; color: #334155; margin-bottom: 8px;" id="paged-range-text">Showing Orders 1 to 10 of 50</div>
-              <ul style="margin: 0; padding-left: 20px; color: #64748b; font-size: 0.875rem;" id="paged-records-list">
+            <div style="background: var(--joy-surface-card); border: 1px solid var(--joy-border-default); border-radius: 8px; padding: 16px; margin-bottom: 16px;" id="paged-content-box">
+              <div style="font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 8px;" id="paged-range-text">Showing Orders 1 to 10 of 50</div>
+              <ul style="margin: 0; padding-left: 20px; color: var(--joy-text-muted); font-size: 0.875rem;" id="paged-records-list">
                 <!-- Records list -->
               </ul>
             </div>
@@ -2002,7 +2232,7 @@ ${navigationHtml}
             </button>
           </div>
           <div class="canvas" style="gap: 32px; justify-content: center;">
-            <div id="skeleton-card-loading" style="width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+            <div id="skeleton-card-loading" style="width: 320px; background: var(--joy-surface-card); border: 1px solid var(--joy-border-default); border-radius: 12px; padding: 20px;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                 <div class="joy-skeleton joy-skeleton--circle"></div>
                 <div style="flex: 1;">
@@ -2015,20 +2245,20 @@ ${navigationHtml}
               <div class="joy-skeleton joy-skeleton--rect" style="height: 60px; margin-top: 12px;"></div>
             </div>
 
-            <div id="skeleton-card-loaded" style="display: none; width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+            <div id="skeleton-card-loaded" style="display: none; width: 320px; background: var(--joy-surface-card); border: 1px solid var(--joy-border-default); border-radius: 12px; padding: 20px;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ede9fe; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-weight: 700;">JOY</div>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--joy-accent-subtle); color: var(--joy-accent-default); display: flex; align-items: center; justify-content: center; font-weight: 700;">JOY</div>
                 <div>
                   <h4 style="margin: 0; font-size: 1rem;">Joymify Quant Pool</h4>
-                  <span style="font-size: 0.75rem; color: #64748b;">Arbitrage High-Freq Vault</span>
+                  <span style="font-size: 0.75rem; color: var(--joy-text-muted);">Arbitrage High-Freq Vault</span>
                 </div>
               </div>
-              <p style="margin: 0 0 12px; font-size: 0.875rem; color: #334155; line-height: 1.5;">
+              <p style="margin: 0 0 12px; font-size: 0.875rem; color: var(--joy-text-secondary); line-height: 1.5;">
                 Delta-neutral funding rate harvester with sub-millisecond execution routing on Vultr Kubernetes.
               </p>
-              <div style="background: #f8fafc; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.8125rem; color: #64748b;">Annualized APY</span>
-                <strong style="color: #10b981; font-size: 1.1rem; font-family: var(--joy-font-family-mono, monospace);">+28.4%</strong>
+              <div style="background: var(--joy-surface-raised); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.8125rem; color: var(--joy-text-muted);">Annualized APY</span>
+                <strong style="color: var(--joy-status-success-fg); font-size: 1.1rem; font-family: var(--joy-font-family-mono);">+28.4%</strong>
               </div>
             </div>
           </div>
@@ -2046,7 +2276,7 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto;">
             <div style="width: 100%;">
-              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Standard Date Picker</label>
+              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Standard Date Picker</label>
               <div class="joy-date-picker" id="demo-date-picker-wrap">
                 <input type="date" class="joy-date-picker__input" id="demo-single-date" value="2026-09-19" onchange="handleDateChange(this.value)">
                 <span class="joy-date-picker__icon">
@@ -2058,11 +2288,11 @@ ${navigationHtml}
                   </svg>
                 </span>
               </div>
-              <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Selected Date: <strong id="single-date-feedback" style="color: #7c3aed;">2026-09-19</strong></div>
+              <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-top: 4px;">Selected Date: <strong id="single-date-feedback" style="color: var(--joy-accent-default);">2026-09-19</strong></div>
             </div>
 
             <div style="width: 100%;">
-              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Financial Date Range Picker (Backtest Window)</label>
+              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Financial Date Range Picker (Backtest Window)</label>
               <div class="joy-date-range-picker">
                 <div class="joy-date-picker">
                   <input type="date" class="joy-date-picker__input" id="demo-range-start" value="2026-01-01" onchange="handleRangeChange()">
@@ -2078,7 +2308,7 @@ ${navigationHtml}
                   </span>
                 </div>
               </div>
-              <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: #7c3aed;">2026-01-01 to 2026-09-19</strong></div>
+              <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: var(--joy-accent-default);">2026-01-01 to 2026-09-19</strong></div>
             </div>
           </div>
         </div>
@@ -2140,7 +2370,7 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="flex-direction: column; gap: 20px; align-items: stretch; max-width: 600px; margin: 0 auto;">
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Active Harvest Task (72%)</div>
+              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Active Harvest Task (72%)</div>
               <div class="joy-progress">
                 <div class="joy-progress__outer">
                   <div class="joy-progress__inner">
@@ -2152,7 +2382,7 @@ ${navigationHtml}
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Completed Sync (100% Success)</div>
+              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Completed Sync (100% Success)</div>
               <div class="joy-progress joy-progress--status-success">
                 <div class="joy-progress__outer">
                   <div class="joy-progress__inner">
@@ -2166,7 +2396,7 @@ ${navigationHtml}
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-color-text-muted);">Failed Execution (Exception State)</div>
+              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Failed Execution (Exception State)</div>
               <div class="joy-progress joy-progress--status-exception">
                 <div class="joy-progress__outer">
                   <div class="joy-progress__inner">
@@ -2244,12 +2474,12 @@ ${navigationHtml}
               <div class="joy-upload-list" id="demo-upload-list">
                 <div class="joy-upload-list__item" id="demo-file-1">
                   <div class="joy-upload-list__item-info">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-brand-primary, #7c3aed); flex-shrink: 0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-accent-default); flex-shrink: 0;">
                       <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
                       <polyline points="13 2 13 9 20 9"></polyline>
                     </svg>
                     <span style="font-weight: 500;">alpha_momentum_v3.json</span>
-                    <span style="color: var(--joy-color-text-muted, #64748b); font-size: 0.75rem;">(42.8 KB)</span>
+                    <span style="color: var(--joy-text-muted); font-size: 0.75rem;">(42.8 KB)</span>
                   </div>
                   <button type="button" class="joy-upload-list__item-remove" onclick="document.getElementById('demo-file-1').remove(); showDemoToast('Removed alpha_momentum_v3.json', 'info');">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2278,16 +2508,16 @@ ${navigationHtml}
               <div class="joy-avatar joy-avatar--circle joy-avatar--sm"><span class="joy-avatar__fallback">QA</span></div>
               <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">JD</span><span class="joy-avatar__badge joy-avatar__badge--online"></span></div>
               <div class="joy-avatar joy-avatar--circle joy-avatar--lg"><span class="joy-avatar__fallback">TC</span><span class="joy-avatar__badge joy-avatar__badge--offline"></span></div>
-              <div class="joy-avatar joy-avatar--square joy-avatar--lg" style="background-color: #0284c7;"><span class="joy-avatar__fallback">VT</span></div>
+              <div class="joy-avatar joy-avatar--square joy-avatar--lg" style="background-color: var(--joy-status-info-fg);"><span class="joy-avatar__fallback">VT</span></div>
             </div>
 
             <div style="margin-top: 8px;">
-              <h5 style="margin: 0 0 8px 0; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--joy-color-text-muted, #64748b);">AvatarGroup (Overlapping Team Stack)</h5>
+              <h5 style="margin: 0 0 8px 0; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--joy-text-muted);">AvatarGroup (Overlapping Team Stack)</h5>
               <div class="joy-avatar-group">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #7c3aed;"><span class="joy-avatar__fallback">AM</span></div>
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #059669;"><span class="joy-avatar__fallback">BL</span></div>
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #d97706;"><span class="joy-avatar__fallback">CR</span></div>
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #475569;"><span class="joy-avatar__fallback">+4</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-accent-default);"><span class="joy-avatar__fallback">AM</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-success-fg);"><span class="joy-avatar__fallback">BL</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-warning-fg);"><span class="joy-avatar__fallback">CR</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-text-muted);"><span class="joy-avatar__fallback">+4</span></div>
               </div>
             </div>
           </div>
@@ -2315,7 +2545,7 @@ ${navigationHtml}
                 <div class="joy-slider__tooltip" id="demo-slider-tooltip" style="display: none;">25x</div>
               </div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--joy-text-muted); margin-top: 8px;">
               <span>1x (Spot)</span>
               <span>50x</span>
               <span>100x (Max)</span>
@@ -2390,7 +2620,7 @@ export async function executeHedge(symbol: string, size: number) {
         <div class="playground-box">
           <div class="playground-header">
             <h4>Icon System Collection (138 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
-            <div id="copy-toast-banner" style="font-size: 0.8125rem; color: #10b981; font-weight: 600; display: none;">Copied to clipboard!</div>
+            <div id="copy-toast-banner" style="font-size: 0.8125rem; color: var(--joy-status-success-fg); font-weight: 600; display: none;">Copied to clipboard!</div>
           </div>
           <div style="padding: 24px;">
             <div class="icon-grid">
@@ -2495,15 +2725,15 @@ export async function executeHedge(symbol: string, size: number) {
                 </div>
                 <ul class="joy-pricing-card__features">
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>138 Vector Icons included</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Svelte 5 & React 19 packages</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Community Discord support</span>
                   </li>
                 </ul>
@@ -2520,19 +2750,19 @@ export async function executeHedge(symbol: string, size: number) {
                 </div>
                 <ul class="joy-pricing-card__features">
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>All Developer tier features</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Financial High-Density Tables</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Bento & Landing Architecture</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>24/7 Priority SLA response</span>
                   </li>
                 </ul>
@@ -2548,15 +2778,15 @@ export async function executeHedge(symbol: string, size: number) {
                 </div>
                 <ul class="joy-pricing-card__features">
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Unlimited sub-accounts & seats</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Custom token pipeline & theme export</span>
                   </li>
                   <li class="joy-pricing-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-status-success-fg); flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Dedicated Technical Account Mgr</span>
                   </li>
                 </ul>
@@ -2582,7 +2812,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
               <p class="joy-testimonial-card__quote">"The transition from generic UI kits to Joymify Design was immediate. High-density financial views and Svelte 5 Rune reactivity cut our portal re-render overhead by 40%."</p>
               <div class="joy-testimonial-card__author">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-color-brand-primary, #7c3aed);">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-accent-default);">
                   <span class="joy-avatar__fallback">AK</span>
                 </div>
                 <div class="joy-testimonial-card__author-info">
@@ -2602,7 +2832,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
               <p class="joy-testimonial-card__quote">"Dark mode coherence is unmatched. Zero unstyled background leaks and crisp 138-vector asset suite that matches Ant Design enterprise rigor."</p>
               <div class="joy-testimonial-card__author">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: #0ea5e9;">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-info-fg);">
                   <span class="joy-avatar__fallback">ML</span>
                 </div>
                 <div class="joy-testimonial-card__author-info">
@@ -2838,12 +3068,12 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="playground-header">
             <h4>Enterprise Portal Footer (SiteFooter)</h4>
           </div>
-          <div style="padding: 0; overflow: hidden; border-radius: 0 0 var(--joy-radius-md, 8px) var(--joy-radius-md, 8px);">
+          <div style="padding: 0; overflow: hidden; border-radius: 0 0 var(--joy-radius-control) var(--joy-radius-control);">
             <footer class="joy-site-footer" style="border: none; padding: 40px 24px 24px 24px;">
               <div class="joy-site-footer__inner">
                 <div class="joy-site-footer__brand">
                   <div class="joy-site-footer__brand-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold-400, #c49a3a);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-accent-default);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     <span>Joymify Design</span>
                   </div>
                   <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
@@ -2879,7 +3109,7 @@ export async function executeHedge(symbol: string, size: number) {
               <div class="joy-site-footer__bottom">
                 <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
                 <div class="joy-site-footer__socials">
-                  <span style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b);">Institutional Grade Telemetry</span>
+                  <span style="font-size: 0.75rem; color: var(--joy-text-muted);">Institutional Grade Telemetry</span>
                 </div>
               </div>
             </footer>
@@ -2918,23 +3148,23 @@ export async function executeHedge(symbol: string, size: number) {
             <span class="simulator-label">Institutional Palette:</span>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button type="button" class="palette-btn active" onclick="switchSimulatorPalette('joymify', this)">
-                <span class="palette-dot" style="background: #c49a3a;"></span>
+                <span class="palette-dot" style="background: var(--joy-accent-default);"></span>
                 Joymify Gold
               </button>
               <button type="button" class="palette-btn" onclick="switchSimulatorPalette('obsidian', this)">
-                <span class="palette-dot" style="background: #10b981;"></span>
+                <span class="palette-dot" style="background: var(--joy-status-success-fg);"></span>
                 Obsidian Emerald
               </button>
               <button type="button" class="palette-btn" onclick="switchSimulatorPalette('quantum', this)">
-                <span class="palette-dot" style="background: #3b82f6;"></span>
+                <span class="palette-dot" style="background: var(--joy-status-info-fg);"></span>
                 Quantum Cobalt
               </button>
               <button type="button" class="palette-btn" onclick="switchSimulatorPalette('cyberpunk', this)">
-                <span class="palette-dot" style="background: #a855f7;"></span>
+                <span class="palette-dot" style="background: var(--joy-accent-default);"></span>
                 Cyberpunk Amethyst
               </button>
               <button type="button" class="palette-btn" onclick="switchSimulatorPalette('titanium', this)">
-                <span class="palette-dot" style="background: #f59e0b;"></span>
+                <span class="palette-dot" style="background: var(--joy-status-warning-fg);"></span>
                 Titanium Steel
               </button>
             </div>
@@ -2958,36 +3188,36 @@ export async function executeHedge(symbol: string, size: number) {
             <div id="simulator-page-container" class="joy-landing-page" data-palette="joymify">
               
               <!-- 1. Header / Navigation Bar -->
-              <header style="display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; background: rgba(20, 37, 62, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: sticky; top: 0; z-index: 100;">
+              <header style="display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; background: transparent; backdrop-filter: blur(12px); border-bottom: 1px solid transparent; position: sticky; top: 0; z-index: 100;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                  <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--joy-brand-primary, #c49a3a); display: flex; align-items: center; justify-content: center; color: #14253e;">
+                  <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--joy-accent-default); display: flex; align-items: center; justify-content: center; color: var(--joy-surface-inverse);">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   </div>
-                  <span style="font-weight: 700; font-size: 1.05rem; letter-spacing: 0.05em; color: #ffffff;">JOYMIFY PROTOCOL</span>
+                  <span style="font-weight: 700; font-size: 1.05rem; letter-spacing: 0.05em; color: var(--joy-surface-card);">JOYMIFY PROTOCOL</span>
                 </div>
                 <nav style="display: flex; align-items: center; gap: 20px;">
-                  <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); cursor: pointer;">Markets</span>
-                  <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); cursor: pointer;">Analytics</span>
-                  <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); cursor: pointer;">Documentation</span>
+                  <span style="font-size: 0.875rem; color: transparent; cursor: pointer;">Markets</span>
+                  <span style="font-size: 0.875rem; color: transparent; cursor: pointer;">Analytics</span>
+                  <span style="font-size: 0.875rem; color: transparent; cursor: pointer;">Documentation</span>
                   <button type="button" class="joy-button joy-button--solid joy-button--sm" style="margin-left: 8px; font-weight: 600;">Launch Terminal</button>
                 </nav>
               </header>
 
               <!-- 2. HeroSection -->
-              <section class="joy-hero" style="position: relative; overflow: hidden; padding: 72px 24px; text-align: center; background: radial-gradient(circle at 50% 20%, rgba(196, 154, 58, 0.15), transparent 70%), var(--joy-surface-canvas, #14253e); color: #ffffff;">
+              <section class="joy-hero" style="position: relative; overflow: hidden; padding: 72px 24px; text-align: center; background: radial-gradient(circle at 50% 20%, transparent, transparent 70%), var(--joy-surface-canvas); color: var(--joy-surface-card);">
                 <div style="max-width: 900px; margin: 0 auto; position: relative; z-index: 2;">
-                  <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 24px; font-size: 0.8125rem;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--joy-brand-primary, #c49a3a);"></span>
+                  <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: transparent; border: 1px solid transparent; margin-bottom: 24px; font-size: 0.8125rem;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--joy-accent-default);"></span>
                     <span>Institutional Execution Stack 2.23 &bull; Sub-5ms Finality</span>
                   </div>
-                  <h1 class="joy-hero__title" style="font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.15; margin: 0 0 20px 0; color: #ffffff;">
+                  <h1 class="joy-hero__title" style="font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.15; margin: 0 0 20px 0; color: var(--joy-surface-card);">
                     Zero-Latency Liquidity Architecture for Algorithmic Desks
                   </h1>
-                  <p class="joy-hero__subtitle" style="font-size: clamp(1rem, 2vw, 1.2rem); color: rgba(255, 255, 255, 0.8); max-width: 680px; margin: 0 auto 36px auto; line-height: 1.6;">
+                  <p class="joy-hero__subtitle" style="font-size: clamp(1rem, 2vw, 1.2rem); color: transparent; max-width: 680px; margin: 0 auto 36px auto; line-height: 1.6;">
                     Deploy high-frequency institutional trading terminals with canvas-accelerated market telemetry, deterministic risk circuits, and dual-framework React 19 / Svelte 5 parity.
                   </p>
                   <div class="joy-hero__actions" style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
-                    <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
+                    <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                       Deploy Production Node
                     </button>
@@ -3051,7 +3281,7 @@ export async function executeHedge(symbol: string, size: number) {
               <section style="padding: 48px 24px;">
                 <div style="text-align: center; max-width: 640px; margin: 0 auto 36px auto;">
                   <h2 style="font-size: 1.875rem; font-weight: 700; margin: 0 0 12px 0;">Architected for High-Stakes Financial Systems</h2>
-                  <p style="color: var(--joy-text-secondary, #64748b); font-size: 0.95rem; margin: 0;">Combining high-performance execution primitives with unyielding design consistency.</p>
+                  <p style="color: var(--joy-text-secondary); font-size: 0.95rem; margin: 0;">Combining high-performance execution primitives with unyielding design consistency.</p>
                 </div>
                 <div class="joy-feature-grid joy-feature-grid--2col">
                   <div class="joy-feature-card">
@@ -3087,13 +3317,13 @@ export async function executeHedge(symbol: string, size: number) {
 
               <!-- 6. Adaptive Mobile Table Section (Demonstrating Stacking) -->
               <section style="padding: 32px 24px;">
-                <div style="background: var(--joy-surface-card, #ffffff); border: 1px solid var(--joy-border, #e2e8f0); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);">
+                <div style="background: var(--joy-surface-card); border: 1px solid var(--joy-border-default); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px transparent;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                     <div>
                       <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700;">Live Execution Ledger &bull; Adaptive Table</h3>
-                      <p style="margin: 0; font-size: 0.8125rem; color: var(--joy-text-secondary, #64748b);">Automatically stacks into individual cards below 768px with full WCAG 2.2 AA contrast.</p>
+                      <p style="margin: 0; font-size: 0.8125rem; color: var(--joy-text-secondary);">Automatically stacks into individual cards below 768px with full WCAG 2.2 AA contrast.</p>
                     </div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; background: transparent; color: var(--joy-status-success-fg); font-weight: 600;">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
                       STREAMING (LIVE P99)
                     </div>
@@ -3113,23 +3343,23 @@ export async function executeHedge(symbol: string, size: number) {
                         <tr>
                           <td data-label="Asset Pair"><strong>BTC-USDC-PERP</strong></td>
                           <td data-label="Order Side"><span class="joy-badge joy-badge--success">BUY / LONG</span></td>
-                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono, monospace);">$68,492.50</td>
+                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono);">$68,492.50</td>
                           <td data-label="Volume">14.250 BTC</td>
-                          <td data-label="Status"><span style="color: #10b981; font-weight: 600;">CONFIRMED</span></td>
+                          <td data-label="Status"><span style="color: var(--joy-status-success-fg); font-weight: 600;">CONFIRMED</span></td>
                         </tr>
                         <tr>
                           <td data-label="Asset Pair"><strong>ETH-USDT-PERP</strong></td>
                           <td data-label="Order Side"><span class="joy-badge joy-badge--danger">SELL / SHORT</span></td>
-                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono, monospace);">$3,584.10</td>
+                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono);">$3,584.10</td>
                           <td data-label="Volume">120.000 ETH</td>
-                          <td data-label="Status"><span style="color: #10b981; font-weight: 600;">CONFIRMED</span></td>
+                          <td data-label="Status"><span style="color: var(--joy-status-success-fg); font-weight: 600;">CONFIRMED</span></td>
                         </tr>
                         <tr>
                           <td data-label="Asset Pair"><strong>SOL-USDC-SPOT</strong></td>
                           <td data-label="Order Side"><span class="joy-badge joy-badge--success">BUY / SPOT</span></td>
-                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono, monospace);">$182.45</td>
+                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono);">$182.45</td>
                           <td data-label="Volume">540.20 SOL</td>
-                          <td data-label="Status"><span style="color: #10b981; font-weight: 600;">CONFIRMED</span></td>
+                          <td data-label="Status"><span style="color: var(--joy-status-success-fg); font-weight: 600;">CONFIRMED</span></td>
                         </tr>
                       </tbody>
                     </table>
@@ -3141,7 +3371,7 @@ export async function executeHedge(symbol: string, size: number) {
               <section class="joy-faq-section" style="padding: 48px 24px;">
                 <div style="text-align: center; max-width: 600px; margin: 0 auto 36px auto;">
                   <h2 style="font-size: 1.875rem; font-weight: 700; margin: 0 0 12px 0;">Frequently Asked Questions</h2>
-                  <p style="color: var(--joy-text-secondary, #64748b); font-size: 0.95rem; margin: 0;">Everything engineering teams need to know about our deterministic architecture.</p>
+                  <p style="color: var(--joy-text-secondary); font-size: 0.95rem; margin: 0;">Everything engineering teams need to know about our deterministic architecture.</p>
                 </div>
                 <div class="joy-faq-section__list">
                   <div class="joy-faq-item joy-faq-item--open">
@@ -3179,7 +3409,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <h2 class="joy-cta-section__title">Ready to Deploy Institutional Infrastructure?</h2>
                 <p class="joy-cta-section__description">Access high-performance execution primitives, Canvas charting engines, and institutional risk guards today.</p>
                 <div class="joy-cta-section__actions">
-                  <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);">
+                  <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
                     Start Free Trial
                   </button>
                   <button type="button" class="joy-button joy-button--glass joy-button--lg">
@@ -3193,7 +3423,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-site-footer__grid">
                   <div class="joy-site-footer__brand">
                     <div class="joy-site-footer__brand-title">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-brand-primary, #c49a3a);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-accent-default);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                       <span>JOYMIFY PROTOCOL</span>
                     </div>
                     <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
@@ -3226,7 +3456,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-site-footer__bottom">
                   <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
                   <div class="joy-site-footer__socials">
-                    <span style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b);">Institutional Grade Telemetry</span>
+                    <span style="font-size: 0.75rem; color: var(--joy-text-muted);">Institutional Grade Telemetry</span>
                   </div>
                 </div>
               </footer>
@@ -3290,8 +3520,8 @@ export async function executeHedge(symbol: string, size: number) {
               <li class="joy-timeline__item">
                 <div class="joy-timeline__dot joy-timeline__dot--success"></div>
                 <div class="joy-timeline__content">
-                  <div style="font-weight: 600;">Trade Order #8841-EX Filled</div>
-                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">Executed 250.00 SOL at average fill price $184.20 via Phoenix Gateway.</div>
+                  <div style="font-weight: 600;">Trade Order 8841-EX Filled</div>
+                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">Executed 250.00 SOL at average fill price $184.20 via Phoenix Gateway.</div>
                   <div class="joy-timeline__time">14:32:08 UTC</div>
                 </div>
               </li>
@@ -3299,7 +3529,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-timeline__dot joy-timeline__dot--primary"></div>
                 <div class="joy-timeline__content">
                   <div style="font-weight: 600;">Risk Check Simulation Passed</div>
-                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">Portfolio beta remains within target limit (0.28 vs max 0.40).</div>
+                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">Portfolio beta remains within target limit (0.28 vs max 0.40).</div>
                   <div class="joy-timeline__time">14:31:55 UTC</div>
                 </div>
               </li>
@@ -3307,7 +3537,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-timeline__dot joy-timeline__dot--warning"></div>
                 <div class="joy-timeline__content">
                   <div style="font-weight: 600;">Slippage Tolerance Rebalanced</div>
-                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">Elevated market volatility triggered auto-adjustment from 5 bps to 12 bps.</div>
+                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">Elevated market volatility triggered auto-adjustment from 5 bps to 12 bps.</div>
                   <div class="joy-timeline__time">14:28:10 UTC</div>
                 </div>
               </li>
@@ -3315,7 +3545,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-timeline__dot joy-timeline__dot--info"></div>
                 <div class="joy-timeline__content">
                   <div style="font-weight: 600;">Sub-Account Session Authenticated</div>
-                  <div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">API Key authorization from Singapore gateway worker.</div>
+                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">API Key authorization from Singapore gateway worker.</div>
                   <div class="joy-timeline__time">14:15:00 UTC</div>
                 </div>
               </li>
@@ -3379,7 +3609,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">O:</span><span class="joy-chart__hud-value" id="hud-o">68,420.00</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">H:</span><span class="joy-chart__hud-value" id="hud-h">68,790.50</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">L:</span><span class="joy-chart__hud-value" id="hud-l">68,310.00</span></div>
-                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">C:</span><span class="joy-chart__hud-value" id="hud-c" style="color: #10b981;">68,720.00</span></div>
+                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">C:</span><span class="joy-chart__hud-value" id="hud-c" style="color: var(--joy-status-success-fg);">68,720.00</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Vol:</span><span class="joy-chart__hud-value">1,428 BTC</span></div>
               </div>
               <div class="joy-chart__canvas-container">
@@ -3387,7 +3617,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <canvas id="candle-overlay-canvas" class="joy-chart__canvas-overlay"></canvas>
               </div>
             </div>
-            <div style="margin-top: 12px; font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); display: flex; justify-content: space-between;">
+            <div style="margin-top: 12px; font-size: 0.75rem; color: var(--joy-text-muted); display: flex; justify-content: space-between;">
               <span>Tip: Scroll mouse wheel on canvas to zoom; drag to pan across time horizons.</span>
               <span id="chart-points-count">Dataset: 500 OHLC Bars</span>
             </div>
@@ -3404,7 +3634,7 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="joy-chart" id="line-demo-chart" style="height: 320px;">
               <div class="joy-chart__hud" id="line-hud">
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Telemetry:</span><span class="joy-chart__hud-value">Solana TPS Feed</span></div>
-                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Value:</span><span class="joy-chart__hud-value" id="line-hud-val" style="color: var(--joy-color-brand-primary, #7c3aed);">3,420 TPS</span></div>
+                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Value:</span><span class="joy-chart__hud-value" id="line-hud-val" style="color: var(--joy-accent-default);">3,420 TPS</span></div>
               </div>
               <div class="joy-chart__canvas-container">
                 <canvas id="line-base-canvas" class="joy-chart__canvas-base"></canvas>
@@ -3427,14 +3657,14 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
           <div style="padding: 24px;">
             <div class="joy-splitter" id="demo-splitter" style="height: 200px;">
-              <div class="joy-splitter__pane" id="split-left" style="width: 40%; background: var(--joy-color-surface-subtle, #f8fafc); padding: 16px;">
+              <div class="joy-splitter__pane" id="split-left" style="width: 40%; background: var(--joy-surface-sunken); padding: 16px;">
                 <h5 style="margin: 0 0 8px 0;">Strategy Controls (Pane 1)</h5>
-                <p style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b); margin: 0;">Arbitrage engine parameters, exchange API keys, and latency tolerances.</p>
+                <p style="font-size: 0.8125rem; color: var(--joy-text-muted); margin: 0;">Arbitrage engine parameters, exchange API keys, and latency tolerances.</p>
               </div>
               <div class="joy-splitter__bar" id="split-bar" onmousedown="initSplitterDrag(event)"></div>
               <div class="joy-splitter__pane" id="split-right" style="width: 60%; padding: 16px;">
                 <h5 style="margin: 0 0 8px 0;">Execution Telemetry (Pane 2)</h5>
-                <p style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b); margin: 0;">Live order matching logs, routing fills, and execution slip statistics.</p>
+                <p style="font-size: 0.8125rem; color: var(--joy-text-muted); margin: 0;">Live order matching logs, routing fills, and execution slip statistics.</p>
               </div>
             </div>
           </div>
@@ -3461,9 +3691,9 @@ export async function executeHedge(symbol: string, size: number) {
 
             <div>
               <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 8px;">Flex (Justify & Align Helpers)</div>
-              <div class="joy-flex" style="justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--joy-color-surface-subtle, #f8fafc); border-radius: 6px;">
+              <div class="joy-flex" style="justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--joy-surface-sunken); border-radius: 6px;">
                 <span>Total Staked Assets</span>
-                <span style="font-weight: 700; color: var(--joy-color-brand-primary, #7c3aed);">$4,892,120.00</span>
+                <span style="font-weight: 700; color: var(--joy-accent-default);">$4,892,120.00</span>
               </div>
             </div>
           </div>
@@ -3487,7 +3717,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 8px;">Segmented Time Horizon:</div>
+              <div style="font-size: 0.8125rem; color: var(--joy-text-muted); margin-bottom: 8px;">Segmented Time Horizon:</div>
               <div class="joy-segmented" id="demo-segmented">
                 <button type="button" class="joy-segmented__item joy-segmented__item--active" onclick="selectSegment(this, '1h')">1H</button>
                 <button type="button" class="joy-segmented__item" onclick="selectSegment(this, '1d')">1D</button>
@@ -3498,7 +3728,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 8px;">Checkable Tags:</div>
+              <div style="font-size: 0.8125rem; color: var(--joy-text-muted); margin-bottom: 8px;">Checkable Tags:</div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <span class="joy-tag joy-tag--checkable joy-tag--checked" onclick="this.classList.toggle('joy-tag--checked')">BTC</span>
                 <span class="joy-tag joy-tag--checkable joy-tag--checked" onclick="this.classList.toggle('joy-tag--checked')">ETH</span>
@@ -3515,6 +3745,8 @@ export async function executeHedge(symbol: string, size: number) {
         <h2 style="margin: 0 0 8px 0;">Form Suite & Advanced Data Entry Parity</h2>
         <p class="header-tagline">Ant Design v5 / v6 data entry parity: Form with validation rules & explains, InputNumber spinbutton stepper, Rate interactive star rating, Mentions autocomplete, TimePicker column selector, and Transfer dual-panel list migration.</p>
 
+        ${renderFormsMatrix()}
+
         <!-- Form & Validation Showcase -->
         <div class="component-card">
           <div class="component-header">
@@ -3527,8 +3759,8 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="component-canvas">
             <div class="form-showcase-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 28px; width: 100%;">
               <!-- Vertical Form -->
-              <div class="joy-form joy-form--vertical" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0);">
-                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-color-brand-primary, #7c3aed);">Vertical Layout with Validation Rules</div>
+              <div class="joy-form joy-form--vertical" style="background: var(--joy-surface-sunken); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-border-subtle);">
+                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-accent-default);">Vertical Layout with Validation Rules</div>
                 
                 <div class="joy-form-item">
                   <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Asset Symbol</label>
@@ -3552,12 +3784,11 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-form-item">
                   <label class="joy-form-item__label">Execution Strategy</label>
                   <div class="joy-form-item__control">
-                    <div class="joy-select-wrapper">
-                      <select class="joy-select">
-                        <option>TWAP (Time-Weighted Average Price)</option>
-                        <option>VWAP (Volume-Weighted Average Price)</option>
-                        <option>POV (Percentage of Volume)</option>
-                      </select>
+                    <div class="joy-select-wrapper joy-select-wrapper--md">
+                      <button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                        <span class="joy-select__value">TWAP (Time-Weighted Average Price)</span>
+                        <span class="joy-select__arrow" aria-hidden="true">${chevronDown}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -3566,8 +3797,8 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
 
               <!-- Horizontal Form -->
-              <div class="joy-form joy-form--horizontal" style="background: var(--joy-color-surface-subtle, #f8fafc); padding: 24px; border-radius: 8px; border: 1px solid var(--joy-color-border-subtle, #e2e8f0); --joy-form-label-width: 160px;">
-                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 18px; color: var(--joy-color-brand-primary, #7c3aed);">Horizontal Layout Alignment (Right-Aligned Baselines)</div>
+              <div class="joy-form joy-form--horizontal" style="background: var(--joy-surface-sunken); padding: 24px; border-radius: 8px; border: 1px solid var(--joy-border-subtle); --joy-form-label-width: 160px;">
+                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 18px; color: var(--joy-accent-default);">Horizontal Layout Alignment (Right-Aligned Baselines)</div>
                 
                 <div class="joy-form-item joy-form-item--horizontal">
                   <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Account Name</label>
@@ -3618,7 +3849,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
             <div class="component-canvas" style="flex-direction: column; align-items: flex-start; gap: 16px;">
               <div>
-                <div style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 6px;">Leverage Multiplier (1x - 100x):</div>
+                <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Leverage Multiplier (1x - 100x):</div>
                 <div class="joy-input-number" role="spinbutton" aria-valuenow="10" aria-valuemin="1" aria-valuemax="100" tabindex="0">
                   <input type="text" class="joy-input-number__input" id="demo-num-input" value="10" />
                   <div class="joy-input-number__handler-wrap">
@@ -3633,7 +3864,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
 
               <div>
-                <div style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 6px;">Precision Sizing (step 0.05):</div>
+                <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Precision Sizing (step 0.05):</div>
                 <div class="joy-input-number" role="spinbutton" aria-valuenow="1.25" tabindex="0">
                   <input type="text" class="joy-input-number__input" id="demo-num-step" value="1.25" />
                   <div class="joy-input-number__handler-wrap">
@@ -3659,9 +3890,9 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
             <div class="component-canvas" style="flex-direction: column; align-items: flex-start; gap: 16px;">
               <div>
-                <div style="font-size: 0.75rem; color: var(--joy-color-text-muted, #64748b); margin-bottom: 6px;">Execution Quality Rating:</div>
+                <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Execution Quality Rating:</div>
                 <div class="joy-rate" id="demo-rate" role="radiogroup" aria-label="Rating"></div>
-                <div id="rate-feedback" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-color-brand-accent, #c49a3a); margin-top: 6px;">4.5 Stars</div>
+                <div id="rate-feedback" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-accent-default); margin-top: 6px;">4.5 Stars</div>
               </div>
             </div>
           </div>
@@ -3698,7 +3929,7 @@ export async function executeHedge(symbol: string, size: number) {
               <div class="joy-time-picker" style="width: 220px;">
                 <div class="joy-input-wrapper" onclick="toggleTimePickerDemo()" style="cursor: pointer;">
                   <input type="text" class="joy-input" id="demo-time-input" readonly value="09:30:00" style="cursor: pointer;" />
-                  <span style="padding-right: 10px; display: flex; align-items: center; color: var(--joy-color-text-muted, #64748b);">
+                  <span style="padding-right: 10px; display: flex; align-items: center; color: var(--joy-text-muted);">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                   </span>
                 </div>
@@ -3772,7 +4003,7 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="component-canvas" style="flex-direction: column; gap: 24px; align-items: stretch;">
             <!-- Horizontal Menu -->
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; color: var(--joy-color-text-muted, #64748b); margin-bottom: 8px;">Horizontal Menu:</div>
+              <div style="font-size: 0.8125rem; font-weight: 600; color: var(--joy-text-muted); margin-bottom: 8px;">Horizontal Menu:</div>
               <ul class="joy-menu joy-menu--horizontal" role="menu" id="demo-menu-horiz">
                 <li class="joy-menu__item joy-menu__item--active" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
                   <span class="joy-menu__item-icon">
@@ -3798,8 +4029,8 @@ export async function executeHedge(symbol: string, size: number) {
             <!-- Inline Sidebar Menu & Anchor Split -->
             <div style="display: grid; grid-template-columns: 260px 1fr 220px; gap: 24px; align-items: start;">
               <!-- Inline Menu -->
-              <div style="background: var(--joy-color-surface-subtle, #f8fafc); border: 1px solid var(--joy-color-border-subtle, #e2e8f0); border-radius: 8px; overflow: hidden;">
-                <div style="padding: 10px 16px; font-weight: 600; font-size: 0.8125rem; color: var(--joy-color-brand-primary, #7c3aed); border-bottom: 1px solid var(--joy-color-border-subtle, #e2e8f0);">Sidebar Subscriptions</div>
+              <div style="background: var(--joy-surface-sunken); border: 1px solid var(--joy-border-subtle); border-radius: 8px; overflow: hidden;">
+                <div style="padding: 10px 16px; font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); border-bottom: 1px solid var(--joy-border-subtle);">Sidebar Subscriptions</div>
                 <ul class="joy-menu joy-menu--inline" role="menu" style="width: 100%; border: none;">
                   <li class="joy-menu__item joy-menu__item--active" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
                     <span>Spot Liquidity (AMM)</span>
@@ -3832,7 +4063,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <button type="button" class="joy-button joy-button--danger joy-button--sm" onclick="togglePopconfirmDemo(this)">Revoke API Key</button>
                     <div class="joy-popconfirm__panel" id="demo-popconfirm-panel" style="display: none;" role="dialog">
                       <div class="joy-popconfirm__title">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--joy-color-status-warning, #f59e0b)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--joy-status-warning-fg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                         <span>Revoke DMA Master Key?</span>
                       </div>
                       <div class="joy-popconfirm__buttons">
@@ -3841,7 +4072,7 @@ export async function executeHedge(symbol: string, size: number) {
                       </div>
                     </div>
                   </div>
-                  <span style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b);">Prevents accidental destructive operations</span>
+                  <span style="font-size: 0.8125rem; color: var(--joy-text-muted);">Prevents accidental destructive operations</span>
                 </div>
 
                 <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Spin Loading Indicators:</div>
@@ -3853,21 +4084,21 @@ export async function executeHedge(symbol: string, size: number) {
                 </div>
 
                 <!-- Wrapped Container with Spin Mask -->
-                <div class="joy-spin__container" id="demo-spin-container" style="background: var(--joy-color-surface-elevated, #fff); border: 1px solid var(--joy-color-border-subtle, #e2e8f0); border-radius: 8px; padding: 16px; margin-top: 8px;">
+                <div class="joy-spin__container" id="demo-spin-container" style="background: var(--joy-surface-raised); border: 1px solid var(--joy-border-subtle); border-radius: 8px; padding: 16px; margin-top: 8px;">
                   <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 6px;">Live Book Depth Stream</div>
-                  <div style="font-size: 0.8125rem; color: var(--joy-color-text-muted, #64748b);">Real-time aggregated L2 order depth feed from 6 venues.</div>
+                  <div style="font-size: 0.8125rem; color: var(--joy-text-muted);">Real-time aggregated L2 order depth feed from 6 venues.</div>
                   <div class="joy-spin__mask" id="demo-spin-mask" style="display: none;" role="status">
                     <div class="joy-spin" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                       <svg class="joy-spin__indicator" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
-                      <span style="font-size: 0.8125rem; color: var(--joy-color-brand-primary, #7c3aed); font-weight: 500;">Rebalancing book...</span>
+                      <span style="font-size: 0.8125rem; color: var(--joy-accent-default); font-weight: 500;">Rebalancing book...</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Anchor Navigation -->
-              <div style="background: var(--joy-color-surface-subtle, #f8fafc); border: 1px solid var(--joy-color-border-subtle, #e2e8f0); border-radius: 8px; padding: 16px;">
-                <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-color-brand-primary, #7c3aed); margin-bottom: 10px;">Anchor Navigator</div>
+              <div style="background: var(--joy-surface-sunken); border: 1px solid var(--joy-border-subtle); border-radius: 8px; padding: 16px;">
+                <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); margin-bottom: 10px;">Anchor Navigator</div>
                 <nav class="joy-anchor" role="navigation" aria-label="Demo Anchor">
                   <div class="joy-anchor__ink"></div>
                   <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" onclick="selectAnchor(this)">#menu-demo</a>
@@ -4062,10 +4293,10 @@ export async function executeHedge(symbol: string, size: number) {
         statusText.innerText = isBtnLoading ? 'Loading Active' : 'Idle';
       }
       if (isBtnLoading) {
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Loading...';
+        btn.innerHTML = '<span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></span><span class="joy-button__label">Loading...</span>';
         btn.disabled = true;
       } else {
-        btn.innerHTML = 'Click Me! (Clicked: <span id="click-counter">' + clickCount + '</span>)';
+        btn.innerHTML = '<span class="joy-button__label">Click Me! (Clicked: <span id="click-counter">' + clickCount + '</span>)</span>';
         btn.disabled = false;
       }
     }
@@ -4168,7 +4399,7 @@ export async function executeHedge(symbol: string, size: number) {
       const toast = document.createElement('div');
       toast.className = 'joy-toast joy-toast--' + variant;
       toast.setAttribute('role', 'status');
-      toast.innerHTML = '<div style="flex: 1;">' + msg + '</div><button type="button" style="background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--joy-color-text-muted);" onclick="this.parentElement.remove()">&times;</button>';
+      toast.innerHTML = '<div style="flex: 1;">' + msg + '</div><button type="button" style="background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--joy-text-muted);" onclick="this.parentElement.remove()">&times;</button>';
       container.appendChild(toast);
       setTimeout(() => {
         if (toast.parentElement) toast.remove();
@@ -4205,17 +4436,17 @@ export async function executeHedge(symbol: string, size: number) {
 
       tbody.innerHTML = rows.map(r => {
         let flashClass = r.flash === 'up' ? 'joy-table-cell--flash-up' : (r.flash === 'down' ? 'joy-table-cell--flash-down' : '');
-        let changeColor = r.change >= 0 ? 'var(--joy-color-status-success, #10b981)' : 'var(--joy-color-status-danger, #ef4444)';
+        let changeColor = r.change >= 0 ? 'var(--joy-status-success-fg)' : 'var(--joy-status-danger-fg)';
         let changeSign = r.change >= 0 ? '+' : '';
         return '<tr>' +
           '<td data-label="Pair" style="font-weight: 600;">' + r.pair + '</td>' +
-          '<td data-label="Price (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono, monospace);" class="' + flashClass + '">' +
+          '<td data-label="Price (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono);" class="' + flashClass + '">' +
             '$' + r.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
           '</td>' +
           '<td data-label="24h Change" style="text-align: right; font-weight: 600; color: ' + changeColor + ';">' +
             changeSign + r.change.toFixed(2) + '%' +
           '</td>' +
-          '<td data-label="24h Vol (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono, monospace); color: #64748b;">' +
+          '<td data-label="24h Vol (USDT)" style="text-align: right; font-family: var(--joy-font-family-mono); color: var(--joy-text-muted);">' +
             '$' + (r.volume / 1e6).toFixed(1) + 'M' +
           '</td>' +
           '<td data-label="Status" style="text-align: center;">' +
@@ -4446,7 +4677,7 @@ export async function executeHedge(symbol: string, size: number) {
         const candleWidth = Math.max(2, (rect.width / visible.length) * 0.7);
 
         // Grid
-        ctx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+        ctx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? 'transparent' : 'transparent';
         ctx.lineWidth = 1;
         for (let i = 1; i <= 4; i++) {
           const y = (rect.height / 5) * i;
@@ -4464,7 +4695,7 @@ export async function executeHedge(symbol: string, size: number) {
           const lowY = rect.height - ((c.low - min) / (max - min)) * rect.height;
 
           const isBull = c.close >= c.open;
-          const color = isBull ? '#10b981' : '#ef4444';
+          const color = isBull ? 'var(--joy-status-success-fg)' : 'var(--joy-status-danger-fg)';
 
           ctx.strokeStyle = color;
           ctx.fillStyle = color;
@@ -4489,7 +4720,7 @@ export async function executeHedge(symbol: string, size: number) {
           document.getElementById('hud-l').innerText = last.low.toFixed(2);
           const cEl = document.getElementById('hud-c');
           cEl.innerText = last.close.toFixed(2);
-          cEl.style.color = last.close >= last.open ? '#10b981' : '#ef4444';
+          cEl.style.color = last.close >= last.open ? 'var(--joy-status-success-fg)' : 'var(--joy-status-danger-fg)';
         }
       }
 
@@ -4522,7 +4753,7 @@ export async function executeHedge(symbol: string, size: number) {
         minY -= pad;
         maxY += pad;
 
-        ctx.strokeStyle = '#7c3aed';
+        ctx.strokeStyle = 'var(--joy-accent-default)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         sampled.forEach((p, idx) => {
@@ -4537,8 +4768,8 @@ export async function executeHedge(symbol: string, size: number) {
         ctx.lineTo(0, rect.height);
         ctx.closePath();
         const grad = ctx.createLinearGradient(0, 0, 0, rect.height);
-        grad.addColorStop(0, 'rgba(124, 58, 237, 0.2)');
-        grad.addColorStop(1, 'rgba(124, 58, 237, 0.0)');
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.fill();
       }
@@ -4845,6 +5076,7 @@ export async function executeHedge(symbol: string, size: number) {
     let kineticAnimId = null;
     let kineticMouse = { x: -1000, y: -1000, vx: 0, vy: 0, lastX: -1000, lastY: -1000, isOver: false };
     const KINETIC_PARTICLE_COUNT = 90;
+    const canvasToken = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
     function initKineticCanvas() {
       kineticCanvas = document.getElementById('kinetic-particle-canvas');
@@ -4853,7 +5085,11 @@ export async function executeHedge(symbol: string, size: number) {
       resizeKineticCanvas();
 
       kineticParticles = [];
-      const colors = ['#a855f7', '#38bdf8', '#c49a3a', '#e879f9'];
+      const colors = [
+        canvasToken('--joy-accent-default'),
+        canvasToken('--joy-status-info-fg'),
+        canvasToken('--joy-accent-hover'),
+      ];
       for (let i = 0; i < KINETIC_PARTICLE_COUNT; i++) {
         kineticParticles.push({
           x: (Math.random() - 0.5) * 600,
@@ -5035,11 +5271,14 @@ export async function executeHedge(symbol: string, size: number) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < maxDist) {
             const alpha = (1 - dist / maxDist) * Math.min(p1.scale, p2.scale) * 0.35;
-            kineticCtx.strokeStyle = 'rgba(168, 85, 247, ' + alpha.toFixed(3) + ')';
+            kineticCtx.save();
+            kineticCtx.globalAlpha = alpha;
+            kineticCtx.strokeStyle = canvasToken('--joy-accent-default');
             kineticCtx.beginPath();
             kineticCtx.moveTo(p1.x, p1.y);
             kineticCtx.lineTo(p2.x, p2.y);
             kineticCtx.stroke();
+            kineticCtx.restore();
           }
         }
       }
@@ -5049,7 +5288,7 @@ export async function executeHedge(symbol: string, size: number) {
         const rad = Math.max(1, p.radius);
         const glow = kineticCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 3);
         glow.addColorStop(0, p.color);
-        glow.addColorStop(0.5, p.color + '66');
+        glow.addColorStop(0.5, p.color);
         glow.addColorStop(1, 'transparent');
 
         kineticCtx.fillStyle = glow;
@@ -5057,7 +5296,7 @@ export async function executeHedge(symbol: string, size: number) {
         kineticCtx.arc(p.x, p.y, rad * 3, 0, Math.PI * 2);
         kineticCtx.fill();
 
-        kineticCtx.fillStyle = '#ffffff';
+        kineticCtx.fillStyle = canvasToken('--joy-text-inverse');
         kineticCtx.beginPath();
         kineticCtx.arc(p.x, p.y, rad * 0.6, 0, Math.PI * 2);
         kineticCtx.fill();
@@ -5131,9 +5370,9 @@ export async function executeHedge(symbol: string, size: number) {
 
 `;
 
-fs.writeFileSync(path.join(outDir, 'index.html'), html);
-const tokensSrc = path.join(__dirname, '../../packages/tokens/dist/theme.css');
+fs.writeFileSync(path.join(outDir, "index.html"), html);
+const tokensSrc = path.join(__dirname, "../../packages/tokens/dist/theme.css");
 if (fs.existsSync(tokensSrc)) {
-  fs.copyFileSync(tokensSrc, path.join(outDir, 'theme.css'));
+  fs.copyFileSync(tokensSrc, path.join(outDir, "theme.css"));
 }
 console.log("Built Storybook Hub static distribution in", outDir);

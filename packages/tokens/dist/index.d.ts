@@ -18,6 +18,7 @@ export interface JoyTokens {
   'color-gold-200': string;
   'color-gold-300': string;
   'color-gold-400': string;
+  'color-gold-450': string;
   'color-gold-500': string;
   'color-gold-600': string;
   'color-gold-700': string;
@@ -113,11 +114,13 @@ export interface JoyTokens {
   'surface-card': string;
   'surface-raised': string;
   'surface-sunken': string;
+  'surface-disabled': string;
   'surface-overlay': string;
   'surface-inverse': string;
   'text-primary': string;
   'text-secondary': string;
   'text-muted': string;
+  'text-disabled': string;
   'text-inverse': string;
   'text-link': string;
   'text-on-accent': string;
@@ -125,11 +128,14 @@ export interface JoyTokens {
   'border-default': string;
   'border-strong': string;
   'border-focus': string;
+  'border-disabled': string;
   'accent-default': string;
   'accent-hover': string;
   'accent-active': string;
   'accent-subtle': string;
   'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
   'status-success-fg': string;
   'status-success-bg': string;
   'status-success-border': string;
@@ -139,6 +145,9 @@ export interface JoyTokens {
   'status-danger-fg': string;
   'status-danger-bg': string;
   'status-danger-border': string;
+  'status-danger-solid-bg': string;
+  'status-danger-solid-fg': string;
+  'status-danger-solid-border': string;
   'status-info-fg': string;
   'status-info-bg': string;
   'status-info-border': string;
@@ -147,6 +156,9 @@ export interface JoyTokens {
   'elevation-1': string;
   'elevation-2': string;
   'elevation-3': string;
+  'elevation-accent-1': string;
+  'elevation-accent-2': string;
+  'elevation-accent-inset': string;
   /**
    * @deprecated Use 'accent-default' instead
    */
@@ -391,6 +403,18 @@ export interface JoyTokens {
    * @deprecated Legacy alias token
    */
   'form-label-width': string;
+  /**
+   * @deprecated Use 'status-danger-solid-bg' instead
+   */
+  'danger-solid-bg': string;
+  /**
+   * @deprecated Use 'status-danger-solid-fg' instead
+   */
+  'danger-solid-fg': string;
+  /**
+   * @deprecated Use 'status-danger-solid-border' instead
+   */
+  'danger-solid-border': string;
 }
 
 export type JoyTokenName = keyof JoyTokens;

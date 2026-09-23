@@ -66,6 +66,7 @@ export function generateAllTokens() {
     { step: '200', L: 0.86, C: 0.08 },
     { step: '300', L: 0.785, C: 0.11 }, // Dark accent (>= 4.5:1 on dark surfaces)
     { step: '400', L: lGoldAnchor, C: cGoldAnchor, hex: '#c49a3a' },
+    { step: '450', L: 0.65, C: 0.105 },
     { step: '500', L: 0.62, C: 0.11 },
     { step: '600', L: 0.525, C: 0.10 }, // Text link (>= 4.5:1 on white and cream-100)
     { step: '700', L: 0.43, C: 0.09 },
@@ -175,6 +176,7 @@ export function generateAllTokens() {
       "card": { "value": "#ffffff", "type": "color" },
       "raised": { "value": "#ffffff", "type": "color" },
       "sunken": { "value": "{color.cream.200}", "type": "color" },
+      "disabled": { "value": "{color.cream.200}", "type": "color" },
       "overlay": { "value": "#ffffff", "type": "color" },
       "inverse": { "value": "{color.navy.500}", "type": "color" }
     },
@@ -183,6 +185,7 @@ export function generateAllTokens() {
       "primary": { "value": "{color.ink.500}", "type": "color" },
       "secondary": { "value": "{color.neutral.700}", "type": "color" },
       "muted": { "value": "{color.neutral.500}", "type": "color" },
+      "disabled": { "value": "{color.neutral.500}", "type": "color" },
       "inverse": { "value": "#ffffff", "type": "color" },
       "link": { "value": "{color.gold.600}", "type": "color" },
       "on-accent": { "value": "{color.navy.500}", "type": "color" }
@@ -192,7 +195,8 @@ export function generateAllTokens() {
       "subtle": { "value": "{color.cream.300}", "type": "color" },
       "default": { "value": "{color.neutral.400}", "type": "color" },
       "strong": { "value": "{color.neutral.600}", "type": "color" },
-      "focus": { "value": "{color.gold.600}", "type": "color" }
+      "focus": { "value": "{color.gold.600}", "type": "color" },
+      "disabled": { "value": "{color.cream.300}", "type": "color" }
     },
     // Accent
     "accent": {
@@ -200,7 +204,9 @@ export function generateAllTokens() {
       "hover": { "value": "{color.gold.500}", "type": "color" },
       "active": { "value": "{color.gold.600}", "type": "color" },
       "subtle": { "value": "{color.gold.50}", "type": "color" },
-      "text": { "value": "{color.gold.600}", "type": "color" }
+      "text": { "value": "{color.gold.600}", "type": "color" },
+      "gradient-end": { "value": "{color.gold.450}", "type": "color" },
+      "highlight": { "value": "{color.gold.200}", "type": "color" }
     },
     // Status
     "status": {
@@ -210,9 +216,12 @@ export function generateAllTokens() {
       "warning-fg": { "value": "{color.status.warning.700}", "type": "color" },
       "warning-bg": { "value": "{color.status.warning.100}", "type": "color" },
       "warning-border": { "value": "{color.status.warning.300}", "type": "color" },
-      "danger-fg": { "value": "{color.status.danger.700}", "type": "color" },
+      "danger-fg": { "value": "{color.status.danger.600}", "type": "color" },
       "danger-bg": { "value": "{color.status.danger.100}", "type": "color" },
       "danger-border": { "value": "{color.status.danger.300}", "type": "color" },
+      "danger-solid-bg": { "value": "{color.status.danger.600}", "type": "color" },
+      "danger-solid-fg": { "value": "#ffffff", "type": "color" },
+      "danger-solid-border": { "value": "{color.status.danger.700}", "type": "color" },
       "info-fg": { "value": "{color.status.info.700}", "type": "color" },
       "info-bg": { "value": "{color.status.info.100}", "type": "color" },
       "info-border": { "value": "{color.status.info.300}", "type": "color" }
@@ -224,7 +233,10 @@ export function generateAllTokens() {
       "0": { "value": "none", "type": "shadow" },
       "1": { "value": "0 1px 3px rgba(20, 37, 62, 0.08), 0 1px 2px rgba(20, 37, 62, 0.04)", "type": "shadow" },
       "2": { "value": "0 4px 8px -2px rgba(20, 37, 62, 0.1), 0 2px 4px -2px rgba(20, 37, 62, 0.06)", "type": "shadow" },
-      "3": { "value": "0 12px 20px -4px rgba(20, 37, 62, 0.12), 0 4px 6px -2px rgba(20, 37, 62, 0.04)", "type": "shadow" }
+      "3": { "value": "0 12px 20px -4px rgba(20, 37, 62, 0.12), 0 4px 6px -2px rgba(20, 37, 62, 0.04)", "type": "shadow" },
+      "accent-1": { "value": "0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)", "type": "shadow" },
+      "accent-2": { "value": "0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)", "type": "shadow" },
+      "accent-inset": { "value": "inset 0 2px 4px rgba(133, 101, 21, 0.35)", "type": "shadow" }
     }
   };
 
@@ -233,8 +245,9 @@ export function generateAllTokens() {
     "surface": {
       "canvas": { "value": "{color.navy.900}", "type": "color" },
       "card": { "value": "{color.navy.800}", "type": "color" },
-      "raised": { "value": "{color.navy.700}", "type": "color" },
+      "raised": { "value": "{color.navy.500}", "type": "color" },
       "sunken": { "value": "{color.navy.950}", "type": "color" },
+      "disabled": { "value": "{color.navy.800}", "type": "color" },
       "overlay": { "value": "{color.navy.800}", "type": "color" },
       "inverse": { "value": "{color.cream.100}", "type": "color" }
     },
@@ -243,16 +256,18 @@ export function generateAllTokens() {
       "primary": { "value": "{color.cream.100}", "type": "color" },
       "secondary": { "value": "{color.neutral.300}", "type": "color" },
       "muted": { "value": "{color.neutral.400}", "type": "color" },
+      "disabled": { "value": "{color.neutral.400}", "type": "color" },
       "inverse": { "value": "{color.ink.500}", "type": "color" },
       "link": { "value": "{color.gold.300}", "type": "color" },
       "on-accent": { "value": "{color.navy.950}", "type": "color" }
     },
     // Border
     "border": {
-      "subtle": { "value": "{color.navy.600}", "type": "color" },
+      "subtle": { "value": "{color.navy.700}", "type": "color" },
       "default": { "value": "{color.navy.400}", "type": "color" },
       "strong": { "value": "{color.navy.300}", "type": "color" },
-      "focus": { "value": "{color.gold.300}", "type": "color" }
+      "focus": { "value": "{color.gold.300}", "type": "color" },
+      "disabled": { "value": "{color.navy.700}", "type": "color" }
     },
     // Accent
     "accent": {
@@ -260,7 +275,9 @@ export function generateAllTokens() {
       "hover": { "value": "{color.gold.200}", "type": "color" },
       "active": { "value": "{color.gold.400}", "type": "color" },
       "subtle": { "value": "#2a2211", "type": "color" },
-      "text": { "value": "{color.gold.300}", "type": "color" }
+      "text": { "value": "{color.gold.300}", "type": "color" },
+      "gradient-end": { "value": "{color.gold.400}", "type": "color" },
+      "highlight": { "value": "{color.gold.200}", "type": "color" }
     },
     // Status
     "status": {
@@ -273,6 +290,9 @@ export function generateAllTokens() {
       "danger-fg": { "value": "{color.status.danger.300}", "type": "color" },
       "danger-bg": { "value": "{color.status.danger.900}", "type": "color" },
       "danger-border": { "value": "{color.status.danger.700}", "type": "color" },
+      "danger-solid-bg": { "value": "{color.status.danger.600}", "type": "color" },
+      "danger-solid-fg": { "value": "#ffffff", "type": "color" },
+      "danger-solid-border": { "value": "{color.status.danger.700}", "type": "color" },
       "info-fg": { "value": "{color.status.info.300}", "type": "color" },
       "info-bg": { "value": "{color.status.info.900}", "type": "color" },
       "info-border": { "value": "{color.status.info.700}", "type": "color" }
@@ -284,7 +304,10 @@ export function generateAllTokens() {
       "0": { "value": "none", "type": "shadow" },
       "1": { "value": "0 0 0 1px rgba(77, 96, 125, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
       "2": { "value": "0 0 0 1px rgba(77, 96, 125, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5)", "type": "shadow" },
-      "3": { "value": "0 0 0 1px rgba(77, 96, 125, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6)", "type": "shadow" }
+      "3": { "value": "0 0 0 1px rgba(77, 96, 125, 0.45), 0 12px 24px -4px rgba(0, 0, 0, 0.6)", "type": "shadow" },
+      "accent-1": { "value": "0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
+      "accent-2": { "value": "0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6)", "type": "shadow" },
+      "accent-inset": { "value": "inset 0 2px 4px rgba(0, 0, 0, 0.45)", "type": "shadow" }
     }
   };
 

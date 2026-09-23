@@ -150,6 +150,7 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
     { fg: '--joy-accent-text', bg: '--joy-surface-canvas', theme: 'Light', role: 'Accent Text / Surface', min: 4.5 },
     { fg: '--joy-accent-text', bg: '--joy-surface-card', theme: 'Light', role: 'Accent Text / Surface', min: 4.5 },
     { fg: '--joy-text-on-accent', bg: '--joy-accent-default', theme: 'Light', role: 'Text / Surface', min: 4.5 },
+    { fg: '--joy-text-on-accent', bg: '--joy-accent-gradient-end', theme: 'Light', role: 'Text / Hero Accent', min: 4.5 },
 
     // Light UI and borders
     { fg: '--joy-border-default', bg: '--joy-surface-canvas', theme: 'Light', role: 'Border / Surface', min: 3.0 },
@@ -163,7 +164,10 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
     { fg: '--joy-status-warning-fg', bg: '--joy-status-warning-bg', theme: 'Light', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-warning-fg', bg: '--joy-surface-canvas', theme: 'Light', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-danger-fg', bg: '--joy-status-danger-bg', theme: 'Light', role: 'Status Text / Surface', min: 4.5 },
+    { fg: '--joy-status-danger-bg', bg: '--joy-status-danger-fg', theme: 'Light', role: 'Status Surface / Text', min: 4.5 },
     { fg: '--joy-status-danger-fg', bg: '--joy-surface-canvas', theme: 'Light', role: 'Status Text / Surface', min: 4.5 },
+    { fg: '--joy-status-danger-solid-fg', bg: '--joy-status-danger-solid-bg', theme: 'Light', role: 'Danger Solid Button', min: 4.5 },
+    { fg: '--joy-text-disabled', bg: '--joy-surface-disabled', theme: 'Light', role: 'Disabled Text / Surface', min: 4.5 },
     { fg: '--joy-status-info-fg', bg: '--joy-status-info-bg', theme: 'Light', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-info-fg', bg: '--joy-surface-canvas', theme: 'Light', role: 'Status Text / Surface', min: 4.5 },
 
@@ -175,11 +179,13 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
     { fg: '--joy-text-secondary', bg: '--joy-surface-card', theme: 'Dark', role: 'Text / Surface', min: 4.5 },
     { fg: '--joy-text-muted', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Text / Surface', min: 4.5 },
     { fg: '--joy-text-muted', bg: '--joy-surface-card', theme: 'Dark', role: 'Text / Surface', min: 4.5 },
+    { fg: '--joy-text-disabled', bg: '--joy-surface-disabled', theme: 'Dark', role: 'Disabled Text / Surface', min: 4.5 },
     { fg: '--joy-text-link', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Text / Surface', min: 4.5 },
     { fg: '--joy-text-link', bg: '--joy-surface-card', theme: 'Dark', role: 'Text / Surface', min: 4.5 },
     { fg: '--joy-accent-text', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Accent Text / Surface', min: 4.5 },
     { fg: '--joy-accent-text', bg: '--joy-surface-card', theme: 'Dark', role: 'Accent Text / Surface', min: 4.5 },
     { fg: '--joy-text-on-accent', bg: '--joy-accent-default', theme: 'Dark', role: 'Text / Surface', min: 4.5 },
+    { fg: '--joy-text-on-accent', bg: '--joy-accent-gradient-end', theme: 'Dark', role: 'Text / Hero Accent', min: 4.5 },
 
     // Dark UI and borders
     { fg: '--joy-border-default', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Border / Surface', min: 3.0 },
@@ -193,7 +199,9 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
     { fg: '--joy-status-warning-fg', bg: '--joy-status-warning-bg', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-warning-fg', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-danger-fg', bg: '--joy-status-danger-bg', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
+    { fg: '--joy-status-danger-bg', bg: '--joy-status-danger-fg', theme: 'Dark', role: 'Status Surface / Text', min: 4.5 },
     { fg: '--joy-status-danger-fg', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
+    { fg: '--joy-status-danger-solid-fg', bg: '--joy-status-danger-solid-bg', theme: 'Dark', role: 'Danger Solid Button', min: 4.5 },
     { fg: '--joy-status-info-fg', bg: '--joy-status-info-bg', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-info-fg', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
   ];

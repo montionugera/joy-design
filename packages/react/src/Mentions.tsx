@@ -1,11 +1,14 @@
 import * as React from 'react';
+import { useOverlay } from './useOverlay.js';
+
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
 export interface MentionOption {
   value: string;
   label?: string;
 }
 
-export interface MentionsProps {
+export interface MentionsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'onSelect'> {
   value?: string;
   defaultValue?: string;
   prefix?: string;
@@ -14,40 +17,64 @@ export interface MentionsProps {
   rows?: number;
   disabled?: boolean;
   className?: string;
+  id?: string;
   onChange?: (value: string) => void;
   onSelect?: (option: MentionOption) => void;
 }
 
 export const Mentions = React.forwardRef<HTMLDivElement, MentionsProps>(
-  ({
-    value: controlledValue,
-    defaultValue = '',
-    prefix = '@',
-    options = [],
-    placeholder = '',
-    rows = 3,
-    disabled = false,
-    className = '',
-    onChange,
-    onSelect
-  }, ref) => {
-    const [internalVal, setInternalVal] = React.useState<string>(
-      controlledValue !== undefined ? controlledValue : defaultValue
-    );
+  (
+    {
+      value: controlledValue,
+      defaultValue = '',
+      prefix = '@',
+      options = [],
+      placeholder = '',
+      rows = 3,
+      disabled = false,
+      className = '',
+      id,
+      onChange,
+      onSelect,
+      ...rest
+    },
+    ref
+  ) => {
+    const isControlled = controlledValue !== undefined;
+    const [internalVal, setInternalVal] = React.useState<string>(defaultValue);
     const [isOpen, setIsOpen] = React.useState(false);
     const [filterText, setFilterText] = React.useState('');
+    const [activeIndex, setActiveIndex] = React.useState<number>(-1);
+
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const dropdownRef = React.useRef<HTMLUListElement>(null);
 
-    const currentVal = controlledValue !== undefined ? controlledValue : internalVal;
+    const generatedId = React.useId();
+    const dropdownId = `${id || generatedId}-listbox`;
 
-    const filteredOptions = options.filter(opt =>
-      opt.value.toLowerCase().includes(filterText.toLowerCase()) ||
-      (opt.label && opt.label.toLowerCase().includes(filterText.toLowerCase()))
+    const currentVal = isControlled ? controlledValue : internalVal;
+
+    const filteredOptions = options.filter(
+      (opt) =>
+        opt.value.toLowerCase().includes(filterText.toLowerCase()) ||
+        (opt.label && opt.label.toLowerCase().includes(filterText.toLowerCase()))
     );
+
+    useOverlay(isOpen && filteredOptions.length > 0, textareaRef, dropdownRef, () => {
+      setIsOpen(false);
+    });
+
+    React.useEffect(() => {
+      if (isOpen && filteredOptions.length > 0) {
+        setActiveIndex(0);
+      } else {
+        setActiveIndex(-1);
+      }
+    }, [isOpen, filterText]);
 
     const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const val = e.target.value;
-      if (controlledValue === undefined) {
+      if (!isControlled) {
         setInternalVal(val);
       }
       onChange?.(val);
@@ -73,7 +100,7 @@ export const Mentions = React.forwardRef<HTMLDivElement, MentionsProps>(
 
       if (lastPrefixIndex !== -1) {
         const nextVal = textBefore.slice(0, lastPrefixIndex) + prefix + opt.value + ' ' + textAfter;
-        if (controlledValue === undefined) {
+        if (!isControlled) {
           setInternalVal(nextVal);
         }
         onChange?.(nextVal);
@@ -90,33 +117,69 @@ export const Mentions = React.forwardRef<HTMLDivElement, MentionsProps>(
       }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (!isOpen || filteredOptions.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % filteredOptions.length);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev - 1 + filteredOptions.length) % filteredOptions.length);
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
+          e.preventDefault();
+          selectOption(filteredOptions[activeIndex]);
+        }
+      }
+    };
+
     return (
-      <div ref={ref} className={`joy-mentions ${className}`.trim()}>
+      <div
+        ref={ref}
+        id={id}
+        className={cx('joy-mentions', disabled && 'joy-mentions--disabled', className)}
+        {...rest}
+      >
         <textarea
           ref={textareaRef}
-          className="joy-mentions__textarea"
+          className="joy-textarea joy-mentions__textarea"
           rows={rows}
           placeholder={placeholder}
           disabled={disabled}
           value={currentVal}
           onChange={handleInput}
-          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+          onKeyDown={handleKeyDown}
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? dropdownId : undefined}
         />
         {isOpen && filteredOptions.length > 0 && (
-          <div className="joy-mentions__dropdown" role="listbox">
-            {filteredOptions.map((opt) => (
-              <div
-                key={opt.value}
-                className="joy-mentions__item"
-                role="option"
-                aria-selected="false"
-                tabIndex={-1}
-                onMouseDown={() => selectOption(opt)}
-              >
-                <span className="joy-mentions__item-label">{opt.label || opt.value}</span>
-              </div>
-            ))}
-          </div>
+          <ul
+            ref={dropdownRef}
+            id={dropdownId}
+            className="joy-mentions__dropdown"
+            role="listbox"
+          >
+            {filteredOptions.map((opt, index) => {
+              const isSelected = index === activeIndex;
+              return (
+                <li
+                  key={opt.value}
+                  className={cx('joy-mentions__item', isSelected && 'joy-mentions__item--active')}
+                  role="option"
+                  aria-selected={isSelected}
+                  tabIndex={-1}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectOption(opt);
+                  }}
+                >
+                  <span className="joy-mentions__item-label">{opt.label || opt.value}</span>
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
     );

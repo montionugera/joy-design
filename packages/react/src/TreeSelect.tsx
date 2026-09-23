@@ -1,4 +1,8 @@
 import * as React from 'react';
+import { useOverlay } from './useOverlay.js';
+import { ChevronDown, ChevronRight, Close, Check } from '@joymify/icons/react';
+
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
 export interface TreeNode {
   key: string;
@@ -9,7 +13,7 @@ export interface TreeNode {
   icon?: React.ReactNode;
 }
 
-export interface TreeSelectProps {
+export interface TreeSelectProps extends React.HTMLAttributes<HTMLDivElement> {
   treeData: TreeNode[];
   value?: string | string[];
   defaultValue?: string | string[];
@@ -22,6 +26,28 @@ export interface TreeSelectProps {
   className?: string;
   style?: React.CSSProperties;
 }
+
+interface FlatNode {
+  node: TreeNode;
+  level: number;
+  parentKey?: string;
+}
+
+const getVisibleNodes = (
+  nodes: TreeNode[],
+  expanded: Set<string>,
+  level = 0,
+  parentKey?: string
+): FlatNode[] => {
+  let list: FlatNode[] = [];
+  for (const node of nodes) {
+    list.push({ node, level, parentKey });
+    if (node.children && node.children.length > 0 && expanded.has(node.key)) {
+      list = list.concat(getVisibleNodes(node.children, expanded, level + 1, node.key));
+    }
+  }
+  return list;
+};
 
 export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
   (
@@ -36,14 +62,16 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
       treeDefaultExpandAll = true,
       onChange,
       className = '',
-      style
+      style,
+      ...rest
     },
     ref
   ) => {
     const [open, setOpen] = React.useState(false);
-    const [internalValue, setInternalValue] = React.useState<string | string[]>(
-      defaultValue || (multiple ? [] : '')
-    );
+    const [internalValue, setInternalValue] = React.useState<string | string[]>(() => {
+      if (defaultValue !== undefined) return defaultValue;
+      return multiple ? [] : '';
+    });
     const [expandedKeys, setExpandedKeys] = React.useState<Set<string>>(() => {
       const all = new Set<string>();
       if (treeDefaultExpandAll) {
@@ -60,23 +88,39 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
       return all;
     });
 
+    const [focusedKey, setFocusedKey] = React.useState<string | null>(null);
+
+    const controlRef = React.useRef<HTMLDivElement | null>(null);
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
+
+    useOverlay(open, controlRef, panelRef, () => setOpen(false));
+
     const selectedValue = controlledValue !== undefined ? controlledValue : internalValue;
-    const containerRef = React.useRef<HTMLDivElement | null>(null);
 
-    // Close on outside click
-    React.useEffect(() => {
-      const handleOutsideClick = (e: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-          setOpen(false);
+    const isSelected = React.useCallback(
+      (val: string) => {
+        if (multiple && Array.isArray(selectedValue)) {
+          return selectedValue.includes(val);
         }
-      };
-      if (open) {
-        document.addEventListener('mousedown', handleOutsideClick);
-      }
-      return () => document.removeEventListener('mousedown', handleOutsideClick);
-    }, [open]);
+        return selectedValue === val;
+      },
+      [multiple, selectedValue]
+    );
 
-    // Find node title by value
+    const visibleNodes = React.useMemo(
+      () => getVisibleNodes(treeData, expandedKeys),
+      [treeData, expandedKeys]
+    );
+
+    React.useEffect(() => {
+      if (open) {
+        if (!focusedKey || !visibleNodes.some((n) => n.node.key === focusedKey)) {
+          const firstSelected = visibleNodes.find((n) => isSelected(n.node.value));
+          setFocusedKey(firstSelected ? firstSelected.node.key : visibleNodes[0]?.node.key || null);
+        }
+      }
+    }, [open, visibleNodes, focusedKey, isSelected]);
+
     const findTitleByValue = (val: string, nodes: TreeNode[]): string | null => {
       for (const n of nodes) {
         if (n.value === val) return n.title;
@@ -90,7 +134,7 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
 
     const toggleExpand = (e: React.MouseEvent, key: string) => {
       e.stopPropagation();
-      setExpandedKeys(prev => {
+      setExpandedKeys((prev) => {
         const next = new Set(prev);
         if (next.has(key)) next.delete(key);
         else next.add(key);
@@ -106,14 +150,18 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
         const idx = arr.indexOf(node.value);
         let next: string[];
         if (idx >= 0) {
-          next = arr.filter(v => v !== node.value);
+          next = arr.filter((v) => v !== node.value);
         } else {
           next = [...arr, node.value];
         }
-        setInternalValue(next);
+        if (controlledValue === undefined) {
+          setInternalValue(next);
+        }
         onChange?.(next, node);
       } else {
-        setInternalValue(node.value);
+        if (controlledValue === undefined) {
+          setInternalValue(node.value);
+        }
         onChange?.(node.value, node);
         setOpen(false);
       }
@@ -122,253 +170,215 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
     const handleClear = (e: React.MouseEvent) => {
       e.stopPropagation();
       const empty = multiple ? [] : '';
-      setInternalValue(empty);
+      if (controlledValue === undefined) {
+        setInternalValue(empty);
+      }
       onChange?.(empty, null);
     };
 
-    const isSelected = (val: string) => {
-      if (multiple && Array.isArray(selectedValue)) {
-        return selectedValue.includes(val);
+    const handleRemoveTag = (e: React.MouseEvent, val: string) => {
+      e.stopPropagation();
+      if (disabled) return;
+      const arr = Array.isArray(selectedValue) ? [...selectedValue] : [];
+      const next = arr.filter((v) => v !== val);
+      if (controlledValue === undefined) {
+        setInternalValue(next);
       }
-      return selectedValue === val;
+      onChange?.(next, null);
     };
 
-    const renderTreeNodes = (nodes: TreeNode[], level = 0) => {
-      return (
-        <ul
-          role="group"
-          style={{
-            listStyle: 'none',
-            margin: 0,
-            paddingLeft: level > 0 ? 18 : 0
-          }}
-        >
-          {nodes.map(node => {
-            const hasChildren = node.children && node.children.length > 0;
-            const isExpanded = expandedKeys.has(node.key);
-            const selected = isSelected(node.value);
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (disabled) return;
 
-            return (
-              <li key={node.key} role="treeitem" aria-selected={selected} aria-expanded={hasChildren ? isExpanded : undefined}>
-                <div
-                  className={`joy-treeselect__node ${selected ? 'joy-treeselect__node--selected' : ''}`}
-                  onClick={() => handleSelectNode(node)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '6px 8px',
-                    borderRadius: 4,
-                    cursor: node.disabled ? 'not-allowed' : 'pointer',
-                    opacity: node.disabled ? 0.5 : 1,
-                    backgroundColor: selected ? 'rgba(196, 154, 58, 0.15)' : 'transparent',
-                    color: selected ? 'var(--gold-400, #c49a3a)' : 'var(--joy-text-primary, #f8f3e8)',
-                    transition: 'background-color 0.15s ease'
-                  }}
-                >
-                  {hasChildren ? (
-                    <button
-                      type="button"
-                      onClick={(e) => toggleExpand(e, node.key)}
-                      aria-label={isExpanded ? 'Collapse node' : 'Expand node'}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: 18,
-                        height: 18,
-                        border: 'none',
-                        background: 'transparent',
-                        color: 'inherit',
-                        cursor: 'pointer',
-                        transform: isExpanded ? 'rotate(90deg)' : 'none',
-                        transition: 'transform 0.15s ease'
-                      }}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <span style={{ width: 18 }} />
-                  )}
+      if (!open) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setOpen(true);
+        }
+        return;
+      }
 
-                  {multiple && (
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: 14,
-                        height: 14,
-                        border: '1px solid var(--joy-border, #23354e)',
-                        borderRadius: 3,
-                        backgroundColor: selected ? 'var(--gold-400, #c49a3a)' : 'transparent',
-                        color: '#14253e'
-                      }}
-                    >
-                      {selected && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </span>
-                  )}
+      const currentIndex = visibleNodes.findIndex((n) => n.node.key === focusedKey);
+      const currentItem = currentIndex >= 0 ? visibleNodes[currentIndex] : null;
 
-                  <span style={{ fontSize: 13, flex: 1 }}>{node.title}</span>
-                </div>
-
-                {hasChildren && isExpanded && renderTreeNodes(node.children!, level + 1)}
-              </li>
-            );
-          })}
-        </ul>
-      );
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentIndex < visibleNodes.length - 1) {
+          setFocusedKey(visibleNodes[currentIndex + 1].node.key);
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentIndex > 0) {
+          setFocusedKey(visibleNodes[currentIndex - 1].node.key);
+        }
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (currentItem && currentItem.node.children && currentItem.node.children.length > 0) {
+          if (!expandedKeys.has(currentItem.node.key)) {
+            setExpandedKeys((prev) => new Set(prev).add(currentItem.node.key));
+          } else if (currentIndex < visibleNodes.length - 1) {
+            setFocusedKey(visibleNodes[currentIndex + 1].node.key);
+          }
+        }
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (currentItem) {
+          if (
+            currentItem.node.children &&
+            currentItem.node.children.length > 0 &&
+            expandedKeys.has(currentItem.node.key)
+          ) {
+            setExpandedKeys((prev) => {
+              const next = new Set(prev);
+              next.delete(currentItem.node.key);
+              return next;
+            });
+          } else if (currentItem.parentKey) {
+            setFocusedKey(currentItem.parentKey);
+          }
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (currentItem && !currentItem.node.disabled) {
+          handleSelectNode(currentItem.node);
+        }
+      }
     };
 
     const hasValue = multiple
       ? Array.isArray(selectedValue) && selectedValue.length > 0
       : Boolean(selectedValue);
 
+    const renderTreeNodes = (nodes: TreeNode[], level = 0) => {
+      return nodes.map((node) => {
+        const hasChildren = Boolean(node.children && node.children.length > 0);
+        const isExpanded = expandedKeys.has(node.key);
+        const selected = isSelected(node.value);
+
+        return (
+          <React.Fragment key={node.key}>
+            <div
+              role="treeitem"
+              aria-selected={selected}
+              aria-expanded={hasChildren ? isExpanded : undefined}
+              className={cx(
+                'joy-treeselect__node',
+                selected && 'joy-treeselect__node--selected',
+                node.disabled && 'joy-treeselect__node--disabled'
+              )}
+              style={level > 0 ? { paddingLeft: 8 + level * 16 } : undefined}
+              onClick={() => handleSelectNode(node)}
+            >
+              {hasChildren ? (
+                <button
+                  type="button"
+                  className="joy-treeselect__node-toggle"
+                  aria-label={isExpanded ? 'Collapse node' : 'Expand node'}
+                  onClick={(e) => toggleExpand(e, node.key)}
+                >
+                  <ChevronRight
+                    width={12}
+                    height={12}
+                    style={{
+                      transform: isExpanded ? 'rotate(90deg)' : 'none'
+                    }}
+                  />
+                </button>
+              ) : (
+                <span style={{ width: 24, display: 'inline-block', flexShrink: 0 }} />
+              )}
+
+              {multiple && (
+                <span className="joy-treeselect__node-checkbox" aria-hidden="true">
+                  {selected && <Check width={12} height={12} />}
+                </span>
+              )}
+
+              <span>{node.title}</span>
+            </div>
+
+            {hasChildren && isExpanded && renderTreeNodes(node.children!, level + 1)}
+          </React.Fragment>
+        );
+      });
+    };
+
     return (
       <div
-        ref={(node) => {
-          containerRef.current = node;
-          if (typeof ref === 'function') ref(node);
-          else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-        }}
-        className={`joy-treeselect ${disabled ? 'joy-treeselect--disabled' : ''} ${className}`}
-        style={{
-          position: 'relative',
-          display: 'inline-block',
-          width: '100%',
-          ...style
-        }}
+        ref={ref}
+        className={cx(
+          'joy-treeselect',
+          disabled && 'joy-treeselect--disabled',
+          open && 'joy-treeselect--open',
+          className
+        )}
+        style={style}
+        {...rest}
       >
         {/* Selector Input Trigger */}
         <div
+          ref={controlRef}
           role="combobox"
           aria-expanded={open}
           aria-haspopup="tree"
           tabIndex={disabled ? -1 : 0}
-          onClick={() => !disabled && setOpen(o => !o)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              setOpen(o => !o);
-            } else if (e.key === 'Escape') {
-              setOpen(false);
-            }
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            minHeight: 36,
-            padding: '4px 10px',
-            border: '1px solid var(--joy-border, #23354e)',
-            borderRadius: 6,
-            backgroundColor: 'var(--joy-surface-card, #14253e)',
-            color: 'var(--joy-text-primary, #f8f3e8)',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            boxSizing: 'border-box'
-          }}
+          className="joy-treeselect__control"
+          onClick={() => !disabled && setOpen((o) => !o)}
+          onKeyDown={handleKeyDown}
         >
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, flex: 1, overflow: 'hidden' }}>
-            {multiple && Array.isArray(selectedValue) && selectedValue.length > 0 ? (
-              selectedValue.map(val => (
-                <span
-                  key={val}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    padding: '2px 6px',
-                    borderRadius: 4,
-                    fontSize: 12,
-                    backgroundColor: 'rgba(196, 154, 58, 0.2)',
-                    color: 'var(--gold-400, #c49a3a)'
-                  }}
-                >
-                  {findTitleByValue(val, treeData) || val}
+          {multiple && Array.isArray(selectedValue) && selectedValue.length > 0 ? (
+            <span className="joy-treeselect__tags">
+              {selectedValue.map((val) => (
+                <span key={val} className="joy-treeselect__tag">
+                  <span>{findTitleByValue(val, treeData) || val}</span>
+                  {!disabled && (
+                    <button
+                      type="button"
+                      className="joy-treeselect__tag-remove"
+                      aria-label={`Remove ${findTitleByValue(val, treeData) || val}`}
+                      onClick={(e) => handleRemoveTag(e, val)}
+                    >
+                      <Close width={12} height={12} />
+                    </button>
+                  )}
                 </span>
-              ))
-            ) : !multiple && selectedValue ? (
-              <span style={{ fontSize: 13 }}>
-                {findTitleByValue(selectedValue as string, treeData) || selectedValue}
-              </span>
-            ) : (
-              <span style={{ fontSize: 13, color: '#94a3b8' }}>{placeholder}</span>
-            )}
-          </div>
+              ))}
+            </span>
+          ) : !multiple && selectedValue ? (
+            <span>{findTitleByValue(selectedValue as string, treeData) || selectedValue}</span>
+          ) : (
+            <span className="joy-treeselect__placeholder">{placeholder}</span>
+          )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {allowClear && hasValue && !disabled && (
-              <button
-                type="button"
-                onClick={handleClear}
-                title="Clear selection"
-                aria-label="Clear selection"
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            )}
-
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              style={{
-                transform: open ? 'rotate(180deg)' : 'none',
-                transition: 'transform 0.2s ease',
-                color: '#94a3b8'
-              }}
+          {allowClear && hasValue && !disabled && (
+            <button
+              type="button"
+              className="joy-treeselect__clear"
+              onClick={handleClear}
+              aria-label="Clear selection"
             >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
+              <Close width={14} height={14} />
+            </button>
+          )}
+
+          <span className="joy-treeselect__arrow" aria-hidden="true">
+            <ChevronDown width={14} height={14} />
+          </span>
         </div>
 
         {/* Tree Dropdown Panel */}
         {open && (
           <div
+            ref={panelRef}
             role="tree"
             aria-label="Tree selector options"
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 4px)',
-              left: 0,
-              right: 0,
-              zIndex: 1000,
-              maxHeight: 280,
-              overflowY: 'auto',
-              padding: 8,
-              borderRadius: 6,
-              backgroundColor: 'var(--joy-surface-card, #14253e)',
-              border: '1px solid var(--joy-border, #23354e)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)'
-            }}
+            className="joy-treeselect__panel joy-overlay"
+            tabIndex={-1}
           >
             {treeData.length > 0 ? (
               renderTreeNodes(treeData)
             ) : (
-              <div style={{ padding: 12, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>
+              <div style={{ padding: 12, textAlign: 'center' }}>
                 No options available
               </div>
             )}
