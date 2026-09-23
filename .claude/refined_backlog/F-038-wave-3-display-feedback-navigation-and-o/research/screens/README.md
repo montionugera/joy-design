@@ -21,6 +21,18 @@ element shots grow the viewport to the content height so nothing is cut off; ove
 
 Every name exists in all four combinations (light/dark x 375/1280): 11 names x 4 = 44 PNGs.
 
+## Views and their components
+
+- "Data Display & Feedback" (`#view-data-display-feedback`): Alert, Badge, Tag, Avatar, Image, ImagePreview, Statistic/MetricTile/StatCard, Progress, Skeleton and Spin, EmptyState, Result, Toast/Message/Notification, Table, charts (Bar, Candlestick).
+- "Navigation & Workflow" (`#view-navigation-workflow`): Pagination, Tabs, Menu, Breadcrumb, Steps, Anchor, Timeline, Splitter, overlay openers (Modal with a Popconfirm inside, Drawer, Popconfirm, Dropdown, Tooltip), MarkdownViewer.
+
+## Known deviations
+
+- Tag close hit area is 44px tall but 34px wide, by design: it grows toward the right edge only and never left over the label, because widening it to 44px would make neighbouring tags' hit areas overlap (tag lists use an 8px gap). Alert and Toast close buttons get the full 44x44 centred area. Ruled on in the F-038 D2b fix round; `display-contracts.spec.ts` asserts 34 for tags and says why.
+- The 44px touch-target rules are `@media (pointer: coarse)` in the component CSS, so the contract runs on the `mobile-chrome` project only (as in Wave 2). At 375px with a fine pointer the controls are intentionally smaller.
+- The overflow contract allow-lists three real scroll regions (scroll Table container, tabs list, breadcrumb under 768px). Any other container that scrolls sideways fails.
+- Dark tokens changed in the D2b fix round to make the evidence readable: `--joy-border-subtle` (was navy-700, 1.05:1 against the card, now 1.34:1) and the four dark `--joy-status-*-bg` fills (were the near-black 900 stops, now a lighter tint, 1.08-1.19:1 against the card, text still >= 7.5:1).
+
 ## Verdicts
 
 Taste review: pending
