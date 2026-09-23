@@ -40,9 +40,9 @@ export interface ChartOptions {
 /**
  * Token-driven canvas color palette. Reads live CSS custom properties from the
  * canvas element so chart rendering stays correct across light/dark themes
- * without hardcoded hex. Called once per render and again on a
- * 'joy-theme-change' CustomEvent so the canvas repaints immediately on theme
- * toggle.
+ * without hardcoded hex. Read on every render and crosshair draw; a
+ * 'joy-theme-change' event triggers a render so the canvas repaints
+ * immediately on theme toggle.
  */
 export interface ChartPalette {
   textSecondary: string;

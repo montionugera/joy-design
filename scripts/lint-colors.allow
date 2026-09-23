@@ -1,6 +1,6 @@
 # One regex per line. Keep entries narrow and explain the CSS-variable source.
-# chart-core.ts has no getComputedStyle-derived canvas colors in Wave 1, so it
-# intentionally has no allowlist entry yet.
+# The only entries below are scoped to chart-core.ts (Wave 3 A1): its
+# readChartPalette() fallbacks and its theme-branching translucent strokes.
 
 # Wave 3 A1: readChartPalette() in chart-core.ts reads live CSS custom
 # properties via getComputedStyle and only falls back to these hex literals

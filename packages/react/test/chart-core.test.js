@@ -10,13 +10,6 @@ import {
   JoyChartCore
 } from '../src/chart-core.ts';
 
-// Minimal fake HTMLCanvasElement-like object: readChartPalette only needs
-// something getComputedStyle(...) accepts, so a plain object stub is enough
-// (no jsdom / real canvas required).
-function fakeCanvas() {
-  return {};
-}
-
 function stubGetComputedStyle(values) {
   const original = globalThis.getComputedStyle;
   globalThis.getComputedStyle = () => ({
@@ -132,57 +125,52 @@ test('RingBuffer supports circular zero-allocation push and rollover', () => {
   assert.deepStrictEqual(rb.toArray(), []);
 });
 
-test('readChartPalette resolves colors from CSS variables in light theme', () => {
-  const restore = stubGetComputedStyle({
-    '--joy-text-secondary': '#3c3a35',
-    '--joy-text-primary': '#1f1c13',
-    '--joy-status-success-fg': '#1a4f1f',
-    '--joy-status-danger-fg': '#9f3331',
-    '--joy-border-subtle': '#e3dccc',
-    '--joy-accent-default': '#b8862c',
-    '--joy-text-on-accent': '#1f1c13'
-  });
-  try {
-    const palette = readChartPalette(fakeCanvas());
-    assert.deepStrictEqual(palette, {
-      textSecondary: '#3c3a35',
-      textPrimary: '#1f1c13',
-      bull: '#1a4f1f',
-      bear: '#9f3331',
-      border: '#e3dccc',
-      accent: '#b8862c',
-      onAccent: '#1f1c13'
-    });
-  } finally {
-    restore();
-  }
-});
+// readChartPalette only needs something getComputedStyle(...) accepts, so a
+// plain object stands in for the canvas (no jsdom / real canvas required).
+const PALETTE_VARS = {
+  textSecondary: '--joy-text-secondary',
+  textPrimary: '--joy-text-primary',
+  bull: '--joy-status-success-fg',
+  bear: '--joy-status-danger-fg',
+  border: '--joy-border-subtle',
+  accent: '--joy-accent-default',
+  onAccent: '--joy-text-on-accent'
+};
 
-test('readChartPalette resolves colors from CSS variables in dark theme', () => {
-  const restore = stubGetComputedStyle({
-    '--joy-text-secondary': '#c9c4b8',
-    '--joy-text-primary': '#f8f3e8',
-    '--joy-status-success-fg': '#5fbf6a',
-    '--joy-status-danger-fg': '#e2635f',
-    '--joy-border-subtle': '#3c3a35',
-    '--joy-accent-default': '#d4ac5f',
-    '--joy-text-on-accent': '#14253e'
-  });
-  try {
-    const palette = readChartPalette(fakeCanvas());
-    assert.deepStrictEqual(palette, {
-      textSecondary: '#c9c4b8',
-      textPrimary: '#f8f3e8',
-      bull: '#5fbf6a',
-      bear: '#e2635f',
-      border: '#3c3a35',
-      accent: '#d4ac5f',
-      onAccent: '#14253e'
-    });
-  } finally {
-    restore();
+const THEME_PALETTES = {
+  light: {
+    textSecondary: '#3c3a35',
+    textPrimary: '#1f1c13',
+    bull: '#1a4f1f',
+    bear: '#9f3331',
+    border: '#e3dccc',
+    accent: '#b8862c',
+    onAccent: '#1f1c13'
+  },
+  dark: {
+    textSecondary: '#c9c4b8',
+    textPrimary: '#f8f3e8',
+    bull: '#5fbf6a',
+    bear: '#e2635f',
+    border: '#3c3a35',
+    accent: '#d4ac5f',
+    onAccent: '#14253e'
   }
-});
+};
+
+for (const [theme, expected] of Object.entries(THEME_PALETTES)) {
+  test(`readChartPalette resolves colors from CSS variables in ${theme} theme`, () => {
+    const cssVars = Object.fromEntries(
+      Object.entries(PALETTE_VARS).map(([key, name]) => [name, expected[key]])
+    );
+    const restore = stubGetComputedStyle(cssVars);
+    try {
+      assert.deepStrictEqual(readChartPalette({}), expected);
+    } finally {
+      restore();
+    }
+  });
+}
 
 // Regression: the bar-series branch used `color` before its `const` declaration
 // (TDZ ReferenceError on every bar render). Drives JoyChartCore.render() through
