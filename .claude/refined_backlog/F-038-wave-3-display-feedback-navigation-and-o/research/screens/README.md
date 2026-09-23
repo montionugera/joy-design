@@ -35,5 +35,5 @@ Every name exists in all four combinations (light/dark x 375/1280): 11 names x 4
 
 ## Verdicts
 
-Taste review: pending
-Code review: pending
+Taste review: FIX after the first pass (0 P0, 7 P1, one older hub-wide finding); PASS after two fix rounds (0 P0/P1, P2s only). Detail in rulings-and-deferrals.md.
+Code review: quality gaps found in the first pass (purple scan missed semi-transparent purple, hand-edited generated tokens.json), fixed and re-reviewed APPROVE; 144 Playwright tests passed with --repeat-each=3 and no flake.
