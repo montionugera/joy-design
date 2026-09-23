@@ -754,7 +754,7 @@ test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and l
     const s = readLib(`${name}.svelte`);
     assert.ok(/import \{[^}]*lockBodyScroll[^}]*trapFocus[^}]*\} from '\.\/overlay-utils\.js'/.test(s), `${name} imports the overlay primitive`);
     assert.ok(s.includes('if (!open || !ref) return;') && s.includes('lockBodyScroll()') && s.includes('trapFocus(ref)'), `${name} locks + traps while open`);
-    assert.ok(s.includes('const previouslyFocused = document.activeElement') && s.includes('previouslyFocused.focus()'), `${name} restores focus`);
+    assert.ok(s.includes('const previouslyFocused = opener.current') && s.includes('previouslyFocused.focus()') && s.includes('$effect.pre(() => opener.sync(open))'), `${name} restores focus`);
     assert.ok(s.includes('role="dialog"') && s.includes('aria-modal="true"'), `${name} is a modal dialog`);
     assert.ok(s.includes('const uid = $props.id()') && s.includes('aria-labelledby={title ? titleId : undefined}') && s.includes('aria-label={title ? undefined :'), `${name} label id is per-instance, with an aria-label fallback`);
     assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover or dialog already claimed it`);

@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons';
 	import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
+	import { createOpenerTracker } from './dialog-opener.js';
 
 	export interface ImageItem {
 		src: string;
@@ -69,9 +70,13 @@
 		untrack(handleReset);
 	});
 
+	// Captured before the dialog's children mount, so an autofocused child cannot become the "opener" (see dialog-opener.ts).
+	const opener = createOpenerTracker();
+	$effect.pre(() => opener.sync(open));
+
 	$effect(() => {
 		if (!open || !ref) return;
-		const previouslyFocused = document.activeElement as HTMLElement | null;
+		const previouslyFocused = opener.current;
 		const unlock = lockBodyScroll();
 		const handle = registerDialog();
 		dialog = handle;

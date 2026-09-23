@@ -147,7 +147,7 @@ All of them use the token scale below.
 
 These files exist in both `packages/svelte/src/lib/` and `packages/react/src/` and must stay identical (`cmp` exits 0):
 `overlay-utils.ts`, `chart-core.ts`, `delta-utils.ts`, `auto-dismiss.ts`, `roving-utils.ts`, `pagination-utils.ts`, `splitter-utils.ts`, `table-utils.ts`.
-Their tests (`overlay-utils`, `chart-core`, `roving-utils`, `pagination-utils`, `splitter-utils`, `table-utils` `.test.js`) are the same file in both packages apart from the import path line. `delta-utils.ts` and `auto-dismiss.ts` are covered inside `components.test.js`. Byte-identity is asserted by tests in both packages (a missing or diverged copy fails `pnpm -r test`); the twin diff in `scripts/parity-check.mjs` covers the components. `dialog-hooks.ts` (`useDialog`, `useOpener`, `useMergedRef`) is React-only.
+Their tests (`overlay-utils`, `chart-core`, `roving-utils`, `pagination-utils`, `splitter-utils`, `table-utils` `.test.js`) are the same file in both packages apart from the import path line. `delta-utils.ts` and `auto-dismiss.ts` are covered inside `components.test.js`. Byte-identity is asserted by tests in both packages (a missing or diverged copy fails `pnpm -r test`); the twin diff in `scripts/parity-check.mjs` covers the components. `dialog-hooks.ts` (`useDialog`, `useOpener`, `useMergedRef`) is React-only; its Svelte counterpart for the focus-return part is `dialog-opener.ts` (`createOpenerTracker`, driven by `$effect.pre`), so an autofocused child cannot become the remembered opener in either package.
 
 ### Casing rule and the parity gate
 
