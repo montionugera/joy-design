@@ -448,9 +448,9 @@ test('an explicit theme option still overrides the palette for grid and crosshai
     const base = recordingCanvas(); const overlay = recordingCanvas();
     const chart = new JoyChartCore(base.canvas, overlay.canvas, { theme: 'dark', showGrid: true, showCrosshair: true });
     chart.setSeries([{ id: 's', type: 'line', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }] }]);
-    assert.strictEqual(base.strokes[0].style, 'rgba(255, 255, 255, 0.05)');
+    assert.deepStrictEqual([base.strokes[0].style, base.strokes[0].alpha], ['white', 0.05]);
     overlay.listeners.mousemove({ clientX: 50, clientY: 40 });
-    assert.strictEqual(overlay.strokes[0].style, 'rgba(255,255,255,0.4)');
+    assert.deepStrictEqual([overlay.strokes[0].style, overlay.strokes[0].alpha], ['white', 0.4]);
   });
 });
 

@@ -508,10 +508,12 @@ export class JoyChartCore {
   }
 
   private drawGrid(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
+    // Explicit `theme` override: neutral white/black at low alpha. Otherwise the token palette.
     const override = this.options.theme;
-    ctx.strokeStyle = override
-      ? override === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'
-      : palette.border;
+    const gridStroke = override ? (override === 'dark' ? 'white' : 'black') : palette.border;
+    const gridAlpha = override ? 0.05 : 1;
+    ctx.strokeStyle = gridStroke;
+    ctx.globalAlpha = gridAlpha;
     ctx.lineWidth = 1;
 
     // Horizontal grid lines
@@ -523,10 +525,12 @@ export class JoyChartCore {
       ctx.lineTo(this.width, y);
       ctx.stroke();
 
+      ctx.globalAlpha = 1;
       const price = this.viewMaxY - (i / ySteps) * (this.viewMaxY - this.viewMinY);
       ctx.fillStyle = palette.textSecondary;
       ctx.font = '10px monospace';
       ctx.fillText(price.toFixed(2), this.width - 55, y - 4);
+      ctx.globalAlpha = gridAlpha;
     }
 
     // Vertical grid lines
@@ -538,6 +542,7 @@ export class JoyChartCore {
       ctx.lineTo(x, this.height);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1;
   }
 
   private drawCandlesticks(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
@@ -785,10 +790,8 @@ export class JoyChartCore {
     ctx.clearRect(0, 0, this.width, this.height);
 
     const override = this.options.theme;
-    ctx.strokeStyle = override
-      ? override === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'
-      : palette.textPrimary;
-    ctx.globalAlpha = override ? 1 : 0.4;
+    ctx.strokeStyle = override ? (override === 'dark' ? 'white' : 'black') : palette.textPrimary;
+    ctx.globalAlpha = override === 'light' ? 0.3 : 0.4;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
 
