@@ -726,3 +726,95 @@ test('F-038 C-L3: Alert/EmptyState/Result/Skeleton render the Svelte DOM contrac
   }
   assert.ok(!/style=\{\{[^}]*(color|background|border)/i.test(alertSrc), 'Alert carries no inline colour styles');
 });
+
+test('F-038 C-L4: Message/Notification/Toast/Progress/Spin render the Svelte DOM contract, forward refs and spread rest', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const html = (el) => renderToStaticMarkup(el);
+  const count = (s, sub) => s.split(sub).length - 1;
+  const noSvg = (s) => s.replace(/<svg[\s\S]*?<\/svg>/g, ''); // icons package owns its own svg attrs
+  const { Message } = loadComponent('Message');
+  const { Notification } = loadComponent('Notification');
+  const { Toast } = loadComponent('Toast');
+  const { Progress } = loadComponent('Progress');
+  const { Spin } = loadComponent('Spin');
+
+  // Message: root + notice + tone-classed aria-hidden icon (no inline styles / hex), content, rest on root
+  const m = html(React.createElement(Message, { content: 'Hi', type: 'error', className: 'x', 'data-testid': 'm' }));
+  assert.ok(m.startsWith('<div class="joy-message x" role="alert" aria-live="polite" data-testid="m">'), m);
+  assert.ok(m.includes('<div class="joy-message__notice"><span class="joy-message__icon joy-message__icon--error" aria-hidden="true"><svg'), m);
+  assert.ok(m.includes('<span class="joy-message__content">Hi</span>'), m);
+  assert.ok(!noSvg(m).includes('style=') && !/#[0-9a-fA-F]{3,8}\b/.test(m), m);
+  assert.ok(html(React.createElement(Message, { content: 'i' })).includes('joy-message__icon--info'));
+
+  // Notification: row/main/icon/close contract, new close label, no inline styles
+  const n = html(React.createElement(Notification, { title: 'T', description: 'D', type: 'warning', 'data-testid': 'n' }));
+  assert.ok(n.startsWith('<div class="joy-notification" role="alert" aria-live="polite" data-testid="n">'), n);
+  for (const c of ['joy-notification__notice', 'joy-notification__row', 'joy-notification__main', 'joy-notification__icon joy-notification__icon--warning', 'joy-notification__title', 'joy-notification__desc']) {
+    assert.ok(n.includes(`class="${c}"`), `${c} in ${n}`);
+  }
+  assert.ok(n.includes('<button type="button" class="joy-notification__close" aria-label="Dismiss notification">'), n);
+  assert.ok(!noSvg(n).includes('style=') && !n.includes('Close notification'), n);
+  const nBare = html(React.createElement(Notification, {}));
+  assert.ok(!nBare.includes('__title') && !nBare.includes('__desc'), nBare);
+
+  // Toast: body + Dismiss close button only with onClose; children win over message; no trailing class space
+  const t = html(React.createElement(Toast, { variant: 'danger', message: 'msg', onClose: () => {}, id: 't' }));
+  assert.ok(t.startsWith('<div class="joy-toast joy-toast--danger" role="status" aria-live="polite" id="t">'), t);
+  assert.ok(t.includes('<div class="joy-toast__body">msg</div>'), t);
+  assert.ok(t.includes('<button type="button" class="joy-toast__close" aria-label="Dismiss notification"><svg'), t);
+  assert.ok(!noSvg(t).includes('style=') && !t.includes('&times;') && !t.includes('×'), t);
+  const tKids = html(React.createElement(Toast, { message: 'msg' }, 'kid'));
+  assert.ok(tKids.includes('<div class="joy-toast__body">kid</div>') && !tKids.includes('joy-toast__close'), tKids);
+  assert.strictEqual(html(React.createElement(Toast, { open: false })), '');
+
+  // Progress: role/aria on the ROOT (once), clamped valuenow, status class, aria-hidden status icons, rest spread
+  const p = html(React.createElement(Progress, { percent: 40, 'aria-label': 'Upload', className: 'w' }));
+  assert.ok(p.startsWith('<div class="joy-progress joy-progress--status-normal w" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="Upload">'), p);
+  assert.strictEqual(count(p, 'role="progressbar"'), 1, p);
+  assert.ok(p.includes('<div class="joy-progress__inner"><div class="joy-progress__bg" style="width:40%;height:8px"></div>'), p);
+  assert.ok(p.includes('<span class="joy-progress__text">40%</span>'), p);
+  const pOver = html(React.createElement(Progress, { percent: 150 }));
+  assert.ok(pOver.includes('aria-valuenow="100"') && pOver.includes('joy-progress--status-success') && pOver.includes('aria-hidden="true"'), pOver);
+  assert.ok(html(React.createElement(Progress, { percent: -5 })).includes('aria-valuenow="0"'));
+  const pEx = html(React.createElement(Progress, { percent: 20, status: 'exception', strokeColor: 'tomato' }));
+  assert.ok(pEx.includes('joy-progress--status-exception') && pEx.includes('background-color:tomato') && pEx.includes('aria-hidden="true"'), pEx);
+  assert.ok(!html(React.createElement(Progress, { showInfo: false })).includes('joy-progress__text'));
+
+  // Spin: standalone => single .joy-spin root (ref/className/rest on it), no inline style, tip via class
+  const s = html(React.createElement(Spin, { tip: 'Loading', className: 'c', id: 's' }));
+  assert.ok(s.startsWith('<div class="joy-spin c" role="status" aria-busy="true" id="s"><svg class="joy-spin__indicator" width="24" height="24"'), s);
+  assert.ok(s.includes('aria-hidden="true"') && s.includes('<span class="joy-spin__tip">Loading</span>'), s);
+  assert.ok(!noSvg(s).includes('style=') && count(s, 'role="status"') === 1, s);
+  assert.ok(html(React.createElement(Spin, { size: 'lg' })).includes('width="36"'));
+  assert.strictEqual(html(React.createElement(Spin, { spinning: false })), '');
+  // with children: container + mask(role=status) + inner .joy-spin WITHOUT role
+  const sc = html(React.createElement(Spin, { className: 'k', 'data-x': '1' }, React.createElement('p', null, 'body')));
+  assert.ok(sc.startsWith('<div class="joy-spin__container k" data-x="1"><p>body</p><div class="joy-spin__mask" role="status" aria-busy="true"><div class="joy-spin"><svg'), sc);
+  assert.strictEqual(count(sc, 'role="status"'), 1, sc);
+  assert.strictEqual(html(React.createElement(Spin, { spinning: false }, 'x')), '<div class="joy-spin__container">x</div>');
+
+  // forwardRef objects; ref reaches the root element
+  for (const [C, props] of [[Message, { content: 'a' }], [Notification, {}], [Toast, {}], [Progress, {}], [Spin, {}], [Spin, { children: 'k' }]]) {
+    assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${C.displayName} must be forwardRef`);
+    let el;
+    html(React.createElement(function Probe() { el = C.render(props, 'REFSENTINEL'); return null; }));
+    assert.strictEqual(el.ref, 'REFSENTINEL', `${C.displayName} ref is attached to the root element`);
+  }
+
+  // class strings/roles match the Svelte twins' markup (Svelte source is the contract)
+  const svelte = (f) => fs.readFileSync(fileURLToPath(new URL(`../../svelte/src/lib/${f}.svelte`, import.meta.url)), 'utf8');
+  const classSet = (src) => new Set(src.match(/joy-[a-z][\w-]*/g) || []); // static names + dynamic prefixes (e.g. joy-toast--)
+  for (const f of ['Message', 'Notification', 'Toast', 'Progress', 'Spin']) {
+    const tsx = fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8');
+    const sv = svelte(f);
+    assert.deepStrictEqual([...classSet(tsx)].sort(), [...classSet(sv)].sort(), `${f} class names match the Svelte twin`);
+    assert.deepStrictEqual((tsx.match(/role="[a-z]+"/g) || []).sort(), (sv.match(/role="[a-z]+"/g) || []).sort(), `${f} roles match the Svelte twin`);
+    assert.deepStrictEqual((tsx.match(/aria-label="[^"]+"/g) || []).sort(), (sv.match(/aria-label="[^"]+"/g) || []).sort(), `${f} aria-labels match the Svelte twin`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(|var\(--joy-color-/.test(tsx), `${f} has a colour literal / foreign fallback`);
+  }
+  // no inline colour/size styles in the five files (Progress keeps its data-driven width/height/strokeColor)
+  for (const f of ['Message', 'Notification', 'Toast', 'Spin']) {
+    assert.ok(!/style=\{\{/.test(fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8')), `${f} has an inline style`);
+  }
+});

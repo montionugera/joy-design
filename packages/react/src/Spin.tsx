@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
 export interface SpinProps extends React.HTMLAttributes<HTMLDivElement> {
   spinning?: boolean;
   size?: 'sm' | 'md' | 'lg';
@@ -15,13 +17,8 @@ export const Spin = React.forwardRef<HTMLDivElement, SpinProps>(
       lg: 36
     }[size] || 24;
 
-    const spinnerContent = (
-      <div
-        className={`joy-spin ${className}`.trim()}
-        role="status"
-        aria-busy="true"
-        style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
-      >
+    const indicator = (
+      <>
         <svg
           className="joy-spin__indicator"
           width={sizePx}
@@ -32,24 +29,21 @@ export const Spin = React.forwardRef<HTMLDivElement, SpinProps>(
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
         >
           <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
         </svg>
-        {tip && (
-          <span style={{ fontSize: '0.8125rem', color: 'var(--joy-color-brand-primary, #7c3aed)' }}>
-            {tip}
-          </span>
-        )}
-      </div>
+        {tip && <span className="joy-spin__tip">{tip}</span>}
+      </>
     );
 
     if (children) {
       return (
-        <div ref={ref} className="joy-spin__container" {...rest}>
+        <div ref={ref} className={cx('joy-spin__container', className)} {...rest}>
           {children}
           {spinning && (
             <div className="joy-spin__mask" role="status" aria-busy="true">
-              {spinnerContent}
+              <div className="joy-spin">{indicator}</div>
             </div>
           )}
         </div>
@@ -59,8 +53,8 @@ export const Spin = React.forwardRef<HTMLDivElement, SpinProps>(
     if (!spinning) return null;
 
     return (
-      <div ref={ref} {...rest}>
-        {spinnerContent}
+      <div ref={ref} className={cx('joy-spin', className)} role="status" aria-busy="true" {...rest}>
+        {indicator}
       </div>
     );
   }
