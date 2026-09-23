@@ -478,3 +478,99 @@ test('F-037 lane review: Mentions/Rate/Select twin parity, Input type, Segmented
     'Segmented uncontrolled state must start from defaultValue only'
   );
 });
+
+// F-038 Wave 3 lane C-L1: Avatar, AvatarGroup, Badge, Tag, Divider (rendered behavior, not just source strings)
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+
+const requireFromHere = createRequire(import.meta.url);
+
+/** Transpile a component .tsx to CJS on the fly and load it (relative ./X.js imports resolve to sibling .tsx). */
+function loadComponent(name, cache = new Map()) {
+  if (cache.has(name)) return cache.get(name);
+  const ts = requireFromHere('typescript');
+  const file = fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url));
+  const out = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
+  }).outputText;
+  const mod = { exports: {} };
+  const localRequire = (id) => {
+    const m = id.match(/^\.\/(\w+)\.js$/);
+    return m ? loadComponent(m[1], cache) : requireFromHere(id);
+  };
+  new Function('require', 'module', 'exports', out)(localRequire, mod, mod.exports);
+  cache.set(name, mod.exports);
+  return mod.exports;
+}
+
+test('F-038 C-L1: display twins forward refs, spread rest props, and match Svelte markup', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const html = (el) => renderToStaticMarkup(el);
+  const { Avatar } = loadComponent('Avatar');
+  const { AvatarGroup } = loadComponent('AvatarGroup');
+  const { Badge } = loadComponent('Badge');
+  const { Tag } = loadComponent('Tag');
+  const { Divider } = loadComponent('Divider');
+
+  // forwardRef objects for every lane component
+  for (const C of [Avatar, AvatarGroup, Badge, Tag, Divider]) {
+    assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${C.displayName} must be a forwardRef component`);
+  }
+
+  // rest props land on the root element
+  assert.match(html(React.createElement(Badge, { 'data-x': '1', id: 'b' }, 'n')), /^<span [^>]*data-x="1"/);
+  assert.match(html(React.createElement(AvatarGroup, { 'data-x': '1' })), /^<div [^>]*data-x="1"/);
+
+  // Badge variant/size/dot classes
+  const badge = html(React.createElement(Badge, { variant: 'brand', size: 'sm', dot: true }, 'New'));
+  assert.ok(badge.includes('class="joy-badge joy-badge--brand joy-badge--sm"'), badge);
+  assert.ok(badge.includes('joy-badge__dot'), badge);
+
+  // Avatar: no inline style unless color is provided; no trailing class whitespace
+  const plain = html(React.createElement(Avatar, { name: 'Ada Lovelace' }));
+  assert.ok(!plain.includes('style='), plain);
+  assert.ok(plain.includes('class="joy-avatar joy-avatar--circle joy-avatar--md"'), plain);
+  assert.ok(html(React.createElement(Avatar, { name: 'A', color: 'tomato' })).includes('background-color:tomato'));
+
+  // Divider: vertical exposes aria-orientation (RXD-101); horizontal does not
+  assert.ok(html(React.createElement(Divider, { type: 'vertical' })).includes('aria-orientation="vertical"'));
+  assert.ok(!html(React.createElement(Divider, {})).includes('aria-orientation'));
+
+  // Tag: close button carries no inline style (44px hit area lives in theme.css)
+  const tag = html(React.createElement(Tag, { closable: true }, 'x'));
+  assert.ok(tag.includes('joy-tag__close') && !/joy-tag__close[^>]*style=/.test(tag), tag);
+});
+
+test('F-038 C-L1: AvatarGroup max collapses items and children into one +N overflow avatar (RXD-102)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Avatar } = loadComponent('Avatar');
+  const { AvatarGroup } = loadComponent('AvatarGroup');
+  const count = (h, needle) => h.split(needle).length - 1;
+  const items = [{ name: 'A B' }, { name: 'C D', size: 'lg' }, { name: 'E F' }, { name: 'G H' }, { name: 'I J' }];
+
+  // items: first `max` avatars + overflow (size follows items[0], default md)
+  const byItems = renderToStaticMarkup(React.createElement(AvatarGroup, { items, max: 2 }));
+  assert.strictEqual(count(byItems, 'joy-avatar__fallback'), 2, byItems);
+  assert.ok(
+    byItems.includes(
+      '<div class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar-group__overflow" role="img" aria-label="3 more">+3</div>'
+    ),
+    byItems
+  );
+
+  // children: same truncation, overflow size follows first child's size
+  const kids = items.map((it, i) => React.createElement(Avatar, { key: i, name: it.name, size: 'sm' }));
+  const byChildren = renderToStaticMarkup(React.createElement(AvatarGroup, { max: 3 }, ...kids));
+  assert.strictEqual(count(byChildren, 'joy-avatar__fallback'), 3, byChildren);
+  assert.ok(byChildren.includes('joy-avatar--sm joy-avatar-group__overflow'), byChildren);
+  assert.ok(byChildren.includes('aria-label="2 more">+2<'), byChildren);
+
+  // no overflow when max is undefined or >= length; max 0 hides all and reports the total; fractional floors
+  assert.ok(!renderToStaticMarkup(React.createElement(AvatarGroup, { items })).includes('overflow'));
+  assert.ok(!renderToStaticMarkup(React.createElement(AvatarGroup, { items, max: 5 })).includes('overflow'));
+  const zero = renderToStaticMarkup(React.createElement(AvatarGroup, { items, max: 0 }));
+  assert.ok(zero.includes('+5') && !zero.includes('joy-avatar__fallback'), zero);
+  assert.strictEqual(count(renderToStaticMarkup(React.createElement(AvatarGroup, { items, max: 2.9 })), 'joy-avatar__fallback'), 2);
+});

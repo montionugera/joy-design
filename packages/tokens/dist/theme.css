@@ -2102,6 +2102,9 @@ h1, h2, h3, .joy-display {
   object-fit: cover;
   border-radius: inherit;
 }
+.joy-avatar__fallback {
+  line-height: 1;
+}
 .joy-avatar__badge {
   position: absolute;
   bottom: -2px;

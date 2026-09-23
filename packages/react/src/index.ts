@@ -28,7 +28,7 @@ export { Progress, type ProgressProps, type ProgressStatus } from './Progress.js
 // Wave 4 Components (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer)
 export { Upload, type UploadProps, type UploadFile } from './Upload.js';
 export { Avatar, type AvatarProps, type AvatarShape, type AvatarSize, type AvatarStatus } from './Avatar.js';
-export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup.js';
+export { AvatarGroup, type AvatarGroupProps, type AvatarGroupItem } from './AvatarGroup.js';
 export { Slider, type SliderProps } from './Slider.js';
 export { MarkdownViewer, type MarkdownViewerProps } from './MarkdownViewer.js';
 export { MarkdownEditor, type MarkdownEditorProps } from './MarkdownEditor.js';
