@@ -456,8 +456,9 @@ const hubStepItem = (state, idx, title, desc = "", stepNo = 0) =>
 const hubSplitter = (layout, first, second, height = 180, id = "") =>
   `<div class="joy-splitter joy-splitter--${layout}"${id ? ` id="${id}"` : ""} role="group" aria-label="Resizable Splitter Panel" style="${layout === "horizontal" ? `height: ${height}px;` : ""}"><div class="joy-splitter__pane" style="--joy-splitter-size: 40;"><div class="hub-pane">${first}</div></div><div class="joy-splitter__bar" role="separator" aria-label="Resize panes" aria-orientation="${layout === "horizontal" ? "vertical" : "horizontal"}" aria-valuenow="40" aria-valuemin="10" aria-valuemax="90" tabindex="0" data-hub-splitter></div><div class="joy-splitter__pane" style="--joy-splitter-size: 60;"><div class="hub-pane">${second}</div></div></div>`;
 
+const hubImageOverlay = (extra = "") => `<div class="joy-image__overlay"${extra}>${iconSvg("Eye", "16")}<span>Preview</span></div>`;
 const hubImage = ({ kind = "a", preview = true, index = 0, hover = false, broken = false, w = 160, h = 120, alt = "Order flow chart" } = {}) =>
-  `<div class="joy-image-wrapper${preview ? " joy-image-wrapper--previewable" : ""}" style="width: ${w}px; height: ${h}px;"${preview ? ` role="button" tabindex="0" data-open="image-preview" onclick="openImagePreview(${index}, false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openImagePreview(${index}, false)}"${hover ? "" : ` onpointerenter="hubImageHover(this, true)" onpointerleave="hubImageHover(this, false)" onfocusin="hubImageHover(this, true)" onfocusout="hubImageHover(this, false)"`}` : ""}><img class="joy-image__img" alt="${alt}" data-hub-img="${broken ? "broken" : kind}"${broken ? ` src="data:image/gif;base64,AAAA"` : ""}>${preview ? `<div class="joy-image__overlay"${hover ? " data-static" : " hidden"}>${iconSvg("Eye", "16").replace("stroke-width=\"1.5\"", "stroke-width=\"2\"")}<span>Preview</span></div>` : ""}</div>`;
+  `<div class="joy-image-wrapper${preview ? " joy-image-wrapper--previewable" : ""}" style="width: ${w}px; height: ${h}px;"${preview ? ` role="button" tabindex="0" data-open="image-preview" onclick="openImagePreview(${index}, false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openImagePreview(${index}, false)}"${hover ? "" : ` onpointerenter="hubImageHover(this, true)" onpointerleave="hubImageHover(this, false)" onfocusin="hubImageHover(this, true)" onfocusout="hubImageHover(this, false)"`}` : ""}><img class="joy-image__img" alt="${alt}" data-hub-img="${broken ? "broken" : kind}"${broken ? ` src="data:image/gif;base64,AAAA"` : ""}>${preview && hover ? hubImageOverlay(" data-static") : ""}</div>`;
 
 const hubTimelineItem = (status, title, desc, time) =>
   `<li class="joy-timeline__item"><div class="joy-timeline__dot joy-timeline__dot--${status}"></div><div class="joy-timeline__content"><div class="joy-timeline__title">${title}</div><div class="joy-timeline__description">${desc}</div><div class="joy-timeline__time">${time}</div></div></li>`;
@@ -4237,7 +4238,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); margin-bottom: 10px;">Anchor Navigator</div>
                 <nav class="joy-anchor" role="navigation" aria-label="Demo Anchor">
                   <div class="joy-anchor__ink"></div>
-                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" onclick="selectAnchor(this, event)">#menu-demo</a>
+                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" aria-current="location" onclick="selectAnchor(this, event)">#menu-demo</a>
                   <a href="#feedback-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#feedback-demo</a>
                   <a href="#popconfirm-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#popconfirm-demo</a>
                   <a href="#spin-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#spin-demo</a>
@@ -5012,9 +5013,13 @@ export async function executeHedge(symbol: string, size: number) {
       img.src = hubImageUri('fallback');
     }
     function hubImageHover(wrapper, show) {
+      // Like the components: the overlay is rendered only while hovered or focused (a [hidden] attribute would
+      // lose to the overlay's display: flex)
       const overlay = wrapper.querySelector('.joy-image__overlay');
-      if (overlay) overlay.hidden = !show;
+      if (show && !overlay) wrapper.insertAdjacentHTML('beforeend', HUB_IMAGE_OVERLAY);
+      else if (!show && overlay) overlay.remove();
     }
+    const HUB_IMAGE_OVERLAY = ${JSON.stringify(hubImageOverlay())};
     const HUB_PREVIEW = { items: ['a'], index: 0, scale: 1, rotate: 0 };
     function hubPreviewRender() {
       const img = document.getElementById('hub-preview-img');
