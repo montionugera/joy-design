@@ -285,3 +285,24 @@ test('Taste review design fixes: focus ring, disabled & danger tokens, deeper gr
   assert.ok(spinnerSvgRule.includes('stroke-width: 3px'), 'spinner svg must have 3px stroke');
 });
 
+test('Taste review D3.6 punch list fixes: InputNumber modifier ordering, button demo-hover/focus classes', () => {
+  const baseIndex = css.indexOf('.joy-input-number {');
+  const errorIndex = css.indexOf('.joy-input-number--error');
+  const successIndex = css.indexOf('.joy-input-number--success');
+  assert.ok(baseIndex !== -1, '.joy-input-number base rule must exist');
+  assert.ok(errorIndex !== -1, '.joy-input-number--error modifier must exist');
+  assert.ok(successIndex !== -1, '.joy-input-number--success modifier must exist');
+  assert.ok(
+    errorIndex > baseIndex,
+    `.joy-input-number--error (${errorIndex}) must be emitted after .joy-input-number (${baseIndex})`
+  );
+  assert.ok(
+    successIndex > baseIndex,
+    `.joy-input-number--success (${successIndex}) must be emitted after .joy-input-number (${baseIndex})`
+  );
+
+  // Demo focus and hover classes exist for state matrix fidelity
+  assert.ok(css.includes('.joy-button--demo-focus'), '.joy-button--demo-focus must be compiled in theme.css');
+  assert.ok(css.includes('.joy-button--demo-hover'), '.joy-button--demo-hover must be compiled in theme.css');
+});
+

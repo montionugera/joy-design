@@ -61,7 +61,8 @@ function renderButtonMatrix() {
         states.map((state) => {
           const loading = state === "loading";
           const disabled = state === "disabled" ? " disabled" : "";
-          return `<button type="button" class="joy-button joy-button--${variant} joy-button--${size}${loading ? " joy-button--loading" : ""}"${loading ? ' aria-busy="true"' : ""}${disabled} data-state="${state}"><span class="joy-button__label">${variant} ${size} ${state}</span>${loading ? spinner : ""}</button>`;
+          const demoClass = state === "hover" ? " joy-button--demo-hover" : state === "focus" ? " joy-button--demo-focus" : "";
+          return `<button type="button" class="joy-button joy-button--${variant} joy-button--${size}${loading ? " joy-button--loading" : ""}${demoClass}"${loading ? ' aria-busy="true"' : ""}${disabled} data-state="${state}"><span class="joy-button__label">${variant} ${size} ${state}</span>${loading ? spinner : ""}</button>`;
         }),
       ),
     )
@@ -340,11 +341,14 @@ ${inlinedThemeCss}
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: var(--joy-space-2);
       position: sticky;
       top: 0;
       z-index: 10;
+    }
+    #btn-theme-toggle {
+      flex-shrink: 0;
     }
     .framework-pill {
       display: inline-flex;
@@ -465,9 +469,17 @@ ${inlinedThemeCss}
     .component-canvas {
       padding: 24px;
       display: flex;
-      background: var(--joy-surface-card);
+      background-color: var(--joy-surface-card);
+      background-image: radial-gradient(var(--joy-border-default) 1.2px, transparent 0);
+      background-size: 20px 20px;
       min-width: 0;
       overflow-x: auto;
+    }
+    .joy-select-wrapper--open .joy-select__listbox {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 100%;
     }
     .hub-sheet-demo {
       min-width: 0;
@@ -618,7 +630,7 @@ ${inlinedThemeCss}
       font-weight: 700;
     }
     .badge-react {
-      background: var(--joy-status-info-fg);
+      background: var(--joy-surface-inverse);
       color: var(--joy-text-inverse);
       font-size: 0.6875rem;
       padding: 2px 6px;
@@ -775,7 +787,7 @@ ${inlinedThemeCss}
       color: var(--joy-text-muted);
     }
     [data-theme="dark"] .component-canvas {
-      background: var(--joy-surface-canvas);
+      background-color: var(--joy-surface-card);
     }
     [data-theme="dark"] .joy-toast {
       background: var(--joy-surface-card) !important;
@@ -981,6 +993,7 @@ ${inlinedThemeCss}
       }
       .topbar {
         padding: 0 16px;
+        flex-wrap: nowrap;
       }
       .topbar-target-label {
         display: none;
@@ -1124,15 +1137,27 @@ ${inlinedThemeCss}
       border-bottom-color: var(--joy-border-subtle);
     }
     [data-theme="dark"] .component-canvas {
-      background: var(--joy-surface-card);
+      background-color: var(--joy-surface-card);
     }
     @media (max-width: 640px) {
       .topbar {
         padding: var(--joy-space-2) var(--joy-space-3);
         align-items: center;
+        flex-wrap: nowrap;
       }
       .topbar > div {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+      }
+      #theme-label {
+        display: none;
+      }
+      #btn-theme-toggle {
+        padding: 0 var(--joy-space-2);
+        min-width: var(--joy-control-height-sm);
+        flex-shrink: 0;
+      }
+      .joy-select-wrapper--open .joy-select__listbox.joy-overlay--sheet {
+        position: fixed;
       }
       .framework-pill {
         display: none;
@@ -1153,9 +1178,14 @@ ${inlinedThemeCss}
       }
       .segmented-control {
         width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
       }
       .segment-btn {
         flex: 1 0 auto;
+        padding: 6px 4px;
+        font-size: 0.75rem;
+        text-align: center;
       }
     }
   </style>
@@ -1190,8 +1220,8 @@ ${navigationHtml}
         <span class="topbar-target-label" style="font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Target Suite:</span>
         <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid var(--joy-border-default);">
+      <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid var(--joy-border-default); flex-shrink: 0;">
           <span id="theme-icon" style="display:inline-flex;align-items:center;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </span>
@@ -1618,9 +1648,7 @@ ${navigationHtml}
             <div style="font-size: 0.8125rem; color: var(--joy-text-muted);">Click button or test controls below</div>
           </div>
           <div class="canvas" id="button-canvas">
-            <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()">
-              Click Me! (Clicked: <span id="click-counter">0</span>)
-            </button>
+            <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()"><span class="joy-button__label">Click Me! (Clicked: <span id="click-counter">0</span>)</span></button>
             <button class="joy-button joy-button--outline joy-button--md" onclick="setBtnVariant('outline')">Outline</button>
             <button class="joy-button joy-button--ghost joy-button--md" onclick="setBtnVariant('ghost')">Ghost</button>
             <button class="joy-button joy-button--danger joy-button--md" onclick="setBtnVariant('danger')">Danger</button>
@@ -4265,10 +4293,10 @@ export async function executeHedge(symbol: string, size: number) {
         statusText.innerText = isBtnLoading ? 'Loading Active' : 'Idle';
       }
       if (isBtnLoading) {
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Loading...';
+        btn.innerHTML = '<span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></span><span class="joy-button__label">Loading...</span>';
         btn.disabled = true;
       } else {
-        btn.innerHTML = 'Click Me! (Clicked: <span id="click-counter">' + clickCount + '</span>)';
+        btn.innerHTML = '<span class="joy-button__label">Click Me! (Clicked: <span id="click-counter">' + clickCount + '</span>)</span>';
         btn.disabled = false;
       }
     }
