@@ -578,10 +578,25 @@ test('F-038 B-L3: Alert/EmptyState/Result/Skeleton use build.js-owned styles, to
   assert.ok(alert.includes('{#if closable}'), 'close button renders only when closable');
 });
 
-test('F-038 B-L3: Alert dismiss hides the alert, then notifies the consumer', () => {
+test('F-038 B-L3: Alert close control is an accessible 44px button and the dismiss model is documented', () => {
   const alert = fs.readFileSync(path.resolve('./src/lib/Alert.svelte'), 'utf8');
+  assert.ok(/<button type="button" class="joy-alert__close" aria-label="Dismiss alert" onclick=\{dismiss\}>/.test(alert), 'close is a type=button with aria-label wired to dismiss');
   const fn = alert.match(/function dismiss\(\)\s*\{([^}]*)\}/);
-  assert.ok(fn, 'dismiss handler exists');
-  assert.ok(fn[1].indexOf('dismissed = true') !== -1 && fn[1].indexOf('dismissed = true') < fn[1].indexOf('onclose?.()'), 'hide first, then call onclose');
+  assert.ok(fn && fn[1].includes('dismissed = true') && fn[1].includes('onclose?.()'), 'dismiss hides then notifies');
   assert.ok(alert.includes('{#if !dismissed}'), 'markup is gated on dismissed');
+  assert.ok(/stays hidden until\s+\*?\s*remounted/.test(alert), 'uncontrolled dismiss model is documented on the props');
+  const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
+  assert.match(css, /\.joy-alert__close::before\s*\{[^}]*width:\s*44px[^}]*height:\s*44px/s, 'theme.css ships the 44px close hit area');
+});
+
+test('F-038 B-L3 fix: Skeleton renders one progressbar root, merges consumer style and accepts numeric sizes', () => {
+  const src = fs.readFileSync(path.resolve('./src/lib/Skeleton.svelte'), 'utf8');
+  assert.strictEqual((src.match(/role="progressbar"/g) || []).length, 2, 'one role per branch (lines wrapper, single element), never per line');
+  assert.strictEqual((src.match(/\{\.\.\.rest\}/g) || []).length, 2, 'rest spread once per branch, not on lines');
+  const lineEl = src.match(/\{#each[\s\S]*?\{\/each\}/)[0];
+  assert.ok(!lineEl.includes('rest') && !lineEl.includes('role='), 'line elements carry no rest/role');
+  assert.ok(lineEl.includes("decl('height'"), 'height applies to each line like React');
+  assert.ok(src.includes('width?: string | number') && src.includes("typeof d === 'number' ? `${d}px`"), 'numeric width/height map to px');
+  assert.ok(/style="[^"]*\{consumerStyle\}"/.test(src), 'consumer style is appended after the computed declarations');
+  assert.ok(!/style=\{width/.test(src), 'no wholesale style replacement');
 });

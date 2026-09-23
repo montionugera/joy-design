@@ -6,7 +6,10 @@
     title?: string;
     description?: string;
     variant?: 'info' | 'success' | 'warning' | 'danger';
-    /** Show a dismiss button. The alert hides itself and then calls `onclose`. */
+    /**
+     * Show a dismiss button. Uncontrolled: once dismissed the alert stays hidden until
+     * remounted; `onclose` fires after hiding.
+     */
     closable?: boolean;
     onclose?: () => void;
     children?: Snippet;
