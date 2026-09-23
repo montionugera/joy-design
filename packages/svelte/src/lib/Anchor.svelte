@@ -9,12 +9,18 @@
     items: AnchorItem[];
     activeKey?: string;
     onchange?: (key: string) => void;
+    class?: string;
+    ref?: HTMLElement | null;
+    [key: string]: any;
   }
 
   let {
     items = [],
     activeKey = $bindable(''),
-    onchange
+    onchange,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
   function handleClick(e: MouseEvent, item: AnchorItem) {
@@ -29,13 +35,14 @@
   }
 </script>
 
-<nav class="joy-anchor" role="navigation" aria-label="Anchor Navigation">
+<nav bind:this={ref} class="joy-anchor {className}" role="navigation" aria-label="Anchor Navigation" {...rest}>
   <div class="joy-anchor__ink"></div>
-  {#each items as item}
+  {#each items as item (item.key)}
     <a
       href={item.href}
       class="joy-anchor__link"
       class:joy-anchor__link--active={activeKey === item.key}
+      aria-current={activeKey === item.key ? 'location' : undefined}
       onclick={(e) => handleClick(e, item)}
     >
       {item.title}

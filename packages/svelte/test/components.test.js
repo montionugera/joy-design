@@ -663,3 +663,69 @@ test('F-038 C-L4 fix: Message/Notification auto-dismiss goes through the shared 
   }
   assert.ok(/function close\(\) \{\s*autoDismiss\.dismiss\(\);/.test(readLib('Notification.svelte')), 'close button dismisses via the helper (clears the timer)');
 });
+
+test('F-038 B-L5: Anchor/Breadcrumb/Menu/Pagination/Steps/Tabs forward class, ref and rest onto the root, and none keeps a scoped style', () => {
+  const roots = {
+    Anchor: /<nav bind:this=\{ref\} class="joy-anchor \{className\}"[^>]*\{\.\.\.rest\}>/,
+    Breadcrumb: /<nav bind:this=\{ref\} class="joy-breadcrumb \{className\}"[^>]*\{\.\.\.rest\}>/,
+    Menu: /<ul\s+bind:this=\{ref\}\s+class="joy-menu joy-menu--\{mode\} \{className\}"[\s\S]*?\{\.\.\.rest\}\s*>/,
+    Pagination: /<nav bind:this=\{ref\} class="joy-pagination \{className\}"[^>]*\{\.\.\.rest\}>/,
+    Steps: /<div bind:this=\{ref\} class="joy-steps joy-steps--\{direction\} \{className\}"[^>]*\{\.\.\.rest\}>/,
+    Tabs: /<div bind:this=\{ref\} class="joy-tabs-container \{className\}" \{\.\.\.rest\}>/
+  };
+  for (const [name, re] of Object.entries(roots)) {
+    const src = readLib(`${name}.svelte`);
+    assert.ok(re.test(src), `${name} root carries bind:this, class and {...rest}`);
+    assert.ok(src.includes('ref = $bindable(null)') && src.includes('class: className'), `${name} declares ref and class props`);
+    assert.ok(!/<style[\s>]/.test(src), `${name} has no scoped style (build.js is the single source)`);
+  }
+});
+
+test('F-038 B-L5: roving-utils and pagination-utils are byte-identical to the React copies once C-L5 lands', () => {
+  for (const f of ['roving-utils.ts', 'pagination-utils.ts']) {
+    const react = path.resolve(`../react/src/${f}`);
+    if (fs.existsSync(react)) assert.strictEqual(readLib(f), fs.readFileSync(react, 'utf8'), `${f} matches the React copy`);
+  }
+});
+
+test('F-038 B-L5: Tabs is a WAI-ARIA tablist with roving tabindex, automatic activation and a labelled panel', () => {
+  const t = readLib('Tabs.svelte');
+  assert.ok(t.includes("import { rovingNextIndex, rovingTabbableIndex } from './roving-utils.js'"), 'uses the shared helper');
+  assert.ok(t.includes('role="tablist"') && t.includes('role="tab"') && t.includes('role="tabpanel"'));
+  assert.ok(t.includes('aria-selected={activeKey === item.key}'), 'aria-selected tracks the active key');
+  assert.ok(t.includes('tabindex={index === tabbable ? 0 : -1}'), 'exactly one tab is tabbable');
+  assert.ok(t.includes("rovingNextIndex(e.key, index, items.map(() => false), 'horizontal')"), 'Left/Right/Home/End');
+  assert.ok(/e\.preventDefault\(\);\s*selectTab\(items\[next\]\.key\);/.test(t), 'arrows activate as well as move focus');
+  assert.ok(t.includes('aria-controls={activeKey === item.key ?') && t.includes('aria-labelledby='), 'panel wiring only points at ids that exist');
+  assert.ok(t.includes('$props.id()'), 'ids are SSR-stable');
+});
+
+test('F-038 B-L5: Menu is a menu/menuitem list with aria-current, roving tabindex and Up/Down (+Left/Right when horizontal)', () => {
+  const m = readLib('Menu.svelte');
+  assert.ok(m.includes('role="menu"') && m.includes('role="menuitem"'));
+  assert.ok(m.includes("aria-current={selectedKey === item.key ? 'page' : undefined}"), 'active item is aria-current=page');
+  assert.ok(m.includes('tabindex={index === tabbable ? 0 : -1}') && m.includes('onfocus={() => (focusIndex = index)}'), 'roving tabindex follows focus');
+  assert.ok(m.includes("mode === 'horizontal' ? 'both' : 'vertical'"), 'orientation by mode');
+  assert.ok(m.includes('rovingNextIndex(e.key, index, disabledFlags, orientation)'), 'skips disabled items');
+  assert.ok(m.includes("e.key === 'Enter' || e.key === ' '"), 'Enter and Space still select');
+});
+
+test('F-038 B-L5: Pagination windows its pages, collapses under 480px via matchMedia, and uses icons not entities', () => {
+  const p = readLib('Pagination.svelte');
+  assert.ok(p.includes("import { pageItems } from './pagination-utils.js'") && p.includes('pageItems(current, totalPages, compact)'));
+  assert.ok(!p.includes('Array.from({ length: totalPages }'), 'no button per page');
+  assert.ok(!/&[lr]arr;/.test(p), 'no arrow entities');
+  assert.ok(/import\s*\{\s*ChevronLeft,\s*ChevronRight\s*\}\s*from\s*'@joymify\/icons'/.test(p));
+  assert.ok(p.includes('let compact = $state(false)'), 'desktop-first default keeps SSR output full');
+  assert.ok(p.includes("window.matchMedia('(max-width: 480px)')") && p.includes("removeEventListener('change', sync)"), 'listener is cleaned up');
+  assert.ok(p.includes("typeof window === 'undefined'"), 'SSR-safe');
+  assert.ok(p.includes('aria-label="Previous page"') && p.includes('aria-label="Next page"') && p.includes('aria-label="Page {p}"'));
+  assert.ok(p.includes("aria-current={p === current ? 'page' : undefined}"));
+});
+
+test('F-038 B-L5: Steps marks the current step, Breadcrumb marks the last crumb, Anchor marks the active link', () => {
+  assert.ok(readLib('Steps.svelte').includes("aria-current={index === current ? 'step' : undefined}"));
+  const b = readLib('Breadcrumb.svelte');
+  assert.ok(b.includes('aria-label="Breadcrumb"') && b.includes("aria-current={isLast ? 'page' : undefined}"));
+  assert.ok(readLib('Anchor.svelte').includes("aria-current={activeKey === item.key ? 'location' : undefined}"));
+});

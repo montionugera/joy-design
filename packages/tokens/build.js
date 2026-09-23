@@ -884,6 +884,7 @@ select.joy-select:disabled,
 /* ── Pagination ── */
 .joy-pagination {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-family: var(--joy-font-family-sans);
@@ -904,25 +905,50 @@ select.joy-select:disabled,
   color: var(--joy-text-primary);
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--joy-duration-fast) ease;
+  transition: background-color var(--joy-duration-fast) ease, border-color var(--joy-duration-fast) ease, color var(--joy-duration-fast) ease;
 }
 .joy-pagination__btn:hover:not(:disabled) {
-  border-color: var(--joy-accent-default);
-  color: var(--joy-accent-default);
+  background: var(--joy-accent-subtle);
+  border-color: var(--joy-accent-text);
+  color: var(--joy-accent-text);
+}
+.joy-pagination__btn:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
 }
 .joy-pagination__btn--active {
   background: var(--joy-accent-default);
   border-color: var(--joy-accent-default);
   color: var(--joy-text-on-accent);
 }
+.joy-pagination__btn--active:hover:not(:disabled) {
+  background: var(--joy-accent-hover);
+  border-color: var(--joy-accent-hover);
+  color: var(--joy-text-on-accent);
+}
 .joy-pagination__btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+.joy-pagination__ellipsis {
+  min-width: 24px;
+  text-align: center;
+  color: var(--joy-text-muted);
+  user-select: none;
 }
 .joy-pagination__info {
   margin-left: auto;
   color: var(--joy-text-muted);
   font-size: 0.8125rem;
+}
+@media (pointer: coarse) {
+  .joy-pagination__btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .joy-pagination .joy-select {
+    min-height: var(--joy-control-height-md);
+  }
 }
 
 /* ── Skeleton Loaders ── */
@@ -1058,13 +1084,28 @@ select.joy-select:disabled,
 }
 
 /* ── Tabs ── */
+/* The tablist scrolls sideways on narrow screens. The 2px rule is an inset shadow (not a border) so the
+   active indicator can sit inside the scroll box instead of being clipped by it. The mask fades the outer
+   16px of both edges (token-coloured, opaque in the middle): that is only tab padding at rest, and it
+   fades whatever is scrolled beneath the edge, hinting at overflow. */
 .joy-tabs {
   display: flex;
-  border-bottom: 2px solid var(--joy-border-subtle);
+  box-shadow: inset 0 -2px 0 var(--joy-border-subtle);
   gap: 8px;
   margin-bottom: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--joy-surface-card) 16px, var(--joy-surface-card) calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, transparent, var(--joy-surface-card) 16px, var(--joy-surface-card) calc(100% - 16px), transparent);
+}
+.joy-tabs::-webkit-scrollbar {
+  display: none;
 }
 .joy-tab-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: transparent;
   border: none;
   padding: 10px 18px;
@@ -1077,20 +1118,32 @@ select.joy-select:disabled,
   transition: color var(--joy-duration-fast);
 }
 .joy-tab-btn:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
+}
+.joy-tab-btn:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--joy-radius-control);
 }
 .joy-tab-btn--active {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
 }
 .joy-tab-btn--active::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--joy-accent-default);
+  background: var(--joy-accent-text);
   border-radius: 2px;
+}
+@media (pointer: coarse) {
+  .joy-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 /* ── Tooltip ── */
@@ -1653,13 +1706,20 @@ h1, h2, h3, .joy-display {
   gap: 8px;
 }
 .joy-breadcrumb__link {
+  display: inline-flex;
+  align-items: center;
   color: var(--joy-text-muted);
   text-decoration: none;
   transition: color var(--joy-duration-fast) ease;
 }
 .joy-breadcrumb__link:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   text-decoration: underline;
+}
+.joy-breadcrumb__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
 }
 .joy-breadcrumb__current {
   color: var(--joy-text-primary);
@@ -1667,6 +1727,24 @@ h1, h2, h3, .joy-display {
 }
 .joy-breadcrumb__sep {
   color: var(--joy-border-default);
+}
+@media (max-width: 768px) {
+  .joy-breadcrumb {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .joy-breadcrumb ol {
+    flex-wrap: nowrap;
+  }
+  .joy-breadcrumb li {
+    flex-shrink: 0;
+  }
+}
+@media (pointer: coarse) {
+  .joy-breadcrumb__link {
+    min-height: 44px;
+  }
 }
 
 /* Empty State */
@@ -2499,12 +2577,12 @@ h1, h2, h3, .joy-display {
   border: 1px solid var(--joy-border-subtle);
   flex-shrink: 0;
   z-index: 1;
-  transition: all 0.2s;
+  transition: background-color var(--joy-duration-normal) ease, color var(--joy-duration-normal) ease, border-color var(--joy-duration-normal) ease, box-shadow var(--joy-duration-normal) ease;
 }
 .joy-steps__item--process .joy-steps__icon {
-  background-color: var(--joy-accent-default);
-  color: var(--joy-text-on-accent);
-  border-color: var(--joy-accent-default);
+  background-color: var(--joy-accent-text);
+  color: var(--joy-surface-card);
+  border-color: var(--joy-accent-text);
   box-shadow: 0 0 0 4px var(--joy-accent-subtle);
 }
 .joy-steps__item--finish .joy-steps__icon {
@@ -2530,6 +2608,28 @@ h1, h2, h3, .joy-display {
   font-size: 0.75rem;
   color: var(--joy-text-muted);
   margin-top: 2px;
+}
+.joy-steps__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--joy-radius-control);
+}
+.joy-steps--vertical {
+  gap: var(--joy-space-4);
+}
+@media (max-width: 768px) {
+  .joy-steps--horizontal {
+    flex-direction: column;
+    gap: var(--joy-space-4);
+  }
+  .joy-steps--horizontal .joy-steps__item:not(:last-child)::after {
+    display: none;
+  }
+}
+@media (pointer: coarse) {
+  .joy-steps__item {
+    min-height: 44px;
+  }
 }
 
 /* Timeline (Ant Design Parity) */
@@ -3409,15 +3509,27 @@ h1, h2, h3, .joy-display {
   padding: 8px 16px;
   cursor: pointer;
   color: var(--joy-text-primary);
-  transition: all 0.15s ease;
+  transition: background-color var(--joy-duration-fast) ease, color var(--joy-duration-fast) ease;
   user-select: none;
 }
 .joy-menu__item:hover {
-  color: var(--joy-accent-default);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-text-primary);
 }
-.joy-menu__item--active {
-  color: var(--joy-accent-default) !important;
+.joy-menu__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-menu__item--active,
+.joy-menu__item--active:hover {
+  color: var(--joy-accent-text);
   font-weight: 600;
+}
+.joy-menu__item--disabled,
+.joy-menu__item--disabled:hover {
+  background-color: transparent;
+  color: var(--joy-text-disabled);
+  cursor: not-allowed;
 }
 .joy-menu--horizontal .joy-menu__item--active::after {
   content: '';
@@ -3426,15 +3538,20 @@ h1, h2, h3, .joy-display {
   left: 0;
   right: 0;
   height: 2px;
-  background-color: var(--joy-accent-default);
+  background-color: var(--joy-accent-text);
 }
+.joy-menu--vertical .joy-menu__item--active,
 .joy-menu--inline .joy-menu__item--active {
   background-color: var(--joy-accent-subtle);
-  border-right: 1px solid var(--joy-border-default);
 }
 .joy-menu__submenu {
   display: flex;
   flex-direction: column;
+}
+@media (pointer: coarse) {
+  .joy-menu__item {
+    min-height: 44px;
+  }
 }
 
 /* ── Anchor ── */
@@ -3457,7 +3574,7 @@ h1, h2, h3, .joy-display {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  border: 2px solid var(--joy-accent-default);
+  border: 2px solid var(--joy-accent-active);
   background-color: var(--joy-surface-card);
   transition: top 0.2s ease;
 }
@@ -3471,8 +3588,20 @@ h1, h2, h3, .joy-display {
 }
 .joy-anchor__link:hover,
 .joy-anchor__link--active {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   font-weight: 600;
+}
+.joy-anchor__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
+}
+@media (pointer: coarse) {
+  .joy-anchor__link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 /* ── Message ── */

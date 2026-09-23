@@ -261,3 +261,118 @@ test('F-038 B-L4 fix: Progress fills reach >= 3:1 (WCAG 1.4.11) against the trac
     }
   }
 });
+
+// ---- F-038 B-L5: Anchor, Breadcrumb, Menu, Pagination, Steps, Tabs ----
+const B5_SELECTORS = ['.joy-anchor', '.joy-anchor__ink', '.joy-anchor__ink-ball', '.joy-anchor__link', '.joy-breadcrumb', '.joy-breadcrumb__link', '.joy-breadcrumb__current', '.joy-breadcrumb__sep', '.joy-menu', '.joy-menu__item', '.joy-pagination', '.joy-pagination__btn', '.joy-pagination__ellipsis', '.joy-steps', '.joy-steps__item', '.joy-steps__icon', '.joy-tabs', '.joy-tab-btn'];
+/** Every top-level rule (incl. @media-nested) whose selector list mentions one of this lane's component prefixes. */
+const b5Rules = () => {
+  const out = [];
+  const noComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of noComments.matchAll(/(^|\n)\s*([^{}@\n][^{}]*?)\s*\{([^{}]*)\}/g)) {
+    if (/\.joy-(anchor|breadcrumb|menu|pagination|steps|tabs?)(-|_|\b)/.test(m[2])) out.push({ sel: m[2].trim(), body: m[3] });
+  }
+  return out;
+};
+/** Body of every `@media (pointer: coarse)` block, concatenated. */
+const coarse = () => [...css.matchAll(/@media \(pointer: coarse\) \{([\s\S]*?)\n\}\n/g)].map((m) => m[1]).join('\n');
+
+test('F-038 B-L5: no foreign hex, purple or slate fallback and no >1px side stripe in Anchor/Breadcrumb/Menu/Pagination/Steps/Tabs rules', () => {
+  const rules = b5Rules();
+  assert.ok(rules.length >= 40, `found the lane rules (${rules.length})`);
+  for (const { sel, body } of rules) {
+    assert.doesNotMatch(body, /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/, `${sel} has a colour literal`);
+    assert.doesNotMatch(body, /brand-primary|--joy-color-|--gold-|--navy-/, `${sel} references a legacy/ramp token`);
+    assert.doesNotMatch(body, /border-(left|right)\s*:\s*([2-9]|\d\d)/, `${sel} has a side stripe`);
+    assert.doesNotMatch(body, /transition:\s*all\b/, `${sel} uses transition: all`);
+  }
+  for (const sel of B5_SELECTORS) assert.ok(rules.some((r) => r.sel.split(',').map((x) => x.trim()).includes(sel)), `${sel} rule exists`);
+  const inline = css.match(/\.joy-menu--inline \.joy-menu__item--active \{([^}]*)\}/);
+  assert.ok(!inline || !/border-right/.test(inline[1]), 'inline active menu item has no border-right stripe');
+});
+
+test('F-038 B-L5: Anchor, Breadcrumb, Menu, Pagination, Steps and Tabs reach 44px on coarse pointers', () => {
+  const c = coarse();
+  const has = (sel, re) => assert.match(c, new RegExp(`${sel.replace(/[.]/g, '\\.')}\\s*\\{[^}]*${re}`), `${sel} ${re} under (pointer: coarse)`);
+  has('.joy-anchor__link', 'min-height:\\s*44px');
+  has('.joy-breadcrumb__link', 'min-height:\\s*44px');
+  has('.joy-menu__item', 'min-height:\\s*44px');
+  has('.joy-pagination__btn', 'min-width:\\s*44px');
+  has('.joy-pagination__btn', 'min-height:\\s*44px');
+  has('.joy-tab-btn', 'min-height:\\s*44px');
+  has('.joy-steps__item', 'min-height:\\s*44px');
+  assert.match(rule('.joy-pagination__btn'), /height:\s*32px/, 'desktop keeps the compact 32px button');
+});
+
+test('F-038 B-L5: Tabs scroll sideways with a token-only fade edge and a visible focus ring; the indicator is not clipped', () => {
+  const tabs = rule('.joy-tabs');
+  assert.match(tabs, /overflow-x:\s*auto/);
+  assert.match(tabs, /scrollbar-width:\s*none/);
+  assert.match(tabs, /mask-image:\s*linear-gradient\(to right, transparent, var\(--joy-surface-card\) 16px, var\(--joy-surface-card\) calc\(100% - 16px\), transparent\)/);
+  assert.doesNotMatch(tabs, /border-bottom/, 'the baseline is an inset shadow so the indicator stays inside the scroll box');
+  assert.match(rule('.joy-tab-btn--active::after'), /bottom:\s*0/);
+  assert.match(rule('.joy-tab-btn:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  assert.match(rule('.joy-tab-btn--active'), /color:\s*var\(--joy-accent-text\)/);
+});
+
+test('F-038 B-L5: Menu hover/active use tint + accent-text fills, never a stripe; Steps stack under 768px', () => {
+  assert.match(rule('.joy-menu__item:hover'), /background-color:\s*var\(--joy-accent-subtle\)[\s\S]*color:\s*var\(--joy-text-primary\)/);
+  assert.match(css, /\.joy-menu--inline \.joy-menu__item--active \{\s*background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(css, /@media \(max-width: 768px\) \{\s*\.joy-steps--horizontal \{\s*flex-direction:\s*column/);
+  assert.match(css, /\.joy-steps--horizontal \.joy-steps__item:not\(:last-child\)::after \{\s*display:\s*none/, 'the horizontal connector is hidden once stacked');
+  assert.match(css, /@media \(max-width: 768px\) \{\s*\.joy-breadcrumb \{[^}]*overflow-x:\s*auto[^}]*white-space:\s*nowrap/);
+  assert.match(rule('.joy-anchor__ink-ball'), /border:\s*2px solid var\(--joy-accent-active\)/);
+});
+
+test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both themes (text 4.5:1, indicators 3:1)', () => {
+  const grab = (re) => {
+    const v = {};
+    for (const m of css.matchAll(re)) for (const l of m[1].split(';')) {
+      const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
+      if (x) v[x[1]] = x[2].trim();
+    }
+    return v;
+  };
+  const light = grab(/:root\s*\{([^}]+)\}/g);
+  const dark = { ...light, ...grab(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
+  const resolve = (val, store, depth = 0) => {
+    const m = val && val.match(/^var\((--[\w-]+)\)$/);
+    return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
+  };
+  const exactRule = (sel) => {
+    const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const m = css.match(new RegExp(`(^|\\n)${esc} \\{([^}]*)\\}`));
+    assert.ok(m, `theme.css must contain a ${sel} rule`);
+    return m[2];
+  };
+  const tok = (sel, prop) => {
+    const m = exactRule(sel).match(new RegExp(`(?:^|[\\s;])${prop}:\\s*var\\((--[\\w-]+)\\)`));
+    assert.ok(m, `${sel} ${prop} is a token`);
+    return m[1];
+  };
+  const checks = [
+    // [label, foreground token, background token, minimum]
+    ['tab active text on card', tok('.joy-tab-btn--active', 'color'), '--joy-surface-card', 4.5],
+    ['tab active indicator on card', tok('.joy-tab-btn--active::after', 'background'), '--joy-surface-card', 3],
+    ['tab inactive text on card', tok('.joy-tab-btn', 'color'), '--joy-surface-card', 4.5],
+    ['tab hover text on card', tok('.joy-tab-btn:hover', 'color'), '--joy-surface-card', 4.5],
+    ['pagination hover text on tint', tok('.joy-pagination__btn:hover:not(:disabled)', 'color'), tok('.joy-pagination__btn:hover:not(:disabled)', 'background'), 4.5],
+    ['pagination active text on fill', tok('.joy-pagination__btn--active', 'color'), tok('.joy-pagination__btn--active', 'background'), 4.5],
+    ['pagination border on card', '--joy-border-default', '--joy-surface-card', 3],
+    ['steps process icon text on fill', tok('.joy-steps__item--process .joy-steps__icon', 'color'), tok('.joy-steps__item--process .joy-steps__icon', 'background-color'), 4.5],
+    ['steps process icon fill on card', tok('.joy-steps__item--process .joy-steps__icon', 'background-color'), '--joy-surface-card', 3],
+    ['anchor ink-ball on card', '--joy-accent-active', '--joy-surface-card', 3],
+    ['anchor active link on card', tok('.joy-anchor__link:hover,\n.joy-anchor__link--active', 'color'), '--joy-surface-card', 4.5],
+    ['menu active text on tint', tok('.joy-menu__item--active,\n.joy-menu__item--active:hover', 'color'), '--joy-accent-subtle', 4.5],
+    ['menu hover text on tint', tok('.joy-menu__item:hover', 'color'), '--joy-accent-subtle', 4.5],
+    ['breadcrumb hover on card', tok('.joy-breadcrumb__link:hover', 'color'), '--joy-surface-card', 4.5],
+    ['breadcrumb current on card', tok('.joy-breadcrumb__current', 'color'), '--joy-surface-card', 4.5],
+    ['focus ring on card', '--joy-focus-ring', '--joy-surface-card', 3]
+  ];
+  for (const [theme, store] of [['light', light], ['dark', dark]]) {
+    for (const [label, fg, bg, min] of checks) {
+      const fgVal = fg === '--joy-focus-ring' ? store[fg].match(/#[0-9a-fA-F]{6}/)[0] : resolve(store[fg], store);
+      const ratio = contrastRatio(fgVal, resolve(store[bg], store));
+      assert.ok(ratio >= min, `${theme}: ${label} (${fg} on ${bg}) is ${ratio.toFixed(2)}:1, needs ${min}:1`);
+    }
+  }
+});

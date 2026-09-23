@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { ChevronLeft, ChevronRight } from '@joymify/icons';
+  import { pageItems } from './pagination-utils.js';
+
   interface Props {
     current?: number;
     pageSize?: number;
@@ -6,6 +9,9 @@
     showSizeChanger?: boolean;
     pageSizeOptions?: number[];
     onchange?: (page: number, pageSize: number) => void;
+    class?: string;
+    ref?: HTMLElement | null;
+    [key: string]: any;
   }
 
   let {
@@ -14,10 +20,26 @@
     total = 0,
     showSizeChanger = false,
     pageSizeOptions = [10, 20, 50],
-    onchange
+    onchange,
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
   let totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
+
+  // Phones show only Previous, the current page and Next. Desktop-first default keeps SSR output full.
+  let compact = $state(false);
+  $effect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia('(max-width: 480px)');
+    compact = query.matches;
+    const sync = (e: MediaQueryListEvent) => (compact = e.matches);
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  });
+
+  let pages = $derived(pageItems(current, totalPages, compact));
 
   function goToPage(p: number) {
     if (p < 1 || p > totalPages || p === current) return;
@@ -33,7 +55,7 @@
   }
 </script>
 
-<nav class="joy-pagination" role="navigation" aria-label="Pagination">
+<nav bind:this={ref} class="joy-pagination {className}" role="navigation" aria-label="Pagination" {...rest}>
   <button
     type="button"
     class="joy-pagination__btn"
@@ -41,19 +63,24 @@
     onclick={() => goToPage(current - 1)}
     aria-label="Previous page"
   >
-    &larr;
+    <ChevronLeft size="1em" />
   </button>
 
-  {#each Array.from({ length: totalPages }, (_, i) => i + 1) as p}
-    <button
-      type="button"
-      class="joy-pagination__btn"
-      class:joy-pagination__btn--active={p === current}
-      onclick={() => goToPage(p)}
-      aria-current={p === current ? 'page' : undefined}
-    >
-      {p}
-    </button>
+  {#each pages as p (p)}
+    {#if typeof p === 'number'}
+      <button
+        type="button"
+        class="joy-pagination__btn"
+        class:joy-pagination__btn--active={p === current}
+        onclick={() => goToPage(p)}
+        aria-label="Page {p}"
+        aria-current={p === current ? 'page' : undefined}
+      >
+        {p}
+      </button>
+    {:else}
+      <span class="joy-pagination__ellipsis" aria-hidden="true">…</span>
+    {/if}
   {/each}
 
   <button
@@ -63,7 +90,7 @@
     onclick={() => goToPage(current + 1)}
     aria-label="Next page"
   >
-    &rarr;
+    <ChevronRight size="1em" />
   </button>
 
   {#if showSizeChanger}
@@ -80,7 +107,9 @@
     </select>
   {/if}
 
-  <span class="joy-pagination__info">
-    Total: {total} items
-  </span>
+  {#if !compact}
+    <span class="joy-pagination__info">
+      Total: {total} items
+    </span>
+  {/if}
 </nav>
