@@ -9,7 +9,6 @@ export interface RateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   allowHalf?: boolean;
   disabled?: boolean;
   readonly?: boolean;
-  readOnly?: boolean;
   label?: string;
   onChange?: (value: number) => void;
 }

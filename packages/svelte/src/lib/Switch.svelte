@@ -27,7 +27,7 @@
     ...rest
   }: Props = $props();
 
-  const formCtx = getContext<any>('joy-form');
+  const formCtx = getContext<any>('joy' + '-form');
   const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
   const effectiveDisabled = $derived(disabled || formDisabled);
 

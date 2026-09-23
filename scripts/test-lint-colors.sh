@@ -26,4 +26,12 @@ if "$repo_root/scripts/lint-colors.sh" --strict "$fallback_file" >/dev/null 2>&1
 fi
 
 "$repo_root/scripts/lint-colors.sh" --strict "$clean_file" >/dev/null
+
+mkdir -p "$fixture_dir/packages/react/src"
+cp "$literal_file" "$fixture_dir/packages/react/src/Button.tsx"
+if (cd "$fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-2 strict file" >&2
+  exit 1
+fi
+
 echo "PASS scripts/test-lint-colors.sh"

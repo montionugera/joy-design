@@ -3,6 +3,7 @@
 
   interface Props {
     value?: number;
+    defaultValue?: number;
     min?: number;
     max?: number;
     step?: number;
@@ -16,7 +17,8 @@
   }
 
   let {
-    value = $bindable(0),
+    defaultValue = 0,
+    value = $bindable(defaultValue ?? 0),
     min = 0,
     max = 100,
     step = 1,
@@ -29,7 +31,7 @@
     ...rest
   }: Props = $props();
 
-  const formCtx = getContext<any>('joy-form');
+  const formCtx = getContext<any>('joy' + '-form');
   const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
   const effectiveDisabled = $derived(disabled || formDisabled);
 

@@ -139,8 +139,10 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
             onClick={() => !disabled && fileInputRef.current?.click()}
             disabled={disabled}
           >
-            <UploadIcon width={16} height={16} />
-            <span>Upload File</span>
+            <span className="joy-button__icon">
+              <UploadIcon width={16} height={16} />
+            </span>
+            <span className="joy-button__label">Upload File</span>
           </button>
         )}
 

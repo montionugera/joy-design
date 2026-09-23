@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FormContext } from './Form.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -6,7 +7,6 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   value?: string | number | readonly string[];
   placeholder?: string;
   disabled?: boolean;
-  readOnly?: boolean;
   readonly?: boolean;
   error?: boolean;
   success?: boolean;
@@ -45,7 +45,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const isReadOnly = readOnly ?? readonly ?? false;
+    const formContext = React.useContext(FormContext);
+    const effectiveDisabled = disabled || (formContext?.disabled ?? false);
+    const isReadOnly = (readOnly as boolean | undefined) ?? readonly ?? false;
     const generatedId = React.useId();
     const inputId = id || generatedId;
     const messageId = `${inputId}-message`;
@@ -57,7 +59,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           size && `joy-input-wrapper--${size}`,
           error && 'joy-input-wrapper--error',
           success && 'joy-input-wrapper--success',
-          disabled && 'joy-input-wrapper--disabled',
+          effectiveDisabled && 'joy-input-wrapper--disabled',
           isReadOnly && 'joy-input-wrapper--readonly'
         )}
       >
@@ -69,7 +71,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           value={value}
           placeholder={placeholder}
-          disabled={disabled}
+          disabled={effectiveDisabled}
           readOnly={isReadOnly}
           aria-invalid={error ? true : undefined}
           aria-describedby={message ? messageId : undefined}

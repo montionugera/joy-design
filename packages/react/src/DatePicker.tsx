@@ -13,7 +13,6 @@ export interface DatePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
   size?: 'sm' | 'md' | 'lg';
   id?: string;
   className?: string;
-  style?: React.CSSProperties;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

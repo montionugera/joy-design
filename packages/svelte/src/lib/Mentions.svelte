@@ -8,6 +8,7 @@
 
   interface Props {
     value?: string;
+    defaultValue?: string;
     prefix?: string;
     options?: MentionOption[];
     placeholder?: string;
@@ -23,7 +24,8 @@
   }
 
   let {
-    value = $bindable(''),
+    defaultValue = '',
+    value = $bindable(defaultValue),
     prefix = '@',
     options = [],
     placeholder = '',

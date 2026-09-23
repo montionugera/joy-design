@@ -4,6 +4,7 @@
 
   interface Props {
     value?: string;
+    defaultValue?: string;
     format?: string;
     placeholder?: string;
     disabled?: boolean;
@@ -16,7 +17,8 @@
   }
 
   let {
-    value = $bindable(''),
+    defaultValue = '',
+    value = $bindable(defaultValue),
     format = 'HH:mm:ss',
     placeholder = 'Select time',
     disabled = false,

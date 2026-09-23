@@ -29,6 +29,10 @@ else
   )
 fi
 
+# Files that are hard failures even in default mode. Waves flip their own files here;
+# the directory-wide flip happens when the last file in a package is clean.
+strict_file_pattern='^packages/(svelte/src/lib|react/src)/(Button|Input|InputNumber|Select|Checkbox|Switch|RadioGroup|Slider|Rate|Segmented|Form|FormItem|DatePicker|TimePicker|DateRangePicker|Mentions|Upload|TreeSelect|Cascader|Transfer|MarkdownEditor)\.(svelte|tsx)$|^packages/(svelte/src/lib|react/src)/(overlay-utils|useOverlay)\.ts$'
+
 pattern='#(?:[0-9a-fA-F]{3,8})\b|(?:rgba?|hsla?)\(|var\(--joy-[^,)]*,[[:space:]]*[^)]*\)'
 allow_patterns=$(mktemp)
 component_styles=$(mktemp)
@@ -110,7 +114,7 @@ scan_target() {
     [[ -n $file ]] || continue
     count=$(awk -F '\t' -v path="$file" '$1 == path { print $2 }' "$hit_counts")
     if [[ -n $count ]]; then
-      if $strict; then
+      if $strict || [[ $file =~ $strict_file_pattern ]]; then
         printf 'HIT %s: %s violation(s)\n' "$file" "$count"
         hard_failures=$((hard_failures + 1))
       else

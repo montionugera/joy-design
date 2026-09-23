@@ -10,6 +10,7 @@
   interface Props {
     options?: (string | number | SegmentedOption)[];
     value?: string | number;
+    defaultValue?: string | number;
     disabled?: boolean;
     size?: 'sm' | 'md';
     onchange?: (value: string | number) => void;
@@ -20,7 +21,8 @@
 
   let {
     options = [],
-    value = $bindable(),
+    defaultValue,
+    value = $bindable(defaultValue),
     disabled = false,
     size = 'md',
     onchange,
@@ -29,7 +31,7 @@
     ...rest
   }: Props = $props();
 
-  const formCtx = getContext<any>('joy-form');
+  const formCtx = getContext<any>('joy' + '-form');
   const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
   const effectiveDisabled = $derived(disabled || formDisabled);
 

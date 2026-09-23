@@ -332,7 +332,7 @@
 			bind:this={panelEl}
 			role="tree"
 			aria-label="Tree selector options"
-			class="joy-treeselect__panel"
+			class="joy-treeselect__panel joy-overlay"
 			tabindex="-1"
 			onkeydown={handleKeyDown}
 		>

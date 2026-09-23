@@ -11,14 +11,12 @@ export interface InputNumberProps extends Omit<React.InputHTMLAttributes<HTMLInp
   precision?: number;
   disabled?: boolean;
   readonly?: boolean;
-  readOnly?: boolean;
   error?: boolean;
   size?: 'sm' | 'md' | 'lg';
   placeholder?: string;
   id?: string;
   name?: string;
   className?: string;
-  style?: React.CSSProperties;
   onChange?: (value: number | null) => void;
 }
 

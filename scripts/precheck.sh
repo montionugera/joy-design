@@ -33,6 +33,12 @@ echo "   Zero emoji policy verified."
 echo "2. Checking color-token integrity..."
 bash scripts/lint-colors.sh
 
+echo "2b. Running workspace unit tests..."
+pnpm -r test
+
+echo "2c. Checking Svelte/React parity contract..."
+node scripts/parity-check.mjs
+
 echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js
 

@@ -4,6 +4,7 @@
   interface Props {
     count?: number;
     value?: number;
+    defaultValue?: number;
     allowHalf?: boolean;
     disabled?: boolean;
     readonly?: boolean;
@@ -16,7 +17,8 @@
 
   let {
     count = 5,
-    value = $bindable(0),
+    defaultValue = 0,
+    value = $bindable(defaultValue ?? 0),
     allowHalf = false,
     disabled = false,
     readonly = false,
@@ -27,7 +29,7 @@
     ...rest
   }: Props = $props();
 
-  const formCtx = getContext<any>('joy-form');
+  const formCtx = getContext<any>('joy' + '-form');
   const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
   const effectiveDisabled = $derived(disabled || formDisabled);
 

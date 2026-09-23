@@ -246,7 +246,7 @@
 			bind:this={panelEl}
 			role="listbox"
 			aria-label="Cascader options"
-			class="joy-cascader__panel"
+			class="joy-cascader__panel joy-overlay"
 			tabindex="-1"
 			onkeydown={handleKeyDown}
 		>

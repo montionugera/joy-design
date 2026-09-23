@@ -18,7 +18,6 @@ export interface DateRangePickerProps extends Omit<React.HTMLAttributes<HTMLDivE
   startId?: string;
   endId?: string;
   className?: string;
-  style?: React.CSSProperties;
   onChange?: (value: DateRangeValue) => void;
 }
 

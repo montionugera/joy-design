@@ -1373,7 +1373,7 @@ ${navigationHtml}
               <tbody>
                 <tr>
                   <td><span class="joy-prop-name">variant</span></td>
-                  <td><span class="joy-prop-type">'solid' | 'outline' | 'ghost' | 'danger'</span></td>
+                  <td><span class="joy-prop-type">'solid' | 'outline' | 'ghost' | 'danger' | 'link'</span></td>
                   <td><span class="joy-prop-default">'solid'</span></td>
                   <td>Visual hierarchy styling</td>
                 </tr>
@@ -1382,6 +1382,30 @@ ${navigationHtml}
                   <td><span class="joy-prop-type">'sm' | 'md' | 'lg'</span></td>
                   <td><span class="joy-prop-default">'md'</span></td>
                   <td>Padding and font size scale</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">block</span></td>
+                  <td><span class="joy-prop-type">boolean</span></td>
+                  <td><span class="joy-prop-default">false</span></td>
+                  <td>Expands button to full container width</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">iconOnly</span></td>
+                  <td><span class="joy-prop-type">boolean</span></td>
+                  <td><span class="joy-prop-default">false</span></td>
+                  <td>Equal width and height square icon button</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">iconStart</span></td>
+                  <td><span class="joy-prop-type">ReactNode / Snippet</span></td>
+                  <td><span class="joy-prop-default">undefined</span></td>
+                  <td>Leading icon slot</td>
+                </tr>
+                <tr>
+                  <td><span class="joy-prop-name">iconEnd</span></td>
+                  <td><span class="joy-prop-type">ReactNode / Snippet</span></td>
+                  <td><span class="joy-prop-default">undefined</span></td>
+                  <td>Trailing icon slot</td>
                 </tr>
                 <tr>
                   <td><span class="joy-prop-name">disabled</span></td>

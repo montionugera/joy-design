@@ -10,6 +10,7 @@
 
 	interface Props {
 		value?: DateRangeValue;
+		defaultValue?: DateRangeValue;
 		min?: string;
 		max?: string;
 		disabled?: boolean;
@@ -22,7 +23,8 @@
 	}
 
 	let {
-		value = $bindable({ start: '', end: '' }),
+		defaultValue = { start: '', end: '' },
+		value = $bindable(defaultValue),
 		min,
 		max,
 		disabled = false,

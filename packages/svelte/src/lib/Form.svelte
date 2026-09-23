@@ -47,7 +47,7 @@
 
 <form
   bind:this={ref}
-  class="joy-form joy-form--{layout} {labelAlign === 'left' ? 'joy-form--label-left' : ''} {colon ? '' : 'joy-form--no-colon'} {className}"
+  class="joy-form {layout === 'horizontal' ? 'joy-form--horizontal' : (layout ? `joy-form--${layout}` : '')} {labelAlign === 'left' ? 'joy-form--label-left' : ''} {colon ? '' : 'joy-form--no-colon'} {className}"
   style={formStyle}
   onsubmit={handleSubmit}
   {...rest}

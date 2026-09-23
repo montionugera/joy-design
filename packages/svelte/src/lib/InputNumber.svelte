@@ -1,6 +1,7 @@
 <script lang="ts">
   interface Props {
     value?: number;
+    defaultValue?: number | null;
     min?: number;
     max?: number;
     step?: number;
@@ -18,7 +19,8 @@
   }
 
   let {
-    value = $bindable(0),
+    defaultValue = 0,
+    value = $bindable(defaultValue ?? 0),
     min = -Infinity,
     max = Infinity,
     step = 1,

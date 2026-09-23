@@ -9,6 +9,7 @@
 
   interface Props {
     value?: string;
+    defaultValue?: string;
     options?: Option[];
     placeholder?: string;
     disabled?: boolean;
@@ -23,7 +24,8 @@
   }
 
   let {
-    value = $bindable(''),
+    defaultValue = '',
+    value = $bindable(defaultValue),
     options = [],
     placeholder = 'Select an option',
     disabled = false,

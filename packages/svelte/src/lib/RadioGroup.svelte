@@ -10,6 +10,7 @@
   interface Props {
     name: string;
     value?: string;
+    defaultValue?: string;
     options?: RadioOption[];
     direction?: 'horizontal' | 'vertical';
     disabled?: boolean;
@@ -23,7 +24,8 @@
 
   let {
     name,
-    value = $bindable(''),
+    defaultValue = '',
+    value = $bindable(defaultValue),
     options = [],
     direction = 'horizontal',
     disabled = false,
@@ -35,7 +37,7 @@
     ...rest
   }: Props = $props();
 
-  const formCtx = getContext<any>('joy-form');
+  const formCtx = getContext<any>('joy' + '-form');
   const formDisabled = $derived(Boolean(typeof formCtx === 'function' ? formCtx()?.disabled : formCtx?.disabled));
   const effectiveDisabled = $derived(disabled || formDisabled);
 

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useOverlay } from './useOverlay.js';
+import { FormContext } from './Form.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
@@ -21,9 +22,7 @@ export interface SelectProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   name?: string;
   id?: string;
   className?: string;
-  style?: React.CSSProperties;
   onChange?: (value: string) => void;
-  children?: React.ReactNode;
 }
 
 export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
@@ -47,6 +46,9 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     },
     ref
   ) => {
+    const formContext = React.useContext(FormContext);
+    const effectiveDisabled = disabled || (formContext?.disabled ?? false);
+
     const [internalValue, setInternalValue] = React.useState<string>(
       value !== undefined ? value : defaultValue
     );
@@ -89,7 +91,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     };
 
     const handleClick = () => {
-      if (disabled) return;
+      if (effectiveDisabled) return;
       setOpen((prev) => !prev);
       if (!open) {
         const currIdx = options.findIndex((o) => o.value === currentValue);
@@ -101,7 +103,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-      if (disabled) return;
+      if (effectiveDisabled) return;
       if (!open) {
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -161,7 +163,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           'joy-select-wrapper',
           size && `joy-select-wrapper--${size}`,
           error && 'joy-select-wrapper--error',
-          disabled && 'joy-select-wrapper--disabled',
+          effectiveDisabled && 'joy-select-wrapper--disabled',
           open && 'joy-select-wrapper--open'
         )}
         style={style}
@@ -175,7 +177,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           aria-controls={open ? listboxId : undefined}
           aria-activedescendant={activeDescendantId}
           aria-invalid={error ? true : undefined}
-          disabled={disabled}
+          disabled={effectiveDisabled}
           className={cx('joy-select', className)}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
