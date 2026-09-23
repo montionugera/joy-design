@@ -305,5 +305,16 @@ test('Taste review D3.6 punch list fixes: InputNumber modifier ordering, button 
   // Demo focus and hover classes exist for state matrix fidelity
   assert.ok(css.includes('.joy-button--demo-focus'), '.joy-button--demo-focus must be compiled in theme.css');
   assert.ok(css.includes('.joy-button--demo-hover'), '.joy-button--demo-hover must be compiled in theme.css');
+
+  // D3.7 wave-acceptance regression: a bare single-class `.joy-button--demo-focus`
+  // selector has the same specificity as `.joy-button--solid` and gets silently
+  // clobbered by source order (this exact regression shipped once already, caught
+  // by pixel-diffing the state-matrix screenshot, not by this test). The selector
+  // must be compound so it out-specifies every single-class variant rule regardless
+  // of source order.
+  assert.ok(
+    css.includes('.joy-button.joy-button--demo-focus'),
+    '.joy-button--demo-focus must be a compound selector (e.g. .joy-button.joy-button--demo-focus) so it out-specifies single-class variant rules like .joy-button--solid'
+  );
 });
 
