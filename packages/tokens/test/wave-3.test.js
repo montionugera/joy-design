@@ -752,3 +752,46 @@ test('F-038 B-L8: HUD wraps and stays inside the chart box at 375px; canvas summ
   assert.match(sr, /clip:\s*rect\(0 0 0 0\)/);
   assert.match(sr, /width:\s*1px/);
 });
+
+// ---- F-038 D2b fix round: taste-review P1s (dark separation, tag text contrast, popconfirm sheet) ----
+test('F-038 D2b: hairline border, chip fills and status surfaces are perceivable and legible in both themes', () => {
+  const tokenOfRule = (sel, prop) => {
+    const m = rule(sel).match(new RegExp(`(?:^|[\\s;])${prop}:\\s*var\\((--[\\w-]+)\\)`));
+    assert.ok(m, `${sel} ${prop} is a token`);
+    return m[1];
+  };
+  for (const [theme, store] of themes) {
+    const val = (tok) => resolve(store[tok], store);
+    // The hairline behind table rows, modal/drawer headers and default chips: it was 1.05:1 in dark (invisible).
+    const hairline = contrastRatio(val('--joy-border-subtle'), val('--joy-surface-card'));
+    assert.ok(hairline >= 1.3, `${theme}: --joy-border-subtle vs --joy-surface-card is ${hairline.toFixed(2)}:1, needs >= 1.3:1`);
+    // Tag text: primary uses the AA gold (accent-default on white was 2.62:1).
+    assert.strictEqual(tokenOfRule('.joy-tag--primary', 'color'), '--joy-accent-text', 'primary tag text uses the AA gold');
+    for (const [label, sel] of [['default', '.joy-tag'], ['primary', '.joy-tag--primary'], ['success', '.joy-tag--success'], ['warning', '.joy-tag--warning'], ['danger', '.joy-tag--danger'], ['checked', '.joy-tag--checked']]) {
+      const fg = tokenOfRule(sel, 'color');
+      const bg = tokenOfRule(sel, 'background-color');
+      const ratio = contrastRatio(val(fg), val(bg));
+      assert.ok(ratio >= 4.5, `${theme}: ${label} tag text ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs 4.5:1`);
+    }
+    // Status surfaces (alert, badge, tag, toast): text on the fill.
+    for (const status of ['info', 'success', 'warning', 'danger']) {
+      const ratio = contrastRatio(val(`--joy-status-${status}-fg`), val(`--joy-status-${status}-bg`));
+      assert.ok(ratio >= 4.5, `${theme}: ${status} text on its fill is ${ratio.toFixed(2)}:1, needs 4.5:1`);
+    }
+  }
+  assert.match(rule('.joy-tag'), /border:\s*1px solid var\(--joy-border-subtle\)/, 'default tag keeps a hairline border');
+  assert.match(rule('.joy-badge--neutral'), /box-shadow:\s*inset 0 0 0 1px var\(--joy-border-subtle\)/, 'neutral badge has a same-size ring so it reads as a chip in dark');
+  // Dark status fills sit lighter than the near-black 900 stop (1.04-1.07:1 against the card before this fix; the floor sits just above that).
+  for (const s of ['info', 'success', 'warning', 'danger']) {
+    const lift = contrastRatio(resolve(dark[`--joy-status-${s}-bg`], dark), resolve(dark['--joy-surface-card'], dark));
+    assert.ok(lift >= 1.08, `dark: ${s} fill vs card is ${lift.toFixed(2)}:1, needs >= 1.08:1`);
+  }
+});
+
+test('F-038 D2b: the Popconfirm sheet keeps the overlay primitive shape (top radius, elevation-3, safe-area padding)', () => {
+  const sheet = css.match(/\.joy-popconfirm__panel\.joy-overlay--sheet \{([^}]*)\}/);
+  assert.ok(sheet, 'a .joy-popconfirm__panel.joy-overlay--sheet rule must exist');
+  assert.match(sheet[1], /border-radius:\s*var\(--joy-radius-overlay\) var\(--joy-radius-overlay\) 0 0/);
+  assert.match(sheet[1], /box-shadow:\s*var\(--joy-elevation-3\)/);
+  assert.match(sheet[1], /padding-bottom:\s*calc\(14px \+ env\(safe-area-inset-bottom\)\)/);
+});

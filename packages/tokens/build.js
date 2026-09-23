@@ -265,6 +265,8 @@ const componentStyles = `
 .joy-badge--neutral {
   background: var(--joy-surface-sunken);
   color: var(--joy-text-primary);
+  /* Ring, not a border: the chip stays the same size, but in dark the sunken fill is only ~1.09:1 against the card. */
+  box-shadow: inset 0 0 0 1px var(--joy-border-subtle);
 }
 .joy-badge--success {
   background: var(--joy-status-success-bg);
@@ -3243,7 +3245,8 @@ h1, h2, h3, .joy-display {
 .joy-tag--primary {
   background-color: var(--joy-surface-raised);
   border-color: var(--joy-accent-default);
-  color: var(--joy-accent-default);
+  /* Text uses the AA gold: accent-default on white is 2.62:1, accent-text is >= 4.5:1 in both themes. */
+  color: var(--joy-accent-text);
 }
 .joy-tag--success {
   background-color: var(--joy-status-success-bg);
@@ -4084,8 +4087,13 @@ h1, h2, h3, .joy-display {
   left: 50%;
   transform: translateX(-50%);
 }
+/* The sheet keeps the overlay primitive's shape: .joy-popconfirm__panel is declared after .joy-overlay--sheet and
+   would otherwise flatten the top radius, drop to elevation-2 and lose the safe-area inset. */
 .joy-popconfirm__panel.joy-overlay--sheet {
   width: auto;
+  border-radius: var(--joy-radius-overlay) var(--joy-radius-overlay) 0 0;
+  box-shadow: var(--joy-elevation-3);
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
 }
 .joy-popconfirm__icon {
   display: inline-flex;

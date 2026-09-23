@@ -46,13 +46,13 @@
 | --joy-border-default (#566a87) on --joy-surface-card (#111b2b) | Dark | Border / Surface | 3.13:1 | ≥ 3:1 | PASS |
 | --joy-focus-ring (#dab362) on --joy-surface-canvas (#0d1624) | Dark | Focus Ring | 9.16:1 | ≥ 3:1 | PASS |
 | --joy-focus-ring (#dab362) on --joy-surface-card (#111b2b) | Dark | Focus Ring | 8.73:1 | ≥ 3:1 | PASS |
-| --joy-status-success-fg (#93c794) on --joy-status-success-bg (#061b07) | Dark | Status Text / Surface | 9.28:1 | ≥ 4.5:1 | PASS |
+| --joy-status-success-fg (#93c794) on --joy-status-success-bg (#0d2d0f) | Dark | Status Text / Surface | 7.74:1 | ≥ 4.5:1 | PASS |
 | --joy-status-success-fg (#93c794) on --joy-surface-canvas (#0d1624) | Dark | Status Text / Surface | 9.36:1 | ≥ 4.5:1 | PASS |
-| --joy-status-warning-fg (#dfae68) on --joy-status-warning-bg (#241100) | Dark | Status Text / Surface | 9.00:1 | ≥ 4.5:1 | PASS |
+| --joy-status-warning-fg (#dfae68) on --joy-status-warning-bg (#3a1e00) | Dark | Status Text / Surface | 7.61:1 | ≥ 4.5:1 | PASS |
 | --joy-status-warning-fg (#dfae68) on --joy-surface-canvas (#0d1624) | Dark | Status Text / Surface | 8.98:1 | ≥ 4.5:1 | PASS |
-| --joy-status-danger-fg (#fb9890) on --joy-status-danger-bg (#2d0606) | Dark | Status Text / Surface | 8.77:1 | ≥ 4.5:1 | PASS |
-| --joy-status-danger-bg (#2d0606) on --joy-status-danger-fg (#fb9890) | Dark | Status Surface / Text | 8.77:1 | ≥ 4.5:1 | PASS |
+| --joy-status-danger-fg (#fb9890) on --joy-status-danger-bg (#470d0e) | Dark | Status Text / Surface | 7.51:1 | ≥ 4.5:1 | PASS |
+| --joy-status-danger-bg (#470d0e) on --joy-status-danger-fg (#fb9890) | Dark | Status Surface / Text | 7.51:1 | ≥ 4.5:1 | PASS |
 | --joy-status-danger-fg (#fb9890) on --joy-surface-canvas (#0d1624) | Dark | Status Text / Surface | 8.64:1 | ≥ 4.5:1 | PASS |
 | --joy-status-danger-solid-fg (#ffffff) on --joy-status-danger-solid-bg (#9f3331) | Dark | Danger Solid Button | 7.02:1 | ≥ 4.5:1 | PASS |
-| --joy-status-info-fg (#8fbceb) on --joy-status-info-bg (#051729) | Dark | Status Text / Surface | 9.10:1 | ≥ 4.5:1 | PASS |
+| --joy-status-info-fg (#8fbceb) on --joy-status-info-bg (#0b2741) | Dark | Status Text / Surface | 7.65:1 | ≥ 4.5:1 | PASS |
 | --joy-status-info-fg (#8fbceb) on --joy-surface-canvas (#0d1624) | Dark | Status Text / Surface | 9.13:1 | ≥ 4.5:1 | PASS |

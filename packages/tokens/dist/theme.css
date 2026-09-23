@@ -247,7 +247,7 @@
   --joy-text-inverse: #1f1c13;
   --joy-text-link: #dab362;
   --joy-text-on-accent: #0a121f;
-  --joy-border-subtle: #132033;
+  --joy-border-subtle: #22324b;
   --joy-border-default: #566a87;
   --joy-border-strong: #7487a5;
   --joy-border-focus: #dab362;
@@ -260,19 +260,19 @@
   --joy-accent-gradient-end: #c49a3a;
   --joy-accent-highlight: #e9cd94;
   --joy-status-success-fg: #93c794;
-  --joy-status-success-bg: #061b07;
+  --joy-status-success-bg: #0d2d0f;
   --joy-status-success-border: #1a4f1f;
   --joy-status-warning-fg: #dfae68;
-  --joy-status-warning-bg: #241100;
+  --joy-status-warning-bg: #3a1e00;
   --joy-status-warning-border: #643600;
   --joy-status-danger-fg: #fb9890;
-  --joy-status-danger-bg: #2d0606;
+  --joy-status-danger-bg: #470d0e;
   --joy-status-danger-border: #781b1c;
   --joy-status-danger-solid-bg: #9f3331;
   --joy-status-danger-solid-fg: #ffffff;
   --joy-status-danger-solid-border: #781b1c;
   --joy-status-info-fg: #8fbceb;
-  --joy-status-info-bg: #051729;
+  --joy-status-info-bg: #0b2741;
   --joy-status-info-border: #17446f;
   --joy-focus-ring: 2px solid #dab362;
   --joy-elevation-0: none;
@@ -307,7 +307,7 @@
   --joy-text-inverse: #1f1c13;
   --joy-text-link: #dab362;
   --joy-text-on-accent: #0a121f;
-  --joy-border-subtle: #132033;
+  --joy-border-subtle: #22324b;
   --joy-border-default: #566a87;
   --joy-border-strong: #7487a5;
   --joy-border-focus: #dab362;
@@ -320,19 +320,19 @@
   --joy-accent-gradient-end: #c49a3a;
   --joy-accent-highlight: #e9cd94;
   --joy-status-success-fg: #93c794;
-  --joy-status-success-bg: #061b07;
+  --joy-status-success-bg: #0d2d0f;
   --joy-status-success-border: #1a4f1f;
   --joy-status-warning-fg: #dfae68;
-  --joy-status-warning-bg: #241100;
+  --joy-status-warning-bg: #3a1e00;
   --joy-status-warning-border: #643600;
   --joy-status-danger-fg: #fb9890;
-  --joy-status-danger-bg: #2d0606;
+  --joy-status-danger-bg: #470d0e;
   --joy-status-danger-border: #781b1c;
   --joy-status-danger-solid-bg: #9f3331;
   --joy-status-danger-solid-fg: #ffffff;
   --joy-status-danger-solid-border: #781b1c;
   --joy-status-info-fg: #8fbceb;
-  --joy-status-info-bg: #051729;
+  --joy-status-info-bg: #0b2741;
   --joy-status-info-border: #17446f;
   --joy-focus-ring: 2px solid #dab362;
   --joy-elevation-0: none;
@@ -516,6 +516,8 @@
 .joy-badge--neutral {
   background: var(--joy-surface-sunken);
   color: var(--joy-text-primary);
+  /* Ring, not a border: the chip stays the same size, but in dark the sunken fill is only ~1.09:1 against the card. */
+  box-shadow: inset 0 0 0 1px var(--joy-border-subtle);
 }
 .joy-badge--success {
   background: var(--joy-status-success-bg);
@@ -3494,7 +3496,8 @@ h1, h2, h3, .joy-display {
 .joy-tag--primary {
   background-color: var(--joy-surface-raised);
   border-color: var(--joy-accent-default);
-  color: var(--joy-accent-default);
+  /* Text uses the AA gold: accent-default on white is 2.62:1, accent-text is >= 4.5:1 in both themes. */
+  color: var(--joy-accent-text);
 }
 .joy-tag--success {
   background-color: var(--joy-status-success-bg);
@@ -4335,8 +4338,13 @@ h1, h2, h3, .joy-display {
   left: 50%;
   transform: translateX(-50%);
 }
+/* The sheet keeps the overlay primitive's shape: .joy-popconfirm__panel is declared after .joy-overlay--sheet and
+   would otherwise flatten the top radius, drop to elevation-2 and lose the safe-area inset. */
 .joy-popconfirm__panel.joy-overlay--sheet {
   width: auto;
+  border-radius: var(--joy-radius-overlay) var(--joy-radius-overlay) 0 0;
+  box-shadow: var(--joy-elevation-3);
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
 }
 .joy-popconfirm__icon {
   display: inline-flex;
