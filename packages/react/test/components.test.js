@@ -642,3 +642,76 @@ test('F-038 C-L2: metric twins render SVG trend icons + sr text, forward refs, a
     assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/.test(src), `${f} has a colour literal`);
   }
 });
+
+test('F-038 C-L3: Alert/EmptyState/Result/Skeleton render the Svelte DOM contract, forward refs and spread rest', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const html = (el) => renderToStaticMarkup(el);
+  const { Alert } = loadComponent('Alert');
+  const { EmptyState } = loadComponent('EmptyState');
+  const { Result } = loadComponent('Result');
+  const { Skeleton } = loadComponent('Skeleton');
+  const count = (s, sub) => s.split(sub).length - 1;
+
+  // Alert: root, icon wrapper aria-hidden, body wrapper, no close by default
+  const a = html(React.createElement(Alert, { title: 'T', description: 'D', 'data-testid': 'a', className: 'x' }, 'kid'));
+  assert.ok(a.startsWith('<div class="joy-alert joy-alert--info x" role="alert"'), a);
+  assert.ok(a.includes('data-testid="a"'), a);
+  assert.ok(/<span class="joy-alert__icon" aria-hidden="true"><svg/.test(a), a);
+  assert.ok(a.includes('<div class="joy-alert__body"><div class="joy-alert__title">T</div><div class="joy-alert__desc">D</div>kid</div>'), a);
+  assert.ok(!a.includes('joy-alert__close') && !a.replace(/<svg.*?<\/svg>/g, '').includes('style='), a);
+  // per-variant icons are distinct; info is the default icon
+  const icon = (v) => html(React.createElement(Alert, { variant: v })).match(/joy-alert__icon" aria-hidden="true">(<svg.*?<\/svg>)/)[1];
+  const icons = ['info', 'success', 'warning', 'danger'].map(icon);
+  assert.strictEqual(new Set(icons).size, 4, 'four distinct variant icons');
+  assert.strictEqual(html(React.createElement(Alert, {})).includes('joy-alert--info'), true);
+  for (const v of ['success', 'warning', 'danger']) assert.ok(html(React.createElement(Alert, { variant: v })).includes(`joy-alert--${v}`));
+  // closable: accessible close button, type=button, no emoji/entity glyphs
+  const c = html(React.createElement(Alert, { closable: true }));
+  assert.ok(/<button type="button" class="joy-alert__close" aria-label="Dismiss alert"><svg/.test(c), c);
+  assert.ok(!/&times;|[\u2715\u00d7]/.test(c), c);
+  // forwardRef + displayName + dismiss model documented in source
+  for (const [C, n] of [[Alert, 'Alert'], [EmptyState, 'EmptyState'], [Skeleton, 'Skeleton'], [Result, 'Result']]) {
+    assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${n} must be forwardRef`);
+    assert.strictEqual(C.displayName, n);
+  }
+  const alertSrc = fs.readFileSync(fileURLToPath(new URL('../src/Alert.tsx', import.meta.url)), 'utf8');
+  assert.ok(/Uncontrolled/.test(alertSrc) && alertSrc.indexOf('setDismissed(true)') < alertSrc.indexOf('onClose?.()'), 'dismiss hides then notifies, documented');
+
+  // EmptyState: markup matches Svelte, rest + className on root
+  const e = html(React.createElement(EmptyState, { title: 'None', description: 'd', icon: 'i', action: 'go', id: 'e1', className: 'k' }));
+  assert.ok(e.startsWith('<div class="joy-empty-state k" id="e1">'), e);
+  assert.ok(e.includes('<div class="joy-empty-state__icon">i</div><h3 class="joy-empty-state__title">None</h3><p class="joy-empty-state__desc">d</p><div class="joy-empty-state__action">go</div>'), e);
+  assert.strictEqual(html(React.createElement(EmptyState, { title: 'x' })), '<div class="joy-empty-state"><h3 class="joy-empty-state__title">x</h3></div>');
+
+  // Result: verify-only (already forwardRef + rest + role=alert)
+  const r = html(React.createElement(Result, { status: 'success', title: 'Ok', 'data-x': '1' }));
+  assert.ok(r.startsWith('<div class="joy-result joy-result--success " role="alert"') && r.includes('data-x="1"') && r.includes('joy-result__title'), r);
+
+  // Skeleton: single element merges consumer style (consumer wins per property), numeric => px
+  const s = html(React.createElement(Skeleton, { variant: 'rect', width: 200, height: '2rem', style: { margin: '4px', height: '9px' }, id: 's' }));
+  assert.ok(s.includes('class="joy-skeleton joy-skeleton--rect"'), s);
+  assert.ok(s.includes('style="width:200px;height:9px;margin:4px"'), s);
+  assert.ok(s.includes('role="progressbar"') && s.includes('aria-busy="true"') && s.includes('id="s"'), s);
+  // lines > 1: exactly one wrapper/progressbar/rest; lines are plain, last is 70%
+  const m = html(React.createElement(Skeleton, { lines: 3, width: '100px', height: 8, className: 'w', id: 'm', style: { margin: '2px' } }));
+  assert.strictEqual(count(m, 'role="progressbar"'), 1, m);
+  assert.strictEqual(count(m, 'id="m"'), 1, m);
+  assert.ok(m.startsWith('<div class="w" style="margin:2px" role="progressbar" aria-busy="true" id="m">'), m);
+  assert.strictEqual(count(m, 'joy-skeleton joy-skeleton--text'), 3, m);
+  assert.ok(m.includes('style="width:70%;height:8px"') && count(m, 'width:100px;height:8px') === 2, m);
+
+  // ref forwarding reaches the root element (invoked via the forwardRef render fn)
+  for (const [C, props] of [[Alert, {}], [EmptyState, { title: 't' }], [Skeleton, {}], [Skeleton, { lines: 2 }]]) {
+    let el;
+    html(React.createElement(function Probe() { el = C.render(props, 'REFSENTINEL'); return null; })); // hooks need a render context
+    assert.strictEqual(el.ref, 'REFSENTINEL', 'ref is attached to the root element');
+  }
+
+  // source: no colour literals / inline design styles in the lane files
+  for (const f of ['Alert', 'EmptyState', 'Result', 'Skeleton']) {
+    const src = fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8');
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/.test(src), `${f} has a colour literal`);
+  }
+  assert.ok(!/style=\{\{[^}]*(color|background|border)/i.test(alertSrc), 'Alert carries no inline colour styles');
+});
