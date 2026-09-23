@@ -559,6 +559,23 @@ test('F-038 B-L2 fix: deltaDirection follows the sign, never the tone', async ()
   }
 });
 
+test('F-038 final fix I-1: no Svelte component carries a scoped <style> (Badge included); build.js owns every joy-* rule', () => {
+  const dir = path.resolve('./src/lib');
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.svelte'));
+  assert.ok(files.includes('Badge.svelte'), 'Badge.svelte is covered');
+  for (const f of files) {
+    assert.ok(!/<style[\s>]/.test(fs.readFileSync(path.join(dir, f), 'utf8')), `${f} must not carry a scoped <style>`);
+  }
+  const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
+  const rule = (sel) => {
+    const m = css.match(new RegExp(`(?:^|\\n)${sel.replace(/[.]/g, '\\.')}\\s*\\{([^}]*)\\}`));
+    assert.ok(m, `${sel} rule exists in dist/theme.css`);
+    return m[1];
+  };
+  assert.match(rule('.joy-badge--neutral'), /box-shadow:\s*inset 0 0 0 1px var\(--joy-border-subtle\)/, 'neutral badge keeps the inset ring');
+  assert.match(rule('.joy-badge--brand'), /background:\s*var\(--joy-accent-subtle\)[\s\S]*color:\s*var\(--joy-accent-text\)/, 'brand badge uses the accent tokens');
+});
+
 test('F-038 B-L3: Alert/EmptyState/Result/Skeleton use build.js-owned styles, tokens only, ref+rest, Alert is closable with icons', () => {
   const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
   for (const n of ['Alert', 'EmptyState', 'Result', 'Skeleton']) {

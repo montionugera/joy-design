@@ -781,6 +781,12 @@ test('F-038 D2b: hairline border, chip fills and status surfaces are perceivable
   }
   assert.match(rule('.joy-tag'), /border:\s*1px solid var\(--joy-border-subtle\)/, 'default tag keeps a hairline border');
   assert.match(rule('.joy-badge--neutral'), /box-shadow:\s*inset 0 0 0 1px var\(--joy-border-subtle\)/, 'neutral badge has a same-size ring so it reads as a chip in dark');
+  // The Svelte twin no longer carries a scoped style, so these rules are the only Badge colours either twin renders.
+  assert.match(rule('.joy-badge--neutral'), /color:\s*var\(--joy-text-primary\)/, 'neutral badge text is primary');
+  assert.match(rule('.joy-badge--brand'), /background:\s*var\(--joy-accent-subtle\)[\s\S]*color:\s*var\(--joy-accent-text\)/, 'brand badge uses accent subtle/text');
+  for (const s of ['success', 'warning', 'danger']) {
+    assert.match(rule(`.joy-badge--${s}`), new RegExp(`background:\\s*var\\(--joy-status-${s}-bg\\)[\\s\\S]*color:\\s*var\\(--joy-status-${s}-fg\\)`), `${s} badge uses its status triad`);
+  }
   // Dark status fills sit lighter than the near-black 900 stop (1.04-1.07:1 against the card before this fix; the floor sits just above that).
   for (const s of ['info', 'success', 'warning', 'danger']) {
     const lift = contrastRatio(resolve(dark[`--joy-status-${s}-bg`], dark), resolve(dark['--joy-surface-card'], dark));
