@@ -834,6 +834,10 @@ ${inlinedThemeCss}
     .hub-matrix--stack {
       grid-template-columns: minmax(0, 1fr);
     }
+    /* The always-open Tooltip demo sits on the tooltip layer, above modals and drawers; hide it while a hub dialog is open so it does not float over the overlay. */
+    body:has([data-hub-dialog][style*="display: block"]) .joy-tooltip[data-static] {
+      visibility: hidden;
+    }
     .hub-matrix__cell {
       min-width: 0;
     }
