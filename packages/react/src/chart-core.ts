@@ -69,6 +69,42 @@ export function readChartPalette(canvas: HTMLCanvasElement): ChartPalette {
 }
 
 /**
+ * Accessible-summary helpers shared by BarChart / LineChart / CandlestickChart
+ * (canvas is opaque to assistive tech, so each chart exposes a role="img"
+ * label plus a visually hidden, row-capped data table).
+ */
+export const CHART_SUMMARY_MAX_ROWS = 20;
+
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+export function describeSeriesChart(kind: 'Bar' | 'Line', series: SeriesConfig[]): string {
+  const points = series.reduce((sum, s) => sum + s.data.length, 0);
+  return `${kind} chart, ${plural(series.length, 'series', 'series')}, ${plural(points, 'point')}`;
+}
+
+export function describeCandlestickChart(data: CandlestickDataPoint[]): string {
+  return `Candlestick chart, ${plural(data.length, 'candle')}`;
+}
+
+/** Most recent `max` rows of `data`, plus a caption fragment noting truncation. */
+export function summaryWindow<T>(
+  data: T[],
+  noun = 'point',
+  max: number = CHART_SUMMARY_MAX_ROWS
+): { rows: T[]; note: string } {
+  const truncated = data.length > max;
+  return {
+    rows: truncated ? data.slice(-max) : data,
+    note: truncated ? `last ${max} of ${plural(data.length, noun)}` : plural(data.length, noun)
+  };
+}
+
+export function formatCandleTime(time: number): string {
+  const d = new Date(time);
+  return Number.isNaN(d.getTime()) ? String(time) : `${d.toISOString().slice(0, 16).replace('T', ' ')} UTC`;
+}
+
+/**
  * Largest-Triangle-Three-Buckets (LTTB) Downsampling Algorithm (For 1D lines/areas)
  */
 export function lttbDownsample(data: ChartPoint[], threshold: number): ChartPoint[] {
@@ -330,6 +366,9 @@ export class JoyChartCore {
   private dragStartViewMinX = 0;
   private dragStartViewMaxX = 0;
   private boundListeners: { element: HTMLElement; event: string; handler: EventListener }[] = [];
+  private themeObserver: MutationObserver | null = null;
+  private themeMedia: MediaQueryList | null = null;
+  private themeMediaHandler: (() => void) | null = null;
 
   constructor(
     baseCanvas: HTMLCanvasElement,
@@ -640,6 +679,26 @@ export class JoyChartCore {
     this.boundListeners.push({ element: element as HTMLElement, event, handler });
   }
 
+  /**
+   * Self-contained theme repaint: theme.css switches on the root `data-theme`
+   * attribute and on `prefers-color-scheme`, so observe both. No-op without a DOM.
+   */
+  private watchTheme() {
+    const repaint = () => this.render();
+    if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.documentElement) {
+      this.themeObserver = new MutationObserver(repaint);
+      this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      if (media && typeof media.addEventListener === 'function') {
+        media.addEventListener('change', repaint);
+        this.themeMedia = media;
+        this.themeMediaHandler = repaint;
+      }
+    }
+  }
+
   private bindEvents() {
     this.addListener(this.overlayCanvas, 'mousedown', ((e: MouseEvent) => {
       if (!this.options.enableZoomPan) return;
@@ -658,6 +717,7 @@ export class JoyChartCore {
     this.addListener(window, 'joy-theme-change', (() => {
       this.render();
     }) as EventListener);
+    this.watchTheme();
 
     this.addListener(this.overlayCanvas, 'mousemove', ((e: MouseEvent) => {
       const rect = this.overlayCanvas.getBoundingClientRect();
@@ -750,5 +810,12 @@ export class JoyChartCore {
       element.removeEventListener(event, handler);
     }
     this.boundListeners = [];
+    this.themeObserver?.disconnect();
+    this.themeObserver = null;
+    if (this.themeMedia && this.themeMediaHandler) {
+      this.themeMedia.removeEventListener('change', this.themeMediaHandler);
+    }
+    this.themeMedia = null;
+    this.themeMediaHandler = null;
   }
 }

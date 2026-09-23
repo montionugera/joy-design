@@ -696,3 +696,59 @@ test('F-038 B-L7: MarkdownViewer text and copy button reach WCAG contrast in bot
     }
   }
 });
+
+// ---- F-038 B-L8/C-L8: BarChart, LineChart, CandlestickChart HUD ----
+const { rules: b8Rules, rule: b8Rule } = laneRules(/\.joy-chart(__|\b)/);
+const b8Tok = (sel, prop) => {
+  const m = b8Rule(sel).match(new RegExp(`(?:^|[\\s;])${prop}:[^;]*var\\((--[\\w-]+)\\)`));
+  assert.ok(m, `${sel} ${prop} is a token`);
+  return m[1];
+};
+
+test('F-038 B-L8: chart rules use tokens only (no colour literal, no foreign fallback)', () => {
+  const rules = b8Rules();
+  assert.ok(rules.length >= 10, `found the chart rules (${rules.length})`);
+  for (const { sel, body } of rules) {
+    assert.doesNotMatch(body, /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/, `${sel} has a colour literal`);
+    assert.doesNotMatch(body, /var\(--[\w-]+\s*,/, `${sel} has a var() fallback`);
+  }
+});
+
+test('F-038 B-L8: HUD value classes map to semantic tokens (accent/bull/bear/default)', () => {
+  assert.strictEqual(b8Tok('.joy-chart__hud-value', 'color'), '--joy-text-primary');
+  assert.strictEqual(b8Tok('.joy-chart__hud-value--accent', 'color'), '--joy-accent-text');
+  assert.strictEqual(b8Tok('.joy-chart__hud-value--bull', 'color'), '--joy-status-success-fg');
+  assert.strictEqual(b8Tok('.joy-chart__hud-value--bear', 'color'), '--joy-status-danger-fg');
+  assert.strictEqual(b8Tok('.joy-chart__hud', 'background'), '--joy-surface-card');
+});
+
+test('F-038 B-L8: every HUD text colour reaches 4.5:1 on the HUD card background in light AND dark (was navy-on-navy 1.00:1)', () => {
+  const bg = b8Tok('.joy-chart__hud', 'background');
+  const texts = [
+    ['value', b8Tok('.joy-chart__hud-value', 'color')],
+    ['accent value', b8Tok('.joy-chart__hud-value--accent', 'color')],
+    ['bull value', b8Tok('.joy-chart__hud-value--bull', 'color')],
+    ['bear value', b8Tok('.joy-chart__hud-value--bear', 'color')],
+    ['label', b8Tok('.joy-chart__hud-label', 'color')]
+  ];
+  for (const [theme, store] of themes) {
+    for (const [label, tok] of texts) {
+      const r = contrastRatio(resolve(store[tok], store), resolve(store[bg], store));
+      assert.ok(r >= 4.5, `${theme}: HUD ${label} (${tok} on ${bg}) is ${r.toFixed(2)}:1, needs 4.5:1`);
+    }
+  }
+});
+
+test('F-038 B-L8: HUD wraps and stays inside the chart box at 375px; canvas summary is visually hidden', () => {
+  const hud = b8Rule('.joy-chart__hud');
+  assert.match(hud, /position:\s*absolute/);
+  assert.match(hud, /flex-wrap:\s*wrap/);
+  assert.match(hud, /max-width:\s*calc\(100% - 28px\)/);
+  const m = mediaBlock('(max-width: 480px)', '.joy-chart__hud');
+  assert.match(m, /\.joy-chart__hud\s*\{[^}]*font-size:\s*0\.6875rem/);
+  assert.match(m, /\.joy-chart__hud\s*\{[^}]*max-width:\s*calc\(100% - 16px\)/);
+  const sr = b8Rule('.joy-chart__sr');
+  assert.match(sr, /position:\s*absolute/);
+  assert.match(sr, /clip:\s*rect\(0 0 0 0\)/);
+  assert.match(sr, /width:\s*1px/);
+});

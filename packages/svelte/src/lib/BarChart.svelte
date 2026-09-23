@@ -1,34 +1,41 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { JoyChartCore, type SeriesConfig, type ChartPoint } from './chart-core.js';
+	import {
+		JoyChartCore,
+		describeSeriesChart,
+		summaryWindow,
+		type SeriesConfig,
+		type ChartPoint
+	} from './chart-core.js';
 
 	interface Props {
 		series: SeriesConfig[];
 		height?: number;
 		theme?: 'light' | 'dark';
 		class?: string;
+		style?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
 		series = [],
 		height = 360,
 		theme = 'light',
-		class: className = ''
+		class: className = '',
+		style = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
-	let container: HTMLDivElement;
 	let baseCanvas: HTMLCanvasElement;
 	let overlayCanvas: HTMLCanvasElement;
 	let chartInstance: JoyChartCore | null = null;
 	let hoveredPoint = $state<ChartPoint | null>(null);
 
-	let barSeries = $derived(
-		series.map((s) => ({
-			...s,
-			type: 'bar' as const,
-			color: s.color || 'var(--gold-400, #c49a3a)'
-		}))
-	);
+	// Unset colors fall through to the token-driven palette accent in chart-core.
+	let barSeries = $derived(series.map((s) => ({ ...s, type: 'bar' as const })));
+	let chartLabel = $derived(describeSeriesChart('Bar', barSeries));
 
 	onMount(() => {
 		chartInstance = new JoyChartCore(baseCanvas, overlayCanvas, {
@@ -44,8 +51,8 @@
 			? new ResizeObserver(() => chartInstance?.resize())
 			: null;
 
-		if (container && ro) {
-			ro.observe(container);
+		if (ref && ro) {
+			ro.observe(ref);
 		}
 
 		const handleResize = () => chartInstance?.resize();
@@ -86,14 +93,17 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<!-- The chart region is focusable on purpose: keyboard users pan/zoom it (see the aria-label). -->
 <div
-	bind:this={container}
+	bind:this={ref}
 	tabindex="0"
 	onkeydown={handleKeyDown}
 	class="joy-chart {className}"
-	style="height: {height}px;"
+	style="height: {height}px; {style}"
 	role="region"
 	aria-label="Interactive Bar Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset."
+	{...rest}
 >
 	<div class="joy-chart__hud" aria-live="polite">
 		{#if hoveredPoint}
@@ -103,18 +113,37 @@
 			</div>
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">Value:</span>
-				<span class="joy-chart__hud-value" style="color: var(--gold-400, #c49a3a);">{hoveredPoint.y.toFixed(2)}</span>
+				<span class="joy-chart__hud-value joy-chart__hud-value--accent">{hoveredPoint.y.toFixed(2)}</span>
 			</div>
 		{:else}
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">Interactive</span>
-				<span class="joy-chart__hud-value" style="color: var(--navy-500, #14253e);">Bar Series</span>
+				<span class="joy-chart__hud-value">Bar Series</span>
 			</div>
 		{/if}
 	</div>
 
-	<div class="joy-chart__canvas-container">
+	<div class="joy-chart__canvas-container" role="img" aria-label={chartLabel}>
 		<canvas bind:this={baseCanvas} class="joy-chart__canvas-base"></canvas>
 		<canvas bind:this={overlayCanvas} class="joy-chart__canvas-overlay"></canvas>
+	</div>
+
+	<div class="joy-chart__sr">
+		{#each series as s (s.id)}
+			{#if s.data.length > 0}
+				{@const win = summaryWindow(s.data)}
+				<table>
+					<caption>{s.name || s.id}: {win.note}</caption>
+					<thead>
+						<tr><th scope="col">Category</th><th scope="col">Value</th></tr>
+					</thead>
+					<tbody>
+						{#each win.rows as pt}
+							<tr><th scope="row">{pt.x}</th><td>{pt.y.toFixed(2)}</td></tr>
+						{/each}
+					</tbody>
+				</table>
+			{/if}
+		{/each}
 	</div>
 </div>

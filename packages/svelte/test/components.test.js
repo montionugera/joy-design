@@ -874,3 +874,63 @@ test('F-038 B-L7: Splitter, Table, Timeline and MarkdownViewer compile with svel
     assert.deepStrictEqual(client.warnings.map((w) => w.code), [], `${f} (client) compiles warning-free`);
   }
 });
+
+test('F-038 B-L8: BarChart/LineChart/CandlestickChart source uses token classes (no inline colour), canvas role=img summary, rest+ref+style merge', () => {
+  for (const f of ['BarChart', 'LineChart', 'CandlestickChart']) {
+    const src = readLib(`${f}.svelte`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|var\(--|color:/.test(src), `${f}.svelte has no colour literal / var() / inline color`);
+    assert.ok(src.includes('bind:this={ref}') && src.includes('ref = $bindable(null)') && src.includes('{...rest}'), `${f}: ref + rest on the root`);
+    assert.ok(src.includes('style="height: {height}px; {style}"'), `${f}: consumer style merges after the height`);
+    assert.ok(src.includes('class="joy-chart__canvas-container" role="img" aria-label={chartLabel}'), `${f}: canvas container is role=img with a summary label`);
+    assert.ok(src.includes('<div class="joy-chart__sr">') && src.includes('<th scope="col">') && src.includes('summaryWindow('), `${f}: capped visually hidden data table`);
+  }
+  const candle = readLib('CandlestickChart.svelte');
+  assert.ok(candle.includes("'joy-chart__hud-value--bull' : 'joy-chart__hud-value--bear'"), 'close and change use bull/bear classes');
+  assert.ok(!candle.includes('joy-color-'), 'no foreign --joy-color-* tokens');
+  for (const f of ['BarChart', 'LineChart']) assert.ok(readLib(`${f}.svelte`).includes('joy-chart__hud-value--accent'), `${f} hover value uses the accent class`);
+  assert.ok(!readLib('BarChart.svelte').includes('gold-400'), 'BarChart no longer hands the canvas an invalid var() series colour (palette.accent is the default)');
+});
+
+test('F-038 B-L8: chart components compile warning-free and server-render the documented contract', async () => {
+  const { compile } = await import('svelte/compiler');
+  const { pathToFileURL } = await import('node:url');
+  const dir = fs.mkdtempSync(path.resolve('./test/.l8-ssr-'));
+  try {
+    const coreUrl = pathToFileURL(path.resolve('./src/lib/chart-core.ts')).href;
+    const load = async (f) => {
+      const src = readLib(`${f}.svelte`);
+      const server = compile(src, { filename: `${f}.svelte`, generate: 'server', runes: true });
+      const client = compile(src, { filename: `${f}.svelte`, generate: 'client', runes: true });
+      assert.deepStrictEqual(server.warnings.map((w) => w.code), [], `${f} compiles warning-free`);
+      assert.deepStrictEqual(client.warnings.map((w) => w.code), [], `${f} (client) compiles warning-free`);
+      const file = path.join(dir, `${f}.mjs`);
+      fs.writeFileSync(file, server.js.code.replace("'./chart-core.js'", `'${coreUrl}'`));
+      return import(pathToFileURL(file).href);
+    };
+    const { render: renderSsr } = await import('svelte/server');
+    // Drop hydration markers (<!--[0-->) so the markup can be matched as written.
+    const render = (...a) => ({ body: renderSsr(...a).body.replace(/<!--.*?-->/g, '') });
+    const bar = render((await load('BarChart')).default, { props: { series: [{ id: 'rev', name: 'Revenue', data: [{ x: 1, y: 5 }, { x: 2, y: 8.5 }] }], class: 'mine', 'data-x': '1' } }).body;
+    assert.ok(bar.includes('class="joy-chart mine"') && bar.includes('data-x="1"') && bar.includes('role="region"'), bar);
+    assert.ok(bar.includes('<span class="joy-chart__hud-value">Bar Series</span>'), bar);
+    assert.ok(bar.includes('role="img" aria-label="Bar chart, 1 series, 2 points"'), bar);
+    assert.ok(bar.includes('<caption>Revenue: 2 points</caption>') && bar.includes('<th scope="col">Category</th><th scope="col">Value</th>'), bar);
+    assert.ok(bar.includes('<tr><th scope="row">1</th><td>5.00</td></tr><tr><th scope="row">2</th><td>8.50</td></tr>'), bar);
+
+    const line = render((await load('LineChart')).default, { props: { series: [{ id: 's1', data: Array.from({ length: 30 }, (_, i) => ({ x: i, y: i })) }] } }).body;
+    assert.ok(line.includes('<caption>s1: last 20 of 30 points</caption>') && line.includes('<th scope="col">Index</th>'), line);
+    assert.strictEqual((line.match(/<th scope="row">/g) || []).length, 20, 'exactly 20 data rows');
+    assert.ok(line.includes('<th scope="row">29</th>') && !line.includes('<th scope="row">9</th>'), 'keeps the most recent rows');
+
+    const t0 = Date.UTC(2026, 0, 2, 3, 4);
+    const candle = render((await load('CandlestickChart')).default, { props: { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11, volume: 500 }], 'aria-label': 'Custom', style: 'width: 50%;' } }).body;
+    assert.ok(candle.includes('aria-label="Custom"') && candle.includes('style="height: 420px; width: 50%;"'), candle);
+    assert.ok(candle.includes('role="img" aria-label="Candlestick chart, 1 candle"'), candle);
+    assert.ok(candle.includes('<th scope="col">Volume</th>') && candle.includes('<th scope="row">2026-01-02 03:04 UTC</th><td>10.00</td><td>12.00</td><td>9.00</td><td>11.00</td><td>500</td>'), candle);
+    assert.ok(candle.includes('<span class="joy-chart__hud-value">Candlestick Feed</span>'), candle);
+    const noVol = render((await load('CandlestickChart')).default, { props: { data: [{ time: t0, open: 10, high: 12, low: 9, close: 11 }] } }).body;
+    assert.ok(!noVol.includes('Volume'), 'no Volume column without volume data');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

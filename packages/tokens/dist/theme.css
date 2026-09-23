@@ -3246,11 +3246,13 @@ h1, h2, h3, .joy-display {
   top: 12px;
   left: 14px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 4px 12px;
+  box-sizing: border-box;
+  max-width: calc(100% - 28px);
   padding: 6px 12px;
   background: var(--joy-surface-card);
-  
   border: 1px solid var(--joy-border-subtle);
   border-radius: var(--joy-radius-control);
   font-size: 0.75rem;
@@ -3269,6 +3271,39 @@ h1, h2, h3, .joy-display {
 }
 .joy-chart__hud-value {
   font-weight: 600;
+  color: var(--joy-text-primary);
+}
+.joy-chart__hud-value--accent {
+  color: var(--joy-accent-text);
+}
+.joy-chart__hud-value--bull {
+  color: var(--joy-status-success-fg);
+}
+.joy-chart__hud-value--bear {
+  color: var(--joy-status-danger-fg);
+}
+/* Visually hidden data summary for the canvas (screen readers read the table). */
+.joy-chart__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 480px) {
+  .joy-chart__hud {
+    top: 8px;
+    left: 8px;
+    gap: 2px 8px;
+    max-width: calc(100% - 16px);
+    padding: 4px 8px;
+    font-size: 0.6875rem;
+  }
 }
 
 /* ── Ant Design Layout Primitives ── */

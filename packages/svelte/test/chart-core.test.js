@@ -7,6 +7,11 @@ import {
   snapToPhysicalPixel,
   RingBuffer,
   readChartPalette,
+  describeSeriesChart,
+  describeCandlestickChart,
+  summaryWindow,
+  formatCandleTime,
+  CHART_SUMMARY_MAX_ROWS,
   JoyChartCore
 } from '../src/lib/chart-core.ts';
 
@@ -226,4 +231,148 @@ test('bar series honors an explicit series color', () => {
   const fills = renderBarSeries('#123456');
   assert.ok(fills.length >= 3);
   assert.ok(fills.every((f) => f === '#123456'));
+});
+
+// Theme-change repaint: JoyChartCore observes the root data-theme attribute and
+// prefers-color-scheme itself, so no consumer has to dispatch 'joy-theme-change'.
+function withThemeEnv(fn) {
+  const cssVars = { '--joy-accent-default': '#b8862c' };
+  const restoreStyle = stubGetComputedStyle(cssVars);
+  const original = {
+    window: globalThis.window,
+    document: globalThis.document,
+    MutationObserver: globalThis.MutationObserver
+  };
+  const env = { observers: [], mediaListeners: [], removedMedia: [], windowListeners: {}, cssVars };
+  globalThis.MutationObserver = class {
+    constructor(cb) {
+      this.cb = cb;
+      this.observed = null;
+      this.disconnected = false;
+      env.observers.push(this);
+    }
+    observe(target, options) {
+      this.observed = { target, options };
+    }
+    disconnect() {
+      this.disconnected = true;
+    }
+  };
+  globalThis.document = { documentElement: { tag: 'html' } };
+  globalThis.window = {
+    devicePixelRatio: 1,
+    addEventListener(event, handler) {
+      env.windowListeners[event] = handler;
+    },
+    removeEventListener(event) {
+      delete env.windowListeners[event];
+    },
+    matchMedia(query) {
+      env.mediaQuery = query;
+      return {
+        addEventListener: (type, handler) => env.mediaListeners.push([type, handler]),
+        removeEventListener: (type, handler) => env.removedMedia.push([type, handler])
+      };
+    }
+  };
+  try {
+    return fn(env);
+  } finally {
+    globalThis.window = original.window;
+    globalThis.document = original.document;
+    globalThis.MutationObserver = original.MutationObserver;
+    restoreStyle();
+  }
+}
+
+function barChartForTheme() {
+  const base = fakeChartCanvas();
+  const overlay = fakeChartCanvas();
+  const chart = new JoyChartCore(base.canvas, overlay.canvas, { showGrid: false });
+  chart.setSeries([{ id: 'bars', type: 'bar', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }] }]);
+  return { chart, base };
+}
+
+test('JoyChartCore observes the root data-theme attribute and prefers-color-scheme on attach', () => {
+  withThemeEnv((env) => {
+    barChartForTheme();
+    assert.strictEqual(env.observers.length, 1, 'one MutationObserver');
+    assert.strictEqual(env.observers[0].observed.target, globalThis.document.documentElement);
+    assert.deepStrictEqual(env.observers[0].observed.options, { attributes: true, attributeFilter: ['data-theme'] });
+    assert.strictEqual(env.mediaQuery, '(prefers-color-scheme: dark)');
+    assert.strictEqual(env.mediaListeners.length, 1);
+    assert.strictEqual(env.mediaListeners[0][0], 'change');
+    assert.strictEqual(typeof env.windowListeners['joy-theme-change'], 'function', 'legacy event listener kept');
+  });
+});
+
+test('JoyChartCore repaints with the new palette when data-theme changes', () => {
+  withThemeEnv((env) => {
+    const { base } = barChartForTheme();
+    const before = base.fills.length;
+    assert.ok(before >= 2);
+    env.cssVars['--joy-accent-default'] = '#d4ac5f';
+    env.observers[0].cb([{ type: 'attributes', attributeName: 'data-theme' }]);
+    assert.ok(base.fills.length > before, 'repainted');
+    assert.strictEqual(base.fills[base.fills.length - 1], '#d4ac5f', 'uses the new theme palette');
+  });
+});
+
+test('JoyChartCore repaints when the OS colour scheme changes', () => {
+  withThemeEnv((env) => {
+    const { base } = barChartForTheme();
+    const before = base.fills.length;
+    env.mediaListeners[0][1]();
+    assert.ok(base.fills.length > before);
+  });
+});
+
+test('JoyChartCore.destroy disconnects the theme observer and media listener', () => {
+  withThemeEnv((env) => {
+    const { chart } = barChartForTheme();
+    chart.destroy();
+    assert.strictEqual(env.observers[0].disconnected, true);
+    assert.deepStrictEqual(env.removedMedia, [env.mediaListeners[0]]);
+    assert.strictEqual(env.windowListeners['joy-theme-change'], undefined);
+  });
+});
+
+test('JoyChartCore stays SSR/no-DOM safe: no MutationObserver or matchMedia is not an error', () => {
+  const restoreStyle = stubGetComputedStyle({});
+  const original = { window: globalThis.window, MutationObserver: globalThis.MutationObserver };
+  globalThis.window = { addEventListener() {}, removeEventListener() {}, devicePixelRatio: 1 };
+  delete globalThis.MutationObserver;
+  try {
+    const chart = new JoyChartCore(fakeChartCanvas().canvas, fakeChartCanvas().canvas, {});
+    chart.destroy();
+  } finally {
+    globalThis.window = original.window;
+    if (original.MutationObserver) globalThis.MutationObserver = original.MutationObserver;
+    restoreStyle();
+  }
+});
+
+test('chart accessible-summary helpers describe the chart and cap the data window', () => {
+  assert.strictEqual(describeSeriesChart('Bar', [{ id: 'a', data: [{ x: 1, y: 1 }] }]), 'Bar chart, 1 series, 1 point');
+  assert.strictEqual(
+    describeSeriesChart('Line', [{ id: 'a', data: [{ x: 1, y: 1 }, { x: 2, y: 2 }] }, { id: 'b', data: [] }]),
+    'Line chart, 2 series, 2 points'
+  );
+  assert.strictEqual(describeSeriesChart('Line', []), 'Line chart, 0 series, 0 points');
+  const candle = (time) => ({ time, open: 1, high: 2, low: 0, close: 1 });
+  assert.strictEqual(describeCandlestickChart([candle(0)]), 'Candlestick chart, 1 candle');
+  assert.strictEqual(describeCandlestickChart([candle(0), candle(1)]), 'Candlestick chart, 2 candles');
+
+  const small = summaryWindow([1, 2, 3], 'candle');
+  assert.deepStrictEqual(small, { rows: [1, 2, 3], note: '3 candles' });
+  const big = Array.from({ length: CHART_SUMMARY_MAX_ROWS + 5 }, (_, i) => i);
+  const win = summaryWindow(big);
+  assert.strictEqual(win.rows.length, CHART_SUMMARY_MAX_ROWS);
+  assert.strictEqual(win.rows[win.rows.length - 1], big[big.length - 1], 'keeps the most recent rows');
+  assert.strictEqual(win.note, `last ${CHART_SUMMARY_MAX_ROWS} of ${big.length} points`);
+});
+
+test('formatCandleTime renders UTC timestamps and tolerates invalid input', () => {
+  assert.strictEqual(formatCandleTime(Date.UTC(2026, 0, 2, 3, 4)), '2026-01-02 03:04 UTC');
+  assert.strictEqual(formatCandleTime(NaN), 'NaN');
 });
