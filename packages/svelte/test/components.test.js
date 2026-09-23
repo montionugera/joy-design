@@ -814,3 +814,61 @@ test('F-038 C-L6 fix: Popconfirm confirm button uses the styled joy-button--soli
   for (const cls of new Set(src.match(/joy-button--[a-z]+/g))) assert.ok(css.includes(`.${cls}`), `${cls} is styled in theme.css`);
   assert.ok(src.includes('joy-button joy-button--solid joy-button--sm'));
 });
+
+// ---- F-038 B-L7: MarkdownViewer, Splitter, Table, Timeline ----
+test('F-038 B-L7: Table sortable headers are focusable, expose aria-sort and sort on Enter/Space; variant and ref/rest are wired', () => {
+  const t = readLib('Table.svelte');
+  assert.ok(!t.includes('<style>'), 'no scoped style block');
+  assert.ok(t.includes("import { ariaSort, isSortActivationKey, nextSort } from './table-utils.js'"), 'shared sort helpers');
+  assert.ok(t.includes('tabindex={col.sortable ? 0 : undefined}') && t.includes('aria-sort={col.sortable ? ariaSort(sortKey, sortDirection, String(col.key)) : undefined}'), 'sortable th: tabindex 0 + aria-sort, non-sortable th get neither');
+  assert.ok(!t.includes('role="columnheader"'), 'th already is a columnheader; no redundant role');
+  assert.ok(t.includes('onkeydown={(e) => handleHeaderKeydown(e, col)}') && t.includes('isSortActivationKey(e.key)') && t.includes('e.preventDefault()'), 'Enter/Space run the click handler, default prevented');
+  assert.ok(t.includes('nextSort(sortKey, sortDirection, key)') && t.includes('onsort?.(key, nextDir)'), 'one sort path for click and keyboard');
+  assert.ok(!t.includes('aria-label="Sort'), 'sort icons are decorative (aria-hidden), the state is on aria-sort');
+  assert.ok((t.match(/aria-hidden="true"/g) || []).length === 3, 'three sort icons aria-hidden');
+  assert.ok(t.includes("variant?: 'stack' | 'scroll'") && t.includes("let isScroll = $derived(variant === 'scroll')") && t.includes("variant ? variant === 'stack' : responsive === 'stack' || responsive === true"), 'variant prop; omitted variant keeps the responsive-driven default (stack)');
+  assert.ok(t.includes('joy-table-container--scroll') && t.includes('joy-table--scroll'), 'scroll variant classes');
+  assert.ok(t.includes('bind:this={ref}') && t.includes('{...rest}') && t.includes('ref = $bindable(null)'), 'ref + rest on the container');
+  for (const cls of ['joy-table-th--sortable', 'joy-table-cell--flash-up', 'joy-table--responsive-stack']) assert.ok(t.includes(cls), cls);
+});
+
+test('F-038 B-L7: Splitter bar is a focusable, labelled separator driven by splitter-utils, with pointer events and a stacked mode', () => {
+  const s = readLib('Splitter.svelte');
+  assert.ok(!s.includes('<style>'), 'no scoped style block');
+  assert.ok(s.includes("from './splitter-utils.js'") && s.includes('splitKeyNext(e.key, ratio, arrangement, min, max, e.shiftKey)') && s.includes('splitFromPointer('), 'arithmetic is in the shared helper');
+  assert.ok(s.includes('role="separator"') && s.includes('tabindex="0"') && s.includes('aria-orientation={barOrientation(arrangement)}'), 'separator, focusable, orientation follows the arrangement');
+  assert.ok(s.includes('aria-valuenow={Math.round(ratio)}') && s.includes('aria-valuemin={min}') && s.includes('aria-valuemax={max}'), 'value/min/max');
+  assert.ok(s.includes('aria-label="Resize panes"'), 'bar is labelled');
+  assert.ok(s.includes('onkeydown={handleKeydown}') && s.includes('if (next === null) return;\n\t\te.preventDefault();'), 'preventDefault only when the key is handled');
+  assert.ok(s.includes('onpointerdown=') && s.includes('setPointerCapture') && !s.includes('mousedown') && !s.includes("window.addEventListener('mousemove'"), 'pointer events with capture (works for touch), no window listeners to leak');
+  assert.ok(s.includes('window.matchMedia(SPLIT_STACK_QUERY)') && s.includes("query.removeEventListener('change', sync)") && s.includes("typeof window === 'undefined'"), 'SSR-safe matchMedia flag with cleanup');
+  assert.ok(s.includes('style="--joy-splitter-size: {ratio};"') && s.includes('style="--joy-splitter-size: {100 - ratio};"'), 'pane size is the ratio custom property');
+  assert.ok(s.includes('bind:this={ref}') && s.includes('{...rest}') && s.includes('ref = $bindable(null)'), 'ref + rest on the root (ref also used to measure)');
+  assert.ok(!/#[0-9a-f]{3,8}\b/i.test(s), 'no colour literal');
+});
+
+test('F-038 B-L7: Timeline text colours and weights come from classes; MarkdownViewer copy button is labelled, iconised and status-announced', () => {
+  const tl = readLib('Timeline.svelte');
+  assert.ok(!/style="/.test(tl), 'no inline style (colour was #64748b fallback)');
+  for (const cls of ['joy-timeline__title', 'joy-timeline__description', 'joy-timeline__time', 'joy-timeline__dot--{item.status']) assert.ok(tl.includes(cls), cls);
+  assert.ok(tl.includes('bind:this={ref}') && tl.includes('{...rest}') && tl.includes('ref = $bindable(null)'), 'ref + rest on the list');
+
+  const md = readLib('MarkdownViewer.svelte');
+  assert.ok(!/style="/.test(md), 'no inline styles (hr had a #e2e8f0 fallback)');
+  assert.ok(md.includes('<hr />'), 'hr is styled by .joy-markdown hr');
+  assert.ok(md.includes('aria-label="Copy code to clipboard"') && md.includes('type="button"') && !md.includes('aria-label="Copy code snippet"'), 'copy button label and type');
+  assert.ok(/import\s*\{\s*Check,\s*Copy\s*\}\s*from\s*'@joymify\/icons'/.test(md) && md.includes('<Check size="14" />') && md.includes('<Copy size="14" />') && !md.includes('<svg'), 'icons come from @joymify/icons');
+  assert.ok(md.includes('class="joy-markdown__status" role="status"') && md.includes("'Copied to clipboard'"), 'copied state is announced');
+  assert.ok(md.includes('await navigator.clipboard.writeText(text)') && md.includes('clearTimeout(resetTimer)'), 'copied is only claimed after a successful write; timer cleaned up');
+  assert.ok(md.includes('bind:this={ref}') && md.includes('class="joy-markdown {className}"') && md.includes('{...rest}'), 'class + ref + rest on the root');
+});
+
+test('F-038 B-L7: Splitter, Table, Timeline and MarkdownViewer compile with svelte/compiler without warnings and server-render the documented contract', async () => {
+  const { compile } = await import('svelte/compiler');
+  for (const f of ['Table', 'Splitter', 'Timeline', 'MarkdownViewer']) {
+    const out = compile(readLib(`${f}.svelte`), { filename: `${f}.svelte`, generate: 'server', runes: true });
+    assert.deepStrictEqual(out.warnings.map((w) => w.code), [], `${f} compiles warning-free`);
+    const client = compile(readLib(`${f}.svelte`), { filename: `${f}.svelte`, generate: 'client', runes: true });
+    assert.deepStrictEqual(client.warnings.map((w) => w.code), [], `${f} (client) compiles warning-free`);
+  }
+});

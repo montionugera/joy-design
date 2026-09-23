@@ -532,3 +532,192 @@ test('F-038 B-L6: safe-area insets are respected by the full-bleed modal and the
   assert.match(m, /\.joy-modal__header\s*\{[^}]*env\(safe-area-inset-top\)/);
   assert.match(mediaBlock('(max-width: 480px)', '.joy-drawer'), /\.joy-drawer--left\s*\{[^}]*padding-bottom:\s*env\(safe-area-inset-bottom\)/);
 });
+
+// ---- F-038 B-L7: MarkdownViewer, Splitter, Table, Timeline ----
+/** Every simple rule (incl. @media-nested) whose selector list mentions a B-L7 component. */
+const b7Rules = () => {
+  const out = [];
+  for (const m of noCommentsCss.matchAll(/(^|\n)\s*([^{}@\n][^{}]*?)\s*\{([^{}]*)\}/g)) {
+    if (/\.joy-(table|splitter|timeline|markdown)(-|_|\b)/.test(m[2]) && !/joy-markdown-editor/.test(m[2])) out.push({ sel: m[2].trim(), body: m[3] });
+  }
+  return out;
+};
+const b7Rule = (sel) => {
+  const found = b7Rules().filter((r) => r.sel.split(',').map((x) => x.trim()).includes(sel));
+  assert.ok(found.length, `${sel} rule exists`);
+  return found.map((r) => r.body).join('\n');
+};
+const b7Themes = () => {
+  const grab = (re) => {
+    const v = {};
+    for (const m of css.matchAll(re)) for (const l of m[1].split(';')) {
+      const x = l.match(/(--[\w-]+)\s*:\s*(.+)/);
+      if (x) v[x[1]] = x[2].trim();
+    }
+    return v;
+  };
+  const light = grab(/:root\s*\{([^}]+)\}/g);
+  const dark = { ...light, ...grab(/\[data-theme="dark"\]\s*\{([^}]+)\}/g) };
+  const resolve = (val, store, depth = 0) => {
+    const m = val && val.match(/^var\((--[\w-]+)\)$/);
+    return m && depth < 10 ? resolve(store[m[1]], store, depth + 1) : val;
+  };
+  return { themes: [['light', light], ['dark', dark]], resolve };
+};
+const b7Tok = (sel, prop) => {
+  const m = b7Rule(sel).match(new RegExp(`(?:^|[\\s;])${prop}:[^;]*var\\((--[\\w-]+)\\)`));
+  assert.ok(m, `${sel} ${prop} is a token`);
+  return m[1];
+};
+
+test('F-038 B-L7: no colour literal, foreign fallback, side stripe or transition: all in Table/Splitter/Timeline/MarkdownViewer rules', () => {
+  const rules = b7Rules();
+  assert.ok(rules.length >= 60, `found the lane rules (${rules.length})`);
+  for (const { sel, body } of rules) {
+    assert.doesNotMatch(body, /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/, `${sel} has a colour literal`);
+    assert.doesNotMatch(body, /brand-primary|--joy-color-|--gold-|--navy-/, `${sel} references a legacy/ramp token`);
+    assert.doesNotMatch(body, /border-(left|right)\s*:\s*([2-9]|\d\d)/, `${sel} has a side stripe`);
+    assert.doesNotMatch(body, /transition:\s*all\b/, `${sel} uses transition: all`);
+    assert.doesNotMatch(body, /letter-spacing:\s*[0-9.]*em[^;]*;[^}]*text-transform:\s*uppercase|text-transform:\s*uppercase/, `${sel} uses tracked uppercase`);
+  }
+  assert.doesNotMatch(css, /#faf5ff|#7c3aed|#a855f7/i, 'no purple / lavender hover literal anywhere in theme.css');
+});
+
+test('F-038 B-L7: Table rows hover on --joy-accent-subtle; container, header and cards use border-default and surface tokens', () => {
+  assert.match(b7Rule('.joy-table tr:hover td'), /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(b7Rule('.joy-table-container'), /border:\s*1px solid var\(--joy-border-default\)/);
+  assert.match(b7Rule('.joy-table-container'), /background:\s*var\(--joy-surface-card\)/);
+  assert.match(b7Rule('.joy-table thead'), /background:\s*var\(--joy-surface-raised\)/);
+  assert.match(b7Rule('.joy-table thead'), /border-bottom:\s*1px solid var\(--joy-border-default\)/);
+  assert.match(b7Rule('.joy-table--responsive-stack td::before'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(b7Rule('.joy-table--responsive-stack tr'), /border:\s*1px solid var\(--joy-border-default\)/);
+  // Dark comes from the tokens: there is no per-component dark override for the table.
+  assert.doesNotMatch(css, /\[data-theme="dark"\]\s+\.joy-table|\.joy-table[^{]*\[data-theme="dark"\]/);
+});
+
+test('F-038 B-L7: sortable headers have a visible focus ring and an accessible hover colour', () => {
+  assert.match(b7Rule('.joy-table-th--sortable:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  assert.match(b7Rule('.joy-table-th--sortable:hover'), /color:\s*var\(--joy-accent-text\)/);
+  assert.match(b7Rule('.joy-table-th--sorted-desc .joy-table-sort-icon'), /color:\s*var\(--joy-accent-text\)/);
+});
+
+test('F-038 B-L7: Table scroll variant scrolls sideways and pins an opaque first column with a 1px separation', () => {
+  assert.match(b7Rule('.joy-table-container--scroll'), /overflow-x:\s*auto/);
+  const first = b7Rule('.joy-table--scroll td:first-child');
+  assert.match(first, /position:\s*sticky/);
+  assert.match(first, /left:\s*0/);
+  assert.match(first, /z-index:\s*var\(--joy-z-sticky\)/);
+  assert.match(first, /border-right:\s*1px solid var\(--joy-border-subtle\)/);
+  assert.match(b7Rule('.joy-table--scroll td:first-child'), /background:\s*var\(--joy-surface-card\)/, 'the pinned body cell is opaque');
+  assert.match(b7Rule('.joy-table--scroll th'), /background:\s*var\(--joy-surface-raised\)/, 'header cells are opaque');
+  assert.match(b7Rule('.joy-table--scroll th'), /position:\s*sticky/);
+  assert.match(b7Rule('.joy-table--scroll'), /border-collapse:\s*separate/, 'a collapsed border would scroll away from a sticky cell');
+  assert.match(b7Rule('.joy-table--scroll tr:hover td:first-child'), /background-color:\s*var\(--joy-accent-subtle\)/, 'the pinned cell follows the row hover');
+  // The phone stacking rules only target the stack variant, so the scroll variant keeps its table layout.
+  const stack = mediaBlock('(max-width: 768px)', '.joy-table--responsive-stack');
+  assert.doesNotMatch(stack, /joy-table--scroll/);
+});
+
+test('F-038 B-L7: the ticker flash animation is neutralised by the global reduced-motion block', () => {
+  const rm = css.match(/@media \(prefers-reduced-motion: reduce\) \{\s*html \{[\s\S]*?\n\}\n/);
+  assert.ok(rm, 'global reduced-motion block exists');
+  assert.match(rm[0], /\[class\*="joy-"\]/);
+  assert.match(rm[0], /animation-duration:\s*0\.01ms !important/);
+  assert.match(rm[0], /animation-iteration-count:\s*1 !important/);
+  assert.match(b7Rule('.joy-table-cell--flash-up'), /animation:\s*joy-ticker-flash-up/, 'the flash is a plain animation on a joy- class, so the global block reaches it');
+});
+
+test('F-038 B-L7: Splitter bar is token-coloured, focusable and has a 44px touch hit area', () => {
+  assert.match(b7Rule('.joy-splitter__bar'), /background-color:\s*var\(--joy-border-default\)/);
+  assert.match(b7Rule('.joy-splitter__bar'), /touch-action:\s*none/);
+  assert.match(b7Rule('.joy-splitter__bar--active'), /background-color:\s*var\(--joy-accent-text\)/);
+  assert.match(b7Rule('.joy-splitter__bar:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  const c = mediaBlock('(pointer: coarse)', '.joy-splitter__bar::after');
+  assert.match(c, /\.joy-splitter__bar::after\s*\{[^}]*width:\s*44px/, 'side-by-side bar grows to 44px wide');
+  assert.match(c, /\.joy-splitter--vertical > \.joy-splitter__bar::after\s*\{[^}]*height:\s*44px/, 'stacked bar grows to 44px tall');
+  const cm = mediaBlock('(pointer: coarse) and (max-width: 640px)', '.joy-splitter--horizontal');
+  assert.match(cm, /\.joy-splitter--horizontal > \.joy-splitter__bar::after\s*\{[^}]*height:\s*44px/, 'a phone-stacked bar is 44px tall too');
+});
+
+test('F-038 B-L7: Splitter stacks panes under 640px and sizes them by a flex ratio that works along either axis', () => {
+  const m = mediaBlock('(max-width: 640px)', '.joy-splitter--horizontal');
+  assert.match(m, /\.joy-splitter--horizontal\s*\{[^}]*flex-direction:\s*column/);
+  assert.match(m, /\.joy-splitter--horizontal > \.joy-splitter__bar\s*\{[^}]*cursor:\s*row-resize/);
+  assert.match(b7Rule('.joy-splitter--vertical'), /flex-direction:\s*column/);
+  assert.match(b7Rule('.joy-splitter__pane'), /flex:\s*var\(--joy-splitter-size\) 1 0%/);
+  assert.doesNotMatch(b7Rule('.joy-splitter__pane'), /(^|[\s;])(width|height):/, 'pane size comes from the ratio, not a width/height');
+});
+
+test('F-038 B-L7: Splitter bar reaches 3:1 against the pane surfaces in both themes (idle, hover, focus)', () => {
+  const { themes, resolve } = b7Themes();
+  const idle = b7Tok('.joy-splitter__bar', 'background-color');
+  const hover = b7Tok('.joy-splitter__bar--active', 'background-color');
+  assert.strictEqual(idle, '--joy-border-default');
+  assert.strictEqual(hover, '--joy-accent-text');
+  for (const [theme, store] of themes) {
+    for (const bg of ['--joy-surface-card', '--joy-surface-canvas']) {
+      for (const [label, tokName] of [['idle', idle], ['hover/active/focus', hover]]) {
+        const ratio = contrastRatio(resolve(store[tokName], store), resolve(store[bg], store));
+        assert.ok(ratio >= 3, `${theme}: bar ${label} (${tokName}) on ${bg} is ${ratio.toFixed(2)}:1 (< 3:1)`);
+      }
+    }
+  }
+});
+
+test('F-038 B-L7: Timeline text, connector and dots use tokens and stay legible in both themes', () => {
+  assert.match(b7Rule('.joy-timeline__description'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(b7Rule('.joy-timeline__time'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(b7Rule('.joy-timeline__item:not(:last-child)::before'), /background-color:\s*var\(--joy-border-default\)/);
+  assert.match(b7Rule('.joy-timeline__dot'), /background-color:\s*var\(--joy-surface-card\)/);
+  assert.match(b7Rule('.joy-timeline__dot'), /border:\s*2px solid var\(--joy-accent-text\)/);
+  const dotToks = ['--joy-accent-text'];
+  for (const s of ['success', 'warning', 'danger', 'info']) dotToks.push(b7Tok(`.joy-timeline__dot--${s}`, 'border-color'));
+  const { themes, resolve } = b7Themes();
+  for (const [theme, store] of themes) {
+    for (const t of dotToks) {
+      const r = contrastRatio(resolve(store[t], store), resolve(store['--joy-surface-card'], store));
+      assert.ok(r >= 3, `${theme}: timeline dot ${t} on card is ${r.toFixed(2)}:1 (< 3:1)`);
+    }
+    for (const sel of ['.joy-timeline__description', '.joy-timeline__time']) {
+      const r = contrastRatio(resolve(store[b7Tok(sel, 'color')], store), resolve(store['--joy-surface-card'], store));
+      assert.ok(r >= 4.5, `${theme}: ${sel} on card is ${r.toFixed(2)}:1 (< 4.5:1)`);
+    }
+  }
+});
+
+test('F-038 B-L7: MarkdownViewer uses tokens for hr, blockquote, links, code and the copy button (no side stripe)', () => {
+  assert.match(b7Rule('.joy-markdown hr'), /border-top:\s*1px solid var\(--joy-border-default\)/);
+  const bq = b7Rule('.joy-markdown blockquote');
+  assert.match(bq, /border:\s*1px solid var\(--joy-border-default\)/, 'full border, not a left stripe');
+  assert.match(bq, /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(bq, /border-radius:\s*var\(--joy-radius-control\)/);
+  assert.doesNotMatch(bq, /border-left/);
+  assert.match(b7Rule('.joy-markdown a'), /color:\s*var\(--joy-text-link\)/);
+  assert.match(b7Rule('.joy-markdown pre'), /background-color:\s*var\(--joy-surface-sunken\)/);
+  assert.match(b7Rule('.joy-markdown pre'), /(^|[\s;])color:\s*var\(--joy-text-primary\)/);
+  assert.match(b7Rule('.joy-markdown code'), /background-color:\s*var\(--joy-surface-sunken\)/);
+  assert.match(b7Rule('.joy-markdown code'), /(^|[\s;])color:\s*var\(--joy-text-primary\)/);
+  assert.match(b7Rule('.joy-markdown .joy-markdown__copy-btn:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  assert.match(mediaBlock('(pointer: coarse)', '.joy-markdown__copy-btn'), /\.joy-markdown \.joy-markdown__copy-btn\s*\{[^}]*min-width:\s*44px[^}]*min-height:\s*44px/);
+  assert.match(b7Rule('.joy-markdown__status'), /clip:\s*rect\(0 0 0 0\)/, 'live status is visually hidden');
+});
+
+test('F-038 B-L7: MarkdownViewer text and copy button reach WCAG contrast in both themes', () => {
+  const { themes, resolve } = b7Themes();
+  const checks = [
+    ['blockquote text on tint', b7Tok('.joy-markdown blockquote', 'color'), b7Tok('.joy-markdown blockquote', 'background-color'), 4.5],
+    ['inline code on sunken', b7Tok('.joy-markdown code', 'color'), b7Tok('.joy-markdown code', 'background-color'), 4.5],
+    ['pre text on sunken', b7Tok('.joy-markdown pre', 'color'), b7Tok('.joy-markdown pre', 'background-color'), 4.5],
+    ['link on card', b7Tok('.joy-markdown a', 'color'), '--joy-surface-card', 4.5],
+    ['hr on card', b7Tok('.joy-markdown hr', 'border-top'), '--joy-surface-card', 1],
+    ['copy button text on its fill', b7Tok('.joy-markdown .joy-markdown__copy-btn', 'color'), b7Tok('.joy-markdown .joy-markdown__copy-btn', 'background'), 4.5],
+    ['copy button hover text on hover fill', b7Tok('.joy-markdown .joy-markdown__copy-btn:hover', 'color'), b7Tok('.joy-markdown .joy-markdown__copy-btn:hover', 'background'), 4.5],
+    ['copy button border on the code block', b7Tok('.joy-markdown .joy-markdown__copy-btn', 'border'), '--joy-surface-sunken', 3]
+  ];
+  for (const [theme, store] of themes) {
+    for (const [label, fg, bg, min] of checks) {
+      const r = contrastRatio(resolve(store[fg], store), resolve(store[bg], store));
+      assert.ok(r >= min, `${theme}: ${label} (${fg} on ${bg}) is ${r.toFixed(2)}:1, needs ${min}:1`);
+    }
+  }
+});

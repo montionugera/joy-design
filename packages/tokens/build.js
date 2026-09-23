@@ -748,7 +748,7 @@ select.joy-select:disabled,
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
-  border: 1px solid var(--joy-border-subtle);
+  border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-control);
   background: var(--joy-surface-card);
   box-shadow: var(--joy-elevation-1);
@@ -763,7 +763,7 @@ select.joy-select:disabled,
 }
 .joy-table thead {
   background: var(--joy-surface-raised);
-  border-bottom: 1px solid var(--joy-border-subtle);
+  border-bottom: 1px solid var(--joy-border-default);
 }
 .joy-table th {
   padding: 10px 14px;
@@ -780,7 +780,7 @@ select.joy-select:disabled,
   border-bottom: none;
 }
 .joy-table tr:hover td {
-  background-color: var(--joy-surface-raised);
+  background-color: var(--joy-accent-subtle);
 }
 .joy-table--compact th, .joy-table--compact td {
   padding: 6px 10px;
@@ -811,7 +811,7 @@ select.joy-select:disabled,
   }
   .joy-table--responsive-stack tr {
     display: block;
-    border: 1px solid var(--joy-border-subtle);
+    border: 1px solid var(--joy-border-default);
     border-radius: var(--joy-radius-control);
     background-color: var(--joy-surface-card);
     padding: 12px 16px;
@@ -834,7 +834,7 @@ select.joy-select:disabled,
   .joy-table--responsive-stack td::before {
     content: attr(data-label);
     font-weight: 600;
-    color: var(--joy-text-muted);
+    color: var(--joy-text-secondary);
     text-align: left;
     padding-right: 12px;
     font-size: 0.8125rem;
@@ -867,7 +867,11 @@ select.joy-select:disabled,
   transition: color var(--joy-duration-fast);
 }
 .joy-table-th--sortable:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
+}
+.joy-table-th--sortable:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
 }
 .joy-table-sort-icon {
   display: inline-block;
@@ -878,7 +882,43 @@ select.joy-select:disabled,
 .joy-table-th--sorted-asc .joy-table-sort-icon,
 .joy-table-th--sorted-desc .joy-table-sort-icon {
   opacity: 1;
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
+}
+
+/* Table scroll variant (variant="scroll"): scrolls sideways and pins the first column. Cells are opaque so
+   scrolled content never shows through the pinned column. border-collapse is separate because a collapsed
+   border would scroll away from a sticky cell. */
+.joy-table-container--scroll {
+  overflow-x: auto;
+}
+.joy-table--scroll {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.joy-table--scroll th {
+  position: sticky;
+  top: 0;
+  z-index: var(--joy-z-sticky);
+  background: var(--joy-surface-raised);
+  border-bottom: 1px solid var(--joy-border-default);
+}
+.joy-table--scroll th:first-child,
+.joy-table--scroll td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: var(--joy-z-sticky);
+  border-right: 1px solid var(--joy-border-subtle);
+}
+.joy-table--scroll th:first-child {
+  z-index: calc(var(--joy-z-sticky) + 1);
+}
+.joy-table--scroll td:first-child {
+  background: var(--joy-surface-card);
+}
+.joy-table--scroll tr:hover td:first-child {
+  background-color: var(--joy-accent-subtle);
 }
 
 /* ── Pagination ── */
@@ -2346,8 +2386,8 @@ h1, h2, h3, .joy-display {
 }
 .joy-markdown pre {
   position: relative;
-  background-color: var(--joy-text-primary);
-  color: var(--joy-border-subtle);
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-primary);
   padding: 16px;
   border-radius: var(--joy-radius-control);
   overflow-x: auto;
@@ -2360,10 +2400,22 @@ h1, h2, h3, .joy-display {
 .joy-markdown code {
   font-family: var(--joy-font-family-mono);
   font-size: 0.875em;
-  background-color: var(--joy-surface-raised);
-  color: var(--joy-accent-default);
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-primary);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--joy-radius-control);
+}
+.joy-markdown a {
+  color: var(--joy-text-link);
+  text-decoration: underline;
+}
+.joy-markdown hr {
+  border: none;
+  border-top: 1px solid var(--joy-border-default);
+  margin: 1.5em 0;
+}
+.joy-markdown__table-wrap {
+  overflow-x: auto;
 }
 .joy-markdown pre code {
   background-color: transparent !important;
@@ -2374,7 +2426,7 @@ h1, h2, h3, .joy-display {
   border: 1px solid var(--joy-border-default);
   margin: 1em 0;
   padding: 8px 16px;
-  background-color: var(--joy-surface-raised);
+  background-color: var(--joy-accent-subtle);
   border-radius: var(--joy-radius-control);
   color: var(--joy-text-secondary);
 }
@@ -2400,18 +2452,37 @@ h1, h2, h3, .joy-display {
   padding: 4px 8px;
   background: var(--joy-surface-card);
   color: var(--joy-text-secondary);
-  border: 1px solid var(--joy-border-subtle);
-  border-radius: 4px;
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-control);
   font-size: 0.75rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
-  transition: all 0.2s;
+  transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
 }
 .joy-markdown .joy-markdown__copy-btn:hover {
   background: var(--joy-surface-raised);
   color: var(--joy-text-primary);
+}
+.joy-markdown .joy-markdown__copy-btn:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+}
+.joy-markdown__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (pointer: coarse) {
+  .joy-markdown .joy-markdown__copy-btn {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
 }
 
 /* ── Wave 5: Landing Page Architecture & Enterprise Workflow Suite ── */
@@ -2799,7 +2870,7 @@ h1, h2, h3, .joy-display {
   top: 10px;
   bottom: 0;
   width: 2px;
-  background-color: var(--joy-border-subtle);
+  background-color: var(--joy-border-default);
 }
 .joy-timeline__dot {
   position: absolute;
@@ -2809,19 +2880,27 @@ h1, h2, h3, .joy-display {
   height: 12px;
   border-radius: 50%;
   background-color: var(--joy-surface-card);
-  border: 2px solid var(--joy-accent-default);
+  border: 2px solid var(--joy-accent-text);
 }
 .joy-timeline__dot--success { border-color: var(--joy-status-success-fg); }
-.joy-timeline__dot--warning { border-color: var(--joy-status-warning-border); }
+.joy-timeline__dot--warning { border-color: var(--joy-status-warning-fg); }
 .joy-timeline__dot--danger { border-color: var(--joy-status-danger-fg); }
-.joy-timeline__dot--info { border-color: var(--joy-status-info-border); }
+.joy-timeline__dot--info { border-color: var(--joy-status-info-fg); }
 .joy-timeline__content {
   font-size: 0.875rem;
   color: var(--joy-text-primary);
 }
+.joy-timeline__title {
+  font-weight: 600;
+}
+.joy-timeline__description {
+  color: var(--joy-text-secondary);
+  font-size: 0.8125rem;
+  margin-top: 2px;
+}
 .joy-timeline__time {
   font-size: 0.75rem;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   margin-top: 4px;
 }
 
@@ -2995,7 +3074,8 @@ h1, h2, h3, .joy-display {
   flex-direction: column;
 }
 
-/* Splitter */
+/* Splitter. Pane size is a flex ratio (--joy-splitter-size, the pane's percentage) so it works along either
+   axis; phones (<= 640px) stack a side-by-side splitter, and the component flips its drag axis to match. */
 .joy-splitter {
   display: flex;
   width: 100%;
@@ -3007,25 +3087,76 @@ h1, h2, h3, .joy-display {
 }
 .joy-splitter--vertical {
   flex-direction: column;
+  min-height: 12rem;
 }
 .joy-splitter__pane {
+  flex: var(--joy-splitter-size) 1 0%;
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
   box-sizing: border-box;
 }
 .joy-splitter__bar {
   position: relative;
   flex: 0 0 6px;
-  background-color: var(--joy-surface-sunken);
+  background-color: var(--joy-border-default);
   cursor: col-resize;
   user-select: none;
-  transition: background-color 0.15s ease;
+  touch-action: none;
+  transition: background-color var(--joy-duration-fast);
 }
 .joy-splitter--vertical > .joy-splitter__bar {
   cursor: row-resize;
 }
 .joy-splitter__bar:hover,
-.joy-splitter__bar--active {
-  background-color: var(--joy-accent-default);
+.joy-splitter__bar--active,
+.joy-splitter__bar:focus-visible {
+  background-color: var(--joy-accent-text);
+}
+.joy-splitter__bar:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
+@media (max-width: 640px) {
+  .joy-splitter--horizontal {
+    flex-direction: column;
+    min-height: 12rem;
+  }
+  .joy-splitter--horizontal > .joy-splitter__bar {
+    cursor: row-resize;
+  }
+}
+/* Touch: keep the slim visual bar, widen the grab area to 44px across the split axis. */
+@media (pointer: coarse) {
+  .joy-splitter__bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 44px;
+    transform: translateX(-50%);
+  }
+  .joy-splitter--vertical > .joy-splitter__bar::after {
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+}
+@media (pointer: coarse) and (max-width: 640px) {
+  .joy-splitter--horizontal > .joy-splitter__bar::after {
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 44px;
+    transform: translateY(-50%);
+  }
 }
 
 /* ── Ant Design Data Display Primitives ── */
