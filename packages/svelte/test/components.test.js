@@ -982,7 +982,7 @@ test('F-038 D3.1: ImagePreview is uncontrolled unless `current` is passed, clamp
   assert.ok(/^\s*current,$/m.test(src) && !/current = 0/.test(src), '`current` has no default, otherwise arrow keys never advance an uncontrolled preview');
   assert.ok(src.includes('current !== undefined ? current : internalCurrent') && src.includes('Math.min(Math.max(0, requestedIndex), Math.max(0, normalizedItems.length - 1))'), 'controlled/uncontrolled index, clamped like React');
   assert.ok(src.includes("e.key === 'ArrowLeft') handlePrev()") && src.includes("e.key === 'ArrowRight') handleNext()"), 'arrow keys navigate');
-  assert.ok(src.includes('internalCurrent = nextIdx;') && src.includes('onChange?.(nextIdx);'), 'navigation advances the internal index and notifies');
+  assert.ok(src.includes('internalCurrent = nextIdx;') && src.includes('onchange?.(nextIdx);'), 'navigation advances the internal index and notifies');
   assert.ok(/\$effect\(\(\) => \{\s*void open;\s*void currentIndex;\s*untrack\(handleReset\);\s*\}\);/.test(src), 'zoom/rotation/pan reset when the open state or shown image changes');
   const { compile } = await import('svelte/compiler');
   for (const generate of ['server', 'client']) {

@@ -13,8 +13,8 @@
 		src?: string;
 		items?: (string | ImageItem)[];
 		current?: number;
-		onClose: () => void;
-		onChange?: (current: number) => void;
+		onclose: () => void;
+		onchange?: (current: number) => void;
 		class?: string;
 		/** The mask/dialog element (`.joy-image-preview-mask`). */
 		ref?: HTMLDivElement | null;
@@ -26,8 +26,8 @@
 		src,
 		items = [],
 		current,
-		onClose,
-		onChange,
+		onclose,
+		onchange,
 		class: className = '',
 		ref = $bindable(null),
 		...rest
@@ -89,14 +89,14 @@
 		if (normalizedItems.length <= 1) return;
 		const nextIdx = (currentIndex - 1 + normalizedItems.length) % normalizedItems.length;
 		internalCurrent = nextIdx;
-		onChange?.(nextIdx);
+		onchange?.(nextIdx);
 	}
 
 	function handleNext() {
 		if (normalizedItems.length <= 1) return;
 		const nextIdx = (currentIndex + 1) % normalizedItems.length;
 		internalCurrent = nextIdx;
-		onChange?.(nextIdx);
+		onchange?.(nextIdx);
 	}
 
 	function handleZoomIn() {
@@ -127,7 +127,7 @@
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (!open || e.defaultPrevented || !dialog?.isTopmost()) return;
-		if (e.key === 'Escape') onClose();
+		if (e.key === 'Escape') onclose();
 		else if (e.key === 'ArrowLeft') handlePrev();
 		else if (e.key === 'ArrowRight') handleNext();
 		else if (e.key === '+' || e.key === '=') handleZoomIn();
@@ -168,7 +168,7 @@
 		aria-label="Image preview"
 		class="joy-image-preview-mask {className}"
 		onclick={(e) => {
-			if (e.target === e.currentTarget) onClose();
+			if (e.target === e.currentTarget) onclose();
 		}}
 		{...rest}
 	>
@@ -194,7 +194,7 @@
 				<Minimize2 size="1.25rem" />
 			</button>
 
-			<button type="button" onclick={onClose} title="Close (Esc)" aria-label="Close preview" class="joy-image-preview-btn joy-image-preview-btn--close">
+			<button type="button" onclick={onclose} title="Close (Esc)" aria-label="Close preview" class="joy-image-preview-btn joy-image-preview-btn--close">
 				<Close size="1.25rem" />
 			</button>
 		</div>

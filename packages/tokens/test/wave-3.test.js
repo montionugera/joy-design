@@ -822,10 +822,50 @@ test('D3.1 reactProps and svelteProps line up handler casing, forwardRef ref, ge
   assert.ok(!mod.reactProps('Box', 'export interface BoxProps { a?: string }').has('ref'), 'no forwardRef and no HTMLAttributes: no ref');
 });
 
-test('D3.1 classes() ignores custom properties and dynamic-prefix classes but keeps real classes', () => {
+test('D3.1 classes() keeps custom properties and dynamic prefixes for the twin diff but flags them as needing no theme.css rule', () => {
   const src = 'style={{ "--joy-space-gap": g, "--joy-splitter-size": s }} className={cx("joy-space", `joy-progress--status-${x}`, `joy-badge-${y}`, "joy-real__el")} style="--joy-foo-bar: 1"';
-  assert.deepStrictEqual([...mod.classes(src)].sort(), ['joy-real__el', 'joy-space']);
-  assert.deepStrictEqual([...mod.classes('class="joy-a joy-a--b {cls}" class="joy-c-{x}"')].sort(), ['joy-a', 'joy-a--b']);
+  assert.deepStrictEqual(
+    [...mod.classes(src)].sort(),
+    ['--joy-foo-bar', '--joy-space-gap', '--joy-splitter-size', 'joy-badge-*', 'joy-progress--status-*', 'joy-real__el', 'joy-space']
+  );
+  assert.deepStrictEqual([...mod.classes(src)].filter(mod.needsThemeRule).sort(), ['joy-real__el', 'joy-space']);
+  assert.deepStrictEqual([...mod.classes('class="joy-a joy-a--b {cls}" class="joy-c-{x}"')].sort(), ['joy-a', 'joy-a--b', 'joy-c-*']);
+});
+
+// Runs the twin check on a one-component temp repo (Alert) built from the given sources.
+function runTwinFixture(svelteSrc, reactSrc, options = {}) {
+  const repoRoot = path.resolve(__dirname, '../../..');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-twin-'));
+  try {
+    for (const d of ['packages/tokens/dist', 'packages/svelte/src/lib', 'packages/react/src']) fs.mkdirSync(path.join(root, d), { recursive: true });
+    fs.copyFileSync(path.join(repoRoot, 'packages/tokens/dist/theme.css'), path.join(root, 'packages/tokens/dist/theme.css'));
+    fs.writeFileSync(path.join(root, 'packages/svelte/src/lib/Alert.svelte'), svelteSrc);
+    fs.writeFileSync(path.join(root, 'packages/react/src/Alert.tsx'), reactSrc);
+    return mod.runParityCheck({ rootDir: root, ...options }).results.Alert;
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('D3.1 fix: a custom property present in ONE twin only is reported by the twin class diff', () => {
+  const svelte = '<div style="--joy-splitter-size: 4px"></div>';
+  const react = 'export const Alert = () => <div style={{ "--joy-splitter-size": "4px", "--joy-foo": "1" }} />;';
+  const row = runTwinFixture(svelte, react);
+  assert.deepStrictEqual(row.classesOnlyInReact, ['--joy-foo']);
+  assert.deepStrictEqual(row.classesOnlyInSvelte, []);
+  assert.deepStrictEqual(row.undefinedClasses, { svelte: [], react: [] }, 'a custom property never needs a theme.css class rule');
+  assert.strictEqual(row.hasViolations, true);
+});
+
+test('D3.1 fix: a dynamic class prefix that differs between the twins is reported, and needs no theme.css rule', () => {
+  const svelte = '<div class="joy-progress--status-{status}"></div>';
+  const react = 'export const Alert = () => <div className={`joy-progress--state-${status}`} />;';
+  const row = runTwinFixture(svelte, react);
+  assert.deepStrictEqual(row.classesOnlyInSvelte, ['joy-progress--status-*']);
+  assert.deepStrictEqual(row.classesOnlyInReact, ['joy-progress--state-*']);
+  assert.deepStrictEqual(row.undefinedClasses, { svelte: [], react: [] });
+  const same = runTwinFixture(svelte, 'export const Alert = () => <div className={`joy-progress--status-${status}`} />;');
+  assert.deepStrictEqual([same.classesOnlyInSvelte, same.classesOnlyInReact], [[], []], 'identical prefixes are clean');
 });
 
 test('D3.1 STRUCTURAL_CLASSES is exempt from the theme.css rule only when BOTH twins carry the class', () => {
@@ -870,4 +910,33 @@ test('D3.1 the default twin check reports zero rows over every component', () =>
   assert.deepStrictEqual(result.checks, []);
   assert.deepStrictEqual(Object.entries(result.results).filter(([, v]) => v.hasViolations).map(([k]) => k), []);
   assert.strictEqual(result.totalViolations, 0);
+});
+
+test('D3.1 fix: handler casing is enforced per side (Svelte all lower-case, React camelCase) while the twins still compare case-insensitively', () => {
+  assert.deepStrictEqual(mod.handlerCasingViolations('svelte', ['onclose', 'onsort', 'title']), []);
+  assert.deepStrictEqual(mod.handlerCasingViolations('react', ['onClose', 'onSort', 'title']), []);
+  assert.deepStrictEqual(mod.handlerCasingViolations('svelte', ['onClose', 'onchange']), ['onClose']);
+  assert.deepStrictEqual(mod.handlerCasingViolations('react', ['onclose', 'onChange']), ['onclose']);
+  const ok = runTwinFixture('interface Props {\n  onclose?: () => void;\n}', 'export interface AlertProps {\n  onClose?: () => void;\n}');
+  assert.strictEqual(ok.hasViolations, false, 'compliant twins pass');
+  const camelSvelte = runTwinFixture('interface Props {\n  onClose?: () => void;\n}', 'export interface AlertProps {\n  onClose?: () => void;\n}');
+  assert.deepStrictEqual(camelSvelte.handlerCasing, { svelte: ['onClose'], react: [] }, 'camelCase Svelte handler fails');
+  assert.strictEqual(camelSvelte.hasViolations, true);
+  const lowerReact = runTwinFixture('interface Props {\n  onclose?: () => void;\n}', 'export interface AlertProps {\n  onclose?: () => void;\n}');
+  assert.deepStrictEqual(lowerReact.handlerCasing, { svelte: [], react: ['onclose'] }, 'lower-case React handler fails');
+  assert.strictEqual(lowerReact.hasViolations, true);
+  // Lane modes enforce their own side only.
+  assert.deepStrictEqual(runTwinFixture('interface Props {\n  onClose?: () => void;\n}', 'export interface AlertProps {\n  onClose?: () => void;\n}', { side: 'svelte' }).handlerCasing, ['onClose']);
+  assert.deepStrictEqual(runTwinFixture('interface Props {\n  onClose?: () => void;\n}', 'export interface AlertProps {\n  onClose?: () => void;\n}', { side: 'react' }).handlerCasing, []);
+  assert.deepStrictEqual([...mod.HANDLER_CASING_EXCEPTIONS], [], 'no exceptions are needed by the 60 components');
+});
+
+test('D3.1 fix: a Svelte twin without a `class` prop fails when the React twin takes className', () => {
+  const react = 'export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {\n  title?: string;\n}';
+  const missing = runTwinFixture('interface Props {\n  title?: string;\n}', react);
+  assert.deepStrictEqual(missing.propsOnlyInReact, ['className']);
+  assert.strictEqual(missing.hasViolations, true);
+  const present = runTwinFixture('interface Props {\n  title?: string;\n  class?: string;\n}', react);
+  assert.deepStrictEqual([present.propsOnlyInSvelte, present.propsOnlyInReact], [[], []]);
+  assert.strictEqual(present.hasViolations, false);
 });

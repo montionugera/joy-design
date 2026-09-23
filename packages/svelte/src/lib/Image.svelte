@@ -84,6 +84,6 @@
 	<ImagePreview
 		open={openPreview}
 		src={previewSrc}
-		onClose={() => (openPreview = false)}
+		onclose={() => (openPreview = false)}
 	/>
 {/if}

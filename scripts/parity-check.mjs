@@ -370,47 +370,64 @@ export function classes(src) {
   const cleaned = src
     .replace(/\$\{[^"'`}]*\}/g, '*')
     .replace(/\{[^"'`}]*\}/g, '*');
-  // `(?<![\w-])` skips CSS custom properties (`--joy-space-gap`); a match followed
-  // by `-`, `_` or a template hole (`*`) is only the prefix of a dynamic class
-  // (`joy-progress--status-${x}`) and is not a class name on its own.
-  const re = /(?<![\w-])joy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g;
+  // Two kinds of token are extracted besides plain classes so a ONE-twin difference still
+  // shows in the twin class diff, but neither needs a theme.css rule (see needsThemeRule):
+  //  - CSS custom properties, kept with their leading dashes: `--joy-space-gap`
+  //  - dynamic prefixes (a match followed by `-`, `_` or a template hole), kept with a trailing
+  //    `*`: `joy-progress--status-${x}` -> `joy-progress--status-*`
+  const re = /(?<![\w-])(?:--)?joy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g;
   const out = new Set();
   let m;
   while ((m = re.exec(cleaned)) !== null) {
     const next = cleaned[m.index + m[0].length];
-    if (next === '-' || next === '_' || next === '*') continue;
-    out.add(m[0]);
+    if (next === '-' || next === '_') out.add(`${m[0]}${next}*`);
+    else if (next === '*') out.add(`${m[0]}*`);
+    else out.add(m[0]);
   }
   return out;
 }
 
-export function svelteProps(src) {
+// Only real, fully spelled class names need a `.joy-*` rule in theme.css.
+export function needsThemeRule(token) {
+  return !token.startsWith('--') && !token.endsWith('*');
+}
+
+// Raw (un-normalised) names declared in `interface Props` / `export interface <X>Props`.
+export function svelteRawProps(src) {
   const startIdx = src.indexOf('interface Props');
   const block = startIdx !== -1 ? extractBraceBlock(src, startIdx) : '';
-  const names = new Set();
-  const re = /^\s*([A-Za-z]+)\??\s*:/gm;
-  let m;
-  while ((m = re.exec(block)) !== null) {
-    const raw = m[1];
-    names.add(normaliseProp(raw));
-  }
-  return names;
+  return [...block.matchAll(/^\s*([A-Za-z]+)\??\s*:/gm)].map((m) => m[1]);
+}
+
+export function reactRawProps(componentName, src) {
+  const declRegex = new RegExp(`export\\s+interface\\s+${componentName}Props\\b`);
+  const match = src.match(declRegex);
+  const block = match ? extractBraceBlock(src, match.index) : '';
+  return [...block.matchAll(/^\s*([A-Za-z]+)\??\s*:/gm)].map((m) => m[1]);
+}
+
+export function svelteProps(src) {
+  return new Set(svelteRawProps(src).map(normaliseProp));
 }
 
 export function reactPropsExplicit(componentName, src) {
-  const declRegex = new RegExp(`export\\s+interface\\s+${componentName}Props\\b`);
-  const match = src.match(declRegex);
-  const startIdx = match ? match.index : -1;
-  const block = startIdx !== -1 ? extractBraceBlock(src, startIdx) : '';
-  const names = new Set();
-  const re = /^\s*([A-Za-z]+)\??\s*:/gm;
-  let m;
-  while ((m = re.exec(block)) !== null) {
-    const raw = m[1];
-    names.add(normaliseProp(raw));
-  }
-  return names;
+  return new Set(reactRawProps(componentName, src).map(normaliseProp));
 }
+
+// Handler casing convention (per side). The twins compare handlers case-insensitively, but each
+// side keeps its own spelling: Svelte handler props are all lower-case (`onclose`), React handler
+// props are camelCase (`onClose`). Returns the declared handler props that break the convention.
+export function handlerCasingViolations(side, rawNames) {
+  return rawNames
+    .filter((n) => /^on[a-z]/i.test(n))
+    .filter((n) => (side === 'svelte' ? n !== n.toLowerCase() : !/^on[A-Z]/.test(n)))
+    .filter((n) => !HANDLER_CASING_EXCEPTIONS.has(n))
+    .sort();
+}
+
+// Narrow, documented exceptions to the handler casing convention: prop names that look like a
+// handler by pattern but are not event handlers. Keep this empty unless a real case needs it.
+export const HANDLER_CASING_EXCEPTIONS = new Set([]);
 
 export function reactProps(componentName, src) {
   const names = new Set(reactPropsExplicit(componentName, src));
@@ -505,29 +522,36 @@ export function runParityCheck(options = {}) {
     const sProps = svelteProps(svelteSrc);
     const rProps = reactProps(comp, reactSrc);
     const rPropsExplicit = reactPropsExplicit(comp, reactSrc);
+    const sHandlerCasing = handlerCasingViolations('svelte', svelteRawProps(svelteSrc));
+    const rHandlerCasing = handlerCasingViolations('react', reactRawProps(comp, reactSrc));
 
     const contractProps = (CONTRACT[comp] || []).map(normaliseProp);
     // A structural hook is exempt from the theme.css rule only while both twins carry it.
-    const isUndefined = (c, other) => !defined.has(c) && !(STRUCTURAL_CLASSES.has(c) && other.has(c));
+    const isUndefined = (c, other) =>
+      needsThemeRule(c) && !defined.has(c) && !(STRUCTURAL_CLASSES.has(c) && other.has(c));
 
     if (side === 'svelte') {
       const undefinedClasses = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
       const missingContractProps = contractProps.filter((p) => !sProps.has(p)).sort();
-      const violationsCount = undefinedClasses.length + missingContractProps.length;
+      const handlerCasing = sHandlerCasing;
+      const violationsCount = undefinedClasses.length + missingContractProps.length + handlerCasing.length;
       totalViolations += violationsCount;
       results[comp] = {
         undefinedClasses,
         missingContractProps,
+        handlerCasing,
         hasViolations: violationsCount > 0
       };
     } else if (side === 'react') {
       const undefinedClasses = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
       const missingContractProps = contractProps.filter((p) => !rProps.has(p)).sort();
-      const violationsCount = undefinedClasses.length + missingContractProps.length;
+      const handlerCasing = rHandlerCasing;
+      const violationsCount = undefinedClasses.length + missingContractProps.length + handlerCasing.length;
       totalViolations += violationsCount;
       results[comp] = {
         undefinedClasses,
         missingContractProps,
+        handlerCasing,
         hasViolations: violationsCount > 0
       };
     } else {
@@ -540,7 +564,8 @@ export function runParityCheck(options = {}) {
       const propsOnlySvelte = [...sProps].filter((p) => !rProps.has(p)).sort();
       const propsOnlyReact = [...rProps]
         .filter((p) => !sProps.has(p))
-        .filter((p) => !HTML_INHERITED_NORMALISED.has(p) || rPropsExplicit.has(p))
+        // `className` is never exempt: a React twin that takes it needs a Svelte `class` prop.
+        .filter((p) => !HTML_INHERITED_NORMALISED.has(p) || rPropsExplicit.has(p) || p === 'className')
         .sort();
 
       const violationsCount =
@@ -551,7 +576,9 @@ export function runParityCheck(options = {}) {
         classesOnlySvelte.length +
         classesOnlyReact.length +
         propsOnlySvelte.length +
-        propsOnlyReact.length;
+        propsOnlyReact.length +
+        sHandlerCasing.length +
+        rHandlerCasing.length;
 
       totalViolations += violationsCount;
 
@@ -562,6 +589,7 @@ export function runParityCheck(options = {}) {
         classesOnlyInReact: classesOnlyReact,
         propsOnlyInSvelte: propsOnlySvelte,
         propsOnlyInReact: propsOnlyReact,
+        handlerCasing: { svelte: sHandlerCasing, react: rHandlerCasing },
         hasViolations: violationsCount > 0
       };
     }
@@ -592,28 +620,30 @@ export function formatMarkdownTable(checkResult) {
   if (side === 'svelte' || side === 'react') {
     rows.push(`### Parity Check (${side})`);
     rows.push('');
-    rows.push('| Component | Classes without theme.css rule | CONTRACT props not implemented |');
-    rows.push('| :--- | :--- | :--- |');
+    rows.push('| Component | Classes without theme.css rule | CONTRACT props not implemented | Handler casing |');
+    rows.push('| :--- | :--- | :--- | :--- |');
     for (const [comp, data] of Object.entries(results)) {
       if (!data.hasViolations) continue;
       const undef = data.undefinedClasses.length > 0 ? data.undefinedClasses.join(', ') : '-';
       const missing = data.missingContractProps.length > 0 ? data.missingContractProps.join(', ') : '-';
-      rows.push(`| ${comp} | ${undef} | ${missing} |`);
+      const casing = data.handlerCasing.length > 0 ? data.handlerCasing.join(', ') : '-';
+      rows.push(`| ${comp} | ${undef} | ${missing} | ${casing} |`);
     }
   } else {
     rows.push('### Parity Check (Twin Mode: Svelte vs React)');
     rows.push('');
     rows.push(
-      '| Component | Undefined Classes (S / R) | Missing CONTRACT Props (S / R) | Classes Diff (S only / R only) | Props Diff (S only / R only) |'
+      '| Component | Undefined Classes (S / R) | Missing CONTRACT Props (S / R) | Classes Diff (S only / R only) | Props Diff (S only / R only) | Handler Casing (S / R) |'
     );
-    rows.push('| :--- | :--- | :--- | :--- | :--- |');
+    rows.push('| :--- | :--- | :--- | :--- | :--- | :--- |');
     for (const [comp, data] of Object.entries(results)) {
       if (!data.hasViolations) continue;
       const undef = `S: [${data.undefinedClasses.svelte.join(', ') || '-'}]<br>R: [${data.undefinedClasses.react.join(', ') || '-'}]`;
       const missing = `S: [${data.missingContractProps.svelte.join(', ') || '-'}]<br>R: [${data.missingContractProps.react.join(', ') || '-'}]`;
       const diffClass = `S: [${data.classesOnlyInSvelte.join(', ') || '-'}]<br>R: [${data.classesOnlyInReact.join(', ') || '-'}]`;
       const diffProp = `S: [${data.propsOnlyInSvelte.join(', ') || '-'}]<br>R: [${data.propsOnlyInReact.join(', ') || '-'}]`;
-      rows.push(`| ${comp} | ${undef} | ${missing} | ${diffClass} | ${diffProp} |`);
+      const casing = `S: [${data.handlerCasing.svelte.join(', ') || '-'}]<br>R: [${data.handlerCasing.react.join(', ') || '-'}]`;
+      rows.push(`| ${comp} | ${undef} | ${missing} | ${diffClass} | ${diffProp} | ${casing} |`);
     }
   }
 

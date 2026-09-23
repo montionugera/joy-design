@@ -58,7 +58,8 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(
           ref={ref}
           className={cx(
             'joy-form',
-            layout === 'horizontal' && 'joy-form--horizontal',
+            // Same hook as the Svelte twin: joy-form--horizontal | --vertical | --inline (only horizontal is styled).
+            layout && `joy-form--${layout}`,
             !colon && 'joy-form--no-colon',
             labelAlign === 'left' && 'joy-form--label-left',
             className
