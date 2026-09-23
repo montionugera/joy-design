@@ -6,7 +6,8 @@ import {
   binarySearchNearest,
   snapToPhysicalPixel,
   RingBuffer,
-  readChartPalette
+  readChartPalette,
+  JoyChartCore
 } from '../src/chart-core.ts';
 
 // Minimal fake HTMLCanvasElement-like object: readChartPalette only needs
@@ -181,4 +182,60 @@ test('readChartPalette resolves colors from CSS variables in dark theme', () => 
   } finally {
     restore();
   }
+});
+
+// Regression: the bar-series branch used `color` before its `const` declaration
+// (TDZ ReferenceError on every bar render). Drives JoyChartCore.render() through
+// fake canvases/contexts so the bar path actually executes.
+function fakeChartCanvas() {
+  const fills = [];
+  const state = {};
+  const ctx = new Proxy(state, {
+    get(target, prop) {
+      if (prop === 'fillRect') return () => fills.push(target.fillStyle);
+      if (prop in target) return target[prop];
+      return () => ({ addColorStop() {} });
+    },
+    set(target, prop, value) {
+      target[prop] = value;
+      return true;
+    }
+  });
+  const canvas = {
+    getContext: () => ctx,
+    getBoundingClientRect: () => ({ width: 200, height: 100, left: 0, top: 0 }),
+    addEventListener() {},
+    removeEventListener() {}
+  };
+  return { canvas, fills };
+}
+
+function renderBarSeries(seriesColor) {
+  const restoreStyle = stubGetComputedStyle({ '--joy-accent-default': '#b8862c' });
+  const originalWindow = globalThis.window;
+  globalThis.window = { addEventListener() {}, removeEventListener() {}, devicePixelRatio: 1 };
+  try {
+    const base = fakeChartCanvas();
+    const overlay = fakeChartCanvas();
+    const chart = new JoyChartCore(base.canvas, overlay.canvas, { showGrid: false });
+    const series = { id: 'bars', type: 'bar', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }, { x: 3, y: 3 }] };
+    if (seriesColor) series.color = seriesColor;
+    chart.setSeries([series]);
+    return base.fills;
+  } finally {
+    globalThis.window = originalWindow;
+    restoreStyle();
+  }
+}
+
+test('bar series renders without throwing and defaults to the palette accent color', () => {
+  const fills = renderBarSeries();
+  assert.ok(fills.length >= 3, 'one fillRect per bar');
+  assert.ok(fills.every((f) => f === '#b8862c'), 'bars use palette.accent when series.color is unset');
+});
+
+test('bar series honors an explicit series color', () => {
+  const fills = renderBarSeries('#123456');
+  assert.ok(fills.length >= 3);
+  assert.ok(fills.every((f) => f === '#123456'));
 });

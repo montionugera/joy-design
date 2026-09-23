@@ -554,6 +554,8 @@ export class JoyChartCore {
 
       if (points.length === 0) return;
 
+      const color = series.color || palette.accent;
+
       if (series.type === 'bar') {
         const barWidth = Math.max(2, (this.width / Math.max(1, points.length)) * 0.7);
         ctx.fillStyle = color;
@@ -569,7 +571,6 @@ export class JoyChartCore {
         return;
       }
 
-      const color = series.color || palette.accent;
       ctx.strokeStyle = color;
       ctx.lineWidth = series.lineWidth || 2;
       ctx.lineJoin = 'round';
