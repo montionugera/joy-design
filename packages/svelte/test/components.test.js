@@ -600,3 +600,50 @@ test('F-038 B-L3 fix: Skeleton renders one progressbar root, merges consumer sty
   assert.ok(/style="[^"]*\{consumerStyle\}"/.test(src), 'consumer style is appended after the computed declarations');
   assert.ok(!/style=\{width/.test(src), 'no wholesale style replacement');
 });
+
+test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned styles, tokens only, icons from @joymify/icons, ref+rest+class', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  for (const n of ['Message', 'Notification', 'Toast', 'Progress', 'Spin']) {
+    const s = read(n);
+    assert.ok(!/<style[\s>]/.test(s), `${n} must not carry a scoped <style> (build.js owns the joy-* rules)`);
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|--joy-color-/.test(s), `${n} must contain no colour literals or legacy --joy-color-* fallbacks`);
+    // Progress legitimately forwards the consumer's strokeColor prop as an inline background-color.
+    const inline = s.replace("background-color: {strokeColor || ''}", '');
+    assert.ok(!/style="[^"]*(color|background|z-index)/.test(inline), `${n} must not carry inline colour styling`);
+    assert.ok(s.includes('bind:this={ref}') && s.includes('$bindable(null)'), `${n} must bind ref`);
+    assert.ok(s.includes('{...rest}') && s.includes('...rest'), `${n} must spread rest props`);
+    assert.ok(s.includes('class: className'), `${n} must accept class`);
+  }
+  for (const n of ['Message', 'Notification']) {
+    const s = read(n);
+    assert.ok(/import\s*\{[^}]*Info[^}]*\}\s*from\s*'@joymify\/icons'/.test(s), `${n} imports status icons from @joymify/icons`);
+    assert.ok(!/<svg/.test(s), `${n} must not inline raw svg markup`);
+    assert.ok(s.includes(`joy-${n.toLowerCase()}__icon--{type}`) && s.includes('aria-hidden="true"'), `${n} icon is decorative and tone-classed`);
+  }
+});
+
+test('F-038 B-L4: Toast and Notification close buttons are labelled icon buttons, Toast renders it only with onclose', () => {
+  const toast = fs.readFileSync(path.resolve('./src/lib/Toast.svelte'), 'utf8');
+  assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@joymify\/icons'/.test(toast), 'Toast imports Close');
+  assert.ok(!toast.includes('&times;'), 'Toast must not use a raw entity as an icon');
+  assert.ok(/<button type="button" class="joy-toast__close" aria-label="Dismiss notification" onclick=\{onclose\}>/.test(toast), 'Toast close is a labelled type=button');
+  assert.ok(toast.includes('{#if onclose}'), 'Toast close renders only when onclose is provided');
+  const note = fs.readFileSync(path.resolve('./src/lib/Notification.svelte'), 'utf8');
+  assert.ok(/<button type="button" class="joy-notification__close" aria-label="Dismiss notification" onclick=\{close\}>/.test(note), 'Notification close is a labelled type=button');
+  assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@joymify\/icons'/.test(note), 'Notification imports Close');
+  const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
+  for (const c of ['joy-toast__close', 'joy-notification__close']) {
+    assert.match(css, new RegExp(`\\.${c}::before\\s*\\{[^}]*width:\\s*44px[^}]*height:\\s*44px`, 's'), `${c} ships a 44px hit area`);
+  }
+});
+
+test('F-038 B-L4: Progress exposes role=progressbar with aria-valuenow/min/max on the track (once) and Spin marks its tip and indicator', () => {
+  const p = fs.readFileSync(path.resolve('./src/lib/Progress.svelte'), 'utf8');
+  assert.strictEqual((p.match(/role="progressbar"/g) || []).length, 1, 'exactly one progressbar role');
+  assert.ok(/class="joy-progress__inner"\s+role="progressbar"\s+aria-valuenow=\{valueNow\}\s+aria-valuemin="0"\s+aria-valuemax="100"/.test(p), 'role and aria values live on the track element');
+  assert.ok(p.includes('Math.min(100, Math.max(0, percent))'), 'aria-valuenow is clamped to 0..100');
+  const s = fs.readFileSync(path.resolve('./src/lib/Spin.svelte'), 'utf8');
+  assert.ok(s.includes('class="joy-spin__tip"'), 'Spin tip uses the tokenized joy-spin__tip class');
+  assert.ok(s.includes('aria-hidden="true"'), 'Spin indicator svg is decorative');
+  assert.strictEqual((s.match(/role="status"/g) || []).length, 2, 'one status role per branch, never nested');
+});

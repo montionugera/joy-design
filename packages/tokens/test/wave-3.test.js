@@ -161,3 +161,78 @@ test('F-038 B-L3: Skeleton reduced-motion block comes after the shimmer rule and
   assert.match(css, /\.joy-result--warning \.joy-result__icon \{[^}]*color:\s*var\(--joy-status-warning-fg\)/s);
   assert.doesNotMatch(css, /\.joy-(alert|empty-state|result|skeleton)[^{]*\{[^}]*#[0-9a-fA-F]{3,8}\b/, 'no hex literal in these rule blocks');
 });
+
+test('F-038 B-L4: Message/Notification/Toast use the tokenized toast z-index, no numeric literals', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  assert.match(css, /--joy-z-toast:\s*1100;/, 'toast token resolves to 1100');
+  const rules = [...css.matchAll(/(^|\n)(\.joy-(?:message|notification|toast)[^{,]*)\s*\{([^}]*)\}/g)];
+  assert.ok(rules.length >= 10, 'expected the message/notification/toast rule blocks');
+  for (const [, , sel, body] of rules) {
+    assert.doesNotMatch(body, /z-index:\s*-?\d/, `${sel.trim()} must not use a numeric z-index literal`);
+  }
+  for (const sel of ['.joy-message', '.joy-notification', '.joy-toast-container']) {
+    const body = css.match(new RegExp(`\\n${sel.replace('.', '\\.')} \\{([^}]*)\\}`))[1];
+    assert.match(body, /z-index:\s*var\(--joy-z-toast\)/, `${sel} uses --joy-z-toast`);
+  }
+});
+
+test('F-038 B-L4: Toast has no side stripe, uses status triads, a 44px close, and a reduced-motion override after the base rule', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const rule = (sel) => {
+    const m = css.match(new RegExp(`(^|\\n)${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`));
+    assert.ok(m, `theme.css must contain a ${sel} rule`);
+    return m[2];
+  };
+  assert.doesNotMatch(rule('.joy-toast'), /border-left/);
+  for (const v of ['info', 'success', 'warning', 'danger']) {
+    const body = rule(`.joy-toast--${v}`);
+    assert.doesNotMatch(body, /border-left/, `${v}: no side stripe`);
+    assert.match(body, new RegExp(`background:\\s*var\\(--joy-status-${v}-bg\\)`));
+    assert.match(body, new RegExp(`border:\\s*1px solid var\\(--joy-status-${v}-border\\)`));
+    assert.match(body, new RegExp(`color:\\s*var\\(--joy-status-${v}-fg\\)`));
+  }
+  const base = css.indexOf('\n.joy-toast {');
+  const reduced = css.search(/@media \(prefers-reduced-motion: reduce\) \{\s*\.joy-toast \{\s*animation: none;/);
+  assert.ok(base !== -1 && reduced > base, 'toast reduced-motion override follows the base animation rule');
+});
+
+test('F-038 B-L4: Notification fits 375px screens and Message/Notification icons use status-fg tokens', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  assert.match(css, /\.joy-notification \{[^}]*max-width:\s*calc\(100vw - var\(--joy-space-8\)\)/s, 'base notification is capped to the viewport');
+  const mq = css.match(/@media \(max-width: 480px\) \{\s*\.joy-notification \{([^}]*)\}\s*\.joy-notification__notice \{([^}]*)\}/);
+  assert.ok(mq, 'a max-width:480px block re-flows the notification');
+  assert.match(mq[1], /left:\s*var\(--joy-space-4\)/);
+  assert.match(mq[1], /right:\s*var\(--joy-space-4\)/);
+  assert.match(mq[2], /min-width:\s*0/);
+  assert.match(mq[2], /max-width:\s*calc\(100vw - var\(--joy-space-8\)\)/);
+  for (const c of ['message', 'notification']) {
+    for (const [t, tok] of [['info', 'info'], ['success', 'success'], ['warning', 'warning'], ['error', 'danger']]) {
+      assert.match(css, new RegExp(`\\.joy-${c}__icon--${t} \\{ color: var\\(--joy-status-${tok}-fg\\); \\}`), `${c} ${t} icon uses status-${tok}-fg`);
+    }
+  }
+});
+
+test('F-038 B-L4: Progress uses tokens and explicit transition properties; Spin tip, reduced-motion (slow, not stop) and mask are tokenized', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const rule = (sel) => css.match(new RegExp(`\\n${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`))[1];
+  const bg = rule('.joy-progress__bg');
+  assert.doesNotMatch(bg, /transition:\s*all/, 'no transition: all');
+  assert.match(bg, /transition:\s*width /);
+  assert.match(bg, /background-color:\s*var\(--joy-accent-default\)/);
+  assert.match(rule('.joy-progress__inner'), /background-color:\s*var\(--joy-surface-sunken\)/);
+  assert.match(rule('.joy-progress--status-success .joy-progress__bg'), /var\(--joy-status-success-fg\)/);
+  assert.match(rule('.joy-progress--status-exception .joy-progress__bg'), /var\(--joy-status-danger-fg\)/);
+  assert.match(rule('.joy-spin__tip'), /color:\s*var\(--joy-accent-text\)/);
+  const mask = rule('.joy-spin__mask');
+  assert.doesNotMatch(mask, /backdrop-filter/, 'no glassmorphism blur on the spin mask');
+  assert.match(mask, /background-color:\s*color-mix\(in srgb, var\(--joy-surface-overlay\) 70%, transparent\)/);
+  // The global reduced-motion block forces 0.01ms / 1 iteration with !important, which would stop the
+  // spinner. The Spin override must therefore be !important, more specific, and after the base rule.
+  const base = css.indexOf('\n.joy-spin__indicator {');
+  const reduced = css.search(/@media \(prefers-reduced-motion: reduce\) \{\s*\.joy-spin \.joy-spin__indicator \{/);
+  assert.ok(base !== -1 && reduced > base, 'spin reduced-motion block follows the base rule');
+  const block = css.slice(reduced, reduced + 260);
+  assert.match(block, /animation-duration:\s*4s !important/);
+  assert.match(block, /animation-iteration-count:\s*infinite !important/);
+  assert.doesNotMatch(css.slice(css.indexOf('\n.joy-spin {'), css.indexOf('\n.joy-spin__container')), /#[0-9a-fA-F]{3,8}\b|brand-primary/);
+});

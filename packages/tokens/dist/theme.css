@@ -1692,7 +1692,7 @@ select.joy-select__input {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 1200;
+  z-index: var(--joy-z-toast);
   pointer-events: none;
 }
 .joy-toast {
@@ -1713,16 +1713,67 @@ select.joy-select__input {
   font-size: 0.875rem;
 }
 .joy-toast--info {
+  background: var(--joy-status-info-bg);
   border: 1px solid var(--joy-status-info-border);
+  color: var(--joy-status-info-fg);
 }
 .joy-toast--success {
+  background: var(--joy-status-success-bg);
   border: 1px solid var(--joy-status-success-border);
+  color: var(--joy-status-success-fg);
 }
 .joy-toast--warning {
+  background: var(--joy-status-warning-bg);
   border: 1px solid var(--joy-status-warning-border);
+  color: var(--joy-status-warning-fg);
 }
 .joy-toast--danger {
+  background: var(--joy-status-danger-bg);
   border: 1px solid var(--joy-status-danger-border);
+  color: var(--joy-status-danger-fg);
+}
+.joy-toast__body {
+  flex: 1;
+  min-width: 0;
+}
+.joy-toast__close {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -2px -6px -2px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+  border-radius: var(--joy-radius-control);
+}
+.joy-toast__close:hover {
+  opacity: 1;
+}
+/* Transparent 44px hit area centred on the 24px visual control, growing outward. */
+.joy-toast__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.joy-toast__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-toast {
+    animation: none;
+  }
 }
 
 /* ── WCAG 2.2 AA Focus Indicators ── */
@@ -1981,7 +2032,7 @@ h1, h2, h3, .joy-display {
 }
 .joy-progress__bg {
   border-radius: 100px;
-  transition: all 0.3s cubic-bezier(0.08, 0.82, 0.17, 1);
+  transition: width var(--joy-duration-slow) var(--joy-ease-out), background-color var(--joy-duration-normal) var(--joy-ease-out);
   background-color: var(--joy-accent-default);
   position: relative;
 }
@@ -3680,7 +3731,7 @@ h1, h2, h3, .joy-display {
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1010;
+  z-index: var(--joy-z-toast);
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -3704,20 +3755,32 @@ h1, h2, h3, .joy-display {
   from { opacity: 0; transform: translateY(-16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.joy-message__icon {
+  display: inline-flex;
+  flex: none;
+  font-size: 1rem;
+}
+.joy-message__icon--info { color: var(--joy-status-info-fg); }
+.joy-message__icon--success { color: var(--joy-status-success-fg); }
+.joy-message__icon--warning { color: var(--joy-status-warning-fg); }
+.joy-message__icon--error { color: var(--joy-status-danger-fg); }
 
 /* ── Notification ── */
 .joy-notification {
   position: fixed;
   top: 24px;
   right: 24px;
-  z-index: 1010;
+  z-index: var(--joy-z-toast);
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: calc(100vw - var(--joy-space-8));
 }
 .joy-notification__notice {
   position: relative;
+  box-sizing: border-box;
   width: 340px;
+  max-width: 100%;
   padding: 16px 20px;
   background-color: var(--joy-surface-card);
   border-radius: var(--joy-radius-card);
@@ -3734,6 +3797,71 @@ h1, h2, h3, .joy-display {
   font-size: 0.8125rem;
   color: var(--joy-text-muted);
   line-height: 1.5;
+}
+.joy-notification__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--joy-space-3);
+}
+.joy-notification__main {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+.joy-notification__icon {
+  display: inline-flex;
+  flex: none;
+  margin-top: 2px;
+  font-size: 1.125rem;
+}
+.joy-notification__icon--info { color: var(--joy-status-info-fg); }
+.joy-notification__icon--success { color: var(--joy-status-success-fg); }
+.joy-notification__icon--warning { color: var(--joy-status-warning-fg); }
+.joy-notification__icon--error { color: var(--joy-status-danger-fg); }
+.joy-notification__close {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--joy-text-muted);
+  cursor: pointer;
+  border-radius: var(--joy-radius-control);
+}
+.joy-notification__close:hover {
+  color: var(--joy-text-primary);
+}
+/* Transparent 44px hit area centred on the 24px visual control, growing outward. */
+.joy-notification__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.joy-notification__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
+@media (max-width: 480px) {
+  .joy-notification {
+    left: var(--joy-space-4);
+    right: var(--joy-space-4);
+    max-width: none;
+  }
+  .joy-notification__notice {
+    width: auto;
+    min-width: 0;
+    max-width: calc(100vw - var(--joy-space-8));
+  }
 }
 
 /* ── Popconfirm ── */
@@ -3772,8 +3900,10 @@ h1, h2, h3, .joy-display {
 /* ── Spin ── */
 .joy-spin {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--joy-space-2);
   color: var(--joy-accent-default);
 }
 .joy-spin__indicator {
@@ -3783,14 +3913,26 @@ h1, h2, h3, .joy-display {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+/* Slow, never stop: the spinner is the only loading affordance. The global reduced-motion
+   block forces duration 0.01ms / 1 iteration with !important, so this needs !important and
+   a higher-specificity selector to win. */
+@media (prefers-reduced-motion: reduce) {
+  .joy-spin .joy-spin__indicator {
+    animation-duration: 4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+.joy-spin__tip {
+  font-size: 0.8125rem;
+  color: var(--joy-accent-text);
+}
 .joy-spin__container {
   position: relative;
 }
 .joy-spin__mask {
   position: absolute;
   inset: 0;
-  background-color: color-mix(in srgb, var(--joy-surface-canvas) 65%, transparent);
-  
+  background-color: color-mix(in srgb, var(--joy-surface-overlay) 70%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
