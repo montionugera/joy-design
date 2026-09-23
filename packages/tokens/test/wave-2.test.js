@@ -220,6 +220,14 @@ test('Wave 2 parity-check script exists and defines the Wave 2 components', asyn
   const mod = await import(pathToFileURL(scriptPath).href);
   assert.ok(Array.isArray(mod.COMPONENTS), 'COMPONENTS must be exported as an array');
   assert.ok(mod.COMPONENTS.length >= 21, 'COMPONENTS must contain at least the 21 Wave 2 names');
+  const wave2 = [
+    'Button', 'Input', 'InputNumber', 'Select', 'Checkbox', 'Switch', 'RadioGroup', 'Slider', 'Rate', 'Segmented',
+    'Form', 'FormItem', 'DatePicker', 'TimePicker', 'DateRangePicker', 'Mentions', 'Upload', 'TreeSelect',
+    'Cascader', 'Transfer', 'MarkdownEditor'
+  ];
+  for (const name of wave2) {
+    assert.ok(mod.COMPONENTS.includes(name), `COMPONENTS must still include Wave 2 component ${name}`);
+  }
 });
 
 test('Taste review design fixes: focus ring, disabled & danger tokens, deeper gradient, sheet & touch gating', () => {

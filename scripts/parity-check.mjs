@@ -68,7 +68,9 @@ export const COMPONENTS = [
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a
-// JSX element. Notification and Popconfirm already do, so they are excluded.
+// JSX element. Notification and Popconfirm are excluded because they already
+// use React.forwardRef (they do not spread rest props, but that is out of scope
+// for this list).
 export const REF_FORWARDING = [
   'Alert',
   'AvatarGroup',
@@ -393,6 +395,22 @@ export function getDefinedClasses(themeCss) {
   return new Set(matches.map((s) => s.slice(1)));
 }
 
+// Drops block comments and line comments. A `//` directly after `:` (as in a
+// URL) is kept so string literals like 'https://x' are not truncated.
+export function stripComments(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:\\'"`])\/\/.*$/gm, '$1');
+}
+
+// React.forwardRef(...) or a bare named-import forwardRef(...) / forwardRef<...>(...).
+export function hasForwardRef(src) {
+  return /\bforwardRef\s*[<(]/.test(stripComments(src));
+}
+
+// A JSX spread of the props/rest binding, e.g. {...rest}, {...props}, {...restProps}.
+export function hasRestSpread(src) {
+  return /\{\s*\.\.\.(?:props|\w*[Rr]est\w*)\s*\}/.test(stripComments(src));
+}
+
 export function checkRefForwarding(rootDir = process.cwd()) {
   const failures = [];
   for (const component of REF_FORWARDING) {
@@ -403,8 +421,8 @@ export function checkRefForwarding(rootDir = process.cwd()) {
     }
     const src = fs.readFileSync(file, 'utf8');
     const missing = [];
-    if (!/\bforwardRef\s*[<(]/.test(src)) missing.push('forwardRef');
-    if (!/<[A-Za-z][\w.]*\b[^<>]*\{\s*\.\.\.(?:rest|props)\b/.test(src)) missing.push('restSpread');
+    if (!hasForwardRef(src)) missing.push('forwardRef');
+    if (!hasRestSpread(src)) missing.push('restSpread');
     if (missing.length > 0) failures.push({ component, missing });
   }
   return failures;
@@ -509,6 +527,8 @@ export function runParityCheck(options = {}) {
 
   if (side !== 'svelte') {
     for (const { component, missing } of checkRefForwarding(rootDir)) {
+      // A missing React file is already reported once by the file-exists check above.
+      if (missing.includes('file')) continue;
       checks.push({ component, check: `ref forwarding (${missing.join(', ')})`, status: 'FAIL' });
       totalViolations += 1;
     }
