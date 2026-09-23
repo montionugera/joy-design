@@ -694,7 +694,7 @@ test('F-038 B-L5: Tabs is a WAI-ARIA tablist with roving tabindex, automatic act
   assert.ok(t.includes('role="tablist"') && t.includes('role="tab"') && t.includes('role="tabpanel"'));
   assert.ok(t.includes('aria-selected={activeKey === item.key}'), 'aria-selected tracks the active key');
   assert.ok(t.includes('tabindex={index === tabbable ? 0 : -1}'), 'exactly one tab is tabbable');
-  assert.ok(t.includes("rovingNextIndex(e.key, index, items.map(() => false), 'horizontal')"), 'Left/Right/Home/End');
+  assert.ok(t.includes("rovingNextIndex(e.key, index, noneDisabled, 'horizontal')"), 'Left/Right/Home/End');
   assert.ok(/e\.preventDefault\(\);\s*selectTab\(items\[next\]\.key\);/.test(t), 'arrows activate as well as move focus');
   assert.ok(t.includes('aria-controls={activeKey === item.key ?') && t.includes('aria-labelledby='), 'panel wiring only points at ids that exist');
   assert.ok(t.includes('$props.id()'), 'ids are SSR-stable');

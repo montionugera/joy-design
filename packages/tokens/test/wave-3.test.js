@@ -323,6 +323,18 @@ test('F-038 B-L5: Menu hover/active use tint + accent-text fills, never a stripe
   assert.match(rule('.joy-anchor__ink-ball'), /border:\s*2px solid var\(--joy-accent-active\)/);
 });
 
+test('F-038 B-L5: the Pagination page-size select is sized by a token class, not an inline px style, in both twins', () => {
+  const size = rule('.joy-pagination .joy-pagination__size');
+  assert.match(size, /padding:[^;]*var\(--joy-space-/, 'padding comes from spacing tokens');
+  assert.match(size, /margin-left:\s*var\(--joy-space-2\)/);
+  assert.doesNotMatch(size, /:\s*\d+px\b/, 'no bare px sizes in the rule');
+  for (const file of ['../../react/src/Pagination.tsx', '../../svelte/src/lib/Pagination.svelte']) {
+    const src = fs.readFileSync(path.resolve(__dirname, file), 'utf8');
+    assert.match(src, /joy-select joy-pagination__size/, `${file} uses the size class`);
+    assert.doesNotMatch(src, /style\s*=\s*[{"'][^>]*\d+px/, `${file} has no inline px style`);
+  }
+});
+
 test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both themes (text 4.5:1, indicators 3:1)', () => {
   const grab = (re) => {
     const v = {};

@@ -97,8 +97,7 @@
 
   {#if showSizeChanger}
     <select
-      class="joy-select"
-      style="width: auto; padding: 4px 28px 4px 8px; font-size: 0.8125rem; margin-left: 8px;"
+      class="joy-select joy-pagination__size"
       value={pageSize}
       onchange={handlePageSizeChange}
       aria-label="Items per page"

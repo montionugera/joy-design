@@ -1194,6 +1194,12 @@ select.joy-select:disabled,
   color: var(--joy-text-muted);
   font-size: 0.8125rem;
 }
+.joy-pagination .joy-pagination__size {
+  width: auto;
+  margin-left: var(--joy-space-2);
+  padding: var(--joy-space-1) calc(var(--joy-space-10) - var(--joy-space-3)) var(--joy-space-1) var(--joy-space-2);
+  font-size: 0.8125rem;
+}
 @media (pointer: coarse) {
   .joy-pagination__btn {
     min-width: 44px;

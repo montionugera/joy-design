@@ -97,8 +97,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 
         {showSizeChanger && (
           <select
-            className="joy-select"
-            style={{ width: 'auto', padding: '4px 28px 4px 8px', fontSize: '0.8125rem', marginLeft: '8px' }}
+            className="joy-select joy-pagination__size"
             value={pageSize}
             onChange={handlePageSizeChange}
             aria-label="Items per page"

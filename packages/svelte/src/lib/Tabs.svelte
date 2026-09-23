@@ -30,7 +30,8 @@
 
   let activeIndex = $derived(items.findIndex((item) => item.key === activeKey));
   // Tabs are never disabled; the helper still owns "which tab is in the tab order" so both twins agree.
-  let tabbable = $derived(rovingTabbableIndex(items.map(() => false), [activeIndex]));
+  let noneDisabled = $derived(items.map(() => false));
+  let tabbable = $derived(rovingTabbableIndex(noneDisabled, [activeIndex]));
 
   function selectTab(key: string) {
     activeKey = key;
@@ -39,7 +40,7 @@
 
   // WAI-ARIA tablist with automatic activation: arrows/Home/End move focus AND select.
   function handleKeydown(e: KeyboardEvent, index: number) {
-    const next = rovingNextIndex(e.key, index, items.map(() => false), 'horizontal');
+    const next = rovingNextIndex(e.key, index, noneDisabled, 'horizontal');
     if (next < 0) return;
     e.preventDefault();
     selectTab(items[next].key);
