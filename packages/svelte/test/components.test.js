@@ -523,3 +523,23 @@ test('F-038 B-L2: MetricTile/StatCard/Statistic/Image/Flex/Space use tokens, ico
     assert.ok(src.includes('var(--joy-status-success-fg)') && src.includes('var(--joy-status-danger-fg)'), `${name} must use status delta tokens`);
   }
 });
+
+test('F-038 B-L2 fix: deltaDirection follows the sign, never the tone', async () => {
+  const { deltaDirection } = await import('../src/lib/delta-utils.ts');
+  assert.strictEqual(deltaDirection('-5%'), 'down');
+  assert.strictEqual(deltaDirection('−5%'), 'down');
+  assert.strictEqual(deltaDirection('  -0.4 pts'), 'down');
+  assert.strictEqual(deltaDirection('+2.1% error rate'), 'up');
+  assert.strictEqual(deltaDirection('12%'), 'flat');
+  assert.strictEqual(deltaDirection('Stable'), 'flat');
+  assert.strictEqual(deltaDirection(''), 'flat');
+  assert.strictEqual(deltaDirection(undefined), 'flat');
+  const src = fs.readFileSync(path.resolve('./src/lib/StatCard.svelte'), 'utf8');
+  assert.ok(src.includes('trend ?? deltaDirection(delta)'), 'StatCard direction = explicit trend, else derived from the delta text');
+  assert.ok(src.includes("direction === 'up'") && src.includes("direction === 'down'"), 'StatCard icon and sr text must key off direction');
+  assert.ok(!src.includes("deltaTone === 'positive'") && !src.includes("deltaTone === 'critical'"), 'tone must not drive the arrow');
+  for (const n of ['StatCard', 'MetricTile']) {
+    const s = fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+    assert.ok(!/__sr\s*\{/.test(s) && !s.includes('inline-flex'), `${n} must not duplicate the build.js-owned sr/row styles`);
+  }
+});

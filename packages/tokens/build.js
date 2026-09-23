@@ -661,9 +661,23 @@ select.joy-select:disabled,
   color: var(--joy-text-primary);
 }
 .joy-metric-tile__change {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--joy-space-1);
   font-size: 0.8125rem;
   font-weight: 600;
   margin-top: 4px;
+}
+.joy-metric-tile__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 .joy-metric-tile--up .joy-metric-tile__change {
   color: var(--joy-status-success-fg);
@@ -1605,9 +1619,23 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-primary);
 }
 .joy-stat-card__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--joy-space-1);
   font-size: 0.8125rem;
   margin-top: 6px;
   font-weight: 500;
+}
+.joy-stat-card__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 .joy-stat-card__delta--positive {
   color: var(--joy-status-success-fg);

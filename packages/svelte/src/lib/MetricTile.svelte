@@ -59,22 +59,8 @@
     font-family: var(--joy-font-family-mono);
   }
   .joy-metric-tile__change {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--joy-space-1);
     font-size: var(--joy-font-size-xs);
     font-weight: 600;
-  }
-  .joy-metric-tile__sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
   }
   .joy-metric-tile--up .joy-metric-tile__change {
     color: var(--joy-status-success-fg);

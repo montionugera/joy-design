@@ -108,3 +108,21 @@ test('F-038 B-L1: Tag close hit area is >=44px tall and never extends left over 
   assert.doesNotMatch(rule[1], /translate\(\s*-50%\s*,/, 'hit area must not be centred horizontally');
   assert.match(css, /\.joy-tag__close\s*\{[^}]*width:\s*24px[^}]*height:\s*24px/s, 'visual close control must be 24px');
 });
+
+test('F-038 B-L2: theme.css ships the visually-hidden trend label and delta row alignment for both twins', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+  const rule = (sel) => {
+    const m = css.match(new RegExp(`(^|\\n)${sel.replace(/[.]/g, '\\.')} \\{([^}]*)\\}`));
+    assert.ok(m, `theme.css must contain a ${sel} rule`);
+    return m[2];
+  };
+  for (const sel of ['.joy-metric-tile__sr', '.joy-stat-card__sr']) {
+    const body = rule(sel);
+    assert.match(body, /position:\s*absolute/, `${sel} must be absolutely positioned`);
+    assert.match(body, /width:\s*1px/, `${sel} must be 1px wide`);
+    assert.match(body, /clip:\s*rect\(0 0 0 0\)/, `${sel} must be clipped`);
+    assert.doesNotMatch(body, /#|rgb|hsl/, `${sel} must carry no colour`);
+  }
+  assert.match(rule('.joy-metric-tile__change'), /display:\s*inline-flex/);
+  assert.match(rule('.joy-stat-card__delta'), /display:\s*inline-flex/);
+});

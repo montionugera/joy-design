@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { TrendingUp, TrendingDown } from '@joymify/icons';
+	import { deltaDirection } from './delta-utils.js';
 
 	type Tone = 'positive' | 'critical' | 'info' | 'neutral';
 
@@ -8,6 +9,8 @@
 		value: string;
 		delta?: string;
 		deltaTone?: Tone;
+		/** Arrow direction. Derived from the delta's leading sign when omitted; tone only sets colour. */
+		trend?: 'up' | 'down' | 'flat';
 		class?: string;
 		ref?: HTMLDivElement | null;
 		[key: string]: any;
@@ -18,10 +21,13 @@
 		value,
 		delta,
 		deltaTone = 'positive',
+		trend,
 		class: className = '',
 		ref = $bindable(null),
 		...rest
 	}: Props = $props();
+
+	let direction = $derived(trend ?? deltaDirection(delta));
 </script>
 
 <div bind:this={ref} class="joy-stat-card {className}" {...rest}>
@@ -29,9 +35,9 @@
 	<div class="joy-stat-card__value">{value}</div>
 	{#if delta}
 		<div class="joy-stat-card__delta joy-stat-card__delta--{deltaTone}">
-			{#if deltaTone === 'positive'}
+			{#if direction === 'up'}
 				<TrendingUp size="1em" /><span class="joy-stat-card__sr">Increase: </span>
-			{:else if deltaTone === 'critical'}
+			{:else if direction === 'down'}
 				<TrendingDown size="1em" /><span class="joy-stat-card__sr">Decrease: </span>
 			{/if}
 			<span>{delta}</span>
@@ -65,24 +71,9 @@
 	}
 
 	.joy-stat-card__delta {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--joy-space-1);
 		font-size: 0.8125rem;
 		margin-top: 6px;
 		font-weight: 500;
-	}
-
-	.joy-stat-card__sr {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		margin: -1px;
-		padding: 0;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
 	}
 
 	.joy-stat-card__delta--positive {
