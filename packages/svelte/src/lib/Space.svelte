@@ -9,6 +9,8 @@
 		children?: Snippet;
 		class?: string;
 		style?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
@@ -18,7 +20,9 @@
 		wrap = false,
 		children,
 		class: className = '',
-		style: customStyle = ''
+		style: customStyle = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	const sizeMap: Record<string, number> = {
@@ -29,11 +33,11 @@
 
 	let gapPx = $derived(typeof size === 'number' ? size : sizeMap[size] || 8);
 	let computedStyle = $derived(
-		`gap: ${gapPx}px; ${wrap ? 'flex-wrap: wrap;' : ''} ${align ? `align-items: ${align};` : ''} ${customStyle}`
+		`--joy-space-gap: ${gapPx}px; gap: var(--joy-space-gap); ${wrap ? 'flex-wrap: wrap;' : ''} ${align ? `align-items: ${align};` : ''} ${customStyle}`
 	);
 </script>
 
-<div class="joy-space joy-space--{direction} {className}" style={computedStyle}>
+<div bind:this={ref} class="joy-space joy-space--{direction} {className}" style={computedStyle} {...rest}>
 	{#if children}
 		{@render children()}
 	{/if}

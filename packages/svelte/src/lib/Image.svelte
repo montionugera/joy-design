@@ -8,6 +8,7 @@
 		fallback?: string;
 		class?: string;
 		style?: string;
+		ref?: HTMLDivElement | null;
 		[key: string]: any;
 	}
 
@@ -18,6 +19,7 @@
 		fallback,
 		class: className = '',
 		style = '',
+		ref = $bindable(null),
 		...rest
 	}: Props = $props();
 
@@ -41,8 +43,9 @@
 </script>
 
 <div
+	bind:this={ref}
 	class="joy-image-wrapper {className}"
-	style="position: relative; display: inline-block; overflow: hidden; border-radius: 6px; cursor: {preview ? 'pointer' : 'default'}; {style}"
+	style="cursor: {preview ? 'pointer' : 'default'}; {style}"
 	onmouseenter={() => (isHovered = true)}
 	onmouseleave={() => (isHovered = false)}
 	onclick={() => {
@@ -61,14 +64,12 @@
 		src={currentSrc}
 		{alt}
 		onerror={handleError}
-		style="display: block; width: 100%; height: 100%; object-fit: cover;"
+		class="joy-image__img"
 		{...rest}
 	/>
 
 	{#if preview && isHovered}
-		<div
-			style="position: absolute; inset: 0; background-color: rgba(20, 37, 62, 0.65); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--cream-100, #f8f3e8); font-size: 13px; font-family: sans-serif; transition: opacity 0.2s ease;"
-		>
+		<div class="joy-image__overlay">
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
 				<circle cx="12" cy="12" r="3" />
@@ -85,3 +86,31 @@
 		onClose={() => (openPreview = false)}
 	/>
 {/if}
+
+<style>
+	.joy-image-wrapper {
+		position: relative;
+		display: inline-block;
+		overflow: hidden;
+		border-radius: var(--joy-radius-control);
+	}
+	.joy-image__img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.joy-image__overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--joy-space-2);
+		background-color: color-mix(in srgb, var(--joy-surface-inverse) 65%, transparent);
+		color: var(--joy-text-inverse);
+		font-size: 0.8125rem;
+		font-family: var(--joy-font-family-sans);
+		transition: opacity var(--joy-duration-fast) var(--joy-ease-out);
+	}
+</style>

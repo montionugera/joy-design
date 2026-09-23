@@ -1,56 +1,88 @@
 <script lang="ts">
+  import { TrendingUp, TrendingDown } from '@joymify/icons';
+
   interface Props {
     title: string;
     value: string | number;
     change?: string;
     trend?: 'up' | 'down' | 'neutral';
+    class?: string;
+    ref?: HTMLDivElement | null;
+    [key: string]: any;
   }
 
-  let { title, value, change, trend = 'neutral' }: Props = $props();
+  let {
+    title,
+    value,
+    change,
+    trend = 'neutral',
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
+  }: Props = $props();
 </script>
 
-<div class="joy-metric-tile joy-metric-tile--{trend}">
+<div bind:this={ref} class="joy-metric-tile joy-metric-tile--{trend} {className}" {...rest}>
   <div class="joy-metric-tile__title">{title}</div>
   <div class="joy-metric-tile__value">{value}</div>
   {#if change}
     <div class="joy-metric-tile__change">
-      {#if trend === 'up'}▲{:else if trend === 'down'}▼{/if} {change}
+      {#if trend === 'up'}
+        <TrendingUp size="1em" /><span class="joy-metric-tile__sr">Increase: </span>
+      {:else if trend === 'down'}
+        <TrendingDown size="1em" /><span class="joy-metric-tile__sr">Decrease: </span>
+      {/if}
+      <span>{change}</span>
     </div>
   {/if}
 </div>
 
 <style>
   .joy-metric-tile {
-    padding: var(--joy-spacing-4, 16px);
-    background: var(--joy-color-surface-subtle, #f8fafc);
-    border: 1px solid var(--joy-color-surface-muted, #f1f5f9);
-    border-radius: var(--joy-radius-md, 8px);
+    padding: var(--joy-space-4);
+    background: var(--joy-surface-card);
+    border: 1px solid var(--joy-border-default);
+    border-radius: var(--joy-radius-card);
     display: flex;
     flex-direction: column;
-    gap: var(--joy-spacing-1, 4px);
-    font-family: var(--joy-font-family-sans, sans-serif);
+    gap: var(--joy-space-1);
+    font-family: var(--joy-font-family-sans);
   }
   .joy-metric-tile__title {
-    font-size: 0.875rem;
-    color: var(--joy-color-text-muted, #64748b);
+    font-size: var(--joy-font-size-sm);
+    color: var(--joy-text-muted);
   }
   .joy-metric-tile__value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--joy-color-text-primary, #0f172a);
-    font-family: var(--joy-font-family-mono, monospace);
+    color: var(--joy-text-primary);
+    font-family: var(--joy-font-family-mono);
   }
   .joy-metric-tile__change {
-    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--joy-space-1);
+    font-size: var(--joy-font-size-xs);
     font-weight: 600;
   }
+  .joy-metric-tile__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .joy-metric-tile--up .joy-metric-tile__change {
-    color: var(--joy-color-status-success, #10b981);
+    color: var(--joy-status-success-fg);
   }
   .joy-metric-tile--down .joy-metric-tile__change {
-    color: var(--joy-color-status-danger, #ef4444);
+    color: var(--joy-status-danger-fg);
   }
   .joy-metric-tile--neutral .joy-metric-tile__change {
-    color: var(--joy-color-text-muted, #64748b);
+    color: var(--joy-text-muted);
   }
 </style>

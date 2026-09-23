@@ -502,3 +502,24 @@ test('F-038 B-L1: Avatar/AvatarGroup/Badge/Tag/Divider use brand tokens, overflo
   assert.ok(read('Avatar').includes('onerror'), 'Avatar must fall back when the image fails to load');
   assert.ok(!read('Tag').includes('style="border: none'), 'Tag close button styling must live in CSS, not inline');
 });
+
+test('F-038 B-L2: MetricTile/StatCard/Statistic/Image/Flex/Space use tokens, icon trends, no tracked caps', () => {
+  const read = (n) => fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
+  const banned = ['#ffffff', '#f8fafc', '#64748b', '#cbd5e1', '#10b981', '#ef4444', '#3b82f6', '#1e293b', '#334155', 'rgba('];
+  for (const name of ['Flex', 'Space', 'Image', 'MetricTile', 'StatCard', 'Statistic']) {
+    const src = read(name);
+    for (const lit of banned) {
+      assert.ok(!src.includes(lit), `${name}.svelte must not contain the raw literal '${lit}'`);
+    }
+    assert.ok(src.includes('bind:this={ref}') && src.includes('{...rest}'), `${name} must bind ref and spread rest props`);
+  }
+  for (const name of ['MetricTile', 'StatCard']) {
+    const src = read(name);
+    assert.ok(!/text-transform:\s*uppercase/.test(src), `${name} must not use uppercase labels`);
+    assert.ok(!/letter-spacing/.test(src), `${name} must not track its labels`);
+    assert.ok(!src.includes('▲') && !src.includes('▼'), `${name} must not use unicode trend glyphs`);
+    assert.ok(src.includes('TrendingUp') && src.includes('TrendingDown'), `${name} must use TrendingUp/TrendingDown icons`);
+    assert.ok(src.includes('var(--joy-surface-card)') && src.includes('var(--joy-border-default)'), `${name} must use card surface + default border tokens`);
+    assert.ok(src.includes('var(--joy-status-success-fg)') && src.includes('var(--joy-status-danger-fg)'), `${name} must use status delta tokens`);
+  }
+});

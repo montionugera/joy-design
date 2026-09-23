@@ -651,7 +651,6 @@ select.joy-select:disabled,
 }
 .joy-metric-tile__title {
   font-size: 0.8125rem;
-  
   color: var(--joy-text-muted);
   margin-bottom: 6px;
 }
@@ -1584,8 +1583,8 @@ h1, h2, h3, .joy-display {
 
 /* Stat Card */
 .joy-stat-card {
-  background: var(--joy-surface-canvas);
-  border: 1px solid var(--joy-border-subtle);
+  background: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
   padding: 20px;
   font-family: inherit;
@@ -1594,7 +1593,6 @@ h1, h2, h3, .joy-display {
 .joy-stat-card__label {
   font-size: 0.75rem;
   font-weight: 600;
-  
   color: var(--joy-text-muted);
 }
 .joy-stat-card__value {
