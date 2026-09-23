@@ -16,26 +16,21 @@ export interface AvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(
   ({ max, items, children, className = '', ...rest }, ref) => {
-    const limit = max === undefined ? undefined : Math.max(0, Math.floor(max));
+    const limit = max === undefined ? Infinity : Math.max(0, Math.floor(max));
 
-    // `items` wins over `children` (same as the Svelte twin); otherwise slice children.
-    const source: Array<AvatarGroupItem | React.ReactNode> = items ?? React.Children.toArray(children);
-    const visible = limit === undefined ? source : source.slice(0, limit);
-    const overflow = limit === undefined ? 0 : Math.max(0, source.length - limit);
+    // `items` wins over `children` (same as the Svelte twin); otherwise use children.
+    const avatars = items?.map((item, i) => <Avatar key={i} {...item} />) ?? React.Children.toArray(children);
+    const visible = avatars.slice(0, limit);
+    const overflow = Math.max(0, avatars.length - limit);
 
-    const first = source[0];
-    const firstSize = items
-      ? items[0]?.size
-      : React.isValidElement<{ size?: AvatarGroupItem['size'] }>(first)
-        ? first.props.size
-        : undefined;
-    const overflowSize = firstSize ?? 'md';
+    // The overflow avatar matches the size of the first avatar.
+    const first = avatars[0];
+    const overflowSize =
+      (React.isValidElement<{ size?: AvatarGroupItem['size'] }>(first) ? first.props.size : undefined) ?? 'md';
 
     return (
       <div ref={ref} className={cx('joy-avatar-group', className)} {...rest}>
-        {items
-          ? (visible as AvatarGroupItem[]).map((item, i) => <Avatar key={i} {...item} />)
-          : visible}
+        {visible}
         {overflow > 0 && (
           <div
             className={`joy-avatar joy-avatar--circle joy-avatar--${overflowSize} joy-avatar-group__overflow`}
