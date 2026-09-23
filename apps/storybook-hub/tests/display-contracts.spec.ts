@@ -1,4 +1,12 @@
 import { test, expect, type Page } from "@playwright/test";
+import {
+  drawerContainer,
+  installPageTools,
+  modalContainer,
+  openModal,
+  openPopconfirmInModal,
+  settle,
+} from "./helpers";
 
 /**
  * F-038 (Wave 3) contracts for the two aspect views of the hub:
@@ -15,15 +23,11 @@ const themes = ["light", "dark"] as const;
 const views = ["data-display-feedback", "navigation-workflow"] as const;
 const TOUCH_MIN = 43.5; // 44px minus the 0.5px sub-pixel rounding tolerance
 
-/** Banned purple family (legacy violet/purple values), as "r, g, b". */
-const BANNED_PURPLE = [
-  "124, 58, 237",
-  "237, 233, 254",
-  "245, 243, 255",
-  "250, 245, 255",
-  "168, 85, 247",
-  "192, 132, 252",
-];
+/**
+ * Elements exempt from the purple scan. Empty on purpose: nothing in the two views or the
+ * overlays may use a violet/purple hue. Add a selector here only with a comment saying why.
+ */
+const PURPLE_ALLOW: string[] = [];
 
 async function open(
   page: Page,
@@ -40,60 +44,11 @@ async function open(
   }, theme);
   await expect(page.locator(`#view-${hash}`)).toHaveClass(/active/);
   await settle(page);
-  await installColorTools(page);
+  await installPageTools(page);
 }
 
 /**
- * Waits for every finite running animation/transition under `rootSelector` (whole
- * document when omitted) to finish. Needed because switching data-theme starts colour
- * transitions whose first computed value is still the OLD theme's colour, and the
- * modal/drawer have a 250ms enter animation (a Popconfirm opened mid-animation is
- * positioned off its final rect). Infinite animations (spinner, skeleton shimmer) are ignored.
- */
-async function settle(page: Page, rootSelector?: string) {
-  await page.waitForFunction((selector) => {
-    const root: Element | Document | null = selector
-      ? document.querySelector(selector)
-      : document;
-    if (!root) return false;
-    const animations =
-      root instanceof Document
-        ? document.getAnimations()
-        : (root as Element).getAnimations({ subtree: true });
-    return animations
-      .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
-      .every((a) => a.playState !== "running" && a.playState !== "pending");
-  }, rootSelector ?? null);
-}
-
-/**
- * Installs window.__rgba(cssColor) -> [r,g,b,a] (0-255, alpha 0-1). A 1x1 canvas resolves
- * ANY CSS colour syntax Chromium returns from getComputedStyle (rgb(), color(srgb ...),
- * oklab(), ...), so the checks below never depend on a regex over one serialisation.
- */
-async function installColorTools(page: Page) {
-  await page.evaluate(() => {
-    const ctx = document.createElement("canvas").getContext("2d", {
-      willReadFrequently: true,
-    })!;
-    const cache = new Map<string, number[]>();
-    (window as any).__rgba = (css: string): number[] => {
-      const hit = cache.get(css);
-      if (hit) return hit;
-      ctx.clearRect(0, 0, 1, 1);
-      ctx.fillStyle = "#000";
-      ctx.fillStyle = css;
-      ctx.fillRect(0, 0, 1, 1);
-      const d = ctx.getImageData(0, 0, 1, 1).data;
-      const value = [d[0], d[1], d[2], Math.round((d[3] / 255) * 100) / 100];
-      cache.set(css, value);
-      return value;
-    };
-  });
-}
-
-/**
- * Elements inside `rootSelector` whose right edge is past the viewport. The hub sets
+ * Elements inside `rootSelector` whose right (or left) edge is past the viewport. The hub sets
  * overflow-x: hidden on html/body, so document.scrollWidth can never fail; instead every
  * element is measured. An overflowing element is excused only if an ancestor UNDER the
  * view root is a real scroll region (overflow-x auto or scroll): the scrolling Table
@@ -110,7 +65,7 @@ async function realOverflow(page: Page, rootSelector: string) {
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) continue;
       scanned++;
-      if (rect.right <= window.innerWidth + 1) continue;
+      if (rect.right <= window.innerWidth + 1 && rect.left >= -1) continue;
       let ancestor = el.parentElement;
       let clipped = false;
       while (ancestor && ancestor !== root) {
@@ -123,7 +78,7 @@ async function realOverflow(page: Page, rootSelector: string) {
       }
       if (!clipped) {
         offenders.push(
-          `${el.tagName.toLowerCase()}.${String((el as HTMLElement).className?.baseVal ?? (el as HTMLElement).className).slice(0, 60)} right=${Math.round(rect.right)}`,
+          `${window.__describe(el)} left=${Math.round(rect.left)} right=${Math.round(rect.right)}`,
         );
       }
     }
@@ -143,28 +98,11 @@ async function realOverflow(page: Page, rootSelector: string) {
       if (el.clientWidth <= 1) continue;
       if (el.matches(intentionalScrollers)) continue;
       scrolling.push(
-        `${el.tagName.toLowerCase()}.${String((el as HTMLElement).className).slice(0, 60)} scrollWidth=${el.scrollWidth} clientWidth=${el.clientWidth}`,
+        `${window.__describe(el)} scrollWidth=${el.scrollWidth} clientWidth=${el.clientWidth}`,
       );
     }
     return { offenders, scrolling, scanned, viewport: window.innerWidth };
   }, rootSelector);
-}
-
-const modalContainer = "#demo-modal-container";
-const drawerContainer = "#demo-drawer-container";
-
-async function openModal(page: Page) {
-  await page.locator('[data-open="modal"]').click();
-  await expect(page.locator(`${modalContainer} .joy-modal`)).toBeVisible();
-  await settle(page, modalContainer);
-}
-
-async function openPopconfirmInModal(page: Page) {
-  await page
-    .locator(`${modalContainer} .joy-popconfirm__trigger button`)
-    .click();
-  await expect(page.locator("#hub-popconfirm-modal")).toBeVisible();
-  await settle(page, modalContainer);
 }
 
 test.describe("F-038 display, feedback, navigation and overlay contracts", () => {
@@ -364,58 +302,63 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
       expect(short, "controls under 44px").toEqual([]);
 
       // Close buttons keep a 24px visual box and get their 44px from a transparent
-      // ::before hit area. Two checks: (1) the pseudo-element's computed size, (2) a real
-      // hit test 20px above and below the button centre must land on the button (so no
-      // sibling or clipping ancestor steals the extended area).
-      // Tag close: the area is 44px tall but only 34px wide by design (it grows toward
-      // the right edge, never over the label), so width is checked against 34.
+      // ::before hit area. Two checks: (1) the pseudo-element's computed size, (2) real hit
+      // tests inside that area (vertical +-20px, and 2px inside its left/right edges) must
+      // land on the button, so no sibling or clipping ancestor steals the extended area.
+      //
+      // DELIBERATE DEVIATION (ruled on in the F-038 D2b fix round): the tag close hit area
+      // is 44px tall but only 34px wide, growing toward the right edge and never left over
+      // the label. The spec asks for a 44px hit; widening the tag's area to 44 would make
+      // adjacent tags' hit areas overlap (tag lists have an 8px gap), so the width is
+      // asserted against 34 (>= 24px is the WCAG 2.5.8 floor). Recorded in
+      // research/screens/README.md under "Known deviations".
       const closeSpecs = [
-        {
-          view: "data-display-feedback",
-          selector: ".joy-tag__close",
-          minW: 33.5,
-        },
-        {
-          view: "data-display-feedback",
-          selector: ".joy-alert__close",
-          minW: TOUCH_MIN,
-        },
-        {
-          view: "data-display-feedback",
-          selector: ".joy-toast__close",
-          minW: TOUCH_MIN,
-        },
-      ];
+        { selector: ".joy-tag__close", minW: 33.5, anchor: "left" },
+        { selector: ".joy-alert__close", minW: TOUCH_MIN, anchor: "centre" },
+        { selector: ".joy-toast__close", minW: TOUCH_MIN, anchor: "centre" },
+      ] as const;
+      const closeView = "data-display-feedback";
       for (const spec of closeSpecs) {
-        await open(page, spec.view, theme);
-        const buttons = page.locator(`#view-${spec.view} ${spec.selector}`);
+        await open(page, closeView, theme);
+        const buttons = page.locator(`#view-${closeView} ${spec.selector}`);
         const count = await buttons.count();
         expect(count, `${spec.selector} present`).toBeGreaterThan(0);
         for (let i = 0; i < count; i++) {
           const button = buttons.nth(i);
           await button.scrollIntoViewIfNeeded();
           await button.evaluate((el) => el.scrollIntoView({ block: "center" }));
-          const measured = await button.evaluate((el) => {
+          const measured = await button.evaluate((el, anchor) => {
             const pseudo = getComputedStyle(el, "::before");
             const rect = el.getBoundingClientRect();
             const cx = rect.left + rect.width / 2;
             const cy = rect.top + rect.height / 2;
+            const w = parseFloat(pseudo.width);
             const owns = (x: number, y: number) => {
               const hit = document.elementFromPoint(x, y);
               return !!hit && (hit === el || el.contains(hit));
             };
+            // Horizontal extent of the hit area: centred on the button, or growing
+            // right from the button's left edge (tag).
+            const [x0, x1] =
+              anchor === "left"
+                ? [rect.left, rect.left + w]
+                : [cx - w / 2, cx + w / 2];
             return {
-              w: parseFloat(pseudo.width),
+              w,
               h: parseFloat(pseudo.height),
               above: owns(cx, cy - 20),
               below: owns(cx, cy + 20),
+              leftEdge: owns(x0 + 2, cy),
+              rightEdge: owns(x1 - 2, cy),
             };
-          });
+          }, spec.anchor);
           const label = `${spec.selector}[${i}] ${JSON.stringify(measured)}`;
           expect(measured.h, label).toBeGreaterThanOrEqual(TOUCH_MIN);
           expect(measured.w, label).toBeGreaterThanOrEqual(spec.minW);
           expect(measured.above, `${label} hit above`).toBe(true);
           expect(measured.below, `${label} hit below`).toBe(true);
+          expect(measured.leftEdge, `${label} hit left edge`).toBe(true);
+          expect(measured.rightEdge, `${label} hit right edge`).toBe(true);
         }
       }
     });
@@ -465,8 +408,8 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
       page,
     }) => {
       await open(page, "data-display-feedback", theme);
-      const { checked, uneven } = await page.evaluate(() => {
-        const uneven: string[] = [];
+      const { checked, stripes } = await page.evaluate(() => {
+        const stripes: string[] = [];
         let checked = 0;
         for (const el of document.querySelectorAll(
           "#view-data-display-feedback .joy-alert, #view-data-display-feedback .joy-toast",
@@ -475,22 +418,58 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
           if (rect.width === 0) continue;
           checked++;
           const cs = getComputedStyle(el);
+          const label = window.__describe(el);
+
+          // 1. Border stripe: a left border thicker than the top one (any asymmetry, e.g.
+          // a thick right or bottom edge, is flagged too).
           const widths = [
             cs.borderTopWidth,
             cs.borderRightWidth,
             cs.borderBottomWidth,
             cs.borderLeftWidth,
           ].map(parseFloat);
-          // A side stripe is a left border thicker than the top border (also flag any
-          // asymmetry, e.g. a thick right or bottom edge).
           if (widths.some((w) => w !== widths[0])) {
-            uneven.push(`${el.className} widths=${widths.join("/")}`);
+            stripes.push(`${label} border widths=${widths.join("/")}`);
+          }
+
+          // 2. Inset box-shadow stripe: `inset Xpx 0 0 0` (or a pure-Y inset) thicker
+          // than 1px. Computed value looks like "rgba(...) 4px 0px 0px 0px inset".
+          const parts = cs.boxShadow.split(/,(?![^(]*\))/);
+          for (const part of parts) {
+            if (!/\binset\b/.test(part)) continue;
+            const lengths = part
+              .replace(
+                /(?:rgba?|hsla?|color|oklab|oklch)\([^)]*\)|#[0-9a-f]{3,8}\b/gi,
+                "",
+              )
+              .match(/-?\d*\.?\d+px/g);
+            if (!lengths) continue;
+            const [x, y] = lengths.map(parseFloat);
+            if ((Math.abs(x) > 1 && y === 0) || (Math.abs(y) > 1 && x === 0)) {
+              stripes.push(`${label} inset shadow stripe: ${part.trim()}`);
+            }
+          }
+
+          // 3. Pseudo-element stripe: an absolutely positioned, filled ::before/::after
+          // that is a thin bar (< 8px wide, at least 12px tall).
+          for (const pseudo of ["::before", "::after"]) {
+            const p = getComputedStyle(el, pseudo);
+            if (p.content === "none" || p.content === "normal") continue;
+            const filled = window.__rgba(p.backgroundColor)[3] > 0;
+            if (
+              p.position === "absolute" &&
+              filled &&
+              parseFloat(p.width) < 8 &&
+              parseFloat(p.height) >= 12
+            ) {
+              stripes.push(`${label} ${pseudo} bar ${p.width}x${p.height}`);
+            }
           }
         }
-        return { checked, uneven };
+        return { checked, stripes };
       });
       expect(checked, "alerts and toasts measured").toBeGreaterThanOrEqual(8);
-      expect(uneven).toEqual([]);
+      expect(stripes).toEqual([]);
     });
 
     test(`chart HUD values are legible (>= 4.5:1) in ${theme}`, async ({
@@ -498,7 +477,7 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
     }) => {
       await open(page, "data-display-feedback", theme);
       const values = await page.evaluate(() => {
-        const rgba = (window as any).__rgba as (c: string) => number[];
+        const rgba = window.__rgba;
         const over = (top: number[], under: number[]) => {
           const a = top[3];
           return [
@@ -509,7 +488,10 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
           ];
         };
         // Resolve the effective background: composite translucent layers from the
-        // element up to the first opaque one (falling back to the canvas default).
+        // element up to the first opaque one. The <canvas> pixels behind the HUD are NOT
+        // sampled, and the "Canvas" system-colour fallback is white in both themes; the
+        // test only means something because an opaque token surface exists on the
+        // ancestor chain (asserted implicitly: a wrong fallback would fail dark).
         const background = (el: Element) => {
           const layers: number[][] = [];
           for (let n: Element | null = el; n; n = n.parentElement) {
@@ -541,7 +523,7 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
           const [hi, lo] = [luminance(fg), luminance(bg)].sort((a, b) => b - a);
           return {
             text: (el.textContent ?? "").trim(),
-            cls: el.className,
+            cls: window.__describe(el),
             ratio: (hi + 0.05) / (lo + 0.05),
           };
         });
@@ -551,6 +533,26 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
       expect(low, "HUD values under 4.5:1").toEqual([]);
     });
   }
+
+  test("the always-open Tooltip demo hides while a dialog is open and returns after (commit 2acad52)", async ({
+    page,
+  }) => {
+    await open(page, "navigation-workflow", "light", 1280, 800);
+    const tooltip = page.locator(".joy-tooltip[data-static]");
+    const visibility = () =>
+      tooltip.evaluate((el) => getComputedStyle(el).visibility);
+    expect(await visibility()).toBe("visible");
+
+    await openModal(page);
+    expect(await visibility(), "hidden behind the modal layer").toBe("hidden");
+    await page.keyboard.press("Escape");
+    await expect(page.locator(`${modalContainer} .joy-modal`)).toBeHidden();
+    expect(await visibility(), "restored after close").toBe("visible");
+
+    await page.locator('[data-open="drawer"]').click();
+    await expect(page.locator(`${drawerContainer} .joy-drawer`)).toBeVisible();
+    expect(await visibility(), "hidden behind the drawer layer").toBe("hidden");
+  });
 
   test("Pagination shows only prev, current and next at 375px", async ({
     page,
@@ -594,10 +596,17 @@ test.describe("F-038 display, feedback, navigation and overlay contracts", () =>
 });
 
 /**
- * Scans every element under `rootSelector` for the banned purple family (colour, border,
- * outline, text-decoration, SVG fill/stroke, plus gradients and shadows by text match) and,
- * when `checkWhite`, for an opaque rgb(255, 255, 255) background (the "white flash" of a
- * hard-coded colour on a dark surface).
+ * Scans every element under `rootSelector` (and its ::before/::after) for the purple/violet
+ * family and, when `checkWhite`, for an opaque rgb(255, 255, 255) background (the "white
+ * flash" of a hard-coded colour on a dark surface).
+ *
+ * Purple is a HUE test, not a list of known values: the resolved colour (canvas-normalised,
+ * so rgb(), rgba(), color(srgb ...) all work) has a hue of 250-300 degrees, HSL saturation
+ * >= 0.25, chroma >= 8/255 (greys and near-whites carry no hue) and alpha >= 0.02. Alpha is
+ * NOT ignored: translucent purple glows and tints are exactly how the legacy hub used it.
+ * Checked properties: color, background, borders, outline, text-decoration, SVG fill/stroke,
+ * and every colour function/hex found inside box-shadow, background-image (gradients) and
+ * border-image.
  *
  * White allow-list: none. Every demo swatch in these views paints through tokens or SVG
  * data URIs (images are <img>, not backgrounds), so any opaque white background in dark is
@@ -609,15 +618,31 @@ async function scanColors(
   checkWhite: boolean,
 ) {
   return page.evaluate(
-    ({ selector, banned, checkWhite }) => {
-      const rgba = (window as any).__rgba as (c: string) => number[];
-      const bannedSet = new Set(banned);
+    ({ selector, allow, checkWhite }) => {
+      const rgba = window.__rgba;
       const root = document.querySelector(selector)!;
       const purple: string[] = [];
       const white: string[] = [];
       let scanned = 0;
-      const name = (el: Element) =>
-        `${el.tagName.toLowerCase()}.${String((el as any).className?.baseVal ?? (el as HTMLElement).className).slice(0, 60)}`;
+
+      const isPurple = ([r, g, b, a]: number[]) => {
+        if (a < 0.02) return false;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const chroma = max - min;
+        if (chroma < 8) return false;
+        let hue: number;
+        if (max === r) hue = ((g - b) / chroma) % 6;
+        else if (max === g) hue = (b - r) / chroma + 2;
+        else hue = (r - g) / chroma + 4;
+        hue = (hue * 60 + 360) % 360;
+        const lightness = (max + min) / 510;
+        const saturation =
+          lightness === 0 || lightness === 1
+            ? 0
+            : chroma / 255 / (1 - Math.abs(2 * lightness - 1));
+        return hue >= 250 && hue <= 300 && saturation >= 0.25;
+      };
       const colorProps = [
         "color",
         "backgroundColor",
@@ -629,35 +654,53 @@ async function scanColors(
         "textDecorationColor",
         "fill",
         "stroke",
-      ];
-      const textProps = ["backgroundImage", "boxShadow", "borderImageSource"];
-      const bannedText = banned.map((b) => `rgb(${b}`);
-      for (const el of [root, ...root.querySelectorAll("*")]) {
-        scanned++;
-        const cs = getComputedStyle(el) as any;
+      ] as const;
+      const stringProps = [
+        "backgroundImage",
+        "boxShadow",
+        "borderImageSource",
+      ] as const;
+      const colorTokens =
+        /(?:rgba?|hsla?|color|oklab|oklch|lab|lch|hwb)\([^)]*\)|#[0-9a-f]{3,8}\b/gi;
+
+      const scan = (cs: CSSStyleDeclaration, label: string) => {
         for (const prop of colorProps) {
-          const value: string = cs[prop];
+          const value = cs[prop];
           if (!value || value === "none") continue;
-          const [r, g, b] = rgba(value);
-          if (bannedSet.has(`${r}, ${g}, ${b}`)) {
-            purple.push(`${name(el)} ${prop}=${value}`);
+          if (isPurple(rgba(value))) purple.push(`${label} ${prop}=${value}`);
+        }
+        for (const prop of stringProps) {
+          const value = cs[prop];
+          if (!value || value === "none") continue;
+          for (const token of value.match(colorTokens) ?? []) {
+            if (isPurple(rgba(token))) {
+              purple.push(`${label} ${prop} has ${token}`);
+            }
           }
         }
-        for (const prop of textProps) {
-          const value: string = cs[prop];
-          if (value && bannedText.some((token) => value.includes(token))) {
-            purple.push(`${name(el)} ${prop}=${value.slice(0, 80)}`);
+      };
+
+      for (const el of [root, ...root.querySelectorAll("*")]) {
+        if (allow.length && el.closest(allow.join(","))) continue;
+        scanned++;
+        const label = window.__describe(el);
+        const cs = getComputedStyle(el);
+        scan(cs, label);
+        for (const pseudo of ["::before", "::after"]) {
+          const p = getComputedStyle(el, pseudo);
+          if (p.content !== "none" && p.content !== "normal") {
+            scan(p, `${label}${pseudo}`);
           }
         }
         if (checkWhite) {
           const [r, g, b, a] = rgba(cs.backgroundColor);
           if (r === 255 && g === 255 && b === 255 && a >= 0.99) {
-            white.push(name(el));
+            white.push(label);
           }
         }
       }
       return { scanned, purple, white };
     },
-    { selector: rootSelector, banned: BANNED_PURPLE, checkWhite },
+    { selector: rootSelector, allow: PURPLE_ALLOW, checkWhite },
   );
 }

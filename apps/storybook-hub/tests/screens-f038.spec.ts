@@ -2,6 +2,12 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  drawerContainer,
+  openModal,
+  openPopconfirmInModal,
+  settle,
+} from "./helpers";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const screenshotsDir = path.resolve(
@@ -43,9 +49,6 @@ const card = (name: string, hash: Shot["view"], selector: string): Shot => ({
     shootElement(page, page.locator(selector).first(), file),
 });
 
-const modalContainer = "#demo-modal-container";
-const drawerContainer = "#demo-drawer-container";
-
 const shots: Shot[] = [
   view("data-display-feedback", "data-display-feedback"),
   view("navigation-workflow", "navigation-workflow"),
@@ -65,11 +68,7 @@ const shots: Shot[] = [
     view: "navigation-workflow",
     take: async (page, file) => {
       await openModal(page);
-      await page
-        .locator(`${modalContainer} .joy-popconfirm__trigger button`)
-        .click();
-      await expect(page.locator("#hub-popconfirm-modal")).toBeVisible();
-      await settle(page, modalContainer);
+      await openPopconfirmInModal(page);
       await page.screenshot({ path: file, animations: "disabled" });
     },
   },
@@ -112,28 +111,6 @@ const shots: Shot[] = [
   },
   card("chart", "data-display-feedback", '[data-matrix-card="chart"]'),
 ];
-
-async function settle(page: Page, rootSelector?: string) {
-  await page.waitForFunction((selector) => {
-    const root: Element | Document | null = selector
-      ? document.querySelector(selector)
-      : document;
-    if (!root) return false;
-    const animations =
-      root instanceof Document
-        ? document.getAnimations()
-        : (root as Element).getAnimations({ subtree: true });
-    return animations
-      .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
-      .every((a) => a.playState !== "running" && a.playState !== "pending");
-  }, rootSelector ?? null);
-}
-
-async function openModal(page: Page) {
-  await page.locator('[data-open="modal"]').click();
-  await expect(page.locator(`${modalContainer} .joy-modal`)).toBeVisible();
-  await settle(page, modalContainer);
-}
 
 /**
  * The hub scrolls inside .main / .content-area, so Playwright's fullPage capture only sees
@@ -188,7 +165,7 @@ async function paint(page: Page) {
   await page.evaluate(
     () =>
       new Promise<void>((resolve) => {
-        (window as any).redrawHubCharts?.();
+        window.redrawHubCharts?.();
         requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
       }),
   );
