@@ -485,22 +485,28 @@ import { fileURLToPath } from 'node:url';
 
 const requireFromHere = createRequire(import.meta.url);
 
-/** Transpile a component .tsx to CJS on the fly and load it (relative ./X.js imports resolve to sibling .tsx). */
-function loadComponent(name, cache = new Map()) {
-  if (cache.has(name)) return cache.get(name);
+/** Transpile a source file (.tsx/.ts) to CJS on the fly and load it. Relative ./X.js imports resolve to sibling .tsx/.ts; `@joymify/icons/react` resolves to the icons package source. */
+function loadFile(file, cache) {
+  if (cache.has(file)) return cache.get(file);
   const ts = requireFromHere('typescript');
-  const file = fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url));
   const out = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
   }).outputText;
   const mod = { exports: {} };
   const localRequire = (id) => {
-    const m = id.match(/^\.\/(\w+)\.js$/);
-    return m ? loadComponent(m[1], cache) : requireFromHere(id);
+    if (id === '@joymify/icons/react') return loadFile(fileURLToPath(new URL('../../icons/src/react.ts', import.meta.url)), cache);
+    const m = id.match(/^\.\/([\w/-]+)\.js$/);
+    if (!m) return requireFromHere(id);
+    const base = path.join(path.dirname(file), m[1]);
+    return loadFile(fs.existsSync(`${base}.tsx`) ? `${base}.tsx` : `${base}.ts`, cache);
   };
   new Function('require', 'module', 'exports', out)(localRequire, mod, mod.exports);
-  cache.set(name, mod.exports);
+  cache.set(file, mod.exports);
   return mod.exports;
+}
+
+function loadComponent(name, cache = new Map()) {
+  return loadFile(fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url)), cache);
 }
 
 test('F-038 C-L1: display twins forward refs, spread rest props, and match Svelte markup', () => {
@@ -573,4 +579,65 @@ test('F-038 C-L1: AvatarGroup max collapses items and children into one +N overf
   const zero = renderToStaticMarkup(React.createElement(AvatarGroup, { items, max: 0 }));
   assert.ok(zero.includes('+5') && !zero.includes('joy-avatar__fallback'), zero);
   assert.strictEqual(count(renderToStaticMarkup(React.createElement(AvatarGroup, { items, max: 2.9 })), 'joy-avatar__fallback'), 2);
+});
+
+test('F-038 C-L2: metric twins render SVG trend icons + sr text, forward refs, and follow delta sign not tone', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const html = (el) => renderToStaticMarkup(el);
+  const { MetricTile } = loadComponent('MetricTile');
+  const { StatCard } = loadComponent('StatCard');
+  const { Statistic } = loadComponent('Statistic');
+  const { Flex } = loadComponent('Flex');
+  const { Space } = loadComponent('Space');
+  const { deltaDirection } = loadFile(fileURLToPath(new URL('../src/delta-utils.ts', import.meta.url)), new Map());
+
+  for (const C of [MetricTile, StatCard, Statistic, Flex, Space]) {
+    assert.strictEqual(C.$$typeof, Symbol.for('react.forward_ref'), `${C.displayName} must be a forwardRef component`);
+  }
+
+  // rest props + className land on the root
+  assert.match(html(React.createElement(MetricTile, { title: 'T', value: 1, 'data-x': '1', className: 'z' })), /^<div class="joy-metric-tile joy-metric-tile--neutral z"[^>]*data-x="1"/);
+  assert.match(html(React.createElement(StatCard, { label: 'L', value: '1', 'data-x': '1' })), /^<div class="joy-stat-card "[^>]*data-x="1"/);
+
+  // MetricTile: SVG icon + sr text, no unicode triangles, change wrapped in a span
+  const up = html(React.createElement(MetricTile, { title: 'T', value: 1, change: '+2%', trend: 'up' }));
+  assert.ok(up.includes('<svg') && up.includes('<span class="joy-metric-tile__sr">Increase: </span><span>+2%</span>'), up);
+  const down = html(React.createElement(MetricTile, { title: 'T', value: 1, change: '-2%', trend: 'down' }));
+  assert.ok(down.includes('Decrease: ') && down.includes('<svg'), down);
+  const flatTile = html(React.createElement(MetricTile, { title: 'T', value: 1, change: '0%' }));
+  assert.ok(!flatTile.includes('<svg') && !flatTile.includes('__sr') && flatTile.includes('<span>0%</span>'), flatTile);
+  assert.ok(!/[▲▼]/.test(up + down));
+  assert.ok(!html(React.createElement(MetricTile, { title: 'T', value: 1 })).includes('joy-metric-tile__change'));
+
+  // StatCard: direction from sign, never tone; trend prop overrides; flat has no icon
+  const neg = html(React.createElement(StatCard, { label: 'L', value: '1', delta: '-3%', deltaTone: 'positive' }));
+  assert.ok(neg.includes('joy-stat-card__delta--positive') && neg.includes('Decrease: ') && !neg.includes('Increase'), neg);
+  const pos = html(React.createElement(StatCard, { label: 'L', value: '1', delta: '+3%', deltaTone: 'critical' }));
+  assert.ok(pos.includes('joy-stat-card__delta--critical') && pos.includes('Increase: ') && pos.includes('<svg'), pos);
+  const bare = html(React.createElement(StatCard, { label: 'L', value: '1', delta: 'New', deltaTone: 'info' }));
+  assert.ok(!bare.includes('<svg') && !bare.includes('joy-stat-card__sr') && bare.includes('<span>New</span>'), bare);
+  const forced = html(React.createElement(StatCard, { label: 'L', value: '1', delta: 'New', trend: 'up' }));
+  assert.ok(forced.includes('Increase: '), forced);
+  const forcedFlat = html(React.createElement(StatCard, { label: 'L', value: '1', delta: '+3%', trend: 'flat' }));
+  assert.ok(!forcedFlat.includes('<svg'), forcedFlat);
+  assert.ok(!html(React.createElement(StatCard, { label: 'L', value: '1' })).includes('joy-stat-card__delta'));
+
+  // deltaDirection contract (same file as Svelte)
+  assert.strictEqual(deltaDirection('-1'), 'down');
+  assert.strictEqual(deltaDirection('\u22121'), 'down');
+  assert.strictEqual(deltaDirection(' +1'), 'up');
+  assert.strictEqual(deltaDirection('1'), 'flat');
+  assert.strictEqual(deltaDirection(undefined), 'flat');
+
+  // Space mirrors the Svelte --joy-space-gap approach; Statistic keeps markup
+  const space = html(React.createElement(Space, { size: 'large' }));
+  assert.ok(space.includes('--joy-space-gap:24px;gap:var(--joy-space-gap)'), space);
+  assert.ok(html(React.createElement(Statistic, { value: 3.14159, precision: 2, title: 'T' })).includes('joy-statistic__value">3.14<'));
+
+  // source: no colour/size literals or inline design styles in the lane files
+  for (const f of ['Flex', 'Space', 'MetricTile', 'StatCard', 'Statistic']) {
+    const src = fs.readFileSync(fileURLToPath(new URL(`../src/${f}.tsx`, import.meta.url)), 'utf8');
+    assert.ok(!/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/.test(src), `${f} has a colour literal`);
+  }
 });
