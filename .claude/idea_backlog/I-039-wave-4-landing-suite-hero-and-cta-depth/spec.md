@@ -26,9 +26,9 @@ The landing suite (HeroSection, CTASection, PricingCard, PricingMatrix, FeatureC
 
 Hub page chrome (Wave 5), form controls (Wave 2), token definitions (Wave 1).
 
-## Acceptance
+## Acceptance criteria
 
-- Playwright contract: landing view at 375px light and dark has zero horizontal overflow, hero primary and secondary buttons both pass 4.5:1 text contrast (computed from `getComputedStyle`), header shows a menu button under 768px that opens a drawer.
-- `bash scripts/lint-colors.sh --strict` passes for every landing `.svelte`/`.tsx` file.
-- Parity script (Wave 1 `scripts/parity-check.mjs` or added here) reports zero prop/class divergence for the 14 landing components.
-- Screenshots at 375px and 1280px, light and dark, of the hub landing view attached to the plan.
+- [ ] Playwright contract: landing view at 375px light and dark has zero horizontal overflow, hero primary and secondary buttons both pass 4.5:1 text contrast (computed from `getComputedStyle`), header shows a menu button under 768px that opens a drawer.
+- [ ] `bash scripts/lint-colors.sh --strict` passes for every landing `.svelte`/`.tsx` file.
+- [ ] Parity script (Wave 1 `scripts/parity-check.mjs` or added here) reports zero prop/class divergence for the 14 landing components.
+- [ ] Screenshots at 375px and 1280px, light and dark, of the hub landing view attached to the plan.

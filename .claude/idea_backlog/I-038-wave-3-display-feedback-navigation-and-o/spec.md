@@ -30,9 +30,9 @@ Chart HUDs and Breadcrumb render navy-on-navy (1.00:1) in dark; Alert/Badge/Empt
 
 Form controls (Wave 2), landing (Wave 4), hub chrome (Wave 5).
 
-## Acceptance
+## Acceptance criteria
 
-- `lint-colors.sh --strict` passes for all listed files; `parity-check.mjs` zero divergences for them.
-- `pnpm -r test` passes with new tests: overlay stacking order asserts `z-index` tokens; chart-core unit test asserts axis colors resolve from CSS variables in both themes; keyboard tests for Table sort, Tabs, Splitter.
-- Playwright contract: at 375px light and dark, "Data Display & Feedback" and "Navigation & Workflow" hub views have zero horizontal overflow; opening Modal then Popconfirm shows Popconfirm above; Drawer opens as a bottom sheet; every pagination/tab/menu control ≥ 44px.
-- Screenshots (375px and 1280px, light and dark) of Alert/Badge/Tag matrix, Modal, Drawer, Table and a chart attached to the plan.
+- [ ] `lint-colors.sh --strict` passes for all listed files; `parity-check.mjs` zero divergences for them.
+- [ ] `pnpm -r test` passes with new tests: overlay stacking order asserts `z-index` tokens; chart-core unit test asserts axis colors resolve from CSS variables in both themes; keyboard tests for Table sort, Tabs, Splitter.
+- [ ] Playwright contract: at 375px light and dark, "Data Display & Feedback" and "Navigation & Workflow" hub views have zero horizontal overflow; opening Modal then Popconfirm shows Popconfirm above; Drawer opens as a bottom sheet; every pagination/tab/menu control ≥ 44px.
+- [ ] Screenshots (375px and 1280px, light and dark) of Alert/Badge/Tag matrix, Modal, Drawer, Table and a chart attached to the plan.

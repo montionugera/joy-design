@@ -29,8 +29,8 @@ Files: `apps/storybook-hub/build.js` (generates HTML+CSS+JS), `apps/storybook-hu
 
 Component internals (Waves 2–4), docs (Wave 6).
 
-## Acceptance
+## Acceptance criteria
 
-- `lint-colors.sh --strict apps/storybook-hub/build.js` exits 0; `grep -c "style\*=" apps/storybook-hub/build.js` is 0.
-- `node apps/storybook-hub/build.js && playwright test` passes with the extended contracts; `scripts/precheck.sh` exits 0.
-- Screenshots attached: landing, primitives, forms, data display at 375px and 1280px, light and dark.
+- [ ] `lint-colors.sh --strict apps/storybook-hub/build.js` exits 0; `grep -c "style\*=" apps/storybook-hub/build.js` is 0.
+- [ ] `node apps/storybook-hub/build.js && playwright test` passes with the extended contracts; `scripts/precheck.sh` exits 0.
+- [ ] Screenshots attached: landing, primitives, forms, data display at 375px and 1280px, light and dark.

@@ -18,9 +18,9 @@ Parent: E-001. Runs last so it documents what shipped. Inputs: `research/audit-s
 5. **Enforcement**: `lint-colors.sh` switches to strict for all packages and the hub; `precheck.sh` runs lint-colors, contrast test, parity check; add `pnpm check` scripts (`svelte-check` for `packages/svelte`, `tsc --noEmit` for `packages/react`) wired into turbo `check` and precheck, fixing any type errors they surface; `.github` workflow runs `pnpm check` and `scripts/precheck.sh`.
 6. Remove the stale `plan.md` at repo root (F-031 leftovers) and point to `.claude/refined_backlog`.
 
-## Acceptance
+## Acceptance criteria
 
-- `scripts/precheck.sh` passes end to end with strict color lint; `pnpm check` passes.
-- `DESIGN.md` regenerates byte-identically from `scripts/gen-design-md.mjs`.
-- README renders the gate list and token contract; AGENTS.md has no reference to `--navy-500`-style raw variables as the contract (they are primitives, the contract is the semantic layer).
-- CI workflow file references the new gates.
+- [ ] `scripts/precheck.sh` passes end to end with strict color lint; `pnpm check` passes.
+- [ ] `DESIGN.md` regenerates byte-identically from `scripts/gen-design-md.mjs`.
+- [ ] README renders the gate list and token contract; AGENTS.md has no reference to `--navy-500`-style raw variables as the contract (they are primitives, the contract is the semantic layer).
+- [ ] CI workflow file references the new gates.
