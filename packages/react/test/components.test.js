@@ -1916,3 +1916,271 @@ test('F-038 C-L6 fix: neither Popconfirm twin uses the dead joy-button--primary 
     for (const cls of used) assert.ok(css.includes(`.${cls}`), `${side}: ${cls} is styled in theme.css`);
   }
 });
+
+// ---------------------------------------------------------------------------------------------------------------------
+// F-038 Wave 3 lane C-L7: MarkdownViewer, Splitter, Table, Timeline (rendered markup + handlers vs the Svelte contract)
+// ---------------------------------------------------------------------------------------------------------------------
+
+test('F-038 C-L7: splitter-utils.ts and table-utils.ts are byte-identical to the Svelte helpers', () => {
+  for (const f of ['splitter-utils.ts', 'table-utils.ts']) {
+    assert.ok(readSrc(`../src/${f}`) === readSrc(`../../svelte/src/lib/${f}`), `${f} must not diverge from the Svelte copy`);
+  }
+});
+
+test('F-038 C-L7: Table renders the Svelte class/aria contract (variants, aria-sort, hidden icons, region attributes, rest override)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Table } = loadComponent('Table');
+  assert.strictEqual(Table.$$typeof, Symbol.for('react.forward_ref'));
+  const columns = [{ key: 'a', title: 'A', sortable: true }, { key: 'b', title: 'B' }];
+  const data = [{ a: 1, b: 2 }];
+  const html = (props) => renderToStaticMarkup(React.createElement(Table, { columns, data, ...props }));
+
+  const stack = html({});
+  assert.ok(stack.startsWith('<div class="joy-table-container joy-table-container--responsive-stack"'), stack);
+  assert.ok(stack.includes('<table class="joy-table joy-table--compact joy-table--responsive-stack">'), stack);
+  assert.ok(!/tabindex="0"[^>]*class="joy-table-container|role="region"|joy-table--scroll/.test(stack), 'stack: no scroll region attributes');
+  // sortable th: tabindex + aria-sort=none; non-sortable th: neither, and no role attribute anywhere on th
+  assert.match(stack, /<th class="joy-table-th--sortable" style="text-align:left" tabindex="0" aria-sort="none">/);
+  assert.match(stack, /<th style="text-align:left"><span>B<\/span><\/th>/);
+  assert.ok(!/<th[^>]*role=/.test(stack));
+  // sort icons are decorative: aria-hidden, never aria-label
+  assert.ok(stack.includes('aria-hidden="true"') && !/<svg[^>]*aria-label/.test(stack), 'sort icons aria-hidden, no aria-label');
+
+  const scroll = html({ variant: 'scroll' });
+  assert.match(scroll, /^<div tabindex="0" role="region" aria-label="Scrollable table" class="joy-table-container joy-table-container--scroll">/);
+  assert.ok(scroll.includes('<table class="joy-table joy-table--compact joy-table--scroll">'), scroll);
+  assert.ok(!scroll.includes('responsive-stack'), 'variant=scroll forces off stack');
+
+  assert.ok(html({ variant: 'stack', responsive: false }).includes('joy-table-container--responsive-stack'), 'variant=stack forces stack');
+  assert.ok(!html({ responsive: 'scroll' }).includes('responsive-stack') && !html({ responsive: 'scroll' }).includes('role="region"'), 'responsive=scroll is the plain table, not the pinned variant');
+  assert.ok(html({ density: 'normal' }).includes('joy-table--normal'));
+
+  // rest wins over the scroll defaults (attributes are placed before {...rest}), className is merged, ids pass through
+  const custom = html({ variant: 'scroll', 'aria-label': 'Prices', className: 'mine', id: 'tbl', 'data-x': '1' });
+  assert.ok(custom.includes('aria-label="Prices"') && !custom.includes('Scrollable table'), custom);
+  assert.ok(custom.includes('joy-table-container--scroll mine"') && custom.includes('id="tbl"') && custom.includes('data-x="1"'), custom);
+
+  // controlled sort state shows through aria-sort and the sorted class
+  const sorted = html({ sortKey: 'a', sortDirection: 'desc' });
+  assert.ok(sorted.includes('class="joy-table-th--sortable joy-table-th--sorted-desc"') && sorted.includes('aria-sort="descending"'), sorted);
+});
+
+test('F-038 C-L7: Table header keyboard - Enter/Space sort like a click, other keys and icon-bubbled events are ignored, aria-sort follows', () => {
+  const columns = [{ key: 'a', title: 'A', sortable: true }, { key: 'b', title: 'B', sortable: true }, { key: 'c', title: 'C' }];
+  const sorts = [];
+  const h = mount('Table', { columns, data: [], onSort: (k, d) => sorts.push([k, d]) });
+  const ths = () => h.find((n) => n.type === 'th');
+  const th = (i) => ths()[i];
+  const el = {};
+  const ev = (key, extra = {}) => reactKey(key, { target: el, currentTarget: el, ...extra });
+
+  assert.strictEqual(th(2).props.tabIndex, undefined);
+  assert.strictEqual(th(2).props['aria-sort'], undefined);
+  assert.strictEqual(th(0).props.tabIndex, 0);
+  assert.strictEqual(th(0).props['aria-sort'], 'none');
+
+  const enter = ev('Enter');
+  th(0).props.onKeyDown(enter);
+  assert.strictEqual(enter.calls.prevented, 1);
+  assert.deepStrictEqual(sorts, [['a', 'asc']]);
+  h.rerender();
+  assert.strictEqual(th(0).props['aria-sort'], 'ascending');
+  assert.strictEqual(th(1).props['aria-sort'], 'none');
+
+  const space = ev(' ');
+  th(0).props.onKeyDown(space);
+  assert.strictEqual(space.calls.prevented, 1, 'Space must not scroll the page');
+  assert.deepStrictEqual(sorts.at(-1), ['a', 'desc']);
+  h.rerender();
+  assert.strictEqual(th(0).props['aria-sort'], 'descending');
+
+  th(1).props.onKeyDown(ev('Enter'));
+  assert.deepStrictEqual(sorts.at(-1), ['b', 'asc'], 'a new column starts ascending');
+
+  const before = sorts.length;
+  const tab = ev('Tab');
+  th(0).props.onKeyDown(tab);
+  th(0).props.onKeyDown(ev('Enter', { target: {} })); // bubbled from a child: the th onClick already handles pointer activation
+  th(2).props.onKeyDown(ev('Enter')); // not sortable
+  assert.strictEqual(tab.calls.prevented, 0, 'unhandled keys keep their default');
+  assert.strictEqual(sorts.length, before);
+
+  th(0).props.onClick();
+  assert.deepStrictEqual(sorts.at(-1), ['a', 'asc'], 'click and key share the same cycle');
+});
+
+test('F-038 C-L7: Splitter renders the Svelte contract (separator aria, --joy-splitter-size panes, no inline width/height, repaired bounds)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Splitter } = loadComponent('Splitter');
+  assert.strictEqual(Splitter.$$typeof, Symbol.for('react.forward_ref'));
+  const html = (props) => renderToStaticMarkup(React.createElement(Splitter, { firstPane: 'L', secondPane: 'R', ...props }));
+
+  const out = html({ defaultSplit: 30, className: 'mine', 'data-x': '1' });
+  assert.match(out, /^<div class="joy-splitter joy-splitter--horizontal mine" role="group" aria-label="Resizable Splitter Panel" data-x="1">/);
+  assert.ok(out.includes('<div class="joy-splitter__pane" style="--joy-splitter-size:30">L</div>'), out);
+  assert.ok(out.includes('<div class="joy-splitter__pane" style="--joy-splitter-size:70">R</div>'), out);
+  assert.match(out, /<div class="joy-splitter__bar " role="separator" aria-label="Resize panes" aria-orientation="vertical" aria-valuenow="30" aria-valuemin="10" aria-valuemax="90" tabindex="0"><\/div>/);
+  assert.ok(!/style="[^"]*(width|height)/.test(out), 'panes are sized only through the custom property');
+  assert.ok(html({ layout: 'vertical' }).includes('joy-splitter--vertical') && html({ layout: 'vertical' }).includes('aria-orientation="horizontal"'));
+  // bounds actually enforced are what ARIA reports; NaN start falls back to the middle
+  const repaired = html({ min: 90, max: 10, defaultSplit: 30 });
+  assert.ok(repaired.includes('aria-valuemin="10"') && repaired.includes('aria-valuemax="90"') && repaired.includes('aria-valuenow="30"'), repaired);
+  const wide = html({ min: -5, max: 300, defaultSplit: NaN });
+  assert.ok(wide.includes('aria-valuemin="0"') && wide.includes('aria-valuemax="100"') && wide.includes('aria-valuenow="50"'), wide);
+});
+
+test('F-038 C-L7: Splitter keyboard, pointer capture drag and the stacked matchMedia flip', () => {
+  withDom(({ win }) => {
+    const sourceRoot = { getBoundingClientRect: () => ({ left: 100, top: 50, width: 400, height: 200 }) };
+    const calls = [];
+    const media = { matches: false, listeners: new Set(), addEventListener(t, f) { this.listeners.add(f); }, removeEventListener(t, f) { this.listeners.delete(f); } };
+    const queries = [];
+    win.matchMedia = (q) => { queries.push(q); return media; };
+
+    const h = mount('Splitter', { defaultSplit: 40, firstPane: 'a', secondPane: 'b' });
+    h.flush();
+    assert.deepStrictEqual(queries, ['(max-width: 640px)']);
+    const bar = () => h.find((n) => n.props.role === 'separator')[0].props;
+    const sizes = () => h.find((n) => n.props.className === 'joy-splitter__pane').map((n) => n.props.style['--joy-splitter-size']);
+    assert.deepStrictEqual(sizes(), [40, 60]);
+    assert.strictEqual(bar()['aria-orientation'], 'vertical');
+
+    // keyboard: handled keys preventDefault, others do not
+    const press = (key, extra = {}) => { const e = reactKey(key, extra); bar().onKeyDown(e); h.rerender(); return e; };
+    assert.strictEqual(press('ArrowRight').calls.prevented, 1);
+    assert.deepStrictEqual(sizes(), [45, 55]);
+    press('ArrowLeft', { shiftKey: true });
+    assert.deepStrictEqual(sizes(), [35, 65], 'Shift takes the large step');
+    assert.strictEqual(press('ArrowDown').calls.prevented, 0, 'off-axis arrow is not handled');
+    assert.strictEqual(press('Tab').calls.prevented, 0);
+    assert.deepStrictEqual(sizes(), [35, 65]);
+    press('End');
+    assert.strictEqual(bar()['aria-valuenow'], 90);
+    press('Home');
+    assert.strictEqual(bar()['aria-valuenow'], 10);
+    assert.strictEqual(press('ArrowLeft').calls.prevented, 1);
+    assert.strictEqual(bar()['aria-valuenow'], 10, 'clamped at min');
+
+    // pointer drag with capture: a secondary mouse button is ignored, move before down is ignored
+    const captured = new Set();
+    const target = (extra = {}) => ({ parentElement: sourceRoot, setPointerCapture: (id) => captured.add(id), hasPointerCapture: (id) => captured.has(id), releasePointerCapture: (id) => captured.delete(id), focus: () => calls.push('focus'), ...extra });
+    const ptr = (over = {}) => { const e = reactKey('', { pointerType: 'mouse', button: 0, pointerId: 7, clientX: 300, clientY: 150, currentTarget: target(), ...over }); return e; };
+    bar().onPointerMove(ptr());
+    h.rerender();
+    assert.strictEqual(bar()['aria-valuenow'], 10, 'no drag until pointerdown');
+    bar().onPointerDown(ptr({ button: 2 })); h.rerender();
+    assert.ok(!bar().className.includes('--active'));
+    const down = ptr(); bar().onPointerDown(down); h.rerender();
+    assert.strictEqual(down.calls.prevented, 1);
+    assert.ok(bar().className.includes('joy-splitter__bar--active') && captured.has(7), 'active state set and the pointer captured on the bar');
+    assert.deepStrictEqual(calls, ['focus']);
+    bar().onPointerMove(ptr({ clientX: 300 })); h.rerender(); // (300-100)/400 = 50%
+    assert.strictEqual(bar()['aria-valuenow'], 50);
+    bar().onPointerMove(ptr({ clientX: 10 })); h.rerender(); // far left, clamped to min
+    assert.strictEqual(bar()['aria-valuenow'], 10);
+    bar().onPointerUp(ptr()); h.rerender();
+    assert.ok(!bar().className.includes('--active') && !captured.has(7), 'pointerup ends the drag and releases capture');
+    // lost capture / cancel also end a drag (no stuck resize state)
+    for (const end of ['onLostPointerCapture', 'onPointerCancel']) {
+      bar().onPointerDown(ptr()); h.rerender();
+      assert.ok(bar().className.includes('--active'));
+      bar()[end](ptr()); h.rerender();
+      assert.ok(!bar().className.includes('--active'), `${end} ends the drag`);
+    }
+    const noWindowListeners = win.listeners;
+    assert.strictEqual(noWindowListeners, 0, 'drag never touches window listeners');
+
+    h.unmount();
+    assert.strictEqual(media.listeners.size, 0, 'matchMedia listener removed on unmount');
+
+    // stacked: on a narrow viewport the axis flips for both drag and keys, while the layout class stays the prop
+    media.matches = true;
+    const s = mount('Splitter', { defaultSplit: 40, firstPane: 'a', secondPane: 'b' });
+    s.flush(); s.rerender();
+    const sbar = () => s.find((n) => n.props.role === 'separator')[0].props;
+    const spress = (key, extra = {}) => { const e = reactKey(key, extra); sbar().onKeyDown(e); s.rerender(); return e; };
+    assert.strictEqual(sbar()['aria-orientation'], 'horizontal');
+    assert.ok(s.byClass('joy-splitter--horizontal').length === 1, 'class follows the prop, not the stacked state');
+    spress('Home'); spress('ArrowDown');
+    assert.strictEqual(sbar()['aria-valuenow'], 15, 'ArrowDown is the forward key when stacked');
+    assert.strictEqual(spress('ArrowRight').calls.prevented, 0);
+    sbar().onPointerDown(ptr()); s.rerender();
+    sbar().onPointerMove(ptr({ clientY: 150 })); s.rerender(); // (150-50)/200 = 50% via clientY
+    assert.strictEqual(sbar()['aria-valuenow'], 50);
+    // a live viewport change flips it back
+    for (const f of media.listeners) f({ matches: false });
+    s.rerender();
+    assert.strictEqual(sbar()['aria-orientation'], 'vertical');
+    s.unmount();
+    assert.strictEqual(media.listeners.size, 0, 'matchMedia listener removed on unmount');
+  });
+});
+
+test('F-038 C-L7: Timeline renders title/description/time classes with no inline style', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { Timeline } = loadComponent('Timeline');
+  assert.strictEqual(Timeline.$$typeof, Symbol.for('react.forward_ref'));
+  const items = [{ title: 'Shipped', description: 'Live', time: '9:00', status: 'success' }, { title: 'Draft' }];
+  const out = renderToStaticMarkup(React.createElement(Timeline, { items, className: 'mine', 'data-x': '1' }));
+  assert.ok(out.startsWith('<ul class="joy-timeline mine" role="list" data-x="1">'), out);
+  assert.ok(out.includes('<div class="joy-timeline__dot joy-timeline__dot--success"></div>') && out.includes('joy-timeline__dot--primary'), out);
+  assert.ok(out.includes('<div class="joy-timeline__title">Shipped</div><div class="joy-timeline__description">Live</div><div class="joy-timeline__time">9:00</div>'), out);
+  assert.ok(out.includes('<div class="joy-timeline__title">Draft</div></div>'), 'no description/time nodes when absent');
+  assert.ok(!out.includes('style='), 'no inline style');
+  assert.ok(!/#64748b|fontWeight/.test(readSrc('../src/Timeline.tsx')), 'source keeps neither the foreign fallback nor inline weight');
+});
+
+test('F-038 C-L7: MarkdownViewer renders the Svelte contract and escapes raw HTML (no dangerouslySetInnerHTML)', () => {
+  const React = requireFromHere('react');
+  const { renderToStaticMarkup } = requireFromHere('react-dom/server');
+  const { MarkdownViewer } = loadComponent('MarkdownViewer');
+  assert.strictEqual(MarkdownViewer.$$typeof, Symbol.for('react.forward_ref'));
+  const md = '# T <b>x</b>\n\n> quote **bold**\n\n---\n\n```js\nconst a = "<i>";\n```\n\n| H1 | H2 |\n|---|---|\n| a | b |\n\n<script>alert(1)</script>';
+  const out = renderToStaticMarkup(React.createElement(MarkdownViewer, { content: md, className: 'mine', 'data-x': '1' }));
+  assert.ok(out.startsWith('<div class="joy-markdown mine" role="region" aria-label="Markdown content" data-x="1">'), out);
+  assert.ok(out.includes('<blockquote>quote <strong>bold</strong></blockquote>'), out);
+  assert.ok(out.includes('<hr/>') && !/<hr[^>]*style/.test(out), 'hr has no inline style');
+  assert.ok(out.includes('<div class="joy-markdown__table-wrap"><table class="joy-markdown__table">') && !out.includes('overflow'), 'table wrapper is a class');
+  // untrusted markup is text, never elements
+  assert.ok(out.includes('&lt;script&gt;alert(1)&lt;/script&gt;') && out.includes('&lt;b&gt;x&lt;/b&gt;') && !/<script|<b>|<i>/.test(out), out);
+  // copy button + status region exactly as Svelte, Copy icon (aria-hidden, size 14)
+  const pre = out.match(/<pre class="joy-markdown__pre">[\s\S]*?<\/pre>/)[0];
+  assert.ok(pre.includes('<button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard">'), pre);
+  assert.ok(/<svg width="14" height="14"[^>]*aria-hidden="true"[\s\S]*<\/svg>Copy<\/button><span class="joy-markdown__status" role="status"><\/span><\/pre>$/.test(pre), pre);
+  assert.ok(!renderToStaticMarkup(React.createElement(MarkdownViewer, { content: '```\nx\n```', allowCopy: false })).includes('joy-markdown__copy-btn'));
+  const src = readSrc('../src/MarkdownViewer.tsx');
+  assert.ok(!src.includes('dangerouslySetInnerHTML') && !/#e2e8f0|style=\{\{/.test(src), 'no raw-HTML sink, no inline styles');
+});
+
+test('F-038 C-L7: MarkdownViewer copy - Check/Copied and live status only after a successful write, failure is silent, timer cleared on unmount', async () => {
+  const saved = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  const writes = [];
+  let fail = false;
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { clipboard: { writeText: async (t) => { if (fail) throw new Error('denied'); writes.push(t); } } } });
+  try {
+    const h = mount('MarkdownViewer', { content: '```\nrun me\n```' });
+    h.flush();
+    const btn = () => h.find((n) => n.type === 'button')[0];
+    const status = () => h.find((n) => n.props.role === 'status')[0];
+    assert.strictEqual(status().props.children, '');
+    fail = true;
+    await btn().props.onClick(); h.rerender();
+    assert.ok(!JSON.stringify(btn().props.children).includes('Copied'), 'a denied write does not claim success');
+    fail = false;
+    await btn().props.onClick(); h.rerender();
+    assert.deepStrictEqual(writes, ['run me']);
+    assert.ok(btn().props.children.includes('Copied'), 'button label flips');
+    assert.strictEqual(status().props.children, 'Copied to clipboard');
+    h.unmount(); // clears the 2s reset timer (otherwise this test would hold the process open)
+    const late = mount('MarkdownViewer', { content: '```\nz\n```' });
+    late.flush();
+    const p = late.find((n) => n.type === 'button')[0].props.onClick();
+    late.unmount();
+    await p; // resolves after unmount: must not schedule a timer or set state
+  } finally {
+    if (saved) Object.defineProperty(globalThis, 'navigator', saved); else delete globalThis.navigator;
+  }
+});
