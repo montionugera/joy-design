@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { pageWindow, pageItems } from '../src/lib/pagination-utils.ts';
+import { pageWindow, pageItems, clampPage, pageCount } from '../src/lib/pagination-utils.ts';
 
 const S = 'start-ellipsis';
 const E = 'end-ellipsis';
@@ -55,4 +55,27 @@ test('pageItems compact rule shows only the current page, clamped', () => {
   assert.deepStrictEqual(pageItems(0, 100, true), [1]);
   assert.deepStrictEqual(pageItems(NaN, 100, true), [1]);
   assert.deepStrictEqual(pageItems(4, 100, false), pageWindow(4, 100));
+});
+
+test('clampPage keeps current inside [1, totalPages] and survives NaN/negative/oversized input', () => {
+  assert.strictEqual(clampPage(3, 10), 3);
+  assert.strictEqual(clampPage(0, 10), 1);
+  assert.strictEqual(clampPage(-4, 10), 1);
+  assert.strictEqual(clampPage(50, 30), 30);
+  assert.strictEqual(clampPage(NaN, 30), 1);
+  assert.strictEqual(clampPage(Infinity, 30), 1);
+  assert.strictEqual(clampPage(2.7, 30), 2);
+  assert.strictEqual(clampPage(5, 0), 1);
+  assert.strictEqual(clampPage(5, NaN), 1);
+  assert.strictEqual(clampPage(5, 3.9), 3);
+});
+
+test('pageCount is at least 1 and never NaN/Infinity', () => {
+  assert.strictEqual(pageCount(100, 10), 10);
+  assert.strictEqual(pageCount(101, 10), 11);
+  assert.strictEqual(pageCount(0, 10), 1);
+  assert.strictEqual(pageCount(-5, 10), 1);
+  assert.strictEqual(pageCount(NaN, 10), 1);
+  assert.strictEqual(pageCount(50, 0), 1);
+  assert.strictEqual(pageCount(50, NaN), 1);
 });

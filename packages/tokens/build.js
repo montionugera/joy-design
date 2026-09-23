@@ -917,14 +917,16 @@ select.joy-select:disabled,
   outline-offset: 2px;
 }
 .joy-pagination__btn--active {
-  background: var(--joy-accent-default);
-  border-color: var(--joy-accent-default);
-  color: var(--joy-text-on-accent);
+  background: var(--joy-accent-text);
+  border-color: var(--joy-accent-text);
+  color: var(--joy-surface-card);
+  font-weight: 600;
 }
 .joy-pagination__btn--active:hover:not(:disabled) {
-  background: var(--joy-accent-hover);
-  border-color: var(--joy-accent-hover);
-  color: var(--joy-text-on-accent);
+  background: var(--joy-accent-text);
+  border-color: var(--joy-accent-text);
+  color: var(--joy-surface-card);
+  box-shadow: var(--joy-elevation-1);
 }
 .joy-pagination__btn:disabled {
   opacity: 0.45;
@@ -1733,6 +1735,8 @@ h1, h2, h3, .joy-display {
     overflow-x: auto;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
+    /* overflow-x makes overflow-y clip too: room inside the scroller keeps the 2px focus ring visible */
+    padding: 4px;
   }
   .joy-breadcrumb ol {
     flex-wrap: nowrap;

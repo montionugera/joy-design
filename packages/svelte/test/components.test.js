@@ -712,7 +712,9 @@ test('F-038 B-L5: Menu is a menu/menuitem list with aria-current, roving tabinde
 
 test('F-038 B-L5: Pagination windows its pages, collapses under 480px via matchMedia, and uses icons not entities', () => {
   const p = readLib('Pagination.svelte');
-  assert.ok(p.includes("import { pageItems } from './pagination-utils.js'") && p.includes('pageItems(current, totalPages, compact)'));
+  assert.ok(p.includes("import { clampPage, pageCount, pageItems } from './pagination-utils.js'") && p.includes('pageItems(page, totalPages, compact)'));
+  assert.ok(p.includes('let page = $derived(clampPage(current, totalPages))'), 'a stale out-of-range current is clamped');
+  assert.ok(p.includes('disabled={page <= 1}') && p.includes('disabled={page >= totalPages}') && p.includes("aria-current={p === page ? 'page' : undefined}"), 'active/disabled/prev/next work from the clamped page');
   assert.ok(!p.includes('Array.from({ length: totalPages }'), 'no button per page');
   assert.ok(!/&[lr]arr;/.test(p), 'no arrow entities');
   assert.ok(/import\s*\{\s*ChevronLeft,\s*ChevronRight\s*\}\s*from\s*'@joymify\/icons'/.test(p));
@@ -720,7 +722,6 @@ test('F-038 B-L5: Pagination windows its pages, collapses under 480px via matchM
   assert.ok(p.includes("window.matchMedia('(max-width: 480px)')") && p.includes("removeEventListener('change', sync)"), 'listener is cleaned up');
   assert.ok(p.includes("typeof window === 'undefined'"), 'SSR-safe');
   assert.ok(p.includes('aria-label="Previous page"') && p.includes('aria-label="Next page"') && p.includes('aria-label="Page {p}"'));
-  assert.ok(p.includes("aria-current={p === current ? 'page' : undefined}"));
 });
 
 test('F-038 B-L5: Steps marks the current step, Breadcrumb marks the last crumb, Anchor marks the active link', () => {

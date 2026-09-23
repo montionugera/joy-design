@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ChevronLeft, ChevronRight } from '@joymify/icons';
-  import { pageItems } from './pagination-utils.js';
+  import { clampPage, pageCount, pageItems } from './pagination-utils.js';
 
   interface Props {
     current?: number;
@@ -26,7 +26,9 @@
     ...rest
   }: Props = $props();
 
-  let totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
+  let totalPages = $derived(pageCount(total, pageSize));
+  // A parent can leave `current` stale when `total` shrinks: everything below works from the clamped page.
+  let page = $derived(clampPage(current, totalPages));
 
   // Phones show only Previous, the current page and Next. Desktop-first default keeps SSR output full.
   let compact = $state(false);
@@ -39,10 +41,10 @@
     return () => query.removeEventListener('change', sync);
   });
 
-  let pages = $derived(pageItems(current, totalPages, compact));
+  let pages = $derived(pageItems(page, totalPages, compact));
 
   function goToPage(p: number) {
-    if (p < 1 || p > totalPages || p === current) return;
+    if (p < 1 || p > totalPages || p === page) return;
     current = p;
     onchange?.(current, pageSize);
   }
@@ -59,8 +61,8 @@
   <button
     type="button"
     class="joy-pagination__btn"
-    disabled={current <= 1}
-    onclick={() => goToPage(current - 1)}
+    disabled={page <= 1}
+    onclick={() => goToPage(page - 1)}
     aria-label="Previous page"
   >
     <ChevronLeft size="1em" />
@@ -71,10 +73,10 @@
       <button
         type="button"
         class="joy-pagination__btn"
-        class:joy-pagination__btn--active={p === current}
+        class:joy-pagination__btn--active={p === page}
         onclick={() => goToPage(p)}
         aria-label="Page {p}"
-        aria-current={p === current ? 'page' : undefined}
+        aria-current={p === page ? 'page' : undefined}
       >
         {p}
       </button>
@@ -86,8 +88,8 @@
   <button
     type="button"
     class="joy-pagination__btn"
-    disabled={current >= totalPages}
-    onclick={() => goToPage(current + 1)}
+    disabled={page >= totalPages}
+    onclick={() => goToPage(page + 1)}
     aria-label="Next page"
   >
     <ChevronRight size="1em" />

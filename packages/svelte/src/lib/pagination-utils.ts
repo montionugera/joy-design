@@ -7,6 +7,18 @@ export type PageItem = number | 'start-ellipsis' | 'end-ellipsis';
 const range = (from: number, to: number): number[] =>
 	Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);
 
+/** Number of pages for `total` items at `pageSize` per page: at least 1, and 1 for non-finite or non-positive input. */
+export function pageCount(total: number, pageSize: number): number {
+	const n = Math.ceil(total / pageSize);
+	return Number.isFinite(n) && n >= 1 ? n : 1;
+}
+
+/** `current` clamped into [1, totalPages] (totalPages floored, at least 1); NaN and non-finite input give page 1. */
+export function clampPage(current: number, totalPages: number): number {
+	const last = Number.isFinite(totalPages) ? Math.max(1, Math.floor(totalPages)) : 1;
+	return Number.isFinite(current) ? Math.min(last, Math.max(1, Math.floor(current))) : 1;
+}
+
 /**
  * Pages to render for `current` of `total`. Always the first and last page, `siblings` pages either
  * side of the current one, and an ellipsis in place of every gap of two or more pages, so a long list
@@ -16,7 +28,7 @@ const range = (from: number, to: number): number[] =>
 export function pageWindow(current: number, total: number, siblings = 1): PageItem[] {
 	const last = Number.isFinite(total) ? Math.max(1, Math.floor(total)) : 1;
 	const s = Math.max(0, Math.floor(siblings));
-	const page = Number.isFinite(current) ? Math.min(last, Math.max(1, Math.floor(current))) : 1;
+	const page = clampPage(current, last);
 	if (last <= 2 * s + 5) return range(1, last);
 
 	const left = Math.max(page - s, 1);
@@ -32,8 +44,5 @@ export function pageWindow(current: number, total: number, siblings = 1): PageIt
 
 /** Compact (phone) rule: only the current page is shown between Previous and Next. */
 export function pageItems(current: number, total: number, compact: boolean): PageItem[] {
-	if (!compact) return pageWindow(current, total);
-	const last = Number.isFinite(total) ? Math.max(1, Math.floor(total)) : 1;
-	const page = Number.isFinite(current) ? Math.min(last, Math.max(1, Math.floor(current))) : 1;
-	return [page];
+	return compact ? [clampPage(current, total)] : pageWindow(current, total);
 }

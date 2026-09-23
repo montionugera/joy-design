@@ -349,15 +349,25 @@ test('F-038 B-L5: interactive states of the lane reach WCAG contrast in both the
     assert.ok(m, `${sel} ${prop} is a token`);
     return m[1];
   };
+  assert.match(exactRule('.joy-pagination__btn'), /border:\s*1px solid var\(--joy-border-default\)/, 'default pagination border token');
   const checks = [
     // [label, foreground token, background token, minimum]
     ['tab active text on card', tok('.joy-tab-btn--active', 'color'), '--joy-surface-card', 4.5],
     ['tab active indicator on card', tok('.joy-tab-btn--active::after', 'background'), '--joy-surface-card', 3],
     ['tab inactive text on card', tok('.joy-tab-btn', 'color'), '--joy-surface-card', 4.5],
     ['tab hover text on card', tok('.joy-tab-btn:hover', 'color'), '--joy-surface-card', 4.5],
+    // Pagination: every text/background (and non-text) pair of every state. Disabled is exempt (WCAG 1.4.3 inactive components).
+    ['pagination default text on card', tok('.joy-pagination__btn', 'color'), tok('.joy-pagination__btn', 'background'), 4.5],
+    ['pagination default border on card', '--joy-border-default', '--joy-surface-card', 3],
+    ['pagination ellipsis on page', tok('.joy-pagination__ellipsis', 'color'), '--joy-surface-card', 4.5],
+    ['pagination info on page', tok('.joy-pagination__info', 'color'), '--joy-surface-card', 4.5],
     ['pagination hover text on tint', tok('.joy-pagination__btn:hover:not(:disabled)', 'color'), tok('.joy-pagination__btn:hover:not(:disabled)', 'background'), 4.5],
+    ['pagination hover border on tint', tok('.joy-pagination__btn:hover:not(:disabled)', 'border-color'), tok('.joy-pagination__btn:hover:not(:disabled)', 'background'), 3],
     ['pagination active text on fill', tok('.joy-pagination__btn--active', 'color'), tok('.joy-pagination__btn--active', 'background'), 4.5],
-    ['pagination border on card', '--joy-border-default', '--joy-surface-card', 3],
+    ['pagination active fill on card', tok('.joy-pagination__btn--active', 'background'), '--joy-surface-card', 3],
+    ['pagination active border on card', tok('.joy-pagination__btn--active', 'border-color'), '--joy-surface-card', 3],
+    ['pagination active+hover text on fill', tok('.joy-pagination__btn--active:hover:not(:disabled)', 'color'), tok('.joy-pagination__btn--active:hover:not(:disabled)', 'background'), 4.5],
+    ['pagination active+hover fill on card', tok('.joy-pagination__btn--active:hover:not(:disabled)', 'background'), '--joy-surface-card', 3],
     ['steps process icon text on fill', tok('.joy-steps__item--process .joy-steps__icon', 'color'), tok('.joy-steps__item--process .joy-steps__icon', 'background-color'), 4.5],
     ['steps process icon fill on card', tok('.joy-steps__item--process .joy-steps__icon', 'background-color'), '--joy-surface-card', 3],
     ['anchor ink-ball on card', '--joy-accent-active', '--joy-surface-card', 3],
