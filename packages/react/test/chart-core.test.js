@@ -137,7 +137,9 @@ test('readChartPalette resolves colors from CSS variables in light theme', () =>
     '--joy-text-primary': '#1f1c13',
     '--joy-status-success-fg': '#1a4f1f',
     '--joy-status-danger-fg': '#9f3331',
-    '--joy-border-subtle': '#e3dccc'
+    '--joy-border-subtle': '#e3dccc',
+    '--joy-accent-default': '#b8862c',
+    '--joy-text-on-accent': '#1f1c13'
   });
   try {
     const palette = readChartPalette(fakeCanvas());
@@ -146,7 +148,9 @@ test('readChartPalette resolves colors from CSS variables in light theme', () =>
       textPrimary: '#1f1c13',
       bull: '#1a4f1f',
       bear: '#9f3331',
-      border: '#e3dccc'
+      border: '#e3dccc',
+      accent: '#b8862c',
+      onAccent: '#1f1c13'
     });
   } finally {
     restore();
@@ -159,7 +163,9 @@ test('readChartPalette resolves colors from CSS variables in dark theme', () => 
     '--joy-text-primary': '#f8f3e8',
     '--joy-status-success-fg': '#5fbf6a',
     '--joy-status-danger-fg': '#e2635f',
-    '--joy-border-subtle': '#3c3a35'
+    '--joy-border-subtle': '#3c3a35',
+    '--joy-accent-default': '#d4ac5f',
+    '--joy-text-on-accent': '#14253e'
   });
   try {
     const palette = readChartPalette(fakeCanvas());
@@ -168,7 +174,9 @@ test('readChartPalette resolves colors from CSS variables in dark theme', () => 
       textPrimary: '#f8f3e8',
       bull: '#5fbf6a',
       bear: '#e2635f',
-      border: '#3c3a35'
+      border: '#3c3a35',
+      accent: '#d4ac5f',
+      onAccent: '#14253e'
     });
   } finally {
     restore();

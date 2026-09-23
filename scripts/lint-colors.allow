@@ -8,3 +8,11 @@
 # These are JS default-argument literals, not un-token-driven CSS, so they
 # are intentionally allowlisted narrowly to this call shape.
 v\('--joy-[a-z-]+', '#[0-9a-fA-F]{3,8}'\)
+
+# Wave 3 A1 (RXD-010 close-out): chart-core.ts grid-line and crosshair-line
+# strokeStyle assignments that ternary-branch on isDark/theme between two
+# rgba(...) translucent-overlay literals. A single opacity value is not
+# representable as one semantic token, and these already branch correctly
+# per theme, so they are legitimate theme-branching translucent strokes, not
+# un-tokenized CSS.
+ctx\.strokeStyle = .*\? 'rgba\([0-9, .]+\)' : 'rgba\([0-9, .]+\)'

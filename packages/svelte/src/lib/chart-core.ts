@@ -50,6 +50,8 @@ export interface ChartPalette {
   bull: string;
   bear: string;
   border: string;
+  accent: string;
+  onAccent: string;
 }
 
 export function readChartPalette(canvas: HTMLCanvasElement): ChartPalette {
@@ -61,6 +63,8 @@ export function readChartPalette(canvas: HTMLCanvasElement): ChartPalette {
     bull: v('--joy-status-success-fg', '#1a4f1f'),
     bear: v('--joy-status-danger-fg', '#9f3331'),
     border: v('--joy-border-subtle', '#e3dccc'),
+    accent: v('--joy-accent-default', '#c49a3a'),
+    onAccent: v('--joy-text-on-accent', '#14253e'),
   };
 }
 
@@ -445,7 +449,7 @@ export class JoyChartCore {
     if (this.isCandlestick) {
       this.drawCandlesticks(ctx, palette);
     } else {
-      this.drawSeries(ctx);
+      this.drawSeries(ctx, palette);
     }
   }
 
@@ -530,7 +534,7 @@ export class JoyChartCore {
     }
   }
 
-  private drawSeries(ctx: CanvasRenderingContext2D) {
+  private drawSeries(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
     this.seriesList.forEach(series => {
       if (series.data.length === 0) return;
 
@@ -565,7 +569,7 @@ export class JoyChartCore {
         return;
       }
 
-      const color = series.color || '#c49a3a';
+      const color = series.color || palette.accent;
       ctx.strokeStyle = color;
       ctx.lineWidth = series.lineWidth || 2;
       ctx.lineJoin = 'round';
@@ -669,7 +673,7 @@ export class JoyChartCore {
       }
 
       if (this.options.showCrosshair) {
-        this.drawCrosshair(mouseX, mouseY);
+        this.drawCrosshair(mouseX, mouseY, readChartPalette(this.baseCanvas));
       }
     }) as EventListener);
 
@@ -689,7 +693,7 @@ export class JoyChartCore {
       this.viewMaxX = mouseDataX + rightSpan * factor;
 
       this.render();
-      this.drawCrosshair(mouseX, e.clientY - rect.top);
+      this.drawCrosshair(mouseX, e.clientY - rect.top, readChartPalette(this.baseCanvas));
     }) as EventListener);
 
     this.addListener(this.overlayCanvas, 'mouseleave', (() => {
@@ -698,7 +702,7 @@ export class JoyChartCore {
     }) as EventListener);
   }
 
-  private drawCrosshair(mouseX: number, mouseY: number) {
+  private drawCrosshair(mouseX: number, mouseY: number, palette: ChartPalette) {
     const ctx = this.overlayCtx;
     ctx.clearRect(0, 0, this.width, this.height);
 
@@ -723,9 +727,9 @@ export class JoyChartCore {
 
     // Price Tracking Pill
     const price = this.toDataY(mouseY);
-    ctx.fillStyle = '#c49a3a';
+    ctx.fillStyle = palette.accent;
     ctx.fillRect(this.width - 60, mouseY - 10, 56, 20);
-    ctx.fillStyle = '#14253e';
+    ctx.fillStyle = palette.onAccent;
     ctx.font = '10px monospace';
     ctx.fillText(price.toFixed(2), this.width - 54, mouseY + 4);
 
