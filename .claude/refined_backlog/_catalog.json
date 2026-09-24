@@ -472,9 +472,10 @@
     "title": "Wave 5: Storybook hub \u2014 mobile layout, dark mode, hero, token-only colors, visual contracts",
     "from_idea": "I-040",
     "created_at": "2026-09-24T13:03:35.359314+00:00",
-    "claimed_by": null,
-    "status": "open",
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
     "release_version": null,
-    "epic": "E-001"
+    "epic": "E-001",
+    "claimed_at": "2026-09-24T13:03:38.617449+00:00"
   }
 ]
