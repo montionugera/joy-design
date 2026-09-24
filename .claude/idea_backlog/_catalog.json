@@ -241,7 +241,7 @@
     "id": "I-040",
     "title": "Wave 5: Storybook hub \u2014 mobile layout, dark mode, hero, token-only colors, visual contracts",
     "created_at": "2026-09-22T01:02:02.032168+00:00",
-    "promoted_to": null,
+    "promoted_to": "F-040",
     "epic": "E-001"
   },
   {
