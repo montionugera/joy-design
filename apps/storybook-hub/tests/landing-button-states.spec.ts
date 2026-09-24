@@ -79,6 +79,10 @@ for (const theme of ["light", "dark"] as const) {
             spinner: spinner ? getComputedStyle(spinner).color : null,
             borderVsSurface: ratio(parse(cs.borderTopColor), surface),
             fillVsSurface: ba > 0.01 ? ratio([br, bg, bb], surface) : 1,
+            labelVsSurface: ratio(
+              parse(cs.color),
+              ba > 0.5 ? [br, bg, bb] : surface,
+            ),
           };
         };
         const keys = [
@@ -124,6 +128,9 @@ for (const theme of ["light", "dark"] as const) {
         expect(off.borderWidth, `${variant} disabled keeps a 1px border`).toBe(
           "1px",
         );
+        // The floor is 2.5, not the 3:1 non-text line, on purpose: a disabled control is exempt from WCAG 1.4.11, the border
+        // only has to keep the shape from vanishing (the taste review found it near-invisible at ~1.1:1), and the brief names
+        // --joy-border-default, whose real minimum is 2.79:1 (#566a87 on the dark raised panel #14253e).
         expect(
           off.borderVsSurface,
           `${variant} disabled border is visible against the surface`,
@@ -142,10 +149,14 @@ for (const theme of ["light", "dark"] as const) {
           "disabled on a raised panel is transparent",
         ).toBe(0);
       }
-      // disabled reads lighter than the live outline button (dimmer border and label)
+      // disabled reads lighter than the live outline button (dimmer border AND dimmer label)
       expect(r["outline-disabled"].borderVsSurface).toBeLessThan(
         r["outline-enabled"].borderVsSurface,
       );
+      expect(
+        r["outline-disabled"].labelVsSurface,
+        "disabled label is dimmer than the live label",
+      ).toBeLessThan(r["outline-enabled"].labelVsSurface);
     });
   }
 }

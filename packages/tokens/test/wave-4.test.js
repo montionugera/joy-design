@@ -336,6 +336,12 @@ test('F-039 L1 contrast: hero and CTA token pairs pass WCAG AA in both themes (c
     ['text-secondary', 'surface-raised', 4.5, 'CTA band description (secondary, never muted, on a raised surface in dark)'],
     ['border-strong', 'surface-raised', 3, 'CTA band outline button border and the band border against the raised panel'],
     ['border-focus', 'surface-raised', 3, 'focus ring against the band'],
+    // the band's radial wash starts at --joy-accent-subtle (top centre, behind the title): the text sits on that colour too
+    ['text-primary', 'accent-subtle', 4.5, 'CTA band title and outline label over the top of the wash'],
+    ['text-secondary', 'accent-subtle', 4.5, 'CTA band description over the wash'],
+    ['border-strong', 'accent-subtle', 3, 'CTA band outline button border over the wash'],
+    // a disabled label is exempt from 4.5 (WCAG 1.4.3 inactive controls, ruled): it only has to stay legible. 4.23:1 in dark.
+    ['text-disabled', 'surface-raised', 3, 'disabled label on the raised band and pricing card'],
     ['text-primary', 'surface-canvas', 4.5, 'CTA title fallback when rendered without the band'],
     ['text-secondary', 'surface-canvas', 4.5, 'CTA description fallback when rendered without the band'],
     ['text-disabled', 'surface-disabled', 4.5, 'disabled hero button chip'],
@@ -381,7 +387,10 @@ test('F-039 T1 CSS: busy and unavailable overrides are scoped to the hero, the C
     .flatMap((group) => group.split(','))
     .map((sel) => sel.trim())
     .filter(Boolean);
-  assert.strictEqual(selectors.length, 13, "13 scoped selectors");
+  for (const container of ['.joy-hero ', '.joy-cta-section ', '.joy-pricing-card ']) {
+    assert.ok(selectors.some((sel) => sel.startsWith(container) && sel.includes(':disabled')), `${container.trim()} has a disabled rule`);
+    assert.ok(selectors.some((sel) => sel.startsWith(container) && sel.includes('--loading')), `${container.trim()} has a busy rule`);
+  }
   for (const sel of selectors) assert.match(sel, /^\.joy-(hero|cta-section|cta-section__container|pricing-card) /, `scoped selector: ${sel}`);
   // the shared base rule is untouched (a library-wide change was rejected in an earlier review)
   assert.match(themeCss, /\.joy-button\[aria-disabled="true"\],\n\.joy-button:disabled \{\n  background-color: var\(--joy-surface-disabled\);\n  background-image: none;/);
@@ -661,6 +670,12 @@ const logoBlock = block('/* ── Landing Page Suite: LogoCloud ── */', '/*
 const statsBlock = block('/* ── Landing Page Suite: StatsSection ── */', '/* ── Landing Page Suite: CTASection ── */');
 const faqBlock = block('/* ── Landing Page Suite: FAQSection ── */', '/* ── Landing Page Suite: SiteFooter ── */');
 const testimonialBlock = block('/* Testimonial Card */', '/* Steps (Ant Design Parity) */');
+// body of the container query `@container <name> (<query>) { ... }` (top-level rule, closes at the next line-start brace)
+const step = (name, query) => {
+  const m = statsBlock.match(new RegExp('@container ' + name + ' \\(' + query.replace(/[()]/g, '\\$&') + '\\) \\{([\\s\\S]*?)\n\\}\n'));
+  assert.ok(m, `@container ${name} (${query}) exists`);
+  return m[1];
+};
 const mediaBody = (css, query) => {
   const m = css.match(new RegExp(`@media \\(${query}\\) \\{([\\s\\S]*?\\n)\\}`));
   assert.ok(m, `@media (${query}) exists`);
@@ -694,7 +709,8 @@ test('F-039 L4 CSS: stats card is raised, values are accent-text, text is second
   assert.match(item, /border:\s*1px solid var\(--joy-border-default\)/);
   const value = rule(statsBlock, '.joy-stat-item__value');
   assert.match(value, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
-  assert.match(value, /font-size:\s*var\(--joy-font-size-3xl\)/, 'a stat is on the step scale, not a section display size');
+  assert.match(value, /font-size:\s*var\(--joy-font-size-xl\)/, 'compact by default, on the step scale');
+  assert.match(step('joy-stats', 'min-width: 30rem'), /\.joy-stat-item__value \{\s*font-size:\s*var\(--joy-font-size-3xl\)/, 'a stat is on the step scale (3xl), not a section display size');
   assert.match(rule(statsBlock, '.joy-stat-item__desc'), /color:\s*var\(--joy-text-secondary\)/);
   assert.match(rule(statsBlock, '.joy-stat-item__label'), /color:\s*var\(--joy-text-primary\)/);
   assert.match(rule(statsBlock, '.joy-stat-item__change--positive'), /color:\s*var\(--joy-status-success-fg\)/);
@@ -702,13 +718,14 @@ test('F-039 L4 CSS: stats card is raised, values are accent-text, text is second
   assert.ok(!/10b981|ef4444|accent-default/i.test(statsBlock), 'no raw tone hexes, no gold-on-white value colour');
 });
 
-test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with smaller values', () => {
-  const small = mediaBody(statsBlock, 'max-width: 480px');
-  assert.match(small, /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-xl\)/, 'so a 7 character mono value fits a half-width card');
-  assert.match(mediaBody(statsBlock, 'max-width: 360px'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-lg\)/, 'a 9 character value fits the ~114px cell at 320px');
+test('F-039 L4 CSS: the stats are a compact 2x2 grid with smaller values by default, and type follows the container', () => {
+  assert.match(mediaBody(statsBlock, 'max-width: 480px'), /\.joy-stats-section \{\s*padding: 32px 16px;/, 'only the section padding stays a media query');
+  assert.ok(!/@media[^{]*\{[^@]*\.joy-stat-item__value/.test(statsBlock), 'no value font size follows the window: columns and type follow the same box');
+  assert.match(step('joy-stats', 'width < 19.5rem'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-lg\)/, 'a 9 character value fits the ~114px cell at 320px');
+  assert.match(step('joy-stats', 'width < 17rem'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-md\)/);
   const value = rule(statsBlock, '.joy-stat-item__value');
   // `anywhere` breaks only a token that cannot fit its cell (a fitting number stays whole: the 9 character case is asserted
-  // in Chromium by apps/storybook-hub/tests/landing-stats-overflow.spec.ts, which also covers 14 and 20 character tokens).
+  // in Chromium by apps/storybook-hub/tests/landing-stats-overflow.spec.ts and landing-stats-grid.spec.ts, which also cover 14 and 20 character tokens).
   assert.match(value, /overflow-wrap:\s*anywhere/, 'an extreme token breaks inside its cell instead of overflowing the page');
   assert.ok(!/word-break:\s*(break-all|break-word)/.test(value), 'never force-break tokens that fit');
   assert.match(rule(statsBlock, '.joy-stat-item'), /min-width:\s*0/, 'the grid item can shrink to its track');
@@ -716,20 +733,19 @@ test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with 
   const grid = rule(statsBlock, '.joy-stats-grid');
   assert.match(grid, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/, 'two compact columns by default');
   assert.match(grid, /gap:\s*12px/);
-  assert.match(rule(statsBlock, '.joy-stats-section'), /container-type:\s*inline-size/, 'columns follow the width the section gets (hub frames, sidebars)');
+  const section = rule(statsBlock, '.joy-stats-section');
+  assert.match(section, /container-type:\s*inline-size/, 'columns follow the width the section gets (hub frames, sidebars)');
+  assert.match(section, /contain-intrinsic-inline-size:\s*20rem/, 'containment must not collapse the section inside a shrink-to-fit parent');
   assert.match(statsBlock, /\.joy-stats-grid > \.joy-stat-item:last-child:nth-child\(odd\) \{\s*grid-column:\s*1 \/ -1;/, 'an odd last card takes the whole row instead of sitting alone');
 });
 
 test('F-039 T1 CSS: the stats grid widens by stat count in container steps, never by a fixed 3-column rule', () => {
-  const step = (min) => {
-    const m = statsBlock.match(new RegExp('@container joy-stats \\(min-width: ' + min + '\\) \\{([\\s\\S]*?)\n\\}\n'));
-    assert.ok(m, 'container step ' + min);
-    return m[1];
-  };
-  assert.match(step('40rem'), /:nth-child\(3\):last-child\),\s*\.joy-stats-grid:has\(> :nth-child\(6\):last-child\) \{\s*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/, '3 and 6 stats: three columns');
-  assert.match(step('52rem'), /:nth-child\(4\):last-child\) \{\s*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/, '4 stats: four columns, 3 + 1 never');
-  assert.match(step('64rem'), /:nth-child\(5\):last-child\) \{\s*grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/, '5 stats: five columns');
-  assert.match(step('40rem'), /:nth-child\(7\)\) \{\s*grid-template-columns:\s*repeat\(auto-fit, minmax\(min\(220px, 100%\), 1fr\)\)/, 'a long list keeps the auto-fit grid');
+  // each step is sized so a 9 character 3xl value ("14 Chains", ~179px) fits its column: 3 x 221 + 2 x 24 <= 45rem,
+  // 4 x 221 + 3 x 24 <= 60rem, 5 x 205 + 4 x 16 <= 69rem
+  assert.match(step('joy-stats', 'min-width: 45rem'), /:nth-child\(3\):last-child\),\s*\.joy-stats-grid:has\(> :nth-child\(6\):last-child\) \{\s*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/, '3 and 6 stats: three columns');
+  assert.match(step('joy-stats', 'min-width: 60rem'), /:nth-child\(4\):last-child\) \{\s*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/, '4 stats: four columns, 3 + 1 never');
+  assert.match(step('joy-stats', 'min-width: 69rem'), /:nth-child\(5\):last-child\) \{\s*grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/, '5 stats: five columns');
+  assert.match(step('joy-stats', 'min-width: 45rem'), /:nth-child\(7\)\) \{\s*grid-template-columns:\s*repeat\(auto-fit, minmax\(min\(224px, 100%\), 1fr\)\)/, 'a long list keeps the auto-fit grid');
   assert.ok(!/repeat\(3, minmax\(0, 1fr\)\)/.test(rule(statsBlock, '.joy-stats-grid')), 'no unconditional 3 column grid');
 });
 

@@ -350,9 +350,9 @@ test('F-039 T1: default copy is sentence case, names one brand in header and foo
   assert.ok(brands.length >= 2, 'header and footer both name the brand');
   assert.deepStrictEqual([...new Set(brands)], ['Joymify Design'], 'one brand name across the page');
   const pills = [...markup.matchAll(/<div class="joy-stat-item__change[^"]*">([\s\S]*?)<\/div>/g)].map((m) => m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
-  assert.ok(pills.length === 4);
+  assert.strictEqual(pills.length, 4);
   const up = markup.match(/joy-stat-item__change--positive[^>]*>[\s\S]*?<\/div>/g) ?? [];
-  assert.ok(up.length === 4, 'every default stat trends up');
+  assert.strictEqual(up.length, 4, 'every default stat trends up');
   for (const pill of pills) assert.ok(!/(^|\s)-\d/.test(pill.replace(/^Trend (up|down):\s*/, '')), `no negative number under an up caret: ${pill}`);
   assert.ok(pills.some((pill) => pill.includes('14% faster vs L1')), 'the latency win reads as an improvement');
 });

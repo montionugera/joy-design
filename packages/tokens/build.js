@@ -4976,13 +4976,17 @@ a.joy-logo-cloud__item:focus-visible {
   max-width: 1200px;
   margin: 0 auto;
   padding: 48px 24px;
-  /* The column count follows the width the section really gets (a hub frame or a sidebar layout is narrower than the
-     window), so the steps below are container queries, not media queries. */
+  /* Columns AND type follow the width the section really gets (a hub frame or a sidebar layout is narrower than the
+     window), so every step below is a container query, never a media query. Inline-size containment would collapse the
+     section to its padding inside a shrink-to-fit parent (a flex item or inline-block without a width), so it also
+     declares the natural inline size it takes there. */
   container-type: inline-size;
   container-name: joy-stats;
+  contain-intrinsic-inline-size: 20rem;
 }
-/* Compact by default: two columns, and an odd last card takes the whole row, so no width leaves a card alone beside an
-   empty cell. The counts below widen the grid only when every column can hold a 7 character mono value on one line. */
+/* Compact by default: two columns of small cards, and an odd last card takes the whole row, so no width leaves a card
+   alone beside an empty cell. The steps further down widen the grid only when every column can hold a 9 character mono
+   value ("1,204,551", "14 Chains") on one line at the type size of that step. */
 .joy-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4996,21 +5000,21 @@ a.joy-logo-cloud__item:focus-visible {
   background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
-  padding: 24px 20px;
+  padding: 16px 12px;
   min-width: 0;
   text-align: center;
 }
 .joy-stat-item__value {
   font-family: var(--joy-font-family-mono);
-  font-size: var(--joy-font-size-3xl);
+  font-size: var(--joy-font-size-xl);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
   color: var(--joy-accent-text);
   margin-bottom: 8px;
-  /* A value that fits its cell is never split (the phone steps below size a 9 character number to fit). anywhere
-     only breaks a token that cannot fit at all, so an extreme value stays inside its cell instead of pushing the
-     page sideways; the cell is min-width: 0 so the grid track can shrink to it. */
+  /* A value that fits its cell is never split (the container steps size a 9 character number to fit). anywhere only
+     breaks a token that cannot fit at all, so an extreme value stays inside its cell instead of pushing the page
+     sideways; the cell is min-width: 0 so the grid track can shrink to it. */
   overflow-wrap: anywhere;
 }
 .joy-stat-item__label {
@@ -5036,11 +5040,13 @@ a.joy-logo-cloud__item:focus-visible {
   margin-top: 8px;
   padding: 2px 8px;
   border-radius: var(--joy-radius-pill);
-  /* A pill is one short line: it never wraps into a multi-line blob (the copy is kept short; see the phone steps for
-     the tighter padding at 320px). */
+  /* A pill is one short line: it never wraps into a multi-line blob. Keep the copy short; a longer one is cut at the
+     card edge (ellipsis) instead of spilling out of the card. */
   white-space: nowrap;
   max-width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* The trend caret is sized from the pill's own type step (1em of --joy-font-size-xs), so it scales with it. */
 .joy-stat-item__change svg {
@@ -5069,26 +5075,43 @@ a.joy-logo-cloud__item:focus-visible {
   white-space: nowrap;
   border: 0;
 }
-/* Phones: a compact 2x2 grid of smaller cards instead of four tall full-width ones. */
+/* Phones: the section itself is padded tighter (a media query is right for the section's own padding). */
 @media (max-width: 480px) {
   .joy-stats-section {
     padding: 32px 16px;
   }
-  .joy-stat-item {
-    padding: 16px 12px;
-  }
+}
+/* Type and padding follow the container. 9 mono characters are ~5.4em wide: xl (23px, ~124px) fits a 150px cell, so
+   containers narrower than ~312px step to lg, and narrower than ~272px to md. */
+@container joy-stats (width < 19.5rem) {
   .joy-stat-item__value {
-    font-size: var(--joy-font-size-xl);
+    font-size: var(--joy-font-size-lg);
+  }
+  .joy-stat-item__change {
+    gap: 2px;
+    padding: 2px 6px;
   }
 }
-/* Wider containers, by how many stats there are. 3 and 6 stats make three columns from 40rem, 4 make four from 52rem,
-   5 make five from 64rem; every other count keeps two columns (an odd last card spans) so no row is ever short. */
+@container joy-stats (width < 17rem) {
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-md);
+  }
+}
+/* Wider containers, by how many stats there are. From 30rem the cards get roomy (3xl values). 3 and 6 stats make three
+   columns from 45rem, 4 make four from 60rem, 5 make five from 69rem (each column then holds a 9 character 3xl value
+   on one line); every other count keeps two columns (an odd last card spans) so no row is ever short. */
 @container joy-stats (min-width: 30rem) {
   .joy-stats-grid {
     gap: 24px;
   }
+  .joy-stat-item {
+    padding: 24px 20px;
+  }
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-3xl);
+  }
 }
-@container joy-stats (min-width: 40rem) {
+@container joy-stats (min-width: 45rem) {
   .joy-stats-grid:has(> :nth-child(3):last-child),
   .joy-stats-grid:has(> :nth-child(6):last-child) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5097,40 +5120,27 @@ a.joy-logo-cloud__item:focus-visible {
     grid-column: auto;
   }
   .joy-stats-grid:has(> :nth-child(7)) {
-    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(224px, 100%), 1fr));
   }
   .joy-stats-grid:has(> :nth-child(7)) > .joy-stat-item:last-child {
     grid-column: auto;
   }
 }
-@container joy-stats (min-width: 52rem) {
+@container joy-stats (min-width: 60rem) {
   .joy-stats-grid:has(> :nth-child(4):last-child) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
-@container joy-stats (min-width: 64rem) {
+@container joy-stats (min-width: 69rem) {
   .joy-stats-grid:has(> :nth-child(5):last-child) {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
   }
   .joy-stats-grid:has(> :nth-child(5):last-child) > .joy-stat-item:last-child {
     grid-column: auto;
   }
-  /* five cards share 1152px at most: a tighter gap and side padding keep a 9 character value on one line */
-  .joy-stats-grid:has(> :nth-child(5):last-child) {
-    gap: 16px;
-  }
   .joy-stats-grid:has(> :nth-child(5):last-child) > .joy-stat-item {
     padding-inline: 12px;
-  }
-}
-/* 320px class phones: a half-width cell has ~114px, so a 9 character mono value ("1,204,551") needs the next step down. */
-@media (max-width: 360px) {
-  .joy-stat-item__value {
-    font-size: var(--joy-font-size-lg);
-  }
-  .joy-stat-item__change {
-    gap: 2px;
-    padding: 2px 6px;
   }
 }
 

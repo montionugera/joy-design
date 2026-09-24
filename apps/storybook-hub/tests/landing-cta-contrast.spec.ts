@@ -31,18 +31,28 @@ for (const theme of themes) {
           };
           return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
         };
-        const effectiveBackground = (element: Element) => {
+        // every colour the element can sit on: the first opaque background up the tree AND, where that node paints a
+        // gradient (the CTA band's accent wash), each of its stops
+        const surfaces = (element: Element) => {
           for (
             let node: Element | null = element;
             node;
             node = node.parentElement
           ) {
-            const [r, g, b, a = 1] = parse(
-              getComputedStyle(node).backgroundColor,
-            );
-            if (a > 0.99) return [r, g, b];
+            const style = getComputedStyle(node);
+            const [r, g, b, a = 1] = parse(style.backgroundColor);
+            const stops = style.backgroundImage.includes("gradient(")
+              ? (style.backgroundImage.match(/rgba?\([^)]*\)/g) ?? []).map(
+                  parse,
+                )
+              : [];
+            if (a > 0.99 || stops.length) {
+              const found = stops.map(([sr, sg, sb]) => [sr, sg, sb]);
+              if (a > 0.99) found.push([r, g, b]);
+              return found;
+            }
           }
-          return [255, 255, 255];
+          return [[255, 255, 255]];
         };
         const ratio = (fg: number[], bg: number[]) => {
           const [hi, lo] = [luminance(fg), luminance(bg)].sort((x, y) => y - x);
@@ -55,9 +65,11 @@ for (const theme of themes) {
         return Array.from(targets).map((element) => ({
           label: element.className,
           disabled: (element as HTMLButtonElement).disabled === true,
-          ratio: ratio(
-            parse(getComputedStyle(element).color),
-            effectiveBackground(element),
+          // the worst surface behind the text: a fully cream wash turns this red
+          ratio: Math.min(
+            ...surfaces(element).map((surface) =>
+              ratio(parse(getComputedStyle(element).color), surface),
+            ),
           ),
         }));
       }, view);
@@ -76,7 +88,7 @@ for (const theme of themes) {
 }
 
 // F-039 T1 (taste review P1-3): in dark the CTA band must not be the brightest slab on the page (it used the inverse
-// surface, cream in dark). Measured on the hub blocks view: the band fill is dark and darker than the page text.
+// surface, cream in dark). Measured on the hub views: the band fill and every stop of its wash are dark and darker than the page text.
 for (const view of views) {
   test(`hub ${view} dark CTA band is not a cream slab`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
@@ -99,8 +111,14 @@ for (const view of views) {
         `#view-${viewId} .joy-cta-section__container`,
       )!;
       const title = band.querySelector(".joy-cta-section__title")!;
+      const style = getComputedStyle(band);
+      // the brightest colour the band paints: its fill AND every stop of its accent wash
+      const painted = [
+        style.backgroundColor,
+        ...(style.backgroundImage.match(/rgba?\([^)]*\)/g) ?? []),
+      ].map(lum);
       return {
-        band: lum(getComputedStyle(band).backgroundColor),
+        band: Math.max(...painted),
         text: lum(getComputedStyle(title).color),
       };
     }, view);
