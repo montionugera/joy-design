@@ -407,6 +407,16 @@ test('F-039 T1 CSS: a disabled landing button is an outline-weight chip with a v
   assert.ok(!/border-disabled/.test(busyBlock), 'border-disabled is the invisible tone the review rejected');
 });
 
+test('F-039 T1 CSS: bento content starts at the card text edge, the hero keeps no margin below its last actions, and the footer pairs its groups from 480px', () => {
+  const content = rule(bentoBlock, '.joy-bento-card__content');
+  assert.match(content, /justify-content:\s*flex-start/, 'chips start where the card text starts');
+  assert.match(content, /align-items:\s*flex-end/, 'chips rest at the bottom of the card, not the middle');
+  assert.match(rule(heroBlock, '.joy-hero__ctas:last-child'), /margin-bottom:\s*0/, 'no 36px margin stacked on the hero padding when nothing follows the actions');
+  const pair = footerBlock.match(/@media \(min-width: 480px\) and \(max-width: 767px\) \{([\s\S]*?\n)\}/)[1];
+  assert.match(pair, /\.joy-site-footer__inner \{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(pair, /\.joy-site-footer__column:last-child:nth-child\(even\) \{\s*grid-column:\s*1 \/ -1/, 'a last group that would sit alone takes the row');
+});
+
 // ── F-039 L2: pricing CSS contract ──
 const pricingBlock = block('/* Pricing Matrix */', '/* Testimonial Card */');
 
@@ -932,7 +942,8 @@ test('F-039 L5a CSS: from 768px the footer is a wrapping flex row (brand on its 
   assert.match(wide, /\.joy-site-footer__brand \{[^}]*flex:\s*2 1 0/);
   assert.match(wide, /\.joy-site-footer__brand \{[^}]*min-width:\s*240px/);
   assert.ok(!/grid-template-columns:[^;]*(\d+fr repeat\(auto-|repeat\(auto-)/.test(footerBlock), 'no auto-fit track list next to a fixed brand (empty cells / invalid list)');
-  assert.ok(!/grid-column/.test(footerBlock), 'no grid span for the brand');
+  // the only grid spans live in the 480-767px pairing rule below (a flex row from 768px has none)
+  assert.ok(!/grid-column/.test(footerBlock.replace(/@media \(min-width: 480px\) and \(max-width: 767px\) \{[\s\S]*?\n\}\n/, '')), 'no grid span outside the phone/tablet pairing rule');
 });
 
 test('F-039 L5a contrast: footer text pairs pass WCAG AA in both themes on the card surface, and the divider is >= 3:1 (computed)', () => {

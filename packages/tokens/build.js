@@ -2563,11 +2563,12 @@ h1, h2, h3, .joy-display {
   line-height: 1.5;
   margin: 0 0 16px 0;
 }
+/* Content (usually a chip row) starts where the card text starts and sits at the bottom of the card, so chips do not float mid-card. */
 .joy-bento-card__content {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 /* Hero Section */
@@ -2618,6 +2619,10 @@ h1, h2, h3, .joy-display {
   gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 36px;
+}
+/* With nothing below the actions (no preview) the hero padding is the only gap to the next section: 36px of margin on top of it left ~110px of dead space. */
+.joy-hero__ctas:last-child {
+  margin-bottom: 0;
 }
 .joy-hero .joy-button--solid:hover:not(:disabled),
 .joy-cta-section .joy-button--solid:hover:not(:disabled) {
@@ -5475,6 +5480,17 @@ a.joy-logo-cloud__item:focus-visible {
     display: grid;
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  /* 480 to 767px: the link groups pair up in two columns (one long single column was ~600px tall). The brand keeps its own
+     row and a last group that would sit alone in a row takes the whole row, so no width leaves an empty cell. */
+  .joy-site-footer__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .joy-site-footer__brand,
+  .joy-site-footer__column:last-child:nth-child(even) {
+    grid-column: 1 / -1;
   }
 }
 @media (max-width: 639px) {
