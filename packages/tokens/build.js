@@ -4966,7 +4966,7 @@ a.joy-logo-cloud__item:focus-visible {
   outline-offset: 4px;
   border-radius: var(--joy-radius-control);
 }
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .joy-logo-cloud {
     padding: 32px 16px;
   }
@@ -5085,7 +5085,7 @@ a.joy-logo-cloud__item:focus-visible {
   border: 0;
 }
 /* Phones: the section itself is padded tighter (a media query is right for the section's own padding). */
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .joy-stats-section {
     padding: 32px 16px;
   }
@@ -5373,7 +5373,7 @@ a.joy-logo-cloud__item:focus-visible {
   color: var(--joy-text-secondary);
   overflow-wrap: anywhere;
 }
-@media (max-width: 480px) {
+@media (max-width: 479px) {
   .joy-faq-section {
     padding: 32px 16px;
   }

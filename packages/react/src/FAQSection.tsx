@@ -16,7 +16,7 @@ export interface FAQSectionProps extends Omit<React.HTMLAttributes<HTMLElement>,
 
 export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
   title = 'Frequently asked questions',
-  subtitle = 'Everything you need to know about our institutional trading and liquidity infrastructure.',
+  subtitle = 'Everything you need to know about our trading and liquidity services.',
   items,
   allowMultiple = false,
   className = '',

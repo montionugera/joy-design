@@ -337,3 +337,10 @@ test('F-039 L4: no phantom colour token, hex literal or middle dot in any proof 
   ].join('');
   assert.ok(!/#[0-9a-f]{3,8}\b|var\(--joy-color|&bull;|·/i.test(markup.replace(/<svg\b[^>]*>/g, '')));
 });
+
+// F-039 F1 (final review A): the default subtitle follows the same plain-copy rule as the other landing defaults.
+test('F-039 F1: FAQSection default subtitle has no word over 12 characters', () => {
+  const subtitle = faq().match(/<p class="joy-faq-section__subtitle">([^<]*)<\/p>/)[1];
+  const long = subtitle.split(/\s+/).map((w) => w.replace(/[^a-z]/gi, '')).filter((w) => w.length > 12);
+  assert.deepStrictEqual(long, [], `words over 12 characters in "${subtitle}"`);
+});

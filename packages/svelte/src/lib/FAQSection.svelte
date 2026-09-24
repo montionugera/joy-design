@@ -19,7 +19,7 @@
 
   let {
     title = 'Frequently asked questions',
-    subtitle = 'Everything you need to know about our institutional trading and liquidity infrastructure.',
+    subtitle = 'Everything you need to know about our trading and liquidity services.',
     items,
     allowMultiple = false,
     class: className = '',

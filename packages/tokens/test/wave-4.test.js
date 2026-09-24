@@ -706,7 +706,7 @@ test('F-039 L4 CSS: logo cloud wraps and centres, draws in currentColor at muted
   const title = rule(logoBlock, '.joy-logo-cloud__title');
   assert.match(title, /color:\s*var\(--joy-text-secondary\)/);
   assert.ok(!/text-transform|letter-spacing/.test(title), 'sentence case, normal tracking');
-  assert.match(mediaBody(logoBlock, 'max-width: 480px'), /gap:\s*24px 28px/);
+  assert.match(mediaBody(logoBlock, 'max-width: 479px'), /gap:\s*24px 28px/);
 });
 
 test('F-039 L4 CSS: linked logos are 44px touch targets with a focus ring', () => {
@@ -730,7 +730,7 @@ test('F-039 L4 CSS: stats card is raised, values are accent-text, text is second
 });
 
 test('F-039 L4 CSS: the stats are a compact 2x2 grid with smaller values by default, and type follows the container', () => {
-  assert.match(mediaBody(statsBlock, 'max-width: 480px'), /\.joy-stats-section \{\s*padding: 32px 16px;/, 'only the section padding stays a media query');
+  assert.match(mediaBody(statsBlock, 'max-width: 479px'), /\.joy-stats-section \{\s*padding: 32px 16px;/, 'only the section padding stays a media query');
   assert.ok(!/@media[^{]*\{[^@]*\.joy-stat-item__value/.test(statsBlock), 'no value font size follows the window: columns and type follow the same box');
   assert.match(step('joy-stats', 'width < 19.5rem'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-lg\)/, 'a 9 character value fits the ~114px cell at 320px');
   assert.match(step('joy-stats', 'width < 17rem'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-md\)/);
@@ -1097,4 +1097,12 @@ test('F-039 T2 CSS: the pricing section wrapper only pads and spaces; the card l
   assert.ok(!/container-type|@container|@media|:has\(/.test(sectionsBlock), 'no container, no query: PricingMatrix lays itself out');
   assert.match(rule(sectionsBlock, '.joy-landing-page__pricing'), /padding:\s*0 24px/);
   assert.ok(!themeCss.includes('.joy-pricing-fit'), 'no hub-only utility class ships in theme.css');
+});
+
+test('F-039 F1 CSS: every landing section agrees on one phone breakpoint (max-width 479px, "under 480px")', () => {
+  for (const [name, css] of [['hero', heroBlock], ['CTA', ctaBlock], ['logo cloud', logoBlock], ['stats', statsBlock], ['FAQ', faqBlock]]) {
+    assert.match(css, /@media \(max-width: 479px\)/, `${name} has a phone rule at 479px`);
+    assert.ok(!/@media \(max-width: 480px\)/.test(css), `${name} has no 480px phone rule (hero and CTA used 479, the rest 480: at exactly 480px the sections disagreed)`);
+  }
+  assert.match(mediaBody(faqBlock, 'max-width: 479px'), /\.joy-faq-section \{\s*padding: 32px 16px;/);
 });
