@@ -1,5 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { render } from 'svelte/server';
 import { compileSvelte, renderSvelte as renderRaw } from './helpers/render-svelte.js';
 
 // F-039 L1: HeroSection + CTASection (Svelte twin). The React twin asserts the same expectations in
@@ -64,10 +68,11 @@ test('F-039 L1: primaryHref renders a link; disabled or loading link drops href 
   const link = firstAnchor(await renderSvelte('HeroSection', { primaryHref: '/start' }));
   assert.match(link, /<a\b[^>]*href="\/start"/);
   assert.match(link, /joy-button--solid/);
-  assert.ok(!/aria-disabled/.test(link));
+  assert.ok(!/aria-disabled/.test(link) && !/role=/.test(link), 'an enabled link keeps its native role');
 
   const off = firstAnchor(await renderSvelte('HeroSection', { primaryHref: '/start', primaryDisabled: true }));
   assert.ok(!/\shref=/.test(off), 'disabled link has no href');
+  assert.match(off, /role="link"/);
   assert.match(off, /aria-disabled="true"/);
   assert.match(off, /tabindex="-1"/);
 
@@ -83,7 +88,7 @@ test('F-039 L1: primaryHref renders a link; disabled or loading link drops href 
   assert.match(sec, /<a\b[^>]*joy-button--outline/);
 });
 
-test('F-039 L1: rest attributes land on the hero and CTA root, ref is bindable', async () => {
+test('F-039 L1: rest attributes land on the hero and CTA root (ref binding is gated by SVELTE_REF_REST in parity-check)', async () => {
   const hero = await renderSvelte('HeroSection', { 'data-x': '1', 'aria-label': 'Landing hero', class: 'extra' });
   assert.match(hero, /<section\b[^>]*class="joy-hero extra"[^>]*/);
   assert.match(hero, /<section\b[^>]*data-x="1"/);
@@ -100,12 +105,35 @@ test('F-039 L1: CTASection has no glass class, outline secondary, no arrow svg, 
   assert.ok(html.includes('Get started today') && html.includes('Contact sales'));
 });
 
-test('F-039 L1: CTASection labels the section by its title (unique id per instance) and takes action props', async () => {
+test('F-039 L1: CTASection labels the section by its title and takes action props', async () => {
   const a = await renderSvelte('CTASection', { title: 'One', primaryLoading: true, secondaryHref: '/contact' });
   const id = a.match(/<section\b[^>]*aria-labelledby="([^"]+)"/)[1];
   assert.match(a, new RegExp(`<h2 class="joy-cta-section__title" id="${id}">One</h2>`));
   assert.match(a, /aria-busy="true"/);
   assert.match(a, /<a\b[^>]*href="\/contact"/);
-  const b = await renderSvelte('CTASection', { title: 'Two' });
-  assert.ok(b.includes('aria-labelledby='), 'second instance also labelled');
+});
+
+test('F-039 L1: two CTASections in one tree get different title ids', async () => {
+  const dir = fs.mkdtempSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '.tmp-cta-pair-'));
+  try {
+    const target = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../src/lib/CTASection.svelte')).href;
+    const file = path.join(dir, 'Pair.svelte');
+    fs.writeFileSync(file, `<script>import CTASection from '${target}';</script><CTASection title="One" /><CTASection title="Two" />`);
+    await renderRaw('Badge', {}); // registers the .svelte load hook
+    const { default: Pair } = await import(pathToFileURL(file).href);
+    const html = render(Pair, { props: {} }).body;
+    const ids = [...html.matchAll(/aria-labelledby="([^"]+)"/g)].map((m) => m[1]);
+    assert.strictEqual(ids.length, 2);
+    assert.notStrictEqual(ids[0], ids[1], 'each instance owns its title id');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('F-039 L1: a consumer aria-label names the CTA section instead of being hidden by aria-labelledby', async () => {
+  const html = await renderSvelte('CTASection', { title: 'One', 'aria-label': 'Sign up band' });
+  assert.match(html, /<section\b[^>]*aria-label="Sign up band"/);
+  assert.ok(!/<section\b[^>]*aria-labelledby/.test(html));
+  const own = await renderSvelte('CTASection', { title: 'One', 'aria-labelledby': 'mine' });
+  assert.match(own, /<section\b[^>]*aria-labelledby="mine"/);
 });

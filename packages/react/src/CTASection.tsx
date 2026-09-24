@@ -32,7 +32,7 @@ export const CTASection = React.forwardRef<HTMLElement, CTASectionProps>(({
 }, ref) => {
   const titleId = `joy-cta-title-${React.useId()}`;
   return (
-    <section ref={ref} className={`joy-cta-section ${className}`} aria-labelledby={titleId} {...props}>
+    <section ref={ref} className={`joy-cta-section ${className}`} aria-labelledby={props['aria-label'] ? undefined : titleId} {...props}>
       <div className="joy-cta-section__container">
         <h2 className="joy-cta-section__title" id={titleId}>{title}</h2>
         {description && <p className="joy-cta-section__desc">{description}</p>}

@@ -3687,16 +3687,18 @@ export async function executeHedge(symbol: string, size: number) {
               </section>
 
               <!-- 8. CTASection -->
-              <section class="joy-cta-section" style="margin: 0 24px 48px; border-radius: 16px;">
-                <h2 class="joy-cta-section__title">Ready to Deploy Institutional Infrastructure?</h2>
-                <p class="joy-cta-section__description">Access high-performance execution primitives, Canvas charting engines, and institutional risk guards today.</p>
-                <div class="joy-cta-section__actions">
-                  <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
-                    Start Free Trial
-                  </button>
-                  <button type="button" class="joy-button joy-button--outline joy-button--lg">
-                    Contact Institutional Sales
-                  </button>
+              <section class="joy-cta-section" style="margin: 0 24px 48px;">
+                <div class="joy-cta-section__container">
+                  <h2 class="joy-cta-section__title">Ready to Deploy Institutional Infrastructure?</h2>
+                  <p class="joy-cta-section__desc">Access high-performance execution primitives, Canvas charting engines, and institutional risk guards today.</p>
+                  <div class="joy-cta-section__actions">
+                    <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
+                      Start Free Trial
+                    </button>
+                    <button type="button" class="joy-button joy-button--outline joy-button--lg">
+                      Contact Institutional Sales
+                    </button>
+                  </div>
                 </div>
               </section>
 

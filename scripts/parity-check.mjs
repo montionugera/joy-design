@@ -67,7 +67,9 @@ export const COMPONENTS = [
   'CandlestickChart',
   // Wave 4 (F-039)
   'HeroSection',
-  'CTASection'
+  'CTASection',
+  // internal (not exported): the action button both landing twins render; no ref/rest by design
+  'LandingAction'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a

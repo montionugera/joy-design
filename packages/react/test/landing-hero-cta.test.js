@@ -9,6 +9,7 @@ const React = requireFromHere('react');
 const { renderToStaticMarkup } = requireFromHere('react-dom/server');
 const { HeroSection } = loadComponent('HeroSection');
 const { CTASection } = loadComponent('CTASection');
+const { LandingAction } = loadComponent('LandingAction');
 const hero = (props = {}) => renderToStaticMarkup(React.createElement(HeroSection, props));
 const cta = (props = {}) => renderToStaticMarkup(React.createElement(CTASection, { title: 'Ready to start', ...props }));
 
@@ -64,10 +65,11 @@ test('F-039 L1: primaryHref renders a link; disabled or loading link drops href 
   const link = firstAnchor(hero({ primaryHref: '/start' }));
   assert.match(link, /^<a\b[^>]*href="\/start"/);
   assert.match(link, /joy-button--solid/);
-  assert.ok(!/aria-disabled/.test(link));
+  assert.ok(!/aria-disabled/.test(link) && !/role=/.test(link), 'an enabled link keeps its native role');
 
   const off = firstAnchor(hero({ primaryHref: '/start', primaryDisabled: true }));
   assert.ok(!/\shref=/.test(off), 'disabled link has no href');
+  assert.match(off, /role="link"/);
   assert.match(off, /aria-disabled="true"/);
   assert.match(off, /tabindex="-1"/);
 
@@ -99,11 +101,67 @@ test('F-039 L1: CTASection has no glass class, outline secondary, no arrow svg, 
   assert.ok(html.includes('Get started today') && html.includes('Contact sales'));
 });
 
-test('F-039 L1: CTASection labels the section by its title (unique id per instance) and takes action props', () => {
+test('F-039 L1: CTASection labels the section by its title and takes action props', () => {
   const a = cta({ title: 'One', primaryLoading: true, secondaryHref: '/contact' });
   const id = a.match(/<section\b[^>]*aria-labelledby="([^"]+)"/)[1];
   assert.ok(a.includes(`<h2 class="joy-cta-section__title" id="${id}">One</h2>`), a);
   assert.match(a, /aria-busy="true"/);
   assert.match(a, /<a\b[^>]*href="\/contact"/);
-  assert.ok(cta({ title: 'Two' }).includes('aria-labelledby='), 'second instance also labelled');
+});
+
+test('F-039 L1: two CTASections in one tree get different title ids', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(React.Fragment, null, React.createElement(CTASection, { title: 'One' }), React.createElement(CTASection, { title: 'Two' }))
+  );
+  const ids = [...html.matchAll(/aria-labelledby="([^"]+)"/g)].map((m) => m[1]);
+  assert.strictEqual(ids.length, 2);
+  assert.notStrictEqual(ids[0], ids[1], 'each instance owns its title id');
+});
+
+test('F-039 L1: a consumer aria-label names the CTA section instead of being hidden by aria-labelledby', () => {
+  const html = cta({ 'aria-label': 'Sign up band' });
+  assert.match(html, /^<section\b[^>]*aria-label="Sign up band"/);
+  assert.ok(!/^<section\b[^>]*aria-labelledby/.test(html));
+  assert.match(cta({ 'aria-labelledby': 'mine' }), /^<section\b[^>]*aria-labelledby="mine"/);
+});
+
+// Event wiring without a DOM: call the forwardRef render function and inspect the element tree.
+const findActions = (node, found = []) => {
+  if (Array.isArray(node)) node.forEach((n) => findActions(n, found));
+  else if (node && typeof node === 'object' && node.props) {
+    if (node.type === LandingAction) found.push(node);
+    findActions(node.props.children, found);
+  }
+  return found;
+};
+
+test('F-039 L1: onPrimaryClick and onSecondaryClick reach the matching action', () => {
+  const primary = () => {};
+  const secondary = () => {};
+  for (const [C, extra] of [[HeroSection, {}], [CTASection, { title: 'T' }]]) {
+    // hooks (useId) need a render context: capture the element tree from inside a probe component
+    let tree;
+    const Probe = () => { tree = C.render({ ...extra, onPrimaryClick: primary, onSecondaryClick: secondary }, null); return null; };
+    renderToStaticMarkup(React.createElement(Probe));
+    const [first, second] = findActions(tree);
+    assert.strictEqual(first.props.onClick, primary, `${C.displayName} primary`);
+    assert.strictEqual(first.props.variant, 'solid');
+    assert.strictEqual(second.props.onClick, secondary, `${C.displayName} secondary`);
+    assert.strictEqual(second.props.variant, 'outline');
+  }
+});
+
+test('F-039 L1: an inert link swallows clicks, an enabled link and a button pass them through', () => {
+  let calls = 0;
+  const handler = () => { calls += 1; };
+  const inert = LandingAction({ href: '/x', disabled: true, onClick: handler });
+  assert.strictEqual(inert.type, 'a');
+  assert.notStrictEqual(inert.props.onClick, handler);
+  let prevented = false;
+  inert.props.onClick({ preventDefault: () => { prevented = true; } });
+  assert.ok(prevented && calls === 0, 'preventDefault called, handler not called');
+  const busy = LandingAction({ href: '/x', loading: true, onClick: handler });
+  assert.notStrictEqual(busy.props.onClick, handler);
+  assert.strictEqual(LandingAction({ href: '/x', onClick: handler }).props.onClick, handler);
+  assert.strictEqual(LandingAction({ onClick: handler }).props.onClick, handler);
 });

@@ -38,7 +38,7 @@
   const titleId = `joy-cta-title-${uid}`;
 </script>
 
-<section bind:this={ref} class="joy-cta-section {className}" aria-labelledby={titleId} {...rest}>
+<section bind:this={ref} class="joy-cta-section {className}" aria-labelledby={rest['aria-label'] ? undefined : titleId} {...rest}>
   <div class="joy-cta-section__container">
     <h2 class="joy-cta-section__title" id={titleId}>{title}</h2>
     {#if description}

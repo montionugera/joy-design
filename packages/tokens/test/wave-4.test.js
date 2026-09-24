@@ -281,19 +281,46 @@ test('F-039 L1 CSS: hero and CTA solid buttons lift 1px on hover and settle on a
   assert.match(heroBlock, /@media \(max-width: 479px\) \{[\s\S]*?\.joy-hero__ctas,\n\s*\.joy-cta-section__actions \{\s*flex-direction: column;\s*align-items: stretch;[\s\S]*?width: 100%;/);
 });
 
-test('F-039 L1 CSS: the CTA band is an inverse surface and every text on it is the inverse text token', () => {
+test('F-039 L1 CSS: the CTA band is an inverse surface and inverse text is scoped to it', () => {
   assert.match(rule(ctaBlock, '.joy-cta-section__container'), /background:\s*var\(--joy-surface-inverse\)/);
-  assert.match(rule(ctaBlock, '.joy-cta-section__title'), /color:\s*var\(--joy-text-inverse\)/);
-  assert.match(rule(ctaBlock, '.joy-cta-section__desc'), /color:\s*var\(--joy-text-inverse\)/);
-  const outline = rule(ctaBlock, '.joy-cta-section .joy-button--outline');
+  // A CTA rendered without the band falls back to readable page text, never to inverse text on the canvas.
+  assert.match(rule(ctaBlock, '.joy-cta-section__title'), /color:\s*var\(--joy-text-primary\)/);
+  assert.match(rule(ctaBlock, '.joy-cta-section__desc'), /color:\s*var\(--joy-text-secondary\)/);
+  const inverse = rule(ctaBlock, '.joy-cta-section__container .joy-cta-section__title,\n.joy-cta-section__container .joy-cta-section__desc');
+  assert.match(inverse, /color:\s*var\(--joy-text-inverse\)/);
+  const outline = rule(ctaBlock, '.joy-cta-section__container .joy-button--outline');
   assert.match(outline, /color:\s*var\(--joy-text-inverse\)/);
   assert.match(outline, /border-color:\s*var\(--joy-text-inverse\)/);
-  assert.ok(!/--joy-text-primary/.test(ctaBlock), 'text-primary is 1.11:1 on the inverse band, never used inside it');
+  assert.match(rule(ctaBlock, '.joy-cta-section__container .joy-button--solid'), /border-color:\s*var\(--joy-text-on-accent\)/);
+  assert.ok(!/\.joy-cta-section \.joy-button--outline\s*\{/.test(ctaBlock), 'no unscoped inverse outline rule');
   assert.match(ctaBlock, /@media \(max-width: 479px\) \{\s*\.joy-cta-section \{\s*padding: 32px 16px;[\s\S]*?padding: 40px 20px;/);
 });
 
+test('F-039 L1 CSS: the CTA outline hover and press never remove the keyboard focus ring', () => {
+  const shadowRule = rule(
+    ctaBlock,
+    '.joy-cta-section__container .joy-button--outline:hover:not(:disabled):not(:focus-visible),\n.joy-cta-section__container .joy-button--outline:active:not(:disabled):not(:focus-visible)'
+  );
+  assert.match(shadowRule, /box-shadow:\s*inset 0 0 0 1px var\(--joy-text-inverse\)/);
+  const plain = rule(ctaBlock, '.joy-cta-section__container .joy-button--outline:hover:not(:disabled),\n.joy-cta-section__container .joy-button--outline:active:not(:disabled)');
+  assert.ok(!/box-shadow/.test(plain), 'the unconditional hover/press rule must not set box-shadow (it would replace the focus ring)');
+});
+
+test('F-039 L1 hub: every CTA in the hub markup uses the band container and only defined classes', () => {
+  const hub = fs.readFileSync(path.resolve(__dirname, '../../../apps/storybook-hub/build.js'), 'utf8');
+  const sections = hub.split(/<(?:section|div) class="joy-cta-section"/).slice(1);
+  assert.ok(sections.length >= 2, 'the hub renders at least two CTA blocks');
+  for (const chunk of sections) {
+    assert.ok(chunk.slice(0, 400).includes('joy-cta-section__container'), 'a hub CTA must wrap its content in .joy-cta-section__container');
+  }
+  assert.ok(!hub.includes('joy-cta-section__description'), 'undefined class joy-cta-section__description');
+});
+
 test('F-039 L1 CSS: a link-based action that is disabled or loading looks and behaves disabled', () => {
-  assert.match(themeCss, /\.joy-button\[aria-disabled="true"\],\n\.joy-button:disabled \{[^}]*pointer-events:\s*none/);
+  assert.match(themeCss, /\.joy-button\[aria-disabled="true"\],\n\.joy-button:disabled \{/);
+  assert.match(themeCss, /\.joy-button\[aria-disabled="true"\] \{ pointer-events: none; \}/);
+  // pointer-events on the shared disabled rule would kill cursor:not-allowed for every disabled Button.
+  assert.ok(!/pointer-events/.test(rule(themeCss, '.joy-button[aria-disabled="true"],\n.joy-button:disabled')), 'the shared disabled rule must not set pointer-events');
 });
 
 test('F-039 L1 contrast: hero and CTA token pairs pass WCAG AA in both themes (computed)', () => {
@@ -302,12 +329,15 @@ test('F-039 L1 contrast: hero and CTA token pairs pass WCAG AA in both themes (c
     ['text-primary', 'surface-raised', 4.5, 'hero outline button text'],
     ['accent-text', 'surface-canvas', 4.5, 'title emphasis on the hero canvas'],
     ['accent-text', 'accent-subtle', 4.5, 'hero badge text'],
-    ['text-inverse', 'surface-inverse', 4.5, 'CTA band title, description and outline button text'],
+    ['text-inverse', 'surface-inverse', 4.5, 'CTA band title, description and outline button text (and its 1px border)'],
+    ['text-primary', 'surface-canvas', 4.5, 'CTA title fallback when rendered without the band'],
+    ['text-secondary', 'surface-canvas', 4.5, 'CTA description fallback when rendered without the band'],
+    ['text-disabled', 'surface-disabled', 4.5, 'disabled button chip on the band'],
+    ['surface-canvas', 'surface-inverse', 3, 'focus halo inner ring against the band'],
     ['text-on-accent', 'accent-default', 4.5, 'solid button label, gradient start'],
     ['text-on-accent', 'accent-gradient-end', 4.5, 'solid button label, gradient end'],
     ['border-strong', 'surface-raised', 3, 'hero outline button border'],
-    ['border-strong', 'surface-canvas', 3, 'CTA band border against the page'],
-    ['text-inverse', 'surface-inverse', 3, 'CTA outline button border on the band']
+    ['border-strong', 'surface-canvas', 3, 'CTA band border against the page']
   ];
   for (const theme of ['light', 'dark']) {
     for (const [fg, bg, min, why] of pairs) {
@@ -315,4 +345,10 @@ test('F-039 L1 contrast: hero and CTA token pairs pass WCAG AA in both themes (c
       assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min} (${why})`);
     }
   }
+});
+
+test('F-039 L1 contrast: the CTA solid button edge is a dark edge on the cream band in dark and invisible (band colour) in light', () => {
+  const on = (theme, fg, bg) => contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+  assert.ok(on('dark', 'text-on-accent', 'surface-inverse') >= 3, 'dark: edge vs cream band');
+  assert.strictEqual(tokenMaps.light['--joy-text-on-accent'], tokenMaps.light['--joy-surface-inverse'], 'light: edge equals the navy band, so nothing changes visually');
 });

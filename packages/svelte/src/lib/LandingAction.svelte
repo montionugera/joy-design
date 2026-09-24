@@ -32,6 +32,7 @@
   <a
     class="joy-button joy-button--{variant} joy-button--lg {loading ? 'joy-button--loading' : ''} {className}"
     href={inert ? undefined : href}
+    role={inert ? 'link' : undefined}
     aria-disabled={inert || undefined}
     aria-busy={loading || undefined}
     tabindex={inert ? -1 : undefined}
