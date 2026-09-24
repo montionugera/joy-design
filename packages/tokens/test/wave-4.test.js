@@ -88,12 +88,131 @@ test('Wave 4 A1 runParityCheck turns a Svelte ref/rest failure into a FAIL row i
         assert.ok(row, `side=${side}: a ref/rest row must be reported`);
         assert.strictEqual(row.status, 'FAIL');
         assert.strictEqual(result.passed, false);
+        assert.deepStrictEqual(
+          result.checks.filter((c) => c.component === 'Bad'),
+          [{ component: 'Bad', check: 'Svelte ref/rest (ref, restSpread, bindThis)', status: 'FAIL' }],
+          `side=${side}: exactly one Bad row with the exact missing list`
+        );
         assert.match(mod.formatMarkdownTable(result), /\| Bad \| Svelte ref\/rest \(ref, restSpread, bindThis\) \| FAIL \|/);
       }
       const reactOnly = mod.runParityCheck({ rootDir: tmp, side: 'react' });
       assert.ok(!reactOnly.checks.some((c) => /ref\/rest/.test(c.check)), 'react mode must not run the Svelte check');
     });
   } finally {
+    mod.SVELTE_REF_REST.length = 0;
+    mod.SVELTE_REF_REST.push(...original);
+  }
+});
+
+test('Wave 4 A1 checkSvelteRefRest reads the markup only for the rest spread and bind:this', () => {
+  withTempSvelteDir(
+    {
+      // {...rest} only inside <script> is not a spread on an element.
+      ScriptOnlyRest: `<script lang="ts">
+  let { ref = $bindable(null), ...rest } = $props();
+  const merged = { ...rest };
+</script>
+<section bind:this={ref}>x</section>
+`,
+      // bind:this={ref} only inside a script string is not a binding.
+      ScriptOnlyBind: `<script lang="ts">
+  let { ref = $bindable(null), ...rest } = $props();
+  const note = 'bind:this={ref}';
+</script>
+<section {...rest}>x</section>
+`,
+      // ref = $bindable(null) only in markup is not a destructure.
+      MarkupOnlyRef: `<script lang="ts">
+  let { ...rest } = $props();
+</script>
+<section bind:this={ref} {...rest}>ref = $bindable(null)</section>
+`
+    },
+    (root) => {
+      const byName = Object.fromEntries(
+        mod.checkSvelteRefRest(root, ['ScriptOnlyRest', 'ScriptOnlyBind', 'MarkupOnlyRef']).map((f) => [f.component, f.missing])
+      );
+      assert.deepStrictEqual(byName.ScriptOnlyRest, ['restSpread']);
+      assert.deepStrictEqual(byName.ScriptOnlyBind, ['bindThis']);
+      assert.deepStrictEqual(byName.MarkupOnlyRef, ['ref']);
+    }
+  );
+});
+
+test('Wave 4 A1 checkSvelteRefRest accepts the generic $bindable<T>(null) form', () => {
+  withTempSvelteDir(
+    {
+      Generic: OK.replace('$bindable(null)', '$bindable<HTMLElement | null>(null)'),
+      Nested: OK.replace('$bindable(null)', '$bindable<Array<HTMLElement> | null>(null)'),
+      // A non-null default is still not the contract.
+      NotNull: OK.replace('$bindable(null)', '$bindable<HTMLElement | null>(undefined)')
+    },
+    (root) => {
+      assert.deepStrictEqual(mod.checkSvelteRefRest(root, ['Generic', 'Nested', 'NotNull']), [
+        { component: 'NotNull', missing: ['ref'] }
+      ]);
+    }
+  );
+});
+
+test('Wave 4 A1 checkSvelteRefRest strips JS comments only in script and HTML comments only in markup', () => {
+  withTempSvelteDir(
+    {
+      // An unbalanced "<!--" string in the script must not hide the markup that follows.
+      HtmlInScript: `<script lang="ts">
+  let { ref = $bindable(null), ...rest } = $props();
+  const open = '<!--';
+</script>
+<section bind:this={ref} {...rest}>x</section>
+<!-- closing -->
+`,
+      // A commented-out markup binding must not count.
+      HtmlCommented: `<script lang="ts">
+  let { ref = $bindable(null), ...rest } = $props();
+</script>
+<!-- <section bind:this={ref} {...rest}> -->
+<section>x</section>
+`,
+      // A // comment inside the script must not count as a destructure.
+      JsCommented: `<script lang="ts">
+  // let { ref = $bindable(null), ...rest } = $props();
+  let { title } = $props();
+</script>
+<section bind:this={ref} {...rest}>{title}</section>
+`
+    },
+    (root) => {
+      const byName = Object.fromEntries(
+        mod.checkSvelteRefRest(root, ['HtmlInScript', 'HtmlCommented', 'JsCommented']).map((f) => [f.component, f.missing])
+      );
+      assert.strictEqual(byName.HtmlInScript, undefined, 'a "<!--" string in the script must not hide markup');
+      assert.deepStrictEqual(byName.HtmlCommented, ['restSpread', 'bindThis']);
+      assert.deepStrictEqual(byName.JsCommented, ['ref']);
+    }
+  );
+});
+
+test('Wave 4 A1 runParityCheck does not double-report a missing Svelte file that COMPONENTS already reports, but does report one that it does not', () => {
+  const root = path.resolve(__dirname, '../../..');
+  const original = mod.SVELTE_REF_REST.slice();
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-svelte-dedupe-'));
+  try {
+    fs.mkdirSync(path.join(tmp, 'packages/tokens/dist'), { recursive: true });
+    fs.copyFileSync(path.join(root, 'packages/tokens/dist/theme.css'), path.join(tmp, 'packages/tokens/dist/theme.css'));
+    const inComponents = mod.COMPONENTS[0];
+    mod.SVELTE_REF_REST.push(inComponents, 'NotInComponentsGone');
+    const { checks } = mod.runParityCheck({ rootDir: tmp, side: 'svelte' });
+    assert.deepStrictEqual(
+      checks.filter((c) => c.component === inComponents),
+      [{ component: inComponents, check: 'svelte file exists', status: 'FAIL' }],
+      'the COMPONENTS file-exists row is the only row for a listed component'
+    );
+    assert.deepStrictEqual(
+      checks.filter((c) => c.component === 'NotInComponentsGone'),
+      [{ component: 'NotInComponentsGone', check: 'Svelte ref/rest (file)', status: 'FAIL' }]
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
     mod.SVELTE_REF_REST.length = 0;
     mod.SVELTE_REF_REST.push(...original);
   }

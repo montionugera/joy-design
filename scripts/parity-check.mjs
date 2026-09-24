@@ -491,6 +491,23 @@ export function checkRefForwarding(rootDir = process.cwd()) {
   return failures;
 }
 
+// Splits a .svelte file into comment-free script text (JS comments stripped) and
+// comment-free markup (<script> blocks removed, HTML comments stripped), so a
+// `{...rest}` object spread or a string in the script can never satisfy a markup
+// check, and a "<!--" string in the script cannot swallow the markup.
+// Limitation: a <script> tag written inside an HTML comment is read as a script.
+export function splitSvelteSource(src) {
+  const scripts = [];
+  const rest = src.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/g, (_, body) => {
+    scripts.push(body);
+    return '';
+  });
+  return {
+    script: stripComments(scripts.join('\n')),
+    markup: rest.replace(/<!--[\s\S]*?-->/g, '')
+  };
+}
+
 // Svelte twin of checkRefForwarding: every listed component must destructure a
 // bindable `ref`, spread `{...rest}` and bind the root element to `ref`.
 // Failure shape: { component, missing: ['ref' | 'restSpread' | 'bindThis'] }
@@ -503,11 +520,12 @@ export function checkSvelteRefRest(rootDir = process.cwd(), names = SVELTE_REF_R
       failures.push({ component, missing: ['file'] });
       continue;
     }
-    const src = stripComments(fs.readFileSync(file, 'utf8').replace(/<!--[\s\S]*?-->/g, ''));
+    const { script, markup } = splitSvelteSource(fs.readFileSync(file, 'utf8'));
     const missing = [];
-    if (!/\bref\s*=\s*\$bindable\(\s*null\s*\)/.test(src)) missing.push('ref');
-    if (!hasRestSpread(src)) missing.push('restSpread');
-    if (!/\bbind:this=\{\s*ref\s*\}/.test(src)) missing.push('bindThis');
+    // The destructure lives in <script>; the spread and the binding must be on markup.
+    if (!/\bref\s*=\s*\$bindable\s*(?:<[^()]*>)?\s*\(\s*null\s*\)/.test(script)) missing.push('ref');
+    if (!/\{\s*\.\.\.(?:props|\w*[Rr]est\w*)\s*\}/.test(markup)) missing.push('restSpread');
+    if (!/\bbind:this=\{\s*ref\s*\}/.test(markup)) missing.push('bindThis');
     if (missing.length > 0) failures.push({ component, missing });
   }
   return failures;
