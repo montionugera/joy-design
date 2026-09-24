@@ -5245,9 +5245,10 @@ a.joy-logo-cloud__item:focus-visible {
   line-height: 1.1;
   color: var(--joy-accent-text);
   margin-bottom: 8px;
-  /* A number is never split mid-token: a value wraps at spaces only, and the phone steps below size it to fit. */
-  overflow-wrap: normal;
-  word-break: normal;
+  /* A value that fits its cell is never split (the phone steps below size a 9 character number to fit). anywhere
+     only breaks a token that cannot fit at all, so an extreme value stays inside its cell instead of pushing the
+     page sideways; the cell is min-width: 0 so the grid track can shrink to it. */
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__label {
   font-size: var(--joy-font-size-sm);

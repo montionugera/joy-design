@@ -249,7 +249,7 @@ test('F-039 L4: FAQ trigger and answer ids point at each other inside each of tw
   assert.strictEqual(seen.size, 6);
 });
 
-test('F-039 L4: list keys are unique and stable even when content repeats', () => {
+test('F-039 L4: list keys are unique even when content repeats (index-composite, so not stable across reorders)', () => {
   const dupe = [{ question: 'Same?', answer: 'a' }, { question: 'Same?', answer: 'b' }];
   const keysOf = (tree, pred) => findAll(tree, pred).map((n) => n.key);
   const faqKeys = keysOf(mount(FAQSection, { items: dupe }).render(), (n) => typeof n.props.className === 'string' && n.props.className.startsWith('joy-faq-item'));

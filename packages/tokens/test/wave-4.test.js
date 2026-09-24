@@ -645,8 +645,11 @@ test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with 
   assert.match(small, /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-xl\)/, 'so a 7 character mono value fits a half-width card');
   assert.match(mediaBody(statsBlock, 'max-width: 360px'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-lg\)/, 'a 9 character value fits the ~114px cell at 320px');
   const value = rule(statsBlock, '.joy-stat-item__value');
-  assert.match(value, /overflow-wrap:\s*normal/, 'a number is never split mid-token');
-  assert.ok(!/overflow-wrap:\s*anywhere|word-break:\s*(break-all|break-word)/.test(value));
+  // `anywhere` breaks only a token that cannot fit its cell (a fitting number stays whole: the 9 character case is asserted
+  // in Chromium by apps/storybook-hub/tests/landing-stats-overflow.spec.ts, which also covers 14 and 20 character tokens).
+  assert.match(value, /overflow-wrap:\s*anywhere/, 'an extreme token breaks inside its cell instead of overflowing the page');
+  assert.ok(!/word-break:\s*(break-all|break-word)/.test(value), 'never force-break tokens that fit');
+  assert.match(rule(statsBlock, '.joy-stat-item'), /min-width:\s*0/, 'the grid item can shrink to its track');
   assert.match(rule(statsBlock, '.joy-stats-grid'), /repeat\(auto-fit, minmax\(min\(220px, 100%\), 1fr\)\)/, 'wider screens keep the auto-fit grid');
 });
 
