@@ -483,35 +483,8 @@ test('F-037 lane review: Mentions/Rate/Select twin parity, Input type, Segmented
 });
 
 // F-038 Wave 3 lane C-L1: Avatar, AvatarGroup, Badge, Tag, Divider (rendered behavior, not just source strings)
-import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-
-const requireFromHere = createRequire(import.meta.url);
-
-/** Transpile a source file (.tsx/.ts) to CJS on the fly and load it. Relative ./X.js imports resolve to sibling .tsx/.ts; `@joymify/icons/react` resolves to the icons package source. */
-const moduleCache = new Map();
-function loadFile(file, cache = moduleCache) {
-  if (cache.has(file)) return cache.get(file);
-  const ts = requireFromHere('typescript');
-  const out = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
-  }).outputText;
-  const mod = { exports: {} };
-  const localRequire = (id) => {
-    if (id === '@joymify/icons/react') return loadFile(fileURLToPath(new URL('../../icons/src/react.ts', import.meta.url)), cache);
-    const m = id.match(/^\.\/([\w/-]+)\.js$/);
-    if (!m) return requireFromHere(id);
-    const base = path.join(path.dirname(file), m[1]);
-    return loadFile(fs.existsSync(`${base}.tsx`) ? `${base}.tsx` : `${base}.ts`, cache);
-  };
-  new Function('require', 'module', 'exports', out)(localRequire, mod, mod.exports);
-  cache.set(file, mod.exports);
-  return mod.exports;
-}
-
-function loadComponent(name, cache = moduleCache) {
-  return loadFile(fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url)), cache);
-}
+import { loadFile, loadComponent, requireFromHere } from './helpers/load-tsx.js';
 
 test('F-038 C-L1: display twins forward refs, spread rest props, and match Svelte markup', () => {
   const React = requireFromHere('react');
