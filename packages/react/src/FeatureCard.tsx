@@ -16,35 +16,36 @@ export const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(({
   icon,
   badge,
   linkText,
-  linkHref = '#',
+  linkHref,
   onLinkClick,
   className = '',
   ...props
 }, ref) => {
+  // A handler with no destination is an action, not a link: a real button, so there is no fake "#" anchor to
+  // middle-click or scroll to the top of the page.
+  const asButton = linkHref === undefined && !!onLinkClick;
   return (
     <div ref={ref} className={`joy-feature-card ${className}`} {...props}>
       {badge && <div className="joy-feature-card__badge">{badge}</div>}
       {icon && <div className="joy-feature-card__icon">{icon}</div>}
       <h3 className="joy-feature-card__title">{title}</h3>
       <p className="joy-feature-card__desc">{description}</p>
-      {linkText && (
+      {linkText && (asButton ? (
+        <button type="button" className="joy-feature-card__link" onClick={() => onLinkClick?.()}>
+          {linkText}
+        </button>
+      ) : (
         <a
-          href={linkHref}
+          href={linkHref ?? '#'}
           className="joy-feature-card__link"
-          onClick={(e) => {
-            if (onLinkClick) {
-              e.preventDefault();
-              onLinkClick();
-            }
-          }}
+          onClick={onLinkClick ? (e) => {
+            e.preventDefault();
+            onLinkClick();
+          } : undefined}
         >
           {linkText}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
         </a>
-      )}
+      ))}
     </div>
   );
 });

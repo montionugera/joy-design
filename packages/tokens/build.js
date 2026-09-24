@@ -2494,37 +2494,47 @@ h1, h2, h3, .joy-display {
 .joy-bento-card {
   position: relative;
   border-radius: var(--joy-radius-card);
-  background-color: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
+  background-color: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
   padding: 24px;
   overflow: hidden;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.25s cubic-bezier(0.08, 0.82, 0.17, 1), box-shadow 0.25s, border-color 0.25s;
+  transition: transform var(--joy-duration-normal) var(--joy-ease-out), box-shadow var(--joy-duration-normal) var(--joy-ease-out), background-color var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-bento-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--joy-elevation-3);
-  border-color: var(--joy-border-default);
+  background-color: var(--joy-accent-subtle);
 }
+/* Every span 1..12 exists as both --col-N (what BentoCard emits) and --col-span-N (the documented alias). */
+.joy-bento-card--col-1, .joy-bento-card--col-span-1 { grid-column: span 1; }
+.joy-bento-card--col-2, .joy-bento-card--col-span-2 { grid-column: span 2; }
 .joy-bento-card--col-3, .joy-bento-card--col-span-3 { grid-column: span 3; }
 .joy-bento-card--col-4, .joy-bento-card--col-span-4 { grid-column: span 4; }
+.joy-bento-card--col-5, .joy-bento-card--col-span-5 { grid-column: span 5; }
 .joy-bento-card--col-6, .joy-bento-card--col-span-6 { grid-column: span 6; }
+.joy-bento-card--col-7, .joy-bento-card--col-span-7 { grid-column: span 7; }
 .joy-bento-card--col-8, .joy-bento-card--col-span-8 { grid-column: span 8; }
+.joy-bento-card--col-9, .joy-bento-card--col-span-9 { grid-column: span 9; }
+.joy-bento-card--col-10, .joy-bento-card--col-span-10 { grid-column: span 10; }
+.joy-bento-card--col-11, .joy-bento-card--col-span-11 { grid-column: span 11; }
 .joy-bento-card--col-12, .joy-bento-card--col-span-12 { grid-column: span 12; }
-.joy-bento-card--col-span-1 { grid-column: span 1; }
-.joy-bento-card--col-span-2 { grid-column: span 2; }
-.joy-bento-card--col-span-5 { grid-column: span 5; }
-.joy-bento-card--col-span-7 { grid-column: span 7; }
-.joy-bento-card--col-span-9 { grid-column: span 9; }
-.joy-bento-card--col-span-10 { grid-column: span 10; }
-.joy-bento-card--col-span-11 { grid-column: span 11; }
-@media (max-width: 900px) {
-  .joy-bento-card--col-3, .joy-bento-card--col-4, .joy-bento-card--col-6, .joy-bento-card--col-8,
-  .joy-bento-card--col-span-2, .joy-bento-card--col-span-3, .joy-bento-card--col-span-4,
-  .joy-bento-card--col-span-5, .joy-bento-card--col-span-6, .joy-bento-card--col-span-7,
-  .joy-bento-card--col-span-8, .joy-bento-card--col-span-9, .joy-bento-card--col-span-10 {
+/* Under 900px the 12-column grid is one column: every span except 12 (already full width) becomes full width. */
+@media (max-width: 899px) {
+  .joy-bento-card--col-1, .joy-bento-card--col-span-1,
+  .joy-bento-card--col-2, .joy-bento-card--col-span-2,
+  .joy-bento-card--col-3, .joy-bento-card--col-span-3,
+  .joy-bento-card--col-4, .joy-bento-card--col-span-4,
+  .joy-bento-card--col-5, .joy-bento-card--col-span-5,
+  .joy-bento-card--col-6, .joy-bento-card--col-span-6,
+  .joy-bento-card--col-7, .joy-bento-card--col-span-7,
+  .joy-bento-card--col-8, .joy-bento-card--col-span-8,
+  .joy-bento-card--col-9, .joy-bento-card--col-span-9,
+  .joy-bento-card--col-10, .joy-bento-card--col-span-10,
+  .joy-bento-card--col-11, .joy-bento-card--col-span-11 {
     grid-column: span 12;
   }
 }
@@ -2534,19 +2544,22 @@ h1, h2, h3, .joy-display {
   gap: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   margin-bottom: 12px;
 }
 .joy-bento-card__title {
-  font-size: 1.125rem;
+  font-size: var(--joy-font-size-display-sm);
   font-weight: 700;
-  letter-spacing: -0.015em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin: 0 0 8px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-bento-card__desc {
   font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   line-height: 1.5;
   margin: 0 0 16px 0;
 }
@@ -4749,39 +4762,75 @@ h1, h2, h3, .joy-display {
   margin: 0 auto;
 }
 .joy-feature-grid--cols-2 {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
 }
 .joy-feature-grid--cols-3 {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 }
 .joy-feature-grid--cols-4 {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+/* Lead layout (default; layout="uniform" opts out). From 900px the grid is 3 columns and the first card leads by
+   spanning 2. The last row must never leave an empty cell, so the final card gets an explicit span by card count:
+     1 card : :first-child:last-child          span 3   (row: 3)
+     2 cards: first span 2, second stays 1              (row: 2 + 1)
+     3 cards: :nth-child(3):last-child         span 3   (rows: 2 + 1 / 3)
+     4 cards: :nth-child(4):last-child         span 2   (rows: 2 + 1 / 1 + 2)
+     5 cards: no extra rule                             (rows: 2 + 1 / 1 + 1 + 1)
+     6 cards: :nth-child(6):last-child         span 3   (rows: 2 + 1 / 1 + 1 + 1 / 3)
+   Under 900px it is one column, and the columns prop only applies to layout="uniform". */
+@media (min-width: 900px) {
+  .joy-feature-grid--lead {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .joy-feature-grid--lead > :first-child {
+    grid-column: span 2;
+  }
+  .joy-feature-grid--lead > :first-child:last-child,
+  .joy-feature-grid--lead > :nth-child(3):last-child,
+  .joy-feature-grid--lead > :nth-child(6):last-child {
+    grid-column: span 3;
+  }
+  .joy-feature-grid--lead > :nth-child(4):last-child {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 899px) {
+  .joy-feature-grid--lead {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .joy-feature-card {
   position: relative;
-  background-color: var(--joy-surface-card);
+  background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
   padding: 28px 24px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition: transform var(--joy-duration-normal) var(--joy-ease-out), box-shadow var(--joy-duration-normal) var(--joy-ease-out), border-color var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-feature-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--joy-elevation-2);
-  border-color: var(--joy-accent-default);
+  border-color: var(--joy-accent-text);
 }
 .joy-feature-card__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--joy-radius-control);
-  background: var(--joy-accent-subtle);
-  color: var(--joy-accent-default);
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
+}
+.joy-feature-card__icon svg {
+  width: 20px;
+  height: 20px;
 }
 .joy-feature-card__badge {
   position: absolute;
@@ -4789,31 +4838,48 @@ h1, h2, h3, .joy-display {
   right: 16px;
 }
 .joy-feature-card__title {
-  font-size: 1.125rem;
+  font-size: var(--joy-font-size-display-sm);
   font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin: 0 0 10px 0;
-  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-feature-card__desc {
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--joy-text-muted);
-  margin: 0 0 16px 0;
+  color: var(--joy-text-secondary);
+  margin: 0 0 12px 0;
   flex: 1;
 }
+/* Anchor or button (a handler with no href renders a button): same look, 44px touch height, no trailing arrow. */
 .joy-feature-card__link {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--joy-accent-default);
+  color: var(--joy-text-link);
   text-decoration: none;
-  transition: gap 0.15s ease;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 .joy-feature-card__link:hover {
-  gap: 10px;
+  text-decoration: underline;
+}
+.joy-feature-card__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
 }
 
 /* ── Landing Page Suite: LogoCloud ── */

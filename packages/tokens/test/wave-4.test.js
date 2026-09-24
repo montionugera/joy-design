@@ -466,3 +466,117 @@ test('F-039 L2 CSS: the pinned first column is capped so a long row label cannot
   assert.match(first, /max-inline-size:\s*min\(40vw,\s*14rem\)/);
   assert.match(first, /overflow-wrap:\s*anywhere/);
 });
+
+// ── F-039 L3: feature grid/card + bento CSS contract ──
+const bentoBlock = block('/* Bento Grid & Card', '/* Hero Section */');
+const featureBlock = block('/* ── Landing Page Suite: FeatureGrid ── */', '/* ── Landing Page Suite: LogoCloud ── */');
+
+test('F-039 L3 CSS: every bento span 1..12 exists as --col-N and --col-span-N, and 1..11 collapse to full width under 900px', () => {
+  for (let n = 1; n <= 12; n += 1) {
+    assert.match(bentoBlock, new RegExp(`\\.joy-bento-card--col-${n}, \\.joy-bento-card--col-span-${n} \\{ grid-column: span ${n}; \\}`), `span rule for ${n}`);
+  }
+  const collapse = bentoBlock.match(/@media \(max-width: 899px\) \{([\s\S]*?\})\s*\}/);
+  assert.ok(collapse, 'a max-width: 899px collapse block exists');
+  assert.match(collapse[1], /grid-column: span 12;/);
+  for (let n = 1; n <= 11; n += 1) {
+    assert.match(collapse[1], new RegExp(`\\.joy-bento-card--col-${n}[,\\s]`), `--col-${n} collapses`);
+    assert.match(collapse[1], new RegExp(`\\.joy-bento-card--col-span-${n}[,\\s]`), `--col-span-${n} collapses`);
+  }
+  assert.strictEqual((bentoBlock.match(/@media \(max-width: \d{3}px\)/g) || []).length, 1, 'one collapse block, not two (no leftover 900px block)');
+});
+
+test('F-039 L3 CSS: bento card is a raised surface with default border, accent-subtle hover, no purple, no glass, no stripe, no data-theme', () => {
+  const card = rule(bentoBlock, '.joy-bento-card');
+  assert.match(card, /background-color:\s*var\(--joy-surface-raised\)/);
+  assert.match(card, /border:\s*1px solid var\(--joy-border-default\)/);
+  assert.match(rule(bentoBlock, '.joy-bento-card:hover'), /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(rule(bentoBlock, '.joy-bento-card__badge'), /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
+  assert.match(rule(bentoBlock, '.joy-bento-card__desc'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.ok(!/gradient|purple|7c3aed|a855f7|8b5cf6|backdrop-filter|border-(left|inline-start)|\[data-theme|var\(--joy-color-|transition:\s*all/i.test(bentoBlock), 'no gradient/purple/glass/stripe/[data-theme]/phantom token/transition: all');
+  const title = rule(bentoBlock, '.joy-bento-card__title');
+  assert.match(title, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(title, /overflow-wrap:\s*anywhere/);
+  assert.match(title, /text-wrap:\s*balance/);
+});
+
+test('F-039 L3 CSS: feature card is a raised surface; the icon is a 40px accent disc with a 20px glyph', () => {
+  const card = rule(featureBlock, '.joy-feature-card');
+  assert.match(card, /background-color:\s*var\(--joy-surface-raised\)/);
+  assert.match(card, /border:\s*1px solid var\(--joy-border-default\)/);
+  const icon = rule(featureBlock, '.joy-feature-card__icon');
+  assert.match(icon, /width:\s*40px/);
+  assert.match(icon, /height:\s*40px/);
+  assert.match(icon, /border-radius:\s*var\(--joy-radius-pill\)/);
+  assert.match(icon, /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(icon, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
+  const glyph = rule(featureBlock, '.joy-feature-card__icon svg');
+  assert.match(glyph, /width:\s*20px/);
+  assert.match(glyph, /height:\s*20px/);
+});
+
+test('F-039 L3 CSS: feature title uses the display scale; description is text-secondary', () => {
+  const title = rule(featureBlock, '.joy-feature-card__title');
+  assert.match(title, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(title, /overflow-wrap:\s*anywhere/);
+  assert.match(title, /text-wrap:\s*balance/);
+  assert.match(rule(featureBlock, '.joy-feature-card__desc'), /color:\s*var\(--joy-text-secondary\)/);
+});
+
+test('F-039 L3 CSS: feature link is text-link, 44px tall, underlined on hover, keeps a focus ring, no arrow pseudo-element', () => {
+  const link = rule(featureBlock, '.joy-feature-card__link');
+  assert.match(link, /color:\s*var\(--joy-text-link\)/);
+  assert.match(link, /min-height:\s*44px/);
+  assert.match(rule(featureBlock, '.joy-feature-card__link:hover'), /text-decoration:\s*underline/);
+  assert.match(rule(featureBlock, '.joy-feature-card__link:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  assert.ok(!/__link::?(after|before)|(?<![-\w])content:/.test(featureBlock), 'no generated arrow content');
+});
+
+test('F-039 L3 CSS: feature block has no purple, glass, stripe, [data-theme], phantom token or transition: all', () => {
+  assert.ok(!/gradient|purple|7c3aed|a855f7|8b5cf6|backdrop-filter|border-(left|inline-start)|\[data-theme|var\(--joy-color-|transition:\s*all/i.test(featureBlock));
+});
+
+test('F-039 L3 CSS: lead layout is 3 columns from 900px with explicit last-card spans, one column below, uniform untouched', () => {
+  const desktop = featureBlock.match(/@media \(min-width: 900px\) \{([\s\S]*?\n\})\n/);
+  assert.ok(desktop, 'a min-width: 900px lead block exists');
+  assert.match(desktop[1], /\.joy-feature-grid--lead \{\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
+  assert.match(desktop[1], /\.joy-feature-grid--lead > :first-child \{\s*grid-column: span 2;/);
+  assert.match(desktop[1], /:first-child:last-child,\s*\.joy-feature-grid--lead > :nth-child\(3\):last-child,\s*\.joy-feature-grid--lead > :nth-child\(6\):last-child \{\s*grid-column: span 3;/);
+  assert.match(desktop[1], /:nth-child\(4\):last-child \{\s*grid-column: span 2;/);
+  assert.match(featureBlock, /@media \(max-width: 899px\) \{\s*\.joy-feature-grid--lead \{\s*grid-template-columns: minmax\(0, 1fr\);/);
+  assert.ok(!/joy-feature-grid--uniform/.test(featureBlock), 'uniform has no class of its own: it is the plain cols-N grid');
+  for (const n of [2, 3, 4]) assert.match(featureBlock, new RegExp(`\\.joy-feature-grid--cols-${n} \\{\\s*grid-template-columns: repeat\\(auto-fit, minmax\\(min\\(\\d+px, 100%\\), 1fr\\)\\);`));
+});
+
+test('F-039 L3 contrast: feature and bento token pairs pass WCAG AA in both themes (computed)', () => {
+  const pairs = [
+    ['text-primary', 'surface-raised', 4.5, 'titles'],
+    ['text-secondary', 'surface-raised', 4.5, 'descriptions'],
+    ['text-link', 'surface-raised', 4.5, 'feature link'],
+    ['accent-text', 'surface-raised', 4.5, 'bento badge'],
+    ['accent-text', 'accent-subtle', 4.5, 'icon glyph, and the bento badge on hover'],
+    ['text-primary', 'accent-subtle', 4.5, 'bento title on hover'],
+    ['text-secondary', 'accent-subtle', 4.5, 'bento description on hover'],
+    ['accent-text', 'surface-raised', 3, 'feature card hover border']
+  ];
+  for (const theme of ['light', 'dark']) {
+    for (const [fg, bg, min, why] of pairs) {
+      const ratio = contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+      assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min} (${why})`);
+    }
+  }
+});
+
+test('F-039 L3 CSS: every colour token the feature and bento rules read has a light and a dark value', () => {
+  const used = new Set([...(featureBlock + bentoBlock).matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]));
+  const colourTokens = [...used].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
+  assert.ok(colourTokens.length >= 7, `sanity: the blocks read colour tokens (${colourTokens.join(', ')})`);
+  for (const token of colourTokens) {
+    assert.ok(tokenMaps.light[token] !== undefined, `light defines ${token}`);
+    assert.ok(tokenMaps.dark[token] !== undefined, `dark defines ${token}`);
+  }
+});
+
+// RECORD (F-039 L3.4): the dark --joy-accent-text is gold-300, so the dark accent text on these cards needs no literal.
+test('F-039 L3 dark: --joy-accent-text in dark is gold-300 (token-driven, no literal added)', () => {
+  assert.strictEqual(tokenMaps.dark['--joy-accent-text'].toLowerCase(), tokenMaps.light['--joy-color-gold-300'].toLowerCase());
+});

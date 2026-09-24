@@ -10,6 +10,7 @@
 		badge?: string;
 		children?: Snippet;
 		class?: string;
+		ref?: HTMLDivElement | null;
 	}
 
 	let {
@@ -18,11 +19,16 @@
 		description,
 		badge,
 		children,
-		class: className = ''
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
+
+	// Only 1..12 have a rule; anything else falls back to 4 instead of emitting a NaN modifier.
+	const span = $derived(Number.isInteger(colSpan) && colSpan >= 1 && colSpan <= 12 ? colSpan : 4);
 </script>
 
-<div class="joy-bento-card joy-bento-card--col-{colSpan} {className}">
+<div bind:this={ref} class="joy-bento-card joy-bento-card--col-{span} {className}" {...rest}>
 	<div>
 		{#if badge}
 			<div class="joy-bento-card__badge">{badge}</div>

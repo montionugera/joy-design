@@ -10,6 +10,7 @@
     linkHref?: string;
     onlinkclick?: () => void;
     class?: string;
+    ref?: HTMLDivElement | null;
   }
 
   let {
@@ -18,13 +19,19 @@
     icon,
     badge,
     linkText,
-    linkHref = '#',
+    linkHref,
     onlinkclick,
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
+
+  // A handler with no destination is an action, not a link: a real button, so there is no fake "#" anchor to
+  // middle-click or scroll to the top of the page.
+  const asButton = $derived(linkHref === undefined && !!onlinkclick);
 </script>
 
-<div class="joy-feature-card {className}">
+<div bind:this={ref} class="joy-feature-card {className}" {...rest}>
   {#if badge}
     <div class="joy-feature-card__badge">
       {@render badge()}
@@ -38,21 +45,19 @@
   <h3 class="joy-feature-card__title">{title}</h3>
   <p class="joy-feature-card__desc">{description}</p>
   {#if linkText}
-    <a
-      href={linkHref}
-      class="joy-feature-card__link"
-      onclick={(e) => {
-        if (onlinkclick) {
-          e.preventDefault();
-          onlinkclick();
-        }
-      }}
-    >
-      {linkText}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-        <polyline points="12 5 19 12 12 19"></polyline>
-      </svg>
-    </a>
+    {#if asButton}
+      <button type="button" class="joy-feature-card__link" onclick={() => onlinkclick?.()}>{linkText}</button>
+    {:else}
+      <a
+        href={linkHref ?? '#'}
+        class="joy-feature-card__link"
+        onclick={(e) => {
+          if (onlinkclick) {
+            e.preventDefault();
+            onlinkclick();
+          }
+        }}>{linkText}</a
+      >
+    {/if}
   {/if}
 </div>
