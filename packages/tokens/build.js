@@ -5246,40 +5246,50 @@ a.joy-logo-cloud__item:focus-visible {
 
 /* ── Landing Page Suite: SiteFooter ── */
 .joy-site-footer {
+  box-sizing: border-box;
   width: 100%;
   background-color: var(--joy-surface-card);
   border-top: 1px solid var(--joy-border-default);
   padding: 64px 24px 32px 24px;
+  color: var(--joy-text-secondary);
 }
 .joy-site-footer__inner {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 2fr repeat(auto-fit, minmax(160px, 1fr));
+  /* A fixed-fr track next to an auto-fit repeat is an invalid list (dropped, one column): the brand spans two tracks instead. */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 48px 32px;
 }
+.joy-site-footer__brand,
+.joy-site-footer__column {
+  min-width: 0;
+}
 .joy-site-footer__brand-title {
-  font-size: 1.25rem;
+  font-size: var(--joy-font-size-xl);
   font-weight: 800;
   color: var(--joy-text-primary);
   margin: 0 0 12px 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  overflow-wrap: anywhere;
 }
 .joy-site-footer__brand-desc {
-  font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   line-height: 1.6;
   max-width: 320px;
   margin: 0 0 20px 0;
+  overflow-wrap: anywhere;
 }
 .joy-site-footer__col-title {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 700;
-  
   color: var(--joy-text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-site-footer__links {
   list-style: none;
@@ -5287,16 +5297,26 @@ a.joy-logo-cloud__item:focus-visible {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 .joy-site-footer__link {
-  font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   text-decoration: none;
-  transition: color 0.15s ease;
+  overflow-wrap: anywhere;
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-site-footer__link:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-text-primary);
+  text-decoration: underline;
+}
+.joy-site-footer__link:focus-visible,
+.joy-site-footer__social-link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
 }
 .joy-site-footer__bottom {
   max-width: 1200px;
@@ -5308,21 +5328,48 @@ a.joy-logo-cloud__item:focus-visible {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
-  font-size: 0.8125rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
 }
 .joy-site-footer__socials {
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 .joy-site-footer__social-link {
-  color: var(--joy-text-muted);
-  transition: color 0.15s ease;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--joy-text-secondary);
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-site-footer__social-link:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-text-primary);
+}
+@media (min-width: 768px) {
+  .joy-site-footer__brand {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 767px) {
+  .joy-site-footer {
+    padding: 48px 16px 24px 16px;
+  }
+  .joy-site-footer__inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+@media (max-width: 639px) {
+  .joy-site-footer__bottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    margin-top: 32px;
+  }
 }
 
 `;

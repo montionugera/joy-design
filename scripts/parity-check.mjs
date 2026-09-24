@@ -78,6 +78,7 @@ export const COMPONENTS = [
   'StatsSection',
   'TestimonialCard',
   'FAQSection',
+  'SiteFooter',
   // internal (not exported): the action button both landing twins render; no ref/rest by design
   'LandingAction'
 ];
@@ -118,7 +119,8 @@ export const REF_FORWARDING = [
   'LogoCloud',
   'StatsSection',
   'TestimonialCard',
-  'FAQSection'
+  'FAQSection',
+  'SiteFooter'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
@@ -138,7 +140,8 @@ export const SVELTE_REF_REST = [
   'LogoCloud',
   'StatsSection',
   'TestimonialCard',
-  'FAQSection'
+  'FAQSection',
+  'SiteFooter'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).

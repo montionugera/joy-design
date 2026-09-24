@@ -770,3 +770,78 @@ test('F-039 L4 CSS: full-width sections and cards size their own border box', ()
     assert.match(rule(css, sel), /box-sizing:\s*border-box/, `${sel} sets box-sizing`);
   }
 });
+
+// ── F-039 L5a: SiteFooter CSS contract (the footer is the last block of theme.css) ──
+const footerBlock = themeCss.slice(themeCss.indexOf('/* ── Landing Page Suite: SiteFooter ── */'));
+// selector lists may span lines, so match "any text without braces or @" up to the declaration block
+const footerRules = [...footerBlock.matchAll(/(?:^|[{}]\s*|\n)([^@{}\n][^{}@]*)\{([^}]*)\}/g)].map((m) => ({ selector: m[1].trim(), body: m[2] }));
+
+test('F-039 L5a CSS: every class the footer twins render has a rule (RXF-112: brand and column were missing)', () => {
+  for (const cls of ['joy-site-footer', 'joy-site-footer__inner', 'joy-site-footer__brand', 'joy-site-footer__brand-title', 'joy-site-footer__brand-desc', 'joy-site-footer__column', 'joy-site-footer__col-title', 'joy-site-footer__links', 'joy-site-footer__link', 'joy-site-footer__bottom', 'joy-site-footer__socials', 'joy-site-footer__social-link']) {
+    assert.ok(footerRules.some((r) => r.selector.split(',').map((s) => s.trim()).includes(`.${cls}`)), `.${cls} has a rule`);
+  }
+});
+
+test('F-039 L5a CSS: no footer rule pairs text-transform: uppercase with letter-spacing, and column titles are sentence case', () => {
+  assert.ok(footerRules.length >= 12, 'sanity: parsed the footer rules');
+  for (const { selector, body } of footerRules) {
+    assert.ok(!(/text-transform:\s*uppercase/.test(body) && /letter-spacing/.test(body)), `${selector} is a tracked ALL-CAPS eyebrow`);
+  }
+  const title = rule(footerBlock, '.joy-site-footer__col-title');
+  assert.ok(!/text-transform|letter-spacing/.test(title), 'sentence case, normal tracking');
+  assert.match(title, /overflow-wrap:\s*anywhere/);
+});
+
+test('F-039 L5a CSS: the footer reads tokens only: secondary text, default borders, focus ring, no hex, no theme selector, no blur', () => {
+  assert.match(rule(footerBlock, '.joy-site-footer'), /(^|[\s;])color:\s*var\(--joy-text-secondary\)/);
+  assert.match(rule(footerBlock, '.joy-site-footer'), /border-top:\s*1px solid var\(--joy-border-default\)/);
+  assert.match(rule(footerBlock, '.joy-site-footer__bottom'), /border-top:\s*1px solid var\(--joy-border-default\)/);
+  for (const sel of ['.joy-site-footer__link', '.joy-site-footer__brand-desc', '.joy-site-footer__bottom', '.joy-site-footer__social-link']) {
+    assert.match(rule(footerBlock, sel), /(^|[\s;])color:\s*var\(--joy-text-secondary\)/, `${sel} uses secondary text (muted fails contrast on raised surfaces in dark)`);
+  }
+  assert.match(rule(footerBlock, '.joy-site-footer__link:hover'), /color:\s*var\(--joy-text-primary\)/, 'hover is primary text (gold text fails contrast on the light card)');
+  assert.match(rule(footerBlock, '.joy-site-footer__link:focus-visible,\n.joy-site-footer__social-link:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+  assert.ok(!/#[0-9a-f]{3,8}\b|rgba?\(|var\(--joy-[a-z0-9-]+,|\[data-theme|backdrop-filter|accent-default|--joy-color-/i.test(footerBlock), 'tokens only, dark comes from the token remap');
+  assert.ok(!/text-muted/.test(footerBlock), 'no muted text anywhere in the footer');
+});
+
+test('F-039 L5a CSS: footer links and social links are at least 44px tall, and the columns can shrink to their track', () => {
+  assert.match(rule(footerBlock, '.joy-site-footer__link'), /min-height:\s*44px/);
+  const social = rule(footerBlock, '.joy-site-footer__social-link');
+  assert.match(social, /min-height:\s*44px/);
+  assert.match(social, /min-width:\s*44px/);
+  assert.match(rule(footerBlock, '.joy-site-footer__brand,\n.joy-site-footer__column'), /min-width:\s*0/);
+});
+
+test('F-039 L5a CSS: below 768px the columns collapse to one, and below 640px the bottom bar stacks', () => {
+  const tablet = mediaBody(footerBlock, 'max-width: 767px');
+  assert.match(tablet, /\.joy-site-footer__inner \{[^}]*grid-template-columns:\s*1fr;/);
+  assert.match(tablet, /\.joy-site-footer__inner \{[^}]*gap:\s*32px/);
+  const phone = mediaBody(footerBlock, 'max-width: 639px');
+  assert.match(phone, /\.joy-site-footer__bottom \{[^}]*flex-direction:\s*column-reverse/);
+  assert.match(phone, /\.joy-site-footer__bottom \{[^}]*align-items:\s*flex-start/);
+  // `2fr repeat(auto-fit, ...)` is an invalid track list (Chromium drops it: the desktop footer was ONE column). Guard the shape.
+  assert.match(rule(footerBlock, '.joy-site-footer__inner'), /grid-template-columns:\s*repeat\(auto-fit, minmax\(160px, 1fr\)\);/, 'wider screens use auto-fit columns');
+  assert.ok(!/grid-template-columns:[^;]*\d+fr repeat\(auto-(fit|fill)/.test(footerBlock), 'no invalid mixed fr + auto-fit track list');
+  assert.match(mediaBody(footerBlock, 'min-width: 768px'), /\.joy-site-footer__brand \{[^}]*grid-column:\s*span 2/, 'the brand takes two tracks from 768px');
+});
+
+test('F-039 L5a contrast: footer text pairs pass WCAG AA in both themes on the card surface, and the divider is >= 3:1 (computed)', () => {
+  const pairs = [['text-primary', 'surface-card', 4.5], ['text-secondary', 'surface-card', 4.5]];
+  for (const theme of ['light', 'dark']) {
+    for (const [fg, bg, min] of pairs) {
+      const ratio = contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+      assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min}`);
+    }
+    const divider = contrastRatio(tokenMaps[theme]['--joy-border-default'], tokenMaps[theme]['--joy-surface-card']);
+    assert.ok(divider >= 3, `${theme}: border-default on surface-card is ${divider.toFixed(2)}:1`);
+  }
+});
+
+test('F-039 L5a CSS: every colour token the footer reads has a light and a dark value', () => {
+  const used = [...new Set([...footerBlock.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]))].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
+  assert.ok(used.length >= 4, `sanity: ${used.join(', ')}`);
+  for (const token of used) {
+    assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
+  }
+});

@@ -14,7 +14,7 @@ export interface FooterColumn {
 export interface SocialLink {
   name: string;
   href: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 export interface SiteFooterProps extends React.HTMLAttributes<HTMLElement> {
@@ -28,7 +28,7 @@ export interface SiteFooterProps extends React.HTMLAttributes<HTMLElement> {
 
 export const SiteFooter = React.forwardRef<HTMLElement, SiteFooterProps>(({
   brandTitle = 'Joymify',
-  brandDescription = 'High-velocity institutional quantitative design system and trading infrastructure.',
+  brandDescription = 'A design system for building clear, fast financial apps.',
   brandLogo,
   columns,
   copyright = `© ${new Date().getFullYear()} Joymify Inc. All rights reserved.`,
@@ -36,8 +36,9 @@ export const SiteFooter = React.forwardRef<HTMLElement, SiteFooterProps>(({
   className = '',
   ...props
 }, ref) => {
+  // A <footer> outside sectioning content is already the page contentinfo landmark: no explicit role.
   return (
-    <footer ref={ref} role="contentinfo" className={`joy-site-footer ${className}`} {...props}>
+    <footer ref={ref} className={`joy-site-footer ${className}`} {...props}>
       <div className="joy-site-footer__inner">
         <div className="joy-site-footer__brand">
           <div className="joy-site-footer__brand-title">
@@ -50,16 +51,17 @@ export const SiteFooter = React.forwardRef<HTMLElement, SiteFooterProps>(({
         </div>
 
         {columns.map((col, idx) => (
-          <div key={col.title || idx} className="joy-site-footer__column">
+          <div key={`${idx}-${col.title}`} className="joy-site-footer__column">
             <h4 className="joy-site-footer__col-title">{col.title}</h4>
             <ul className="joy-site-footer__links">
               {col.links.map((link, lIdx) => (
-                <li key={link.label || lIdx}>
+                <li key={`${lIdx}-${link.label}`}>
                   <a
                     href={link.href}
                     className="joy-site-footer__link"
                     target={link.external ? '_blank' : undefined}
-                    rel={link.external ? 'noreferrer noopener' : undefined}
+                    aria-label={link.external ? `${link.label} (opens in new tab)` : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
                   >
                     {link.label}
                   </a>
@@ -76,12 +78,13 @@ export const SiteFooter = React.forwardRef<HTMLElement, SiteFooterProps>(({
           <div className="joy-site-footer__socials">
             {socialLinks.map((social, sIdx) => (
               <a
-                key={social.name || sIdx}
+                key={`${sIdx}-${social.name}`}
                 href={social.href}
                 className="joy-site-footer__social-link"
                 title={social.name}
+                aria-label={`${social.name} (opens in new tab)`}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noopener noreferrer"
               >
                 {social.icon}
               </a>

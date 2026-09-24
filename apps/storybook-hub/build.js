@@ -3351,14 +3351,14 @@ export async function executeHedge(symbol: string, size: number) {
             <h4>Enterprise Portal Footer (SiteFooter)</h4>
           </div>
           <div style="padding: 0; overflow: hidden; border-radius: 0 0 var(--joy-radius-control) var(--joy-radius-control);">
-            <footer class="joy-site-footer" style="border: none; padding: 40px 24px 24px 24px;">
+            <footer class="joy-site-footer">
               <div class="joy-site-footer__inner">
                 <div class="joy-site-footer__brand">
                   <div class="joy-site-footer__brand-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-accent-default);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     <span>Joymify Design</span>
                   </div>
-                  <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
+                  <p class="joy-site-footer__brand-desc">A design system for building clear, fast financial apps.</p>
                 </div>
                 <div class="joy-site-footer__column">
                   <h4 class="joy-site-footer__col-title">Architecture</h4>
@@ -3391,7 +3391,7 @@ export async function executeHedge(symbol: string, size: number) {
               <div class="joy-site-footer__bottom">
                 <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
                 <div class="joy-site-footer__socials">
-                  <span style="font-size: 0.75rem; color: var(--joy-text-muted);">Institutional Grade Telemetry</span>
+                  <a href="https://github.com/montionugera/joy-design" class="joy-site-footer__social-link" title="GitHub" aria-label="GitHub (opens in new tab)" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a>
                 </div>
               </div>
             </footer>
