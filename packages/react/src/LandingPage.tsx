@@ -1,5 +1,6 @@
 import React from 'react';
 import { Cpu, Layers, Menu, Smartphone } from '@joymify/icons/react';
+import { Badge } from './Badge.js';
 import { Drawer } from './Drawer.js';
 import { HeroSection } from './HeroSection.js';
 import { LogoCloud } from './LogoCloud.js';
@@ -185,7 +186,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
               title="Fast order matching"
               description="Co-located matching engines process up to 2.4M orders a second with steady, predictable timing."
               icon={<Cpu size="1.5rem" />}
-              badge={<span className="joy-badge joy-badge--brand">FPGA-Core</span>}
+              badge={<Badge variant="brand" size="sm">FPGA-Core</Badge>}
               linkText="See the engine"
               linkHref="#features"
             />
@@ -193,7 +194,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
               title="Tested light and dark themes"
               description="Light and dark themes keep text at WCAG 2.2 AA contrast on every component."
               icon={<Layers size="1.5rem" />}
-              badge={<span className="joy-badge joy-badge--success">WCAG AA</span>}
+              badge={<Badge variant="success" size="sm">WCAG AA</Badge>}
               linkText="Browse tokens"
               linkHref="#features"
             />
@@ -201,7 +202,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
               title="Tables that fit phones"
               description="Wide market tables turn into clear stacked cards on small screens."
               icon={<Smartphone size="1.5rem" />}
-              badge={<span className="joy-badge joy-badge--warning">Adaptive</span>}
+              badge={<Badge variant="warning" size="sm">Adaptive</Badge>}
               linkText="Try the demo"
               linkHref="#features"
             />

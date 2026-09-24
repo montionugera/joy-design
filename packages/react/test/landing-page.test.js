@@ -314,3 +314,10 @@ test('F-039 T1: default copy is sentence case, names one brand in header and foo
   for (const pill of pills) assert.ok(!/(^|\s)-\d/.test(pill.replace(/^Trend (up|down):\s*/, '')), `no negative number under an up caret: ${pill}`);
   assert.ok(pills.some((pill) => pill.includes('14% faster vs L1')), 'the latency win reads as an improvement');
 });
+
+test('F-039 T2: feature card tags are real Badge chips with a size class (a bare joy-badge has no padding and reads as a text highlight)', () => {
+  const markup = renderPage();
+  const badges = markup.match(/<span class="joy-badge [^"]*"[^>]*>/g) ?? [];
+  assert.strictEqual(badges.length, 3, 'one tag per feature card');
+  for (const b of badges) assert.match(b, /class="joy-badge joy-badge--\w+ joy-badge--(sm|md)"/, `tag carries a size modifier: ${b}`);
+});

@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { Cpu, Layers, Menu, Smartphone } from '@joymify/icons';
+  import Badge from './Badge.svelte';
   import Drawer from './Drawer.svelte';
   import HeroSection from './HeroSection.svelte';
   import LogoCloud from './LogoCloud.svelte';
@@ -204,7 +205,7 @@
             linkHref="#features"
           >
             {#snippet icon()}<Cpu size="1.5rem" />{/snippet}
-            {#snippet badge()}<span class="joy-badge joy-badge--brand">FPGA-Core</span>{/snippet}
+            {#snippet badge()}<Badge variant="brand" size="sm">FPGA-Core</Badge>{/snippet}
           </FeatureCard>
           <FeatureCard
             title="Tested light and dark themes"
@@ -213,7 +214,7 @@
             linkHref="#features"
           >
             {#snippet icon()}<Layers size="1.5rem" />{/snippet}
-            {#snippet badge()}<span class="joy-badge joy-badge--success">WCAG AA</span>{/snippet}
+            {#snippet badge()}<Badge variant="success" size="sm">WCAG AA</Badge>{/snippet}
           </FeatureCard>
           <FeatureCard
             title="Tables that fit phones"
@@ -222,7 +223,7 @@
             linkHref="#features"
           >
             {#snippet icon()}<Smartphone size="1.5rem" />{/snippet}
-            {#snippet badge()}<span class="joy-badge joy-badge--warning">Adaptive</span>{/snippet}
+            {#snippet badge()}<Badge variant="warning" size="sm">Adaptive</Badge>{/snippet}
           </FeatureCard>
         {/snippet}
       </FeatureGrid>
