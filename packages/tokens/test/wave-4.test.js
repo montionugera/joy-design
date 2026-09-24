@@ -494,7 +494,7 @@ test('F-039 L3 CSS: bento card is a raised surface with default border, accent-s
   assert.match(rule(bentoBlock, '.joy-bento-card__desc'), /color:\s*var\(--joy-text-secondary\)/);
   assert.ok(!/gradient|purple|7c3aed|a855f7|8b5cf6|backdrop-filter|border-(left|inline-start)|\[data-theme|var\(--joy-color-|transition:\s*all/i.test(bentoBlock), 'no gradient/purple/glass/stripe/[data-theme]/phantom token/transition: all');
   const title = rule(bentoBlock, '.joy-bento-card__title');
-  assert.match(title, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(title, /font-size:\s*var\(--joy-font-size-xl\)/, 'a card title is on the step scale, not the section display clamp (mid-word breaks in narrow cards)');
   assert.match(title, /overflow-wrap:\s*anywhere/);
   assert.match(title, /text-wrap:\s*balance/);
 });
@@ -514,9 +514,10 @@ test('F-039 L3 CSS: feature card is a raised surface; the icon is a 40px accent 
   assert.match(glyph, /height:\s*20px/);
 });
 
-test('F-039 L3 CSS: feature title uses the display scale; description is text-secondary', () => {
+test('F-039 L3 CSS: feature title is on the card scale, only the lead card steps up to display; description is text-secondary', () => {
   const title = rule(featureBlock, '.joy-feature-card__title');
-  assert.match(title, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(title, /font-size:\s*var\(--joy-font-size-2xl\)/, 'a card title is on the step scale, not the section display clamp');
+  assert.match(featureBlock, /@media \(min-width: 900px\) \{[\s\S]*\.joy-feature-grid--lead > :first-child \.joy-feature-card__title \{\s*font-size: var\(--joy-font-size-display-sm\);/, 'the 2-column lead card keeps the display size');
   assert.match(title, /overflow-wrap:\s*anywhere/);
   assert.match(title, /text-wrap:\s*balance/);
   assert.match(rule(featureBlock, '.joy-feature-card__desc'), /color:\s*var\(--joy-text-secondary\)/);
@@ -535,16 +536,26 @@ test('F-039 L3 CSS: feature block has no purple, glass, stripe, [data-theme], ph
   assert.ok(!/gradient|purple|7c3aed|a855f7|8b5cf6|backdrop-filter|border-(left|inline-start)|\[data-theme|var\(--joy-color-|transition:\s*all/i.test(featureBlock));
 });
 
-test('F-039 L3 CSS: lead layout is 3 columns from 900px with explicit last-card spans, one column below, uniform untouched', () => {
+test('F-039 L3 CSS: lead layout is 3 columns from 900px with general last-card spans, one column below, uniform untouched', () => {
   const desktop = featureBlock.match(/@media \(min-width: 900px\) \{([\s\S]*?\n\})\n/);
   assert.ok(desktop, 'a min-width: 900px lead block exists');
   assert.match(desktop[1], /\.joy-feature-grid--lead \{\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
   assert.match(desktop[1], /\.joy-feature-grid--lead > :first-child \{\s*grid-column: span 2;/);
-  assert.match(desktop[1], /:first-child:last-child,\s*\.joy-feature-grid--lead > :nth-child\(3\):last-child,\s*\.joy-feature-grid--lead > :nth-child\(6\):last-child \{\s*grid-column: span 3;/);
-  assert.match(desktop[1], /:nth-child\(4\):last-child \{\s*grid-column: span 2;/);
+  assert.match(desktop[1], /> :nth-child\(3n\):last-child \{\s*grid-column: span 3;/);
+  assert.match(desktop[1], /> :nth-child\(3n\+1\):last-child \{\s*grid-column: span 2;/);
+  const at = (needle) => desktop[1].indexOf(needle);
+  assert.ok(at('> :first-child:last-child') > at('> :nth-child(3n+1):last-child'), 'the single-card rule is declared after the 3n+1 rule so it wins');
+  assert.match(desktop[1], /> :first-child:last-child \{\s*grid-column: span 3;/);
   assert.match(featureBlock, /@media \(max-width: 899px\) \{\s*\.joy-feature-grid--lead \{\s*grid-template-columns: minmax\(0, 1fr\);/);
   assert.ok(!/joy-feature-grid--uniform/.test(featureBlock), 'uniform has no class of its own: it is the plain cols-N grid');
   for (const n of [2, 3, 4]) assert.match(featureBlock, new RegExp(`\\.joy-feature-grid--cols-${n} \\{\\s*grid-template-columns: repeat\\(auto-fit, minmax\\(min\\(\\d+px, 100%\\), 1fr\\)\\);`));
+});
+
+test('F-039 L3 CSS: the feature badge is in normal flow, so it can never cover a wrapped title', () => {
+  const badge = rule(featureBlock, '.joy-feature-card__badge');
+  assert.ok(!/position:\s*(absolute|fixed)/.test(badge), badge);
+  assert.match(badge, /align-self:\s*flex-start/);
+  assert.match(badge, /margin-bottom:/);
 });
 
 test('F-039 L3 contrast: feature and bento token pairs pass WCAG AA in both themes (computed)', () => {

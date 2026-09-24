@@ -1,10 +1,14 @@
+<script lang="ts" module>
+	export type BentoColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+</script>
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	type ColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-
-	interface Props {
-		colSpan?: ColSpan;
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'title'> {
+		/** Column span out of 12 (1..12, default 4). Everything under 900px is full width. Spans below 3 suit decorative tiles only. */
+		colSpan?: BentoColSpan;
 		title?: string;
 		description?: string;
 		badge?: string;

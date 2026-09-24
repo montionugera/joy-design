@@ -35,7 +35,7 @@ export { MarkdownEditor, type MarkdownEditorProps } from './MarkdownEditor.js';
 
 // Wave 5: Landing Page Architecture & Enterprise Workflow Suite
 export { BentoGrid, type BentoGridProps } from './BentoGrid.js';
-export { BentoCard, type BentoCardProps } from './BentoCard.js';
+export { BentoCard, type BentoCardProps, type BentoColSpan } from './BentoCard.js';
 export { HeroSection, type HeroSectionProps } from './HeroSection.js';
 export { PricingCard, type PricingCardProps } from './PricingCard.js';
 export { PricingMatrix, type PricingMatrixProps, type PricingMatrixRow } from './PricingMatrix.js';

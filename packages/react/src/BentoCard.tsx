@@ -3,6 +3,7 @@ import React from 'react';
 export type BentoColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export interface BentoCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Column span out of 12 (1..12, default 4). Everything under 900px is full width. Spans below 3 suit decorative tiles only. */
   colSpan?: BentoColSpan;
   title?: string;
   description?: string;

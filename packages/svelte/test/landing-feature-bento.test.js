@@ -49,50 +49,78 @@ test('F-039 L3: FeatureCard link is an anchor with a real href, and a button whe
 });
 
 // Behaviour without a DOM: evaluate the compiled CLIENT component against a recording stand-in for svelte/internal/client.
-// It captures the delegated event handlers and bind:this setters the component registers, and the tests then run them
-// for real against the props (no browser or jsdom is available in this repo). Anything else is a no-op.
+// Every element the component creates from a template is a distinct tagged node (`created`, in creation order, so
+// created[0] is the root); child/sibling lookups return separate `derived` nodes. The stand-in records WHICH node each
+// delegated handler and each bind:this setter is attached to, and the tests then run the real closures against the props
+// (no browser or jsdom is available in this repo). Anything else is a no-op.
 const libFile = (name) => fileURLToPath(new URL(`../src/lib/${name}.svelte`, import.meta.url));
 function runClient(name, props) {
   const code = compile(fs.readFileSync(libFile(name), 'utf8'), { generate: 'client', filename: libFile(name) }).js.code
     .replace(/^import .*$/gm, '')
     .replace('export default function', 'function');
+  const created = [];
   const delegated = [];
   const binds = [];
   const noop = () => noop;
+  const derivedNode = (parent) => ({ derived: true, parent });
   const $ = new Proxy({}, {
     get: (_, key) => {
       switch (key) {
-        case 'prop': return (p, k, _flags, fallback) => (...args) => (args.length ? (p[k] = args[0]) : (p[k] ?? fallback));
+        case 'from_html': return (html) => () => { const node = { html }; created.push(node); return node; };
+        case 'child':
+        case 'sibling':
+        case 'first_child':
+        case 'only_child': return derivedNode;
+        case 'prop': return (p, k, _flags, fallback) => (...args) => (args.length ? (p[k] = args[0]) : (p[k] === undefined ? fallback : p[k]));
         case 'rest_props': return () => ({});
         case 'derived': return (fn) => ({ fn });
         case 'get': return (d) => d.fn();
         case 'if': return (_node, render) => render((branch) => branch({}));
-        case 'delegated': return (event, _el, handler) => { delegated.push({ event, handler }); };
-        case 'bind_this': return (_el, setter) => { binds.push(setter); };
+        case 'delegated': return (event, el, handler) => { delegated.push({ event, el, handler }); };
+        case 'bind_this': return (el, setter) => { binds.push({ el, setter }); };
         default: return noop;
       }
     }
   });
   new Function('$', 'props', `${code}\nreturn ${name}({}, props);`)($, props);
-  return { delegated, binds };
+  return { created, delegated, binds };
 }
+const plainClick = (extra = {}) => {
+  const event = { button: 0, defaultPrevented: false, prevented: 0, preventDefault() { this.prevented += 1; }, ...extra };
+  return event;
+};
 
-test('F-039 L3: onlinkclick runs on click and cancels the # navigation; without a handler nothing is intercepted', () => {
+test('F-039 L3: a plain primary click runs onlinkclick and cancels navigation; no handler, or a modified click, is left to the browser', () => {
   let calls = 0;
   const handler = () => { calls += 1; };
-  let prevented = 0;
-  const event = { preventDefault: () => { prevented += 1; } };
   const anchor = runClient('FeatureCard', { title: 'T', description: 'D', linkText: 'More', linkHref: '/x', onlinkclick: handler });
   assert.strictEqual(anchor.delegated.length, 1);
-  anchor.delegated[0].handler(event);
-  assert.deepStrictEqual([calls, prevented], [1, 1]);
-  const plain = runClient('FeatureCard', { title: 'T', description: 'D', linkText: 'More', linkHref: '/x' });
-  plain.delegated[0].handler(event);
-  assert.deepStrictEqual([calls, prevented], [1, 1], 'a plain link is left to the browser');
-  const button = runClient('FeatureCard', { title: 'T', description: 'D', linkText: 'Open', onlinkclick: handler });
+  const link = anchor.delegated[0];
+  assert.strictEqual(link.event, 'click');
+  assert.ok(!link.el.derived && /^<a\b[^>]*class="joy-feature-card__link"/.test(link.el.html), `the handler is on the link anchor itself (${link.el.html})`);
+  const plain = plainClick();
+  link.handler(plain);
+  assert.deepStrictEqual([calls, plain.prevented], [1, 1]);
+  for (const extra of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
+    const event = plainClick(extra);
+    link.handler(event);
+    assert.deepStrictEqual([calls, event.prevented], [1, 0], `modified click ${JSON.stringify(extra)} keeps browser behaviour`);
+  }
+  const noHandler = runClient('FeatureCard', { title: 'T', description: 'D', linkText: 'More', linkHref: '/x' });
+  const untouched = plainClick();
+  noHandler.delegated[0].handler(untouched);
+  assert.deepStrictEqual([calls, untouched.prevented], [1, 0], 'a plain link is left to the browser');
+});
+
+test('F-039 L3: the action button carries the handler itself (not a sibling), and only a button renders for a handler with no href', () => {
+  let calls = 0;
+  const button = runClient('FeatureCard', { title: 'T', description: 'D', linkText: 'Open', onlinkclick: () => { calls += 1; } });
   assert.strictEqual(button.delegated.length, 1);
-  button.delegated[0].handler();
-  assert.strictEqual(calls, 2, 'the button runs the handler');
+  const { el, handler } = button.delegated[0];
+  assert.ok(!el.derived && /^<button\b[^>]*class="joy-feature-card__link"/.test(el.html) && !/hidden/.test(el.html), `handler is on the link button (${el.html})`);
+  handler();
+  assert.strictEqual(calls, 1);
+  assert.ok(!button.created.some((n) => /^<a\b/.test(n.html)), 'no anchor is created for an action');
 });
 
 test('F-039 L3: FeatureGrid layout defaults to lead; uniform drops the lead class', async () => {
@@ -154,13 +182,15 @@ test('F-039 L3: every twin forwards class and rest props to its root element (Sv
   }
 });
 
-test('F-039 L3: ref is bound exactly once per twin and writes the element back to the bindable prop', () => {
+test('F-039 L3: ref is bound once per twin, on the root element, and writes the element back to the bindable prop', () => {
   const sentinel = { el: true };
   for (const name of NAMES) {
     const props = { title: 'T', description: 'D', children: () => {}, ref: null };
-    const { binds } = runClient(name, props);
+    const { binds, created } = runClient(name, props);
     assert.strictEqual(binds.length, 1, `${name} calls bind_this once`);
-    binds[0](sentinel);
+    assert.strictEqual(binds[0].el, created[0], `${name} binds the root element, not a descendant`);
+    assert.ok(!binds[0].el.derived, `${name} root is a template node`);
+    binds[0].setter(sentinel);
     assert.strictEqual(props.ref, sentinel, `${name} writes the element to ref`);
   }
 });

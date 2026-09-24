@@ -2548,7 +2548,7 @@ h1, h2, h3, .joy-display {
   margin-bottom: 12px;
 }
 .joy-bento-card__title {
-  font-size: var(--joy-font-size-display-sm);
+  font-size: var(--joy-font-size-xl);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -4771,14 +4771,15 @@ h1, h2, h3, .joy-display {
   grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
 }
 /* Lead layout (default; layout="uniform" opts out). From 900px the grid is 3 columns and the first card leads by
-   spanning 2. The last row must never leave an empty cell, so the final card gets an explicit span by card count:
-     1 card : :first-child:last-child          span 3   (row: 3)
-     2 cards: first span 2, second stays 1              (row: 2 + 1)
-     3 cards: :nth-child(3):last-child         span 3   (rows: 2 + 1 / 3)
-     4 cards: :nth-child(4):last-child         span 2   (rows: 2 + 1 / 1 + 2)
-     5 cards: no extra rule                             (rows: 2 + 1 / 1 + 1 + 1)
-     6 cards: :nth-child(6):last-child         span 3   (rows: 2 + 1 / 1 + 1 + 1 / 3)
-   Under 900px it is one column, and the columns prop only applies to layout="uniform". */
+   spanning 2. The last row must never leave an empty cell, so the final card gets an explicit span by card count,
+   written generally so it holds for any number of cards:
+     :first-child                          span 2   (the lead card; card 2 fills its row)
+     :nth-child(3n):last-child             span 3   (3, 6, 9, 12 cards: the last card is a full row)
+     :nth-child(3n+1):last-child           span 2   (4, 7, 10 cards: the last row is 1 + 2)
+     :first-child:last-child               span 3   (1 card; declared last so it beats the 3n+1 rule)
+   5, 8 and 11 cards need no extra rule (the last row is 1 + 1 + 1). Under 900px it is one column, and the columns
+   prop only applies to layout="uniform". The lead card's title steps up to the display scale (it is 2 columns wide, so
+   it does not break mid-word); every other card title stays on the card scale. */
 @media (min-width: 900px) {
   .joy-feature-grid--lead {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4786,13 +4787,17 @@ h1, h2, h3, .joy-display {
   .joy-feature-grid--lead > :first-child {
     grid-column: span 2;
   }
-  .joy-feature-grid--lead > :first-child:last-child,
-  .joy-feature-grid--lead > :nth-child(3):last-child,
-  .joy-feature-grid--lead > :nth-child(6):last-child {
+  .joy-feature-grid--lead > :nth-child(3n):last-child {
     grid-column: span 3;
   }
-  .joy-feature-grid--lead > :nth-child(4):last-child {
+  .joy-feature-grid--lead > :nth-child(3n+1):last-child {
     grid-column: span 2;
+  }
+  .joy-feature-grid--lead > :first-child:last-child {
+    grid-column: span 3;
+  }
+  .joy-feature-grid--lead > :first-child .joy-feature-card__title {
+    font-size: var(--joy-font-size-display-sm);
   }
 }
 @media (max-width: 899px) {
@@ -4832,13 +4837,13 @@ h1, h2, h3, .joy-display {
   width: 20px;
   height: 20px;
 }
+/* In normal flow above the icon and title: an absolutely positioned badge covered wrapped titles. */
 .joy-feature-card__badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  align-self: flex-start;
+  margin-bottom: 16px;
 }
 .joy-feature-card__title {
-  font-size: var(--joy-font-size-display-sm);
+  font-size: var(--joy-font-size-2xl);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;

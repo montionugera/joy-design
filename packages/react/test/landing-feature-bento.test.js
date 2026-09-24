@@ -59,18 +59,32 @@ const findAll = (node, type, found = []) => {
 };
 const render = (C, props, ref = null) => C.render(props, ref);
 
-test('F-039 L3: onLinkClick runs on click and cancels the # navigation; without a handler nothing is intercepted', () => {
+const plainClick = (extra = {}) => ({ button: 0, defaultPrevented: false, prevented: 0, preventDefault() { this.prevented += 1; }, ...extra });
+
+test('F-039 L3: a plain primary click runs onLinkClick and cancels navigation; no handler, or a modified click, is left to the browser', () => {
   let calls = 0;
   const handler = () => { calls += 1; };
   const [anchor] = findAll(render(FeatureCard, { title: 'T', description: 'D', linkText: 'More', linkHref: '/x', onLinkClick: handler }), 'a');
-  let prevented = 0;
-  anchor.props.onClick({ preventDefault: () => { prevented += 1; } });
-  assert.deepStrictEqual([calls, prevented], [1, 1]);
-  const [plain] = findAll(render(FeatureCard, { title: 'T', description: 'D', linkText: 'More', linkHref: '/x' }), 'a');
-  assert.strictEqual(plain.props.onClick, undefined, 'a plain link is left to the browser');
-  const [button] = findAll(render(FeatureCard, { title: 'T', description: 'D', linkText: 'Open', onLinkClick: handler }), 'button');
+  const plain = plainClick();
+  anchor.props.onClick(plain);
+  assert.deepStrictEqual([calls, plain.prevented], [1, 1]);
+  for (const extra of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
+    const event = plainClick(extra);
+    anchor.props.onClick(event);
+    assert.deepStrictEqual([calls, event.prevented], [1, 0], `modified click ${JSON.stringify(extra)} keeps browser behaviour`);
+  }
+  const [bare] = findAll(render(FeatureCard, { title: 'T', description: 'D', linkText: 'More', linkHref: '/x' }), 'a');
+  assert.strictEqual(bare.props.onClick, undefined, 'a plain link is left to the browser');
+});
+
+test('F-039 L3: the action button runs onLinkClick itself, and only a button renders for a handler with no href', () => {
+  let calls = 0;
+  const tree = render(FeatureCard, { title: 'T', description: 'D', linkText: 'Open', onLinkClick: () => { calls += 1; } });
+  const [button] = findAll(tree, 'button');
+  assert.strictEqual(button.props.className, 'joy-feature-card__link');
   button.props.onClick();
-  assert.strictEqual(calls, 2, 'the button runs the handler');
+  assert.strictEqual(calls, 1);
+  assert.strictEqual(findAll(tree, 'a').length, 0);
 });
 
 test('F-039 L3: FeatureGrid layout defaults to lead; uniform drops the lead class', () => {
