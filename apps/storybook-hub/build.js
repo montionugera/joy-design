@@ -220,8 +220,6 @@ function iconSvg(name, size = "1em") {
 }
 // The landing simulator mirrors the components' markup without the icon package's inline style attribute.
 const simIcon = (name, size) => iconSvg(name, size).replace(/ style="[^"]*"/, "");
-const simTrend =
-  '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> ';
 const svgAttrs = (size, sw) =>
   `width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"`;
 const hubSvg = {
@@ -1424,17 +1422,46 @@ ${inlinedThemeCss}
       gap: 10px;
     }
     .simulator-label {
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 0.875rem;
+      font-weight: 600;
       color: var(--joy-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       white-space: nowrap;
+    }
+    /* Frame width switcher: three short segments that never overprint. The px size is a second line of detail that goes away on phones. */
+    .segmented-control--frames .segment-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+    .segmented-control--frames .simulator-icon {
+      margin-right: 0;
+      vertical-align: baseline;
+      flex-shrink: 0;
+    }
+    .segment-btn__size {
+      color: var(--joy-text-secondary);
+      font-weight: 400;
+    }
+    @media (max-width: 480px) {
+      .segmented-control--frames {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .segmented-control--frames .segment-btn {
+        justify-content: center;
+        padding: 6px 4px;
+      }
+      .segmented-control--frames .segment-btn__size {
+        display: none;
+      }
     }
     .simulator-status-bar {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      gap: 4px 16px;
       padding: 8px 14px;
       background: var(--joy-surface-sunken);
       border: 1px solid var(--joy-border-default);
@@ -3118,7 +3145,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <p class="joy-feature-card__desc">
                       Both packages share one token set, the same class names and the same keyboard behaviour.
                     </p>
-                    <a href="#table" class="joy-feature-card__link">Browse tables</a>
+                    <a href="#overview" class="joy-feature-card__link">See the overview</a>
                   </div>
                 </div>
               </div>
@@ -3170,7 +3197,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <p class="joy-feature-card__desc">
                       Both packages share one token set, the same class names and the same keyboard behaviour.
                     </p>
-                    <a href="#table" class="joy-feature-card__link">Browse tables</a>
+                    <a href="#overview" class="joy-feature-card__link">See the overview</a>
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
@@ -3237,7 +3264,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <p class="joy-feature-card__desc">
                       Both packages share one token set, the same class names and the same keyboard behaviour.
                     </p>
-                    <a href="#table" class="joy-feature-card__link">Browse tables</a>
+                    <a href="#overview" class="joy-feature-card__link">See the overview</a>
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
@@ -3319,7 +3346,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <p class="joy-feature-card__desc">
                       Both packages share one token set, the same class names and the same keyboard behaviour.
                     </p>
-                    <a href="#table" class="joy-feature-card__link">Browse tables</a>
+                    <a href="#overview" class="joy-feature-card__link">See the overview</a>
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
@@ -3370,7 +3397,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
               <div class="landing-demo__group">
                 <h5 class="landing-demo__label">
-                  Uniform layout, 3 columns
+                  Uniform layout, up to 3 columns
                 </h5>
                 <div class="joy-feature-grid joy-feature-grid--cols-3" id="blocks-feature-uniform">
                   <div class="joy-feature-card">
@@ -3416,7 +3443,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <p class="joy-feature-card__desc">
                       Both packages share one token set, the same class names and the same keyboard behaviour.
                     </p>
-                    <a href="#table" class="joy-feature-card__link">Browse tables</a>
+                    <a href="#overview" class="joy-feature-card__link">See the overview</a>
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
@@ -3432,6 +3459,36 @@ export async function executeHedge(symbol: string, size: number) {
                       Sticky headers, aligned numbers and a stacked layout for phones keep long ledgers readable.
                     </p>
                     <a href="#financial-table" class="joy-feature-card__link">Open the ledger</a>
+                  </div>
+                  <div class="joy-feature-card">
+                    <div class="joy-feature-card__badge">
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Security</span>
+                    </div>
+                    <div class="joy-feature-card__icon">
+                      ${simIcon("LockClose", "22")}
+                    </div>
+                    <h3 class="joy-feature-card__title">
+                      Safe by default
+                    </h3>
+                    <p class="joy-feature-card__desc">
+                      Forms, dialogs and drawers trap focus, restore it on close and label every control for screen readers.
+                    </p>
+                    <a href="#modal" class="joy-feature-card__link">See dialogs</a>
+                  </div>
+                  <div class="joy-feature-card">
+                    <div class="joy-feature-card__badge">
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> Charts</span>
+                    </div>
+                    <div class="joy-feature-card__icon">
+                      ${simIcon("CandlestickChart", "22")}
+                    </div>
+                    <h3 class="joy-feature-card__title">
+                      Live charts at 60 FPS
+                    </h3>
+                    <p class="joy-feature-card__desc">
+                      Canvas charts cull off-screen points and reuse buffers, so a busy tick stream stays smooth.
+                    </p>
+                    <a href="#charts" class="joy-feature-card__link">View charts</a>
                   </div>
                 </div>
               </div>
@@ -3758,81 +3815,83 @@ export async function executeHedge(symbol: string, size: number) {
                 <h5 class="landing-demo__label">
                   Default and featured
                 </h5>
-                <div class="joy-pricing-matrix" role="region" aria-label="Pricing plans">
-                  <div class="joy-pricing-card">
-                    <h3 class="joy-pricing-card__title">
-                      Developer
-                    </h3>
-                    <p class="joy-pricing-card__desc">
-                      Core tokens, icons and the base components.
-                    </p>
-                    <div class="joy-pricing-card__price">
-                      <span>$0</span> <span class="joy-pricing-card__period">/month</span>
+                <div class="joy-pricing-fit">
+                  <div class="joy-pricing-matrix" role="region" aria-label="Pricing plans">
+                    <div class="joy-pricing-card">
+                      <h3 class="joy-pricing-card__title">
+                        Developer
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        Core tokens, icons and the base components.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$0</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>138 vector icons</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Svelte 5 and React 19 packages</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Community chat support</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Start free</span>  </button>
                     </div>
-                    <ul class="joy-pricing-card__features">
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>138 vector icons</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Svelte 5 and React 19 packages</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Community chat support</span>
-                      </li>
-                    </ul>
-                    <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Start free</span>  </button>
-                  </div>
-                  <div class="joy-pricing-card joy-pricing-card--featured">
-                    <div class="joy-pricing-card__badge">
-                      Most popular
+                    <div class="joy-pricing-card joy-pricing-card--featured">
+                      <div class="joy-pricing-card__badge">
+                        Most popular
+                      </div>
+                      <h3 class="joy-pricing-card__title">
+                        Professional
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        The full financial suite and every landing block.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$149</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Everything in Developer</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Dense financial tables</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Landing block library</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Priority support, 24/7</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Upgrade to Pro</span>  </button>
                     </div>
-                    <h3 class="joy-pricing-card__title">
-                      Professional
-                    </h3>
-                    <p class="joy-pricing-card__desc">
-                      The full financial suite and every landing block.
-                    </p>
-                    <div class="joy-pricing-card__price">
-                      <span>$149</span> <span class="joy-pricing-card__period">/month</span>
+                    <div class="joy-pricing-card">
+                      <h3 class="joy-pricing-card__title">
+                        Team
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        Shared themes and seats for a whole desk.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$899</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Unlimited seats</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Custom theme export</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Named account manager</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Contact sales</span>  </button>
                     </div>
-                    <ul class="joy-pricing-card__features">
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Everything in Developer</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Dense financial tables</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Landing block library</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Priority support, 24/7</span>
-                      </li>
-                    </ul>
-                    <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Upgrade to Pro</span>  </button>
-                  </div>
-                  <div class="joy-pricing-card">
-                    <h3 class="joy-pricing-card__title">
-                      Team
-                    </h3>
-                    <p class="joy-pricing-card__desc">
-                      Shared themes and seats for a whole desk.
-                    </p>
-                    <div class="joy-pricing-card__price">
-                      <span>$899</span> <span class="joy-pricing-card__period">/month</span>
-                    </div>
-                    <ul class="joy-pricing-card__features">
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Unlimited seats</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Custom theme export</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Named account manager</span>
-                      </li>
-                    </ul>
-                    <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Contact sales</span>  </button>
                   </div>
                 </div>
               </div>
@@ -3840,46 +3899,48 @@ export async function executeHedge(symbol: string, size: number) {
                 <h5 class="landing-demo__label">
                   Loading and disabled
                 </h5>
-                <div class="joy-pricing-matrix" role="region" aria-label="Pricing plan states">
-                  <div class="joy-pricing-card joy-pricing-card--featured">
-                    <h3 class="joy-pricing-card__title">
-                      Loading
-                    </h3>
-                    <p class="joy-pricing-card__desc">
-                      The button is busy and ignores clicks.
-                    </p>
-                    <div class="joy-pricing-card__price">
-                      <span>$149</span> <span class="joy-pricing-card__period">/month</span>
+                <div class="joy-pricing-fit">
+                  <div class="joy-pricing-matrix" role="region" aria-label="Pricing plan states">
+                    <div class="joy-pricing-card joy-pricing-card--featured">
+                      <h3 class="joy-pricing-card__title">
+                        Loading
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        The button is busy and ignores clicks.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$149</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Spinner in the button</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>aria-busy is set</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--loading joy-button--block joy-pricing-card__cta" disabled="" aria-busy="true"> <span class="joy-button__label">Upgrade to Pro</span>  <span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></span></button>
                     </div>
-                    <ul class="joy-pricing-card__features">
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Spinner in the button</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>aria-busy is set</span>
-                      </li>
-                    </ul>
-                    <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--loading joy-button--block joy-pricing-card__cta" disabled="" aria-busy="true"> <span class="joy-button__label">Upgrade to Pro</span>  <span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></span></button>
-                  </div>
-                  <div class="joy-pricing-card">
-                    <h3 class="joy-pricing-card__title">
-                      Disabled
-                    </h3>
-                    <p class="joy-pricing-card__desc">
-                      The plan cannot be picked right now.
-                    </p>
-                    <div class="joy-pricing-card__price">
-                      <span>$0</span> <span class="joy-pricing-card__period">/month</span>
+                    <div class="joy-pricing-card">
+                      <h3 class="joy-pricing-card__title">
+                        Disabled
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        The plan cannot be picked right now.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$0</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Button is dimmed</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Skipped by the keyboard</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta" disabled=""> <span class="joy-button__label">Start free</span>  </button>
                     </div>
-                    <ul class="joy-pricing-card__features">
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Button is dimmed</span>
-                      </li>
-                      <li class="joy-pricing-card__feature">
-                        <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Skipped by the keyboard</span>
-                      </li>
-                    </ul>
-                    <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta" disabled=""> <span class="joy-button__label">Start free</span>  </button>
                   </div>
                 </div>
               </div>
@@ -4069,7 +4130,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Measured inside the colocation window
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster than benchmark
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster vs L1
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4083,7 +4144,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Two-site failover
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> Zero unplanned downtime
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> Zero downtime
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4097,7 +4158,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Routed across all venues
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--negative">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg> <span class="joy-stat-item__sr">Trend down:</span> 3% below last month
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg> <span class="joy-stat-item__sr">Trend down:</span> 3% lower
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4111,7 +4172,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Bridged through one API
                   </p>
                   <div class="joy-stat-item__change">
-                    No change this quarter
+                    No change
                   </div>
                 </div>
               </div>
@@ -4238,7 +4299,7 @@ export async function executeHedge(symbol: string, size: number) {
                   <svg width="120" height="32" viewBox="0 0 120 32" fill="none" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text></svg>
                 </div>
                 <div class="joy-logo-cloud__item" title="Citadel" role="img" aria-label="Citadel">
-                  <svg width="110" height="32" viewBox="0 0 110 32" fill="none" aria-hidden="true" focusable="false"><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text></svg>
+                  <svg width="110" height="32" viewBox="0 0 110 32" fill="none" aria-hidden="true" focusable="false"><polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text></svg>
                 </div>
                 <div class="joy-logo-cloud__item" title="Nexus Capital" role="img" aria-label="Nexus Capital">
                   <svg width="120" height="32" viewBox="0 0 120 32" fill="none" aria-hidden="true" focusable="false"><circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="4" fill="currentColor"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">NEXUS CAP</text></svg>
@@ -4395,19 +4456,19 @@ export async function executeHedge(symbol: string, size: number) {
         <div class="simulator-toolbar">
           <!-- Viewport Controller -->
           <div class="simulator-group">
-            <span class="simulator-label">Frame width:</span>
-            <div class="segmented-control" id="simulator-viewport-ctrl">
+            <span class="simulator-label" id="simulator-viewport-label">Frame width</span>
+            <div class="segmented-control segmented-control--frames" id="simulator-viewport-ctrl" role="group" aria-labelledby="simulator-viewport-label">
               <button type="button" class="segment-btn active" onclick="switchSimulatorViewport('100%', this)">
                 <svg class="simulator-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                Desktop (1440px)
+                Desktop
               </button>
               <button type="button" class="segment-btn" onclick="switchSimulatorViewport('768px', this)">
                 <svg class="simulator-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                Tablet (768px)
+                Tablet <span class="segment-btn__size">768px</span>
               </button>
               <button type="button" class="segment-btn" onclick="switchSimulatorViewport('375px', this)">
                 <svg class="simulator-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                Mobile (375px)
+                Mobile <span class="segment-btn__size">375px</span>
               </button>
             </div>
           </div>
@@ -4417,7 +4478,7 @@ export async function executeHedge(symbol: string, size: number) {
         <!-- Simulator Status Bar -->
         <div class="simulator-status-bar">
           <div>
-            Active frame: <strong id="simulator-viewport-info">Desktop (Fluid / 1440px)</strong>
+            Active frame: <strong id="simulator-viewport-info">Full width</strong>
           </div>
           <div>Same class names and structure as the LandingPage components</div>
         </div>
@@ -4433,10 +4494,11 @@ export async function executeHedge(symbol: string, size: number) {
               <header class="joy-landing-header">
                 <div class="joy-landing-header__brand">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <span>Joymify Quant</span>
+                  <span>Joymify Design</span>
                 </div>
                 <nav class="joy-landing-header__nav" aria-label="Primary">
                   <a class="joy-landing-header__link" href="#sim-features">Features</a>
+                  <a class="joy-landing-header__link" href="#sim-pricing">Pricing</a>
                   <a class="joy-landing-header__link" href="#sim-telemetry">Telemetry</a>
                   <a class="joy-landing-header__link" href="#sim-faq">FAQ</a>
                   <button type="button" class="joy-button joy-button--solid joy-button--sm">Launch Terminal</button>
@@ -4457,6 +4519,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <div class="joy-drawer__body">
                       <nav class="joy-landing-drawer__nav" aria-label="Mobile">
                         <a class="joy-landing-drawer__link" href="#sim-features">Features</a>
+                        <a class="joy-landing-drawer__link" href="#sim-pricing">Pricing</a>
                         <a class="joy-landing-drawer__link" href="#sim-telemetry">Telemetry</a>
                         <a class="joy-landing-drawer__link" href="#sim-faq">FAQ</a>
                       </nav>
@@ -4470,23 +4533,26 @@ export async function executeHedge(symbol: string, size: number) {
               <!-- landing-header:end -->
 
               <main id="sim-main" tabindex="-1">
-                <!-- HeroSection -->
+                <!-- landing-simulator:generated:start -->
+                <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the real LandingPage render (default copy), plus a features heading and a pricing section that only the hub adds. Do not edit by hand. -->
                 <section class="joy-hero">
                   <div class="joy-hero__badge">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    Sub-5μs execution engine
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Sub-5μs execution engine
                   </div>
-                  <h1 class="joy-hero__title">Live market data and <span class="joy-hero__title-emphasis">fast trading screens</span></h1>
-                  <p class="joy-hero__subtitle">Built for trading desks and portals that need every chart, table and price to render in under 5 ms.</p>
+                  <h1 class="joy-hero__title">
+                    Live market data and <span class="joy-hero__title-emphasis">fast trading screens</span>
+                  </h1>
+                  <p class="joy-hero__subtitle">
+                    Built for trading desks and portals that need every chart, table and price to render in under 5 ms.
+                  </p>
                   <div class="joy-hero__ctas">
-                    <button type="button" class="joy-button joy-button--solid joy-button--lg"><span class="joy-button__label">Deploy a node</span></button>
-                    <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"><span class="joy-button__label">Read the whitepaper</span></button>
+                    <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Deploy a node</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read the whitepaper</span>  </button>
                   </div>
                 </section>
-
-                <!-- LogoCloud -->
-                <section class="joy-logo-cloud" aria-labelledby="joy-logo-cloud-title-sim">
-                  <p class="joy-logo-cloud__title" id="joy-logo-cloud-title-sim">Trusted by trading desks and liquidity providers</p>
+                <section class="joy-logo-cloud" aria-labelledby="joy-logo-cloud-title-sim3">
+                  <p class="joy-logo-cloud__title" id="joy-logo-cloud-title-sim3">
+                    Trusted by trading desks and liquidity providers
+                  </p>
                   <div class="joy-logo-cloud__logos">
                     <div class="joy-logo-cloud__item" title="Quantum Capital" role="img" aria-label="Quantum Capital">
                       <svg width="120" height="32" viewBox="0 0 120 32" fill="none"><rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text></svg>
@@ -4502,148 +4568,474 @@ export async function executeHedge(symbol: string, size: number) {
                     </div>
                   </div>
                 </section>
-
-                <!-- StatsSection -->
                 <div id="sim-telemetry">
                   <section class="joy-stats-section">
                     <div class="joy-stats-grid">
                       <div class="joy-stat-item">
-                        <div class="joy-stat-item__value">4.2 μs</div>
-                        <div class="joy-stat-item__label">P99 Order Latency</div>
-                        <p class="joy-stat-item__desc">Kernel bypass colocation</p>
-                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> -14% vs L1</div>
+                        <div class="joy-stat-item__value">
+                          4.2 μs
+                        </div>
+                        <div class="joy-stat-item__label">
+                          P99 Order Latency
+                        </div>
+                        <p class="joy-stat-item__desc">
+                          Kernel bypass colocation
+                        </p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster vs L1
+                        </div>
                       </div>
                       <div class="joy-stat-item">
-                        <div class="joy-stat-item__value">99.999%</div>
-                        <div class="joy-stat-item__label">Historical Uptime</div>
-                        <p class="joy-stat-item__desc">Two live sites, instant failover</p>
-                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> Zero downtime</div>
+                        <div class="joy-stat-item__value">
+                          99.999%
+                        </div>
+                        <div class="joy-stat-item__label">
+                          Historical Uptime
+                        </div>
+                        <p class="joy-stat-item__desc">
+                          Two live sites, instant failover
+                        </p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> Zero downtime
+                        </div>
                       </div>
                       <div class="joy-stat-item">
-                        <div class="joy-stat-item__value">$48.2B</div>
-                        <div class="joy-stat-item__label">Monthly Volume</div>
-                        <p class="joy-stat-item__desc">Settled across 14 networks</p>
-                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> +32% MoM</div>
+                        <div class="joy-stat-item__value">
+                          $48.2B
+                        </div>
+                        <div class="joy-stat-item__label">
+                          Monthly Volume
+                        </div>
+                        <p class="joy-stat-item__desc">
+                          Settled across 14 networks
+                        </p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> +32% MoM
+                        </div>
                       </div>
                       <div class="joy-stat-item">
-                        <div class="joy-stat-item__value">14 Chains</div>
-                        <div class="joy-stat-item__label">Settlement Chains</div>
-                        <p class="joy-stat-item__desc">Instant cross-L2 finality</p>
-                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> EVM &amp; SVM</div>
+                        <div class="joy-stat-item__value">
+                          14 Chains
+                        </div>
+                        <div class="joy-stat-item__label">
+                          Settlement Chains
+                        </div>
+                        <p class="joy-stat-item__desc">
+                          Instant cross-L2 finality
+                        </p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> EVM &amp; SVM
+                        </div>
                       </div>
                     </div>
                   </section>
                 </div>
-
-                <!-- FeatureGrid -->
                 <div id="sim-features" class="joy-landing-page__features">
+                  <div class="joy-landing-page__section-header">
+                    <h2 class="joy-landing-page__section-title">
+                      Built for busy trading desks
+                    </h2>
+                    <p class="joy-landing-page__section-subtitle">
+                      Fast screens, clear tables and themes that stay readable in light and dark.
+                    </p>
+                  </div>
                   <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead">
                     <div class="joy-feature-card">
-                      <div class="joy-feature-card__badge"><span class="joy-badge joy-badge--brand">FPGA-Core</span></div>
-                      <div class="joy-feature-card__icon">${simIcon("Cpu", "1.5rem")}</div>
-                      <h3 class="joy-feature-card__title">Fast order matching</h3>
-                      <p class="joy-feature-card__desc">Co-located matching engines process up to 2.4M orders a second with steady, predictable timing.</p>
+                      <div class="joy-feature-card__badge">
+                        <span class="joy-badge joy-badge--brand joy-badge--sm"> FPGA-Core</span>
+                      </div>
+                      <div class="joy-feature-card__icon">
+                        <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                      </div>
+                      <h3 class="joy-feature-card__title">
+                        Fast order matching
+                      </h3>
+                      <p class="joy-feature-card__desc">
+                        Co-located matching engines process up to 2.4M orders a second with steady, predictable timing.
+                      </p>
                       <a href="#sim-features" class="joy-feature-card__link">See the engine</a>
                     </div>
                     <div class="joy-feature-card">
-                      <div class="joy-feature-card__badge"><span class="joy-badge joy-badge--success">WCAG AA</span></div>
-                      <div class="joy-feature-card__icon">${simIcon("Layers", "1.5rem")}</div>
-                      <h3 class="joy-feature-card__title">Tested light and dark themes</h3>
-                      <p class="joy-feature-card__desc">Light and dark themes keep text at WCAG 2.2 AA contrast on every component.</p>
+                      <div class="joy-feature-card__badge">
+                        <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG AA</span>
+                      </div>
+                      <div class="joy-feature-card__icon">
+                        <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                      </div>
+                      <h3 class="joy-feature-card__title">
+                        Tested light and dark themes
+                      </h3>
+                      <p class="joy-feature-card__desc">
+                        Light and dark themes keep text at WCAG 2.2 AA contrast on every component.
+                      </p>
                       <a href="#sim-features" class="joy-feature-card__link">Browse tokens</a>
                     </div>
                     <div class="joy-feature-card">
-                      <div class="joy-feature-card__badge"><span class="joy-badge joy-badge--warning">Adaptive</span></div>
-                      <div class="joy-feature-card__icon">${simIcon("Smartphone", "1.5rem")}</div>
-                      <h3 class="joy-feature-card__title">Tables that fit phones</h3>
-                      <p class="joy-feature-card__desc">Wide market tables turn into clear stacked cards on small screens.</p>
+                      <div class="joy-feature-card__badge">
+                        <span class="joy-badge joy-badge--warning joy-badge--sm"> Adaptive</span>
+                      </div>
+                      <div class="joy-feature-card__icon">
+                        <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                      </div>
+                      <h3 class="joy-feature-card__title">
+                        Tables that fit phones
+                      </h3>
+                      <p class="joy-feature-card__desc">
+                        Wide market tables turn into clear stacked cards on small screens.
+                      </p>
                       <a href="#sim-features" class="joy-feature-card__link">Try the demo</a>
                     </div>
                   </div>
                 </div>
-
-                <!-- FAQSection -->
+                <div id="sim-pricing" class="joy-landing-page__pricing">
+                  <div class="joy-landing-page__section-header">
+                    <h2 class="joy-landing-page__section-title">
+                      Simple plans for every desk
+                    </h2>
+                    <p class="joy-landing-page__section-subtitle">
+                      Start free, then add seats and tools as your team grows.
+                    </p>
+                  </div>
+                  <div class="joy-pricing-matrix" role="region" aria-label="Pricing plans">
+                    <div class="joy-pricing-card">
+                      <h3 class="joy-pricing-card__title">
+                        Developer
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        Core tokens, icons and the base components.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$0</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>138 vector icons</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Svelte 5 and React 19 packages</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Community chat support</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Start free</span>  </button>
+                    </div>
+                    <div class="joy-pricing-card joy-pricing-card--featured">
+                      <div class="joy-pricing-card__badge">
+                        Most popular
+                      </div>
+                      <h3 class="joy-pricing-card__title">
+                        Professional
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        The full financial suite and every landing block.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$149</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Everything in Developer</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Dense financial tables</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Landing block library</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Priority support, 24/7</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Upgrade to Pro</span>  </button>
+                    </div>
+                    <div class="joy-pricing-card">
+                      <h3 class="joy-pricing-card__title">
+                        Team
+                      </h3>
+                      <p class="joy-pricing-card__desc">
+                        Shared themes and seats for a whole desk.
+                      </p>
+                      <div class="joy-pricing-card__price">
+                        <span>$899</span> <span class="joy-pricing-card__period">/month</span>
+                      </div>
+                      <ul class="joy-pricing-card__features">
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Unlimited seats</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Custom theme export</span>
+                        </li>
+                        <li class="joy-pricing-card__feature">
+                          <span class="joy-pricing-card__check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span> <span>Named account manager</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta"> <span class="joy-button__label">Contact sales</span>  </button>
+                    </div>
+                  </div>
+                  <div class="joy-pricing-matrix joy-pricing-matrix--table" id="sim-matrix">
+                    <div class="joy-pricing-matrix__scroll" role="region" tabindex="0" aria-label="Compare plans">
+                      <table class="joy-table joy-table--scroll joy-pricing-matrix__table">
+                        <thead>
+                          <tr>
+                            <th scope="col">
+                              Feature
+                            </th>
+                            <th scope="col">
+                              Developer
+                            </th>
+                            <th scope="col">
+                              Professional
+                            </th>
+                            <th scope="col">
+                              Team
+                            </th>
+                            <th scope="col">
+                              Enterprise
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">
+                              Vector icons
+                            </th>
+                            <td>
+                              138
+                            </td>
+                            <td>
+                              138
+                            </td>
+                            <td>
+                              138
+                            </td>
+                            <td>
+                              138
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">
+                              Financial tables
+                            </th>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">
+                              Landing block library
+                            </th>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">
+                              Custom theme export
+                            </th>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">
+                              Seats included
+                            </th>
+                            <td>
+                              1
+                            </td>
+                            <td>
+                              5
+                            </td>
+                            <td>
+                              Unlimited
+                            </td>
+                            <td>
+                              Unlimited
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">
+                              Priority support
+                            </th>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">
+                              Dedicated manager
+                            </th>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--no" role="img" aria-label="Not included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle></svg></span>
+                            </td>
+                            <td>
+                              <span class="joy-pricing-matrix__mark joy-pricing-matrix__mark--yes" role="img" aria-label="Included"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
                 <div id="sim-faq">
                   <section class="joy-faq-section">
                     <div class="joy-faq-section__header">
-                      <h2 class="joy-faq-section__title">Frequently Asked Questions</h2>
-                      <p class="joy-faq-section__subtitle">Answers on architecture, speed and security.</p>
+                      <h2 class="joy-faq-section__title">
+                        Frequently asked questions
+                      </h2>
+                      <p class="joy-faq-section__subtitle">
+                        Answers on architecture, speed and security.
+                      </p>
                     </div>
                     <div class="joy-faq-list">
-                      <div class="joy-faq-item joy-faq-item--open" id="sim-faq-item-0">
-                        <button type="button" id="sim-faq-trigger-0" aria-expanded="true" aria-controls="sim-faq-answer-0" class="joy-faq-item__trigger" onclick="toggleFaq('sim-faq-item-0')">
-                          <span class="joy-faq-item__label">How do charts stay under 5 ms?</span>
-                          <span class="joy-faq-item__icon" aria-hidden="true">${simIcon("ChevronDown", "100%")}</span>
-                        </button>
-                        <div id="sim-faq-answer-0" role="region" aria-labelledby="sim-faq-trigger-0" class="joy-faq-item__content">Charts draw on two canvas layers, thin out dense data with a downsampling step and reuse preallocated buffers, so garbage collection never stalls a frame.</div>
+                      <div class="joy-faq-item joy-faq-item--open">
+                        <button type="button" id="sim4-trigger-0" aria-expanded="true" aria-controls="sim4-answer-0" class="joy-faq-item__trigger" onclick="toggleFaq(this)"><span class="joy-faq-item__label">How do charts stay under 5 ms?</span> <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button>
+                        <div id="sim4-answer-0" role="region" aria-labelledby="sim4-trigger-0" class="joy-faq-item__content">
+                          Charts draw on two canvas layers, thin out dense data with a downsampling step and reuse preallocated buffers, so garbage collection never stalls a frame.
+                        </div>
                       </div>
-                      <div class="joy-faq-item" id="sim-faq-item-1">
-                        <button type="button" id="sim-faq-trigger-1" aria-expanded="false" aria-controls="sim-faq-answer-1" class="joy-faq-item__trigger" onclick="toggleFaq('sim-faq-item-1')">
-                          <span class="joy-faq-item__label">Can the color theme change at runtime?</span>
-                          <span class="joy-faq-item__icon" aria-hidden="true">${simIcon("ChevronDown", "100%")}</span>
-                        </button>
-                        <div id="sim-faq-answer-1" role="region" aria-labelledby="sim-faq-trigger-1" class="joy-faq-item__content" hidden>Yes. Every component reads shared CSS custom properties, so a new theme applies the moment the variables change.</div>
+                      <div class="joy-faq-item">
+                        <button type="button" id="sim4-trigger-1" aria-expanded="false" aria-controls="sim4-answer-1" class="joy-faq-item__trigger" onclick="toggleFaq(this)"><span class="joy-faq-item__label">Can the color theme change at runtime?</span> <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button>
+                        <div id="sim4-answer-1" role="region" aria-labelledby="sim4-trigger-1" class="joy-faq-item__content" hidden="">
+                          Yes. Every component reads shared CSS custom properties, so a new theme applies the moment the variables change.
+                        </div>
                       </div>
-                      <div class="joy-faq-item" id="sim-faq-item-2">
-                        <button type="button" id="sim-faq-trigger-2" aria-expanded="false" aria-controls="sim-faq-answer-2" class="joy-faq-item__trigger" onclick="toggleFaq('sim-faq-item-2')">
-                          <span class="joy-faq-item__label">How do tables look on phones?</span>
-                          <span class="joy-faq-item__icon" aria-hidden="true">${simIcon("ChevronDown", "100%")}</span>
-                        </button>
-                        <div id="sim-faq-answer-2" role="region" aria-labelledby="sim-faq-trigger-2" class="joy-faq-item__content" hidden>Below 768px each row becomes a stacked card and every value keeps its label, so nothing is cut off.</div>
+                      <div class="joy-faq-item">
+                        <button type="button" id="sim4-trigger-2" aria-expanded="false" aria-controls="sim4-answer-2" class="joy-faq-item__trigger" onclick="toggleFaq(this)"><span class="joy-faq-item__label">How do tables look on phones?</span> <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button>
+                        <div id="sim4-answer-2" role="region" aria-labelledby="sim4-trigger-2" class="joy-faq-item__content" hidden="">
+                          Below 768px each row becomes a stacked card and every value keeps its label, so nothing is cut off.
+                        </div>
                       </div>
                     </div>
                   </section>
                 </div>
-
-                <!-- CTASection -->
-                <section class="joy-cta-section" aria-labelledby="joy-cta-title-sim">
+                <section class="joy-cta-section" aria-labelledby="joy-cta-title-sim5">
                   <div class="joy-cta-section__container">
-                    <h2 class="joy-cta-section__title" id="joy-cta-title-sim">Build fast, exact trading interfaces</h2>
-                    <p class="joy-cta-section__desc">Get low-latency screens, dense financial tables and verified WCAG 2.2 contrast in one design system.</p>
+                    <h2 class="joy-cta-section__title" id="joy-cta-title-sim5">
+                      Build fast, exact trading interfaces
+                    </h2>
+                    <p class="joy-cta-section__desc">
+                      Get low-latency screens, dense financial tables and verified WCAG 2.2 contrast in one design system.
+                    </p>
                     <div class="joy-cta-section__actions">
-                      <button type="button" class="joy-button joy-button--solid joy-button--lg"><span class="joy-button__label">Deploy a node</span></button>
-                      <button type="button" class="joy-button joy-button--outline joy-button--lg"><span class="joy-button__label">Contact sales</span></button>
+                      <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Deploy a node</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg"> <span class="joy-button__label">Contact sales</span>  </button>
                     </div>
                   </div>
                 </section>
+                <!-- landing-simulator:generated:end -->
               </main>
 
-              <!-- SiteFooter -->
+              <!-- landing-simulator-footer:generated:start -->
+              <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the real LandingPage render: do not edit by hand. -->
               <footer class="joy-site-footer">
                 <div class="joy-site-footer__inner">
                   <div class="joy-site-footer__brand">
-                    <div class="joy-site-footer__brand-title"><span>Joymify Design</span></div>
-                    <p class="joy-site-footer__brand-desc">Design tokens and UI parts for trading products.</p>
+                    <div class="joy-site-footer__brand-title">
+                      <span>Joymify Design</span>
+                    </div>
+                    <p class="joy-site-footer__brand-desc">
+                      Design tokens and UI parts for trading products.
+                    </p>
                   </div>
                   <div class="joy-site-footer__column">
-                    <h4 class="joy-site-footer__col-title">Platform</h4>
+                    <h4 class="joy-site-footer__col-title">
+                      Platform
+                    </h4>
                     <ul class="joy-site-footer__links">
-                      <li><a href="#sim-features" class="joy-site-footer__link">Financial Charts</a></li>
-                      <li><a href="#sim-features" class="joy-site-footer__link">Adaptive Table</a></li>
-                      <li><a href="#sim-features" class="joy-site-footer__link">Bento Grid</a></li>
+                      <li>
+                        <a href="#sim-features" class="joy-site-footer__link">Financial Charts</a>
+                      </li>
+                      <li>
+                        <a href="#sim-features" class="joy-site-footer__link">Adaptive Table</a>
+                      </li>
+                      <li>
+                        <a href="#sim-features" class="joy-site-footer__link">Bento Grid</a>
+                      </li>
                     </ul>
                   </div>
                   <div class="joy-site-footer__column">
-                    <h4 class="joy-site-footer__col-title">Resources</h4>
+                    <h4 class="joy-site-footer__col-title">
+                      Resources
+                    </h4>
                     <ul class="joy-site-footer__links">
-                      <li><a href="#" class="joy-site-footer__link">Docs</a></li>
-                      <li><a href="#" class="joy-site-footer__link">Design Tokens</a></li>
-                      <li><a href="#" class="joy-site-footer__link">API Reference</a></li>
+                      <li>
+                        <a href="#" class="joy-site-footer__link">Docs</a>
+                      </li>
+                      <li>
+                        <a href="#" class="joy-site-footer__link">Design Tokens</a>
+                      </li>
+                      <li>
+                        <a href="#" class="joy-site-footer__link">API Reference</a>
+                      </li>
                     </ul>
                   </div>
                   <div class="joy-site-footer__column">
-                    <h4 class="joy-site-footer__col-title">Compliance</h4>
+                    <h4 class="joy-site-footer__col-title">
+                      Compliance
+                    </h4>
                     <ul class="joy-site-footer__links">
-                      <li><a href="#" class="joy-site-footer__link">WCAG 2.2 AA</a></li>
-                      <li><a href="#" class="joy-site-footer__link">Zero Emoji Policy</a></li>
-                      <li><a href="#" class="joy-site-footer__link">SOC 2 Type II</a></li>
+                      <li>
+                        <a href="#" class="joy-site-footer__link">WCAG 2.2 AA</a>
+                      </li>
+                      <li>
+                        <a href="#" class="joy-site-footer__link">Zero Emoji Policy</a>
+                      </li>
+                      <li>
+                        <a href="#" class="joy-site-footer__link">SOC 2 Type II</a>
+                      </li>
                     </ul>
                   </div>
                 </div>
                 <div class="joy-site-footer__bottom">
-                  <div>&copy; 2026 Joymify Inc. All rights reserved.</div>
+                  <div>
+                    © 2026 Joymify Inc. All rights reserved.
+                  </div>
                 </div>
               </footer>
+              <!-- landing-simulator-footer:generated:end -->
             </div>
           </div>
         </div>
@@ -6850,7 +7242,7 @@ export async function executeHedge(symbol: string, size: number) {
         frame.style.maxWidth = width;
       }
       if (info) {
-        info.textContent = width === '100%' ? 'Desktop (Fluid / 1440px)' : width === '768px' ? 'Tablet (768px)' : 'Mobile (375px)';
+        info.textContent = width === '100%' ? 'Full width' : width === '768px' ? 'Tablet, 768px' : 'Mobile, 375px';
       }
       if (btn && btn.parentElement) {
         btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));

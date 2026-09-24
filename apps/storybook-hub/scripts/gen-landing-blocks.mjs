@@ -1,9 +1,16 @@
-// Generator for the hub's `#view-landing-blocks` demos (apps/storybook-hub/build.js).
+// Generator for the hub's landing views (apps/storybook-hub/build.js): `#view-landing-blocks` and the body of the
+// full-page simulator `#view-landing-preview`.
 //
-// The block markup in that view is the SSR output of the real Svelte components, so it can drift when a component
-// changes. This script owns the region of build.js between the two markers
-//   <!-- landing-blocks:generated:start -->  ...  <!-- landing-blocks:generated:end -->
-// and is the only thing that should edit it. Do not edit that region by hand.
+// The markup in those views is the SSR output of the real Svelte components, so it can drift when a component
+// changes. This script owns three regions of build.js, each between a pair of markers, and is the only thing that should
+// edit them. Do not edit a region by hand.
+//   <!-- landing-blocks:generated:start -->           ... <!-- landing-blocks:generated:end -->            the blocks view
+//   <!-- landing-simulator:generated:start -->        ... <!-- landing-simulator:generated:end -->         simulator <main> content
+//   <!-- landing-simulator-footer:generated:start --> ... <!-- landing-simulator-footer:generated:end -->  simulator footer
+// The simulator header (skip link, banner, drawer), the <main> wrapper and the toolbar stay hand-written (the drawer
+// wiring lives in build.js; packages/{svelte,react}/test/landing-page.test.js proves the header class set).
+// The simulator body is the real LandingPage render (default copy) plus three hub-only additions marked below: a features
+// heading, a pricing section and matching anchors.
 //
 // Regenerate after changing a landing component (from the repo root):
 //   node apps/storybook-hub/scripts/gen-landing-blocks.mjs --write
@@ -63,7 +70,7 @@ const indent = (s, n) => s.split('\n').map((l) => (l ? ' '.repeat(n) + l : l)).j
 const cards = [
   { badge: ['brand', 'Speed'], icon: icon('Cpu', 22), title: 'Fast order matching', description: 'Orders route through a co-located gateway and reach the book in microseconds, with no pauses from garbage collection.', linkText: 'Explore charts', linkHref: '#charts' },
   { badge: ['success', 'WCAG 2.2 AA'], icon: icon('Shield', 22), title: 'Dark mode that holds up', description: 'Every text and surface pair is checked for contrast in both themes, so no button turns white on white.', linkText: 'Inspect tokens', linkHref: '#tokens' },
-  { badge: ['warning', 'Twin packages'], icon: icon('Layers', 22), title: 'Svelte 5 and React 19', description: 'Both packages share one token set, the same class names and the same keyboard behaviour.', linkText: 'Browse tables', linkHref: '#table' },
+  { badge: ['warning', 'Twin packages'], icon: icon('Layers', 22), title: 'Svelte 5 and React 19', description: 'Both packages share one token set, the same class names and the same keyboard behaviour.', linkText: 'See the overview', linkHref: '#overview' },
   { badge: ['neutral', 'Data'], icon: icon('Database', 22), title: 'Dense financial tables', description: 'Sticky headers, aligned numbers and a stacked layout for phones keep long ledgers readable.', linkText: 'Open the ledger', linkHref: '#financial-table' },
   { badge: ['brand', 'Security'], icon: icon('LockClose', 22), title: 'Safe by default', description: 'Forms, dialogs and drawers trap focus, restore it on close and label every control for screen readers.', linkText: 'See dialogs', linkHref: '#modal' },
   { badge: ['success', 'Charts'], icon: icon('CandlestickChart', 22), title: 'Live charts at 60 FPS', description: 'Canvas charts cull off-screen points and reuse buffers, so a busy tick stream stays smooth.', linkText: 'View charts', linkHref: '#charts' },
@@ -170,10 +177,7 @@ const pricingStates = [
   await R('PricingCard', { title: 'Loading', description: 'The button is busy and ignores clicks.', price: '$149', features: ['Spinner in the button', 'aria-busy is set'], ctaText: 'Upgrade to Pro', featured: true, loading: true }),
   await R('PricingCard', { title: 'Disabled', description: 'The plan cannot be picked right now.', price: '$0', features: ['Button is dimmed', 'Skipped by the keyboard'], ctaText: 'Start free', disabled: true }),
 ];
-const matrix = await R('PricingMatrix', {
-  id: 'blocks-matrix',
-  label: 'Compare plans',
-  rowHeaderLabel: 'Feature',
+const matrixSpec = {
   columns: ['Developer', 'Professional', 'Team', 'Enterprise'],
   rows: [
     { label: 'Vector icons', values: ['138', '138', '138', '138'] },
@@ -184,14 +188,15 @@ const matrix = await R('PricingMatrix', {
     { label: 'Priority support', values: [false, true, true, true] },
     { label: 'Dedicated manager', values: [false, false, false, true] },
   ],
-});
+};
+const matrix = await R('PricingMatrix', { id: 'blocks-matrix', label: 'Compare plans', rowHeaderLabel: 'Feature', ...matrixSpec });
 
 const stats = await R('StatsSection', {
   stats: [
-    { label: 'P99 order latency', value: '4.2 \u00b5s', description: 'Measured inside the colocation window', change: '14% faster than benchmark', trend: 'up' },
-    { label: 'Gateway uptime', value: '99.999%', description: 'Two-site failover', change: 'Zero unplanned downtime', trend: 'up' },
-    { label: 'Monthly volume', value: '$48.2B', description: 'Routed across all venues', change: '3% below last month', trend: 'down' },
-    { label: 'Settlement networks', value: '14 chains', description: 'Bridged through one API', change: 'No change this quarter', trend: 'neutral' },
+    { label: 'P99 order latency', value: '4.2 \u00b5s', description: 'Measured inside the colocation window', change: '14% faster vs L1', trend: 'up' },
+    { label: 'Gateway uptime', value: '99.999%', description: 'Two-site failover', change: 'Zero downtime', trend: 'up' },
+    { label: 'Monthly volume', value: '$48.2B', description: 'Routed across all venues', change: '3% lower', trend: 'down' },
+    { label: 'Settlement networks', value: '14 chains', description: 'Bridged through one API', change: 'No change', trend: 'neutral' },
   ],
 });
 
@@ -215,7 +220,7 @@ const logoCloud = uniq(await R('LogoCloud', {
   title: 'Trusted by trading desks and liquidity providers',
   logos: [
     { name: 'Quantum', svgHtml: logoSvg('<rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', 'QUANTUM', 120) },
-    { name: 'Citadel', svgHtml: logoSvg('', 'CITADEL', 110) },
+    { name: 'Citadel', svgHtml: logoSvg('<polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/>', 'CITADEL', 110) },
     { name: 'Nexus Capital', svgHtml: logoSvg('<circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="4" fill="currentColor"/>', 'NEXUS CAP', 120) },
     { name: 'Flow Desk', svgHtml: logoSvg('<rect x="4" y="6" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', 'FLOW DESK', 115) },
     { name: 'Apex Alpha', href: 'https://github.com/montionugera/joy-design', svgHtml: logoSvg('<path d="M4 22L12 8L20 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', 'APEX ALPHA', 125) },
@@ -285,7 +290,7 @@ for (const n of [3, 4, 5, 6]) leadHtml.push(group(`${n} cards, lead layout`, awa
 sections.push(box('Feature grid (FeatureGrid)', 'The lead layout is the default: from 900px the first card spans two of three columns and the last card fills its row, so any number of cards leaves no empty cell. Below 900px it is one column.',
   `<div class="landing-demo__stack">
 ${leadHtml.join('\n')}
-${group('Uniform layout, 3 columns', await featureGrid(4, 'uniform', 'blocks-feature-uniform', 3))}
+${group('Uniform layout, up to 3 columns', await featureGrid(6, 'uniform', 'blocks-feature-uniform', 3))}
 </div>`));
 
 sections.push(box('Bento grid (BentoGrid, BentoCard)', 'A 12-column grid. Under 900px every card is full width.', await showcaseBento()));
@@ -297,8 +302,8 @@ ${group('Spans from the col-span-N alias', await bentoSpans(true, 'blocks-bento-
 
 sections.push(box('Pricing cards (PricingCard)', 'Three plans with the featured card marked, then the loading and disabled button states.',
   `<div class="landing-demo__stack">
-${group('Default and featured', await R('PricingMatrix', { label: 'Pricing plans' }, pricingCards.join('')))}
-${group('Loading and disabled', await R('PricingMatrix', { label: 'Pricing plan states' }, pricingStates.join('')))}
+${group('Default and featured', `<div class="joy-pricing-fit">${await R('PricingMatrix', { label: 'Pricing plans' }, pricingCards.join(''))}</div>`)}
+${group('Loading and disabled', `<div class="joy-pricing-fit">${await R('PricingMatrix', { label: 'Pricing plan states' }, pricingStates.join(''))}</div>`)}
 </div>`));
 
 sections.push(box('Plan comparison table', 'A real table in a scroll region. The first column stays pinned when the table scrolls sideways.', matrix));
@@ -316,41 +321,118 @@ sections.push(box('Footer (SiteFooter)', null, footer, { flush: true }));
 let body = sections.map(pretty).join('\n\n');
 
 // Escape for a JS template literal, then restore the intended icon expressions.
-body = body.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+const toTemplate = (text) => text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+body = toTemplate(body);
 body = body.replace(/@@ICON:([A-Za-z0-9]+):([0-9a-z%]+)@@/g, (_, n, s) => '${simIcon("' + n + '", "' + s + '")}');
 
-const START = '<!-- landing-blocks:generated:start -->';
-const END = '<!-- landing-blocks:generated:end -->';
-// The first line sits after the 6-space indent that precedes START in build.js.
-const generated = `${START}
+// ── simulator body: the real LandingPage render, plus the hub-only additions ──────────────────────────────────────────
+// Anchors: the page ids are prefixed (`sim-`) so they never collide with the hub's own ids. The header block in build.js
+// (hand-written) links to #sim-features, #sim-pricing, #sim-telemetry and #sim-faq.
+const page = tidy(await renderSvelte('LandingPage'));
+const mainOpen = page.match(/<main id="[^"]*" tabindex="-1">/);
+const mainStart = mainOpen ? page.indexOf(mainOpen[0]) + mainOpen[0].length : -1;
+const mainEnd = page.indexOf('</main>');
+const footerStart = page.indexOf('<footer class="joy-site-footer">');
+const footerEnd = page.indexOf('</footer>') + '</footer>'.length;
+if (mainStart < 0 || mainEnd < mainStart || footerStart < mainEnd || footerEnd < footerStart) {
+  console.error('LandingPage render has no <main tabindex="-1">...</main> followed by <footer class="joy-site-footer">');
+  process.exit(2);
+}
+const simIds = (html) =>
+  html
+    .replace(/\bs(\d+)\b/g, 'sim$1')
+    .replace(/(id|href)="#?(features|telemetry|faq)"/g, (m, attr, name) => `${attr}="${attr === 'href' ? '#' : ''}sim-${name}"`)
+    .replace(/class="joy-faq-item__trigger"/g, 'class="joy-faq-item__trigger" onclick="toggleFaq(this)"');
+let simMain = simIds(page.slice(mainStart, mainEnd));
+const simFooter = simIds(page.slice(footerStart, footerEnd));
+
+// Hub-only 1: a section heading above the feature grid (LandingPage has none).
+const sectionHeader = (title, subtitle) => `<div class="joy-landing-page__section-header"><h2 class="joy-landing-page__section-title">${title}</h2><p class="joy-landing-page__section-subtitle">${subtitle}</p></div>`;
+const featuresOpen = '<div id="sim-features" class="joy-landing-page__features">';
+if (!simMain.includes(featuresOpen)) {
+  console.error(`the LandingPage render has no ${featuresOpen}`);
+  process.exit(2);
+}
+simMain = simMain.replace(featuresOpen, featuresOpen + sectionHeader('Built for busy trading desks', 'Fast screens, clear tables and themes that stay readable in light and dark.'));
+
+// Hub-only 2: the pricing section (3 plan cards and the comparison table) before the FAQ.
+const faqOpen = '<div id="sim-faq">';
+if (!simMain.includes(faqOpen)) {
+  console.error(`the LandingPage render has no ${faqOpen}`);
+  process.exit(2);
+}
+const simMatrix = uniq(await R('PricingMatrix', {
+  id: 'sim-matrix', label: 'Compare plans', rowHeaderLabel: 'Feature', columns: matrixSpec.columns, rows: matrixSpec.rows,
+}), 'sim-matrix');
+const pricingSection = `<div id="sim-pricing" class="joy-landing-page__pricing">${sectionHeader('Simple plans for every desk', 'Start free, then add seats and tools as your team grows.')}${await R('PricingMatrix', { label: 'Pricing plans' }, pricingCards.join(''))}${simMatrix}</div>`;
+simMain = simMain.replace(faqOpen, pricingSection + faqOpen);
+
+const simBody = (html, depth) => indent(toTemplate(pretty(html)), depth);
+
+// ── regions ────────────────────────────────────────────────────────────────
+// `text` is everything from the start marker to the end marker inclusive; the first line sits after the indent that
+// precedes the marker in build.js.
+const regions = [
+  {
+    name: 'landing-blocks',
+    text: (start, end) => `${start}
       <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the Svelte components: do not edit by hand. -->
       <section id="view-landing-blocks" class="view-panel">
 ${indent(body, 8)}
       </section>
-      ${END}`;
+      ${end}`,
+  },
+  {
+    name: 'landing-simulator',
+    text: (start, end) => `${start}
+                <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the real LandingPage render (default copy), plus a features heading and a pricing section that only the hub adds. Do not edit by hand. -->
+${simBody(simMain, 16)}
+                ${end}`,
+  },
+  {
+    name: 'landing-simulator-footer',
+    text: (start, end) => `${start}
+              <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the real LandingPage render: do not edit by hand. -->
+${simBody(simFooter, 14)}
+              ${end}`,
+  },
+];
 
-const src = fs.readFileSync(buildFile, 'utf8');
-const from = src.indexOf(START);
-const to = src.indexOf(END);
-if (from < 0 || to < from) {
-  console.error(`markers ${START} / ${END} not found in ${buildFile}`);
-  process.exit(2);
+let src = fs.readFileSync(buildFile, 'utf8');
+const drifted = [];
+for (const region of regions) {
+  const start = `<!-- ${region.name}:generated:start -->`;
+  const end = `<!-- ${region.name}:generated:end -->`;
+  const from = src.indexOf(start);
+  const to = src.indexOf(end);
+  if (from < 0 || to < from) {
+    console.error(`markers ${start} / ${end} not found in ${buildFile}`);
+    process.exit(2);
+  }
+  const current = src.slice(from, to + end.length);
+  const generated = region.text(start, end);
+  if (mode === 'write') {
+    src = src.slice(0, from) + generated + src.slice(to + end.length);
+    console.log(`wrote ${generated.split('\n').length} lines of ${region.name} to ${path.relative(root, buildFile)}`);
+  } else if (current !== generated) {
+    drifted.push({ name: region.name, current, generated });
+  }
 }
-const current = src.slice(from, to + END.length);
 
 if (mode === 'write') {
-  fs.writeFileSync(buildFile, src.slice(0, from) + generated + src.slice(to + END.length));
-  console.log(`wrote ${generated.split('\n').length} lines to ${path.relative(root, buildFile)}`);
-} else if (current === generated) {
-  console.log('landing blocks in build.js match the components');
+  fs.writeFileSync(buildFile, src);
+} else if (drifted.length === 0) {
+  console.log('landing blocks and simulator in build.js match the components');
 } else {
-  const a = current.split('\n');
-  const b = generated.split('\n');
-  const diffs = [];
-  for (let i = 0; i < Math.max(a.length, b.length); i++) if (a[i] !== b[i]) diffs.push(i);
-  console.error(`landing blocks drift: build.js differs from the components on ${diffs.length} of ${b.length} lines (committed ${a.length}, generated ${b.length}).`);
-  for (const i of diffs.slice(0, 8)) {
-    console.error(`  line ${i + 1}\n    build.js  : ${(a[i] ?? '<missing>').trim().slice(0, 160)}\n    generated : ${(b[i] ?? '<missing>').trim().slice(0, 160)}`);
+  for (const { name, current, generated } of drifted) {
+    const a = current.split('\n');
+    const b = generated.split('\n');
+    const diffs = [];
+    for (let i = 0; i < Math.max(a.length, b.length); i++) if (a[i] !== b[i]) diffs.push(i);
+    console.error(`landing blocks drift in ${name}: build.js differs from the components on ${diffs.length} of ${b.length} lines (committed ${a.length}, generated ${b.length}).`);
+    for (const i of diffs.slice(0, 8)) {
+      console.error(`  line ${i + 1}\n    build.js  : ${(a[i] ?? '<missing>').trim().slice(0, 160)}\n    generated : ${(b[i] ?? '<missing>').trim().slice(0, 160)}`);
+    }
   }
   console.error('Regenerate with: node apps/storybook-hub/scripts/gen-landing-blocks.mjs --write');
   process.exit(1);
