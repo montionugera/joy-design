@@ -771,8 +771,12 @@ test('F-039 L4 CSS: full-width sections and cards size their own border box', ()
   }
 });
 
-// ── F-039 L5a: SiteFooter CSS contract (the footer is the last block of theme.css) ──
-const footerBlock = themeCss.slice(themeCss.indexOf('/* ── Landing Page Suite: SiteFooter ── */'));
+// ── F-039 L5a: SiteFooter CSS contract ──
+// Bounded at the next top-level comment header (a comment at the start of a line), so CSS a later lane appends after the
+// footer (LandingPage) is never policed by the footer checks. A later block must start with such a header.
+const footerStart = themeCss.indexOf('/* ── Landing Page Suite: SiteFooter ── */');
+const footerEndRel = themeCss.slice(footerStart + 10).search(/\n\/\*/);
+const footerBlock = themeCss.slice(footerStart, footerEndRel === -1 ? undefined : footerStart + 10 + footerEndRel);
 // selector lists may span lines, so match "any text without braces or @" up to the declaration block
 const footerRules = [...footerBlock.matchAll(/(?:^|[{}]\s*|\n)([^@{}\n][^{}@]*)\{([^}]*)\}/g)].map((m) => ({ selector: m[1].trim(), body: m[2] }));
 
@@ -810,20 +814,34 @@ test('F-039 L5a CSS: footer links and social links are at least 44px tall, and t
   const social = rule(footerBlock, '.joy-site-footer__social-link');
   assert.match(social, /min-height:\s*44px/);
   assert.match(social, /min-width:\s*44px/);
-  assert.match(rule(footerBlock, '.joy-site-footer__brand,\n.joy-site-footer__column'), /min-width:\s*0/);
+  assert.match(rule(footerBlock, '.joy-site-footer__brand'), /min-width:\s*0/);
+  assert.match(rule(footerBlock, '.joy-site-footer__column'), /min-width:\s*100px/, 'a column can shrink to 100px before it wraps');
 });
 
 test('F-039 L5a CSS: below 768px the columns collapse to one, and below 640px the bottom bar stacks', () => {
   const tablet = mediaBody(footerBlock, 'max-width: 767px');
   assert.match(tablet, /\.joy-site-footer__inner \{[^}]*grid-template-columns:\s*1fr;/);
+  assert.match(tablet, /\.joy-site-footer__inner \{[^}]*display:\s*grid/);
   assert.match(tablet, /\.joy-site-footer__inner \{[^}]*gap:\s*32px/);
   const phone = mediaBody(footerBlock, 'max-width: 639px');
   assert.match(phone, /\.joy-site-footer__bottom \{[^}]*flex-direction:\s*column-reverse/);
   assert.match(phone, /\.joy-site-footer__bottom \{[^}]*align-items:\s*flex-start/);
-  // `2fr repeat(auto-fit, ...)` is an invalid track list (Chromium drops it: the desktop footer was ONE column). Guard the shape.
-  assert.match(rule(footerBlock, '.joy-site-footer__inner'), /grid-template-columns:\s*repeat\(auto-fit, minmax\(160px, 1fr\)\);/, 'wider screens use auto-fit columns');
-  assert.ok(!/grid-template-columns:[^;]*\d+fr repeat\(auto-(fit|fill)/.test(footerBlock), 'no invalid mixed fr + auto-fit track list');
-  assert.match(mediaBody(footerBlock, 'min-width: 768px'), /\.joy-site-footer__brand \{[^}]*grid-column:\s*span 2/, 'the brand takes two tracks from 768px');
+});
+
+// The layout is a wrapping flex row whose items grow, so every row is full whatever the column count (2 to 5): an
+// auto-fit grid next to a fixed brand span left empty cells at 768 to ~1183px, and `2fr repeat(auto-fit, ...)` is an
+// invalid track list that Chromium drops (the desktop footer was ONE column). Chromium proves the rows in the L5a probe.
+test('F-039 L5a CSS: from 768px the footer is a wrapping flex row (brand on its own row, then from 1024px beside the columns)', () => {
+  const inner = rule(footerBlock, '.joy-site-footer__inner');
+  assert.match(inner, /display:\s*flex/);
+  assert.match(inner, /flex-wrap:\s*wrap/);
+  assert.match(rule(footerBlock, '.joy-site-footer__brand'), /flex:\s*1 1 100%/, 'the brand takes its own row below 1024px');
+  assert.match(rule(footerBlock, '.joy-site-footer__column'), /flex:\s*1 1 0/, 'columns grow, so their row is always full');
+  const wide = mediaBody(footerBlock, 'min-width: 1024px');
+  assert.match(wide, /\.joy-site-footer__brand \{[^}]*flex:\s*2 1 0/);
+  assert.match(wide, /\.joy-site-footer__brand \{[^}]*min-width:\s*240px/);
+  assert.ok(!/grid-template-columns:[^;]*(\d+fr repeat\(auto-|repeat\(auto-)/.test(footerBlock), 'no auto-fit track list next to a fixed brand (empty cells / invalid list)');
+  assert.ok(!/grid-column/.test(footerBlock), 'no grid span for the brand');
 });
 
 test('F-039 L5a contrast: footer text pairs pass WCAG AA in both themes on the card surface, and the divider is >= 3:1 (computed)', () => {

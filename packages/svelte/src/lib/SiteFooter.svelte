@@ -17,6 +17,7 @@
     name: string;
     href: string;
     icon?: Snippet;
+    /** Svelte-only legacy field (React passes an element through `icon`): raw markup, trusted input only. */
     svgHtml?: string;
   }
 
@@ -98,6 +99,8 @@
               {@render social.icon()}
             {:else if social.svgHtml}
               {@html social.svgHtml}
+            {:else}
+              {social.name}
             {/if}
           </a>
         {/each}

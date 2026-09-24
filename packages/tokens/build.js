@@ -5256,14 +5256,18 @@ a.joy-logo-cloud__item:focus-visible {
 .joy-site-footer__inner {
   max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  /* A fixed-fr track next to an auto-fit repeat is an invalid list (dropped, one column): the brand spans two tracks instead. */
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  /* Flex, not an auto-fit grid: growing items always fill their row, so 2 to 5 link columns never leave an empty cell (an auto-fit track count next to a fixed brand span did). */
+  display: flex;
+  flex-wrap: wrap;
   gap: 48px 32px;
 }
-.joy-site-footer__brand,
-.joy-site-footer__column {
+.joy-site-footer__brand {
+  flex: 1 1 100%;
   min-width: 0;
+}
+.joy-site-footer__column {
+  flex: 1 1 0;
+  min-width: 100px;
 }
 .joy-site-footer__brand-title {
   font-size: var(--joy-font-size-xl);
@@ -5344,15 +5348,20 @@ a.joy-logo-cloud__item:focus-visible {
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+  padding: 0 8px;
+  font-size: var(--joy-font-size-sm);
+  text-decoration: none;
+  box-sizing: border-box;
   color: var(--joy-text-secondary);
   transition: color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-site-footer__social-link:hover {
   color: var(--joy-text-primary);
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .joy-site-footer__brand {
-    grid-column: span 2;
+    flex: 2 1 0;
+    min-width: 240px;
   }
 }
 @media (max-width: 767px) {
@@ -5360,6 +5369,7 @@ a.joy-logo-cloud__item:focus-visible {
     padding: 48px 16px 24px 16px;
   }
   .joy-site-footer__inner {
+    display: grid;
     grid-template-columns: 1fr;
     gap: 32px;
   }

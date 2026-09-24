@@ -14,10 +14,12 @@ export interface FooterColumn {
 export interface SocialLink {
   name: string;
   href: string;
+  /** Shown as the link content; when omitted the visible link text is the name. (The Svelte twin also has a raw-markup `svgHtml`.) */
   icon?: React.ReactNode;
 }
 
-export interface SiteFooterProps extends React.HTMLAttributes<HTMLElement> {
+// children are omitted: the footer renders its own body, so a caller's children would be silently dropped (Svelte twin omits them too).
+export interface SiteFooterProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   brandTitle?: string;
   brandDescription?: string;
   brandLogo?: React.ReactNode;
@@ -86,7 +88,7 @@ export const SiteFooter = React.forwardRef<HTMLElement, SiteFooterProps>(({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {social.icon}
+                {social.icon ?? social.name}
               </a>
             ))}
           </div>

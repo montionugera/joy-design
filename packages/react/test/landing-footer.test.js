@@ -81,6 +81,17 @@ test('F-039 L5a: every social link carries the disclosure label, target and rel,
   assert.ok(!render({ columns: COLUMNS }).includes('joy-site-footer__socials'), 'no socials, no empty container');
 });
 
+test('F-039 L5a: a social link without an icon shows its name as visible text (never an invisible 44px target)', () => {
+  const markup = render({ columns: COLUMNS, socialLinks: [{ name: 'Blog', href: 'https://example.com/blog' }] });
+  assert.match(markup, /<a href="https:\/\/example.com\/blog" class="joy-site-footer__social-link" title="Blog" aria-label="Blog \(opens in new tab\)" target="_blank" rel="noopener noreferrer">Blog<\/a>/);
+  assert.ok(!/>GitHub<\/a>/.test(render({ columns: COLUMNS, socialLinks: [SOCIALS[0]] })), 'an icon replaces the text fallback');
+});
+
+test('F-039 L5a: children are not part of the footer contract (the type omits them, and they render nowhere)', () => {
+  const markup = renderToStaticMarkup(h(SiteFooter, { columns: COLUMNS }, h('p', { className: 'stray' }, 'dropped')));
+  assert.ok(!markup.includes('stray'), 'children are dropped by design; SiteFooterProps omits them so TypeScript rejects them');
+});
+
 test('F-039 L5a: no inline style, hex literal, phantom token or middle dot in the footer markup', () => {
   const markup = render({ columns: COLUMNS, socialLinks: SOCIALS });
   assert.ok(!/style=|#[0-9a-f]{3,8}\b|var\(--joy-color|&bull;|·/i.test(markup), markup);

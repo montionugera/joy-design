@@ -84,6 +84,13 @@ test('F-039 L5a: every social link carries the disclosure label, target and rel,
   assert.ok(!(await renderSvelte({ columns: COLUMNS })).includes('joy-site-footer__socials'), 'no socials, no empty container');
 });
 
+test('F-039 L5a: a social link without an icon shows its name as visible text (never an invisible 44px target)', async () => {
+  const markup = await renderSvelte({ columns: COLUMNS, socialLinks: [{ name: 'Blog', href: 'https://example.com/blog' }] });
+  assert.match(markup, /<a href="https:\/\/example.com\/blog" class="joy-site-footer__social-link" title="Blog" aria-label="Blog \(opens in new tab\)" target="_blank" rel="noopener noreferrer">\s*Blog\s*<\/a>/);
+  const withIcon = await renderSvelte({ columns: COLUMNS, socialLinks: [SOCIALS[0]] });
+  assert.ok(!/>\s*GitHub\s*<\/a>/.test(withIcon), 'an icon replaces the text fallback');
+});
+
 test('F-039 L5a: no inline style, hex literal, phantom token or middle dot in the footer markup', async () => {
   const markup = await renderSvelte({ columns: COLUMNS, socialLinks: SOCIALS });
   assert.ok(!/style=|#[0-9a-f]{3,8}\b|var\(--joy-color|&bull;|·/i.test(markup), markup);
@@ -98,6 +105,7 @@ const clientCode = compile(fs.readFileSync(libFile, 'utf8'), { generate: 'client
 function runClient(props) {
   const created = [];
   const binds = [];
+  const propFlags = {};
   const noop = () => noop;
   const derivedNode = (parent) => ({ derived: true, parent, attrs: {} });
   const $ = new Proxy({}, {
@@ -108,7 +116,7 @@ function runClient(props) {
         case 'sibling':
         case 'first_child':
         case 'only_child': return derivedNode;
-        case 'prop': return (p, k, _flags, fallback) => (...args) => (args.length ? (p[k] = args[0]) : (p[k] === undefined ? (typeof fallback === 'function' ? fallback() : fallback) : p[k]));
+        case 'prop': return (p, k, flags, fallback) => { propFlags[k] = flags; return (...args) => (args.length ? (p[k] = args[0]) : (p[k] === undefined ? (typeof fallback === 'function' ? fallback() : fallback) : p[k])); };
         case 'rest_props': return () => ({});
         case 'get': return (d) => (d.fn ? d.fn() : d.v);
         case 'template_effect': return (fn) => fn();
@@ -121,13 +129,15 @@ function runClient(props) {
     }
   });
   new Function('$', 'props', `${clientCode}\nreturn SiteFooter({}, props);`)($, props);
-  return { created, binds };
+  return { created, binds, propFlags };
 }
 
 test('F-039 L5a: bind:this is on the root <footer> (not a descendant) and writes the element to the bindable ref', () => {
   const sentinel = { el: true };
   const props = { columns: COLUMNS, ref: null, 'data-testid': 'x' };
-  const { binds, created } = runClient(props);
+  const { binds, created, propFlags } = runClient(props);
+  assert.ok(propFlags.ref & 8, 'ref is declared with $bindable (PROPS_IS_BINDABLE), not as a plain prop');
+  assert.ok(!(propFlags.brandTitle & 8), 'and an ordinary prop is not bindable (the flag check can tell them apart)');
   assert.strictEqual(binds.length, 1, 'bind:this is called once');
   assert.strictEqual(binds[0].el, created[0], 'it binds the root element created from the template');
   assert.ok(created[0].html.startsWith('<footer'), 'and the root template node is the <footer>');
