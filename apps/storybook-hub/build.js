@@ -218,6 +218,10 @@ function iconSvg(name, size = "1em") {
     .replace("height={size}", `height="${size}"`)
     .replace("stroke={color}", 'stroke="currentColor"');
 }
+// The landing simulator mirrors the components' markup without the icon package's inline style attribute.
+const simIcon = (name, size) => iconSvg(name, size).replace(/ style="[^"]*"/, "");
+const simTrend =
+  '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> ';
 const svgAttrs = (size, sw) =>
   `width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"`;
 const hubSvg = {
@@ -1406,7 +1410,7 @@ ${inlinedThemeCss}
       }
     }
 
-    /* Full Page Simulator & Palette Engine */
+    /* Full Page Simulator */
     .simulator-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -1471,34 +1475,14 @@ ${inlinedThemeCss}
     [data-theme="dark"] .simulator-frame {
       box-shadow: 0 16px 48px transparent;
     }
-    .palette-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--joy-border-default);
-      background: var(--joy-surface-card);
-      color: var(--joy-text-primary);
+    .simulator-icon {
+      margin-right: 4px;
+      vertical-align: -2px;
+    }
+    .simulator-note {
+      margin: 0;
       font-size: 0.8125rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 150ms ease;
-      font-family: inherit;
-    }
-    .palette-btn:hover {
-      border-color: var(--joy-accent-default);
-    }
-    .palette-btn.active {
-      border-color: var(--joy-accent-default);
-      background: transparent;
-      font-weight: 600;
-    }
-    .palette-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
+      color: var(--joy-text-secondary);
     }
 
     /* Token-driven corrections keep the hub's chrome aligned with the component system. */
@@ -3402,349 +3386,261 @@ export async function executeHedge(symbol: string, size: number) {
       <!-- View: Full Page Simulator (Preview the Look) -->
       <section id="view-landing-preview" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Full Page Simulator (Preview the Look)</h2>
-        <p class="header-tagline">Simulate an end-to-end institutional landing page. Test hot-swappable institutional color palettes and responsive behavior across Desktop, Tablet, and Mobile viewports.</p>
+        <p class="header-tagline">The full landing page template, built from the same classes and structure as the LandingPage components. Switch the frame width, then narrow the browser window to see the mobile menu open as a drawer.</p>
 
         <!-- Top Simulator Controls Toolbar -->
         <div class="simulator-toolbar">
           <!-- Viewport Controller -->
           <div class="simulator-group">
-            <span class="simulator-label">Viewport:</span>
+            <span class="simulator-label">Frame width:</span>
             <div class="segmented-control" id="simulator-viewport-ctrl">
               <button type="button" class="segment-btn active" onclick="switchSimulatorViewport('100%', this)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -2px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <svg class="simulator-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                 Desktop (1440px)
               </button>
               <button type="button" class="segment-btn" onclick="switchSimulatorViewport('768px', this)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -2px;"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                <svg class="simulator-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                 Tablet (768px)
               </button>
               <button type="button" class="segment-btn" onclick="switchSimulatorViewport('375px', this)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -2px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                <svg class="simulator-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                 Mobile (375px)
               </button>
             </div>
           </div>
-
-          <!-- Institutional Palette Switcher -->
-          <div class="simulator-group">
-            <span class="simulator-label">Institutional Palette:</span>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button type="button" class="palette-btn active" onclick="switchSimulatorPalette('joymify', this)">
-                <span class="palette-dot" style="background: var(--joy-accent-default);"></span>
-                Joymify Gold
-              </button>
-              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('obsidian', this)">
-                <span class="palette-dot" style="background: var(--joy-status-success-fg);"></span>
-                Obsidian Emerald
-              </button>
-              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('quantum', this)">
-                <span class="palette-dot" style="background: var(--joy-status-info-fg);"></span>
-                Quantum Cobalt
-              </button>
-              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('cyberpunk', this)">
-                <span class="palette-dot" style="background: var(--joy-accent-default);"></span>
-                Cyberpunk Amethyst
-              </button>
-              <button type="button" class="palette-btn" onclick="switchSimulatorPalette('titanium', this)">
-                <span class="palette-dot" style="background: var(--joy-status-warning-fg);"></span>
-                Titanium Steel
-              </button>
-            </div>
-          </div>
+          <p class="simulator-note">The frame changes width only. Layout breakpoints follow the browser window, so resize the window to see the phone layout.</p>
         </div>
 
         <!-- Simulator Status Bar -->
         <div class="simulator-status-bar">
           <div>
-            Active Viewport: <strong id="simulator-viewport-info">Desktop (Fluid / 1440px)</strong>
+            Active frame: <strong id="simulator-viewport-info">Desktop (Fluid / 1440px)</strong>
           </div>
-          <div>
-            Applied Palette: <strong id="simulator-palette-info">Joymify (Gold / Navy)</strong> &bull; Zero OS Emojis &bull; Fully Adaptive Mobile Grid
-          </div>
+          <div>Same class names and structure as the LandingPage components</div>
         </div>
 
         <!-- Live Page Simulator Wrapper Frame -->
         <div class="simulator-wrapper">
           <div class="simulator-frame" id="simulator-viewport-frame" style="max-width: 100%;">
-            <!-- Simulated Combined Landing Page -->
+            <!-- Simulated Combined Landing Page: mirrors the markup the LandingPage components render (packages/svelte/src/lib/LandingPage.svelte). -->
             <div id="simulator-page-container" class="joy-landing-page" data-palette="joymify">
-              
-              <!-- 1. Header / Navigation Bar -->
-              <header style="display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; background: transparent; backdrop-filter: blur(12px); border-bottom: 1px solid transparent; position: sticky; top: 0; z-index: 100;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--joy-accent-default); display: flex; align-items: center; justify-content: center; color: var(--joy-surface-inverse);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  </div>
-                  <span style="font-weight: 700; font-size: 1.05rem; letter-spacing: 0.05em; color: var(--joy-surface-card);">JOYMIFY PROTOCOL</span>
+              <!-- landing-header:start -->
+              <a class="joy-landing-skip" href="#sim-main">Skip to main content</a>
+
+              <header class="joy-landing-header">
+                <div class="joy-landing-header__brand">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <span>Joymify Quant</span>
                 </div>
-                <nav style="display: flex; align-items: center; gap: 20px;">
-                  <span style="font-size: 0.875rem; color: transparent; cursor: pointer;">Markets</span>
-                  <span style="font-size: 0.875rem; color: transparent; cursor: pointer;">Analytics</span>
-                  <span style="font-size: 0.875rem; color: transparent; cursor: pointer;">Documentation</span>
-                  <button type="button" class="joy-button joy-button--solid joy-button--sm" style="margin-left: 8px; font-weight: 600;">Launch Terminal</button>
+                <nav class="joy-landing-header__nav" aria-label="Primary">
+                  <a class="joy-landing-header__link" href="#sim-features">Features</a>
+                  <a class="joy-landing-header__link" href="#sim-telemetry">Telemetry</a>
+                  <a class="joy-landing-header__link" href="#sim-faq">FAQ</a>
+                  <button type="button" class="joy-button joy-button--solid joy-button--sm">Launch Terminal</button>
                 </nav>
+                <button type="button" class="joy-button joy-button--ghost joy-button--icon-only joy-landing-header__menu" aria-label="Open menu" aria-expanded="false" aria-controls="sim-menu" onclick="openLandingDrawer(this)">
+                  ${simIcon("Menu", "1.25rem")}
+                </button>
               </header>
 
-              <!-- 2. HeroSection -->
-              <section class="joy-hero" style="position: relative; overflow: hidden; padding: 72px 24px; text-align: center; background: radial-gradient(circle at 50% 20%, transparent, transparent 70%), var(--joy-surface-canvas); color: var(--joy-surface-card);">
-                <div style="max-width: 900px; margin: 0 auto; position: relative; z-index: 2;">
-                  <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: transparent; border: 1px solid transparent; margin-bottom: 24px; font-size: 0.8125rem;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--joy-accent-default);"></span>
-                    <span>Institutional Execution Stack 2.23 &bull; Sub-5ms Finality</span>
-                  </div>
-                  <h1 class="joy-hero__title" style="font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; line-height: 1.15; margin: 0 0 20px 0; color: var(--joy-surface-card);">
-                    Zero-Latency Liquidity Architecture for Algorithmic Desks
-                  </h1>
-                  <p class="joy-hero__subtitle" style="font-size: clamp(1rem, 2vw, 1.2rem); color: transparent; max-width: 680px; margin: 0 auto 36px auto; line-height: 1.6;">
-                    Deploy high-frequency institutional trading terminals with canvas-accelerated market telemetry, deterministic risk circuits, and dual-framework React 19 / Svelte 5 parity.
-                  </p>
-                  <div class="joy-hero__actions" style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
-                    <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                      Deploy Production Node
-                    </button>
-                    <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                      Read Protocol Spec
-                    </button>
+              <!-- Below 768px the inline nav is hidden; the same links live in this drawer (a bottom sheet at 480px and below). -->
+              <div id="landing-drawer-container" data-hub-dialog style="display: none;">
+                <div class="joy-drawer-backdrop" role="presentation" onclick="closeLandingDrawer(event)">
+                  <div class="joy-drawer" id="sim-menu" role="dialog" aria-modal="true" aria-labelledby="sim-menu-title">
+                    <div class="joy-drawer__header">
+                      <h3 class="joy-drawer__title" id="sim-menu-title">Menu</h3>
+                      <button type="button" class="joy-drawer__close" aria-label="Close drawer" onclick="closeLandingDrawer()">${simIcon("Close", "1.25rem")}</button>
+                    </div>
+                    <div class="joy-drawer__body">
+                      <nav class="joy-landing-drawer__nav" aria-label="Mobile">
+                        <a class="joy-landing-drawer__link" href="#sim-features">Features</a>
+                        <a class="joy-landing-drawer__link" href="#sim-telemetry">Telemetry</a>
+                        <a class="joy-landing-drawer__link" href="#sim-faq">FAQ</a>
+                      </nav>
+                    </div>
+                    <div class="joy-drawer__footer">
+                      <button type="button" class="joy-button joy-button--solid joy-button--lg joy-button--block" onclick="closeLandingDrawer()">Launch Terminal</button>
+                    </div>
                   </div>
                 </div>
-              </section>
+              </div>
+              <!-- landing-header:end -->
 
-              <!-- 3. LogoCloud -->
-              <section class="joy-logo-cloud" style="padding: 40px 24px;">
-                <p class="joy-logo-cloud__title">Trusted by institutional desks and liquidity providers worldwide</p>
-                <div class="joy-logo-cloud__logos">
-                  <div class="joy-logo-cloud__item">
-                    <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text></svg>
+              <main id="sim-main" tabindex="-1">
+                <!-- HeroSection -->
+                <section class="joy-hero">
+                  <div class="joy-hero__badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Sub-5μs execution engine
                   </div>
-                  <div class="joy-logo-cloud__item">
-                    <svg width="120" height="32" viewBox="0 0 110 32" fill="none"><polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text></svg>
+                  <h1 class="joy-hero__title">Live market data and <span class="joy-hero__title-emphasis">fast trading screens</span></h1>
+                  <p class="joy-hero__subtitle">Built for trading desks and portals that need every chart, table and price to render in under 5 ms.</p>
+                  <div class="joy-hero__ctas">
+                    <button type="button" class="joy-button joy-button--solid joy-button--lg"><span class="joy-button__label">Deploy a node</span></button>
+                    <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"><span class="joy-button__label">Read the whitepaper</span></button>
                   </div>
-                  <div class="joy-logo-cloud__item">
-                    <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="4" fill="currentColor"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">NEXUS CAP</text></svg>
-                  </div>
-                  <div class="joy-logo-cloud__item">
-                    <svg width="125" height="32" viewBox="0 0 115 32" fill="none"><rect x="4" y="6" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">FLOW DESK</text></svg>
-                  </div>
-                  <div class="joy-logo-cloud__item">
-                    <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><polygon points="12,4 20,16 12,28 4,16" stroke="currentColor" stroke-width="2"/><text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="13" fill="currentColor">PARADIGM</text></svg>
-                  </div>
-                </div>
-              </section>
+                </section>
 
-              <!-- 4. StatsSection -->
-              <section class="joy-stats-section" style="padding: 48px 24px;">
-                <div class="joy-stats-section__grid">
-                  <div class="joy-stat-item">
-                    <div class="joy-stat-item__value">4.2 μs</div>
-                    <div class="joy-stat-item__label">P99 Order Latency</div>
-                    <div class="joy-stat-item__desc">Kernel bypass colocation &bull; 0 GC pauses</div>
+                <!-- LogoCloud -->
+                <section class="joy-logo-cloud" aria-labelledby="joy-logo-cloud-title-sim">
+                  <p class="joy-logo-cloud__title" id="joy-logo-cloud-title-sim">Trusted by trading desks and liquidity providers</p>
+                  <div class="joy-logo-cloud__logos">
+                    <div class="joy-logo-cloud__item" title="Quantum Capital" role="img" aria-label="Quantum Capital">
+                      <svg width="120" height="32" viewBox="0 0 120 32" fill="none"><rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text></svg>
+                    </div>
+                    <div class="joy-logo-cloud__item" title="Citadel Trading" role="img" aria-label="Citadel Trading">
+                      <svg width="110" height="32" viewBox="0 0 110 32" fill="none"><polygon points="12,6 22,26 2,26" stroke="currentColor" stroke-width="2"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">CITADEL</text></svg>
+                    </div>
+                    <div class="joy-logo-cloud__item" title="Nexus Alpha" role="img" aria-label="Nexus Alpha">
+                      <svg width="120" height="32" viewBox="0 0 120 32" fill="none"><circle cx="12" cy="16" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="4" fill="currentColor"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">NEXUS CAP</text></svg>
+                    </div>
+                    <div class="joy-logo-cloud__item" title="Flow Desk" role="img" aria-label="Flow Desk">
+                      <svg width="115" height="32" viewBox="0 0 115 32" fill="none"><rect x="4" y="6" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="28" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">FLOW DESK</text></svg>
+                    </div>
                   </div>
-                  <div class="joy-stat-item">
-                    <div class="joy-stat-item__value">99.999%</div>
-                    <div class="joy-stat-item__label">Historical Uptime</div>
-                    <div class="joy-stat-item__desc">Dual active-active failover mesh</div>
-                  </div>
-                  <div class="joy-stat-item">
-                    <div class="joy-stat-item__value">$48.2B</div>
-                    <div class="joy-stat-item__label">Monthly Volume</div>
-                    <div class="joy-stat-item__desc">Settled across 14 networks (+32% MoM)</div>
-                  </div>
-                  <div class="joy-stat-item">
-                    <div class="joy-stat-item__value">14 Chains</div>
-                    <div class="joy-stat-item__label">Settlement Mesh</div>
-                    <div class="joy-stat-item__desc">Atomic cross-L2 instant finality</div>
-                  </div>
-                </div>
-              </section>
+                </section>
 
-              <!-- 5. FeatureGrid -->
-              <section style="padding: 48px 24px;">
-                <div style="text-align: center; max-width: 640px; margin: 0 auto 36px auto;">
-                  <h2 style="font-size: 1.875rem; font-weight: 700; margin: 0 0 12px 0;">Architected for High-Stakes Financial Systems</h2>
-                  <p style="color: var(--joy-text-secondary); font-size: 0.95rem; margin: 0;">Combining high-performance execution primitives with unyielding design consistency.</p>
+                <!-- StatsSection -->
+                <div id="sim-telemetry">
+                  <section class="joy-stats-section">
+                    <div class="joy-stats-grid">
+                      <div class="joy-stat-item">
+                        <div class="joy-stat-item__value">4.2 μs</div>
+                        <div class="joy-stat-item__label">P99 Order Latency</div>
+                        <p class="joy-stat-item__desc">Kernel bypass colocation</p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> -14% vs L1</div>
+                      </div>
+                      <div class="joy-stat-item">
+                        <div class="joy-stat-item__value">99.999%</div>
+                        <div class="joy-stat-item__label">Historical Uptime</div>
+                        <p class="joy-stat-item__desc">Two live sites, instant failover</p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> Zero downtime</div>
+                      </div>
+                      <div class="joy-stat-item">
+                        <div class="joy-stat-item__value">$48.2B</div>
+                        <div class="joy-stat-item__label">Monthly Volume</div>
+                        <p class="joy-stat-item__desc">Settled across 14 networks</p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> +32% MoM</div>
+                      </div>
+                      <div class="joy-stat-item">
+                        <div class="joy-stat-item__value">14 Chains</div>
+                        <div class="joy-stat-item__label">Settlement Chains</div>
+                        <p class="joy-stat-item__desc">Instant cross-L2 finality</p>
+                        <div class="joy-stat-item__change joy-stat-item__change--positive">${simTrend}<span class="joy-stat-item__sr">Trend up:</span> EVM &amp; SVM</div>
+                      </div>
+                    </div>
+                  </section>
                 </div>
-                <div class="joy-feature-grid joy-feature-grid--2col">
-                  <div class="joy-feature-card">
-                    <div class="joy-feature-card__icon-box">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                    </div>
-                    <h3 class="joy-feature-card__title">Sub-5ms Execution Engine</h3>
-                    <p class="joy-feature-card__description">Zero-garbage-collection circular RingBuffers and memory-mapped state machines deliver microsecond determinism under peak order volumes.</p>
-                  </div>
-                  <div class="joy-feature-card">
-                    <div class="joy-feature-card__icon-box">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    </div>
-                    <h3 class="joy-feature-card__title">Quant Algorithmic Arbitrage</h3>
-                    <p class="joy-feature-card__description">Real-time delta-neutral hedging algorithms continuously monitor spread imbalances across centralized and decentralized venues.</p>
-                  </div>
-                  <div class="joy-feature-card">
-                    <div class="joy-feature-card__icon-box">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-                    </div>
-                    <h3 class="joy-feature-card__title">Multi-Chain Liquidity Mesh</h3>
-                    <p class="joy-feature-card__description">Native atomic settlement bridges 14 EVM and SVM networks with consolidated cryptographic audit trails and zero slippage traps.</p>
-                  </div>
-                  <div class="joy-feature-card">
-                    <div class="joy-feature-card__icon-box">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <h3 class="joy-feature-card__title">SOC 2 Type II & Institutional Custody</h3>
-                    <p class="joy-feature-card__description">Multi-party computation (MPC) key shards and hardware security modules enforce cryptographically verifiable authorization policies.</p>
-                  </div>
-                </div>
-              </section>
 
-              <!-- 6. Adaptive Mobile Table Section (Demonstrating Stacking) -->
-              <section style="padding: 32px 24px;">
-                <div style="background: var(--joy-surface-card); border: 1px solid var(--joy-border-default); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px transparent;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                    <div>
-                      <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700;">Live Execution Ledger &bull; Adaptive Table</h3>
-                      <p style="margin: 0; font-size: 0.8125rem; color: var(--joy-text-secondary);">Automatically stacks into individual cards below 768px with full WCAG 2.2 AA contrast.</p>
+                <!-- FeatureGrid -->
+                <div id="sim-features" class="joy-landing-page__features">
+                  <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead">
+                    <div class="joy-feature-card">
+                      <div class="joy-feature-card__badge"><span class="joy-badge joy-badge--brand">FPGA-Core</span></div>
+                      <div class="joy-feature-card__icon">${simIcon("Cpu", "1.5rem")}</div>
+                      <h3 class="joy-feature-card__title">Fast order matching</h3>
+                      <p class="joy-feature-card__desc">Co-located matching engines process up to 2.4M orders a second with steady, predictable timing.</p>
+                      <a href="#sim-features" class="joy-feature-card__link">See the engine</a>
                     </div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; background: transparent; color: var(--joy-status-success-fg); font-weight: 600;">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-                      STREAMING (LIVE P99)
+                    <div class="joy-feature-card">
+                      <div class="joy-feature-card__badge"><span class="joy-badge joy-badge--success">WCAG AA</span></div>
+                      <div class="joy-feature-card__icon">${simIcon("Layers", "1.5rem")}</div>
+                      <h3 class="joy-feature-card__title">Tested light and dark themes</h3>
+                      <p class="joy-feature-card__desc">Light and dark themes keep text at WCAG 2.2 AA contrast on every component.</p>
+                      <a href="#sim-features" class="joy-feature-card__link">Browse tokens</a>
                     </div>
-                  </div>
-                  <div class="joy-table-container">
-                    <table class="joy-table joy-table--striped joy-table--responsive-stack" style="width: 100%;">
-                      <thead>
-                        <tr>
-                          <th>Asset Pair</th>
-                          <th>Order Side</th>
-                          <th>Fill Price</th>
-                          <th>Volume</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td data-label="Asset Pair"><strong>BTC-USDC-PERP</strong></td>
-                          <td data-label="Order Side"><span class="joy-badge joy-badge--success">BUY / LONG</span></td>
-                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono);">$68,492.50</td>
-                          <td data-label="Volume">14.250 BTC</td>
-                          <td data-label="Status"><span style="color: var(--joy-status-success-fg); font-weight: 600;">CONFIRMED</span></td>
-                        </tr>
-                        <tr>
-                          <td data-label="Asset Pair"><strong>ETH-USDT-PERP</strong></td>
-                          <td data-label="Order Side"><span class="joy-badge joy-badge--danger">SELL / SHORT</span></td>
-                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono);">$3,584.10</td>
-                          <td data-label="Volume">120.000 ETH</td>
-                          <td data-label="Status"><span style="color: var(--joy-status-success-fg); font-weight: 600;">CONFIRMED</span></td>
-                        </tr>
-                        <tr>
-                          <td data-label="Asset Pair"><strong>SOL-USDC-SPOT</strong></td>
-                          <td data-label="Order Side"><span class="joy-badge joy-badge--success">BUY / SPOT</span></td>
-                          <td data-label="Fill Price" style="font-family: var(--joy-font-family-mono);">$182.45</td>
-                          <td data-label="Volume">540.20 SOL</td>
-                          <td data-label="Status"><span style="color: var(--joy-status-success-fg); font-weight: 600;">CONFIRMED</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div class="joy-feature-card">
+                      <div class="joy-feature-card__badge"><span class="joy-badge joy-badge--warning">Adaptive</span></div>
+                      <div class="joy-feature-card__icon">${simIcon("Smartphone", "1.5rem")}</div>
+                      <h3 class="joy-feature-card__title">Tables that fit phones</h3>
+                      <p class="joy-feature-card__desc">Wide market tables turn into clear stacked cards on small screens.</p>
+                      <a href="#sim-features" class="joy-feature-card__link">Try the demo</a>
+                    </div>
                   </div>
                 </div>
-              </section>
 
-              <!-- 7. FAQSection -->
-              <section class="joy-faq-section" style="padding: 48px 24px;">
-                <div style="text-align: center; max-width: 600px; margin: 0 auto 36px auto;">
-                  <h2 style="font-size: 1.875rem; font-weight: 700; margin: 0 0 12px 0;">Frequently Asked Questions</h2>
-                  <p style="color: var(--joy-text-secondary); font-size: 0.95rem; margin: 0;">Everything engineering teams need to know about our deterministic architecture.</p>
+                <!-- FAQSection -->
+                <div id="sim-faq">
+                  <section class="joy-faq-section">
+                    <div class="joy-faq-section__header">
+                      <h2 class="joy-faq-section__title">Frequently Asked Questions</h2>
+                      <p class="joy-faq-section__subtitle">Answers on architecture, speed and security.</p>
+                    </div>
+                    <div class="joy-faq-list">
+                      <div class="joy-faq-item joy-faq-item--open" id="sim-faq-item-0">
+                        <button type="button" id="sim-faq-trigger-0" aria-expanded="true" aria-controls="sim-faq-answer-0" class="joy-faq-item__trigger" onclick="toggleFaq('sim-faq-item-0')">
+                          <span class="joy-faq-item__label">How do charts stay under 5 ms?</span>
+                          <span class="joy-faq-item__icon" aria-hidden="true">${simIcon("ChevronDown", "100%")}</span>
+                        </button>
+                        <div id="sim-faq-answer-0" role="region" aria-labelledby="sim-faq-trigger-0" class="joy-faq-item__content">Charts draw on two canvas layers, thin out dense data with a downsampling step and reuse preallocated buffers, so garbage collection never stalls a frame.</div>
+                      </div>
+                      <div class="joy-faq-item" id="sim-faq-item-1">
+                        <button type="button" id="sim-faq-trigger-1" aria-expanded="false" aria-controls="sim-faq-answer-1" class="joy-faq-item__trigger" onclick="toggleFaq('sim-faq-item-1')">
+                          <span class="joy-faq-item__label">Can the color theme change at runtime?</span>
+                          <span class="joy-faq-item__icon" aria-hidden="true">${simIcon("ChevronDown", "100%")}</span>
+                        </button>
+                        <div id="sim-faq-answer-1" role="region" aria-labelledby="sim-faq-trigger-1" class="joy-faq-item__content" hidden>Yes. Every component reads shared CSS custom properties, so a new theme applies the moment the variables change.</div>
+                      </div>
+                      <div class="joy-faq-item" id="sim-faq-item-2">
+                        <button type="button" id="sim-faq-trigger-2" aria-expanded="false" aria-controls="sim-faq-answer-2" class="joy-faq-item__trigger" onclick="toggleFaq('sim-faq-item-2')">
+                          <span class="joy-faq-item__label">How do tables look on phones?</span>
+                          <span class="joy-faq-item__icon" aria-hidden="true">${simIcon("ChevronDown", "100%")}</span>
+                        </button>
+                        <div id="sim-faq-answer-2" role="region" aria-labelledby="sim-faq-trigger-2" class="joy-faq-item__content" hidden>Below 768px each row becomes a stacked card and every value keeps its label, so nothing is cut off.</div>
+                      </div>
+                    </div>
+                  </section>
                 </div>
-                <div class="joy-faq-section__list">
-                  <div class="joy-faq-item joy-faq-item--open">
-                    <button type="button" class="joy-faq-item__question" onclick="toggleFaq(this)" aria-expanded="true">
-                      <span>How are sub-5ms chart rendering benchmarks maintained?</span>
-                      <svg class="joy-faq-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    </button>
-                    <div class="joy-faq-item__answer" role="region">
-                      <p>Decoupled double-buffered canvas layers, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers eliminate garbage-collection pauses even under bursts of 100k points/sec.</p>
-                    </div>
-                  </div>
-                  <div class="joy-faq-item">
-                    <button type="button" class="joy-faq-item__question" onclick="toggleFaq(this)" aria-expanded="false">
-                      <span>Is there full functional parity between React 19 and Svelte 5?</span>
-                      <svg class="joy-faq-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    </button>
-                    <div class="joy-faq-item__answer" role="region" style="display: none;">
-                      <p>Yes. Every component exists in both packages with identical visual appearance, accessibility traits, design token binding, and keyboard navigation semantics.</p>
-                    </div>
-                  </div>
-                  <div class="joy-faq-item">
-                    <button type="button" class="joy-faq-item__question" onclick="toggleFaq(this)" aria-expanded="false">
-                      <span>How does the institutional color palette system work?</span>
-                      <svg class="joy-faq-item__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    </button>
-                    <div class="joy-faq-item__answer" role="region" style="display: none;">
-                      <p>Palettes are applied dynamically via the data-palette attribute on root or page containers, instantly recalibrating primary surfaces, borders, text contrast, and brand accents without CSS bundle duplication.</p>
-                    </div>
-                  </div>
-                </div>
-              </section>
 
-              <!-- 8. CTASection -->
-              <section class="joy-cta-section" style="margin: 0 24px 48px;">
-                <div class="joy-cta-section__container">
-                  <h2 class="joy-cta-section__title">Ready to Deploy Institutional Infrastructure?</h2>
-                  <p class="joy-cta-section__desc">Access high-performance execution primitives, Canvas charting engines, and institutional risk guards today.</p>
-                  <div class="joy-cta-section__actions">
-                    <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
-                      Start Free Trial
-                    </button>
-                    <button type="button" class="joy-button joy-button--outline joy-button--lg">
-                      Contact Institutional Sales
-                    </button>
+                <!-- CTASection -->
+                <section class="joy-cta-section" aria-labelledby="joy-cta-title-sim">
+                  <div class="joy-cta-section__container">
+                    <h2 class="joy-cta-section__title" id="joy-cta-title-sim">Build fast, exact trading interfaces</h2>
+                    <p class="joy-cta-section__desc">Get low-latency screens, dense financial tables and verified WCAG 2.2 contrast in one design system.</p>
+                    <div class="joy-cta-section__actions">
+                      <button type="button" class="joy-button joy-button--solid joy-button--lg"><span class="joy-button__label">Deploy a node</span></button>
+                      <button type="button" class="joy-button joy-button--outline joy-button--lg"><span class="joy-button__label">Contact sales</span></button>
+                    </div>
                   </div>
-                </div>
-              </section>
+                </section>
+              </main>
 
-              <!-- 9. SiteFooter -->
+              <!-- SiteFooter -->
               <footer class="joy-site-footer">
-                <div class="joy-site-footer__grid">
+                <div class="joy-site-footer__inner">
                   <div class="joy-site-footer__brand">
-                    <div class="joy-site-footer__brand-title">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-accent-default);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <span>JOYMIFY PROTOCOL</span>
-                    </div>
-                    <p class="joy-site-footer__brand-desc">High-velocity institutional quantitative design system and trading infrastructure engineered for modern finance.</p>
+                    <div class="joy-site-footer__brand-title"><span>Joymify Design</span></div>
+                    <p class="joy-site-footer__brand-desc">Design tokens and UI parts for trading products.</p>
                   </div>
                   <div class="joy-site-footer__column">
-                    <h4 class="joy-site-footer__col-title">Architecture</h4>
+                    <h4 class="joy-site-footer__col-title">Platform</h4>
                     <ul class="joy-site-footer__links">
-                      <li><a href="#view-charts" class="joy-site-footer__link">Financial Charts</a></li>
-                      <li><a href="#view-table" class="joy-site-footer__link">Adaptive Tables</a></li>
-                      <li><a href="#view-landing-preview" class="joy-site-footer__link">Page Simulator</a></li>
+                      <li><a href="#sim-features" class="joy-site-footer__link">Financial Charts</a></li>
+                      <li><a href="#sim-features" class="joy-site-footer__link">Adaptive Table</a></li>
+                      <li><a href="#sim-features" class="joy-site-footer__link">Bento Grid</a></li>
                     </ul>
                   </div>
                   <div class="joy-site-footer__column">
-                    <h4 class="joy-site-footer__col-title">Frameworks</h4>
+                    <h4 class="joy-site-footer__col-title">Resources</h4>
                     <ul class="joy-site-footer__links">
-                      <li><a href="#" class="joy-site-footer__link">React 19 Hooks</a></li>
-                      <li><a href="#" class="joy-site-footer__link">Svelte 5 Runes</a></li>
-                      <li><a href="#" class="joy-site-footer__link">Tailwind Tokens</a></li>
+                      <li><a href="#" class="joy-site-footer__link">Docs</a></li>
+                      <li><a href="#" class="joy-site-footer__link">Design Tokens</a></li>
+                      <li><a href="#" class="joy-site-footer__link">API Reference</a></li>
                     </ul>
                   </div>
                   <div class="joy-site-footer__column">
                     <h4 class="joy-site-footer__col-title">Compliance</h4>
                     <ul class="joy-site-footer__links">
                       <li><a href="#" class="joy-site-footer__link">WCAG 2.2 AA</a></li>
-                      <li><a href="#" class="joy-site-footer__link">Zero OS Emojis</a></li>
+                      <li><a href="#" class="joy-site-footer__link">Zero Emoji Policy</a></li>
                       <li><a href="#" class="joy-site-footer__link">SOC 2 Type II</a></li>
                     </ul>
                   </div>
                 </div>
                 <div class="joy-site-footer__bottom">
-                  <div>&copy; 2026 Joymify Inc. Enterprise Design System. All rights reserved.</div>
-                  <div class="joy-site-footer__socials">
-                    <span style="font-size: 0.75rem; color: var(--joy-text-muted);">Institutional Grade Telemetry</span>
-                  </div>
+                  <div>&copy; 2026 Joymify Inc. All rights reserved.</div>
                 </div>
               </footer>
-
             </div>
           </div>
         </div>
@@ -5959,27 +5855,41 @@ export async function executeHedge(symbol: string, size: number) {
       }
     }
 
-    function switchSimulatorPalette(palette, btn) {
-      const container = document.getElementById('simulator-page-container');
-      const info = document.getElementById('simulator-palette-info');
-      if (container) {
-        container.setAttribute('data-palette', palette);
-      }
-      if (info) {
-        const names = {
-          joymify: 'Joymify (Gold / Navy)',
-          obsidian: 'Obsidian (Emerald / Slate)',
-          quantum: 'Quantum (Cobalt / Midnight)',
-          cyberpunk: 'Cyberpunk (Amethyst / Violet)',
-          titanium: 'Titanium (Amber / Steel)'
-        };
-        info.textContent = names[palette] || palette;
-      }
-      if (btn && btn.parentElement) {
-        btn.parentElement.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      }
+    // Landing simulator mobile menu: the same .joy-drawer markup the LandingPage renders through its Drawer twin, opened with
+    // the hub dialog helpers (Tab trap, Escape, focus return). aria-expanded and the scroll lock follow the container's
+    // display, so every close path (Escape, backdrop, close button, link) stays in sync.
+    function openLandingDrawer(btn) {
+      hubOpenDialog('landing-drawer-container', '.joy-drawer__close');
+      document.getElementById('landing-drawer-container')._hubOpener = btn;
     }
+    function closeLandingDrawer(e) {
+      if (e && e.target !== e.currentTarget) return;
+      hubCloseDialog('landing-drawer-container');
+    }
+    (function () {
+      const drawer = document.getElementById('landing-drawer-container');
+      const page = document.getElementById('simulator-page-container');
+      const scroller = document.querySelector('.main');
+      if (!drawer || !page) return;
+      new MutationObserver(function () {
+        const open = drawer.style.display === 'block';
+        const menu = page.querySelector('.joy-landing-header__menu');
+        if (menu) menu.setAttribute('aria-expanded', String(open));
+        if (scroller) scroller.style.overflowY = open ? 'hidden' : '';
+      }).observe(drawer, { attributes: true, attributeFilter: ['style'] });
+      // Hub routing reads location.hash, so an in-page link must scroll instead of navigating.
+      page.addEventListener('click', function (e) {
+        const link = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!link) return;
+        e.preventDefault();
+        if (link.closest('.joy-drawer')) closeLandingDrawer();
+        const id = link.getAttribute('href').slice(1);
+        const target = id ? document.getElementById(id) : null;
+        if (!target) return;
+        target.scrollIntoView();
+        if (target.hasAttribute('tabindex')) target.focus({ preventScroll: true });
+      });
+    })();
 
     function updateCodeSnippets() {
       const btnSnippet = document.getElementById('button-code');
