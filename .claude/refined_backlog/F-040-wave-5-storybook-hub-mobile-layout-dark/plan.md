@@ -117,7 +117,7 @@ export async function hitSize(page: Page, selector: string) {
         });
       });
       await page.goto('/');
-      await page.waitForFunction(() => 'hubThemeProbe' in window || (window as any).__themeAtFirstFrame !== undefined);
+      await page.waitForFunction(() => (window as any).__themeAtFirstFrame !== undefined);
       expect(await page.evaluate(() => (window as any).__themeAtFirstFrame), `first frame, OS ${scheme}`).toBe(scheme);
 
       const toggle = page.locator('#btn-theme-toggle');
@@ -136,6 +136,7 @@ export async function hitSize(page: Page, selector: string) {
   test('Contract 8: topbar and sidebar text contrast >= 4.5 in both themes at 375 and 1280', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop-chrome', 'viewports are set explicitly');
     for (const width of [375, 1280]) {
+      await page.goto('about:blank'); // fresh document per viewport
       await page.setViewportSize({ width, height: 800 });
       await page.goto('/#overview');
       await page.waitForLoadState('networkidle');
@@ -155,9 +156,8 @@ export async function hitSize(page: Page, selector: string) {
   });
 ```
 
-Remove the stray `'hubThemeProbe' in window ||` clause if the reviewer finds it confusing; it is only a guard and the rAF flag is what is asserted.
 
-- [ ] **Step 3: Run and see it fail.** `node apps/storybook-hub/build.js && cd apps/storybook-hub && PLAYWRIGHT_PORT=6122 ../../node_modules/.bin/playwright test tests/contracts.spec.ts -g "Contract (7|8)" --project=desktop-chrome`. Expected: Contract 7 FAILS (first frame `null` for OS dark, no `aria-label`). Contract 8 may pass or fail; record which in `/tmp/f040-sdd/progress.md`.
+- [ ] **Step 3: Run and see it fail.** `node apps/storybook-hub/build.js && cd apps/storybook-hub && PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/contracts.spec.ts -g "Contract (7|8)" --project=desktop-chrome`. Expected: Contract 7 FAILS (first frame `null` for OS dark, no `aria-label`). Contract 8 may pass or fail; record which in `/tmp/f040-sdd/progress.md`.
 
 - [ ] **Step 4: Theme boot script.** In `build.js`, directly after `<meta name="viewport" ...>` and before any stylesheet, insert:
 
@@ -202,7 +202,7 @@ Delete the end-of-body "Restore saved theme on startup" block. Rewrite `toggleTh
 
 - [ ] **Step 6: Delete the `style*=` selectors.** (a) Overview cards (`#view-overview`, the three `<div style="background: var(--joy-surface-card); padding: 24px; ...">` and any other `div[style*=...]` targets): give them `class="hub-card"` and move the inline declarations into one `.hub-card` rule (`background: var(--joy-surface-card); border: 1px solid var(--hub-chrome-border); border-radius: var(--joy-radius-lg); padding: var(--joy-space-6);` plus a `:focus-visible` ring; make them `<button type="button">` or give them `role="link" tabindex="0"` with Enter/Space handling so they are keyboard reachable). Same for any element matched by the `surface-raised` selector. Delete both `[data-theme="dark"] .content-area div[style*=...]` rules. (b) Line ~840 `body:has([data-hub-dialog][style*="display: block"])`: replace with a class the dialog opener already toggles (add `document.body.classList.toggle('hub-dialog-open', open)` where `[data-hub-dialog]` is shown/hidden) and select `body.hub-dialog-open .joy-tooltip[data-static]`. Check `grep -c "style\*=" apps/storybook-hub/build.js` prints 0.
 
-- [ ] **Step 7: Run.** Build, then `-g "Contract (7|8)"` passes on desktop-chrome; then the full hub suite `PLAYWRIGHT_PORT=6122 ../../node_modules/.bin/playwright test --workers=3 2>&1 | tail -n 15` has no new failures versus base (record base failures, if any, in `/tmp/f040-sdd/progress.md` first). `bash scripts/lint-colors.sh --strict apps/storybook-hub/build.js` = PASS 0.
+- [ ] **Step 7: Run.** Build, then `-g "Contract (7|8)"` passes on desktop-chrome; then the full hub suite `PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test --workers=3 2>&1 | tail -n 15` has no new failures versus base (record base failures, if any, in `/tmp/f040-sdd/progress.md` first). `bash scripts/lint-colors.sh --strict apps/storybook-hub/build.js` = PASS 0.
 
 - [ ] **Step 8: Commit.** `git add apps/storybook-hub/build.js apps/storybook-hub/tests/helpers.ts apps/storybook-hub/tests/contracts.spec.ts && git commit -m "feat(hub): theme resolved before first paint, chrome on semantic aliases, style*= dark hacks removed"`.
 
@@ -269,7 +269,7 @@ Delete the end-of-body "Restore saved theme on startup" block. Rewrite `toggleTh
   - `.mobile-menu-btn`, `.sidebar-close-btn`, `#btn-theme-toggle` (phone), `.framework-btn` (drawer copy): `min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;` with `:focus-visible` ring `outline: 2px solid var(--joy-border-focus); outline-offset: 2px;`.
   - Markup: `<aside class="sidebar" id="hub-sidebar">`; `#mobile-menu-toggle` gets `aria-controls="hub-sidebar" aria-expanded="false"`; insert `<div class="framework-pill framework-pill--drawer" role="group" aria-label="Code framework">` with two `<button type="button" class="framework-btn" data-framework="svelte|react" aria-pressed="...">` after `.brand` in the sidebar; topbar buttons gain `data-framework` and `aria-pressed`.
   - JS: `setFramework(fw)` sets `.active` + `aria-pressed` on `document.querySelectorAll('[data-framework]')`. `toggleMobileMenu(open)` sets `aria-expanded`, traps Tab/Shift+Tab inside `.sidebar` while open (keydown listener cycling between first and last focusable: `a[href], button:not([disabled]), input, select, [tabindex]:not([tabindex="-1"])` that are visible), and on close returns focus to `#mobile-menu-toggle` only when focus was inside the sidebar. Opening at >= 900px is a no-op.
-- [ ] **Step 4: Run** Contract 9 + Contracts 1-8 on both projects: `PLAYWRIGHT_PORT=6122 ../../node_modules/.bin/playwright test tests/contracts.spec.ts tests/forms-contracts.spec.ts 2>&1 | tail -n 15`. Expected PASS.
+- [ ] **Step 4: Run** Contract 9 + Contracts 1-8 on both projects: `PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/contracts.spec.ts tests/forms-contracts.spec.ts 2>&1 | tail -n 15`. Expected PASS.
 - [ ] **Step 5: Commit** `feat(hub): phone tier topbar, framework switcher in the drawer, 44px chrome targets, drawer focus trap`.
 - [ ] **Step 6: Phase gate** (as Task 1 Step 9).
 
@@ -311,10 +311,11 @@ export async function measureHubOverflow(page: Page) {
 
 ```ts
 test.describe('Contract 6: every manifest view at 375 and 1280, light and dark', () => {
-  test.skip(({}, info) => info.project.name !== 'desktop-chrome', 'viewports are set explicitly');
+  test.beforeEach(({}, info) => { test.skip(info.project.name !== 'desktop-chrome', 'viewports are set explicitly'); });
   for (const view of HUB_VIEWS) {
     test(view, async ({ page }, info) => {
       for (const vp of [{ width: 375, height: 812 }, { width: 1280, height: 800 }]) {
+        await page.goto('about:blank'); // fresh document per viewport: a same-URL hash goto would not reload
         await page.setViewportSize(vp);
         await page.goto(`/#${view}`);
         await page.waitForLoadState('networkidle');
@@ -338,7 +339,7 @@ test.describe('Contract 6: every manifest view at 375 and 1280, light and dark',
 
 Delete old Contract 3 only if Contract 6 covers all of its widths; it does not (320/768/899/900), so keep Contract 3 and change its loop to iterate `['overview', 'button', 'forms', 'table']` so the in-between widths are sampled on more than one view.
 
-- [ ] **Step 3: Run, list failures.** `PLAYWRIGHT_PORT=6122 ../../node_modules/.bin/playwright test tests/contracts.spec.ts -g "Contract 6" --project=desktop-chrome --workers=4 2>&1 | grep -E "✘|failed|beyond|document|\.main" | head -n 60` and write the failing views + offending selectors to `/tmp/f040-sdd/overflow.txt`.
+- [ ] **Step 3: Run, list failures.** `PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/contracts.spec.ts -g "Contract 6" --project=desktop-chrome --workers=4 2>&1 | grep -E "✘|failed|beyond|document|\.main" | head -n 60` and write the failing views + offending selectors to `/tmp/f040-sdd/overflow.txt`.
 
 - [ ] **Step 4: Fix each failure at its source**, one view family at a time, re-running only that view (`-g "Contract 6.* <view>$"`):
   - Tables: wrap every `.tokens-table`, `.joy-props-table`, `.controls-table` in `<div class="hub-scroll-x">` (hand-written views); inside wrappers the table keeps its natural width.
@@ -359,7 +360,7 @@ Delete old Contract 3 only if Contract 6 covers all of its widths; it does not (
 **Files:** Modify `apps/storybook-hub/scripts/gen-landing-blocks.mjs` (kinetic block ~line 263), regenerate `build.js` regions; Modify `apps/storybook-hub/build.js` (kinetic JS ~7000-7130, `.kinetic-*` CSS ~1254-1340 and ~1382-1390, `#view-overview` header); Modify `apps/storybook-hub/tests/contracts.spec.ts` (replace Contract 5).
 
 **Interfaces:**
-- Produces (page global): `window.hubKineticPalette(): { accents: string[]; muted: string }` returning the computed values of `--joy-accent-default`, `--joy-accent-hover`, `--joy-accent-highlight` and `--joy-text-muted` read with `getComputedStyle(document.documentElement)` at call time (it is what the canvas draws with; re-read on theme change).
+- Produces (page global): `window.hubKineticPalette(): { accents: string[]; muted: string }` returning the computed values of `--joy-accent-default`, `--joy-accent-hover`, `--joy-accent-active` and `--joy-text-muted` read with `getComputedStyle(document.documentElement)` at call time (it is what the canvas draws with; re-read on theme change).
 - Produces (markup): `#kinetic-hero-container.kinetic-canvas-container` containing `<canvas id="kinetic-particle-canvas" aria-hidden="true">` and a HeroSection render (`<section class="joy-hero">`), no `.kinetic-title|subtitle|badge|actions|hint|overlay` classes. `#view-overview` starts with a HeroSection render whose CTAs are Wave 2 `joy-button--solid` / `joy-button--outline` buttons ("Browse components" -> `switchView('button')`, "Read the tokens" -> `switchView('tokens')`).
 
 - [ ] **Step 1: Failing contract** (replace Contract 5):
@@ -391,7 +392,7 @@ Delete old Contract 3 only if Contract 6 covers all of its widths; it does not (
       const [palette, tokens] = await page.evaluate(() => {
         const cs = getComputedStyle(document.documentElement);
         const v = (n: string) => cs.getPropertyValue(n).trim();
-        return [window.hubKineticPalette!(), { accents: [v('--joy-accent-default'), v('--joy-accent-hover'), v('--joy-accent-highlight')], muted: v('--joy-text-muted') }];
+        return [window.hubKineticPalette!(), { accents: [v('--joy-accent-default'), v('--joy-accent-hover'), v('--joy-accent-active')], muted: v('--joy-text-muted') }];
       });
       expect(palette, `palette ${theme}`).toEqual(tokens);
     }
@@ -431,14 +432,14 @@ Delete old Contract 3 only if Contract 6 covers all of its widths; it does not (
 Declare `hubKineticPalette?(): { accents: string[]; muted: string };` in the `Window` interface in helpers.ts.
 
 - [ ] **Step 2: Run, expect FAIL** (`hubKineticPalette` undefined, `.kinetic-title` present).
-- [ ] **Step 3: Generator.** In `gen-landing-blocks.mjs` replace the hand-written kinetic overlay with a HeroSection render, reusing the existing `R('HeroSection', {...})` helper and props used for `heroDefault` (badge "Interactive particle field", title "Fast, clear order screens for busy desks" with emphasis "order screens" if the component supports an emphasis prop; primary CTA "Deploy solution", secondary "Read the guide"). Keep `<canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true">` as the first child of `#kinetic-hero-container`. The hint sentence ("Move the cursor or touch to nudge the particles. Click to send a pulse.") becomes the HeroSection subtitle's second sentence or is dropped. The existing `onclick` wiring (burst + toast) moves to a delegated listener in `build.js` on `#kinetic-hero-container .joy-hero__ctas` (generator output must stay SSR-pure). Run `node apps/storybook-hub/scripts/gen-landing-blocks.mjs --write` then `--check` (exit 0).
+- [ ] **Step 3: Generator.** In `gen-landing-blocks.mjs` replace the hand-written kinetic overlay with a HeroSection render, reusing the existing `R('HeroSection', {...})` helper and props used for `heroDefault` (badge "Interactive particle field", title "Fast, clear order screens for busy desks" with emphasis "order screens" if the component supports an emphasis prop; primary CTA "Deploy solution", secondary "Read the guide"). Keep `<canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true">` as the first child of `#kinetic-hero-container`. **Move the kinetic block after the "Hero states" box** (generator ~line 280) so `landing-blocks-states.spec.ts`, which indexes `#view-landing-blocks .joy-hero` `nth(0..2)` as default/loading/disabled, keeps passing unchanged. The hint sentence ("Move the cursor or touch to nudge the particles. Click to send a pulse.") becomes the HeroSection subtitle's second sentence or is dropped. The existing `onclick` wiring (burst + toast) moves to a delegated listener in `build.js` on `#kinetic-hero-container .joy-hero__ctas` (generator output must stay SSR-pure). Run `node apps/storybook-hub/scripts/gen-landing-blocks.mjs --write` then `--check` (exit 0).
 - [ ] **Step 4: CSS.** Delete `.kinetic-overlay`, `.kinetic-overlay *`, `.kinetic-badge`, `.kinetic-badge-dot`, `.kinetic-title`, `.kinetic-title-emphasis`, `.kinetic-subtitle`, `.kinetic-actions`, `.kinetic-hint` and their media-query copies. Keep only layout glue: `.kinetic-canvas-container { position: relative; overflow: hidden; border-radius: var(--joy-radius-lg); border: 1px solid var(--hub-chrome-border); background: var(--joy-surface-card); }`, `.kinetic-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }`, `.kinetic-canvas-container > .joy-hero { position: relative; z-index: var(--joy-z-base); }`, and `@media (pointer: coarse), (prefers-reduced-motion: reduce) { .kinetic-canvas-container { background-image: radial-gradient(circle at 30% 20%, var(--joy-accent-subtle), transparent 60%), radial-gradient(circle at 80% 80%, var(--joy-accent-subtle), transparent 55%); } }` and `@media (pointer: coarse) { .kinetic-canvas { display: none; } }`. (`transparent` is a keyword, not a colour literal; confirm with lint-colors.)
 - [ ] **Step 5: JS.** Rewrite the kinetic module (~7000-7130):
   - `function hubKineticPalette()` reads the four tokens at call time; expose `window.hubKineticPalette = hubKineticPalette`. Particles store a palette index, not a colour; draw with `palette.accents[i]`, links with `palette.muted` at `globalAlpha` 0.25 (no `rgba(` literals). Re-read the palette in `toggleTheme()` (call `refreshKineticPalette()`), and on `matchMedia('(prefers-color-scheme: dark)')` change.
   - Motion gate: `const reduce = matchMedia('(prefers-reduced-motion: reduce)')`, `const coarse = matchMedia('(pointer: coarse)')`. If `reduce.matches`: draw ONE static frame (particles at rest) and schedule nothing. If `coarse.matches`: draw nothing, schedule nothing (CSS shows the gradient). Listen to `change` on both to start/stop. Delete the 300ms `setTimeout` poll.
   - Visibility: an `IntersectionObserver` on `#kinetic-hero-container` starts the loop when intersecting and cancels `kineticAnimId` when not (a `display: none` view reports not intersecting). Also stop on `document.visibilitychange` hidden.
   - 60fps cap: in the rAF callback skip the update when `now - lastFrame < 1000 / 60 - 1`.
-- [ ] **Step 6: Overview hero.** Replace the `#view-overview` badge + `<h1 style=...>` + tagline with HeroSection markup copied from the generator's `heroDefault` output shape (`<section class="joy-hero">`, `joy-hero__badge`, `joy-hero__title`, `joy-hero__subtitle`, `joy-hero__ctas` with two `joy-button joy-button--lg` buttons), hub copy: badge "Design system", title "Joymify Design System", subtitle the existing tagline text, CTAs "Browse components" (solid) and "Read the tokens" (outline). No hub CSS targets `.joy-hero*`.
+- [ ] **Step 6: Overview hero.** Replace the `#view-overview` badge + `<h1 style=...>` + tagline with a NEW generator-owned region `<!-- overview-hero:generated:start -->` ... `<!-- overview-hero:generated:end -->` rendered by `R('HeroSection', { badgeText: 'Design system', title: 'Joymify Design System', subtitle: <existing tagline text>, primary CTA 'Browse components', secondary CTA 'Read the tokens' })` (prop names: read the existing `heroDefault` call ~line 140 and reuse them exactly; `titleEmphasis` and `badgeText` exist). Extend the generator's `--write`/`--check` to own this region so the drift test covers it. CTA wiring (`switchView('button')`, `switchView('tokens')`) is a delegated listener in `build.js`. The only hub rule touching `.joy-hero` is the Step 4 positioning glue (`position: relative; z-index`); nothing restyles its visuals.
 - [ ] **Step 7: Run** Contract 5, Contract 6 for `overview` and `landing-blocks`, all `landing-*.spec.ts`, and `pnpm --filter @joymify/svelte test 2>&1 | tail -n 5` (generator drift test). Expected PASS.
 - [ ] **Step 8: Commit** `feat(hub): kinetic hero is HeroSection over a token-palette canvas that respects motion, pointer and visibility; overview hero uses HeroSection`.
 - [ ] **Step 9: Phase gate** (as Task 1 Step 9, plus an `impeccable` critique of the overview and landing-blocks screenshots from Contract 6's output folder in both themes).
@@ -457,7 +458,7 @@ Declare `hubKineticPalette?(): { accents: string[]; muted: string };` in the `Wi
 
 ```ts
 test.describe('Contract 10: hub chrome carries no slop', () => {
-  test.skip(({}, info) => info.project.name !== 'desktop-chrome', 'one project is enough');
+  test.beforeEach(({}, info) => { test.skip(info.project.name !== 'desktop-chrome', 'one project is enough'); });
   const sweep = (page: import('@playwright/test').Page) => page.evaluate((chrome) => {
     const root = getComputedStyle(document.documentElement);
     const tokens = (prefix: string) => new Set(
@@ -486,16 +487,19 @@ test.describe('Contract 10: hub chrome carries no slop', () => {
         if (dur !== 0 && (dur < 150 || dur > 250)) issues.push(`${d}: transition ${dur}ms`);
       }
     }
-    const text = document.querySelector('.main')!.innerText + '\n' + document.querySelector('.sidebar')!.textContent;
+    // Chrome text only: demo data (e.g. the TimePicker's "09 10 30 45") is component content, not a decorative marker.
+    const text = Array.from(document.querySelectorAll(chrome)).map((el) => (el as HTMLElement).innerText ?? '').join('\n')
+      + '\n' + (document.querySelector('.main') as HTMLElement).innerText.replace(/[^\u2192\u2022]/g, '');
     if (/→|→/.test(text)) issues.push('arrow glyph in visible copy');
     if (/•|&bull;/.test(text)) issues.push('middle dot in visible copy');
-    if (/(^|\s)0[1-9](\s|$)/m.test(text.replace(/\d{2}:\d{2}|\d+\.\d+/g, ''))) issues.push('01/02 marker in visible copy');
+    if (/(^|\s)0[1-9](\s|$)/m.test(text.split('\n').filter((l) => !/[\u2192\u2022]/.test(l)).join('\n'))) issues.push('01/02 marker in hub chrome');
     return issues;
   }, HUB_CHROME);
 
   for (const view of HUB_VIEWS) {
     test(view, async ({ page }) => {
       for (const width of [375, 1280]) {
+        await page.goto('about:blank'); // fresh document per viewport
         await page.setViewportSize({ width, height: 800 });
         await page.goto(`/#${view}`);
         await page.waitForLoadState('networkidle');
@@ -521,10 +525,10 @@ test.describe('Contract 10: hub chrome carries no slop', () => {
 });
 ```
 
-(If the `01/02` regex produces false positives on legitimate numeric data inside demos, restrict it to `document.querySelectorAll(HUB_CHROME)` text rather than `.main` innerText; the rule targets decorative markers in chrome, not data.)
+(Arrow and middle-dot checks cover all of `.main` (a stripped copy keeping only those glyphs); the `01/02` marker check reads hub chrome text only, per audit 2026-09-24.)
 
 - [ ] **Step 2: Run, expect FAIL**; capture the issue list per view to `/tmp/f040-sdd/slop.txt`.
-- [ ] **Step 3: Fix.** `.topbar` and `.sidebar-backdrop`: delete `backdrop-filter`/`-webkit-backdrop-filter`; backdrop uses `background: var(--joy-surface-overlay)` or the scrim token that exists in theme.css (check `grep -o -- '--joy-[a-z-]*scrim[a-z-]*\|--joy-[a-z-]*backdrop[a-z-]*' packages/tokens/dist/theme.css`). `.nav-section`, the `hub-matrix__cell > h4` rule (~850) and the inline AvatarGroup `<h5 style="...text-transform: uppercase...">` (~2861): sentence case, `letter-spacing: normal`, `font-size: var(--joy-font-size-xs)`, `font-weight: 600`, `color: var(--joy-text-secondary)`; the inline one becomes a class. Copy: DateRange separator `&rarr;` -> `to` (with `aria-hidden` removed), toast `' → '` -> `' to '`, the two `&bull;` headings become "Icon system (138 vector assets for Svelte 5 and React 19)" and "Splitter (drag the divider or use the arrow keys)". z-index: topbar `var(--joy-z-sticky)`, backdrop `var(--joy-z-backdrop)`, drawer `var(--joy-z-drawer)`, kinetic hero `var(--joy-z-base)`. Font sizes: every chrome `font-size` literal (0.6875rem, 0.8125rem, 0.9375rem, 1.1rem, 2rem ...) maps to the nearest `var(--joy-font-size-*)`; do the same for inline `font-size:` in hand-written view headings/taglines. Motion: chrome transitions use `var(--joy-duration-fast)` (150ms) or `var(--joy-duration-normal)` (verify it is <= 250ms in theme.css) and name properties (`transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast)`) instead of `all`; sidebar slide `transform var(--joy-duration-normal) var(--joy-motion-easing-decelerate)`; add once:
+- [ ] **Step 3: Fix.** `.topbar` and `.sidebar-backdrop`: delete `backdrop-filter`/`-webkit-backdrop-filter`; backdrop uses `background: color-mix(in srgb, var(--joy-surface-inverse) 55%, transparent)` (no scrim token exists and `--joy-surface-overlay` is opaque; `color-mix` with `transparent` is not a colour literal for lint-colors). `.nav-section` (drop `text-transform`/tracking only; the manifest labels and Contract 4 stay as they are), the `hub-matrix__cell > h4` rule (~850) and the inline AvatarGroup `<h5 style="...text-transform: uppercase...">` (~2861, copy to sentence case): `letter-spacing: normal`, `font-size: var(--joy-font-size-xs)`, `font-weight: 600`, `color: var(--joy-text-secondary)`; the inline one becomes a class. Copy: DateRange separator `&rarr;` -> `<span class="joy-date-range-picker__sep" aria-hidden="true">to</span>` (what `DateRangePicker.svelte:76` renders), toast `' → '` -> `' to '`, the two `&bull;` headings become "Icon system (138 vector assets for Svelte 5 and React 19)" and "Splitter (drag the divider or use the arrow keys)". z-index: topbar `var(--joy-z-sticky)`, backdrop `var(--joy-z-backdrop)`, drawer `var(--joy-z-drawer)`, kinetic hero `var(--joy-z-base)`. Font sizes: every chrome `font-size` literal (0.6875rem, 0.8125rem, 0.9375rem, 1.1rem, 2rem ...) maps to the nearest `var(--joy-font-size-*)`; do the same for inline `font-size:` in hand-written view headings/taglines. Motion: chrome transitions use `var(--joy-duration-fast)` (150ms) or `var(--joy-duration-normal)` (verify it is <= 250ms in theme.css) and name properties (`transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast)`) instead of `all`; sidebar slide `transform var(--joy-duration-normal) var(--joy-motion-easing-decelerate)`; add once:
 
 ```css
     @media (prefers-reduced-motion: reduce) {
@@ -568,7 +572,7 @@ const shots = [
 ];
 
 test.describe("F-040 screenshots", () => {
-  test.skip(({}, info) => !process.env.F040_SCREENS || info.project.name !== "desktop-chrome", "set F040_SCREENS=1");
+  test.beforeEach(({}, info) => { test.skip(!process.env.F040_SCREENS || info.project.name !== "desktop-chrome", "set F040_SCREENS=1"); });
   for (const shot of shots) {
     for (const width of [375, 1280]) {
       for (const theme of ["light", "dark"] as const) {
@@ -587,7 +591,7 @@ test.describe("F-040 screenshots", () => {
 });
 ```
 
-- [ ] **Step 2: Generate** `F040_SCREENS=1 PLAYWRIGHT_PORT=6122 ../../node_modules/.bin/playwright test tests/screens-f040.spec.ts --project=desktop-chrome` -> 16 PNGs. A subagent reviews them (text verdict only, rule 12 image budget) with `impeccable` critique: dark mode designed (visible borders, no halos, code blocks sunken), phone topbar = menu + brand + theme toggle, no slop. Findings fixed in `build.js` (new commit) and shots regenerated. Write `research/screens/README.md` indexing all 16 files (one line each: file, view, theme, width).
+- [ ] **Step 2: Generate** `F040_SCREENS=1 PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/screens-f040.spec.ts --project=desktop-chrome` -> 16 PNGs. A subagent reviews them (text verdict only, rule 12 image budget) with `impeccable` critique: dark mode designed (visible borders, no halos, code blocks sunken), phone topbar = menu + brand + theme toggle, no slop. Findings fixed in `build.js` (new commit) and shots regenerated. Write `research/screens/README.md` indexing all 16 files (one line each: file, view, theme, width).
 - [ ] **Step 3: Issue ledger.** `research/issue-coverage.md`: one row per HUB-001..070: `| ID | status (resolved-F040 / resolved-earlier / deferred) | evidence (contract name, commit sha, or file:line) | reason if deferred |`. Every ID is re-checked against the current code, not the audit's stale line numbers. Known deferrals to confirm: HUB-069 (icon size/colour parity test belongs to the icons package, Wave 6 docs/parity owner). Anything else deferred needs a reason.
 - [ ] **Step 4: README.** Add a "## Storybook hub (Wave 5)" section to `README.md` after the Wave 4 section: breakpoint ladder (480/768/900) and what changes at each; theme boot (inline head script, `localStorage['joy-theme']`, falls back to `prefers-color-scheme`); `--hub-*` chrome aliases and the rule that the hub uses tokens only; kinetic canvas behaviour (token palette, reduced motion, coarse pointer, visibility); Contracts 5-10 and how to run them (`PLAYWRIGHT_PORT=6122 pnpm --filter storybook-hub exec playwright test tests/contracts.spec.ts --project=desktop-chrome`), where per-view screenshots land (`apps/storybook-hub/test-results/`), and the gated `F040_SCREENS=1` command; known deviations/deferrals with a link to `issue-coverage.md`.
 - [ ] **Step 5: Plan screenshots section.** Append to this plan a "## Screenshots" section linking 8 representative PNGs (landing light 375, landing dark 1280, primitives dark 375, primitives light 1280, forms light 375, forms dark 1280, data-display dark 375, data-display light 1280) with relative links `research/screens/<file>`.
@@ -619,6 +623,6 @@ node apps/storybook-hub/scripts/gen-landing-blocks.mjs --check; echo "gen=$?"   
 | Every HUB- issue resolved or deferred with reason | 6 Step 3 |
 | README | 6 Step 4 |
 
-## Audit trail
+## Appendix: audit trail
 
-- (self-grill-audit findings and fixes are appended here)
+- 2026-09-24 self-grill-audit: verdict safe-with-fixes. Corrected: (CRITICAL) describe-level `test.skip(({}, info) => ...)` gets fixtures only, so every project gate now uses `test.beforeEach(({}, info) => test.skip(...))`; (HIGH) Playwright binary is `apps/storybook-hub/node_modules/.bin/playwright` (`./node_modules/.bin/playwright` from the app dir), not the root; (HIGH) kinetic block moves after the "Hero states" box so `landing-blocks-states.spec.ts` nth() indexing is unchanged; (HIGH) the `01/02` marker check reads hub chrome text only (TimePicker data "09 10 30 45" false-positived); (HIGH) each viewport pass starts from `about:blank` because a same-URL hash `goto` does not reload. MEDIUM applied: backdrop via `color-mix(... transparent)` (no scrim token, overlay is opaque); `.nav-section` keeps its Title Case labels (Contract 4); overview hero becomes a generator-owned region covered by the drift check; `.joy-hero` gets positioning glue only; DateRange separator keeps `aria-hidden` like the component; particle palette uses `--joy-accent-active` instead of `--joy-accent-highlight` (pale gold in both themes). Open: none.
