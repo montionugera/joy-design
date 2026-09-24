@@ -932,3 +932,24 @@ test('F-039 L5b CSS: every colour token the LandingPage block reads has a light 
     assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
   }
 });
+
+// ── F-039 L5b fix round 1 ──
+// theme.css ships no global reset, so a landing rule that sets `width: 100%` next to padding or a border must set
+// `box-sizing: border-box` itself, or the page is wider than its container (the CTA band overflowed 24-48px until the
+// overflow guard on .joy-landing-page hid it). Chromium probe of the whole composed page: /tmp/f039-sdd/l5b/page-probe.mjs.
+test('F-039 L5b fix CSS: every landing rule with width 100% plus padding or border sets box-sizing border-box', () => {
+  const landing = /joy-(hero|cta|logo|stats|feature|faq|site-footer|pricing|bento|landing|testimonial)/;
+  const rules = [...themeCss.matchAll(/(?:^|\n)([^@{}\n/][^{}@]*)\{([^}]*)\}/g)].map((m) => ({ selector: m[1].trim(), body: m[2] }));
+  const risky = rules.filter((r) => landing.test(r.selector) && /(^|[\s;])width:\s*100%/.test(r.body) && /(^|[\s;])(padding|border)[a-z-]*:/.test(r.body));
+  assert.ok(risky.length >= 3, `sanity: the scan finds the rules (${risky.map((r) => r.selector).join(', ')})`);
+  for (const r of risky) assert.match(r.body, /box-sizing:\s*border-box/, `${r.selector} needs box-sizing: border-box`);
+  assert.match(rule(themeCss, '.joy-cta-section'), /box-sizing:\s*border-box/);
+});
+
+test('F-039 L5b fix CSS: the page root paints canvas surface and primary text, and the skip link is fixed to the viewport', () => {
+  const root = rule(pageBlock, '.joy-landing-page');
+  assert.match(root, /background-color:\s*var\(--joy-surface-canvas\)/);
+  assert.match(root, /color:\s*var\(--joy-text-primary\)/);
+  assert.match(rule(pageBlock, '.joy-landing-skip'), /position:\s*fixed/);
+  assert.match(rule(pageBlock, '.joy-landing-page > main:focus'), /outline:\s*none/);
+});

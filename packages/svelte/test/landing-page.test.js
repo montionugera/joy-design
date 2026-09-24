@@ -10,6 +10,8 @@ import { compileSvelte, renderSvelte as renderRaw } from './helpers/render-svelt
 // packages/react/test/landing-page.test.js; the CSS contract is in packages/tokens/test/wave-4.test.js.
 // Interaction in a real browser is proven by Playwright against the hub; here: SSR markup plus the click/open wiring of
 // the compiled client component (no DOM is available in this repo).
+// The wiring tests below evaluate the compiled client output against a stand-in for svelte/internal/client, so they are
+// pinned to the installed Svelte (5.57.x): an upgrade that renames those internals fails them loudly, not silently.
 
 // Svelte SSR wraps blocks in <!--[--> hydration markers; strip them so the markup reads like the React twin's.
 const renderPage = async (props = {}) => (await renderRaw('LandingPage', props)).replace(/<!--[\s\S]*?-->/g, '');
@@ -132,7 +134,7 @@ test('F-039 L5b: feature cards carry distinct icons in the icon slot, distinct l
 
 test('F-039 L5b: palette is a plain data attribute, the component never sets a theme, and a caller class and rest props reach the root', async () => {
   const dflt = await renderPage();
-  assert.match(dflt, /^<div data-palette="joymify" class="joy-landing-page ">/);
+  assert.match(dflt, /^<div data-palette="joymify" class="joy-landing-page\s*">/);
   const custom = await renderPage({ palette: 'obsidian', class: 'extra', id: 'lp', 'data-testid': 'page', 'aria-label': 'Landing' });
   const root = tags(custom, 'div')[0];
   assert.strictEqual(attr(root, 'data-palette'), 'obsidian');
@@ -159,9 +161,11 @@ test('F-039 L5b: landmarks: skip link first, then header, one <main> holding the
 // Behaviour without a DOM: evaluate the compiled CLIENT component against a tiny stand-in for svelte/internal/client that
 // hands out DISTINCT nodes and records handlers per node, with recording stubs for Drawer, the sections and the icons.
 const libFile = fileURLToPath(new URL('../src/lib/LandingPage.svelte', import.meta.url));
-const clientCode = compile(fs.readFileSync(libFile, 'utf8'), { generate: 'client', filename: libFile }).js.code
+// Compiled lazily so a compile regression fails the named compile test, not the whole file at load.
+let clientCodeCache;
+const clientCode = () => (clientCodeCache ??= compile(fs.readFileSync(libFile, 'utf8'), { generate: 'client', filename: libFile }).js.code
   .replace(/^import .*$/gm, '')
-  .replace('export default function', 'function');
+  .replace('export default function', 'function'));
 function runClient(props) {
   const created = [];
   const binds = [];
@@ -199,7 +203,7 @@ function runClient(props) {
     }
   });
   const names = ['Cpu', 'Layers', 'Menu', 'Smartphone', 'Drawer', 'HeroSection', 'LogoCloud', 'FeatureGrid', 'FeatureCard', 'StatsSection', 'CTASection', 'FAQSection', 'SiteFooter'];
-  new Function('$', 'props', ...names, `${clientCode}\nreturn LandingPage({}, props);`)($, props, ...names.map(stub));
+  new Function('$', 'props', ...names, `${clientCode()}\nreturn LandingPage({}, props);`)($, props, ...names.map(stub));
   const flush = () => effects.forEach((fn) => fn());
   return { created, all, binds, propFlags, calls, flush };
 }
@@ -304,3 +308,10 @@ test('F-039 L5b: feature cards receive real icon snippets (three different icons
 });
 
 const findByAttr = (all, name) => all.find((n) => name in n.attrs);
+
+test('F-039 L5b fix: <main> is programmatically focusable so the skip link moves focus, and the copy makes no false palette claim', async () => {
+  const markup = await renderPage();
+  assert.match(tags(markup, 'main')[0], /^<main id="[^"]+" tabindex="-1">$/);
+  assert.match(markup, /Tested light and dark themes/);
+  assert.ok(!/Five tested|five .*themes|recalibrat/i.test(markup), 'palette is a plain attribute; the copy must not promise palette themes');
+});

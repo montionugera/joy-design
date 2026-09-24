@@ -5069,6 +5069,7 @@ a.joy-logo-cloud__item:focus-visible {
 
 /* ── Landing Page Suite: CTASection ── */
 .joy-cta-section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -5189,6 +5190,7 @@ a.joy-logo-cloud__item:focus-visible {
 }
 /* A real button: 44px tall, ink text; hover only tints the row (gold text on a light card fails contrast). */
 .joy-faq-item__trigger {
+  box-sizing: border-box;
   width: 100%;
   min-height: 44px;
   padding: 14px 20px;
@@ -5385,8 +5387,15 @@ a.joy-logo-cloud__item:focus-visible {
 /* ── Landing Page Suite: LandingPage ── */
 .joy-landing-page {
   position: relative;
-  /* Guard only: the header collapses below 768px, so nothing should overflow, but a stray wide child must never scroll the page sideways. */
+  /* The page paints its own surface and text colour, so it is legible on a bare page (no consumer body style). */
+  background-color: var(--joy-surface-canvas);
+  color: var(--joy-text-primary);
+  /* Belt and braces only: the composed page has no horizontal overflow without it (probed with no reset, guard off); a stray wide child must never scroll the page sideways. */
   overflow-x: clip;
+}
+.joy-landing-page > main:focus {
+  /* The skip-link target is focused programmatically (tabindex -1), never by Tab: no ring around the whole landmark. */
+  outline: none;
 }
 .joy-landing-page__slot {
   max-width: 1200px;
@@ -5399,7 +5408,8 @@ a.joy-logo-cloud__item:focus-visible {
   padding: 0 24px;
 }
 .joy-landing-skip {
-  position: absolute;
+  /* Fixed to the viewport, not the page root, so a page embedded below other content never shows it through. */
+  position: fixed;
   top: var(--joy-space-2);
   left: var(--joy-space-2);
   z-index: var(--joy-z-sticky);

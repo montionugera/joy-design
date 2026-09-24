@@ -12,6 +12,10 @@
   import FAQSection from './FAQSection.svelte';
   import SiteFooter from './SiteFooter.svelte';
 
+  /**
+   * A full-page template: it renders its own banner, `<main>` and footer landmarks, so render it as the page body and
+   * not inside another `<main>` (that would nest two main landmarks).
+   */
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
     /** A plain `data-palette` attribute; the theme is decided by `data-theme` alone. */
     palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium';
@@ -126,7 +130,7 @@
       <span>Joymify Quant</span>
     </div>
     <nav class="joy-landing-header__nav" aria-label="Primary">
-      {#each navLinks as link (link.href)}
+      {#each navLinks as link, i (`${i}-${link.href}`)}
         <a class="joy-landing-header__link" href={link.href}>{link.label}</a>
       {/each}
       <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick={ondeployclick}>
@@ -148,7 +152,7 @@
   <!-- Below 768px the inline nav is hidden; the same links live in this drawer (a bottom sheet at 480px and below). -->
   <Drawer id={menuId} open={menuOpen} title="Menu" onclose={closeMenu}>
     <nav class="joy-landing-drawer__nav" aria-label="Mobile">
-      {#each navLinks as link (link.href)}
+      {#each navLinks as link, i (`${i}-${link.href}`)}
         <a class="joy-landing-drawer__link" href={link.href} onclick={closeMenu}>{link.label}</a>
       {/each}
     </nav>
@@ -166,7 +170,7 @@
     {/snippet}
   </Drawer>
 
-  <main id={mainId}>
+  <main id={mainId} tabindex="-1">
     <HeroSection
       badgeText="Sub-5μs execution engine"
       title="Live market data and"
@@ -203,7 +207,7 @@
             {#snippet badge()}<span class="joy-badge joy-badge--brand">FPGA-Core</span>{/snippet}
           </FeatureCard>
           <FeatureCard
-            title="Five tested color themes"
+            title="Tested light and dark themes"
             description="Light and dark themes keep text at WCAG 2.2 AA contrast on every component."
             linkText="Browse tokens"
             linkHref="#features"

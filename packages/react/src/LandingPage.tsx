@@ -10,7 +10,11 @@ import { CTASection } from './CTASection.js';
 import { FAQSection } from './FAQSection.js';
 import { SiteFooter } from './SiteFooter.js';
 
-export interface LandingPageProps extends React.HTMLAttributes<HTMLDivElement> {
+/**
+ * A full-page template: it renders its own banner, `<main>` and footer landmarks, so render it as the page body and
+ * not inside another `<main>` (that would nest two main landmarks).
+ */
+export interface LandingPageProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   /** A plain `data-palette` attribute; the theme is decided by `data-theme` alone. */
   palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium';
   onDeployClick?: () => void;
@@ -56,8 +60,8 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
           <span>Joymify Quant</span>
         </div>
         <nav className="joy-landing-header__nav" aria-label="Primary">
-          {NAV_LINKS.map((link) => (
-            <a key={link.href} className="joy-landing-header__link" href={link.href}>{link.label}</a>
+          {NAV_LINKS.map((link, i) => (
+            <a key={`${i}-${link.href}`} className="joy-landing-header__link" href={link.href}>{link.label}</a>
           ))}
           <button type="button" className="joy-button joy-button--solid joy-button--sm" onClick={onDeployClick}>
             Launch Terminal
@@ -95,13 +99,13 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
         )}
       >
         <nav className="joy-landing-drawer__nav" aria-label="Mobile">
-          {NAV_LINKS.map((link) => (
-            <a key={link.href} className="joy-landing-drawer__link" href={link.href} onClick={closeMenu}>{link.label}</a>
+          {NAV_LINKS.map((link, i) => (
+            <a key={`${i}-${link.href}`} className="joy-landing-drawer__link" href={link.href} onClick={closeMenu}>{link.label}</a>
           ))}
         </nav>
       </Drawer>
 
-      <main id={mainId}>
+      <main id={mainId} tabIndex={-1}>
         <HeroSection
           badgeText="Sub-5μs execution engine"
           title="Live market data and"
@@ -186,7 +190,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
               linkHref="#features"
             />
             <FeatureCard
-              title="Five tested color themes"
+              title="Tested light and dark themes"
               description="Light and dark themes keep text at WCAG 2.2 AA contrast on every component."
               icon={<Layers size="1.5rem" />}
               badge={<span className="joy-badge joy-badge--success">WCAG AA</span>}

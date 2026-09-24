@@ -6,7 +6,9 @@ import { loadComponent, requireFromHere } from './helpers/load-tsx.js';
 // F-039 L5b: LandingPage (React twin). The Svelte twin asserts the same expectations in
 // packages/svelte/test/landing-page.test.js; the CSS contract is in packages/tokens/test/wave-4.test.js.
 // Interaction in a real browser is proven by Playwright against the hub; here: SSR markup plus the click/open wiring read
-// from the element tree, with the hooks driven by a tiny dispatcher (no DOM is available in this repo).
+// from the element tree, with the hooks driven by a tiny dispatcher (no DOM is available in this repo). The dispatcher
+// only implements useState and useId and is pinned to the installed React (19.3.x): adding another hook to LandingPage
+// or upgrading React may need it extended.
 
 const React = requireFromHere('react');
 const { renderToStaticMarkup } = requireFromHere('react-dom/server');
@@ -127,7 +129,7 @@ test('F-039 L5b: the source file holds no emoji or other non-ASCII pictograph (R
 });
 
 test('F-039 L5b: palette is a plain data attribute, the component never sets a theme, and a caller class and rest props reach the root', () => {
-  assert.match(renderPage(), /^<div data-palette="joymify" class="joy-landing-page ">/);
+  assert.match(renderPage(), /^<div data-palette="joymify" class="joy-landing-page\s*">/);
   const custom = renderPage({ palette: 'obsidian', className: 'extra', id: 'lp', 'data-testid': 'page', 'aria-label': 'Landing' });
   const root = tags(custom, 'div')[0];
   assert.strictEqual(attr(root, 'data-palette'), 'obsidian');
@@ -258,4 +260,19 @@ test('F-039 L5b: the header launch button and both section CTAs are wired to onD
   assert.strictEqual(cta.props.onSecondaryClick, onDocsClick);
   assert.strictEqual(hero.props.titleEmphasis, 'fast trading screens', 'titleEmphasis, not titleGradient');
   assert.ok(!('titleGradient' in hero.props));
+});
+
+test('F-039 L5b fix: <main> is programmatically focusable so the skip link moves focus, and the copy makes no false palette claim', () => {
+  const markup = renderPage();
+  assert.match(tags(markup, 'main')[0], /^<main id="[^"]+" tabindex="-1">$/);
+  assert.match(markup, /Tested light and dark themes/);
+  assert.ok(!/Five tested|five .*themes|recalibrat/i.test(markup), 'palette is a plain attribute; the copy must not promise palette themes');
+});
+
+test('F-039 L5b fix: nav link keys are index-composite (content-only keys break the lane convention)', () => {
+  const tree = mount(LandingPage, {}).render();
+  const keys = (cls) => withClass(tree, cls).map((n) => n.key);
+  assert.deepStrictEqual(keys('joy-landing-header__link'), ['0-#features', '1-#telemetry', '2-#faq']);
+  const drawerLinks = withClass(drawerOf(tree), 'joy-landing-drawer__link').map((n) => n.key);
+  assert.deepStrictEqual(drawerLinks, ['0-#features', '1-#telemetry', '2-#faq']);
 });
