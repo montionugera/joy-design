@@ -160,6 +160,8 @@ Parked (found in review or by lanes, judged not worth blocking; "both" means bot
 29. **Comparison matrix has no scroll affordance at 375px** (taste review 2; same as item 11): "Profe..." is cut with no edge fade.
 30. **Footer is one long column of three link lists at 375px** (taste review 2, P2-11): two columns exist from 480px; a two-column phone layout or collapsible groups would shorten it.
 31. **Features heading and pricing exist only in the hub simulator** (extends item 15): the LandingPage twins do not render them.
+32. **Two-line stat delta pill stretches to near card width** (taste review 3, P2-a): at 375px the wrapped pill grows close to the card width with the caret stranded at the left edge and the text centred. Suggested: `inline-size: fit-content` on the pill and align the caret to the first text line (`align-items: start` or baseline); shorter copy such as "-14% vs L1" would also stay on one line. Touches both twins and the hub copy.
+33. **About 60px of empty padding under the Key metrics grid in the hub demo frame at 375px** (taste review 3, P2-b): cosmetic; trim the demo wrapper bottom padding for the stats block on phones (hub-only, generator-owned region, so change the source and regenerate).
 
 ## 4. Process notes and lessons
 
@@ -211,6 +213,8 @@ Parked (found in review or by lanes, judged not worth blocking; "both" means bot
 | T1 | code-reviewer, typescript-reviewer | 1 Important (stats wrap, two width models); ts APPROVE | round 1 (a2b5c5e), round 2 pill ellipsis (22a0b9d) | APPROVE after re-review (round 2 mutation-proven) |
 | T2 | code-reviewer | 0 Critical/Important, 5 Minor | round 1 (afb4648) | APPROVE |
 | Taste 1 | opus taste reviewer on 38 screenshots | 0 P0, 7 P1, 16 P2 | T1, T2 | FIX, then round 2 dispatched at bff30b9 |
+| Taste 3 | opus taste reviewer, targeted re-check of the stats block and the 375/1280 acceptance views, both themes | 0 P0, 0 P1; 2 new P2 (backlog items 32 and 33) | none needed; P1-A confirmed fixed in the simulator and the hub blocks view | PASS |
+| Final whole-branch reviews | A spec and CSS; B components and tests; C hub and hygiene; F1 scoped re-review | B: request-changes, fixed in F1 | F1 consolidated fixes | A APPROVE; B request-changes then fixed in F1; C APPROVE; F1 scoped re-review APPROVE |
 
 ## 5. Release notes (breaking and visible changes)
 

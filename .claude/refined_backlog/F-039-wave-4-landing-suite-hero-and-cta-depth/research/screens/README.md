@@ -48,8 +48,9 @@ view now fits in 3 parts); every file is under 1 MB (largest `landing-blocks-dar
 
 ## Verdicts
 
-Taste review (record as of the F1 fixes, pending re-check by the orchestrator):
+Taste review (final record):
 
 - Round 1: FIX (P0 0, P1 7, P2 16). T1 and T2 addressed all seven P1s (stats grid orphan, tag chips, dark CTA band, loading and disabled states, frame switcher, mobile stats, pricing in the simulator); round 2 confirmed six as fixed and the mobile stats one as partly fixed.
 - Round 2: FIX (P0 0, P1 1, P2 about 9 open). The one P1 was the stats change pill cut off with an ellipsis at 375px and a cramped two-column grid in the hub blocks view. F1 fixed it: the pill wraps (balanced, at most two lines, never clipped), the hub demo wrapper no longer double-pads the stats on phones, and the grid drops to one column under 15rem of container. The screenshots in this folder pre-date that fix; the re-check is pending until they are regenerated.
+- Round 3 (targeted re-check of the stats block and the 375/1280 acceptance views, both themes): PASS (P0 0, P1 0). P1-A is fixed in the simulator and in the hub blocks view; two new P2 polish items were recorded (see rulings-and-deferrals.md backlog).
 - Accepted or known deviations (not fixed in this wave; see rulings-and-deferrals.md): disabled outline is close to the enabled outline in light; the featured plan has no lift; the pricing showcase rows use different card widths; the neutral trend is bare text, not a pill; the comparison matrix has no scroll affordance at 375px; the footer is one long column at 375px (two columns from 480px); features heading and pricing exist only in the hub simulator; the drawer link that renders underlined may be hover or focus rather than a state, not judgeable from a still.
