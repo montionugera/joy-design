@@ -162,6 +162,7 @@ Parked (found in review or by lanes, judged not worth blocking; "both" means bot
 31. **Features heading and pricing exist only in the hub simulator** (extends item 15): the LandingPage twins do not render them.
 32. **Two-line stat delta pill stretches to near card width** (taste review 3, P2-a): at 375px the wrapped pill grows close to the card width with the caret stranded at the left edge and the text centred. Suggested: `inline-size: fit-content` on the pill and align the caret to the first text line (`align-items: start` or baseline); shorter copy such as "-14% vs L1" would also stay on one line. Touches both twins and the hub copy.
 33. **About 60px of empty padding under the Key metrics grid in the hub demo frame at 375px** (taste review 3, P2-b): cosmetic; trim the demo wrapper bottom padding for the stats block on phones (hub-only, generator-owned region, so change the source and regenerate).
+34. **`SiteFooter.svelte` social icons take a raw-HTML `svgHtml` string (`{@html social.svgHtml}`); this pre-dates Wave 4** (ruling, verified with `git show 85141e1:packages/svelte/src/lib/SiteFooter.svelte`, which already has `svgHtml?: string`), so Wave 4 does not change it. Svelte-only, trusted input only (the consumer supplies the markup; never pass user-controlled strings). The React twin takes an element instead. Consider a snippet/element API for the Svelte twin in a later wave.
 
 ## 4. Process notes and lessons
 
