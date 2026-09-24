@@ -269,13 +269,16 @@ test('F-039 L1 CSS: badge uses accent-text on accent-subtle; hero outline reads 
   assert.match(outline, /color:\s*var\(--joy-text-primary\)/);
 });
 
+const PRESSED_SELECTOR =
+  '.joy-hero .joy-button--solid:active:not(:disabled),\n.joy-cta-section .joy-button--solid:active:not(:disabled),\n.joy-pricing-card .joy-button--solid:active:not(:disabled)';
+
 test('F-039 L1 CSS: hero and CTA solid buttons lift 1px on hover and settle on active; actions stack under 480px', () => {
   assert.match(
     rule(heroBlock, '.joy-hero .joy-button--solid:hover:not(:disabled),\n.joy-cta-section .joy-button--solid:hover:not(:disabled)'),
     /transform:\s*translateY\(-1px\)/
   );
   assert.match(
-    rule(heroBlock, '.joy-hero .joy-button--solid:active:not(:disabled),\n.joy-cta-section .joy-button--solid:active:not(:disabled)'),
+    rule(heroBlock, PRESSED_SELECTOR),
     /transform:\s*none/
   );
   assert.match(heroBlock, /@media \(max-width: 479px\) \{[\s\S]*?\.joy-hero__ctas,\n\s*\.joy-cta-section__actions \{\s*flex-direction: column;\s*align-items: stretch;[\s\S]*?width: 100%;/);
@@ -356,6 +359,30 @@ test('F-039 L1 contrast: hero and CTA token pairs pass WCAG AA in both themes (c
       assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min} (${why})`);
     }
   }
+});
+
+test('F-039 G1 contrast: the pressed solid button in the hero, CTA band and pricing card keeps its label at 4.5:1 in both themes (rest, hover, pressed, gradient end)', () => {
+  const pressed = rule(heroBlock, PRESSED_SELECTOR);
+  const fill = pressed.match(/background-color:\s*var\((--joy-[\w-]+)\)/);
+  assert.ok(fill, 'the landing pressed rule sets its own background-color token (the shared pressed fill is only 4.20:1 in light)');
+  const label = '--joy-text-on-accent';
+  // the shared pressed fill (--joy-accent-hover) is why the scoped override exists
+  assert.ok(contrastRatio(tokenMaps.light[label], tokenMaps.light['--joy-accent-hover']) < 4.5, 'light: shared pressed fill is below 4.5');
+  for (const theme of ['light', 'dark']) {
+    for (const [state, token] of [
+      ['rest (gradient start)', '--joy-accent-default'],
+      ['rest (gradient end)', '--joy-accent-gradient-end'],
+      ['pressed (landing override)', fill[1]]
+    ]) {
+      const ratio = contrastRatio(tokenMaps[theme][label], tokenMaps[theme][token]);
+      assert.ok(ratio >= 4.5, `${theme}: ${state} ${token} under the solid label is ${ratio.toFixed(2)}:1, needs 4.5`);
+    }
+  }
+  // hover changes no fill (lift + shadow only), so the rest pair is the hover pair
+  const hover = rule(heroBlock, '.joy-hero .joy-button--solid:hover:not(:disabled),\n.joy-cta-section .joy-button--solid:hover:not(:disabled)');
+  assert.ok(!/background/.test(hover), 'hover in the landing containers does not repaint the fill');
+  // the shared rule stays untouched
+  assert.match(themeCss, /\.joy-button--solid:active:not\(:disabled\) \{ transform: none; background-image: none; background-color: var\(--joy-accent-hover\);/);
 });
 
 test('F-039 T1 contrast: the gold solid button stays visible on the band in both themes', () => {

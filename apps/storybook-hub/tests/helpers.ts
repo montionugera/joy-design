@@ -290,6 +290,61 @@ export async function measureButtonContrast(page: Page, selector: string): Promi
   }, selector);
 }
 
+export type PressedButtonContrast = {
+  className: string;
+  text: string;
+  /** The button matched :active while the measurement was taken (the pointer really was held on it). */
+  pressed: boolean;
+  min: number;
+  gradient: boolean;
+  surfaces: number[][];
+};
+
+/**
+ * Contrast of the first button matching `selector` while it is really pressed: the pointer is moved onto it and held
+ * (page.mouse.down), the colour transition is waited out, the label is measured against the pressed fill, then the
+ * pointer leaves the button before it is released so no click is fired. Works in both Playwright projects.
+ */
+export async function measurePressedButtonContrast(page: Page, selector: string): Promise<PressedButtonContrast> {
+  const button = page.locator(selector).first();
+  await button.scrollIntoViewIfNeeded();
+  const box = await button.boundingBox();
+  if (!box) throw new Error(`no box for ${selector}`);
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  try {
+    await button.evaluate(async (el) => {
+      // :active is set by the browser on mousedown; wait for it and for the pressed-state transition to finish
+      for (let i = 0; i < 100 && !(el.matches(":active") && el.getAnimations().length === 0); i++) {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+    });
+    return await button.evaluate((el) => {
+      const label = el.querySelector<HTMLElement>(".joy-button__label") ?? el;
+      const { min, surfaces } = window.__textRatio(label);
+      return {
+        className: el.className,
+        text: (label.textContent ?? "").trim(),
+        pressed: el.matches(":active"),
+        min,
+        gradient: getComputedStyle(el).backgroundImage.includes("gradient("),
+        surfaces,
+      };
+    });
+  } finally {
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+  }
+}
+
+/** Asserts a pressed button is really pressed, is a flat fill (the gradient is gone) and its label is >= 4.5:1 on it. */
+export function expectReadablePressedButton(measured: PressedButtonContrast, where: string) {
+  expect(measured.pressed, `${where}: the button is :active while measured`).toBe(true);
+  expect(measured.text.length, `${where}: label`).toBeGreaterThan(0);
+  expect(measured.surfaces.length, `${where}: pressed surfaces`).toBeGreaterThan(0);
+  expect(measured.min, `${where} pressed contrast (${measured.className})`).toBeGreaterThanOrEqual(4.5);
+}
+
 /** Asserts the label of every measured button is visible, non-empty and >= 4.5:1 on every surface it can sit on. */
 export function expectReadableButtons(buttons: ButtonContrast[], expectedCount: number, where: string) {
   expect(buttons.length, `${where}: number of buttons`).toBe(expectedCount);

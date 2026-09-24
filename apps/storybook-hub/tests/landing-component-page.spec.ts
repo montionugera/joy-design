@@ -8,7 +8,9 @@ import {
   installContrastTools,
   installPageTools,
   measureButtonContrast,
+  expectReadablePressedButton,
   measureOverflow,
+  measurePressedButtonContrast,
   type Theme,
 } from "./helpers";
 
@@ -103,6 +105,18 @@ for (const twin of twins) {
           }, band);
           for (const text of bandText) {
             expect(text.min, `${twin} ${text.cls} on the raised band`).toBeGreaterThanOrEqual(4.5);
+          }
+        });
+
+        // F-039 G1: the pressed (:active) fill of the solid landing buttons keeps the label at 4.5:1 (the shared pressed
+        // fill was 4.20:1 in light). The pointer is really held on the button. The default page has no pricing card: the
+        // featured card is covered in landing-contracts.spec.ts.
+        test("pressed solid buttons keep 4.5:1: hero primary and CTA band", async ({ page }) => {
+          for (const [name, selector] of [
+            ["hero primary", `${PAGE} .joy-hero__ctas .joy-button--solid`],
+            ["CTA band", `${PAGE} .joy-cta-section__container .joy-button--solid`],
+          ] as const) {
+            expectReadablePressedButton(await measurePressedButtonContrast(page, selector), `${twin} ${name} in ${theme}`);
           }
         });
 

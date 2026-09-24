@@ -1,10 +1,12 @@
 import { test, expect, type Page } from "@playwright/test";
 import {
   expectReadableButtons,
+  expectReadablePressedButton,
   installContrastTools,
   installPageTools,
   measureButtonContrast,
   measureOverflow,
+  measurePressedButtonContrast,
   setTheme,
   type Theme,
 } from "./helpers";
@@ -60,6 +62,17 @@ for (const theme of themes) {
       // found by role too: both are real, named buttons
       await expect(page.locator(hero).getByRole("button", { name: solid[0].text })).toBeVisible();
       await expect(page.locator(hero).getByRole("button", { name: outline[0].text })).toBeVisible();
+    });
+
+    // (2b) F-039 G1: pressed (:active) solid buttons keep 4.5:1 (the shared pressed fill was 4.20:1 in light)
+    test("pressed solid buttons are readable: hero primary, CTA band, featured pricing card", async ({ page }) => {
+      for (const [name, selector] of [
+        ["hero primary", `${PAGE} .joy-hero__ctas .joy-button--solid`],
+        ["CTA band", `${PAGE} .joy-cta-section__container .joy-button--solid`],
+        ["featured pricing card", `${PAGE} .joy-pricing-card--featured .joy-button--solid`],
+      ] as const) {
+        expectReadablePressedButton(await measurePressedButtonContrast(page, selector), `${name} in ${theme}`);
+      }
     });
 
     // (3) mobile navigation

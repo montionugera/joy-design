@@ -2628,9 +2628,13 @@ h1, h2, h3, .joy-display {
 .joy-cta-section .joy-button--solid:hover:not(:disabled) {
   transform: translateY(-1px);
 }
+/* The shared pressed fill (--joy-accent-hover) is 4.20:1 under the label in light. In the landing containers the pressed fill is the
+   gradient end stop instead (4.75:1 light, 7.18:1 dark); the inset pressed shadow (from the shared rule) still reads as "pushed in". */
 .joy-hero .joy-button--solid:active:not(:disabled),
-.joy-cta-section .joy-button--solid:active:not(:disabled) {
+.joy-cta-section .joy-button--solid:active:not(:disabled),
+.joy-pricing-card .joy-button--solid:active:not(:disabled) {
   transform: none;
+  background-color: var(--joy-accent-gradient-end);
 }
 .joy-hero .joy-button--outline,
 .joy-hero__secondary-cta,
