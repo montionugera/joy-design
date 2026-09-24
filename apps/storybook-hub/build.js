@@ -3295,7 +3295,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-faq-item joy-faq-item--open" id="faq-item-1">
                   <button type="button" id="faq-trigger-1" class="joy-faq-item__trigger" aria-expanded="true" aria-controls="faq-answer-1" onclick="toggleFaq('faq-item-1')">
                     <span class="joy-faq-item__label">How does Joymify guarantee 60 FPS rendering under 100k candlestick points?</span>
-                    <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    <span class="joy-faq-item__icon" aria-hidden="true">${iconSvg("ChevronDown", "100%")}</span>
                   </button>
                   <div class="joy-faq-item__content" id="faq-answer-1" role="region" aria-labelledby="faq-trigger-1">
                     Through dual-layer canvas decoupling, O(log N) binary search viewport culling, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers that prevent garbage collection thrashing during real-time tick streaming.
@@ -3305,7 +3305,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-faq-item" id="faq-item-2">
                   <button type="button" id="faq-trigger-2" class="joy-faq-item__trigger" aria-expanded="false" aria-controls="faq-answer-2" onclick="toggleFaq('faq-item-2')">
                     <span class="joy-faq-item__label">Can we hot-swap institutional theme palettes without re-rendering?</span>
-                    <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    <span class="joy-faq-item__icon" aria-hidden="true">${iconSvg("ChevronDown", "100%")}</span>
                   </button>
                   <div class="joy-faq-item__content" id="faq-answer-2" role="region" aria-labelledby="faq-trigger-2" hidden>
                     Yes. All styling is driven by CSS custom properties (--joy-surface-*, --joy-border, --joy-text-primary, --gold-400). Swapping theme attributes dynamically updates the entire layout instantly with zero layout shifts and verified WCAG contrast.
@@ -3315,7 +3315,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-faq-item" id="faq-item-3">
                   <button type="button" id="faq-trigger-3" class="joy-faq-item__trigger" aria-expanded="false" aria-controls="faq-answer-3" onclick="toggleFaq('faq-item-3')">
                     <span class="joy-faq-item__label">How do financial tables adapt to mobile smartphone viewports?</span>
-                    <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    <span class="joy-faq-item__icon" aria-hidden="true">${iconSvg("ChevronDown", "100%")}</span>
                   </button>
                   <div class="joy-faq-item__content" id="faq-answer-3" role="region" aria-labelledby="faq-trigger-3" hidden>
                     With responsive stack mode enabled (.joy-table--responsive-stack), tables below 768px transform rows into individual card layouts, utilizing data-label attributes to present column keys alongside ticker values with zero horizontal cutoff.

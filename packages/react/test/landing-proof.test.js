@@ -295,7 +295,7 @@ test('F-039 L4: every twin forwards className and rest props to its root element
 test('F-039 L4: StatsSection accepts an accessible name from the caller (no fixed English label baked in)', () => {
   const root = openTag(html(StatsSection, { stats: STATS, 'aria-label': 'Key metrics' }));
   assert.match(root, /aria-label="Key metrics"/);
-  assert.ok(!openTag(html(StatsSection, { stats: STATS,  })).includes('aria-label'), 'unnamed by default');
+  assert.ok(!openTag(html(StatsSection, { stats: STATS })).includes('aria-label'), 'unnamed by default');
 });
 
 test('F-039 L4: the forwarded ref lands on the root element of every twin', () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { ChevronDown } from '@joymify/icons/react';
 
 export interface FAQItem {
@@ -22,7 +22,7 @@ export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
   className = '',
   ...props
 }, ref) => {
-  const uid = React.useId();
+  const uid = useId();
 
   // Until the reader toggles something, the open items are the ones marked defaultOpen; after that their choice wins.
   // The choice is stored by index: if `items` is reordered or inserted into afterwards, the same positions stay open.

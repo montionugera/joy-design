@@ -33,7 +33,6 @@ test('F-039 L4: Svelte proof files compile with zero warnings', () => {
   for (const name of NAMES) {
     assert.deepStrictEqual(compileSvelte(name).warnings.map((w) => w.code), [], `${name} compiles without warnings`);
   }
-  assert.strictEqual(compileSvelte('FAQSection').warnings.length, 0, 'state_referenced_locally is gone');
 });
 
 // ---------------------------------------------------------------- LogoCloud
@@ -160,10 +159,17 @@ test('F-039 L4: FAQSection chevron is an @joymify/icons icon inside the rotating
 // recorded template effects then write to the nodes, and the tests re-run those effects and read the attributes back.
 // It records WHICH node each delegated handler and each bind:this setter is attached to.
 const libFile = (name) => fileURLToPath(new URL(`../src/lib/${name}.svelte`, import.meta.url));
+const clientCode = new Map();
+const clientCodeFor = (name) => {
+  if (!clientCode.has(name)) {
+    clientCode.set(name, compile(fs.readFileSync(libFile(name), 'utf8'), { generate: 'client', filename: libFile(name) }).js.code
+      .replace(/^import .*$/gm, '')
+      .replace('export default function', 'function'));
+  }
+  return clientCode.get(name);
+};
 function runClient(name, props, { propsId = 'uid' } = {}) {
-  const code = compile(fs.readFileSync(libFile(name), 'utf8'), { generate: 'client', filename: libFile(name) }).js.code
-    .replace(/^import .*$/gm, '')
-    .replace('export default function', 'function');
+  const code = clientCodeFor(name);
   const created = [];
   const delegated = [];
   const binds = [];
@@ -267,8 +273,7 @@ test('F-039 L4: FAQ open state follows defaultOpen until the first click, then i
   props.items = [{ ...ITEMS[1], defaultOpen: true }, { ...ITEMS[0], defaultOpen: false }, ITEMS[2]];
   run.rerun();
   assert.deepStrictEqual(expanded(), [true, false, false], 'no click yet: follows the new defaultOpen (position 0)');
-  props.items = [ITEMS[1], ITEMS[2], { ...ITEMS[0], defaultOpen: false }];
-  props.items[2].defaultOpen = true;
+  props.items = [ITEMS[1], ITEMS[2], ITEMS[0]];
   run.rerun();
   assert.deepStrictEqual(expanded(), [false, false, true], 'no click yet: follows the new defaultOpen (position 2)');
   run.delegated[1].handler();
@@ -291,7 +296,7 @@ test('F-039 L4: allowMultiple keeps other items open and toggles each independen
 test('F-039 L4: StatsSection accepts an accessible name from the caller (no fixed English label baked in)', async () => {
   const root = openTag(await renderSvelte('StatsSection', { stats: STATS, 'aria-label': 'Key metrics' }));
   assert.match(root, /aria-label="Key metrics"/);
-  assert.ok(!openTag(await renderSvelte('StatsSection', { stats: STATS,  })).includes('aria-label'), 'unnamed by default');
+  assert.ok(!openTag(await renderSvelte('StatsSection', { stats: STATS })).includes('aria-label'), 'unnamed by default');
 });
 
 test('F-039 L4: ref is bound once per twin, on the root element, and writes the element back to the bindable prop', () => {

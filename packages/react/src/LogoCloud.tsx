@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 export interface LogoItem {
   name: string;
@@ -17,7 +17,7 @@ export const LogoCloud = React.forwardRef<HTMLElement, LogoCloudProps>(({
   className = '',
   ...props
 }, ref) => {
-  const titleId = `joy-logo-cloud-title-${React.useId()}`;
+  const titleId = `joy-logo-cloud-title-${useId()}`;
   return (
     <section ref={ref} className={`joy-logo-cloud ${className}`} aria-labelledby={title && !props['aria-label'] ? titleId : undefined} {...props}>
       {title && <p className="joy-logo-cloud__title" id={titleId}>{title}</p>}

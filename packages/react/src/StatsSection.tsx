@@ -37,20 +37,12 @@ export const StatsSection = React.forwardRef<HTMLElement, StatsSectionProps>(({
                   .filter(Boolean)
                   .join(' ')}
               >
-                {item.trend === 'up' && (
+                {(item.trend === 'up' || item.trend === 'down') && (
                   <>
                     <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="18 15 12 9 6 15" />
+                      <polyline points={item.trend === 'up' ? '18 15 12 9 6 15' : '6 9 12 15 18 9'} />
                     </svg>
-                    <span className="joy-stat-item__sr">Trend up:</span>
-                  </>
-                )}
-                {item.trend === 'down' && (
-                  <>
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                    <span className="joy-stat-item__sr">Trend down:</span>
+                    <span className="joy-stat-item__sr">{item.trend === 'up' ? 'Trend up:' : 'Trend down:'}</span>
                   </>
                 )}
                 {item.change}
