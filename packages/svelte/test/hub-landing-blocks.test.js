@@ -82,6 +82,22 @@ test('T2: the drift check catches the tag defect the taste review found (a bare 
   });
 });
 
+test('T2 fix: the render-id rewrite (s<digits> to sim<digits>) touches attribute values only, never text or SVG path data', () => {
+  withScratch((scratch) => {
+    // Text and path data that look like a render id sit in the generated region; ids and aria refs must still be renamed.
+    mutate(scratch, 'LandingPage.svelte', '<Smartphone size="1.5rem" />', '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M0 0 s1.5 2 3 4 s2 1" /></svg>');
+    mutate(scratch, 'LandingPage.svelte', 'title="Tables that fit phones"', 'title="Tables that fit s2 phones"');
+    const write = spawnSync(process.execPath, [generator, '--write', '--root', scratch], { encoding: 'utf8', timeout: 120000 });
+    assert.equal(write.status, 0, `${write.stderr}${write.stdout}`);
+    const out = fs.readFileSync(path.join(scratch, 'apps/storybook-hub/build.js'), 'utf8');
+    assert.ok(out.includes('d="M0 0 s1.5 2 3 4 s2 1"'), 'SVG path data is untouched');
+    assert.ok(out.includes('Tables that fit s2 phones'), 'visible text is untouched');
+    assert.ok(!/sim1\.5|sim2 phones/.test(out), 'no rewritten text or path data');
+    assert.match(out, /id="sim\d+-trigger-0"/, 'FAQ trigger ids are still renamed');
+    assert.match(out, /aria-controls="sim\d+-answer-0"/, 'aria references are still renamed');
+  });
+});
+
 // ── T2: the simulator copy rules (plain words, one brand, sentence-case headings), read from the source of build.js ──
 const buildSource = fs.readFileSync(path.join(repoRoot, 'apps/storybook-hub/build.js'), 'utf8');
 const region = (name) => {

@@ -72,6 +72,7 @@ test.describe("simulator body (generated from the components)", () => {
           cards: root.querySelectorAll("#sim-pricing .joy-pricing-card").length,
           featured: root.querySelectorAll("#sim-pricing .joy-pricing-card--featured").length,
           tables: root.querySelectorAll("#sim-pricing table.joy-pricing-matrix__table").length,
+          disclosure: /features heading and (a )?pricing/.test(document.getElementById("view-landing-preview")!.textContent ?? ""),
           brands: Array.from(new Set((root.textContent ?? "").match(/Joymify (?:Design|Quant)/g) ?? [])),
         };
       }, SIM);
@@ -91,6 +92,7 @@ test.describe("simulator body (generated from the components)", () => {
       expect(facts.featured, "one featured plan").toBe(1);
       expect(facts.tables, "the comparison table").toBe(1);
       expect(facts.brands, "one brand name on the page").toEqual(["Joymify Design"]);
+      expect(facts.disclosure, "the hub text says the features heading and pricing are added around the component output").toBe(true);
     });
 
     test(`${theme}: feature tags are padded chips, not bare text highlights`, async ({ page }) => {
@@ -109,7 +111,7 @@ test.describe("simulator body (generated from the components)", () => {
       }
     });
 
-    test(`${theme}: page ids are unique and no bare joy-badge is left`, async ({ page }) => {
+    test(`${theme}: page ids are unique and every badge has a size class`, async ({ page }) => {
       await open(page, "landing-preview", 1280, theme);
       const dup = await page.evaluate(() => {
         const seen = new Map<string, number>();
@@ -117,6 +119,8 @@ test.describe("simulator body (generated from the components)", () => {
         return [...seen].filter(([, n]) => n > 1).map(([id]) => id);
       });
       expect(dup, "duplicate ids in the hub document").toEqual([]);
+      const bare = await page.evaluate((sim) => Array.from(document.querySelectorAll<HTMLElement>(`${sim} .joy-badge`)).filter((b) => !/\bjoy-badge--(sm|md)\b/.test(b.className)).length, SIM);
+      expect(bare, "badges without a size modifier (no padding)").toBe(0);
     });
   }
 
@@ -208,7 +212,7 @@ test.describe("blocks view tells the truth", () => {
   for (const theme of themes) {
     test(`${theme} 1280px: uniform grid columns match the label, plan cards fill their rows`, async ({ page }) => {
       await open(page, "landing-blocks", 1280, theme);
-      const pricing = await page.evaluate(measureRows, { root: "#view-landing-blocks", sels: [".joy-pricing-fit .joy-pricing-matrix"] });
+      const pricing = await page.evaluate(measureRows, { root: "#view-landing-blocks", sels: [".joy-pricing-matrix:not(.joy-pricing-matrix--table)"] });
       const facts = await page.evaluate(() => {
         const grid = document.getElementById("blocks-feature-uniform")!;
         const label = grid.closest(".landing-demo__group")!.querySelector(".landing-demo__label")!.textContent!.trim();

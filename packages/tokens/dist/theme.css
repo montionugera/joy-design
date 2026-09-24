@@ -2919,17 +2919,23 @@ h1, h2, h3, .joy-display {
 
 /* Pricing Matrix */
 .joy-pricing-matrix {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
 }
-@media (max-width: 899px) {
-  .joy-pricing-matrix {
-    grid-template-columns: 1fr;
-  }
+/* Plan cards wrap by the width they have and grow to fill their row, so a card never sits alone next to an empty cell:
+   16rem basis means one column below ~34rem, three across from ~51rem, and a short last row stretches. Four cards use a
+   wider basis so they read as 2 by 2 instead of 3 + 1. No viewport query and no container: it holds in a narrow frame. */
+.joy-pricing-matrix:not(.joy-pricing-matrix--table) > * {
+  box-sizing: border-box;
+  flex: 1 1 min(100%, 16rem);
+  min-width: 0;
+}
+.joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(4):last-child) > * {
+  flex-basis: min(100%, 24rem);
 }
 /* Data variant (columns + rows): a real table inside a scroll region, not the card grid. */
 .joy-pricing-matrix--table {
@@ -5917,43 +5923,5 @@ a.joy-logo-cloud__item:focus-visible {
 }
 .joy-landing-page__pricing > .joy-pricing-matrix + .joy-pricing-matrix {
   margin-top: 32px;
-}
-  /* Plan cards never leave an empty cell: the columns follow the width of the section (not the window, a frame or a sidebar
-     can be narrower) and the card count. One column by default, two from 32rem with an odd last card taking its row, and
-     three from 50rem when there are exactly three cards. Designed for one to four cards; more fall back to auto-fit.
-     (Indented on purpose: the CSS tests end a block at the next comment that starts a line.) */
-.joy-landing-page__pricing,
-.joy-pricing-fit {
-  container-type: inline-size;
-  container-name: joy-pricing;
-}
-.joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table),
-.joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) {
-  grid-template-columns: minmax(0, 1fr);
-}
-@container joy-pricing (min-width: 32rem) {
-  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table),
-  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :last-child:nth-child(odd):not(:only-child),
-  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :last-child:nth-child(odd):not(:only-child) {
-    grid-column: 1 / -1;
-  }
-  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(5)),
-  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(5)) {
-    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
-  }
-}
-@container joy-pricing (min-width: 50rem) {
-  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child),
-  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  /* The :has() carries the specificity needed to undo the odd-last span above (indented on purpose, see above). */
-  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) > :nth-child(3):last-child,
-  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) > :nth-child(3):last-child {
-    grid-column: auto;
-  }
 }
 

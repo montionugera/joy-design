@@ -474,8 +474,19 @@ test('F-039 L2 CSS: check icons use status-success-fg and the CTA keeps a 44px t
   assert.match(rule(pricingBlock, '.joy-pricing-card__cta'), /min-height:\s*max\(44px,\s*var\(--joy-control-height-md\)\)/);
 });
 
-test('F-039 L2 CSS: matrix stacks to one column under 900px and the table variant scrolls with a sticky first column', () => {
-  assert.match(pricingBlock, /@media \(max-width: 899px\) \{\s*\.joy-pricing-matrix \{\s*grid-template-columns: 1fr;/);
+test('F-039 L2 + T2 CSS: plan cards wrap by their own width and fill their row (no empty cell), and the table variant scrolls with a sticky first column', () => {
+  // T2 fix round 1 replaced the auto-fit grid (three cards in an 886px column left one alone, 5 or 7 cards left empty cells)
+  // and its 900px stack with a wrapping flex row whose items grow: one column when narrow, a short last row stretches.
+  const grid = rule(pricingBlock, '.joy-pricing-matrix');
+  assert.match(grid, /display:\s*flex/);
+  assert.match(grid, /flex-wrap:\s*wrap/);
+  assert.ok(!/grid-template-columns/.test(grid), 'the card branch is no longer a fixed-track grid');
+  const cards = rule(pricingBlock, '.joy-pricing-matrix:not(.joy-pricing-matrix--table) > \\*');
+  assert.match(cards, /flex:\s*1 1 min\(100%, 16rem\)/, 'cards grow to fill the row and go one column when narrow');
+  assert.match(cards, /box-sizing:\s*border-box/, 'the basis counts the card padding');
+  assert.match(cards, /min-width:\s*0/);
+  assert.match(rule(pricingBlock, '.joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(4):last-child) > \\*'), /flex-basis:\s*min\(100%, 24rem\)/, 'four cards read as 2 by 2');
+  assert.ok(!/@container|@media/.test(pricingBlock.slice(pricingBlock.indexOf('.joy-pricing-matrix {'), pricingBlock.indexOf('/* Data variant'))), 'no viewport or container query: it holds in a narrow hub frame');
   assert.match(rule(pricingBlock, '.joy-pricing-matrix--table'), /display:\s*block/);
   const scroll = rule(pricingBlock, '.joy-pricing-matrix__scroll');
   assert.match(scroll, /overflow-x:\s*auto/);
@@ -1078,12 +1089,8 @@ test('F-039 T2 CSS: the section heading uses the display scale like the FAQ titl
   for (const token of ['--joy-text-primary', '--joy-text-secondary']) assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
 });
 
-test('F-039 T2 CSS: plan cards follow the section width by card count (container query), one column by default', () => {
-  assert.match(sectionsBlock, /container-type:\s*inline-size/);
-  assert.match(sectionsBlock, /@container joy-pricing \(min-width: 32rem\)/);
-  assert.match(sectionsBlock, /@container joy-pricing \(min-width: 50rem\)/);
-  assert.match(sectionsBlock, /:has\(> :nth-child\(3\):last-child\)/, 'exactly three cards get three columns');
-  assert.match(sectionsBlock, /:last-child:nth-child\(odd\):not\(:only-child\)/, 'an odd last card takes its row instead of leaving an empty cell');
-  assert.ok(!/@media/.test(sectionsBlock), 'no viewport query: a hub frame or sidebar can be narrower than the window');
-  assert.ok(sectionsBlock.includes(':not(.joy-pricing-matrix--table)'), 'the data table variant keeps its own layout');
+test('F-039 T2 CSS: the pricing section wrapper only pads and spaces; the card layout lives in the component rule', () => {
+  assert.ok(!/container-type|@container|@media|:has\(/.test(sectionsBlock), 'no container, no query: PricingMatrix lays itself out');
+  assert.match(rule(sectionsBlock, '.joy-landing-page__pricing'), /padding:\s*0 24px/);
+  assert.ok(!themeCss.includes('.joy-pricing-fit'), 'no hub-only utility class ships in theme.css');
 });

@@ -302,8 +302,8 @@ ${group('Spans from the col-span-N alias', await bentoSpans(true, 'blocks-bento-
 
 sections.push(box('Pricing cards (PricingCard)', 'Three plans with the featured card marked, then the loading and disabled button states.',
   `<div class="landing-demo__stack">
-${group('Default and featured', `<div class="joy-pricing-fit">${await R('PricingMatrix', { label: 'Pricing plans' }, pricingCards.join(''))}</div>`)}
-${group('Loading and disabled', `<div class="joy-pricing-fit">${await R('PricingMatrix', { label: 'Pricing plan states' }, pricingStates.join(''))}</div>`)}
+${group('Default and featured', await R('PricingMatrix', { label: 'Pricing plans' }, pricingCards.join('')))}
+${group('Loading and disabled', await R('PricingMatrix', { label: 'Pricing plan states' }, pricingStates.join('')))}
 </div>`));
 
 sections.push(box('Plan comparison table', 'A real table in a scroll region. The first column stays pinned when the table scrolls sideways.', matrix));
@@ -338,10 +338,14 @@ if (mainStart < 0 || mainEnd < mainStart || footerStart < mainEnd || footerEnd <
   console.error('LandingPage render has no <main tabindex="-1">...</main> followed by <footer class="joy-site-footer">');
   process.exit(2);
 }
+// The `s<digits>` render ids are rewritten inside attribute values only (id, for, href, aria-*), so visible text and SVG path
+// data such as `d="M0 0 s1.5 2"` can never match.
 const simIds = (html) =>
   html
-    .replace(/\bs(\d+)\b/g, 'sim$1')
-    .replace(/(id|href)="#?(features|telemetry|faq)"/g, (m, attr, name) => `${attr}="${attr === 'href' ? '#' : ''}sim-${name}"`)
+    .replace(/(\s(?:id|for|href|aria-[a-z]+)=")([^"]*)"/g, (_, open, value) => {
+      const renamed = value.replace(/\bs(\d+)\b/g, 'sim$1').replace(/^#?(features|telemetry|faq)$/, (m, name) => `${m.startsWith('#') ? '#' : ''}sim-${name}`);
+      return `${open}${renamed}"`;
+    })
     .replace(/class="joy-faq-item__trigger"/g, 'class="joy-faq-item__trigger" onclick="toggleFaq(this)"');
 let simMain = simIds(page.slice(mainStart, mainEnd));
 const simFooter = simIds(page.slice(footerStart, footerEnd));
