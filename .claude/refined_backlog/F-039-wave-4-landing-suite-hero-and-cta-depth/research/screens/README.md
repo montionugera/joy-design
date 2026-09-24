@@ -12,7 +12,7 @@ when the view is taller than Chromium's 16384px screenshot limit, as `landing-bl
 | Name | What it shows |
 | --- | --- |
 | `landing-preview-*` | Full "Landing Page Simulator" hub view (`#landing-preview`): simulator toolbar plus the whole simulated page, generated from the real components (header, hero, features heading, bento, pricing section, FAQ, CTA band, footer); the features heading and pricing section are added by the simulator around `LandingPage` output |
-| `landing-blocks-*` | Full "Landing Blocks" hub view (`#landing-blocks`), split into parts (2 at 1280, 4 at 375; the 375 `-part4` is a 595px closing strip) |
+| `landing-blocks-*` | Full "Landing Blocks" hub view (`#landing-blocks`), split into parts (2 at 1280, 3 at 375) |
 | `landing-page-simulator-*` | Only the `#simulator-page-container` element: the simulated page itself without the hub toolbar |
 | `drawer-open-*` | Landing header menu opened on the preview at 375px (the Wave 3 Drawer as a bottom sheet with the navigation links) |
 | `hero-states-*` | "Hero states (HeroSection)" block: default with title emphasis, primary loading, primary disabled, both buttons as links |
@@ -21,13 +21,13 @@ when the view is taller than Chromium's 16384px screenshot limit, as `landing-bl
 | `pricing-comparison-*` | "Plan comparison table" block |
 
 Every name exists at both widths in both themes except `drawer-open` (see below): 8 names x 4 = 32 states, minus the two
-`drawer-open-*-1280x800` states = 30 states; `landing-blocks` adds `-partN` files, so the folder holds 38 PNGs.
+`drawer-open-*-1280x800` states = 30 states; `landing-blocks` adds `-partN` files, so the folder holds 36 PNGs.
 Element shots (`landing-page-simulator`, blocks) are the element's own box, so their width is the hub content column minus
 padding (for example 347 or 936 px), not the nominal viewport width.
 
-Refreshed after the final fixes (stats pill wraps, hub blocks stats padding, 479px breakpoint, FAQ copy): same 38 file names as before,
-none stale, none added; the 375px `landing-blocks-*-part4` closing strips are byte-identical and every other 375px page shot changed
-height or content; every file is under 1 MB (largest `landing-blocks-dark-1280x800-part1`, 0.95 MB).
+Refreshed after the taste-review fixes (simulator now has a features heading and pricing section): the same 8 names at the same
+widths and themes as before, 36 PNGs, stale ones removed (the two 375px `landing-blocks-*-part4` strips no longer exist because the
+view now fits in 3 parts); every file is under 1 MB (largest `landing-blocks-dark-1280x800-part1`, 0.95 MB).
 
 ## Known deviations
 
