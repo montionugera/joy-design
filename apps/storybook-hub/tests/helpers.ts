@@ -1,4 +1,7 @@
 import { expect, type Page } from "@playwright/test";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 /**
  * Helpers shared by the F-038 specs (display-contracts.spec.ts, screens-f038.spec.ts) and the
@@ -363,4 +366,27 @@ export function expectReadableButtons(buttons: ButtonContrast[], expectedCount: 
     }
     expect(button.min, `${name} contrast (${button.className})`).toBeGreaterThanOrEqual(4.5);
   }
+}
+
+const manifestFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../src/navigation.manifest.json");
+const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8")) as {
+  categories: { views: { id: string }[] }[];
+};
+/** Every view id in the navigation manifest, in sidebar order (38 at the time of writing). */
+export const HUB_VIEWS: string[] = manifest.categories.flatMap((c) => c.views.map((v) => v.id));
+
+/** Hub chrome (F-040 decision 3). Component demo markup (.joy-*) is not chrome. */
+export const HUB_CHROME = [
+  ".topbar", ".topbar *", ".sidebar", ".sidebar *", ".sidebar-backdrop",
+  ".view-panel.active > h1", ".view-panel.active > h2", ".view-panel.active > .header-tagline",
+  ".view-panel.active .playground-header", ".view-panel.active .playground-header *",
+  ".view-panel.active .component-header", ".view-panel.active .component-header *",
+  ".view-panel.active .code-snippet", ".view-panel.active .tokens-table", ".view-panel.active .tokens-table *",
+].join(", ");
+
+/** Rendered size of the first element matching `selector`. */
+export async function hitSize(page: Page, selector: string) {
+  const box = await page.locator(selector).first().boundingBox();
+  if (!box) throw new Error(`hitSize: ${selector} is not rendered`);
+  return { width: box.width, height: box.height };
 }

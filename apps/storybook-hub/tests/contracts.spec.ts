@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { installContrastTools, installPageTools, setTheme, settle } from './helpers';
 
 test.describe('Storybook Hub Quality Contracts', () => {
 
@@ -150,6 +151,56 @@ test.describe('Storybook Hub Quality Contracts', () => {
     const errors: string[] = [];
     page.on('pageerror', err => errors.push(err.message));
     expect(errors).toEqual([]);
+  });
+
+  test('Contract 7: theme resolved before first paint, honours prefers-color-scheme, persists', async ({ browser }, info) => {
+    test.skip(info.project.name !== 'desktop-chrome', 'context-level colour scheme; one project is enough');
+    for (const scheme of ['light', 'dark'] as const) {
+      const context = await browser.newContext({ colorScheme: scheme, baseURL: info.project.use.baseURL });
+      const page = await context.newPage();
+      // The first requestAnimationFrame callback runs before the first paint.
+      await page.addInitScript(() => {
+        requestAnimationFrame(() => {
+          (window as any).__themeAtFirstFrame = document.documentElement.getAttribute('data-theme');
+        });
+      });
+      await page.goto('/');
+      await page.waitForFunction(() => (window as any).__themeAtFirstFrame !== undefined);
+      expect(await page.evaluate(() => (window as any).__themeAtFirstFrame), `first frame, OS ${scheme}`).toBe(scheme);
+
+      const toggle = page.locator('#btn-theme-toggle');
+      const other = scheme === 'light' ? 'dark' : 'light';
+      await expect(toggle).toHaveAttribute('aria-label', `Switch to ${other} theme`);
+      await toggle.click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', other);
+      await page.reload();
+      await page.waitForFunction(() => (window as any).__themeAtFirstFrame !== undefined);
+      expect(await page.evaluate(() => (window as any).__themeAtFirstFrame), 'saved choice beats the OS').toBe(other);
+      await expect(page.locator('#btn-theme-toggle')).toHaveAttribute('aria-label', `Switch to ${scheme} theme`);
+      await context.close();
+    }
+  });
+
+  test('Contract 8: topbar and sidebar text contrast >= 4.5 in both themes at 375 and 1280', async ({ page }, info) => {
+    test.skip(info.project.name !== 'desktop-chrome', 'viewports are set explicitly');
+    for (const width of [375, 1280]) {
+      await page.goto('about:blank'); // fresh document per viewport
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/#overview');
+      await page.waitForLoadState('networkidle');
+      await installPageTools(page);
+      await installContrastTools(page);
+      if (width < 900) await page.locator('#mobile-menu-toggle').click();
+      await settle(page);
+      for (const theme of ['light', 'dark'] as const) {
+        await setTheme(page, theme);
+        for (const root of ['.topbar', '.sidebar']) {
+          const result = await page.evaluate(([sel]) => window.__lowContrast(document.querySelector(sel)!, 4.5), [root]);
+          expect(result.checked, `${root} ${theme} ${width}: sweep found text`).toBeGreaterThan(0);
+          expect(result.failures, `${root} ${theme} ${width}`).toEqual([]);
+        }
+      }
+    }
   });
 
 });

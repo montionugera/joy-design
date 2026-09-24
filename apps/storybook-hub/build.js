@@ -539,6 +539,16 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('joy-theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <title>Joymify Design System & Component Portal</title>
   <style id="joy-theme-inline">
 ${inlinedThemeCss}
@@ -550,6 +560,20 @@ ${inlinedThemeCss}
   <style>
     :root {
       --sidebar-width: 280px;
+      --hub-sidebar-bg: var(--joy-surface-card);
+      --hub-topbar-bg: var(--joy-surface-card);
+      --hub-chrome-border: var(--joy-border-default);
+      --hub-code-bg: var(--joy-surface-sunken);
+      --hub-code-fg: var(--joy-text-primary);
+      --hub-drawer-edge: var(--joy-elevation-3);
+    }
+    [data-theme="dark"] {
+      --hub-sidebar-bg: var(--joy-surface-card);
+      --hub-topbar-bg: var(--joy-surface-card);
+      --hub-chrome-border: var(--joy-border-strong);
+      --hub-code-bg: var(--joy-surface-sunken);
+      --hub-code-fg: var(--joy-text-primary);
+      --hub-drawer-edge: 1px 0 0 var(--joy-border-strong);
     }
     * {
       box-sizing: border-box;
@@ -579,8 +603,8 @@ ${inlinedThemeCss}
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background: var(--joy-surface-card);
-      border-right: 1px solid var(--joy-border-default);
+      background: var(--hub-sidebar-bg);
+      border-right: 1px solid var(--hub-chrome-border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -615,7 +639,7 @@ ${inlinedThemeCss}
     }
     .brand-info span {
       font-size: 0.75rem;
-      color: var(--joy-accent-default);
+      color: var(--joy-accent-text);
       font-weight: 600;
     }
     .nav {
@@ -667,8 +691,8 @@ ${inlinedThemeCss}
     }
     .topbar {
       min-height: 60px;
-      border-bottom: var(--joy-border-hairline);
-      background: var(--joy-surface-overlay);
+      border-bottom: 1px solid var(--hub-chrome-border);
+      background: var(--hub-topbar-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       padding: 0 32px;
@@ -705,7 +729,7 @@ ${inlinedThemeCss}
     }
     .framework-btn.active {
       background: var(--joy-surface-card);
-      color: var(--joy-accent-default);
+      color: var(--joy-accent-text);
       box-shadow: 0 1px 4px transparent;
     }
     .content-area {
@@ -713,6 +737,19 @@ ${inlinedThemeCss}
       width: 100%;
       margin: 0 auto;
       padding: 36px 32px 64px;
+    }
+    /* Overview landing cards: keyboard-reachable (role="link" + tabindex), not inline styles. */
+    .hub-card {
+      display: block;
+      background: var(--joy-surface-card);
+      border: 1px solid var(--hub-chrome-border);
+      border-radius: var(--joy-radius-lg);
+      padding: var(--joy-space-6);
+      cursor: pointer;
+    }
+    .hub-card:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: 2px;
     }
 
     /* Component Canvas & Docs */
@@ -837,7 +874,7 @@ ${inlinedThemeCss}
       grid-template-columns: minmax(0, 1fr);
     }
     /* The always-open Tooltip demo sits on the tooltip layer, above modals and drawers; hide it while a hub dialog is open so it does not float over the overlay. */
-    body:has([data-hub-dialog][style*="display: block"]) .joy-tooltip[data-static] {
+    body.hub-dialog-open .joy-tooltip[data-static] {
       visibility: hidden;
     }
     .hub-matrix__cell {
@@ -902,25 +939,15 @@ ${inlinedThemeCss}
       border-collapse: collapse;
       font-size: 0.875rem;
     }
-    [data-theme="dark"] .controls-table {
-      background: var(--joy-surface-card);
-      border-top-color: var(--joy-text-secondary);
-    }
     .controls-table td {
       padding: 14px 24px;
       border-bottom: 1px solid var(--joy-surface-sunken);
       vertical-align: middle;
     }
-    [data-theme="dark"] .controls-table td {
-      border-bottom-color: var(--joy-surface-raised);
-    }
     .controls-table td:first-child {
       font-weight: 600;
       color: var(--joy-text-secondary);
       width: 180px;
-    }
-    [data-theme="dark"] .controls-table td:first-child {
-      color: var(--joy-text-muted);
     }
     .segmented-control {
       display: inline-flex;
@@ -956,24 +983,10 @@ ${inlinedThemeCss}
       font-weight: 600;
       box-shadow: 0 1px 3px transparent, 0 1px 2px transparent;
     }
-    [data-theme="dark"] .segmented-control {
-      background: var(--joy-surface-canvas);
-      border-color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .segment-btn {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .segment-btn:hover {
-      color: var(--joy-text-primary);
-    }
-    [data-theme="dark"] .segment-btn.active {
-      background: var(--joy-surface-raised);
-      color: var(--joy-text-primary);
-      box-shadow: 0 1px 3px transparent;
-    }
     .code-snippet {
-      background: var(--joy-surface-inverse);
-      color: var(--joy-text-inverse);
+      background: var(--hub-code-bg);
+      color: var(--hub-code-fg);
+      border: 1px solid var(--hub-chrome-border);
       padding: 16px 20px;
       border-radius: 8px;
       font-family: var(--joy-font-family-mono);
@@ -1027,72 +1040,10 @@ ${inlinedThemeCss}
     }
 
     /* ── Coherent Dark Mode Overrides for Hub UI ── */
-    [data-theme="dark"] body {
-      background-color: var(--joy-surface-canvas);
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .sidebar {
-      background: var(--joy-surface-card);
-      border-right-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .brand {
-      border-bottom-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .brand-info h2 {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .nav-section {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .nav-item {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .nav-item:hover {
-      background: var(--joy-surface-raised);
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .nav-item.active {
-      background: var(--joy-accent-subtle);
-      color: var(--joy-accent-text);
-    }
-    [data-theme="dark"] .topbar {
-      background: transparent;
-      border-bottom-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .framework-pill {
-      background: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .framework-btn {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .framework-btn.active {
-      background: var(--joy-surface-card);
-      color: var(--joy-accent-text);
-    }
     [data-theme="dark"] .playground-box {
       background: var(--joy-surface-card);
       border-color: var(--joy-surface-raised);
       box-shadow: 0 4px 12px transparent;
-    }
-    [data-theme="dark"] .playground-header {
-      background: var(--joy-surface-raised);
-      border-bottom-color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .playground-header h4 {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .tokens-table {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .tokens-table th {
-      background: var(--joy-surface-raised);
-      border-bottom-color: var(--joy-text-secondary);
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .tokens-table td {
-      border-bottom-color: var(--joy-surface-raised);
-      color: var(--joy-border-default);
     }
     /* Icon Gallery Styling */
     .icon-grid {
@@ -1132,47 +1083,11 @@ ${inlinedThemeCss}
       text-align: center;
       word-break: break-all;
     }
-    [data-theme="dark"] .icon-card {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .icon-card:hover {
-      border-color: var(--joy-accent-default);
-      box-shadow: 0 4px 12px transparent;
-    }
-    [data-theme="dark"] .icon-preview {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .icon-name {
-      color: var(--joy-text-muted);
-    }
 
-    /* Coherent Dark Mode for All Containers & Component Cards */
-    [data-theme="dark"] .header-tagline {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .content-area div[style*="background: var(--joy-surface-card)"] {
-      background: var(--joy-surface-card) !important;
-      border-color: var(--joy-surface-raised) !important;
-    }
-    [data-theme="dark"] .content-area div[style*="background: var(--joy-surface-raised)"] {
-      background: var(--joy-surface-raised) !important;
-      border-color: var(--joy-text-secondary) !important;
-    }
     [data-theme="dark"] .component-card {
       background: var(--joy-surface-card);
       border-color: var(--joy-surface-raised);
       box-shadow: 0 4px 12px transparent;
-    }
-    [data-theme="dark"] .component-header {
-      background: var(--joy-surface-raised);
-      border-bottom-color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .component-title {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .component-desc {
-      color: var(--joy-text-muted);
     }
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
@@ -1336,9 +1251,6 @@ ${inlinedThemeCss}
       font-size: 0.75rem;
       color: var(--joy-text-secondary);
     }
-    [data-theme="dark"] .kinetic-canvas-container {
-      border-color: var(--joy-surface-raised);
-    }
 
     /* ── Responsive Mobile & Tablet Rules ── */
     @media (max-width: 900px) {
@@ -1361,7 +1273,7 @@ ${inlinedThemeCss}
       }
       .sidebar.open {
         transform: translateX(0);
-        box-shadow: 6px 0 28px transparent;
+        box-shadow: var(--hub-drawer-edge);
       }
       .main {
         width: 100vw;
@@ -1565,20 +1477,6 @@ ${inlinedThemeCss}
       gap: 16px;
     }
 
-    /* Token-driven corrections keep the hub's chrome aligned with the component system. */
-    [data-theme="dark"] body,
-    [data-theme="dark"] .brand-info h2,
-    [data-theme="dark"] .nav-item:hover,
-    [data-theme="dark"] .playground-header h4,
-    [data-theme="dark"] .tokens-table th,
-    [data-theme="dark"] .icon-preview,
-    [data-theme="dark"] .component-title {
-      color: var(--joy-text-primary);
-    }
-    [data-theme="dark"] .topbar {
-      background: var(--joy-surface-overlay);
-      border-bottom-color: var(--joy-border-subtle);
-    }
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
     }
@@ -1664,11 +1562,11 @@ ${navigationHtml}
         <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
       </div>
       <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid var(--joy-border-default); flex-shrink: 0;">
+        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme" style="gap: 6px; border: 1px solid var(--joy-border-default); flex-shrink: 0;">
           <span id="theme-icon" style="display:inline-flex;align-items:center;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </span>
-          <span id="theme-label">Dark Mode</span>
+          <span id="theme-label">Dark theme</span>
         </button>
         <div class="framework-pill">
           <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
@@ -1693,7 +1591,7 @@ ${navigationHtml}
         </p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px;">
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('tokens')">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/tokens" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
@@ -1703,7 +1601,7 @@ ${navigationHtml}
             </p>
           </div>
 
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('button'); setFramework('svelte');">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/svelte" onclick="switchView('button'); setFramework('svelte');" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Svelte 5 Runes</span>
             </div>
@@ -1713,7 +1611,7 @@ ${navigationHtml}
             </p>
           </div>
 
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('button'); setFramework('react');">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/react" onclick="switchView('button'); setFramework('react');" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> React 19 Ready</span>
             </div>
@@ -1723,7 +1621,7 @@ ${navigationHtml}
             </p>
           </div>
 
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('tokens')">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open Modern & Utility postures" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> OpenDesign Postures</span>
             </div>
@@ -5628,31 +5526,45 @@ export async function executeHedge(symbol: string, size: number) {
     let isBtnLoading = false;
     let isSwitchOn = false;
 
+    /** Sets the theme toggle's icon, visible label and aria-label from the CURRENT theme (the state to switch away from). */
+    function syncThemeToggle(theme) {
+      const btn = document.getElementById('btn-theme-toggle');
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      const next = theme === 'dark' ? 'light' : 'dark';
+      if (icon) {
+        icon.innerHTML = theme === 'dark'
+          ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
+          : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+      }
+      if (label) {
+        label.innerText = theme === 'dark' ? 'Light theme' : 'Dark theme';
+      }
+      if (btn) {
+        btn.setAttribute('aria-label', 'Switch to ' + next + ' theme');
+      }
+    }
+
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('joy-theme', next); } catch (e) {}
-      const icon = document.getElementById('theme-icon');
-      const label = document.getElementById('theme-label');
-      if (icon) {
-        icon.innerHTML = next === 'dark'
-          ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
-          : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
-      }
-      if (label) {
-        label.innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
-      }
+      syncThemeToggle(next);
       redrawHubCharts();
     }
 
-    // Restore saved theme on startup
-    try {
-      const savedTheme = localStorage.getItem('joy-theme');
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', savedTheme);
+    document.addEventListener('DOMContentLoaded', () => {
+      syncThemeToggle(document.documentElement.getAttribute('data-theme'));
+    });
+
+    /** Enter/Space activates a role="link" .hub-card the same as a click (native <a>/<button> behaviour). */
+    function hubCardActivate(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.currentTarget.click();
       }
-    } catch (e) {}
+    }
 
     function toggleMobileMenu(open) {
       const sidebar = document.querySelector('.sidebar');
@@ -6277,6 +6189,7 @@ export async function executeHedge(symbol: string, size: number) {
       const container = document.getElementById(containerId);
       container._hubOpener = document.activeElement;
       container.style.display = 'block';
+      document.body.classList.toggle('hub-dialog-open', true);
       const target = container.querySelector(focusSelector);
       if (target) target.focus();
     }
@@ -6284,6 +6197,8 @@ export async function executeHedge(symbol: string, size: number) {
       hubClosePanels();
       const container = document.getElementById(containerId);
       container.style.display = 'none';
+      const stillOpen = Array.from(document.querySelectorAll('[data-hub-dialog]')).some(function (c) { return c.style.display === 'block'; });
+      document.body.classList.toggle('hub-dialog-open', stillOpen);
       const opener = container._hubOpener;
       container._hubOpener = null;
       if (opener && opener.isConnected && opener.focus) opener.focus();
