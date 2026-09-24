@@ -53,7 +53,7 @@ export const TestimonialCard = forwardRef<HTMLDivElement, TestimonialCardProps>(
               <img className="joy-avatar__image" src={avatarSrc} alt="" />
             ) : (
               <span className="joy-avatar__fallback" aria-hidden="true">
-                {avatarInitials || authorName.slice(0, 2).toUpperCase()}
+                {avatarInitials || Array.from(authorName).slice(0, 2).join('').toUpperCase()}
               </span>
             )}
           </div>

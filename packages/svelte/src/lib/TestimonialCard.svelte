@@ -46,7 +46,7 @@
 			{#if avatarSrc}
 				<img class="joy-avatar__image" src={avatarSrc} alt="" />
 			{:else}
-				<span class="joy-avatar__fallback" aria-hidden="true">{avatarInitials || authorName.slice(0, 2).toUpperCase()}</span>
+				<span class="joy-avatar__fallback" aria-hidden="true">{avatarInitials || Array.from(authorName).slice(0, 2).join('').toUpperCase()}</span>
 			{/if}
 		</div>
 		<div class="joy-testimonial-card__author-info">

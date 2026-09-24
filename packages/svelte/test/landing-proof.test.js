@@ -136,6 +136,19 @@ test('F-039 L4: TestimonialCard initials fall back to the first two letters, and
   assert.ok(!(await testimonial()).includes('<p>'), 'no role, no role paragraph');
 });
 
+test('F-039 G1: TestimonialCard initials never split a surrogate pair', async () => {
+  const initialsOf = (markup) => markup.match(/joy-avatar__fallback" aria-hidden="true">([^<]*)<\/span>/)[1];
+  const loneSurrogate = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+  // U+20BB7 (a CJK letter outside the BMP) and U+1D400 (mathematical bold A) are each two UTF-16 code units
+  for (const name of ['\u{20BB7}\u{91CE}\u{5BB6}', 'a\u{20BB7}', '\u{1D400}\u{1D401}\u{1D402}']) {
+    const initials = initialsOf(await testimonial({ authorName: name }));
+    assert.ok(!loneSurrogate.test(initials), `no lone surrogate in initials of ${JSON.stringify(name)}: ${JSON.stringify(initials)}`);
+    assert.strictEqual(Array.from(initials).length, 2, `two whole code points for ${JSON.stringify(name)}: ${JSON.stringify(initials)}`);
+  }
+  assert.strictEqual(initialsOf(await testimonial({ authorName: '\u{20BB7}\u{91CE}\u{5BB6}' })), '\u{20BB7}\u{91CE}');
+  assert.strictEqual(initialsOf(await testimonial({ authorName: 'ada lovelace' })), 'AD', 'BMP names keep the two-letter uppercase behaviour');
+});
+
 // ---------------------------------------------------------------- FAQSection
 
 const faq = (props = {}) => renderSvelte('FAQSection', { items: ITEMS, ...props });
