@@ -2975,7 +2975,7 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="landing-demo__stack">
               <div class="landing-demo__group">
                 <h5 class="landing-demo__label">
-                  Default with titleEmphasis
+                  Default with title emphasis
                 </h5>
                 <div class="landing-demo__frame">
                   <section class="joy-hero">
@@ -3070,7 +3070,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-3">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Speed
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -3085,7 +3085,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      WCAG 2.2 AA
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -3100,7 +3100,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Twin packages
+                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -3122,7 +3122,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-4">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Speed
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -3137,7 +3137,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      WCAG 2.2 AA
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -3152,7 +3152,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Twin packages
+                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -3167,7 +3167,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Data
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -3176,7 +3176,7 @@ export async function executeHedge(symbol: string, size: number) {
                       Dense financial tables
                     </h3>
                     <p class="joy-feature-card__desc">
-                      Sticky headers, right-aligned numbers and a stacked layout for phones keep long ledgers readable.
+                      Sticky headers, aligned numbers and a stacked layout for phones keep long ledgers readable.
                     </p>
                     <a href="#financial-table" class="joy-feature-card__link">Open the ledger</a>
                   </div>
@@ -3189,7 +3189,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-5">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Speed
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -3204,7 +3204,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      WCAG 2.2 AA
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -3219,7 +3219,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Twin packages
+                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -3234,7 +3234,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Data
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -3243,13 +3243,13 @@ export async function executeHedge(symbol: string, size: number) {
                       Dense financial tables
                     </h3>
                     <p class="joy-feature-card__desc">
-                      Sticky headers, right-aligned numbers and a stacked layout for phones keep long ledgers readable.
+                      Sticky headers, aligned numbers and a stacked layout for phones keep long ledgers readable.
                     </p>
                     <a href="#financial-table" class="joy-feature-card__link">Open the ledger</a>
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Security
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Security</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("LockClose", "22")}
@@ -3271,7 +3271,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-6">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Speed
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -3286,7 +3286,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      WCAG 2.2 AA
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -3301,7 +3301,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Twin packages
+                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -3316,7 +3316,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Data
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -3325,13 +3325,13 @@ export async function executeHedge(symbol: string, size: number) {
                       Dense financial tables
                     </h3>
                     <p class="joy-feature-card__desc">
-                      Sticky headers, right-aligned numbers and a stacked layout for phones keep long ledgers readable.
+                      Sticky headers, aligned numbers and a stacked layout for phones keep long ledgers readable.
                     </p>
                     <a href="#financial-table" class="joy-feature-card__link">Open the ledger</a>
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Security
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Security</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("LockClose", "22")}
@@ -3346,7 +3346,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Charts
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> Charts</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("CandlestickChart", "22")}
@@ -3368,7 +3368,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div class="joy-feature-grid joy-feature-grid--cols-3" id="blocks-feature-uniform">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Speed
+                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -3383,7 +3383,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      WCAG 2.2 AA
+                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -3398,7 +3398,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Twin packages
+                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -3413,7 +3413,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      Data
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -3422,7 +3422,7 @@ export async function executeHedge(symbol: string, size: number) {
                       Dense financial tables
                     </h3>
                     <p class="joy-feature-card__desc">
-                      Sticky headers, right-aligned numbers and a stacked layout for phones keep long ledgers readable.
+                      Sticky headers, aligned numbers and a stacked layout for phones keep long ledgers readable.
                     </p>
                     <a href="#financial-table" class="joy-feature-card__link">Open the ledger</a>
                   </div>
@@ -3550,7 +3550,7 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="landing-demo__stack">
               <div class="landing-demo__group">
                 <h5 class="landing-demo__label">
-                  joy-bento-card--col-N (BentoCard colSpan)
+                  Spans from BentoCard colSpan
                 </h5>
                 <div class="joy-bento-grid" id="blocks-bento-cols">
                   <div class="joy-bento-card joy-bento-card--col-12">
@@ -3642,7 +3642,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
               <div class="landing-demo__group">
                 <h5 class="landing-demo__label">
-                  joy-bento-card--col-span-N (alias)
+                  Spans from the col-span-N alias
                 </h5>
                 <div class="joy-bento-grid" id="blocks-bento-spans">
                   <div class="joy-bento-card joy-bento-card--col-span-12">
@@ -3739,7 +3739,7 @@ export async function executeHedge(symbol: string, size: number) {
         <div class="playground-box">
           <div class="playground-header">
             <h4>
-              Pricing cards (PricingCard, PricingMatrix)
+              Pricing cards (PricingCard)
             </h4>
           </div>
           <div class="landing-demo">
@@ -3883,7 +3883,7 @@ export async function executeHedge(symbol: string, size: number) {
         <div class="playground-box">
           <div class="playground-header">
             <h4>
-              Plan comparison (PricingMatrix table)
+              Plan comparison table
             </h4>
           </div>
           <div class="landing-demo">
@@ -4073,7 +4073,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Gateway uptime
                   </div>
                   <p class="joy-stat-item__desc">
-                    Active-active failover
+                    Two-site failover
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
                     <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> Zero unplanned downtime
@@ -4115,7 +4115,7 @@ export async function executeHedge(symbol: string, size: number) {
         <div class="playground-box">
           <div class="playground-header">
             <h4>
-              Testimonials (TestimonialCard)
+              Testimonials
             </h4>
           </div>
           <div class="landing-demo">
@@ -4177,7 +4177,7 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
           <div class="landing-demo">
             <p class="landing-demo__note">
-              The trigger is a button with aria-expanded and aria-controls; the answer stays in the page and is hidden while closed.
+              Each question is a button that reports whether its answer is open. The answer stays in the page and is hidden while closed.
             </p>
             <section class="joy-faq-section">
               <div class="joy-faq-section__header">
