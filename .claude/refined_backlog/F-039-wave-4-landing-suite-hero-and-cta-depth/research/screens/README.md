@@ -25,8 +25,9 @@ Every name exists at both widths in both themes except `drawer-open` (see below)
 Element shots (`landing-page-simulator`, blocks) are the element's own box, so their width is the hub content column minus
 padding (for example 347 or 936 px), not the nominal viewport width.
 
-Refreshed after the taste-review fixes (components and CSS, hub simulator): same 38 file names as before, none stale, none added;
-every file is under 1 MB (largest `landing-blocks-dark-1280x800-part1`, 0.95 MB).
+Refreshed after the final fixes (stats pill wraps, hub blocks stats padding, 479px breakpoint, FAQ copy): same 38 file names as before,
+none stale, none added; the 375px `landing-blocks-*-part4` closing strips are byte-identical and every other 375px page shot changed
+height or content; every file is under 1 MB (largest `landing-blocks-dark-1280x800-part1`, 0.95 MB).
 
 ## Known deviations
 
