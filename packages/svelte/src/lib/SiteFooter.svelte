@@ -70,7 +70,7 @@
                 href={link.href}
                 class="joy-site-footer__link"
                 target={link.external ? '_blank' : undefined}
-                aria-label={link.external ? `${link.label} (opens in new tab)` : undefined}
+                aria-label={link.external ? `${link.label} (opens in a new tab)` : undefined}
                 rel={link.external ? 'noopener noreferrer' : undefined}
               >
                 {link.label}
@@ -91,7 +91,7 @@
             href={social.href}
             class="joy-site-footer__social-link"
             title={social.name}
-            aria-label="{social.name} (opens in new tab)"
+            aria-label="{social.name} (opens in a new tab)"
             target="_blank"
             rel="noopener noreferrer"
           >

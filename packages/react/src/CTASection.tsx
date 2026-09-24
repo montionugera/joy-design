@@ -1,7 +1,7 @@
 import React from 'react';
 import { LandingAction } from './LandingAction.js';
 
-export interface CTASectionProps extends React.HTMLAttributes<HTMLElement> {
+export interface CTASectionProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   title: string;
   description?: string;
   primaryCtaText?: string;

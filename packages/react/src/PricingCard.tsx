@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import { Check } from '@joymify/icons/react';
 import { Button } from './Button.js';
 
-export interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PricingCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   title: string;
   description?: string;
   price: string;

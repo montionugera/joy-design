@@ -40,6 +40,7 @@ export type { BentoColSpan } from './BentoCard.svelte';
 export { default as HeroSection } from './HeroSection.svelte';
 export { default as PricingCard } from './PricingCard.svelte';
 export { default as PricingMatrix } from './PricingMatrix.svelte';
+export type { PricingMatrixRow } from './PricingMatrix.svelte';
 export { default as TestimonialCard } from './TestimonialCard.svelte';
 export { default as Steps, type StepItem } from './Steps.svelte';
 export { default as Timeline, type TimelineItem } from './Timeline.svelte';

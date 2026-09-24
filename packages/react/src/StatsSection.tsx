@@ -8,7 +8,7 @@ export interface StatItem {
   trend?: 'up' | 'down' | 'neutral';
 }
 
-export interface StatsSectionProps extends React.HTMLAttributes<HTMLElement> {
+export interface StatsSectionProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   stats: StatItem[];
 }
 

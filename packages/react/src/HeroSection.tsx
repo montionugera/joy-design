@@ -1,7 +1,7 @@
 import React from 'react';
 import { LandingAction } from './LandingAction.js';
 
-export interface HeroSectionProps extends React.HTMLAttributes<HTMLElement> {
+export interface HeroSectionProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   badgeText?: string;
   title?: string;
   titleEmphasis?: string;

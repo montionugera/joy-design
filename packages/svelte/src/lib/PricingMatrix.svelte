@@ -1,3 +1,10 @@
+<script lang="ts" module>
+	export interface PricingMatrixRow {
+		label: string;
+		values: Array<string | boolean>;
+	}
+</script>
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { Check, Minus } from '@joymify/icons';
@@ -9,7 +16,7 @@
 	// entry per column; a shorter or longer row renders a ragged table.
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
 		columns?: string[];
-		rows?: { label: string; values: Array<string | boolean> }[];
+		rows?: PricingMatrixRow[];
 		rowHeaderLabel?: string;
 		label?: string;
 		children?: Snippet;

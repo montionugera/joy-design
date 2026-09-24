@@ -1,6 +1,6 @@
 import React from 'react';
 
-export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface FeatureCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   title: string;
   description: string;
   icon?: React.ReactNode;

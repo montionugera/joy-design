@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-export interface TestimonialCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TestimonialCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   quote: string;
   authorName: string;
   authorRole?: string;

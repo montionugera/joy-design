@@ -65,7 +65,7 @@ test('F-039 L5a: an external column link opens in a new tab with rel and a discl
   }
   assert.strictEqual(attr(changelog, 'target'), '_blank');
   assert.strictEqual(attr(changelog, 'rel'), 'noopener noreferrer');
-  assert.strictEqual(attr(changelog, 'aria-label'), 'Changelog (opens in new tab)');
+  assert.strictEqual(attr(changelog, 'aria-label'), 'Changelog (opens in a new tab)');
   assert.ok(attr(changelog, 'aria-label').startsWith('Changelog'), 'the accessible name starts with the visible text');
 });
 
@@ -73,7 +73,7 @@ test('F-039 L5a: every social link carries the disclosure label, target and rel,
   const markup = await renderSvelte({ columns: COLUMNS, socialLinks: SOCIALS });
   const socials = tags(markup, 'a').filter((t) => attr(t, 'class') === 'joy-site-footer__social-link');
   assert.strictEqual(socials.length, 2);
-  assert.deepStrictEqual(socials.map((t) => attr(t, 'aria-label')), ['GitHub (opens in new tab)', 'Mastodon (opens in new tab)']);
+  assert.deepStrictEqual(socials.map((t) => attr(t, 'aria-label')), ['GitHub (opens in a new tab)', 'Mastodon (opens in a new tab)']);
   for (const t of socials) {
     assert.strictEqual(attr(t, 'target'), '_blank');
     assert.strictEqual(attr(t, 'rel'), 'noopener noreferrer');
@@ -85,7 +85,7 @@ test('F-039 L5a: every social link carries the disclosure label, target and rel,
 
 test('F-039 L5a: a social link without an icon shows its name as visible text (never an invisible 44px target)', async () => {
   const markup = await renderSvelte({ columns: COLUMNS, socialLinks: [{ name: 'Blog', href: 'https://example.com/blog' }] });
-  assert.match(markup, /<a href="https:\/\/example.com\/blog" class="joy-site-footer__social-link" title="Blog" aria-label="Blog \(opens in new tab\)" target="_blank" rel="noopener noreferrer">\s*Blog\s*<\/a>/);
+  assert.match(markup, /<a href="https:\/\/example.com\/blog" class="joy-site-footer__social-link" title="Blog" aria-label="Blog \(opens in a new tab\)" target="_blank" rel="noopener noreferrer">\s*Blog\s*<\/a>/);
   const withIcon = await renderSvelte({ columns: COLUMNS, socialLinks: [SOCIALS[0]] });
   assert.ok(!/>\s*GitHub\s*<\/a>/.test(withIcon), 'an icon replaces the text fallback');
 });

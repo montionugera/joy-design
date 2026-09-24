@@ -7,7 +7,7 @@ export interface FAQItem {
   defaultOpen?: boolean;
 }
 
-export interface FAQSectionProps extends React.HTMLAttributes<HTMLElement> {
+export interface FAQSectionProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   title?: string;
   subtitle?: string;
   items: FAQItem[];

@@ -6,7 +6,7 @@ export interface LogoItem {
   href?: string;
 }
 
-export interface LogoCloudProps extends React.HTMLAttributes<HTMLElement> {
+export interface LogoCloudProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   title?: string;
   logos: LogoItem[];
 }
