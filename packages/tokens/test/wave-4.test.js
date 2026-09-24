@@ -863,3 +863,72 @@ test('F-039 L5a CSS: every colour token the footer reads has a light and a dark 
     assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
   }
 });
+
+// ── F-039 L5b: LandingPage header / mobile menu CSS contract ──
+const pageStart = themeCss.indexOf('/* ── Landing Page Suite: LandingPage ── */');
+const pageEndRel = themeCss.slice(pageStart + 10).search(/\n\/\*/);
+const pageBlock = themeCss.slice(pageStart, pageEndRel === -1 ? undefined : pageStart + 10 + pageEndRel);
+
+test('F-039 L5b CSS: the LandingPage block exists, is tokens-only and has no blur, gradient text or tracked caps', () => {
+  assert.ok(pageStart > 0, 'the block opens with a top-level comment header');
+  for (const sel of ['.joy-landing-page', '.joy-landing-header', '.joy-landing-header__brand', '.joy-landing-header__nav', '.joy-landing-header__link', '.joy-landing-drawer__link', '.joy-landing-skip']) {
+    assert.ok(pageBlock.includes(sel), `${sel} is defined`);
+  }
+  assert.ok(!/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(pageBlock), 'no colour literal');
+  assert.ok(!/var\([^)]*,/.test(pageBlock), 'no var() fallback');
+  assert.ok(!/backdrop-filter|background-clip|text-transform:\s*uppercase|letter-spacing/.test(pageBlock));
+  assert.ok(!/--joy-color-|--gold-|--navy-/.test(pageBlock), 'no phantom or foreign tokens');
+  assert.ok(!/\[data-theme|\[data-palette/.test(pageBlock), 'dark treatment is token-driven; nothing keys off data-theme or data-palette');
+  assert.ok(!/@container/.test(pageBlock), 'a container-query root would contain the fixed drawer');
+});
+
+test('F-039 L5b CSS: the header is a centred flex row on space tokens, links and menu button are 44px targets', () => {
+  const head = rule(pageBlock, '.joy-landing-header');
+  assert.match(head, /display:\s*flex/);
+  assert.match(head, /justify-content:\s*space-between/);
+  assert.match(head, /max-width:\s*1200px/);
+  assert.match(head, /padding:\s*var\(--joy-space-4\) var\(--joy-space-6\)/);
+  assert.match(pageBlock, /\.joy-landing-header__link,\n\.joy-landing-drawer__link \{[^}]*min-height:\s*44px/, 'nav links (inline and in the drawer) are 44px tall');
+  const menu = rule(pageBlock, '.joy-landing-header .joy-landing-header__menu');
+  assert.match(menu, /display:\s*none/, 'hidden from 768px up');
+  assert.match(menu, /min-width:\s*44px/, 'icon-only has no width without a size class');
+  assert.match(menu, /min-height:\s*44px/, 'the medium control is 40px on fine pointers');
+});
+
+test('F-039 L5b CSS: below 768px (media query, not container) the inline nav is hidden and the menu button is shown', () => {
+  const phone = mediaBody(pageBlock, 'max-width: 767px');
+  assert.match(phone, /\.joy-landing-header__nav \{[^}]*display:\s*none/);
+  assert.match(phone, /\.joy-landing-header \.joy-landing-header__menu \{[^}]*display:\s*inline-flex/);
+  assert.ok(!/\.joy-landing-header__nav \{[^}]*display:\s*none/.test(pageBlock.replace(/@media[\s\S]*$/, '')), 'the nav is visible outside the media query');
+});
+
+test('F-039 L5b CSS: the page guards against sideways scroll and the skip link is off-screen until focused', () => {
+  assert.match(rule(pageBlock, '.joy-landing-page'), /overflow-x:\s*clip/);
+  assert.match(rule(pageBlock, '.joy-landing-skip'), /transform:\s*translateY\(-200%\)/);
+  assert.match(rule(pageBlock, '.joy-landing-skip:focus-visible'), /transform:\s*none/);
+  assert.match(rule(pageBlock, '.joy-landing-skip:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+});
+
+test('F-039 L5b contrast: header, drawer and skip-link text pass WCAG AA in both themes (computed)', () => {
+  const pairs = [
+    ['text-secondary', 'surface-canvas'],
+    ['text-primary', 'surface-canvas'],
+    ['accent-text', 'surface-canvas'],
+    ['text-primary', 'surface-card'],
+    ['text-inverse', 'surface-inverse']
+  ];
+  for (const theme of ['light', 'dark']) {
+    for (const [fg, bg] of pairs) {
+      const ratio = contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+      assert.ok(ratio >= 4.5, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1`);
+    }
+  }
+});
+
+test('F-039 L5b CSS: every colour token the LandingPage block reads has a light and a dark value', () => {
+  const used = [...new Set([...pageBlock.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]))].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
+  assert.ok(used.length >= 4, `sanity: ${used.join(', ')}`);
+  for (const token of used) {
+    assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
+  }
+});

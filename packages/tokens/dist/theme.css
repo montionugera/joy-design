@@ -5633,3 +5633,118 @@ a.joy-logo-cloud__item:focus-visible {
   }
 }
 
+/* ── Landing Page Suite: LandingPage ── */
+.joy-landing-page {
+  position: relative;
+  /* Guard only: the header collapses below 768px, so nothing should overflow, but a stray wide child must never scroll the page sideways. */
+  overflow-x: clip;
+}
+.joy-landing-page__slot {
+  max-width: 1200px;
+  margin: 0 auto 48px auto;
+  padding: 0 24px;
+}
+.joy-landing-page__features {
+  max-width: 1200px;
+  margin: 0 auto 48px auto;
+  padding: 0 24px;
+}
+.joy-landing-skip {
+  position: absolute;
+  top: var(--joy-space-2);
+  left: var(--joy-space-2);
+  z-index: var(--joy-z-sticky);
+  padding: var(--joy-space-2) var(--joy-space-4);
+  border-radius: var(--joy-radius-control);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  font-size: var(--joy-font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.joy-landing-skip:focus-visible {
+  transform: none;
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+}
+.joy-landing-header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--joy-space-4);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--joy-space-4) var(--joy-space-6);
+}
+.joy-landing-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-2);
+  min-width: 0;
+  font-size: var(--joy-font-size-xl);
+  font-weight: 800;
+  color: var(--joy-text-primary);
+  overflow-wrap: anywhere;
+}
+.joy-landing-header__brand > svg {
+  flex-shrink: 0;
+  color: var(--joy-accent-text);
+}
+.joy-landing-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-5);
+}
+.joy-landing-header__link,
+.joy-landing-drawer__link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--joy-font-size-sm);
+  font-weight: 600;
+  color: var(--joy-text-secondary);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-landing-header__link:hover,
+.joy-landing-drawer__link:hover {
+  color: var(--joy-text-primary);
+  text-decoration: underline;
+}
+.joy-landing-header__link:focus-visible,
+.joy-landing-drawer__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
+}
+.joy-landing-header .joy-landing-header__menu {
+  /* Two classes, so the base .joy-button display never wins over the desktop hide. */
+  display: none;
+  /* .joy-button--icon-only has no width without a size class, and the medium control is 40px on fine pointers. */
+  min-width: 44px;
+  min-height: 44px;
+}
+.joy-landing-drawer__nav {
+  display: flex;
+  flex-direction: column;
+}
+.joy-landing-drawer__link {
+  font-size: var(--joy-font-size-lg);
+  color: var(--joy-text-primary);
+}
+@media (max-width: 767px) {
+  .joy-landing-header {
+    padding: var(--joy-space-3) var(--joy-space-4);
+  }
+  .joy-landing-header__nav {
+    display: none;
+  }
+  .joy-landing-header .joy-landing-header__menu {
+    display: inline-flex;
+  }
+}
+
