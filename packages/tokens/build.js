@@ -2816,12 +2816,13 @@ h1, h2, h3, .joy-display {
 /* Testimonial Card */
 .joy-testimonial-card {
   border-radius: var(--joy-radius-card);
-  background-color: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
+  background-color: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
   box-shadow: var(--joy-elevation-2);
 }
 .joy-testimonial-card__stars {
@@ -2830,27 +2831,40 @@ h1, h2, h3, .joy-display {
   color: var(--joy-status-warning-fg);
 }
 .joy-testimonial-card__quote {
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  font-size: var(--joy-font-size-md);
+  line-height: 1.6;
   color: var(--joy-text-primary);
   font-style: italic;
   margin: 0;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 .joy-testimonial-card__author {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+/* The initials fallback is a quiet accent disc: accent-subtle with accent-text, in both themes. */
+.joy-testimonial-card .joy-avatar {
+  flex-shrink: 0;
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+}
+.joy-testimonial-card__author-info {
+  min-width: 0;
+}
 .joy-testimonial-card__author-info h6 {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 600;
   color: var(--joy-text-primary);
+  overflow-wrap: anywhere;
 }
 .joy-testimonial-card__author-info p {
   margin: 0;
-  font-size: 0.75rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
 }
 
 /* Steps (Ant Design Parity) */
@@ -4896,11 +4910,12 @@ h1, h2, h3, .joy-display {
   text-align: center;
 }
 .joy-logo-cloud__title {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 600;
-  
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   margin: 0 0 28px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-logo-cloud__logos {
   display: flex;
@@ -4909,20 +4924,42 @@ h1, h2, h3, .joy-display {
   flex-wrap: wrap;
   gap: 36px 48px;
 }
+/* Logos draw in currentColor: muted on the canvas, ink on hover. Colour logos (images) are greyed until hovered. */
 .joy-logo-cloud__item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.65;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  max-width: 100%;
+  color: var(--joy-text-muted);
   filter: grayscale(100%);
-  color: var(--joy-text-primary);
+  transition: color var(--joy-duration-fast) var(--joy-ease-out), filter var(--joy-duration-fast) var(--joy-ease-out);
   text-decoration: none;
 }
+.joy-logo-cloud__item svg,
+.joy-logo-cloud__item img {
+  max-width: 100%;
+  height: auto;
+}
+a.joy-logo-cloud__item {
+  min-width: 44px;
+  min-height: 44px;
+}
 .joy-logo-cloud__item:hover {
-  opacity: 1;
+  color: var(--joy-text-primary);
   filter: grayscale(0%);
-  transform: scale(1.04);
+}
+a.joy-logo-cloud__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 4px;
+  border-radius: var(--joy-radius-control);
+}
+@media (max-width: 480px) {
+  .joy-logo-cloud {
+    padding: 32px 16px;
+  }
+  .joy-logo-cloud__logos {
+    gap: 24px 28px;
+  }
 }
 
 /* ── Landing Page Suite: StatsSection ── */
@@ -4934,47 +4971,50 @@ h1, h2, h3, .joy-display {
 }
 .joy-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: 24px;
 }
 .joy-stat-item {
-  background-color: var(--joy-surface-card);
+  background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
   padding: 24px 20px;
+  min-width: 0;
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 .joy-stat-item__value {
   font-family: var(--joy-font-family-mono);
-  font-size: 2.25rem;
-  font-weight: 800;
+  font-size: var(--joy-font-size-3xl);
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   margin-bottom: 8px;
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__label {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 600;
   color: var(--joy-text-primary);
   margin-bottom: 4px;
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__desc {
-  font-size: 0.8125rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__change {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.75rem;
+  font-size: var(--joy-font-size-xs);
   font-weight: 700;
   margin-top: 8px;
   padding: 2px 8px;
-  border-radius: 9999px;
+  border-radius: var(--joy-radius-pill);
 }
 .joy-stat-item__change--positive {
   background: var(--joy-status-success-bg);
@@ -4983,6 +5023,35 @@ h1, h2, h3, .joy-display {
 .joy-stat-item__change--negative {
   background: var(--joy-status-danger-bg);
   color: var(--joy-status-danger-fg);
+}
+/* The arrow carries the trend visually; this says it in words for assistive tech. */
+.joy-stat-item__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+/* Phones: a compact 2x2 grid of smaller cards instead of four tall full-width ones. */
+@media (max-width: 480px) {
+  .joy-stats-section {
+    padding: 32px 16px;
+  }
+  .joy-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .joy-stat-item {
+    padding: 16px 12px;
+  }
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-xl);
+  }
 }
 
 /* ── Landing Page Suite: CTASection ── */
@@ -5074,15 +5143,20 @@ h1, h2, h3, .joy-display {
   margin-bottom: 36px;
 }
 .joy-faq-section__title {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: var(--joy-font-size-display-sm);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin: 0 0 12px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-faq-section__subtitle {
-  font-size: 1rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-md);
+  color: var(--joy-text-secondary);
   margin: 0;
+  text-wrap: pretty;
 }
 .joy-faq-list {
   display: flex;
@@ -5092,16 +5166,18 @@ h1, h2, h3, .joy-display {
 .joy-faq-item {
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-control);
-  background-color: var(--joy-surface-card);
+  background-color: var(--joy-surface-raised);
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-faq-item--open {
-  border-color: var(--joy-accent-default);
+  border-color: var(--joy-border-strong);
 }
+/* A real button: 44px tall, ink text; hover only tints the row (gold text on a light card fails contrast). */
 .joy-faq-item__trigger {
   width: 100%;
-  padding: 18px 20px;
+  min-height: 44px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5110,29 +5186,51 @@ h1, h2, h3, .joy-display {
   border: none;
   cursor: pointer;
   text-align: left;
-  font-size: 1.0625rem;
+  font: inherit;
+  font-size: var(--joy-font-size-md);
   font-weight: 600;
+  line-height: 1.4;
   color: var(--joy-text-primary);
-  transition: color 0.15s ease;
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-faq-item__trigger:hover {
-  color: var(--joy-accent-default);
+  background-color: var(--joy-accent-subtle);
+}
+.joy-faq-item__trigger:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-faq-item__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 .joy-faq-item__icon {
+  display: inline-flex;
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--joy-accent-default);
+  transition: transform var(--joy-duration-normal) var(--joy-ease-out);
+  color: var(--joy-accent-text);
 }
 .joy-faq-item--open .joy-faq-item__icon {
   transform: rotate(180deg);
 }
 .joy-faq-item__content {
-  padding: 0 20px 20px 20px;
-  font-size: 0.9375rem;
+  padding: 4px 20px 20px 20px;
+  font-size: var(--joy-font-size-md);
   line-height: 1.65;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
+}
+.joy-faq-item__content[hidden] {
+  display: none;
+}
+@media (max-width: 480px) {
+  .joy-faq-section {
+    padding: 32px 16px;
+  }
 }
 
 /* ── Landing Page Suite: SiteFooter ── */

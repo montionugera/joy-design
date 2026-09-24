@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ChevronDown } from '@joymify/icons/react';
 
 export interface FAQItem {
   question: string;
@@ -14,26 +15,25 @@ export interface FAQSectionProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
-  title = 'Frequently Asked Questions',
+  title = 'Frequently asked questions',
   subtitle = 'Everything you need to know about our institutional trading and liquidity infrastructure.',
   items,
   allowMultiple = false,
   className = '',
   ...props
 }, ref) => {
-  const [openIndexes, setOpenIndexes] = useState<number[]>(() => {
-    return items
-      .map((item, idx) => (item.defaultOpen ? idx : -1))
-      .filter((idx) => idx !== -1);
-  });
+  const uid = React.useId();
+
+  // Until the reader toggles something, the open items are the ones marked defaultOpen; after that their choice wins.
+  const defaultOpen = items.flatMap((item, idx) => (item.defaultOpen ? [idx] : []));
+  const [chosen, setChosen] = useState<number[] | null>(null);
+  const openIndexes = chosen ?? defaultOpen;
 
   const toggleIndex = (index: number) => {
     if (allowMultiple) {
-      setOpenIndexes((prev) =>
-        prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-      );
+      setChosen(openIndexes.includes(index) ? openIndexes.filter((i) => i !== index) : [...openIndexes, index]);
     } else {
-      setOpenIndexes((prev) => (prev.includes(index) ? [] : [index]));
+      setChosen(openIndexes.includes(index) ? [] : [index]);
     }
   };
 
@@ -48,13 +48,13 @@ export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
       <div className="joy-faq-list">
         {items.map((item, idx) => {
           const isOpen = openIndexes.includes(idx);
-          const answerId = `faq-answer-${idx}`;
-          const triggerId = `faq-trigger-${idx}`;
+          const answerId = `${uid}-answer-${idx}`;
+          const triggerId = `${uid}-trigger-${idx}`;
 
           return (
             <div
               key={item.question || idx}
-              className={`joy-faq-item ${isOpen ? 'joy-faq-item--open' : ''}`}
+              className={isOpen ? 'joy-faq-item joy-faq-item--open' : 'joy-faq-item'}
             >
               <button
                 type="button"
@@ -64,29 +64,19 @@ export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
                 className="joy-faq-item__trigger"
                 onClick={() => toggleIndex(idx)}
               >
-                <span>{item.question}</span>
-                <svg
-                  className="joy-faq-item__icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
+                <span className="joy-faq-item__label">{item.question}</span>
+                <span className="joy-faq-item__icon" aria-hidden="true"><ChevronDown size="100%" /></span>
               </button>
-              {isOpen && (
-                <div
-                  id={answerId}
-                  role="region"
-                  aria-labelledby={triggerId}
-                  className="joy-faq-item__content"
-                >
-                  {item.answer}
-                </div>
-              )}
+              {/* Always in the DOM so aria-controls resolves and the answer is part of the page; hidden while closed. */}
+              <div
+                id={answerId}
+                role="region"
+                aria-labelledby={triggerId}
+                className="joy-faq-item__content"
+                hidden={!isOpen}
+              >
+                {item.answer}
+              </div>
             </div>
           );
         })}

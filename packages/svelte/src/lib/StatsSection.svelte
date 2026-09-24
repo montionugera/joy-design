@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   interface StatItem {
     label: string;
     value: string | number;
@@ -7,18 +9,21 @@
     trend?: 'up' | 'down' | 'neutral';
   }
 
-  interface Props {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class' | 'children'> {
     stats: StatItem[];
     class?: string;
+    ref?: HTMLElement | null;
   }
 
   let {
     stats,
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 </script>
 
-<section class="joy-stats-section {className}">
+<section bind:this={ref} class="joy-stats-section {className}" {...rest}>
   <div class="joy-stats-grid">
     {#each stats as item}
       <div class="joy-stat-item">
@@ -34,13 +39,15 @@
             class:joy-stat-item__change--negative={item.trend === 'down'}
           >
             {#if item.trend === 'up'}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="18 15 12 9 6 15"></polyline>
               </svg>
+              <span class="joy-stat-item__sr">Trend up:</span>
             {:else if item.trend === 'down'}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
+              <span class="joy-stat-item__sr">Trend down:</span>
             {/if}
             {item.change}
           </div>

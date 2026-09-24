@@ -591,3 +591,164 @@ test('F-039 L3 CSS: every colour token the feature and bento rules read has a li
 test('F-039 L3 dark: --joy-accent-text in dark is gold-300 (token-driven, no literal added)', () => {
   assert.strictEqual(tokenMaps.dark['--joy-accent-text'].toLowerCase(), tokenMaps.light['--joy-color-gold-300'].toLowerCase());
 });
+
+// ── F-039 L4: logo cloud, stats, testimonial and FAQ CSS contract ──
+const logoBlock = block('/* ── Landing Page Suite: LogoCloud ── */', '/* ── Landing Page Suite: StatsSection ── */');
+const statsBlock = block('/* ── Landing Page Suite: StatsSection ── */', '/* ── Landing Page Suite: CTASection ── */');
+const faqBlock = block('/* ── Landing Page Suite: FAQSection ── */', '/* ── Landing Page Suite: SiteFooter ── */');
+const testimonialBlock = block('/* Testimonial Card */', '/* Steps (Ant Design Parity) */');
+const mediaBody = (css, query) => {
+  const m = css.match(new RegExp(`@media \\(${query}\\) \\{([\\s\\S]*?\\n)\\}`));
+  assert.ok(m, `@media (${query}) exists`);
+  return m[1];
+};
+
+test('F-039 L4 CSS: logo cloud wraps and centres, draws in currentColor at muted, and has no tracked caps', () => {
+  const logos = rule(logoBlock, '.joy-logo-cloud__logos');
+  assert.match(logos, /flex-wrap:\s*wrap/);
+  assert.match(logos, /justify-content:\s*center/);
+  assert.match(logos, /gap:\s*36px 48px/);
+  const item = rule(logoBlock, '.joy-logo-cloud__item');
+  assert.match(item, /(^|[\s;])color:\s*var\(--joy-text-muted\)/, 'inline svg logos use currentColor, which is muted');
+  assert.ok(!/opacity/.test(logoBlock), 'no opacity: it would push muted logos further below contrast');
+  assert.match(rule(logoBlock, '.joy-logo-cloud__item:hover'), /color:\s*var\(--joy-text-primary\)/);
+  const title = rule(logoBlock, '.joy-logo-cloud__title');
+  assert.match(title, /color:\s*var\(--joy-text-secondary\)/);
+  assert.ok(!/text-transform|letter-spacing/.test(title), 'sentence case, normal tracking');
+  assert.match(mediaBody(logoBlock, 'max-width: 480px'), /gap:\s*24px 28px/);
+});
+
+test('F-039 L4 CSS: linked logos are 44px touch targets with a focus ring', () => {
+  assert.match(rule(logoBlock, 'a.joy-logo-cloud__item'), /min-height:\s*44px/);
+  assert.match(rule(logoBlock, 'a.joy-logo-cloud__item:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+});
+
+test('F-039 L4 CSS: stats card is raised, values are accent-text, text is secondary, tones are status tokens', () => {
+  const item = rule(statsBlock, '.joy-stat-item');
+  assert.match(item, /background-color:\s*var\(--joy-surface-raised\)/);
+  assert.match(item, /border:\s*1px solid var\(--joy-border-default\)/);
+  const value = rule(statsBlock, '.joy-stat-item__value');
+  assert.match(value, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
+  assert.match(value, /font-size:\s*var\(--joy-font-size-3xl\)/, 'a stat is on the step scale, not a section display size');
+  assert.match(rule(statsBlock, '.joy-stat-item__desc'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(rule(statsBlock, '.joy-stat-item__label'), /color:\s*var\(--joy-text-primary\)/);
+  assert.match(rule(statsBlock, '.joy-stat-item__change--positive'), /color:\s*var\(--joy-status-success-fg\)/);
+  assert.match(rule(statsBlock, '.joy-stat-item__change--negative'), /color:\s*var\(--joy-status-danger-fg\)/);
+  assert.ok(!/10b981|ef4444|accent-default/i.test(statsBlock), 'no raw tone hexes, no gold-on-white value colour');
+});
+
+test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with smaller values', () => {
+  const small = mediaBody(statsBlock, 'max-width: 480px');
+  assert.match(small, /\.joy-stats-grid \{[^}]*grid-template-columns:\s*repeat\(2, 1fr\)/);
+  assert.match(small, /\.joy-stats-grid \{[^}]*gap:\s*12px/);
+  assert.match(small, /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-xl\)/, 'so a 7 character mono value fits a half-width card');
+  assert.match(rule(statsBlock, '.joy-stats-grid'), /repeat\(auto-fit, minmax\(min\(220px, 100%\), 1fr\)\)/, 'wider screens keep the auto-fit grid');
+});
+
+test('F-039 L4 CSS: testimonial stars are warning-fg, the avatar fallback is accent-subtle on accent-text, no purple, no stripe', () => {
+  assert.match(rule(testimonialBlock, '.joy-testimonial-card__stars'), /color:\s*var\(--joy-status-warning-fg\)/);
+  const avatar = rule(testimonialBlock, '.joy-testimonial-card .joy-avatar');
+  assert.match(avatar, /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(avatar, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
+  const card = rule(testimonialBlock, '.joy-testimonial-card');
+  assert.match(card, /background-color:\s*var\(--joy-surface-raised\)/);
+  assert.match(card, /border:\s*1px solid var\(--joy-border-default\)/);
+  assert.match(rule(testimonialBlock, '.joy-testimonial-card__quote'), /font-size:\s*var\(--joy-font-size-md\)/, 'body scale');
+  assert.match(rule(testimonialBlock, '.joy-testimonial-card__author-info p'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.ok(!/purple|7c3aed|eab308|border-(left|inline-start)|\[data-theme|gradient/i.test(testimonialBlock));
+});
+
+test('F-039 L4 CSS: FAQ title is fluid, wraps long words and balances lines', () => {
+  const title = rule(faqBlock, '.joy-faq-section__title');
+  assert.match(title, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(title, /overflow-wrap:\s*anywhere/);
+  assert.match(title, /text-wrap:\s*balance/);
+  assert.ok(!/font-size:\s*2rem/.test(faqBlock), 'no fixed 2rem title');
+  assert.match(tokenMaps.light['--joy-font-size-display-sm'], /^clamp\(/, 'display-sm is a clamp token');
+});
+
+test('F-039 L4 CSS: FAQ trigger is 44px, keeps ink text on hover over an accent-subtle tint, and keeps its focus ring', () => {
+  const trigger = rule(faqBlock, '.joy-faq-item__trigger');
+  assert.match(trigger, /min-height:\s*44px/);
+  assert.match(trigger, /(^|[\s;])color:\s*var\(--joy-text-primary\)/);
+  const hover = rule(faqBlock, '.joy-faq-item__trigger:hover');
+  assert.match(hover, /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.ok(!/(^|[\s;])color:/.test(hover), 'hover does not recolour the text (gold text fails contrast)');
+  assert.match(rule(faqBlock, '.joy-faq-item__trigger:focus-visible'), /outline:\s*var\(--joy-focus-ring\)/);
+});
+
+test('F-039 L4 CSS: FAQ item is raised with a default border, the open item takes the strong border', () => {
+  const item = rule(faqBlock, '.joy-faq-item');
+  assert.match(item, /background-color:\s*var\(--joy-surface-raised\)/);
+  assert.match(item, /border:\s*1px solid var\(--joy-border-default\)/);
+  assert.match(rule(faqBlock, '.joy-faq-item--open'), /border-color:\s*var\(--joy-border-strong\)/);
+  assert.match(rule(faqBlock, '.joy-faq-item__content'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(rule(faqBlock, '.joy-faq-item__subtitle'.replace('item__subtitle', 'section__subtitle')), /color:\s*var\(--joy-text-secondary\)/);
+});
+
+test('F-039 L4 CSS: FAQ chevron rotates on open through a token transition, and a hidden answer is display: none', () => {
+  const icon = rule(faqBlock, '.joy-faq-item__icon');
+  assert.match(icon, /transition:\s*transform var\(--joy-duration-normal\) var\(--joy-ease-out\)/);
+  assert.match(icon, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
+  assert.match(rule(faqBlock, '.joy-faq-item--open .joy-faq-item__icon'), /transform:\s*rotate\(180deg\)/);
+  assert.match(rule(faqBlock, '.joy-faq-item__content[hidden]'), /display:\s*none/);
+});
+
+test('F-039 L4 CSS: the four blocks have no purple, glass, stripe, [data-theme], phantom token, fallback or transition: all', () => {
+  for (const [name, css] of [['logo', logoBlock], ['stats', statsBlock], ['faq', faqBlock], ['testimonial', testimonialBlock]]) {
+    assert.ok(!/gradient|purple|7c3aed|backdrop-filter|border-(left|inline-start)|\[data-theme|var\(--joy-color-|transition:\s*all|var\([^)]*,\s*[^)]+\)/i.test(css), `${name} block is clean`);
+  }
+});
+
+test('F-039 L4 contrast: proof token pairs pass WCAG AA in both themes (computed)', () => {
+  const pairs = [
+    ['text-secondary', 'surface-canvas', 4.5, 'logo cloud title'],
+    ['text-muted', 'surface-canvas', 4.5, 'logo cloud logos on the page canvas'],
+    ['text-primary', 'surface-canvas', 4.5, 'logo hover'],
+    ['accent-text', 'surface-raised', 4.5, 'stat value, faq chevron'],
+    ['text-primary', 'surface-raised', 4.5, 'stat label, faq question, testimonial quote'],
+    ['text-secondary', 'surface-raised', 4.5, 'stat description, faq answer, author role'],
+    ['status-success-fg', 'status-success-bg', 4.5, 'positive change chip'],
+    ['status-danger-fg', 'status-danger-bg', 4.5, 'negative change chip'],
+    ['status-warning-fg', 'surface-raised', 3, 'star graphic'],
+    ['accent-text', 'accent-subtle', 4.5, 'avatar initials, faq chevron on hover'],
+    ['text-primary', 'accent-subtle', 4.5, 'faq question on hover'],
+    ['border-strong', 'surface-raised', 3, 'open faq item border']
+  ];
+  for (const theme of ['light', 'dark']) {
+    for (const [fg, bg, min, why] of pairs) {
+      const ratio = contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+      assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min} (${why})`);
+    }
+  }
+});
+
+// RULING (F-039 L4): the card, stat, testimonial and FAQ item borders (--joy-border-default on --joy-surface-raised) are
+// decorative containment, not the identity of a control: the FAQ control is the button (text + chevron, both >= 4.5:1),
+// and every card is identified by its text and fill. Light measures >= 3:1; dark measures 2.79:1, the same pair the
+// F-039 L3 feature and bento cards already ship. The open FAQ item, the one state a border does signal, uses
+// --joy-border-strong (>= 3:1 above). Pinned so a token change cannot silently make it worse.
+test('F-039 L4 contrast RULING: decorative card borders measure >= 3:1 light and >= 2.7:1 dark (pinned)', () => {
+  const ratio = (theme) => contrastRatio(tokenMaps[theme]['--joy-border-default'], tokenMaps[theme]['--joy-surface-raised']);
+  assert.ok(ratio('light') >= 3, `light ${ratio('light').toFixed(2)}`);
+  assert.ok(ratio('dark') >= 2.7, `dark ${ratio('dark').toFixed(2)}`);
+});
+
+test('F-039 L4 CSS: the dark-gap components (feature card, stats, faq, logo cloud) read only tokens that have a dark value', () => {
+  const blocks = {
+    'joy-feature-card': featureBlock,
+    'joy-stats-section': statsBlock,
+    'joy-faq-section': faqBlock,
+    'joy-logo-cloud': logoBlock,
+    'joy-testimonial-card': testimonialBlock
+  };
+  for (const [name, css] of Object.entries(blocks)) {
+    const used = [...css.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]);
+    const colourTokens = [...new Set(used)].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
+    assert.ok(colourTokens.length >= 3, `sanity: ${name} reads colour tokens (${colourTokens.join(', ')})`);
+    for (const token of colourTokens) {
+      assert.ok(tokenMaps.light[token] !== undefined, `${name}: light defines ${token}`);
+      assert.ok(tokenMaps.dark[token] !== undefined, `${name}: dark defines ${token}`);
+    }
+  }
+});

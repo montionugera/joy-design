@@ -74,6 +74,10 @@ export const COMPONENTS = [
   'FeatureGrid',
   'BentoCard',
   'BentoGrid',
+  'LogoCloud',
+  'StatsSection',
+  'TestimonialCard',
+  'FAQSection',
   // internal (not exported): the action button both landing twins render; no ref/rest by design
   'LandingAction'
 ];
@@ -110,7 +114,11 @@ export const REF_FORWARDING = [
   'FeatureCard',
   'FeatureGrid',
   'BentoCard',
-  'BentoGrid'
+  'BentoGrid',
+  'LogoCloud',
+  'StatsSection',
+  'TestimonialCard',
+  'FAQSection'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
@@ -126,7 +134,11 @@ export const SVELTE_REF_REST = [
   'FeatureCard',
   'FeatureGrid',
   'BentoCard',
-  'BentoGrid'
+  'BentoGrid',
+  'LogoCloud',
+  'StatsSection',
+  'TestimonialCard',
+  'FAQSection'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).
