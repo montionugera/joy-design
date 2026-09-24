@@ -45,7 +45,7 @@ const BAD = `<script lang="ts">
 <section class="joy-bad">{title}</section>
 `;
 
-test('Wave 4 A1 SVELTE_REF_REST is exported, starts empty and the checker is a function', () => {
+test('Wave 4 A1 SVELTE_REF_REST is exported and the checker is a function', () => {
   assert.ok(Array.isArray(mod.SVELTE_REF_REST), 'SVELTE_REF_REST must be exported as an array');
   assert.strictEqual(typeof mod.checkSvelteRefRest, 'function', 'checkSvelteRefRest must be exported');
   assert.deepStrictEqual(mod.checkSvelteRefRest(repoRoot), [], 'the shipped tree has no ref/rest failures');

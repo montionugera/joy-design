@@ -54,7 +54,7 @@
 
   {#if title || titleEmphasis}
     <h1 class="joy-hero__title">
-      {#if title}{title}{/if}{#if titleEmphasis}{#if title}{' '}{/if}<span class="joy-hero__title-emphasis">{titleEmphasis}</span>{/if}
+      {title}{#if titleEmphasis}{#if title}{' '}{/if}<span class="joy-hero__title-emphasis">{titleEmphasis}</span>{/if}
     </h1>
   {/if}
 
