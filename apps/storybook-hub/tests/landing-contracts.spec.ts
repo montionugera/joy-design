@@ -110,7 +110,7 @@ for (const theme of themes) {
       }
     });
 
-    // (5) CTA band: text and both buttons on the inverse surface
+    // (5) CTA band: text and both buttons on the raised band (F-039 T1: the band is a raised panel in both themes)
     test("CTA band text and buttons are readable", async ({ page }) => {
       const band = `${PAGE} .joy-cta-section__container`;
       const texts = await page.evaluate((selector) => {

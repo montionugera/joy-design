@@ -5140,7 +5140,11 @@ a.joy-logo-cloud__item:focus-visible {
 .joy-cta-section__container {
   position: relative;
   text-align: center;
-  background: var(--joy-surface-inverse);
+  /* A raised panel in both themes (white on the cream page, lifted navy on the dark page), never the inverse surface:
+     that token is navy in light but CREAM in dark, which made the band the brightest slab of the dark page. There is no
+     colour-scheme on the theme, so a two-value colour function is not available and the band is one token-driven treatment. */
+  background: var(--joy-surface-raised);
+  background-image: radial-gradient(ellipse 70% 90% at 50% 0%, var(--joy-accent-subtle), var(--joy-surface-raised));
   border: 1px solid var(--joy-border-strong);
   border-radius: var(--joy-radius-overlay);
   padding: 64px 32px;
@@ -5162,10 +5166,6 @@ a.joy-logo-cloud__item:focus-visible {
   margin: 0 auto 36px auto;
   line-height: 1.6;
 }
-.joy-cta-section__container .joy-cta-section__title,
-.joy-cta-section__container .joy-cta-section__desc {
-  color: var(--joy-text-inverse);
-}
 .joy-cta-section__actions {
   display: flex;
   align-items: center;
@@ -5175,8 +5175,8 @@ a.joy-logo-cloud__item:focus-visible {
 }
 .joy-cta-section__container .joy-button--outline {
   background: transparent;
-  border-color: var(--joy-text-inverse);
-  color: var(--joy-text-inverse);
+  border-color: var(--joy-border-strong);
+  color: var(--joy-text-primary);
 }
 .joy-cta-section__container .joy-button--solid {
   border-color: var(--joy-text-on-accent);
@@ -5187,16 +5187,7 @@ a.joy-logo-cloud__item:focus-visible {
 }
 .joy-cta-section__container .joy-button--outline:hover:not(:disabled):not(:focus-visible),
 .joy-cta-section__container .joy-button--outline:active:not(:disabled):not(:focus-visible) {
-  box-shadow: inset 0 0 0 1px var(--joy-text-inverse);
-}
-.joy-hero .joy-button:disabled,
-.joy-hero .joy-button[aria-disabled="true"],
-.joy-cta-section .joy-button:disabled,
-.joy-cta-section .joy-button[aria-disabled="true"] {
-  background: var(--joy-surface-disabled);
-  border-color: var(--joy-border-disabled);
-  color: var(--joy-text-disabled);
-  box-shadow: none;
+  box-shadow: inset 0 0 0 1px var(--joy-border-strong);
 }
 @media (max-width: 479px) {
   .joy-cta-section {
@@ -5205,6 +5196,54 @@ a.joy-logo-cloud__item:focus-visible {
   .joy-cta-section__container {
     padding: 40px 20px;
   }
+}
+
+/* ── Landing containers: busy and unavailable buttons ── */
+/* Scoped to the hero, the CTA band and the pricing card: the shared .joy-button rules are untouched. A disabled button is an
+   outline-weight chip (never a solid fill heavier than a live button) and always keeps a visible 1px border so its shape
+   survives on a dark page. A busy button is also disabled to the browser, but it keeps its variant identity (gold gradient,
+   outline border) so "working" never reads as "unavailable". */
+.joy-hero .joy-button:disabled,
+.joy-hero .joy-button[aria-disabled="true"] {
+  background: var(--joy-surface-disabled);
+  border-color: var(--joy-border-default);
+  color: var(--joy-text-disabled);
+  box-shadow: none;
+}
+.joy-cta-section .joy-button:disabled,
+.joy-cta-section .joy-button[aria-disabled="true"],
+.joy-pricing-card .joy-button:disabled,
+.joy-pricing-card .joy-button[aria-disabled="true"] {
+  background: transparent;
+  border-color: var(--joy-border-default);
+  color: var(--joy-text-disabled);
+  box-shadow: none;
+}
+.joy-hero .joy-button--solid.joy-button--loading,
+.joy-cta-section .joy-button--solid.joy-button--loading,
+.joy-pricing-card .joy-button--solid.joy-button--loading {
+  background-color: var(--joy-accent-default);
+  background-image: linear-gradient(180deg, var(--joy-accent-default), var(--joy-accent-gradient-end));
+  border-color: var(--joy-accent-gradient-end);
+  color: var(--joy-text-on-accent);
+  box-shadow: inset 0 1px 0 var(--joy-accent-highlight), var(--joy-elevation-accent-1);
+  cursor: progress;
+}
+.joy-cta-section__container .joy-button--solid.joy-button--loading {
+  border-color: var(--joy-text-on-accent);
+}
+.joy-hero .joy-button--outline.joy-button--loading {
+  background: var(--joy-surface-raised);
+  border-color: var(--joy-border-strong);
+  color: var(--joy-text-primary);
+  cursor: progress;
+}
+.joy-cta-section .joy-button--outline.joy-button--loading,
+.joy-pricing-card .joy-button--outline.joy-button--loading {
+  background: transparent;
+  border-color: var(--joy-border-strong);
+  color: var(--joy-text-primary);
+  cursor: progress;
 }
 
 /* ── Landing Page Suite: FAQSection ── */

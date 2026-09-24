@@ -102,7 +102,7 @@ for (const twin of twins) {
             }));
           }, band);
           for (const text of bandText) {
-            expect(text.min, `${twin} ${text.cls} on the inverse band`).toBeGreaterThanOrEqual(4.5);
+            expect(text.min, `${twin} ${text.cls} on the raised band`).toBeGreaterThanOrEqual(4.5);
           }
         });
 
