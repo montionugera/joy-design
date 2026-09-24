@@ -93,6 +93,12 @@ export const REF_FORWARDING = [
   'Tooltip'
 ];
 
+// Svelte components that must destructure `ref = $bindable(null)`, spread
+// `{...rest}` on the root element and expose the root via `bind:this={ref}`.
+// Starts empty: each landing lane appends its own names in the commit that
+// makes them clean, so the gate never goes red ahead of the code.
+export const SVELTE_REF_REST = [];
+
 // Non-handler aliases between the twins (Svelte `class` is React `className`).
 export const NORMALISE = {
   class: 'className'
@@ -485,6 +491,28 @@ export function checkRefForwarding(rootDir = process.cwd()) {
   return failures;
 }
 
+// Svelte twin of checkRefForwarding: every listed component must destructure a
+// bindable `ref`, spread `{...rest}` and bind the root element to `ref`.
+// Failure shape: { component, missing: ['ref' | 'restSpread' | 'bindThis'] }
+// (or ['file'] when the component file does not exist).
+export function checkSvelteRefRest(rootDir = process.cwd(), names = SVELTE_REF_REST) {
+  const failures = [];
+  for (const component of names) {
+    const file = path.resolve(rootDir, `packages/svelte/src/lib/${component}.svelte`);
+    if (!fs.existsSync(file)) {
+      failures.push({ component, missing: ['file'] });
+      continue;
+    }
+    const src = stripComments(fs.readFileSync(file, 'utf8').replace(/<!--[\s\S]*?-->/g, ''));
+    const missing = [];
+    if (!/\bref\s*=\s*\$bindable\(\s*null\s*\)/.test(src)) missing.push('ref');
+    if (!hasRestSpread(src)) missing.push('restSpread');
+    if (!/\bbind:this=\{\s*ref\s*\}/.test(src)) missing.push('bindThis');
+    if (missing.length > 0) failures.push({ component, missing });
+  }
+  return failures;
+}
+
 export function runParityCheck(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const themeCssPath = path.resolve(rootDir, 'packages/tokens/dist/theme.css');
@@ -598,6 +626,15 @@ export function runParityCheck(options = {}) {
       // A missing React file is already reported once by the file-exists check above.
       if (missing.includes('file')) continue;
       checks.push({ component, check: `ref forwarding (${missing.join(', ')})`, status: 'FAIL' });
+      totalViolations += 1;
+    }
+  }
+
+  if (side !== 'react') {
+    for (const { component, missing } of checkSvelteRefRest(rootDir)) {
+      // A missing Svelte file of a COMPONENTS entry is already reported by the file-exists check above.
+      if (missing.includes('file') && COMPONENTS.includes(component)) continue;
+      checks.push({ component, check: `Svelte ref/rest (${missing.join(', ')})`, status: 'FAIL' });
       totalViolations += 1;
     }
   }
