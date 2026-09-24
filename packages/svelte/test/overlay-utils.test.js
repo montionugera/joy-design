@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { positionPanel, isOutside, isSheet, openOverlay, SHEET_MAX_WIDTH } from '../src/lib/overlay-utils.ts';
+import { positionPanel, isOutside, isSheet, openOverlay, registerDialog, trapFocus, SHEET_MAX_WIDTH } from '../src/lib/overlay-utils.ts';
 
 const rect = (top, left, width, height) => ({ top, left, width, height, bottom: top + height, right: left + width });
 const node = (r, name) => {
@@ -70,4 +70,61 @@ test('narrow viewports get the sheet class and fixed positioning; dispose never 
   const h = harness(SHEET_MAX_WIDTH - 1);
   assert.ok(h.panel.classes.has('joy-overlay--sheet')); assert.strictEqual(h.panel.style.position, 'fixed');
   h.handle.dispose(); assert.strictEqual(h.closed(), 0);
+});
+
+test('Escape is claimed (defaultPrevented) so a dialog listening for Escape can skip it', () => {
+  const h = harness();
+  const e = new Event('keydown', { cancelable: true }); Object.defineProperty(e, 'key', { value: 'Escape' });
+  h.doc.dispatchEvent(e);
+  assert.strictEqual(e.defaultPrevented, true);
+  assert.strictEqual(h.closed(), 1);
+});
+
+test('registerDialog: the last registered dialog is topmost; the top switches when it unregisters', () => {
+  const a = registerDialog(); const b = registerDialog();
+  assert.strictEqual(a.isTopmost(), false); assert.strictEqual(b.isTopmost(), true);
+  b.unregister();
+  assert.strictEqual(a.isTopmost(), true);
+  a.unregister();
+});
+
+test('registerDialog: unregistering out of order keeps the remaining order; double unregister is a no-op', () => {
+  const a = registerDialog(); const b = registerDialog(); const c = registerDialog();
+  b.unregister();
+  assert.strictEqual(c.isTopmost(), true); assert.strictEqual(a.isTopmost(), false);
+  b.unregister(); b.unregister();
+  assert.strictEqual(c.isTopmost(), true, 'a second unregister must not remove another dialog');
+  c.unregister();
+  assert.strictEqual(a.isTopmost(), true);
+  a.unregister(); a.unregister();
+  const d = registerDialog();
+  assert.strictEqual(d.isTopmost(), true, 'stack is empty again after everything unregistered');
+  d.unregister();
+});
+
+test('registerDialog + Escape claim: a popover inside a dialog closes alone, the dialog stays topmost and sees defaultPrevented', () => {
+  const dialog = registerDialog();
+  const h = harness();
+  const e = new Event('keydown', { cancelable: true }); Object.defineProperty(e, 'key', { value: 'Escape' });
+  h.doc.dispatchEvent(e);
+  assert.strictEqual(h.closed(), 1);
+  assert.strictEqual(e.defaultPrevented, true, 'a dialog checking defaultPrevented skips this Escape');
+  assert.strictEqual(dialog.isTopmost(), true);
+  dialog.unregister();
+});
+
+test('trapFocus: does not steal focus from an element already focused inside the container (autoFocus input)', () => {
+  const first = node(rect(0, 0, 10, 10), 'close'); const input = node(rect(0, 0, 10, 10), 'input');
+  const container = node(rect(0, 0, 100, 100), 'dialog');
+  container.querySelector = () => first; container.addEventListener = () => {}; container.removeEventListener = () => {};
+  container.contains = (n) => n === container || n === input || n === first;
+  const prev = globalThis.document;
+  try {
+    globalThis.document = { activeElement: input };
+    trapFocus(container);
+    assert.strictEqual(first.focused, 0, 'first focusable (Close button) must not take focus');
+    globalThis.document = { activeElement: { name: 'opener' } };
+    trapFocus(container);
+    assert.strictEqual(first.focused, 1, 'focus outside the container still moves to the first focusable');
+  } finally { globalThis.document = prev; }
 });

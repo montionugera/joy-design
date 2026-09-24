@@ -200,6 +200,338 @@ const navigationHtml = manifest.categories
   })
   .join("\n\n");
 
+// ── Wave 3 (F-038) aspect views ──────────────────────────────────────────────
+// Markup below mirrors the SSR output of the Svelte components (icons are read from @joymify/icons at
+// build time, so the hub demos and the components can never drift on icon geometry).
+const iconMarkupCache = {};
+function iconSvg(name, size = "1em") {
+  if (!iconMarkupCache[name]) {
+    const file = path.join(iconsSrcDir, `${name}.svelte`);
+    const match = fs.existsSync(file)
+      ? fs.readFileSync(file, "utf8").match(/<svg[\s\S]*?<\/svg>/)
+      : null;
+    if (!match) throw new Error(`Icon ${name} not found in @joymify/icons`);
+    iconMarkupCache[name] = match[0].replace(/\s*\n\s*/g, " ");
+  }
+  return iconMarkupCache[name]
+    .replace("width={size}", `width="${size}"`)
+    .replace("height={size}", `height="${size}"`)
+    .replace("stroke={color}", 'stroke="currentColor"');
+}
+const svgAttrs = (size, sw) =>
+  `width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"`;
+const hubSvg = {
+  tagClose: `<svg ${svgAttrs(12, 2.5)}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+  check: `<svg ${svgAttrs(16, 2.5)} aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+  cross: `<svg ${svgAttrs(16, 2.5)} aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+  sortNone: `<svg ${svgAttrs(12, 2)} aria-hidden="true"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg>`,
+  sortAsc: `<svg ${svgAttrs(12, 2)} aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>`,
+  sortDesc: `<svg ${svgAttrs(12, 2)} aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
+  spin: (size) =>
+    `<svg class="joy-spin__indicator" ${svgAttrs(size, 2.5)} aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>`,
+  resultSuccess: `<svg ${svgAttrs(36, 2.5)}><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+  resultError: `<svg ${svgAttrs(36, 2.5)}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+  result404: `<svg ${svgAttrs(36, 2)}><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></svg>`,
+};
+const statusIcon = { info: "Info", success: "CheckCircle", warning: "AlertTriangle", danger: "AlertCircle", error: "AlertCircle" };
+
+const hubCell = (label, body) => `<div class="hub-matrix__cell"><h4>${label}</h4>${body}</div>`;
+const hubCard = (name, title, desc, cells, extra = "") => `<div class="component-card" data-matrix-card="${name}">
+    <div class="component-header"><div><div class="component-title">${title}</div><div class="component-desc">${desc}</div></div></div>
+    <div class="component-canvas"><div class="hub-matrix${extra}" data-matrix="${name}">${cells}</div></div>
+  </div>`;
+
+const hubAlert = (variant, title, desc, closable = false) =>
+  `<div class="joy-alert joy-alert--${variant}" role="alert"><span class="joy-alert__icon" aria-hidden="true">${iconSvg(statusIcon[variant])}</span><div class="joy-alert__body"><div class="joy-alert__title">${title}</div><div class="joy-alert__desc">${desc}</div></div>${closable ? `<button type="button" class="joy-alert__close" aria-label="Dismiss alert" onclick="this.closest('.joy-alert').remove()">${iconSvg("Close")}</button>` : ""}</div>`;
+const hubBadge = (variant, label, size = "md", dot = false) =>
+  `<span class="joy-badge joy-badge--${variant} joy-badge--${size}">${dot ? '<span class="joy-badge__dot" aria-hidden="true"></span> ' : ""}${label}</span>`;
+const hubTag = (color, label, { closable = false, checkable = false, checked = false } = {}) =>
+  checkable
+    ? `<span class="joy-tag joy-tag--${color} joy-tag--checkable${checked ? " joy-tag--checked" : ""}" role="checkbox" aria-checked="${checked}" tabindex="0" onclick="toggleHubTag(this)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleHubTag(this)}">${label}</span>`
+    : `<span class="joy-tag joy-tag--${color}" role="status">${label}${closable ? ` <button type="button" class="joy-tag__close" aria-label="Close tag" onclick="this.closest('.joy-tag').remove()">${hubSvg.tagClose}</button>` : ""}</span>`;
+const hubAvatar = (name, { size = "md", shape = "circle", status = "none" } = {}) => {
+  const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  return `<div class="joy-avatar joy-avatar--${shape} joy-avatar--${size}" role="img" aria-label="${name}"><span class="joy-avatar__fallback">${initials}</span>${status !== "none" ? `<span class="joy-avatar__badge joy-avatar__badge--${status}" aria-label="Status: ${status}"></span>` : ""}</div>`;
+};
+const hubDelta = (cls, text) => {
+  const first = text.trim().charAt(0);
+  const dir = first === "-" ? "down" : first === "+" ? "up" : "flat";
+  const icon = dir === "up" ? iconSvg("TrendingUp") + `<span class="joy-${cls}__sr">Increase: </span>` : dir === "down" ? iconSvg("TrendingDown") + `<span class="joy-${cls}__sr">Decrease: </span>` : "";
+  return `${icon}<span>${text}</span>`;
+};
+const hubProgress = (percent, status = "normal", { showInfo = true, stroke = 8 } = {}) => {
+  const info = !showInfo ? "" : status === "success" ? `<span class="joy-progress__text">${hubSvg.check}</span>` : status === "exception" ? `<span class="joy-progress__text">${hubSvg.cross}</span>` : `<span class="joy-progress__text">${percent}%</span>`;
+  return `<div class="joy-progress joy-progress--status-${status}" role="progressbar" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"><div class="joy-progress__outer"><div class="joy-progress__inner"><div class="joy-progress__bg" style="width: ${percent}%; height: ${stroke}px;"></div></div></div>${info}</div>`;
+};
+const hubResult = (status, icon, title, sub, actions = true) =>
+  `<div class="joy-result joy-result--${status}" role="alert"><div class="joy-result__icon">${icon}</div><h2 class="joy-result__title">${title}</h2>${sub ? `<p class="joy-result__subtitle">${sub}</p>` : ""}${actions ? `<div class="joy-result__actions"><button type="button" class="joy-button joy-button--solid joy-button--md">Retry</button><button type="button" class="joy-button joy-button--outline joy-button--md">Back</button></div>` : ""}</div>`;
+const hubToast = (variant, msg) =>
+  `<div class="joy-toast joy-toast--${variant}" role="status" aria-live="polite"><div class="joy-toast__body">${msg}</div><button type="button" class="joy-toast__close" aria-label="Dismiss notification" onclick="this.closest('.joy-toast').remove()">${iconSvg("Close")}</button></div>`;
+const hubMessage = (type, msg) =>
+  `<div class="joy-message" role="alert" aria-live="polite"><div class="joy-message__notice"><span class="joy-message__icon joy-message__icon--${type}" aria-hidden="true">${iconSvg(statusIcon[type])}</span><span class="joy-message__content">${msg}</span></div></div>`;
+const hubNotification = (type, title, desc) =>
+  `<div class="joy-notification" role="alert" aria-live="polite"><div class="joy-notification__notice"><div class="joy-notification__row"><div class="joy-notification__main"><span class="joy-notification__icon joy-notification__icon--${type}" aria-hidden="true">${iconSvg(statusIcon[type])}</span><div><div class="joy-notification__title">${title}</div><div class="joy-notification__desc">${desc}</div></div></div><button type="button" class="joy-notification__close" aria-label="Dismiss notification" onclick="this.closest('.joy-notification').remove()">${iconSvg("Close")}</button></div></div></div>`;
+
+const hubSortTh = (label, sort, align = "left") =>
+  `<th style="text-align: ${align}" tabindex="0" aria-sort="${sort}" class="joy-table-th--sortable${sort === "ascending" ? " joy-table-th--sorted-asc" : sort === "descending" ? " joy-table-th--sorted-desc" : ""}" onclick="hubSortTable(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();hubSortTable(this)}"><span>${label}</span> <span class="joy-table-sort-icon">${sort === "ascending" ? hubSvg.sortAsc : sort === "descending" ? hubSvg.sortDesc : hubSvg.sortNone}</span></th>`;
+const ledgerRows = [
+  ["#ORD-8921", "BTC/USDT", "BUY", "67,820.50", "0.45", "FILLED", "success", "14:32", "Phoenix", "0.01%"],
+  ["#ORD-8922", "ETH/USDT", "SELL", "3,510.20", "4.20", "FILLED", "success", "14:28", "Phoenix", "0.02%"],
+  ["#ORD-8923", "SOL/USDT", "BUY", "184.20", "250.00", "OPEN", "warning", "14:15", "Jupiter", "0.05%"],
+  ["#ORD-8924", "AVAX/USDT", "SELL", "28.90", "90.00", "REJECTED", "danger", "14:02", "Jupiter", "0.00%"],
+];
+const hubLedgerTable = (variant) => {
+  const cols = ["Order", "Asset", "Side", "Price", "Size", "Status"];
+  const scroll = variant === "scroll";
+  const allCols = scroll ? [...cols, "Time", "Venue", "Fee"] : cols;
+  const head = allCols
+    .map((c, i) => (i === 0 ? hubSortTh(c, "ascending") : i === 3 ? hubSortTh(c, "none", "right") : i === 4 ? hubSortTh(c, "none", "right") : `<th style="text-align: left"><span>${c}</span> </th>`))
+    .join("");
+  const body = ledgerRows
+    .map((r) => {
+      const cells = [r[0], r[1], r[2], r[3], r[4], r[5]];
+      const extra = [r[7], r[8], r[9]];
+      return `<tr>${[...cells, ...(scroll ? extra : [])]
+        .map((c, i) => {
+          const align = i === 3 || i === 4 ? "right" : "left";
+          const inner = i === 5 ? `<span class="joy-badge joy-badge--${r[6]} joy-badge--sm">${c}</span>` : c;
+          return `<td data-label="${allCols[i]}" style="text-align: ${align};">${inner}</td>`;
+        })
+        .join("")}</tr>`;
+    })
+    .join("");
+  return scroll
+    ? `<div tabindex="0" role="region" aria-label="Scrollable table" class="joy-table-container joy-table-container--scroll"><table class="joy-table joy-table--compact joy-table--scroll"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`
+    : `<div class="joy-table-container joy-table-container--responsive-stack"><table class="joy-table joy-table--compact joy-table--responsive-stack"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+};
+
+const hubChartRegion = (id, label, hudItems, canvasLabel, caption, head, rows, height) =>
+  `<div tabindex="0" class="joy-chart" style="height: ${height}px;" role="region" aria-label="${label}"><div class="joy-chart__hud" aria-live="polite">${hudItems}</div><div class="joy-chart__canvas-container" role="img" aria-label="${canvasLabel}"><canvas id="${id}-base" class="joy-chart__canvas-base"></canvas><canvas id="${id}-overlay" class="joy-chart__canvas-overlay"></canvas></div><div class="joy-chart__sr"><table><caption>${caption}</caption><thead><tr>${head.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+const hubHud = (label, value, cls = "") => `<div class="joy-chart__hud-item"><span class="joy-chart__hud-label">${label}</span> <span class="joy-chart__hud-value${cls ? " joy-chart__hud-value--" + cls : ""}">${value}</span></div>`;
+
+// Deterministic data so the SR table, the HUD and the painted canvas always agree.
+const hubMatrixCharts = (() => {
+  const bars = Array.from({ length: 8 }, (_, i) => 5 + 3 * Math.abs(Math.sin(i * 1.3)));
+  let price = 68200;
+  const candles = Array.from({ length: 16 }, (_, i) => {
+    const open = price;
+    const close = open + Math.sin(i * 0.9) * 90 + (i % 3 === 0 ? -40 : 30);
+    const high = Math.max(open, close) + 35 + (i % 4) * 8;
+    const low = Math.min(open, close) - 30 - (i % 3) * 9;
+    price = close;
+    return { open, high, low, close };
+  });
+  return { bars, candles };
+})();
+const firstCandle = hubMatrixCharts.candles[0];
+const lastCandle = hubMatrixCharts.candles[hubMatrixCharts.candles.length - 1];
+
+function renderDisplayView() {
+  const variants = ["info", "success", "warning", "danger"];
+  const alertCards = hubCard(
+    "alert", "Alert", "Four semantic variants, each with its icon; description-only and closable forms.",
+    variants.map((v) => hubCell(v, hubAlert(v, `${v[0].toUpperCase()}${v.slice(1)} title`, "Real-time feed connects over a high-throughput WebSocket."))).join("") +
+      hubCell("closable", hubAlert("danger", "API disconnected", "Retrying in 5s. Dismiss to hide.", true)) +
+      hubCell("description only", `<div class="joy-alert joy-alert--info" role="alert"><span class="joy-alert__icon" aria-hidden="true">${iconSvg("Info")}</span><div class="joy-alert__body"><div class="joy-alert__desc">Description-only alert body.</div></div></div>`),
+  );
+  const badgeVariants = ["brand", "success", "warning", "danger", "neutral"];
+  const badgeCard = hubCard(
+    "badge", "Badge", "Variants, sizes and the status dot.",
+    hubCell("variants", `<div class="hub-row">${badgeVariants.map((v) => hubBadge(v, v)).join("")}</div>`) +
+      hubCell("sizes", `<div class="hub-row">${hubBadge("brand", "small", "sm")}${hubBadge("brand", "medium", "md")}</div>`) +
+      hubCell("with dot", `<div class="hub-row">${badgeVariants.map((v) => hubBadge(v, v, "md", true)).join("")}</div>`),
+  );
+  const tagColors = ["default", "primary", "success", "warning", "danger"];
+  const tagCard = hubCard(
+    "tag", "Tag", "Colours, closable and checkable (click or press Space).",
+    hubCell("colors", `<div class="hub-row">${tagColors.map((c) => hubTag(c, c)).join("")}</div>`) +
+      hubCell("closable", `<div class="hub-row">${hubTag("primary", "Alpha-1", { closable: true })}${hubTag("success", "Live", { closable: true })}</div>`) +
+      hubCell("checkable", `<div class="hub-row">${hubTag("default", "Spot", { checkable: true, checked: true })}${hubTag("default", "Perps", { checkable: true })}${hubTag("primary", "Options", { checkable: true, checked: true })}</div>`),
+  );
+  const avatarCard = hubCard(
+    "avatar", "Avatar and AvatarGroup", "Sizes, shapes, presence status and the +N overflow.",
+    hubCell("sizes", `<div class="hub-row">${["sm", "md", "lg"].map((s) => hubAvatar("Jane Doe", { size: s })).join("")}</div>`) +
+      hubCell("shapes and status", `<div class="hub-row">${hubAvatar("Ada Lovelace", { status: "online" })}${hubAvatar("Alan Turing", { shape: "square", status: "offline" })}</div>`) +
+      hubCell("group with overflow", `<div class="joy-avatar-group">${["Ada Lovelace", "Alan Turing", "Grace Hopper"].map((n) => hubAvatar(n)).join("")}<div class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar-group__overflow" role="img" aria-label="2 more">+2</div></div>`),
+  );
+  const statCard = hubCard(
+    "statistic", "Statistic, MetricTile and StatCard", "Trend arrows are inline SVG; direction comes from the delta sign, tone only sets colour.",
+    hubCell("Statistic", `<div class="joy-statistic"><div class="joy-statistic__title">Volume</div><div class="joy-statistic__content"><span class="joy-statistic__prefix">$</span> <span class="joy-statistic__value">1234.50</span> <span class="joy-statistic__suffix">USD</span></div></div>`) +
+      [["up", "Portfolio Sharpe", "2.84", "+14.2% vs benchmark"], ["down", "Max drawdown", "-4.12%", "-0.5% this session"], ["neutral", "Active strategies", "12", "3 pending review"]]
+        .map(([t, title, value, change]) => hubCell(`MetricTile ${t}`, `<div class="joy-metric-tile joy-metric-tile--${t}"><div class="joy-metric-tile__title">${title}</div><div class="joy-metric-tile__value">${value}</div><div class="joy-metric-tile__change">${t === "up" ? iconSvg("TrendingUp") + '<span class="joy-metric-tile__sr">Increase: </span>' : t === "down" ? iconSvg("TrendingDown") + '<span class="joy-metric-tile__sr">Decrease: </span>' : ""}<span>${change}</span></div></div>`)).join("") +
+      [["positive", "Portfolio Value", "$1,429,850", "+14.2% (30d)"], ["critical", "Max Drawdown", "1.84%", "-0.4% from peak"], ["info", "Active Workers", "32 Nodes", "99.99% uptime"]]
+        .map(([tone, label, value, delta]) => hubCell(`StatCard ${tone}`, `<div class="joy-stat-card"><div class="joy-stat-card__label">${label}</div><div class="joy-stat-card__value">${value}</div><div class="joy-stat-card__delta joy-stat-card__delta--${tone}">${hubDelta("stat-card", delta)}</div></div>`)).join(""),
+  );
+  const progressCard = hubCard(
+    "progress", "Progress", "role=progressbar on the root; success and exception swap the percentage for an icon.",
+    hubCell("default", hubProgress(60)) + hubCell("success", hubProgress(100, "success")) + hubCell("exception", hubProgress(40, "exception")) + hubCell("no info, thick", hubProgress(72, "normal", { showInfo: false, stroke: 12 })),
+  );
+  const loadingCard = hubCard(
+    "skeleton", "Skeleton and Spin", "Loading placeholders and indicators.",
+    hubCell("text lines", `<div role="progressbar" aria-busy="true" aria-label="Loading text"><div class="joy-skeleton joy-skeleton--text"></div><div class="joy-skeleton joy-skeleton--text"></div><div class="joy-skeleton joy-skeleton--text" style="width: 70%;"></div></div>`) +
+      hubCell("circle and rect", `<div class="hub-row"><div class="joy-skeleton joy-skeleton--circle" role="progressbar" aria-busy="true" aria-label="Loading avatar"></div><div class="joy-skeleton joy-skeleton--rect" role="progressbar" aria-busy="true" aria-label="Loading card" style="height: 64px; flex: 1;"></div></div>`) +
+      hubCell("Spin", `<div class="hub-row">${[["sm", 16], ["md", 24], ["lg", 36]].map(([s, px]) => `<div class="joy-spin" role="status" aria-busy="true">${hubSvg.spin(px)}<span class="joy-spin__tip">${s}</span></div>`).join("")}</div>`),
+    "",
+  );
+  const imageCard = hubCard(
+    "image", "Image", "Previewable wrapper (role=button, Enter or Space opens the preview), the hover and focus overlay, a plain non-previewable image and the load-error fallback. Pictures are painted from theme tokens.",
+    hubCell("previewable (hover or focus)", hubImage({ kind: "a", index: 0 })) +
+      hubCell("overlay shown", hubImage({ kind: "b", index: 1, hover: true, alt: "Depth heatmap" })) +
+      hubCell("not previewable", hubImage({ kind: "a", preview: false })) +
+      hubCell("fallback after load error", hubImage({ broken: true, preview: false, alt: "Missing chart" })),
+  );
+  const imagePreviewCard = hubCard(
+    "image-preview", "ImagePreview", "Modal-layer mask with a labelled toolbar (zoom, rotate, reset, close); a gallery adds a counter and previous/next. Escape or the close button dismisses it and returns focus to the opener.",
+    hubCell("single image", `<button type="button" class="joy-button joy-button--solid joy-button--md" data-open="image-preview" aria-haspopup="dialog" onclick="openImagePreview(0, false)">Open preview</button>`) +
+      hubCell("gallery", `<button type="button" class="joy-button joy-button--outline joy-button--md" data-open="image-gallery" aria-haspopup="dialog" onclick="openImagePreview(0, true)">Open gallery</button>`),
+  );
+  const emptyCard = hubCard(
+    "empty-state", "EmptyState", "Title, description and an action slot.",
+    hubCell("empty", `<div class="joy-empty-state"><h3 class="joy-empty-state__title">No open orders</h3><p class="joy-empty-state__desc">Orders you place will appear here.</p><div class="joy-empty-state__action"><button type="button" class="joy-button joy-button--solid joy-button--md">New order</button></div></div>`),
+  );
+  const resultCard = hubCard(
+    "result", "Result", "Outcome states with an icon, title, optional subtitle and actions.",
+    hubCell("success", hubResult("success", hubSvg.resultSuccess, "Batch dispatched", "42 orders routed with zero rejections.")) +
+      hubCell("error", hubResult("error", hubSvg.resultError, "Margin limit exceeded", "Deposit funds or reduce the lot size.")) +
+      hubCell("404", hubResult("404", hubSvg.result404, "Page not found", "", false)),
+  );
+  const feedbackCard = hubCard(
+    "feedback", "Toast, Message and Notification", "Static states (the live triggers live on the Toast view); fixed positioning is neutralised here so every state stays in flow.",
+    variants.map((v) => hubCell(`Toast ${v}`, hubToast(v, `${v} toast message`))).join("") +
+      ["info", "success", "warning", "error"].map((t) => hubCell(`Message ${t}`, hubMessage(t, `${t} message`))).join("") +
+      ["info", "success", "warning", "error"].map((t) => hubCell(`Notification ${t}`, hubNotification(t, `${t[0].toUpperCase()}${t.slice(1)} notification`, "Longer description for the notification card."))).join(""),
+    " hub-static-feedback",
+  );
+  const tableCard = hubCard(
+    "table", "Table", "Default stacks into labelled cards on phones; the scroll variant keeps columns and pins the first one. Headers are sortable (click or Enter).",
+    hubCell("responsive stack (default)", hubLedgerTable("stack")) + hubCell("scroll variant, sticky first column", hubLedgerTable("scroll")),
+    " hub-matrix--stack",
+  );
+  const chartCard = hubCard(
+    "chart", "Charts", "HUD, region and canvas-summary markup of BarChart and CandlestickChart; canvases are painted from theme tokens.",
+    hubCell("BarChart", hubChartRegion("hub-bar", "Interactive Bar Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset.", hubHud("Interactive", "Bar Series") + hubHud("Peak", Math.max(...hubMatrixCharts.bars).toFixed(2), "accent"), `Bar chart, 1 series, ${hubMatrixCharts.bars.length} points`, `Revenue: ${hubMatrixCharts.bars.length} points`, ["Category", "Value"], hubMatrixCharts.bars.map((v, i) => `<tr><th scope="row">${i + 1}</th><td>${v.toFixed(2)}</td></tr>`).join(""), 240)) +
+      hubCell("CandlestickChart", hubChartRegion("hub-candle", "Interactive Candlestick Financial Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset.", hubHud("Pair:", "BTC/USDT") + hubHud("C:", lastCandle.close.toFixed(2), lastCandle.close >= lastCandle.open ? "bull" : "bear") + hubHud("Chg:", `${(((lastCandle.close - firstCandle.open) / firstCandle.open) * 100).toFixed(2)}%`, lastCandle.close >= firstCandle.open ? "bull" : "bear"), `Candlestick chart, ${hubMatrixCharts.candles.length} candles`, `Candlestick data: ${hubMatrixCharts.candles.length} candles`, ["Time", "Open", "High", "Low", "Close"], hubMatrixCharts.candles.map((c, i) => `<tr><th scope="row">T+${i}m</th><td>${c.open.toFixed(2)}</td><td>${c.high.toFixed(2)}</td><td>${c.low.toFixed(2)}</td><td>${c.close.toFixed(2)}</td></tr>`).join(""), 240)),
+    " hub-matrix--stack",
+  );
+  return `<section id="view-data-display-feedback" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Data Display & Feedback</h2>
+        <p class="header-tagline">State matrices for the display and feedback components: Alert, Badge, Tag, Avatar, Statistic and KPI tiles, Progress, Skeleton, Spin, EmptyState, Result, Toast, Message, Notification, Table and charts.</p>
+        ${alertCards}${badgeCard}${tagCard}${avatarCard}${imageCard}${imagePreviewCard}${statCard}${progressCard}${loadingCard}${emptyCard}${resultCard}${feedbackCard}${tableCard}${chartCard}
+      </section>`;
+}
+
+// Same windowing rule as packages/svelte/src/lib/pagination-utils.ts (siblings = 1).
+function hubPageWindow(current, last) {
+  if (last <= 7) return Array.from({ length: last }, (_, i) => i + 1);
+  const left = Math.max(current - 1, 1);
+  const right = Math.min(current + 1, last);
+  const showStart = left > 3;
+  const showEnd = right < last - 2;
+  const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  if (!showStart && showEnd) return [...range(1, 5), "…", last];
+  if (showStart && !showEnd) return [1, "…", ...range(last - 4, last)];
+  return [1, "…", ...range(left, right), "…", last];
+}
+const hubPager = (current, last, { compact = false, sizeChanger = false, total = last * 10, id = "" } = {}) => {
+  const pages = compact ? [current] : hubPageWindow(current, last);
+  const btn = (aria, inner, extra = "", attrs = "") => `<button type="button" class="joy-pagination__btn${extra}" aria-label="${aria}"${attrs}>${inner}</button>`;
+  return `<nav class="joy-pagination"${id ? ` id="${id}"` : ""} role="navigation" aria-label="Pagination">${btn("Previous page", iconSvg("ChevronLeft"), "", current <= 1 ? " disabled" : "")}${pages
+    .map((p) => (p === "…" ? '<span class="joy-pagination__ellipsis" aria-hidden="true">…</span>' : btn(`Page ${p}`, p, p === current ? " joy-pagination__btn--active" : "", p === current ? ' aria-current="page"' : "")))
+    .join("")}${btn("Next page", iconSvg("ChevronRight"), "", current >= last ? " disabled" : "")}${sizeChanger ? '<select class="joy-select joy-pagination__size" aria-label="Items per page"><option value="10" selected>10 / page</option><option value="20">20 / page</option><option value="50">50 / page</option></select>' : ""}${compact ? "" : `<span class="joy-pagination__info">Total: ${total} items</span>`}</nav>`;
+};
+
+const hubTabs = (id, tabs, active = 0) =>
+  `<div class="joy-tabs-container" data-hub-tabs><div class="joy-tabs" role="tablist" aria-orientation="horizontal">${tabs
+    .map((t, i) => `<button type="button" role="tab" id="${id}-tab-${i}" aria-selected="${i === active}" aria-controls="${id}-panel-${i}" tabindex="${i === active ? 0 : -1}" class="joy-tab-btn${i === active ? " joy-tab-btn--active" : ""}" onclick="hubSelectTab(this)" onkeydown="hubTabKey(event,this)">${t.label}</button>`)
+    .join("")}</div>${tabs
+    .map((t, i) => `<div class="joy-tab-content" role="tabpanel" id="${id}-panel-${i}" aria-labelledby="${id}-tab-${i}"${i === active ? "" : " hidden"}>${t.content || ""}</div>`)
+    .join("")}</div>`;
+
+const hubMenuItem = (label, { icon = "", active = false, disabled = false } = {}) =>
+  `<li class="joy-menu__item${active ? " joy-menu__item--active" : ""}${disabled ? " joy-menu__item--disabled" : ""}" role="menuitem"${active ? ' aria-current="page"' : ""}${disabled ? ' aria-disabled="true"' : ""} tabindex="${active ? 0 : -1}"${disabled ? "" : ' onclick="selectMenuItem(this)"'}>${icon ? `<span class="joy-menu__item-icon">${iconSvg(icon, "15")}</span>` : ""}<span class="joy-menu__item-text">${label}</span></li>`;
+
+const hubStepItem = (state, idx, title, desc = "", stepNo = 0) =>
+  `<div class="joy-steps__item joy-steps__item--${state}" role="button" tabindex="0"${state === "process" || state === "error" ? ' aria-current="step"' : ""}${stepNo >= 0 ? ` onclick="setDemoStep(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setDemoStep(${idx})}"` : ""}><div class="joy-steps__icon">${state === "finish" ? hubSvg.check : state === "error" ? hubSvg.cross : idx + 1}</div><div class="joy-steps__content"><div class="joy-steps__title">${title}</div>${desc ? `<div class="joy-steps__desc">${desc}</div>` : ""}</div></div>`;
+
+const hubSplitter = (layout, first, second, height = 180, id = "") =>
+  `<div class="joy-splitter joy-splitter--${layout}"${id ? ` id="${id}"` : ""} role="group" aria-label="Resizable Splitter Panel" style="${layout === "horizontal" ? `height: ${height}px;` : ""}"><div class="joy-splitter__pane" style="--joy-splitter-size: 40;"><div class="hub-pane">${first}</div></div><div class="joy-splitter__bar" role="separator" aria-label="Resize panes" aria-orientation="${layout === "horizontal" ? "vertical" : "horizontal"}" aria-valuenow="40" aria-valuemin="10" aria-valuemax="90" tabindex="0" data-hub-splitter></div><div class="joy-splitter__pane" style="--joy-splitter-size: 60;"><div class="hub-pane">${second}</div></div></div>`;
+
+const hubImageOverlay = (extra = "") => `<div class="joy-image__overlay"${extra}>${iconSvg("Eye", "16")}<span>Preview</span></div>`;
+const hubImage = ({ kind = "a", preview = true, index = 0, hover = false, broken = false, w = 160, h = 120, alt = "Order flow chart" } = {}) =>
+  `<div class="joy-image-wrapper${preview ? " joy-image-wrapper--previewable" : ""}" style="width: ${w}px; height: ${h}px;"${preview ? ` role="button" tabindex="0" data-open="image-preview" onclick="openImagePreview(${index}, false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openImagePreview(${index}, false)}"${hover ? "" : ` onpointerenter="hubImageHover(this, true)" onpointerleave="hubImageHover(this, false)" onfocusin="hubImageHover(this, true)" onfocusout="hubImageHover(this, false)"`}` : ""}><img class="joy-image__img" alt="${alt}" data-hub-img="${broken ? "broken" : kind}"${broken ? ` src="data:image/gif;base64,AAAA"` : ""}>${preview && hover ? hubImageOverlay(" data-static") : ""}</div>`;
+
+const hubTimelineItem = (status, title, desc, time) =>
+  `<li class="joy-timeline__item"><div class="joy-timeline__dot joy-timeline__dot--${status}"></div><div class="joy-timeline__content"><div class="joy-timeline__title">${title}</div><div class="joy-timeline__description">${desc}</div><div class="joy-timeline__time">${time}</div></div></li>`;
+
+const hubDropdown = (id) => {
+  const item = (key, label, cls = "") => `<button type="button" role="menuitem" class="joy-dropdown__item${cls}" onclick="selectHubDropdownItem(this, '${key}')">${label}</button>`;
+  return `<div class="joy-dropdown-wrapper"><div class="joy-dropdown-trigger" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-controls="${id}" onclick="toggleHubDropdown(this)" onkeydown="if(event.key==='Enter'||event.key===' '||event.key==='ArrowDown'){event.preventDefault();toggleHubDropdown(this)}"><span class="joy-button joy-button--outline joy-button--md">Strategy options ${iconSvg("ChevronDown", "12")}</span></div><div id="${id}" class="joy-dropdown" role="menu" tabindex="-1" aria-orientation="vertical" data-hub-panel hidden>${item("dup", "Duplicate strategy")}${item("csv", "Export CSV")}${item("arch", "Archive strategy", " joy-dropdown__item--danger")}<button type="button" role="menuitem" class="joy-dropdown__item" disabled>Locked action</button></div></div>`;
+};
+
+const hubPopconfirm = (id, triggerLabel, title = "Revoke this key?", variant = "danger") =>
+  `<div class="joy-popconfirm"><div class="joy-popconfirm__trigger"><button type="button" class="joy-button joy-button--${variant} joy-button--sm" aria-haspopup="dialog" aria-expanded="false" aria-controls="${id}" onclick="toggleHubPopconfirm(this)">${triggerLabel}</button></div><div id="${id}" class="joy-popconfirm__panel" role="alertdialog" aria-labelledby="${id}-title" data-hub-panel hidden><div class="joy-popconfirm__title"><span class="joy-popconfirm__icon">${iconSvg("AlertCircle", "1rem")}</span><span id="${id}-title">${title}</span></div><div class="joy-popconfirm__buttons"><button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="closeHubPopconfirm(this)">Cancel</button><button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="confirmHubPopconfirm(this)">Confirm</button></div></div></div>`;
+
+const hubTooltip = (id, label, visible = false) =>
+  `<div class="joy-tooltip-wrapper"${visible ? "" : ` onpointerenter="hubTip('${id}', true)" onpointerleave="hubTip('${id}', false)" onfocusin="hubTip('${id}', true)" onfocusout="hubTip('${id}', false)"`}><button type="button" class="joy-button joy-button--outline joy-button--md" aria-describedby="${id}">${label}</button><div id="${id}" class="joy-tooltip" role="tooltip"${visible ? " data-static" : " hidden"}>Maker 0.01% | Taker 0.04%</div></div>`;
+
+function renderNavigationView() {
+  const pagerCard = hubCard(
+    "pagination", "Pagination", "Windowed list, first page, size changer, and the phone rule (only the current page between Previous and Next at 480px or less).",
+    hubCell("windowed (page 5 of 20)", hubPager(5, 20)) + hubCell("first page", hubPager(1, 20)) + hubCell("with size changer", hubPager(1, 3, { sizeChanger: true })) + hubCell("compact rule", hubPager(5, 20, { compact: true })) + hubCell("live (responsive)", `<div data-live-pager>${hubPager(5, 20, { id: "hub-live-pager" })}</div>`),
+  );
+  const tabsCard = hubCard(
+    "tabs", "Tabs", "Roving keyboard support (arrows, Home, End); the tab list scrolls with edge fades when it overflows.",
+    hubCell("default", hubTabs("hub-tabs-a", [{ label: "Live Orders", content: "3 active limit orders awaiting a counter-party." }, { label: "Historical Fills", content: "12 fills in the last 24 hours." }, { label: "Risk Matrix", content: "VaR 99%: 1.42 BTC." }])) +
+      hubCell("overflowing", hubTabs("hub-tabs-b", ["Overview", "Positions", "Orders", "Fills", "Funding", "Risk limits", "Reports", "Audit log"].map((label) => ({ label, content: `${label} panel` })))),
+  );
+  const menuCard = hubCard(
+    "menu", "Menu", "Horizontal with icons, inline sidebar and a disabled item.",
+    hubCell("horizontal", `<ul class="joy-menu joy-menu--horizontal" role="menu" aria-orientation="horizontal">${hubMenuItem("Terminal", { icon: "Activity", active: true })}${hubMenuItem("Wallet", { icon: "Wallet" })}${hubMenuItem("Rules", { icon: "Sliders" })}${hubMenuItem("Archived", { disabled: true })}</ul>`) +
+      hubCell("inline", `<ul class="joy-menu joy-menu--inline" role="menu" aria-orientation="vertical">${hubMenuItem("Spot liquidity", { active: true })}${hubMenuItem("Perpetual futures")}${hubMenuItem("Options surface")}</ul>`),
+  );
+  const breadcrumbCard = hubCard(
+    "breadcrumb", "Breadcrumb", "Links, separators and the current page.",
+    hubCell("default", `<nav class="joy-breadcrumb" aria-label="Breadcrumb"><ol><li><a class="joy-breadcrumb__link" href="#overview" onclick="switchView('overview')">Home</a> <span class="joy-breadcrumb__sep" aria-hidden="true">/</span></li><li><a class="joy-breadcrumb__link" href="#financial-table" onclick="switchView('financial-table')">Quant Engine</a> <span class="joy-breadcrumb__sep" aria-hidden="true">/</span></li><li><span class="joy-breadcrumb__current" aria-current="page">Alpha-1 Delta Neutral</span></li></ol></nav>`),
+  );
+  const stepsCard = hubCard(
+    "steps", "Steps", "Interactive horizontal tracker and a vertical list with an error step.",
+    hubCell("horizontal (click to advance)", `<div class="joy-steps joy-steps--horizontal" id="demo-steps-nav" role="navigation" aria-label="Steps progress">${hubStepItem("finish", 0, "KYC", "Identity verified")}${hubStepItem("process", 1, "Funding", "Deposit collateral")}${hubStepItem("wait", 2, "Activation", "Deploy strategies")}</div><div class="hub-row" style="margin-top: var(--joy-space-3);"><button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="advanceDemoStep(-1)">Previous step</button><button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="advanceDemoStep(1)">Next step</button></div>`) +
+      hubCell("vertical with error", `<div class="joy-steps joy-steps--vertical" role="navigation" aria-label="Steps progress">${hubStepItem("finish", 0, "Submitted", "", -1)}${hubStepItem("error", 1, "Compliance review", "Document rejected", -1)}${hubStepItem("wait", 2, "Settlement", "", -1)}</div>`),
+  );
+  const anchorCard = hubCard(
+    "anchor", "Anchor", "In-page anchor track with an ink marker and aria-current on the active link.",
+    hubCell("default", `<nav class="joy-anchor" role="navigation" aria-label="Anchor Navigation"><div class="joy-anchor__ink"></div><a href="#menu" class="joy-anchor__link joy-anchor__link--active" aria-current="location" onclick="selectAnchor(this, event)">Overview</a><a href="#api" class="joy-anchor__link" onclick="selectAnchor(this, event)">API</a><a href="#a11y" class="joy-anchor__link" onclick="selectAnchor(this, event)">Accessibility</a></nav>`),
+  );
+  const timelineCard = hubCard(
+    "timeline", "Timeline", "Event trail with dot statuses from success to danger.",
+    hubCell("statuses", `<ul class="joy-timeline" role="list">${hubTimelineItem("success", "Order 8841 filled", "250 SOL at 184.20 via Phoenix.", "14:32:08 UTC")}${hubTimelineItem("primary", "Risk check passed", "Portfolio beta 0.28 of 0.40.", "14:31:55 UTC")}${hubTimelineItem("warning", "Slippage rebalanced", "Tolerance moved from 5 to 12 bps.", "14:28:10 UTC")}${hubTimelineItem("danger", "Venue rejected quote", "Gateway timeout after 3 retries.", "14:20:41 UTC")}${hubTimelineItem("info", "Session authenticated", "API key from the Singapore worker.", "14:15:00 UTC")}</ul>`),
+  );
+  const splitterCard = hubCard(
+    "splitter", "Splitter", "Drag the divider or use the arrow keys; below 640px the horizontal layout stacks.",
+    hubCell("horizontal", hubSplitter("horizontal", "<strong>Controls</strong><p>Engine parameters and latency limits.</p>", "<strong>Telemetry</strong><p>Live fills and routing logs.</p>", 180)) + hubCell("vertical", hubSplitter("vertical", "<strong>Top</strong>", "<strong>Bottom</strong>")),
+    " hub-matrix--stack",
+  );
+  const overlayCard = hubCard(
+    "overlays", "Overlay openers", "Modal (with a Popconfirm inside it), Drawer, Popconfirm, Dropdown and Tooltip. Popconfirm sits on the popover layer, above the modal.",
+    hubCell("Modal", `<button type="button" class="joy-button joy-button--solid joy-button--md" data-open="modal" aria-haspopup="dialog" onclick="openDemoModal()">Open modal</button>`) +
+      hubCell("Drawer", `<div class="hub-row"><button type="button" class="joy-button joy-button--solid joy-button--md" data-open="drawer" aria-haspopup="dialog" onclick="openDemoDrawer('right')">Open drawer</button><button type="button" class="joy-button joy-button--outline joy-button--md" data-open="drawer-left" aria-haspopup="dialog" onclick="openDemoDrawer('left')">Open left drawer</button></div>`) +
+      hubCell("Popconfirm", hubPopconfirm("hub-popconfirm-inline", "Revoke API key")) +
+      hubCell("Dropdown", hubDropdown("hub-dropdown-menu")) +
+      hubCell("Tooltip (hover or focus)", hubTooltip("hub-tip-a", "Trading fee")) +
+      hubCell("Tooltip (open state)", `<div style="padding-top: var(--joy-space-8);">${hubTooltip("hub-tip-b", "Always shown", true)}</div>`),
+  );
+  const markdownCard = hubCard(
+    "markdown", "MarkdownViewer", "Rendered content region with the code-block copy contract.",
+    hubCell("viewer", `<div class="joy-markdown" role="region" aria-label="Markdown content"><h3>Release notes</h3><p>This release ships <strong>display, feedback and navigation</strong> fixes.</p><pre class="joy-markdown__pre"><code>pnpm --filter @joymify/svelte test</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre></div>`),
+    " hub-matrix--stack",
+  );
+  return `<section id="view-navigation-workflow" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Navigation & Workflow</h2>
+        <p class="header-tagline">State matrices for navigation, workflow and overlay components: Pagination, Tabs, Menu, Breadcrumb, Steps, Anchor, Timeline, Splitter, Modal, Drawer, Popconfirm, Dropdown, Tooltip and MarkdownViewer.</p>
+        ${pagerCard}${tabsCard}${menuCard}${breadcrumbCard}${stepsCard}${anchorCard}${timelineCard}${splitterCard}${overlayCard}${markdownCard}
+      </section>`;
+}
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -489,6 +821,60 @@ ${inlinedThemeCss}
         width: 100vw;
         margin-left: calc(50% - 50vw);
       }
+    }
+    /* Wave 3 (F-038) aspect views: token-only matrices */
+    .hub-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+      gap: var(--joy-space-4);
+      align-items: start;
+      width: 100%;
+      min-width: 0;
+    }
+    .hub-matrix--stack {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    /* The always-open Tooltip demo sits on the tooltip layer, above modals and drawers; hide it while a hub dialog is open so it does not float over the overlay. */
+    body:has([data-hub-dialog][style*="display: block"]) .joy-tooltip[data-static] {
+      visibility: hidden;
+    }
+    .hub-matrix__cell {
+      min-width: 0;
+    }
+    .hub-matrix__cell > h4 {
+      margin: 0 0 var(--joy-space-2);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--joy-text-muted);
+    }
+    .hub-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--joy-space-2);
+    }
+    .hub-pane {
+      padding: var(--joy-space-3);
+      font-size: 0.8125rem;
+      color: var(--joy-text-secondary);
+    }
+    .hub-pane p {
+      margin: var(--joy-space-1) 0 0;
+    }
+    /* Message and Notification are position: fixed toasts; keep the static states in flow. */
+    .hub-static-feedback .joy-message,
+    .hub-static-feedback .joy-notification {
+      position: static;
+      transform: none;
+      max-width: 100%;
+    }
+    .hub-static-feedback .joy-message {
+      align-items: flex-start;
+    }
+    .hub-static-feedback .joy-notification__notice {
+      width: 100%;
     }
     .canvas {
       padding: 44px 32px;
@@ -788,12 +1174,6 @@ ${inlinedThemeCss}
     }
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
-    }
-    [data-theme="dark"] .joy-toast {
-      background: var(--joy-surface-card) !important;
-      color: var(--joy-surface-raised) !important;
-      border-color: var(--joy-surface-raised) !important;
-      box-shadow: 0 10px 25px transparent !important;
     }
 
     /* ── Mobile Navigation Drawer & Backdrop ── */
@@ -1128,8 +1508,7 @@ ${inlinedThemeCss}
     [data-theme="dark"] .playground-header h4,
     [data-theme="dark"] .tokens-table th,
     [data-theme="dark"] .icon-preview,
-    [data-theme="dark"] .component-title,
-    [data-theme="dark"] .joy-toast {
+    [data-theme="dark"] .component-title {
       color: var(--joy-text-primary);
     }
     [data-theme="dark"] .topbar {
@@ -1496,6 +1875,12 @@ ${navigationHtml}
                   <td>Spacing density optimized for order books vs general tables</td>
                 </tr>
                 <tr>
+                  <td><span class="joy-prop-name">variant</span></td>
+                  <td><span class="joy-prop-type">'stack' | 'scroll'</span></td>
+                  <td><span class="joy-prop-default">follows responsive</span></td>
+                  <td>Phone layout: <code>stack</code> turns rows into labelled cards; <code>scroll</code> keeps the columns and pins the first one while scrolling sideways</td>
+                </tr>
+                <tr>
                   <td><span class="joy-prop-name">sortKey</span></td>
                   <td><span class="joy-prop-type">string</span></td>
                   <td><span class="joy-prop-default">''</span></td>
@@ -1775,29 +2160,17 @@ ${navigationHtml}
       <!-- View: Alert -->
       <section id="view-alert" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Alert Component</h2>
-        <p class="header-tagline">Contextual notification banners for messaging, validation, and system status.</p>
+        <p class="header-tagline">Contextual notification banners for messaging, validation, and system status. Every variant renders its status icon; closable alerts add a dismiss button.</p>
 
         <div class="playground-box">
           <div class="playground-header">
             <h4>Alert Variations</h4>
           </div>
-          <div style="padding: 24px;">
-            <div class="joy-alert joy-alert--info">
-              <div class="joy-alert__title">System Information</div>
-              <div class="joy-alert__desc">Real-time market feed connects to high-throughput WebSocket.</div>
-            </div>
-            <div class="joy-alert joy-alert--success">
-              <div class="joy-alert__title">Order Executed</div>
-              <div class="joy-alert__desc">Filled 1.5 BTC at $68,420.00 with 0.01% slippage.</div>
-            </div>
-            <div class="joy-alert joy-alert--warning">
-              <div class="joy-alert__title">Margin Warning</div>
-              <div class="joy-alert__desc">Maintenance margin usage reached 78%.</div>
-            </div>
-            <div class="joy-alert joy-alert--danger">
-              <div class="joy-alert__title">API Disconnected</div>
-              <div class="joy-alert__desc">Unable to reach gateway endpoint. Retrying in 5s...</div>
-            </div>
+          <div style="padding: 24px; display: flex; flex-direction: column; gap: var(--joy-space-3);">
+            ${hubAlert("info", "System Information", "Real-time market feed connects to high-throughput WebSocket.")}
+            ${hubAlert("success", "Order Executed", "Filled 1.5 BTC at $68,420.00 with 0.01% slippage.")}
+            ${hubAlert("warning", "Margin Warning", "Maintenance margin usage reached 78%.", true)}
+            ${hubAlert("danger", "API Disconnected", "Unable to reach gateway endpoint. Retrying in 5s...", true)}
           </div>
         </div>
       </section>
@@ -1813,17 +2186,17 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%;">
             <div class="joy-metric-tile joy-metric-tile--up">
-              <div class="joy-metric-tile__title">PORTFOLIO SHARPE</div>
+              <div class="joy-metric-tile__title">Portfolio Sharpe</div>
               <div class="joy-metric-tile__value">2.84</div>
               <div class="joy-metric-tile__change">+14.2% vs benchmark</div>
             </div>
             <div class="joy-metric-tile joy-metric-tile--down">
-              <div class="joy-metric-tile__title">MAX DRAWDOWN</div>
+              <div class="joy-metric-tile__title">Max drawdown</div>
               <div class="joy-metric-tile__value">-4.12%</div>
               <div class="joy-metric-tile__change">-0.5% this session</div>
             </div>
             <div class="joy-metric-tile joy-metric-tile--neutral">
-              <div class="joy-metric-tile__title">ACTIVE STRATEGIES</div>
+              <div class="joy-metric-tile__title">Active strategies</div>
               <div class="joy-metric-tile__value">12</div>
               <div class="joy-metric-tile__change">3 pending review</div>
             </div>
@@ -1880,34 +2253,16 @@ ${navigationHtml}
       <!-- View: Modal -->
       <section id="view-modal" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Modal / Dialog Component</h2>
-        <p class="header-tagline">Accessible modal dialog overlay with backdrop blur, focus trap, and escape key listener.</p>
+        <p class="header-tagline">Accessible modal dialog overlay with backdrop blur, focus trap, and escape key listener. The dialog contains a Popconfirm that opens above it on the popover layer; at 480px or less the dialog is full-bleed and the Popconfirm becomes a bottom sheet.</p>
 
         <div class="playground-box">
           <div class="playground-header">
             <h4>Interactive Dialog Trigger</h4>
           </div>
           <div class="canvas">
-            <button class="joy-button joy-button--solid joy-button--md" onclick="openDemoModal()">
+            <button type="button" class="joy-button joy-button--solid joy-button--md" aria-haspopup="dialog" onclick="openDemoModal()">
               Open Confirm Modal
             </button>
-          </div>
-        </div>
-
-        <div id="demo-modal-container" style="display: none;">
-          <div class="joy-modal-backdrop" onclick="closeDemoModal(event)">
-            <div class="joy-modal">
-              <div class="joy-modal__header">
-                <h3 class="joy-modal__title">Confirm Liquidation Order</h3>
-                <button type="button" class="joy-modal__close" onclick="closeDemoModal()">&times;</button>
-              </div>
-              <div class="joy-modal__body">
-                Are you sure you want to trigger emergency liquidation across all connected sub-accounts? This action is immediate and non-reversible.
-              </div>
-              <div class="joy-modal__footer">
-                <button class="joy-button joy-button--ghost joy-button--md" onclick="closeDemoModal()">Cancel</button>
-                <button class="joy-button joy-button--danger joy-button--md" onclick="alert('Order submitted!'); closeDemoModal();">Confirm</button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -1930,17 +2285,7 @@ ${navigationHtml}
             <h4>Interactive Dropdown</h4>
           </div>
           <div class="canvas" style="min-height: 220px;">
-            <div class="joy-dropdown-wrapper">
-              <button class="joy-button joy-button--outline joy-button--md" onclick="toggleDemoDropdown()">
-                Strategy Options <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
-              <div class="joy-dropdown" id="demo-dropdown-menu" style="display: none;">
-                <button class="joy-dropdown__item" onclick="selectDropdownAction('Duplicate')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Duplicate Strategy</button>
-                <button class="joy-dropdown__item" onclick="selectDropdownAction('Export CSV')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export Performance CSV</button>
-                <button class="joy-dropdown__item" onclick="selectDropdownAction('Backtest')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Run Deep Backtest</button>
-                <button class="joy-dropdown__item joy-dropdown__item--danger" style="color: var(--joy-status-danger-fg);" onclick="selectDropdownAction('Archive')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Archive Strategy</button>
-              </div>
-            </div>
+            ${hubDropdown("demo-dropdown-menu")}
           </div>
           <div style="padding: 12px 20px; background: var(--joy-surface-raised); border-top: 1px solid var(--joy-border-default); font-size: 0.875rem;">
             Selected action: <strong id="dropdown-selection-text" style="color: var(--joy-accent-default);">None</strong>
@@ -1958,20 +2303,7 @@ ${navigationHtml}
             <h4>Interactive Tabs</h4>
           </div>
           <div style="padding: 24px;">
-            <div class="joy-tabs">
-              <button class="joy-tab-btn joy-tab-btn--active" id="tab-btn-1" onclick="switchDemoTab('tab-btn-1', 'tab-panel-1')">Live Orders</button>
-              <button class="joy-tab-btn" id="tab-btn-2" onclick="switchDemoTab('tab-btn-2', 'tab-panel-2')">Historical Fills</button>
-              <button class="joy-tab-btn" id="tab-btn-3" onclick="switchDemoTab('tab-btn-3', 'tab-panel-3')">Risk Matrix</button>
-            </div>
-            <div id="tab-panel-1" class="tab-panel-demo">
-              <p style="margin: 0; color: var(--joy-text-secondary);">Showing 3 active live limit orders awaiting counter-party match.</p>
-            </div>
-            <div id="tab-panel-2" class="tab-panel-demo" style="display: none;">
-              <p style="margin: 0; color: var(--joy-text-secondary);">12 fills executed in the last 24 hours with zero rejected packets.</p>
-            </div>
-            <div id="tab-panel-3" class="tab-panel-demo" style="display: none;">
-              <p style="margin: 0; color: var(--joy-text-secondary);">Value at Risk (VaR 99%): 1.42 BTC across delta-neutral positions.</p>
-            </div>
+            ${hubTabs("demo-tabs", [{ label: "Live Orders", content: '<p style="margin: 0; color: var(--joy-text-secondary);">Showing 3 active live limit orders awaiting counter-party match.</p>' }, { label: "Historical Fills", content: '<p style="margin: 0; color: var(--joy-text-secondary);">12 fills executed in the last 24 hours with zero rejected packets.</p>' }, { label: "Risk Matrix", content: '<p style="margin: 0; color: var(--joy-text-secondary);">Value at Risk (VaR 99%): 1.42 BTC across delta-neutral positions.</p>' }])}
           </div>
         </div>
       </section>
@@ -1986,18 +2318,10 @@ ${navigationHtml}
             <h4>Interactive Tooltips</h4>
           </div>
           <div class="canvas" style="gap: 32px;">
-            <div class="joy-tooltip-wrapper">
-              <button class="joy-button joy-button--outline joy-button--md">
-                Hover Me (Trading Fee)
-              </button>
-              <div class="joy-tooltip">Maker fee: 0.01% | Taker: 0.04%</div>
-            </div>
-
-            <div class="joy-tooltip-wrapper">
-              <span class="joy-badge joy-badge--brand joy-badge--md" tabindex="0">
-                Focus Me (Keyboard)
-              </span>
-              <div class="joy-tooltip">Accessible ARIA tooltip with keyboard tab support</div>
+            ${hubTooltip("demo-tip-a", "Hover me (trading fee)")}
+            <div class="joy-tooltip-wrapper" onpointerenter="hubTip('demo-tip-b', true)" onpointerleave="hubTip('demo-tip-b', false)" onfocusin="hubTip('demo-tip-b', true)" onfocusout="hubTip('demo-tip-b', false)">
+              <span class="joy-badge joy-badge--brand joy-badge--md" tabindex="0" aria-describedby="demo-tip-b">Focus me (keyboard)</span>
+              <div id="demo-tip-b" class="joy-tooltip" role="tooltip" hidden>Accessible ARIA tooltip with keyboard tab support</div>
             </div>
           </div>
         </div>
@@ -2095,18 +2419,18 @@ ${navigationHtml}
       <!-- View: Drawer -->
       <section id="view-drawer" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Drawer / Slide-out Sheet</h2>
-        <p class="header-tagline">Heavyweight off-canvas inspection panel for deep financial telemetry, analytics, and detail workflows.</p>
+        <p class="header-tagline">Heavyweight off-canvas inspection panel for deep financial telemetry, analytics, and detail workflows. At 480px or less it renders as a bottom sheet from either side.</p>
 
         <div class="playground-box">
           <div class="playground-header">
             <h4>Drawer Placement Triggers</h4>
           </div>
           <div class="canvas" style="gap: 20px;">
-            <button class="joy-button joy-button--solid joy-button--md" onclick="openDemoDrawer('right')">
-              Open Right Sheet (Risk Analytics) &rarr;
+            <button type="button" class="joy-button joy-button--solid joy-button--md" aria-haspopup="dialog" onclick="openDemoDrawer('right')">
+              Open right drawer (risk analytics)
             </button>
-            <button class="joy-button joy-button--outline joy-button--md" onclick="openDemoDrawer('left')">
-              &larr; Open Left Sheet (Navigation Tree)
+            <button type="button" class="joy-button joy-button--outline joy-button--md" aria-haspopup="dialog" onclick="openDemoDrawer('left')">
+              Open left drawer (navigation tree)
             </button>
           </div>
         </div>
@@ -2199,15 +2523,15 @@ ${navigationHtml}
             </div>
 
             <nav class="joy-pagination" role="navigation" aria-label="Pagination">
-              <button type="button" class="joy-pagination__btn" id="pg-prev" onclick="handlePageNav('prev')">&larr;</button>
-              <button type="button" class="joy-pagination__btn joy-pagination__btn--active" id="pg-1" onclick="goToDemoPage(1)">1</button>
-              <button type="button" class="joy-pagination__btn" id="pg-2" onclick="goToDemoPage(2)">2</button>
-              <button type="button" class="joy-pagination__btn" id="pg-3" onclick="goToDemoPage(3)">3</button>
-              <button type="button" class="joy-pagination__btn" id="pg-4" onclick="goToDemoPage(4)">4</button>
-              <button type="button" class="joy-pagination__btn" id="pg-5" onclick="goToDemoPage(5)">5</button>
-              <button type="button" class="joy-pagination__btn" id="pg-next" onclick="handlePageNav('next')">&rarr;</button>
+              <button type="button" class="joy-pagination__btn" id="pg-prev" aria-label="Previous page" onclick="handlePageNav('prev')">${iconSvg("ChevronLeft")}</button>
+              <button type="button" class="joy-pagination__btn joy-pagination__btn--active" id="pg-1" aria-label="Page 1" aria-current="page" onclick="goToDemoPage(1)">1</button>
+              <button type="button" class="joy-pagination__btn" id="pg-2" aria-label="Page 2" onclick="goToDemoPage(2)">2</button>
+              <button type="button" class="joy-pagination__btn" id="pg-3" aria-label="Page 3" onclick="goToDemoPage(3)">3</button>
+              <button type="button" class="joy-pagination__btn" id="pg-4" aria-label="Page 4" onclick="goToDemoPage(4)">4</button>
+              <button type="button" class="joy-pagination__btn" id="pg-5" aria-label="Page 5" onclick="goToDemoPage(5)">5</button>
+              <button type="button" class="joy-pagination__btn" id="pg-next" aria-label="Next page" onclick="handlePageNav('next')">${iconSvg("ChevronRight")}</button>
 
-              <select class="joy-select" style="width: auto; padding: 4px 28px 4px 8px; font-size: 0.8125rem; margin-left: 12px;" onchange="handleDemoPageSize(this.value)">
+              <select class="joy-select joy-pagination__size" aria-label="Items per page" onchange="handleDemoPageSize(this.value)">
                 <option value="10">10 / page</option>
                 <option value="20">20 / page</option>
                 <option value="50">50 / page</option>
@@ -2314,50 +2638,8 @@ ${navigationHtml}
         </div>
       </section>
 
-      <!-- View: Enterprise Display (Breadcrumb & StatCard) -->
-      <section id="view-enterprise-display" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">Breadcrumb Navigation & Stat Cards</h2>
-        <p class="header-tagline">Hierarchical route tracking and trading KPI metric displays with high-contrast delta tone badges.</p>
-
-        <div class="playground-box">
-          <div class="playground-header">
-            <h4>Breadcrumb Navigation</h4>
-          </div>
-          <div class="canvas" style="justify-content: flex-start; padding: 24px;">
-            <nav class="joy-breadcrumb" aria-label="Breadcrumb">
-              <ol>
-                <li><a class="joy-breadcrumb__link" href="#overview" onclick="switchView('overview')">Home</a><span class="joy-breadcrumb__sep">/</span></li>
-                <li><a class="joy-breadcrumb__link" href="#quant" onclick="switchView('financial-table')">Quant Engine</a><span class="joy-breadcrumb__sep">/</span></li>
-                <li><a class="joy-breadcrumb__link" href="#vaults">Vaults</a><span class="joy-breadcrumb__sep">/</span></li>
-                <li><span class="joy-breadcrumb__current" aria-current="page">Alpha-1 Delta Neutral</span></li>
-              </ol>
-            </nav>
-          </div>
-        </div>
-
-        <div class="playground-box">
-          <div class="playground-header">
-            <h4>Enterprise KPI Stat Cards</h4>
-          </div>
-          <div class="canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
-            <div class="joy-stat-card">
-              <div class="joy-stat-card__label">Portfolio Value</div>
-              <div class="joy-stat-card__value">$1,429,850</div>
-              <div class="joy-stat-card__delta joy-stat-card__delta--positive">&uarr; +14.2% (30d)</div>
-            </div>
-            <div class="joy-stat-card">
-              <div class="joy-stat-card__label">Max Drawdown</div>
-              <div class="joy-stat-card__value">1.84%</div>
-              <div class="joy-stat-card__delta joy-stat-card__delta--critical">&darr; -0.4% from peak</div>
-            </div>
-            <div class="joy-stat-card">
-              <div class="joy-stat-card__label">Active Workers</div>
-              <div class="joy-stat-card__value">32 Nodes</div>
-              <div class="joy-stat-card__delta joy-stat-card__delta--info">&bull; 99.99% Vultr Uptime</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- View: Data Display & Feedback (Wave 3 aspect view) -->
+      ${renderDisplayView()}
 
       <!-- View: Progress -->
       <section id="view-progress" class="view-panel">
@@ -2576,7 +2858,7 @@ import { Router, OrderType } from '@joymify/quant';
 export async function executeHedge(symbol: string, size: number) {
   const quote = await Router.getOptimalQuote(symbol, size);
   return Router.dispatch({ symbol, size, type: OrderType.LIMIT, price: quote.bestAsk });
-}</code><button type="button" class="joy-markdown__copy-btn" onclick="navigator.clipboard?.writeText('// TypeScript Quantitative Order Router\nimport { Router, OrderType } from \'@joymify/quant\';'); showDemoToast('Code copied to clipboard', 'success');"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button></pre>
+}</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre>
               <table class="joy-markdown__table">
                 <thead>
                   <tr>
@@ -3466,127 +3748,8 @@ export async function executeHedge(symbol: string, size: number) {
         </div>
       </section>
 
-      <!-- View: Enterprise Workflow Suite -->
-      <section id="view-enterprise-workflow" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">Enterprise Workflow Suite (Ant Design Parity)</h2>
-        <p class="header-tagline">Structured progress indicators, audit trail timelines, and comprehensive transaction outcome states designed for high-stakes operational workflows.</p>
-
-        <!-- Steps Progress Demo -->
-        <div class="playground-box" style="margin-bottom: 24px;">
-          <div class="playground-header">
-            <h4>Interactive Multi-Step Progress Tracker</h4>
-          </div>
-          <div style="padding: 24px;">
-            <div class="joy-steps" id="demo-steps-nav">
-              <div class="joy-steps__item joy-steps__item--finish" onclick="setDemoStep(0)">
-                <div class="joy-steps__icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <div class="joy-steps__content">
-                  <div class="joy-steps__title">KYC Verification</div>
-                  <div class="joy-steps__desc">Identity and residency verified</div>
-                </div>
-              </div>
-              <div class="joy-steps__item joy-steps__item--process" onclick="setDemoStep(1)" aria-current="step">
-                <div class="joy-steps__icon">2</div>
-                <div class="joy-steps__content">
-                  <div class="joy-steps__title">Account Funding</div>
-                  <div class="joy-steps__desc">Collateral deposit via wire or USDC</div>
-                </div>
-              </div>
-              <div class="joy-steps__item joy-steps__item--wait" onclick="setDemoStep(2)">
-                <div class="joy-steps__icon">3</div>
-                <div class="joy-steps__content">
-                  <div class="joy-steps__title">Algorithm Activation</div>
-                  <div class="joy-steps__desc">Deploy quantitative strategies</div>
-                </div>
-              </div>
-            </div>
-
-            <div style="margin-top: 24px; display: flex; gap: 8px;">
-              <button class="joy-button joy-button--outline joy-button--sm" onclick="advanceDemoStep(-1)">Previous Step</button>
-              <button class="joy-button joy-button--solid joy-button--sm" onclick="advanceDemoStep(1)">Next Step</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Timeline Audit Trail Demo -->
-        <div class="playground-box" style="margin-bottom: 24px;">
-          <div class="playground-header">
-            <h4>Chronological Event & Execution Timeline</h4>
-          </div>
-          <div style="padding: 24px;">
-            <ul class="joy-timeline">
-              <li class="joy-timeline__item">
-                <div class="joy-timeline__dot joy-timeline__dot--success"></div>
-                <div class="joy-timeline__content">
-                  <div style="font-weight: 600;">Trade Order 8841-EX Filled</div>
-                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">Executed 250.00 SOL at average fill price $184.20 via Phoenix Gateway.</div>
-                  <div class="joy-timeline__time">14:32:08 UTC</div>
-                </div>
-              </li>
-              <li class="joy-timeline__item">
-                <div class="joy-timeline__dot joy-timeline__dot--primary"></div>
-                <div class="joy-timeline__content">
-                  <div style="font-weight: 600;">Risk Check Simulation Passed</div>
-                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">Portfolio beta remains within target limit (0.28 vs max 0.40).</div>
-                  <div class="joy-timeline__time">14:31:55 UTC</div>
-                </div>
-              </li>
-              <li class="joy-timeline__item">
-                <div class="joy-timeline__dot joy-timeline__dot--warning"></div>
-                <div class="joy-timeline__content">
-                  <div style="font-weight: 600;">Slippage Tolerance Rebalanced</div>
-                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">Elevated market volatility triggered auto-adjustment from 5 bps to 12 bps.</div>
-                  <div class="joy-timeline__time">14:28:10 UTC</div>
-                </div>
-              </li>
-              <li class="joy-timeline__item">
-                <div class="joy-timeline__dot joy-timeline__dot--info"></div>
-                <div class="joy-timeline__content">
-                  <div style="font-weight: 600;">Sub-Account Session Authenticated</div>
-                  <div style="color: var(--joy-text-muted); font-size: 0.8125rem; margin-top: 2px;">API Key authorization from Singapore gateway worker.</div>
-                  <div class="joy-timeline__time">14:15:00 UTC</div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Result States Demo -->
-        <div class="playground-box">
-          <div class="playground-header">
-            <h4>Workflow Result Outcomes</h4>
-          </div>
-          <div style="padding: 24px; display: flex; flex-direction: column; gap: 32px;">
-            <!-- Success Result -->
-            <div class="joy-result joy-result--success">
-              <div class="joy-result__icon">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </div>
-              <h2 class="joy-result__title">Order Batch Dispatched Successfully</h2>
-              <p class="joy-result__subtitle">Order batch ID: 20260920-88127. 42 orders routed to dark pool liquidity providers with zero rejection errors.</p>
-              <div class="joy-result__actions">
-                <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Viewing Order Batch', 'info')">View Execution</button>
-                <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Starting New Order', 'info')">New Order</button>
-              </div>
-            </div>
-
-            <!-- Error Result -->
-            <div class="joy-result joy-result--error">
-              <div class="joy-result__icon">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </div>
-              <h2 class="joy-result__title">Margin Limit Exceeded</h2>
-              <p class="joy-result__subtitle">The requested position would increase portfolio leverage beyond the allocated collateral requirement. Please deposit funds or adjust lot sizes.</p>
-              <div class="joy-result__actions">
-                <button class="joy-button joy-button--solid joy-button--md" onclick="showDemoToast('Navigating to Deposit Collateral', 'info')">Deposit Collateral</button>
-                <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Dismissed error', 'info')">Dismiss</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- View: Navigation & Workflow (Wave 3 aspect view) -->
+      ${renderNavigationView()}
 
       <!-- View: High-Performance Financial Charts -->
       <section id="view-charts" class="view-panel">
@@ -3603,16 +3766,16 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
           </div>
           <div style="padding: 24px;">
-            <div class="joy-chart" id="candlestick-demo-chart" style="height: 380px;">
-              <div class="joy-chart__hud" id="candlestick-hud">
+            <div class="joy-chart" id="candlestick-demo-chart" style="height: 380px;" tabindex="0" role="region" aria-label="Interactive Candlestick Financial Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset.">
+              <div class="joy-chart__hud" id="candlestick-hud" aria-live="polite">
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Pair:</span><span class="joy-chart__hud-value">BTC/USDT</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">O:</span><span class="joy-chart__hud-value" id="hud-o">68,420.00</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">H:</span><span class="joy-chart__hud-value" id="hud-h">68,790.50</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">L:</span><span class="joy-chart__hud-value" id="hud-l">68,310.00</span></div>
-                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">C:</span><span class="joy-chart__hud-value" id="hud-c" style="color: var(--joy-status-success-fg);">68,720.00</span></div>
+                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">C:</span><span class="joy-chart__hud-value joy-chart__hud-value--bull" id="hud-c">68,720.00</span></div>
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Vol:</span><span class="joy-chart__hud-value">1,428 BTC</span></div>
               </div>
-              <div class="joy-chart__canvas-container">
+              <div class="joy-chart__canvas-container" role="img" aria-label="Candlestick chart, 500 candles">
                 <canvas id="candle-base-canvas" class="joy-chart__canvas-base"></canvas>
                 <canvas id="candle-overlay-canvas" class="joy-chart__canvas-overlay"></canvas>
               </div>
@@ -3631,12 +3794,12 @@ export async function executeHedge(symbol: string, size: number) {
             <span class="joy-badge joy-badge--brand joy-badge--subtle">60 FPS Hardware Scaled</span>
           </div>
           <div style="padding: 24px;">
-            <div class="joy-chart" id="line-demo-chart" style="height: 320px;">
-              <div class="joy-chart__hud" id="line-hud">
+            <div class="joy-chart" id="line-demo-chart" style="height: 320px;" tabindex="0" role="region" aria-label="Interactive Line Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset.">
+              <div class="joy-chart__hud" id="line-hud" aria-live="polite">
                 <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Telemetry:</span><span class="joy-chart__hud-value">Solana TPS Feed</span></div>
-                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Value:</span><span class="joy-chart__hud-value" id="line-hud-val" style="color: var(--joy-accent-default);">3,420 TPS</span></div>
+                <div class="joy-chart__hud-item"><span class="joy-chart__hud-label">Value:</span><span class="joy-chart__hud-value joy-chart__hud-value--accent" id="line-hud-val">3,420 TPS</span></div>
               </div>
-              <div class="joy-chart__canvas-container">
+              <div class="joy-chart__canvas-container" role="img" aria-label="Line chart, 10,000 points">
                 <canvas id="line-base-canvas" class="joy-chart__canvas-base"></canvas>
                 <canvas id="line-overlay-canvas" class="joy-chart__canvas-overlay"></canvas>
               </div>
@@ -3653,20 +3816,10 @@ export async function executeHedge(symbol: string, size: number) {
         <!-- Splitter Demo -->
         <div class="playground-box" style="margin-bottom: 24px;">
           <div class="playground-header">
-            <h4>Splitter (Resizable Split Panes &bull; Drag Divider to Resize)</h4>
+            <h4>Splitter (Resizable Split Panes &bull; Drag Divider or Use Arrow Keys)</h4>
           </div>
           <div style="padding: 24px;">
-            <div class="joy-splitter" id="demo-splitter" style="height: 200px;">
-              <div class="joy-splitter__pane" id="split-left" style="width: 40%; background: var(--joy-surface-sunken); padding: 16px;">
-                <h5 style="margin: 0 0 8px 0;">Strategy Controls (Pane 1)</h5>
-                <p style="font-size: 0.8125rem; color: var(--joy-text-muted); margin: 0;">Arbitrage engine parameters, exchange API keys, and latency tolerances.</p>
-              </div>
-              <div class="joy-splitter__bar" id="split-bar" onmousedown="initSplitterDrag(event)"></div>
-              <div class="joy-splitter__pane" id="split-right" style="width: 60%; padding: 16px;">
-                <h5 style="margin: 0 0 8px 0;">Execution Telemetry (Pane 2)</h5>
-                <p style="font-size: 0.8125rem; color: var(--joy-text-muted); margin: 0;">Live order matching logs, routing fills, and execution slip statistics.</p>
-              </div>
-            </div>
+            ${hubSplitter("horizontal", "<strong>Strategy Controls</strong><p>Arbitrage engine parameters, exchange API keys, and latency tolerances.</p>", "<strong>Execution Telemetry</strong><p>Live order matching logs, routing fills, and execution slip statistics.</p>", 200, "demo-splitter")}
           </div>
         </div>
 
@@ -3793,7 +3946,7 @@ export async function executeHedge(symbol: string, size: number) {
                   </div>
                 </div>
 
-                <button type="button" class="joy-button joy-button--primary joy-button--md" style="align-self: flex-start; margin-top: 8px;">Submit Order</button>
+                <button type="button" class="joy-button joy-button--solid joy-button--md" style="align-self: flex-start; margin-top: 8px;">Submit Order</button>
               </div>
 
               <!-- Horizontal Form -->
@@ -3829,7 +3982,7 @@ export async function executeHedge(symbol: string, size: number) {
                 </div>
 
                 <div class="joy-form-actions">
-                  <button type="button" class="joy-button joy-button--primary joy-button--md">Save Policy</button>
+                  <button type="button" class="joy-button joy-button--solid joy-button--md">Save Policy</button>
                   <button type="button" class="joy-button joy-button--outline joy-button--md">Reset</button>
                 </div>
               </div>
@@ -3965,10 +4118,10 @@ export async function executeHedge(symbol: string, size: number) {
 
               <!-- Operation Controls -->
               <div class="joy-transfer__operations">
-                <button type="button" class="joy-button joy-button--primary joy-button--sm" id="btn-transfer-right" onclick="executeTransfer('right')" aria-label="Migrate right">
+                <button type="button" class="joy-button joy-button--solid joy-button--sm" id="btn-transfer-right" onclick="executeTransfer('right')" aria-label="Migrate right">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
-                <button type="button" class="joy-button joy-button--primary joy-button--sm" id="btn-transfer-left" onclick="executeTransfer('left')" aria-label="Migrate left">
+                <button type="button" class="joy-button joy-button--solid joy-button--sm" id="btn-transfer-left" onclick="executeTransfer('left')" aria-label="Migrate left">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
               </div>
@@ -4051,27 +4204,15 @@ export async function executeHedge(symbol: string, size: number) {
               <div style="display: flex; flex-direction: column; gap: 16px;">
                 <div style="font-weight: 600; font-size: 0.875rem;">Message & Notification Triggers:</div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  <button type="button" class="joy-button joy-button--primary joy-button--sm" onclick="triggerMessage('success', 'Order filled successfully at $64,250.00')">Message Success</button>
+                  <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="triggerMessage('success', 'Order filled successfully at $64,250.00')">Message Success</button>
                   <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="triggerMessage('error', 'Execution rejected: Insufficient margin')">Message Error</button>
                   <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="triggerMessage('warning', 'Network latency elevated: 142ms')">Message Warning</button>
-                  <button type="button" class="joy-button joy-button--primary joy-button--sm" onclick="triggerNotification('info', 'Liquidation Warning', 'ETH-PERP margin ratio has dropped below 15%. Consider adding collateral.')">Notification Card</button>
+                  <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="triggerNotification('info', 'Liquidation Warning', 'ETH-PERP margin ratio has dropped below 15%. Consider adding collateral.')">Notification Card</button>
                 </div>
 
                 <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Popconfirm Confirmation:</div>
                 <div style="display: flex; gap: 16px; align-items: center;">
-                  <div class="joy-popconfirm" id="demo-popconfirm">
-                    <button type="button" class="joy-button joy-button--danger joy-button--sm" onclick="togglePopconfirmDemo(this)">Revoke API Key</button>
-                    <div class="joy-popconfirm__panel" id="demo-popconfirm-panel" style="display: none;" role="dialog">
-                      <div class="joy-popconfirm__title">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--joy-status-warning-fg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                        <span>Revoke DMA Master Key?</span>
-                      </div>
-                      <div class="joy-popconfirm__buttons">
-                        <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="closePopconfirmDemo()">Cancel</button>
-                        <button type="button" class="joy-button joy-button--primary joy-button--sm" onclick="confirmPopconfirmDemo()">Confirm</button>
-                      </div>
-                    </div>
-                  </div>
+                  ${hubPopconfirm("demo-popconfirm-panel", "Revoke API Key", "Revoke DMA Master Key?")}
                   <span style="font-size: 0.8125rem; color: var(--joy-text-muted);">Prevents accidental destructive operations</span>
                 </div>
 
@@ -4101,10 +4242,10 @@ export async function executeHedge(symbol: string, size: number) {
                 <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); margin-bottom: 10px;">Anchor Navigator</div>
                 <nav class="joy-anchor" role="navigation" aria-label="Demo Anchor">
                   <div class="joy-anchor__ink"></div>
-                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" onclick="selectAnchor(this)">#menu-demo</a>
-                  <a href="#feedback-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#feedback-demo</a>
-                  <a href="#popconfirm-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#popconfirm-demo</a>
-                  <a href="#spin-demo" class="joy-anchor__link" onclick="selectAnchor(this)">#spin-demo</a>
+                  <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" aria-current="location" onclick="selectAnchor(this, event)">#menu-demo</a>
+                  <a href="#feedback-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#feedback-demo</a>
+                  <a href="#popconfirm-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#popconfirm-demo</a>
+                  <a href="#spin-demo" class="joy-anchor__link" onclick="selectAnchor(this, event)">#spin-demo</a>
                 </nav>
               </div>
             </div>
@@ -4113,26 +4254,63 @@ export async function executeHedge(symbol: string, size: number) {
       </section>
   </main>
 
+  <!-- Interactive Demo Modal (body level so any view can open it) -->
+  <div id="demo-modal-container" data-hub-dialog style="display: none;">
+    <div class="joy-modal-backdrop" role="presentation" onclick="closeDemoModal(event)">
+      <div class="joy-modal" role="dialog" aria-modal="true" aria-labelledby="demo-modal-title">
+        <div class="joy-modal__header">
+          <h3 id="demo-modal-title" class="joy-modal__title">Confirm Liquidation Order</h3>
+          <button type="button" class="joy-modal__close" aria-label="Close dialog" onclick="closeDemoModal()">${iconSvg("Close")}</button>
+        </div>
+        <div class="joy-modal__body">
+          <p style="margin: 0 0 var(--joy-space-4) 0;">Are you sure you want to trigger emergency liquidation across all connected sub-accounts? This action is immediate and non-reversible.</p>
+          ${hubPopconfirm("hub-popconfirm-modal", "Review sub-accounts first", "Open the sub-account list?", "outline")}
+        </div>
+        <div class="joy-modal__footer">
+          <button type="button" class="joy-button joy-button--ghost joy-button--md" onclick="closeDemoModal()">Cancel</button>
+          <button type="button" class="joy-button joy-button--danger joy-button--md" onclick="showDemoToast('Order submitted', 'success'); closeDemoModal();">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Demo ImagePreview -->
+  <div id="demo-image-preview-container" data-hub-dialog style="display: none;">
+    <div class="joy-image-preview-mask" role="dialog" aria-modal="true" aria-label="Image preview" onclick="if (event.target === this) closeImagePreview()">
+      <div class="joy-image-preview-toolbar" role="toolbar" aria-label="Preview tools">
+        <button type="button" title="Zoom in (+)" aria-label="Zoom in" class="joy-image-preview-btn" onclick="hubPreviewZoom(1.25)">${iconSvg("ZoomIn", "1.25rem")}</button>
+        <button type="button" title="Zoom out (-)" aria-label="Zoom out" class="joy-image-preview-btn" onclick="hubPreviewZoom(0.8)">${iconSvg("ZoomOut", "1.25rem")}</button>
+        <button type="button" title="Rotate left" aria-label="Rotate left" class="joy-image-preview-btn" onclick="hubPreviewRotate(-90)"><span class="joy-image-preview-btn__icon--flip">${iconSvg("RefreshCw", "1.25rem")}</span></button>
+        <button type="button" title="Rotate right (R)" aria-label="Rotate right" class="joy-image-preview-btn" onclick="hubPreviewRotate(90)">${iconSvg("RefreshCw", "1.25rem")}</button>
+        <button type="button" title="Reset" aria-label="Reset zoom and rotation" class="joy-image-preview-btn" onclick="hubPreviewReset()">${iconSvg("Minimize2", "1.25rem")}</button>
+        <button type="button" title="Close (Esc)" aria-label="Close preview" class="joy-image-preview-btn joy-image-preview-btn--close" onclick="closeImagePreview()">${iconSvg("Close", "1.25rem")}</button>
+      </div>
+      <div class="joy-image-preview-counter" id="hub-preview-counter" style="display: none;"></div>
+      <button type="button" aria-label="Previous image" class="joy-image-preview-nav joy-image-preview-nav--prev" id="hub-preview-prev" style="display: none;" onclick="hubPreviewStep(-1)">${iconSvg("ChevronLeft", "1.5rem")}</button>
+      <button type="button" aria-label="Next image" class="joy-image-preview-nav joy-image-preview-nav--next" id="hub-preview-next" style="display: none;" onclick="hubPreviewStep(1)">${iconSvg("ChevronRight", "1.5rem")}</button>
+      <div class="joy-image-preview-stage">
+        <img class="joy-image-preview-img" id="hub-preview-img" alt="Preview image" draggable="false">
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Demo Drawer -->
-  <div id="demo-drawer-container" style="display: none;">
-    <div class="joy-drawer-backdrop" id="demo-drawer-backdrop" onclick="closeDemoDrawer(event)">
-      <div class="joy-drawer" id="demo-drawer-panel">
+  <div id="demo-drawer-container" data-hub-dialog style="display: none;">
+    <div class="joy-drawer-backdrop" id="demo-drawer-backdrop" role="presentation" onclick="closeDemoDrawer(event)">
+      <div class="joy-drawer" id="demo-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="demo-drawer-title">
         <div class="joy-drawer__header">
           <h3 class="joy-drawer__title" id="demo-drawer-title">Risk Engine Analysis</h3>
-          <button type="button" class="joy-drawer__close" onclick="closeDemoDrawer()">&times;</button>
+          <button type="button" class="joy-drawer__close" aria-label="Close drawer" onclick="closeDemoDrawer()">${iconSvg("Close")}</button>
         </div>
         <div class="joy-drawer__body" id="demo-drawer-body">
           <p><strong>Sub-account:</strong> Quant Alpha Alpha-1</p>
           <p><strong>Margin Ratio:</strong> 14.2% (Healthy)</p>
           <p><strong>Maintenance Margin:</strong> $124,500.00</p>
-          <div class="joy-alert joy-alert--info" style="margin-top: 16px;">
-            <div class="joy-alert__title">Liquidation Buffer</div>
-            <div class="joy-alert__desc">Liquidation price is 48% below current index mark.</div>
-          </div>
+          <div style="margin-top: 16px;">${hubAlert("info", "Liquidation Buffer", "Liquidation price is 48% below current index mark.")}</div>
         </div>
         <div class="joy-drawer__footer">
-          <button class="joy-button joy-button--ghost joy-button--sm" onclick="closeDemoDrawer()">Cancel</button>
-          <button class="joy-button joy-button--solid joy-button--sm" onclick="showDemoToast('Audit snapshot generated successfully', 'success'); closeDemoDrawer();">Export PDF</button>
+          <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="closeDemoDrawer()">Cancel</button>
+          <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="showDemoToast('Audit snapshot generated successfully', 'success'); closeDemoDrawer();">Export PDF</button>
         </div>
       </div>
     </div>
@@ -4162,6 +4340,7 @@ export async function executeHedge(symbol: string, size: number) {
       if (label) {
         label.innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
       }
+      redrawHubCharts();
     }
 
     // Restore saved theme on startup
@@ -4228,6 +4407,11 @@ export async function executeHedge(symbol: string, size: number) {
       // Trigger 3D particle canvas resize when entering landing blocks
       if (viewName === 'landing-blocks') {
         setTimeout(resizeKineticCanvas, 40);
+      }
+
+      // Canvases are zero-sized while their view is hidden, so paint them once the view is visible
+      if (viewName === 'charts' || viewName === 'data-display-feedback') {
+        requestAnimationFrame(redrawHubCharts);
       }
     }
 
@@ -4329,29 +4513,17 @@ export async function executeHedge(symbol: string, size: number) {
     }
 
     function openDemoModal() {
-      document.getElementById('demo-modal-container').style.display = 'block';
+      hubOpenDialog('demo-modal-container', '.joy-modal__close');
     }
 
     function closeDemoModal(e) {
       if (e && e.target !== e.currentTarget) return;
-      document.getElementById('demo-modal-container').style.display = 'none';
-    }
-
-    function toggleDemoDropdown() {
-      const menu = document.getElementById('demo-dropdown-menu');
-      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      hubCloseDialog('demo-modal-container');
     }
 
     function selectDropdownAction(action) {
-      document.getElementById('dropdown-selection-text').innerText = action;
-      document.getElementById('demo-dropdown-menu').style.display = 'none';
-    }
-
-    function switchDemoTab(btnId, panelId) {
-      document.querySelectorAll('.joy-tab-btn').forEach(b => b.classList.remove('joy-tab-btn--active'));
-      document.getElementById(btnId).classList.add('joy-tab-btn--active');
-      document.querySelectorAll('.tab-panel-demo').forEach(p => p.style.display = 'none');
-      document.getElementById(panelId).style.display = 'block';
+      const out = document.getElementById('dropdown-selection-text');
+      if (out) out.innerText = action;
     }
 
     function handleSelectOrderType(val) {
@@ -4374,17 +4546,16 @@ export async function executeHedge(symbol: string, size: number) {
     }
 
     function openDemoDrawer(placement = 'right') {
-      const container = document.getElementById('demo-drawer-container');
       const panel = document.getElementById('demo-drawer-panel');
       const backdrop = document.getElementById('demo-drawer-backdrop');
-      backdrop.style.justifyContent = placement === 'left' ? 'flex-start' : 'flex-end';
+      backdrop.className = 'joy-drawer-backdrop' + (placement === 'left' ? ' joy-drawer-backdrop--left' : '');
       panel.className = 'joy-drawer ' + (placement === 'left' ? 'joy-drawer--left' : '');
-      container.style.display = 'block';
+      hubOpenDialog('demo-drawer-container', '.joy-drawer__close');
     }
 
     function closeDemoDrawer(e) {
       if (e && e.target !== e.currentTarget) return;
-      document.getElementById('demo-drawer-container').style.display = 'none';
+      hubCloseDialog('demo-drawer-container');
     }
 
     function toggleFaq(id) {
@@ -4397,9 +4568,13 @@ export async function executeHedge(symbol: string, size: number) {
     function showDemoToast(msg, variant = 'info') {
       const container = document.getElementById('demo-toast-container');
       const toast = document.createElement('div');
+      if (variant === 'error') variant = 'danger';
       toast.className = 'joy-toast joy-toast--' + variant;
       toast.setAttribute('role', 'status');
-      toast.innerHTML = '<div style="flex: 1;">' + msg + '</div><button type="button" style="background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--joy-text-muted);" onclick="this.parentElement.remove()">&times;</button>';
+      toast.setAttribute('aria-live', 'polite');
+      toast.innerHTML = '<div class="joy-toast__body"></div><button type="button" class="joy-toast__close" aria-label="Dismiss notification">' + HUB_ICONS.close + '</button>';
+      toast.querySelector('.joy-toast__body').textContent = msg;
+      toast.querySelector('.joy-toast__close').addEventListener('click', function () { toast.remove(); });
       container.appendChild(toast);
       setTimeout(() => {
         if (toast.parentElement) toast.remove();
@@ -4587,6 +4762,476 @@ export async function executeHedge(symbol: string, size: number) {
       });
     }
 
+    // ── Wave 3 (F-038) hub handlers: aspect views, overlays and charts ──
+    const HUB_ICONS = ${JSON.stringify({ close: iconSvg("Close"), chevronLeft: iconSvg("ChevronLeft"), chevronRight: iconSvg("ChevronRight"), sortNone: hubSvg.sortNone, sortAsc: hubSvg.sortAsc, sortDesc: hubSvg.sortDesc })};
+    const HUB_MATRIX_CHARTS = ${JSON.stringify(hubMatrixCharts)};
+
+    function toggleHubTag(el) {
+      const on = el.getAttribute('aria-checked') !== 'true';
+      el.setAttribute('aria-checked', String(on));
+      el.classList.toggle('joy-tag--checked', on);
+    }
+
+    function hubSortTable(th) {
+      const table = th.closest('table');
+      const idx = Array.from(th.parentElement.children).indexOf(th);
+      const next = th.getAttribute('aria-sort') === 'ascending' ? 'descending' : 'ascending';
+      table.querySelectorAll('th.joy-table-th--sortable').forEach(function (h) {
+        h.setAttribute('aria-sort', 'none');
+        h.classList.remove('joy-table-th--sorted-asc', 'joy-table-th--sorted-desc');
+        h.querySelector('.joy-table-sort-icon').innerHTML = HUB_ICONS.sortNone;
+      });
+      th.setAttribute('aria-sort', next);
+      th.classList.add(next === 'ascending' ? 'joy-table-th--sorted-asc' : 'joy-table-th--sorted-desc');
+      th.querySelector('.joy-table-sort-icon').innerHTML = next === 'ascending' ? HUB_ICONS.sortAsc : HUB_ICONS.sortDesc;
+      const tbody = table.tBodies[0];
+      const rows = Array.from(tbody.rows);
+      const text = function (r) { return r.cells[idx].textContent.trim(); };
+      rows.sort(function (a, b) {
+        const x = text(a);
+        const y = text(b);
+        const nx = parseFloat(x.replace(/[^0-9.-]/g, ''));
+        const ny = parseFloat(y.replace(/[^0-9.-]/g, ''));
+        const c = (!isNaN(nx) && !isNaN(ny)) ? nx - ny : x.localeCompare(y);
+        return next === 'ascending' ? c : -c;
+      });
+      rows.forEach(function (r) { tbody.appendChild(r); });
+    }
+
+    function hubSelectTab(btn) {
+      const root = btn.closest('[data-hub-tabs]');
+      root.querySelectorAll('[role="tab"]').forEach(function (t) {
+        const on = t === btn;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        t.classList.toggle('joy-tab-btn--active', on);
+        const panel = document.getElementById(t.getAttribute('aria-controls'));
+        if (panel) panel.hidden = !on;
+      });
+    }
+
+    function hubTabKey(e, btn) {
+      const tabs = Array.from(btn.parentElement.querySelectorAll('[role="tab"]'));
+      let i = tabs.indexOf(btn);
+      if (e.key === 'ArrowRight') i = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') i = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') i = 0;
+      else if (e.key === 'End') i = tabs.length - 1;
+      else return;
+      e.preventDefault();
+      tabs[i].focus();
+      hubSelectTab(tabs[i]);
+    }
+
+    function hubTip(id, show) {
+      const tip = document.getElementById(id);
+      if (tip) tip.hidden = !show;
+    }
+
+    // Overlay panels (Popconfirm, Dropdown) follow the openOverlay contract: .joy-overlay + position: fixed,
+    // or a bottom sheet on phones. Being fixed, they escape overflow: hidden ancestors such as .joy-modal.
+    function hubPlaceOverlay(anchor, panel) {
+      panel.classList.add('joy-overlay');
+      panel.style.position = 'fixed';
+      const narrow = window.innerWidth < 480 || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+      if (narrow) {
+        panel.classList.add('joy-overlay--sheet');
+        panel.classList.remove('joy-overlay--above');
+        panel.style.top = '';
+        panel.style.left = '';
+        panel.style.minWidth = '';
+        return;
+      }
+      panel.classList.remove('joy-overlay--sheet');
+      const a = anchor.getBoundingClientRect();
+      const p = panel.getBoundingClientRect();
+      const left = Math.min(Math.max(a.left, 8), Math.max(8, window.innerWidth - p.width - 8));
+      let top = a.bottom + 4;
+      const above = top + p.height > window.innerHeight - 8 && a.top - 4 - p.height >= 8;
+      if (above) top = a.top - 4 - p.height;
+      panel.classList.toggle('joy-overlay--above', above);
+      panel.style.top = top + 'px';
+      panel.style.left = left + 'px';
+      panel.style.minWidth = a.width + 'px';
+    }
+
+    // restore: true refocuses the opener when focus was inside the panel; 'force' always refocuses it (Escape).
+    function hubClosePanel(panel, restore) {
+      const trigger = panel.parentElement.querySelector('[aria-expanded]');
+      const focusInside = panel.contains(document.activeElement);
+      panel.hidden = true;
+      panel.classList.remove('joy-overlay', 'joy-overlay--sheet', 'joy-overlay--above');
+      ['position', 'top', 'left', 'minWidth'].forEach(function (k) { panel.style[k] = ''; });
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (restore && trigger && (restore === 'force' || focusInside)) trigger.focus();
+    }
+
+    function hubClosePanels(except, restore) {
+      let any = false;
+      document.querySelectorAll('[data-hub-panel]:not([hidden])').forEach(function (p) {
+        if (p !== except) {
+          hubClosePanel(p, restore);
+          any = true;
+        }
+      });
+      return any;
+    }
+
+    function hubTogglePanel(trigger, panel) {
+      if (!panel.hidden) {
+        hubClosePanel(panel, true);
+        return;
+      }
+      hubClosePanels();
+      panel.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      hubPlaceOverlay(trigger, panel);
+      // Like the components: focus moves into the panel (first item / first button)
+      const first = panel.matches('.joy-dropdown') ? panel.querySelector('[role="menuitem"]:not([disabled])') : panel.querySelector('button:not([disabled])');
+      if (first) first.focus({ preventScroll: true });
+    }
+
+    function toggleHubPopconfirm(btn) {
+      hubTogglePanel(btn, btn.closest('.joy-popconfirm').querySelector('.joy-popconfirm__panel'));
+    }
+    function closeHubPopconfirm(el) {
+      hubClosePanel(el.closest('.joy-popconfirm__panel'), true);
+    }
+    function confirmHubPopconfirm(el) {
+      closeHubPopconfirm(el);
+      showDemoToast('Action confirmed', 'success');
+    }
+    function toggleHubDropdown(trigger) {
+      hubTogglePanel(trigger, trigger.parentElement.querySelector('.joy-dropdown'));
+    }
+    function selectHubDropdownItem(btn, key) {
+      hubClosePanel(btn.closest('.joy-dropdown'), true);
+      showDemoToast('Dropdown action: ' + key, 'info');
+    }
+
+    document.addEventListener('pointerdown', function (e) {
+      document.querySelectorAll('[data-hub-panel]:not([hidden])').forEach(function (p) {
+        const root = p.closest('.joy-popconfirm, .joy-dropdown-wrapper');
+        if (!root || !root.contains(e.target)) hubClosePanel(p);
+      });
+    });
+    window.addEventListener('resize', function () { hubClosePanels(); });
+    document.addEventListener('scroll', function (e) {
+      const t = e.target;
+      if (t && t.closest && t.closest('[data-hub-panel]')) return;
+      hubClosePanels();
+    }, true);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      let tipHidden = false;
+      document.querySelectorAll('.joy-tooltip[role="tooltip"]:not([hidden]):not([data-static])').forEach(function (t) {
+        t.hidden = true;
+        tipHidden = true;
+      });
+      if (tipHidden) return;
+      if (hubClosePanels(null, 'force')) return;
+      const open = Array.from(document.querySelectorAll('[data-hub-dialog]')).filter(function (c) { return c.style.display === 'block'; }).pop();
+      if (open) hubCloseDialog(open.id);
+    });
+
+    // Dropdown menu: arrow keys, Home/End; Tab leaves the menu (refocusing the trigger first)
+    document.addEventListener('keydown', function (e) {
+      const menu = e.target.closest && e.target.closest('.joy-dropdown[data-hub-panel]');
+      if (!menu) return;
+      const items = Array.from(menu.querySelectorAll('[role="menuitem"]:not([disabled])'));
+      const i = items.indexOf(document.activeElement);
+      let n;
+      if (e.key === 'ArrowDown') n = (i + 1) % items.length;
+      else if (e.key === 'ArrowUp') n = (i - 1 + items.length) % items.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = items.length - 1;
+      else if (e.key === 'Tab') { hubClosePanel(menu, 'force'); return; }
+      else return;
+      e.preventDefault();
+      items[n].focus();
+    });
+
+    // Modal, Drawer and ImagePreview trap Tab inside the open dialog
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      const open = Array.from(document.querySelectorAll('[data-hub-dialog]')).filter(function (c) { return c.style.display === 'block'; }).pop();
+      if (!open) return;
+      const root = open.querySelector('[role="dialog"]');
+      const focusable = Array.from(root.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(function (el) { return !el.closest('[hidden]') && el.getClientRects().length > 0; });
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (!root.contains(active)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    });
+
+    function hubOpenDialog(containerId, focusSelector) {
+      const container = document.getElementById(containerId);
+      container._hubOpener = document.activeElement;
+      container.style.display = 'block';
+      const target = container.querySelector(focusSelector);
+      if (target) target.focus();
+    }
+    function hubCloseDialog(containerId) {
+      hubClosePanels();
+      const container = document.getElementById(containerId);
+      container.style.display = 'none';
+      const opener = container._hubOpener;
+      container._hubOpener = null;
+      if (opener && opener.isConnected && opener.focus) opener.focus();
+    }
+
+    // Image and ImagePreview: pictures are SVG data URIs built from theme tokens (an img cannot resolve var()).
+    function hubImageUri(kind) {
+      const s = getComputedStyle(document.documentElement);
+      const v = function (name) { return s.getPropertyValue(name).trim(); };
+      const bg = v('--joy-surface-sunken');
+      const accent = v('--joy-accent-default');
+      const bull = v('--joy-status-success-fg');
+      const bear = v('--joy-status-danger-fg');
+      const line = v('--joy-border-default');
+      let art;
+      if (kind === 'b') {
+        art = '<rect x="30" y="40" width="70" height="160" fill="' + bull + '"/><rect x="110" y="90" width="70" height="110" fill="' + accent + '"/><rect x="190" y="60" width="70" height="140" fill="' + bear + '"/>';
+      } else if (kind === 'fallback') {
+        art = '<circle cx="160" cy="120" r="48" fill="none" stroke="' + line + '" stroke-width="10"/><path d="M128 152 L192 88" stroke="' + line + '" stroke-width="10"/>';
+      } else {
+        art = '<polyline points="20,180 80,120 130,150 190,70 300,40" fill="none" stroke="' + accent + '" stroke-width="10" stroke-linejoin="round"/><circle cx="190" cy="70" r="12" fill="' + bull + '"/>';
+      }
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid slice"><rect width="320" height="240" fill="' + bg + '"/>' + art + '</svg>';
+      return 'data:image/svg+xml,' + encodeURIComponent(svg);
+    }
+    function hubPaintImages() {
+      document.querySelectorAll('img[data-hub-img]').forEach(function (img) {
+        const kind = img.getAttribute('data-hub-img');
+        if (kind !== 'broken') img.src = hubImageUri(kind);
+      });
+      const preview = document.getElementById('hub-preview-img');
+      if (preview && document.getElementById('demo-image-preview-container').style.display === 'block') preview.src = hubImageUri(HUB_PREVIEW.items[HUB_PREVIEW.index]);
+    }
+    function hubImgError(img) {
+      img.onerror = null;
+      img.setAttribute('data-hub-img', 'fallback');
+      img.src = hubImageUri('fallback');
+    }
+    function hubImageHover(wrapper, show) {
+      // Like the components: the overlay is rendered only while hovered or focused (a [hidden] attribute would
+      // lose to the overlay's display: flex)
+      const overlay = wrapper.querySelector('.joy-image__overlay');
+      if (show && !overlay) wrapper.insertAdjacentHTML('beforeend', HUB_IMAGE_OVERLAY);
+      else if (!show && overlay) overlay.remove();
+    }
+    const HUB_IMAGE_OVERLAY = ${JSON.stringify(hubImageOverlay())};
+    const HUB_PREVIEW = { items: ['a'], index: 0, scale: 1, rotate: 0 };
+    function hubPreviewRender() {
+      const img = document.getElementById('hub-preview-img');
+      img.src = hubImageUri(HUB_PREVIEW.items[HUB_PREVIEW.index]);
+      img.style.transform = 'translate(0px, 0px) scale(' + HUB_PREVIEW.scale + ') rotate(' + HUB_PREVIEW.rotate + 'deg)';
+      const many = HUB_PREVIEW.items.length > 1;
+      document.getElementById('hub-preview-counter').style.display = many ? '' : 'none';
+      document.getElementById('hub-preview-prev').style.display = many ? '' : 'none';
+      document.getElementById('hub-preview-next').style.display = many ? '' : 'none';
+      document.getElementById('hub-preview-counter').textContent = (HUB_PREVIEW.index + 1) + ' / ' + HUB_PREVIEW.items.length;
+    }
+    function hubPreviewZoom(factor) { HUB_PREVIEW.scale = Math.max(0.5, Math.min(4, HUB_PREVIEW.scale * factor)); hubPreviewRender(); }
+    function hubPreviewRotate(deg) { HUB_PREVIEW.rotate += deg; hubPreviewRender(); }
+    function hubPreviewReset() { HUB_PREVIEW.scale = 1; HUB_PREVIEW.rotate = 0; hubPreviewRender(); }
+    function hubPreviewStep(delta) {
+      const n = HUB_PREVIEW.items.length;
+      HUB_PREVIEW.index = (HUB_PREVIEW.index + delta + n) % n;
+      hubPreviewReset();
+    }
+    function openImagePreview(index, gallery) {
+      HUB_PREVIEW.items = gallery ? ['a', 'b'] : [index === 1 ? 'b' : 'a'];
+      HUB_PREVIEW.index = 0;
+      HUB_PREVIEW.scale = 1;
+      HUB_PREVIEW.rotate = 0;
+      hubPreviewRender();
+      hubOpenDialog('demo-image-preview-container', '.joy-image-preview-btn');
+    }
+    function closeImagePreview() { hubCloseDialog('demo-image-preview-container'); }
+    // The broken source may already have failed while the page was parsing, before this script ran
+    document.querySelectorAll('img[data-hub-img="broken"]').forEach(function (img) {
+      if (img.complete && !img.naturalWidth) hubImgError(img);
+      else img.addEventListener('error', function () { hubImgError(img); }, { once: true });
+    });
+    hubPaintImages();
+
+    function copyHubCode(btn) {
+      const pre = btn.closest('pre');
+      const code = pre.querySelector('code').innerText;
+      const status = pre.querySelector('.joy-markdown__status');
+      const done = function () {
+        if (status) status.textContent = 'Copied to clipboard';
+        setTimeout(function () { if (status) status.textContent = ''; }, 2000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, done);
+      else done();
+    }
+
+    // Live Pagination: same windowing and phone rule (current page only at 480px or less) as the component.
+    let hubPagerPage = 5;
+    const HUB_PAGER_LAST = 20;
+    function hubPageWindowJs(current, last) {
+      const range = function (a, b) { return Array.from({ length: b - a + 1 }, function (_, i) { return a + i; }); };
+      if (last <= 7) return range(1, last);
+      const left = Math.max(current - 1, 1);
+      const right = Math.min(current + 1, last);
+      const showStart = left > 3;
+      const showEnd = right < last - 2;
+      if (!showStart && showEnd) return range(1, 5).concat(['…', last]);
+      if (showStart && !showEnd) return [1, '…'].concat(range(last - 4, last));
+      return [1, '…'].concat(range(left, right), ['…', last]);
+    }
+    function renderHubPager(focusLabel) {
+      const nav = document.getElementById('hub-live-pager');
+      if (!nav) return;
+      const compact = window.matchMedia('(max-width: 480px)').matches;
+      const pages = compact ? [hubPagerPage] : hubPageWindowJs(hubPagerPage, HUB_PAGER_LAST);
+      const btn = function (label, inner, active, disabled) {
+        return '<button type="button" class="joy-pagination__btn' + (active ? ' joy-pagination__btn--active' : '') + '" aria-label="' + label + '"' + (active ? ' aria-current="page"' : '') + (disabled ? ' disabled' : '') + '>' + inner + '</button>';
+      };
+      nav.innerHTML = btn('Previous page', HUB_ICONS.chevronLeft, false, hubPagerPage <= 1) +
+        pages.map(function (p) { return p === '…' ? '<span class="joy-pagination__ellipsis" aria-hidden="true">…</span>' : btn('Page ' + p, p, p === hubPagerPage, false); }).join('') +
+        btn('Next page', HUB_ICONS.chevronRight, false, hubPagerPage >= HUB_PAGER_LAST) +
+        (compact ? '' : '<span class="joy-pagination__info">Total: ' + (HUB_PAGER_LAST * 10) + ' items</span>');
+      if (focusLabel) {
+        const again = nav.querySelector('[aria-label="' + focusLabel + '"]:not([disabled])');
+        if (again) again.focus();
+      }
+    }
+    (function () {
+      const nav = document.getElementById('hub-live-pager');
+      if (!nav) return;
+      nav.addEventListener('click', function (e) {
+        const b = e.target.closest('button');
+        if (!b) return;
+        const label = b.getAttribute('aria-label');
+        if (label === 'Previous page') hubPagerPage = Math.max(1, hubPagerPage - 1);
+        else if (label === 'Next page') hubPagerPage = Math.min(HUB_PAGER_LAST, hubPagerPage + 1);
+        else hubPagerPage = Number(label.replace('Page ', ''));
+        renderHubPager(label);
+      });
+      window.matchMedia('(max-width: 480px)').addEventListener('change', function () { renderHubPager(); });
+      renderHubPager();
+    })();
+
+    // Splitter: drag the divider or use the arrow keys (stacked below 640px, so orientation is read from layout).
+    function hubSetSplit(bar, pct) {
+      const min = Number(bar.getAttribute('aria-valuemin'));
+      const max = Number(bar.getAttribute('aria-valuemax'));
+      const v = Math.max(min, Math.min(max, pct));
+      const panes = bar.parentElement.querySelectorAll(':scope > .joy-splitter__pane');
+      panes[0].style.setProperty('--joy-splitter-size', String(v));
+      panes[1].style.setProperty('--joy-splitter-size', String(100 - v));
+      bar.setAttribute('aria-valuenow', String(Math.round(v)));
+      bar.setAttribute('aria-orientation', getComputedStyle(bar.parentElement).flexDirection === 'column' ? 'horizontal' : 'vertical');
+    }
+    (function () {
+      let dragging = null;
+      document.addEventListener('pointerdown', function (e) {
+        const bar = e.target.closest && e.target.closest('[data-hub-splitter]');
+        if (!bar) return;
+        dragging = bar;
+        bar.classList.add('joy-splitter__bar--active');
+        if (bar.setPointerCapture) bar.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      document.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        const split = dragging.parentElement;
+        const rect = split.getBoundingClientRect();
+        const vertical = getComputedStyle(split).flexDirection === 'column';
+        hubSetSplit(dragging, vertical ? ((e.clientY - rect.top) / rect.height) * 100 : ((e.clientX - rect.left) / rect.width) * 100);
+      });
+      const end = function () {
+        if (dragging) dragging.classList.remove('joy-splitter__bar--active');
+        dragging = null;
+      };
+      document.addEventListener('pointerup', end);
+      document.addEventListener('pointercancel', end);
+      document.addEventListener('keydown', function (e) {
+        const bar = e.target.closest && e.target.closest('[data-hub-splitter]');
+        if (!bar) return;
+        const now = Number(bar.getAttribute('aria-valuenow'));
+        const step = { ArrowLeft: -5, ArrowUp: -5, ArrowRight: 5, ArrowDown: 5 }[e.key];
+        if (step !== undefined) hubSetSplit(bar, now + step);
+        else if (e.key === 'Home') hubSetSplit(bar, 0);
+        else if (e.key === 'End') hubSetSplit(bar, 100);
+        else return;
+        e.preventDefault();
+      });
+    })();
+
+    // Charts paint from theme tokens: a canvas cannot resolve var(), so read the computed values.
+    function hubPalette() {
+      const s = getComputedStyle(document.documentElement);
+      const v = function (name) { return s.getPropertyValue(name).trim(); };
+      return { bull: v('--joy-status-success-fg'), bear: v('--joy-status-danger-fg'), accent: v('--joy-accent-default'), border: v('--joy-border-subtle') };
+    }
+    function hubPrepCanvas(id) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return null;
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      return { ctx: ctx, w: rect.width, h: rect.height };
+    }
+    function drawHubMatrixCharts() {
+      const pal = hubPalette();
+      const top = 72;
+      const bar = hubPrepCanvas('hub-bar-base');
+      if (bar) {
+        const data = HUB_MATRIX_CHARTS.bars;
+        const max = Math.max.apply(null, data) * 1.1;
+        const slot = bar.w / data.length;
+        bar.ctx.fillStyle = pal.accent;
+        data.forEach(function (v, i) {
+          const bh = (v / max) * (bar.h - top - 8);
+          bar.ctx.fillRect(i * slot + slot * 0.2, bar.h - bh - 8, slot * 0.6, bh);
+        });
+      }
+      const candle = hubPrepCanvas('hub-candle-base');
+      if (candle) {
+        const data = HUB_MATRIX_CHARTS.candles;
+        let min = Infinity;
+        let max = -Infinity;
+        data.forEach(function (c) { min = Math.min(min, c.low); max = Math.max(max, c.high); });
+        const y = function (p) { return candle.h - 8 - ((p - min) / (max - min)) * (candle.h - top - 8); };
+        const slot = candle.w / data.length;
+        data.forEach(function (c, i) {
+          const color = c.close >= c.open ? pal.bull : pal.bear;
+          const x = i * slot + slot / 2;
+          candle.ctx.strokeStyle = color;
+          candle.ctx.fillStyle = color;
+          candle.ctx.lineWidth = 1.5;
+          candle.ctx.beginPath();
+          candle.ctx.moveTo(x, y(c.high));
+          candle.ctx.lineTo(x, y(c.low));
+          candle.ctx.stroke();
+          const bodyTop = Math.min(y(c.open), y(c.close));
+          candle.ctx.fillRect(x - slot * 0.3, bodyTop, slot * 0.6, Math.max(2, Math.abs(y(c.open) - y(c.close))));
+        });
+      }
+    }
+    function redrawHubCharts() {
+      drawCandlestickCanvas();
+      drawLineCanvas();
+      drawHubMatrixCharts();
+      hubPaintImages();
+    }
+    let hubResizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(hubResizeTimer);
+      hubResizeTimer = setTimeout(redrawHubCharts, 120);
+    });
+
     // Wave 5 Steps Demo Handlers
     let currentWorkflowStep = 1;
     function setDemoStep(idx) {
@@ -4653,6 +5298,7 @@ export async function executeHedge(symbol: string, size: number) {
         const baseCanvas = document.getElementById('candle-base-canvas');
         if (!baseCanvas) return;
         const rect = baseCanvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
         const dpr = window.devicePixelRatio || 1;
         baseCanvas.width = rect.width * dpr;
         baseCanvas.height = rect.height * dpr;
@@ -4662,6 +5308,7 @@ export async function executeHedge(symbol: string, size: number) {
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, rect.width, rect.height);
 
+        const pal = hubPalette();
         const visible = candleData.slice(Math.max(0, candleData.length - chartZoomSpan));
         if (visible.length === 0) return;
 
@@ -4695,7 +5342,7 @@ export async function executeHedge(symbol: string, size: number) {
           const lowY = rect.height - ((c.low - min) / (max - min)) * rect.height;
 
           const isBull = c.close >= c.open;
-          const color = isBull ? 'var(--joy-status-success-fg)' : 'var(--joy-status-danger-fg)';
+          const color = isBull ? pal.bull : pal.bear;
 
           ctx.strokeStyle = color;
           ctx.fillStyle = color;
@@ -4720,7 +5367,9 @@ export async function executeHedge(symbol: string, size: number) {
           document.getElementById('hud-l').innerText = last.low.toFixed(2);
           const cEl = document.getElementById('hud-c');
           cEl.innerText = last.close.toFixed(2);
-          cEl.style.color = last.close >= last.open ? 'var(--joy-status-success-fg)' : 'var(--joy-status-danger-fg)';
+          const up = last.close >= last.open;
+          cEl.classList.toggle('joy-chart__hud-value--bull', up);
+          cEl.classList.toggle('joy-chart__hud-value--bear', !up);
         }
       }
 
@@ -4728,6 +5377,7 @@ export async function executeHedge(symbol: string, size: number) {
         const baseCanvas = document.getElementById('line-base-canvas');
         if (!baseCanvas) return;
         const rect = baseCanvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
         const dpr = window.devicePixelRatio || 1;
         baseCanvas.width = rect.width * dpr;
         baseCanvas.height = rect.height * dpr;
@@ -4753,7 +5403,7 @@ export async function executeHedge(symbol: string, size: number) {
         minY -= pad;
         maxY += pad;
 
-        ctx.strokeStyle = 'var(--joy-accent-default)';
+        ctx.strokeStyle = hubPalette().accent;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         sampled.forEach((p, idx) => {
@@ -4791,30 +5441,6 @@ export async function executeHedge(symbol: string, size: number) {
         last.low = low;
         drawCandlestickCanvas();
         showDemoToast('Live tick: $' + close.toFixed(2), 'success');
-      }
-
-      // Splitter Drag Handler
-      function initSplitterDrag(e) {
-        e.preventDefault();
-        const container = document.getElementById('demo-splitter');
-        const leftPane = document.getElementById('split-left');
-        const rightPane = document.getElementById('split-right');
-        const bar = document.getElementById('split-bar');
-
-        bar.classList.add('joy-splitter__bar--active');
-        const onMove = (moveEv) => {
-          const rect = container.getBoundingClientRect();
-          const percent = Math.max(15, Math.min(85, ((moveEv.clientX - rect.left) / rect.width) * 100));
-          leftPane.style.width = percent + '%';
-          rightPane.style.width = (100 - percent) + '%';
-        };
-        const onUp = () => {
-          bar.classList.remove('joy-splitter__bar--active');
-          window.removeEventListener('mousemove', onMove);
-          window.removeEventListener('mouseup', onUp);
-        };
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
       }
 
       function selectSegment(btn, val) {
@@ -5021,17 +5647,29 @@ export async function executeHedge(symbol: string, size: number) {
       function selectMenuItem(el) {
         const parent = el.parentElement;
         if (!parent) return;
-        parent.querySelectorAll('.joy-menu__item').forEach(i => i.classList.remove('joy-menu__item--active'));
+        parent.querySelectorAll('.joy-menu__item').forEach(i => {
+          i.classList.remove('joy-menu__item--active');
+          i.removeAttribute('aria-current');
+          i.tabIndex = -1;
+        });
         el.classList.add('joy-menu__item--active');
+        el.setAttribute('aria-current', 'page');
+        el.tabIndex = 0;
         const text = el.querySelector('span:last-child')?.innerText || 'Menu Item';
         showDemoToast('Navigated to ' + text, 'info');
       }
 
-      function selectAnchor(el) {
+      function selectAnchor(el, e) {
+        // Demo hrefs are not hub views: stay on the page and only move the active link
+        if (e) e.preventDefault();
         const parent = el.parentElement;
         if (!parent) return;
-        parent.querySelectorAll('.joy-anchor__link').forEach(a => a.classList.remove('joy-anchor__link--active'));
+        parent.querySelectorAll('.joy-anchor__link').forEach(a => {
+          a.classList.remove('joy-anchor__link--active');
+          a.removeAttribute('aria-current');
+        });
         el.classList.add('joy-anchor__link--active');
+        el.setAttribute('aria-current', 'location');
         showDemoToast('Scrolled to ' + el.innerText, 'info');
       }
 
@@ -5041,22 +5679,6 @@ export async function executeHedge(symbol: string, size: number) {
 
       function triggerNotification(type, title, desc) {
         showDemoToast(title + ': ' + desc, type);
-      }
-
-      function togglePopconfirmDemo(btn) {
-        const panel = document.getElementById('demo-popconfirm-panel');
-        if (!panel) return;
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      }
-
-      function closePopconfirmDemo() {
-        const panel = document.getElementById('demo-popconfirm-panel');
-        if (panel) panel.style.display = 'none';
-      }
-
-      function confirmPopconfirmDemo() {
-        closePopconfirmDemo();
-        showDemoToast('API Key revoked successfully', 'success');
       }
 
       function toggleSpinMask() {

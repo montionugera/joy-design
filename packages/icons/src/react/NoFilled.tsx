@@ -27,7 +27,7 @@ export const NoFilled: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="10" fill=color /><path
+    <circle cx="12" cy="12" r="10" fill={color} /><path
 		d="M9 9L15 15M15 9L9 15"
 		stroke="var(--bg-canvas)"
 		strokeWidth="1.5"

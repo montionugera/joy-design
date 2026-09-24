@@ -8,6 +8,8 @@
 		prefix?: Snippet;
 		suffix?: Snippet;
 		class?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
@@ -16,7 +18,9 @@
 		precision,
 		prefix,
 		suffix,
-		class: className = ''
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	let formattedValue = $derived(
@@ -24,7 +28,7 @@
 	);
 </script>
 
-<div class="joy-statistic {className}">
+<div bind:this={ref} class="joy-statistic {className}" {...rest}>
 	{#if title}
 		<div class="joy-statistic__title">{title}</div>
 	{/if}

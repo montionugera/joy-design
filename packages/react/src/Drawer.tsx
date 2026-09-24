@@ -1,6 +1,10 @@
 import * as React from 'react';
+import { Close } from '@joymify/icons/react';
+import { useDialog, useMergedRef } from './dialog-hooks.js';
 
-export interface DrawerProps {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   open?: boolean;
   title?: string;
   placement?: 'right' | 'left';
@@ -10,62 +14,69 @@ export interface DrawerProps {
   className?: string;
 }
 
-export const Drawer: React.FC<DrawerProps> = ({
-  open = false,
-  title,
-  placement = 'right',
-  onClose,
-  children,
-  footer,
-  className = ''
-}) => {
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
+/** `ref` and `...rest` land on the drawer panel (`.joy-drawer`), like the Svelte twin. */
+export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
+  (
+    { open = false, title, placement = 'right', onClose, children, footer, className = '', ...rest },
+    ref
+  ) => {
+    // Unique per instance, so several drawers/modals never share a label id.
+    const titleId = `${React.useId()}-title`;
+    const dialogRef = React.useRef<HTMLDivElement | null>(null);
+    const setDialogRef = useMergedRef(ref, dialogRef);
+    // Only the topmost dialog answers Escape, and a popover/menu/tooltip inside claims it first
+    // (preventDefault) so it closes alone; dialogs claim it too so an outer one does not also close.
+    useDialog(open, dialogRef, (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
         onClose?.();
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, onClose]);
+    });
 
-  if (!open) return null;
+    if (!open) return null;
 
-  return (
-    <div
-      className="joy-drawer-backdrop"
-      role="presentation"
-      style={{ justifyContent: placement === 'left' ? 'flex-start' : 'flex-end' }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose?.();
-      }}
-    >
+    const left = placement === 'left';
+
+    return (
       <div
-        className={`joy-drawer ${placement === 'left' ? 'joy-drawer--left' : ''} ${className}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="drawer-title"
+        className={cx('joy-drawer-backdrop', left && 'joy-drawer-backdrop--left')}
+        role="presentation"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose?.();
+        }}
       >
-        <div className="joy-drawer__header">
-          <h3 id="drawer-title" className="joy-drawer__title">
-            {title}
-          </h3>
-          <button
-            type="button"
-            className="joy-drawer__close"
-            onClick={onClose}
-            aria-label="Close drawer"
-          >
-            &times;
-          </button>
+        <div
+          {...rest}
+          ref={setDialogRef}
+          className={cx('joy-drawer', className, left && 'joy-drawer--left')}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}
+          aria-label={rest['aria-label'] ?? (title ? undefined : 'Drawer')}
+        >
+          <div className="joy-drawer__header">
+            {title ? (
+              <h3 id={titleId} className="joy-drawer__title">
+                {title}
+              </h3>
+            ) : null}
+            <button
+              type="button"
+              className="joy-drawer__close"
+              onClick={() => onClose?.()}
+              aria-label="Close drawer"
+            >
+              <Close size="1.25rem" />
+            </button>
+          </div>
+
+          <div className="joy-drawer__body">{children}</div>
+
+          {footer ? <div className="joy-drawer__footer">{footer}</div> : null}
         </div>
-
-        <div className="joy-drawer__body">{children}</div>
-
-        {footer && <div className="joy-drawer__footer">{footer}</div>}
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
 Drawer.displayName = 'Drawer';

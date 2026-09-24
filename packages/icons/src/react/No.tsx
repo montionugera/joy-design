@@ -27,9 +27,9 @@ export const No: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="9" stroke=color strokeWidth="1.5" /><path
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5" /><path
 		d="M9 9L15 15M15 9L9 15"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"

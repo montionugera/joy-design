@@ -247,7 +247,7 @@
   --joy-text-inverse: #1f1c13;
   --joy-text-link: #dab362;
   --joy-text-on-accent: #0a121f;
-  --joy-border-subtle: #132033;
+  --joy-border-subtle: #22324b;
   --joy-border-default: #566a87;
   --joy-border-strong: #7487a5;
   --joy-border-focus: #dab362;
@@ -260,19 +260,19 @@
   --joy-accent-gradient-end: #c49a3a;
   --joy-accent-highlight: #e9cd94;
   --joy-status-success-fg: #93c794;
-  --joy-status-success-bg: #061b07;
+  --joy-status-success-bg: #0d2d0f;
   --joy-status-success-border: #1a4f1f;
   --joy-status-warning-fg: #dfae68;
-  --joy-status-warning-bg: #241100;
+  --joy-status-warning-bg: #3a1e00;
   --joy-status-warning-border: #643600;
   --joy-status-danger-fg: #fb9890;
-  --joy-status-danger-bg: #2d0606;
+  --joy-status-danger-bg: #470d0e;
   --joy-status-danger-border: #781b1c;
   --joy-status-danger-solid-bg: #9f3331;
   --joy-status-danger-solid-fg: #ffffff;
   --joy-status-danger-solid-border: #781b1c;
   --joy-status-info-fg: #8fbceb;
-  --joy-status-info-bg: #051729;
+  --joy-status-info-bg: #0b2741;
   --joy-status-info-border: #17446f;
   --joy-focus-ring: 2px solid #dab362;
   --joy-elevation-0: none;
@@ -307,7 +307,7 @@
   --joy-text-inverse: #1f1c13;
   --joy-text-link: #dab362;
   --joy-text-on-accent: #0a121f;
-  --joy-border-subtle: #132033;
+  --joy-border-subtle: #22324b;
   --joy-border-default: #566a87;
   --joy-border-strong: #7487a5;
   --joy-border-focus: #dab362;
@@ -320,19 +320,19 @@
   --joy-accent-gradient-end: #c49a3a;
   --joy-accent-highlight: #e9cd94;
   --joy-status-success-fg: #93c794;
-  --joy-status-success-bg: #061b07;
+  --joy-status-success-bg: #0d2d0f;
   --joy-status-success-border: #1a4f1f;
   --joy-status-warning-fg: #dfae68;
-  --joy-status-warning-bg: #241100;
+  --joy-status-warning-bg: #3a1e00;
   --joy-status-warning-border: #643600;
   --joy-status-danger-fg: #fb9890;
-  --joy-status-danger-bg: #2d0606;
+  --joy-status-danger-bg: #470d0e;
   --joy-status-danger-border: #781b1c;
   --joy-status-danger-solid-bg: #9f3331;
   --joy-status-danger-solid-fg: #ffffff;
   --joy-status-danger-solid-border: #781b1c;
   --joy-status-info-fg: #8fbceb;
-  --joy-status-info-bg: #051729;
+  --joy-status-info-bg: #0b2741;
   --joy-status-info-border: #17446f;
   --joy-focus-ring: 2px solid #dab362;
   --joy-elevation-0: none;
@@ -516,6 +516,8 @@
 .joy-badge--neutral {
   background: var(--joy-surface-sunken);
   color: var(--joy-text-primary);
+  /* Ring, not a border: the chip stays the same size, but in dark the sunken fill is only ~1.09:1 against the card. */
+  box-shadow: inset 0 0 0 1px var(--joy-border-subtle);
 }
 .joy-badge--success {
   background: var(--joy-status-success-bg);
@@ -849,12 +851,31 @@ select.joy-select:disabled,
 
 /* Alert */
 .joy-alert {
-  padding: 12px 16px;
-  border-radius: var(--joy-radius-control);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--joy-space-3);
+  padding: var(--joy-space-3) var(--joy-space-4);
+  border-radius: var(--joy-radius-card);
   border: 1px solid var(--joy-border-default);
   font-family: var(--joy-font-family-sans);
-  margin-bottom: 12px;
+  margin-bottom: var(--joy-space-3);
   animation: joy-fade-in var(--joy-duration-fast) ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-alert {
+    animation: none;
+  }
+}
+.joy-alert__icon {
+  display: inline-flex;
+  flex: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-top: 1px;
+}
+.joy-alert__body {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .joy-alert__title {
   font-weight: 700;
@@ -866,32 +887,66 @@ select.joy-select:disabled,
   line-height: 1.5;
   opacity: 0.9;
 }
+.joy-alert__close {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -2px -6px -2px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+  border-radius: var(--joy-radius-control);
+}
+.joy-alert__close:hover {
+  opacity: 1;
+}
+/* Transparent 44px hit area centred on the 24px visual control, growing outward. */
+.joy-alert__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.joy-alert__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
 .joy-alert--info {
   background: var(--joy-status-info-bg);
-  border: 1px solid var(--joy-status-info-border);
+  border-color: var(--joy-status-info-border);
   color: var(--joy-status-info-fg);
 }
 .joy-alert--success {
   background: var(--joy-status-success-bg);
-  border: 1px solid var(--joy-status-success-border);
+  border-color: var(--joy-status-success-border);
   color: var(--joy-status-success-fg);
 }
 .joy-alert--warning {
   background: var(--joy-status-warning-bg);
-  border: 1px solid var(--joy-status-warning-border);
+  border-color: var(--joy-status-warning-border);
   color: var(--joy-status-warning-fg);
 }
 .joy-alert--danger {
   background: var(--joy-status-danger-bg);
-  border: 1px solid var(--joy-status-danger-border);
+  border-color: var(--joy-status-danger-border);
   color: var(--joy-status-danger-fg);
 }
 
 /* Metric Tile */
 .joy-metric-tile {
   background: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
-  border-radius: var(--joy-radius-control);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
   padding: 16px 20px;
   box-shadow: var(--joy-elevation-1);
   transition: transform var(--joy-duration-fast) ease, box-shadow var(--joy-duration-fast) ease;
@@ -902,7 +957,6 @@ select.joy-select:disabled,
 }
 .joy-metric-tile__title {
   font-size: 0.8125rem;
-  
   color: var(--joy-text-muted);
   margin-bottom: 6px;
 }
@@ -913,9 +967,24 @@ select.joy-select:disabled,
   color: var(--joy-text-primary);
 }
 .joy-metric-tile__change {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--joy-space-1);
   font-size: 0.8125rem;
   font-weight: 600;
   margin-top: 4px;
+}
+.joy-metric-tile__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .joy-metric-tile--up .joy-metric-tile__change {
   color: var(--joy-status-success-fg);
@@ -932,7 +1001,7 @@ select.joy-select:disabled,
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
-  border: 1px solid var(--joy-border-subtle);
+  border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-control);
   background: var(--joy-surface-card);
   box-shadow: var(--joy-elevation-1);
@@ -947,7 +1016,7 @@ select.joy-select:disabled,
 }
 .joy-table thead {
   background: var(--joy-surface-raised);
-  border-bottom: 1px solid var(--joy-border-subtle);
+  border-bottom: 1px solid var(--joy-border-default);
 }
 .joy-table th {
   padding: 10px 14px;
@@ -964,7 +1033,7 @@ select.joy-select:disabled,
   border-bottom: none;
 }
 .joy-table tr:hover td {
-  background-color: var(--joy-surface-raised);
+  background-color: var(--joy-accent-subtle);
 }
 .joy-table--compact th, .joy-table--compact td {
   padding: 6px 10px;
@@ -995,7 +1064,7 @@ select.joy-select:disabled,
   }
   .joy-table--responsive-stack tr {
     display: block;
-    border: 1px solid var(--joy-border-subtle);
+    border: 1px solid var(--joy-border-default);
     border-radius: var(--joy-radius-control);
     background-color: var(--joy-surface-card);
     padding: 12px 16px;
@@ -1018,7 +1087,7 @@ select.joy-select:disabled,
   .joy-table--responsive-stack td::before {
     content: attr(data-label);
     font-weight: 600;
-    color: var(--joy-text-muted);
+    color: var(--joy-text-secondary);
     text-align: left;
     padding-right: 12px;
     font-size: 0.8125rem;
@@ -1051,7 +1120,11 @@ select.joy-select:disabled,
   transition: color var(--joy-duration-fast);
 }
 .joy-table-th--sortable:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
+}
+.joy-table-th--sortable:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
 }
 .joy-table-sort-icon {
   display: inline-block;
@@ -1062,12 +1135,54 @@ select.joy-select:disabled,
 .joy-table-th--sorted-asc .joy-table-sort-icon,
 .joy-table-th--sorted-desc .joy-table-sort-icon {
   opacity: 1;
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
+}
+
+/* Table scroll variant (variant="scroll"): scrolls sideways and pins the first column. Cells are opaque so
+   scrolled content never shows through the pinned column. border-collapse is separate because a collapsed
+   border would scroll away from a sticky cell. */
+.joy-table-container--scroll {
+  overflow-x: auto;
+  isolation: isolate;
+}
+.joy-table-container--scroll:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-table--scroll {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.joy-table--scroll th {
+  position: sticky;
+  top: 0;
+  z-index: var(--joy-z-sticky);
+  background: var(--joy-surface-raised);
+  border-bottom: 1px solid var(--joy-border-default);
+}
+.joy-table--scroll th:first-child,
+.joy-table--scroll td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: var(--joy-z-sticky);
+  border-right: 1px solid var(--joy-border-default);
+}
+.joy-table--scroll th:first-child {
+  z-index: calc(var(--joy-z-sticky) + 1);
+}
+.joy-table--scroll td:first-child {
+  background: var(--joy-surface-card);
+}
+.joy-table--scroll tr:hover td:first-child {
+  background-color: var(--joy-accent-subtle);
 }
 
 /* ── Pagination ── */
 .joy-pagination {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-family: var(--joy-font-family-sans);
@@ -1088,25 +1203,58 @@ select.joy-select:disabled,
   color: var(--joy-text-primary);
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--joy-duration-fast) ease;
+  transition: background-color var(--joy-duration-fast) ease, border-color var(--joy-duration-fast) ease, color var(--joy-duration-fast) ease;
 }
 .joy-pagination__btn:hover:not(:disabled) {
-  border-color: var(--joy-accent-default);
-  color: var(--joy-accent-default);
+  background: var(--joy-accent-subtle);
+  border-color: var(--joy-accent-text);
+  color: var(--joy-accent-text);
+}
+.joy-pagination__btn:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
 }
 .joy-pagination__btn--active {
-  background: var(--joy-accent-default);
-  border-color: var(--joy-accent-default);
-  color: var(--joy-text-on-accent);
+  background: var(--joy-accent-text);
+  border-color: var(--joy-accent-text);
+  color: var(--joy-surface-card);
+  font-weight: 600;
+}
+.joy-pagination__btn--active:hover:not(:disabled) {
+  background: var(--joy-accent-text);
+  border-color: var(--joy-accent-text);
+  color: var(--joy-surface-card);
+  box-shadow: var(--joy-elevation-1);
 }
 .joy-pagination__btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+.joy-pagination__ellipsis {
+  min-width: 24px;
+  text-align: center;
+  color: var(--joy-text-muted);
+  user-select: none;
+}
 .joy-pagination__info {
   margin-left: auto;
   color: var(--joy-text-muted);
   font-size: 0.8125rem;
+}
+.joy-pagination .joy-pagination__size {
+  width: auto;
+  margin-left: var(--joy-space-2);
+  padding: var(--joy-space-1) calc(var(--joy-space-10) - var(--joy-space-3)) var(--joy-space-1) var(--joy-space-2);
+  font-size: 0.8125rem;
+}
+@media (pointer: coarse) {
+  .joy-pagination__btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .joy-pagination .joy-select {
+    min-height: var(--joy-control-height-md);
+  }
 }
 
 /* ── Skeleton Loaders ── */
@@ -1132,63 +1280,98 @@ select.joy-select:disabled,
   height: 40px;
   border-radius: 50%;
 }
+@media (prefers-reduced-motion: reduce) {
+  .joy-skeleton {
+    animation: none;
+    background: var(--joy-surface-sunken);
+  }
+}
 
 /* ── Modal / Dialog ── */
+/* The backdrop is the dialog's positioning parent, so one stacking context carries both: it takes the
+   modal layer (above the drawer, below popovers/toasts/tooltips). The scrim is a solid, theme-invariant dark
+   tint: navy-900 is near-black in the light AND the dark theme, so the page dims in both (an inverse-surface
+   scrim would turn cream in dark mode). No backdrop-filter: blur is decorative, and costs paint on mobile. */
 .joy-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: color-mix(in srgb, var(--joy-color-navy-500) 60%, transparent);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background-color: color-mix(in srgb, var(--joy-color-navy-900) 60%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--joy-z-index-modal);
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  z-index: var(--joy-z-modal);
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
   padding: 20px;
 }
 .joy-modal {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
   background: var(--joy-surface-card);
-  border-radius: var(--joy-radius-card);
+  color: var(--joy-text-primary);
+  border: 1px solid var(--joy-border-subtle);
+  border-radius: var(--joy-radius-overlay);
   box-shadow: var(--joy-elevation-3);
   width: 100%;
   max-width: 520px;
+  max-height: 100%;
   overflow: hidden;
-  animation: joy-modal-pop var(--joy-duration-normal) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: joy-modal-pop var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-modal__header {
+  flex: none;
   padding: 20px 24px;
   border-bottom: 1px solid var(--joy-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--joy-space-3);
 }
 .joy-modal__title {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--joy-text-primary);
 }
-.joy-modal__close {
+/* Close buttons (modal + drawer): a real 44x44 hit area, pulled into the header padding so the header
+   does not grow. margin-left:auto keeps it on the right when there is no title. */
+.joy-modal__close,
+.joy-drawer__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -12px -10px auto;
+  padding: 0;
   background: transparent;
   border: none;
+  border-radius: var(--joy-radius-control);
   font-size: 1.25rem;
+  line-height: 1;
   cursor: pointer;
   color: var(--joy-text-muted);
-  transition: color var(--joy-duration-fast);
+  transition: color var(--joy-duration-fast) var(--joy-ease-out), background-color var(--joy-duration-fast) var(--joy-ease-out);
 }
-.joy-modal__close:hover {
+.joy-modal__close:hover,
+.joy-drawer__close:hover {
   color: var(--joy-text-primary);
+  background-color: var(--joy-surface-raised);
 }
 .joy-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   padding: 24px;
   font-size: 0.9375rem;
   line-height: 1.6;
   color: var(--joy-text-primary);
 }
 .joy-modal__footer {
+  flex: none;
   padding: 16px 24px;
   background: var(--joy-surface-sunken);
   border-top: 1px solid var(--joy-border-subtle);
@@ -1197,28 +1380,64 @@ select.joy-select:disabled,
   justify-content: flex-end;
   gap: 12px;
 }
+/* Phones: the dialog is a full-bleed screen; the footer stays reachable at the bottom edge. */
+@media (max-width: 480px) {
+  .joy-modal-backdrop {
+    padding: 0;
+  }
+  .joy-modal {
+    max-width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .joy-modal__header {
+    padding-top: calc(20px + env(safe-area-inset-top));
+  }
+  .joy-modal__footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--joy-surface-card);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-modal-backdrop,
+  .joy-modal {
+    animation: none;
+  }
+}
 
 /* ── Dropdown Menu ── */
 .joy-dropdown-wrapper {
   position: relative;
   display: inline-block;
 }
+/* Positioned by openOverlay (position: fixed + top/left inline), which is what lets the menu escape
+   overflow:hidden ancestors; the rules here only skin it and set its layer. */
 .joy-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 6px;
+  box-sizing: border-box;
   background: var(--joy-surface-card);
   border: 1px solid var(--joy-border-subtle);
   border-radius: var(--joy-radius-control);
   box-shadow: var(--joy-elevation-3);
   min-width: 180px;
-  z-index: var(--joy-z-index-dropdown);
-  overflow: hidden;
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  z-index: var(--joy-z-dropdown);
+  overflow-x: hidden;
+  overflow-y: auto;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+/* Fallback for panels that openOverlay has not taken over (static demos, unmigrated twins): anchor under the
+   wrapper as before. openOverlay adds .joy-overlay and positions inline, which disables this. */
+.joy-dropdown:not(.joy-overlay) {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
 }
 .joy-dropdown__item {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   padding: 10px 16px;
   text-align: left;
@@ -1230,19 +1449,62 @@ select.joy-select:disabled,
   cursor: pointer;
   transition: background-color var(--joy-duration-fast);
 }
-.joy-dropdown__item:hover {
+.joy-dropdown__item:hover,
+.joy-dropdown__item:focus-visible {
   background-color: var(--joy-surface-raised);
   color: var(--joy-accent-default);
 }
+.joy-dropdown__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-dropdown__item--danger {
+  color: var(--joy-status-danger-fg);
+}
+.joy-dropdown__item--danger:hover,
+.joy-dropdown__item--danger:focus-visible {
+  background-color: var(--joy-status-danger-bg);
+  color: var(--joy-status-danger-fg);
+}
+.joy-dropdown__item:disabled {
+  color: var(--joy-text-disabled);
+  background: transparent;
+  cursor: not-allowed;
+}
+@media (pointer: coarse) {
+  .joy-dropdown__item {
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-dropdown {
+    animation: none;
+  }
+}
 
 /* ── Tabs ── */
+/* The tablist scrolls sideways on narrow screens. The 2px rule is an inset shadow (not a border) so the
+   active indicator can sit inside the scroll box instead of being clipped by it. The mask fades the outer
+   16px of both edges (token-coloured, opaque in the middle): that is only tab padding at rest, and it
+   fades whatever is scrolled beneath the edge, hinting at overflow. */
 .joy-tabs {
   display: flex;
-  border-bottom: 2px solid var(--joy-border-subtle);
+  box-shadow: inset 0 -2px 0 var(--joy-border-subtle);
   gap: 8px;
   margin-bottom: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--joy-surface-card) 16px, var(--joy-surface-card) calc(100% - 16px), transparent);
+  mask-image: linear-gradient(to right, transparent, var(--joy-surface-card) 16px, var(--joy-surface-card) calc(100% - 16px), transparent);
+}
+.joy-tabs::-webkit-scrollbar {
+  display: none;
 }
 .joy-tab-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: transparent;
   border: none;
   padding: 10px 18px;
@@ -1255,20 +1517,32 @@ select.joy-select:disabled,
   transition: color var(--joy-duration-fast);
 }
 .joy-tab-btn:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
+}
+.joy-tab-btn:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--joy-radius-control);
 }
 .joy-tab-btn--active {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
 }
 .joy-tab-btn--active::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--joy-accent-default);
+  background: var(--joy-accent-text);
   border-radius: 2px;
+}
+@media (pointer: coarse) {
+  .joy-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 /* ── Tooltip ── */
@@ -1289,9 +1563,14 @@ select.joy-select:disabled,
   font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
-  z-index: var(--joy-z-index-tooltip);
+  z-index: var(--joy-z-tooltip);
   box-shadow: var(--joy-elevation-2);
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-tooltip {
+    animation: none;
+  }
 }
 .joy-tooltip::after {
   content: '';
@@ -1549,62 +1828,100 @@ select.joy-select__input {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
 }
+@keyframes joy-drawer-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+/* Like the modal, the backdrop is the panel's positioning parent and carries the drawer layer (below the
+   modal, so a modal opened from a drawer stacks above it). Same solid dark scrim, no backdrop-filter. */
 .joy-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background-color: color-mix(in srgb, var(--joy-color-navy-500) 50%, transparent);
-  backdrop-filter: blur(2px);
-  z-index: var(--joy-z-index-modal);
+  background-color: color-mix(in srgb, var(--joy-color-navy-900) 60%, transparent);
+  z-index: var(--joy-z-drawer);
   display: flex;
   justify-content: flex-end;
-  animation: joy-fade-in var(--joy-duration-fast) ease-out;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-drawer-backdrop--left {
+  justify-content: flex-start;
 }
 .joy-drawer {
+  box-sizing: border-box;
   background: var(--joy-surface-card);
+  color: var(--joy-text-primary);
   width: 100%;
   max-width: 400px;
   height: 100%;
+  border-left: 1px solid var(--joy-border-subtle);
   box-shadow: var(--joy-elevation-3);
   display: flex;
   flex-direction: column;
-  animation: joy-drawer-slide-right var(--joy-duration-normal) cubic-bezier(0.16, 1, 0.3, 1);
+  animation: joy-drawer-slide-right var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-drawer--left {
+  border-left: 0;
+  border-right: 1px solid var(--joy-border-subtle);
   animation-name: joy-drawer-slide-left;
 }
 .joy-drawer__header {
+  flex: none;
   padding: 16px 20px;
   border-bottom: 1px solid var(--joy-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--joy-space-3);
 }
 .joy-drawer__title {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--joy-text-primary);
 }
-.joy-drawer__close {
-  background: transparent;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: var(--joy-text-muted);
-}
 .joy-drawer__body {
   padding: 20px;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   color: var(--joy-text-primary);
 }
 .joy-drawer__footer {
+  flex: none;
   padding: 16px 20px;
-  border-top: 1px solid var(--joy-surface-sunken);
+  border-top: 1px solid var(--joy-border-subtle);
   background: var(--joy-surface-raised);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+/* Phones: whichever side it opens from, the drawer becomes a bottom sheet (same shape as .joy-overlay--sheet). */
+@media (max-width: 480px) {
+  .joy-drawer-backdrop {
+    align-items: flex-end;
+  }
+  .joy-drawer,
+  .joy-drawer--left {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 70vh;
+    border: 0;
+    border-top: 1px solid var(--joy-border-subtle);
+    border-radius: var(--joy-radius-overlay) var(--joy-radius-overlay) 0 0;
+    animation-name: joy-drawer-slide-up;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-drawer-backdrop,
+  .joy-drawer {
+    animation: none;
+  }
 }
 
 /* ── Toast Notifications ── */
@@ -1619,7 +1936,7 @@ select.joy-select__input {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 1200;
+  z-index: var(--joy-z-toast);
   pointer-events: none;
 }
 .joy-toast {
@@ -1640,16 +1957,67 @@ select.joy-select__input {
   font-size: 0.875rem;
 }
 .joy-toast--info {
+  background: var(--joy-status-info-bg);
   border: 1px solid var(--joy-status-info-border);
+  color: var(--joy-status-info-fg);
 }
 .joy-toast--success {
+  background: var(--joy-status-success-bg);
   border: 1px solid var(--joy-status-success-border);
+  color: var(--joy-status-success-fg);
 }
 .joy-toast--warning {
+  background: var(--joy-status-warning-bg);
   border: 1px solid var(--joy-status-warning-border);
+  color: var(--joy-status-warning-fg);
 }
 .joy-toast--danger {
+  background: var(--joy-status-danger-bg);
   border: 1px solid var(--joy-status-danger-border);
+  color: var(--joy-status-danger-fg);
+}
+.joy-toast__body {
+  flex: 1;
+  min-width: 0;
+}
+.joy-toast__close {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -2px -6px -2px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+  border-radius: var(--joy-radius-control);
+}
+.joy-toast__close:hover {
+  opacity: 1;
+}
+/* Transparent 44px hit area centred on the 24px visual control, growing outward. */
+.joy-toast__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.joy-toast__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-toast {
+    animation: none;
+  }
 }
 
 /* ── WCAG 2.2 AA Focus Indicators ── */
@@ -1780,13 +2148,20 @@ h1, h2, h3, .joy-display {
   gap: 8px;
 }
 .joy-breadcrumb__link {
+  display: inline-flex;
+  align-items: center;
   color: var(--joy-text-muted);
   text-decoration: none;
   transition: color var(--joy-duration-fast) ease;
 }
 .joy-breadcrumb__link:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   text-decoration: underline;
+}
+.joy-breadcrumb__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
 }
 .joy-breadcrumb__current {
   color: var(--joy-text-primary);
@@ -1794,6 +2169,26 @@ h1, h2, h3, .joy-display {
 }
 .joy-breadcrumb__sep {
   color: var(--joy-border-default);
+}
+@media (max-width: 768px) {
+  .joy-breadcrumb {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    /* overflow-x makes overflow-y clip too: room inside the scroller keeps the 2px focus ring visible */
+    padding: 4px;
+  }
+  .joy-breadcrumb ol {
+    flex-wrap: nowrap;
+  }
+  .joy-breadcrumb li {
+    flex-shrink: 0;
+  }
+}
+@media (pointer: coarse) {
+  .joy-breadcrumb__link {
+    min-height: 44px;
+  }
 }
 
 /* Empty State */
@@ -1804,7 +2199,7 @@ h1, h2, h3, .joy-display {
   text-align: center;
   gap: 12px;
   padding: 48px 24px;
-  background: var(--joy-surface-canvas);
+  background: var(--joy-surface-card);
   border: 1px dashed var(--joy-border-default);
   border-radius: var(--joy-radius-card);
   max-width: 480px;
@@ -1824,7 +2219,7 @@ h1, h2, h3, .joy-display {
 }
 .joy-empty-state__desc {
   font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   line-height: 1.5;
   margin: 0;
   max-width: 40ch;
@@ -1835,8 +2230,8 @@ h1, h2, h3, .joy-display {
 
 /* Stat Card */
 .joy-stat-card {
-  background: var(--joy-surface-canvas);
-  border: 1px solid var(--joy-border-subtle);
+  background: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
   padding: 20px;
   font-family: inherit;
@@ -1845,7 +2240,6 @@ h1, h2, h3, .joy-display {
 .joy-stat-card__label {
   font-size: 0.75rem;
   font-weight: 600;
-  
   color: var(--joy-text-muted);
 }
 .joy-stat-card__value {
@@ -1858,9 +2252,24 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-primary);
 }
 .joy-stat-card__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--joy-space-1);
   font-size: 0.8125rem;
   margin-top: 6px;
   font-weight: 500;
+}
+.joy-stat-card__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .joy-stat-card__delta--positive {
   color: var(--joy-status-success-fg);
@@ -1894,8 +2303,9 @@ h1, h2, h3, .joy-display {
 }
 .joy-progress__bg {
   border-radius: 100px;
-  transition: all 0.3s cubic-bezier(0.08, 0.82, 0.17, 1);
-  background-color: var(--joy-accent-default);
+  transition: width var(--joy-duration-slow) var(--joy-ease-out), background-color var(--joy-duration-normal) var(--joy-ease-out);
+  /* accent-text, not accent-default: default gold is 2.16:1 on the light track (< 3:1 for UI graphics) */
+  background-color: var(--joy-accent-text);
   position: relative;
 }
 .joy-progress--status-success .joy-progress__bg {
@@ -2070,8 +2480,8 @@ h1, h2, h3, .joy-display {
   justify-content: center;
   font-family: var(--joy-font-family-sans);
   font-weight: 600;
-  color: var(--joy-text-inverse);
-  background-color: var(--joy-accent-default);
+  color: var(--joy-text-secondary);
+  background-color: var(--joy-surface-sunken);
   user-select: none;
   overflow: visible;
 }
@@ -2102,6 +2512,9 @@ h1, h2, h3, .joy-display {
   object-fit: cover;
   border-radius: inherit;
 }
+.joy-avatar__fallback {
+  line-height: 1;
+}
 .joy-avatar__badge {
   position: absolute;
   bottom: -2px;
@@ -2109,7 +2522,7 @@ h1, h2, h3, .joy-display {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 2px solid var(--joy-surface-card);
+  border: 2px solid var(--joy-surface-canvas);
 }
 .joy-avatar__badge--online {
   background-color: var(--joy-status-success-fg);
@@ -2123,8 +2536,12 @@ h1, h2, h3, .joy-display {
 }
 .joy-avatar-group .joy-avatar {
   margin-right: -8px;
-  border: 2px solid var(--joy-surface-card);
+  border: 2px solid var(--joy-surface-canvas);
   box-shadow: var(--joy-elevation-1);
+}
+.joy-avatar-group__overflow {
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-secondary);
 }
 .joy-avatar-group .joy-avatar:hover {
   z-index: 2;
@@ -2227,8 +2644,8 @@ h1, h2, h3, .joy-display {
 }
 .joy-markdown pre {
   position: relative;
-  background-color: var(--joy-text-primary);
-  color: var(--joy-border-subtle);
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-primary);
   padding: 16px;
   border-radius: var(--joy-radius-control);
   overflow-x: auto;
@@ -2241,10 +2658,22 @@ h1, h2, h3, .joy-display {
 .joy-markdown code {
   font-family: var(--joy-font-family-mono);
   font-size: 0.875em;
-  background-color: var(--joy-surface-raised);
-  color: var(--joy-accent-default);
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-primary);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--joy-radius-control);
+}
+.joy-markdown a {
+  color: var(--joy-text-link);
+  text-decoration: underline;
+}
+.joy-markdown hr {
+  border: none;
+  border-top: 1px solid var(--joy-border-default);
+  margin: 1.5em 0;
+}
+.joy-markdown__table-wrap {
+  overflow-x: auto;
 }
 .joy-markdown pre code {
   background-color: transparent !important;
@@ -2255,7 +2684,7 @@ h1, h2, h3, .joy-display {
   border: 1px solid var(--joy-border-default);
   margin: 1em 0;
   padding: 8px 16px;
-  background-color: var(--joy-surface-raised);
+  background-color: var(--joy-accent-subtle);
   border-radius: var(--joy-radius-control);
   color: var(--joy-text-secondary);
 }
@@ -2281,18 +2710,37 @@ h1, h2, h3, .joy-display {
   padding: 4px 8px;
   background: var(--joy-surface-card);
   color: var(--joy-text-secondary);
-  border: 1px solid var(--joy-border-subtle);
-  border-radius: 4px;
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-control);
   font-size: 0.75rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
-  transition: all 0.2s;
+  transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
 }
 .joy-markdown .joy-markdown__copy-btn:hover {
   background: var(--joy-surface-raised);
   color: var(--joy-text-primary);
+}
+.joy-markdown .joy-markdown__copy-btn:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+}
+.joy-markdown__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (pointer: coarse) {
+  .joy-markdown .joy-markdown__copy-btn {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
 }
 
 /* ── Wave 5: Landing Page Architecture & Enterprise Workflow Suite ── */
@@ -2604,12 +3052,12 @@ h1, h2, h3, .joy-display {
   border: 1px solid var(--joy-border-subtle);
   flex-shrink: 0;
   z-index: 1;
-  transition: all 0.2s;
+  transition: background-color var(--joy-duration-normal) ease, color var(--joy-duration-normal) ease, border-color var(--joy-duration-normal) ease, box-shadow var(--joy-duration-normal) ease;
 }
 .joy-steps__item--process .joy-steps__icon {
-  background-color: var(--joy-accent-default);
-  color: var(--joy-text-on-accent);
-  border-color: var(--joy-accent-default);
+  background-color: var(--joy-accent-text);
+  color: var(--joy-surface-card);
+  border-color: var(--joy-accent-text);
   box-shadow: 0 0 0 4px var(--joy-accent-subtle);
 }
 .joy-steps__item--finish .joy-steps__icon {
@@ -2636,6 +3084,28 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-muted);
   margin-top: 2px;
 }
+.joy-steps__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--joy-radius-control);
+}
+.joy-steps--vertical {
+  gap: var(--joy-space-4);
+}
+@media (max-width: 768px) {
+  .joy-steps--horizontal {
+    flex-direction: column;
+    gap: var(--joy-space-4);
+  }
+  .joy-steps--horizontal .joy-steps__item:not(:last-child)::after {
+    display: none;
+  }
+}
+@media (pointer: coarse) {
+  .joy-steps__item {
+    min-height: 44px;
+  }
+}
 
 /* Timeline (Ant Design Parity) */
 .joy-timeline {
@@ -2658,7 +3128,7 @@ h1, h2, h3, .joy-display {
   top: 10px;
   bottom: 0;
   width: 2px;
-  background-color: var(--joy-border-subtle);
+  background-color: var(--joy-border-default);
 }
 .joy-timeline__dot {
   position: absolute;
@@ -2668,19 +3138,27 @@ h1, h2, h3, .joy-display {
   height: 12px;
   border-radius: 50%;
   background-color: var(--joy-surface-card);
-  border: 2px solid var(--joy-accent-default);
+  border: 2px solid var(--joy-accent-text);
 }
 .joy-timeline__dot--success { border-color: var(--joy-status-success-fg); }
-.joy-timeline__dot--warning { border-color: var(--joy-status-warning-border); }
+.joy-timeline__dot--warning { border-color: var(--joy-status-warning-fg); }
 .joy-timeline__dot--danger { border-color: var(--joy-status-danger-fg); }
-.joy-timeline__dot--info { border-color: var(--joy-status-info-border); }
+.joy-timeline__dot--info { border-color: var(--joy-status-info-fg); }
 .joy-timeline__content {
   font-size: 0.875rem;
   color: var(--joy-text-primary);
 }
+.joy-timeline__title {
+  font-weight: 600;
+}
+.joy-timeline__description {
+  color: var(--joy-text-secondary);
+  font-size: 0.8125rem;
+  margin-top: 2px;
+}
 .joy-timeline__time {
   font-size: 0.75rem;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   margin-top: 4px;
 }
 
@@ -2770,11 +3248,13 @@ h1, h2, h3, .joy-display {
   top: 12px;
   left: 14px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 4px 12px;
+  box-sizing: border-box;
+  max-width: calc(100% - 28px);
   padding: 6px 12px;
   background: var(--joy-surface-card);
-  
   border: 1px solid var(--joy-border-subtle);
   border-radius: var(--joy-radius-control);
   font-size: 0.75rem;
@@ -2793,6 +3273,39 @@ h1, h2, h3, .joy-display {
 }
 .joy-chart__hud-value {
   font-weight: 600;
+  color: var(--joy-text-primary);
+}
+.joy-chart__hud-value--accent {
+  color: var(--joy-accent-text);
+}
+.joy-chart__hud-value--bull {
+  color: var(--joy-status-success-fg);
+}
+.joy-chart__hud-value--bear {
+  color: var(--joy-status-danger-fg);
+}
+/* Visually hidden data summary for the canvas (screen readers read the table). */
+.joy-chart__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 480px) {
+  .joy-chart__hud {
+    top: 8px;
+    left: 8px;
+    gap: 2px 8px;
+    max-width: calc(100% - 16px);
+    padding: 4px 8px;
+    font-size: 0.6875rem;
+  }
 }
 
 /* ── Ant Design Layout Primitives ── */
@@ -2854,7 +3367,8 @@ h1, h2, h3, .joy-display {
   flex-direction: column;
 }
 
-/* Splitter */
+/* Splitter. Pane size is a flex ratio (--joy-splitter-size, the pane's percentage) so it works along either
+   axis; phones (<= 640px) stack a side-by-side splitter, and the component flips its drag axis to match. */
 .joy-splitter {
   display: flex;
   width: 100%;
@@ -2866,25 +3380,76 @@ h1, h2, h3, .joy-display {
 }
 .joy-splitter--vertical {
   flex-direction: column;
+  min-height: 12rem;
 }
 .joy-splitter__pane {
+  flex: var(--joy-splitter-size) 1 0%;
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
   box-sizing: border-box;
 }
 .joy-splitter__bar {
   position: relative;
   flex: 0 0 6px;
-  background-color: var(--joy-surface-sunken);
+  background-color: var(--joy-border-default);
   cursor: col-resize;
   user-select: none;
-  transition: background-color 0.15s ease;
+  touch-action: none;
+  transition: background-color var(--joy-duration-fast);
 }
 .joy-splitter--vertical > .joy-splitter__bar {
   cursor: row-resize;
 }
 .joy-splitter__bar:hover,
-.joy-splitter__bar--active {
-  background-color: var(--joy-accent-default);
+.joy-splitter__bar--active,
+.joy-splitter__bar:focus-visible {
+  background-color: var(--joy-accent-text);
+}
+.joy-splitter__bar:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
+@media (max-width: 640px) {
+  .joy-splitter--horizontal {
+    flex-direction: column;
+    min-height: 12rem;
+  }
+  .joy-splitter--horizontal > .joy-splitter__bar {
+    cursor: row-resize;
+  }
+}
+/* Touch: keep the slim visual bar, widen the grab area to 44px across the split axis. */
+@media (pointer: coarse) {
+  .joy-splitter__bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 44px;
+    transform: translateX(-50%);
+  }
+  .joy-splitter--vertical > .joy-splitter__bar::after {
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+}
+@media (pointer: coarse) and (max-width: 640px) {
+  .joy-splitter--horizontal > .joy-splitter__bar::after {
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 44px;
+    transform: translateY(-50%);
+  }
 }
 
 /* ── Ant Design Data Display Primitives ── */
@@ -2931,7 +3496,8 @@ h1, h2, h3, .joy-display {
 .joy-tag--primary {
   background-color: var(--joy-surface-raised);
   border-color: var(--joy-accent-default);
-  color: var(--joy-accent-default);
+  /* Text uses the AA gold: accent-default on white is 2.62:1, accent-text is >= 4.5:1 in both themes. */
+  color: var(--joy-accent-text);
 }
 .joy-tag--success {
   background-color: var(--joy-status-success-bg);
@@ -2958,6 +3524,41 @@ h1, h2, h3, .joy-display {
   background-color: var(--joy-accent-default);
   border-color: var(--joy-accent-default);
   color: var(--joy-text-on-accent);
+}
+.joy-tag--checkable:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+}
+.joy-tag__close {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -4px -6px -4px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--joy-radius-control);
+}
+/* Transparent hit area: 44px tall, growing above/below and toward the right edge only, never
+   left over the label (the button's left edge is the boundary). Tag lists need
+   gap >= var(--joy-space-2) so neighbouring hit areas do not overlap. */
+.joy-tag__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 34px;
+  height: 44px;
+  transform: translateY(-50%);
+}
+.joy-tag__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
 }
 
 /* Segmented */
@@ -3479,15 +4080,27 @@ h1, h2, h3, .joy-display {
   padding: 8px 16px;
   cursor: pointer;
   color: var(--joy-text-primary);
-  transition: all 0.15s ease;
+  transition: background-color var(--joy-duration-fast) ease, color var(--joy-duration-fast) ease;
   user-select: none;
 }
 .joy-menu__item:hover {
-  color: var(--joy-accent-default);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-text-primary);
 }
-.joy-menu__item--active {
-  color: var(--joy-accent-default) !important;
+.joy-menu__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-menu__item--active,
+.joy-menu__item--active:hover {
+  color: var(--joy-accent-text);
   font-weight: 600;
+}
+.joy-menu__item--disabled,
+.joy-menu__item--disabled:hover {
+  background-color: transparent;
+  color: var(--joy-text-disabled);
+  cursor: not-allowed;
 }
 .joy-menu--horizontal .joy-menu__item--active::after {
   content: '';
@@ -3496,15 +4109,20 @@ h1, h2, h3, .joy-display {
   left: 0;
   right: 0;
   height: 2px;
-  background-color: var(--joy-accent-default);
+  background-color: var(--joy-accent-text);
 }
+.joy-menu--vertical .joy-menu__item--active,
 .joy-menu--inline .joy-menu__item--active {
   background-color: var(--joy-accent-subtle);
-  border-right: 1px solid var(--joy-border-default);
 }
 .joy-menu__submenu {
   display: flex;
   flex-direction: column;
+}
+@media (pointer: coarse) {
+  .joy-menu__item {
+    min-height: 44px;
+  }
 }
 
 /* ── Anchor ── */
@@ -3527,7 +4145,7 @@ h1, h2, h3, .joy-display {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  border: 2px solid var(--joy-accent-default);
+  border: 2px solid var(--joy-accent-active);
   background-color: var(--joy-surface-card);
   transition: top 0.2s ease;
 }
@@ -3541,8 +4159,20 @@ h1, h2, h3, .joy-display {
 }
 .joy-anchor__link:hover,
 .joy-anchor__link--active {
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   font-weight: 600;
+}
+.joy-anchor__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
+}
+@media (pointer: coarse) {
+  .joy-anchor__link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 /* ── Message ── */
@@ -3551,7 +4181,7 @@ h1, h2, h3, .joy-display {
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1010;
+  z-index: var(--joy-z-toast);
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -3575,20 +4205,32 @@ h1, h2, h3, .joy-display {
   from { opacity: 0; transform: translateY(-16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.joy-message__icon {
+  display: inline-flex;
+  flex: none;
+  font-size: 1rem;
+}
+.joy-message__icon--info { color: var(--joy-status-info-fg); }
+.joy-message__icon--success { color: var(--joy-status-success-fg); }
+.joy-message__icon--warning { color: var(--joy-status-warning-fg); }
+.joy-message__icon--error { color: var(--joy-status-danger-fg); }
 
 /* ── Notification ── */
 .joy-notification {
   position: fixed;
   top: 24px;
   right: 24px;
-  z-index: 1010;
+  z-index: var(--joy-z-toast);
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: calc(100vw - var(--joy-space-8));
 }
 .joy-notification__notice {
   position: relative;
+  box-sizing: border-box;
   width: 340px;
+  max-width: 100%;
   padding: 16px 20px;
   background-color: var(--joy-surface-card);
   border-radius: var(--joy-radius-card);
@@ -3606,24 +4248,108 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-muted);
   line-height: 1.5;
 }
+.joy-notification__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--joy-space-3);
+}
+.joy-notification__main {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+.joy-notification__icon {
+  display: inline-flex;
+  flex: none;
+  margin-top: 2px;
+  font-size: 1.125rem;
+}
+.joy-notification__icon--info { color: var(--joy-status-info-fg); }
+.joy-notification__icon--success { color: var(--joy-status-success-fg); }
+.joy-notification__icon--warning { color: var(--joy-status-warning-fg); }
+.joy-notification__icon--error { color: var(--joy-status-danger-fg); }
+.joy-notification__close {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--joy-text-muted);
+  cursor: pointer;
+  border-radius: var(--joy-radius-control);
+}
+.joy-notification__close:hover {
+  color: var(--joy-text-primary);
+}
+/* Transparent 44px hit area centred on the 24px visual control, growing outward. */
+.joy-notification__close::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.joy-notification__close:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 1px;
+}
+@media (max-width: 480px) {
+  .joy-notification {
+    left: var(--joy-space-4);
+    right: var(--joy-space-4);
+    max-width: none;
+  }
+  .joy-notification__notice {
+    width: auto;
+    min-width: 0;
+    max-width: calc(100vw - var(--joy-space-8));
+  }
+}
 
 /* ── Popconfirm ── */
 .joy-popconfirm {
   position: relative;
   display: inline-block;
 }
+/* Positioned by openOverlay (position: fixed + top/left inline). The popover layer sits above the modal, so a
+   confirm opened from inside a Modal or Drawer is never hidden behind it. */
 .joy-popconfirm__panel {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  box-sizing: border-box;
   width: 220px;
   padding: 14px;
   background-color: var(--joy-surface-card);
   border-radius: var(--joy-radius-control);
   box-shadow: var(--joy-elevation-2);
   border: 1px solid var(--joy-border-subtle);
-  z-index: 100;
+  z-index: var(--joy-z-popover);
+}
+/* Fallback for panels that openOverlay has not taken over: float above the trigger as before. */
+.joy-popconfirm__panel:not(.joy-overlay) {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+/* The sheet keeps the overlay primitive's shape: .joy-popconfirm__panel is declared after .joy-overlay--sheet and
+   would otherwise flatten the top radius, drop to elevation-2 and lose the safe-area inset. */
+.joy-popconfirm__panel.joy-overlay--sheet {
+  width: auto;
+  border-radius: var(--joy-radius-overlay) var(--joy-radius-overlay) 0 0;
+  box-shadow: var(--joy-elevation-3);
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+}
+.joy-popconfirm__icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--joy-status-warning-fg);
 }
 .joy-popconfirm__title {
   display: flex;
@@ -3639,12 +4365,174 @@ h1, h2, h3, .joy-display {
   justify-content: flex-end;
   gap: 6px;
 }
+@media (prefers-reduced-motion: reduce) {
+  .joy-popconfirm__panel {
+    animation: none;
+  }
+}
+
+/* ── Image / ImagePreview ── */
+.joy-image-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: var(--joy-radius-control);
+}
+.joy-image-wrapper--previewable {
+  cursor: pointer;
+}
+.joy-image__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.joy-image__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--joy-space-2);
+  background-color: color-mix(in srgb, var(--joy-surface-inverse) 65%, transparent);
+  color: var(--joy-text-inverse);
+  font-size: 0.8125rem;
+  font-family: var(--joy-font-family-sans);
+}
+/* The preview is a modal-layer overlay: same solid navy scrim as Modal (theme-invariant, no blur), a little
+   denser because the photo, not the page, is the subject. Toolbar and nav sit on the inverse surface so they
+   read against the scrim and against any photo in both themes. */
+.joy-image-preview-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--joy-z-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: color-mix(in srgb, var(--joy-color-navy-900) 85%, transparent);
+  user-select: none;
+  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-image-preview-toolbar {
+  position: absolute;
+  bottom: var(--joy-space-6);
+  z-index: var(--joy-z-popover);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--joy-space-1);
+  max-width: calc(100% - var(--joy-space-6));
+  padding: var(--joy-space-2);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  border: 1px solid var(--joy-border-subtle);
+  box-shadow: var(--joy-elevation-3);
+}
+.joy-image-preview-btn,
+.joy-image-preview-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-image-preview-btn:hover {
+  background-color: color-mix(in srgb, var(--joy-text-inverse) 15%, transparent);
+}
+.joy-image-preview-btn--close {
+  background-color: color-mix(in srgb, var(--joy-text-inverse) 10%, transparent);
+}
+.joy-image-preview-btn__icon--flip {
+  display: inline-flex;
+  transform: scaleX(-1);
+}
+.joy-image-preview-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--joy-z-popover);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  border: 1px solid var(--joy-border-subtle);
+  box-shadow: var(--joy-elevation-2);
+}
+.joy-image-preview-nav--prev {
+  left: var(--joy-space-6);
+}
+.joy-image-preview-nav--next {
+  right: var(--joy-space-6);
+}
+.joy-image-preview-counter {
+  position: absolute;
+  top: var(--joy-space-6);
+  padding: var(--joy-space-1) var(--joy-space-3);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  font-family: var(--joy-font-family-mono);
+  font-size: 0.875rem;
+}
+.joy-image-preview-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.joy-image-preview-stage--zoomed {
+  cursor: grab;
+}
+.joy-image-preview-stage--dragging {
+  cursor: grabbing;
+}
+.joy-image-preview-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--joy-radius-control);
+  box-shadow: var(--joy-elevation-3);
+  transition: transform var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-image-preview-stage--dragging .joy-image-preview-img {
+  transition: none;
+}
+@media (max-width: 480px) {
+  .joy-image-preview-nav--prev {
+    left: var(--joy-space-2);
+  }
+  .joy-image-preview-nav--next {
+    right: var(--joy-space-2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-image-preview-mask {
+    animation: none;
+  }
+  .joy-image-preview-btn,
+  .joy-image-preview-img {
+    transition: none;
+  }
+}
 
 /* ── Spin ── */
 .joy-spin {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--joy-space-2);
   color: var(--joy-accent-default);
 }
 .joy-spin__indicator {
@@ -3654,14 +4542,26 @@ h1, h2, h3, .joy-display {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+/* Slow, never stop: the spinner is the only loading affordance. The global reduced-motion
+   block forces duration 0.01ms / 1 iteration with !important, so this needs !important and
+   a higher-specificity selector to win. */
+@media (prefers-reduced-motion: reduce) {
+  .joy-spin .joy-spin__indicator {
+    animation-duration: 4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+.joy-spin__tip {
+  font-size: 0.8125rem;
+  color: var(--joy-accent-text);
+}
 .joy-spin__container {
   position: relative;
 }
 .joy-spin__mask {
   position: absolute;
   inset: 0;
-  background-color: color-mix(in srgb, var(--joy-surface-canvas) 65%, transparent);
-  
+  background-color: color-mix(in srgb, var(--joy-surface-overlay) 70%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -55,3 +55,13 @@ test('@joymify/icons exports dual Svelte 5 and React 19 suites', () => {
   assert.ok(provenance.includes('Feather Icons'), 'Provenance must cite Feather upstream');
 });
 
+
+test('React icon sources contain no unbraced JSX attribute values (e.g. stroke=color is a syntax error in a real bundler)', () => {
+  const dir = path.resolve('./src/react');
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.tsx'));
+  assert.ok(files.length > 100, 'expected the full React icon set');
+  // An attribute followed directly by a bare identifier: name=identifier (quoted strings and {expressions} are fine).
+  const bare = /[\s"'}]([A-Za-z][\w:-]*)=[A-Za-z_$]/;
+  const offenders = files.filter((f) => bare.test(fs.readFileSync(path.join(dir, f), 'utf8')));
+  assert.deepStrictEqual(offenders, [], `unbraced attribute values in: ${offenders.join(', ')}`);
+});

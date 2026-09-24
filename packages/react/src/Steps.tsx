@@ -1,4 +1,6 @@
-import React, { forwardRef } from 'react';
+import * as React from 'react';
+
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
 export interface StepItem {
   title: string;
@@ -6,14 +8,14 @@ export interface StepItem {
   status?: 'wait' | 'process' | 'finish' | 'error';
 }
 
-export interface StepsProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StepsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   current?: number;
   items?: StepItem[];
   direction?: 'horizontal' | 'vertical';
   onChange?: (step: number) => void;
 }
 
-export const Steps = forwardRef<HTMLDivElement, StepsProps>(
+export const Steps = React.forwardRef<HTMLDivElement, StepsProps>(
   (
     {
       current = 0,
@@ -21,7 +23,7 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
       direction = 'horizontal',
       onChange,
       className = '',
-      ...props
+      ...rest
     },
     ref
   ) => {
@@ -35,10 +37,10 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
     return (
       <div
         ref={ref}
-        className={`joy-steps joy-steps--${direction} ${className}`}
+        className={cx('joy-steps', `joy-steps--${direction}`, className)}
         role="navigation"
         aria-label="Steps progress"
-        {...props}
+        {...rest}
       >
         {items.map((item, index) => {
           const status = getItemStatus(item, index);
@@ -55,11 +57,12 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
                   onChange?.(index);
                 }
               }}
-              aria-current={status === 'process' ? 'step' : undefined}
+              aria-current={index === current ? 'step' : undefined}
             >
               <div className="joy-steps__icon">
                 {status === 'finish' ? (
                   <svg
+                    aria-hidden="true"
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
@@ -73,6 +76,7 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(
                   </svg>
                 ) : status === 'error' ? (
                   <svg
+                    aria-hidden="true"
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"

@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-export interface StatisticProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StatisticProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'> {
   title?: string;
   value: number | string;
   precision?: number;

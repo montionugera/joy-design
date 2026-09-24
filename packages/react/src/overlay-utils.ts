@@ -68,9 +68,14 @@ export function trapFocus(container: HTMLElement): () => void {
 
   container.addEventListener('keydown', handleKeyDown);
 
-  // Set initial focus to first focusable element
-  const initial = container.querySelector<HTMLElement>(focusableSelector);
-  initial?.focus();
+  // Set initial focus to first focusable element, unless focus is already inside the container
+  // (e.g. a body input with autofocus) - that must not be stolen by the header Close button.
+  const active = typeof document !== 'undefined' ? document.activeElement : null;
+  const focusAlreadyInside = !!active && active !== container && container.contains(active);
+  if (!focusAlreadyInside) {
+    const initial = container.querySelector<HTMLElement>(focusableSelector);
+    initial?.focus();
+  }
 
   return () => {
     container.removeEventListener('keydown', handleKeyDown);
@@ -229,6 +234,9 @@ export function openOverlay(opts: OverlayOptions): OverlayHandle {
 
   function handleKeyDown(e: Event) {
     if ((e as KeyboardEvent).key === 'Escape') {
+      // Claim the key: a dialog/drawer that also listens for Escape checks defaultPrevented, so one
+      // press closes only the topmost overlay (e.g. a popconfirm inside a modal), not both.
+      e.preventDefault?.();
       close();
     }
   }
@@ -263,5 +271,32 @@ export function openOverlay(opts: OverlayOptions): OverlayHandle {
   return {
     update,
     dispose
+  };
+}
+
+
+/**
+ * Dialog stack: modal dialogs (Modal, Drawer, ImagePreview) register while open so that keys such as Escape
+ * act only on the topmost one (a Modal opened from a Drawer, a preview inside a Modal). No window/document
+ * access, so it is SSR-safe; register inside the effect that locks scroll and unregister in its cleanup.
+ * Pair it with `event.defaultPrevented`: a dialog that handles Escape calls preventDefault(), so a dialog
+ * whose listener runs later in the same event (after a re-render already unregistered the first) still skips it.
+ */
+const dialogStack: object[] = [];
+
+export interface DialogHandle {
+  isTopmost(): boolean;
+  unregister(): void;
+}
+
+export function registerDialog(): DialogHandle {
+  const token = {};
+  dialogStack.push(token);
+  return {
+    isTopmost: () => dialogStack[dialogStack.length - 1] === token,
+    unregister() {
+      const i = dialogStack.indexOf(token);
+      if (i !== -1) dialogStack.splice(i, 1);
+    }
   };
 }

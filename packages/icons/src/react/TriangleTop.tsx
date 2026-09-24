@@ -27,7 +27,7 @@ export const TriangleTop: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <path d="M12 8L18 16H6L12 8Z" fill=color />
+    <path d="M12 8L18 16H6L12 8Z" fill={color} />
   </svg>
 );
 

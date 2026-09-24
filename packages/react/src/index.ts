@@ -28,7 +28,7 @@ export { Progress, type ProgressProps, type ProgressStatus } from './Progress.js
 // Wave 4 Components (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer)
 export { Upload, type UploadProps, type UploadFile } from './Upload.js';
 export { Avatar, type AvatarProps, type AvatarShape, type AvatarSize, type AvatarStatus } from './Avatar.js';
-export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup.js';
+export { AvatarGroup, type AvatarGroupProps, type AvatarGroupItem } from './AvatarGroup.js';
 export { Slider, type SliderProps } from './Slider.js';
 export { MarkdownViewer, type MarkdownViewerProps } from './MarkdownViewer.js';
 export { MarkdownEditor, type MarkdownEditorProps } from './MarkdownEditor.js';
@@ -74,7 +74,8 @@ export { Notification, type NotificationProps } from './Notification.js';
 export { Popconfirm, type PopconfirmProps } from './Popconfirm.js';
 export { Spin, type SpinProps } from './Spin.js';
 // Wave 10: Rich Media, Hierarchical Select & Accessible Overlay Suite
-export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
+export { Image, type ImageProps } from './Image.js';
+export { ImagePreview, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
 export { TreeSelect, type TreeSelectProps, type TreeNode } from './TreeSelect.js';
 export { Cascader, type CascaderProps, type CascaderOption } from './Cascader.js';
 export {

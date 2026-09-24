@@ -1,5 +1,7 @@
 import React, { forwardRef } from 'react';
 
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
 export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: 'horizontal' | 'vertical';
   dashed?: boolean;
@@ -13,8 +15,9 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
       return (
         <div
           ref={ref}
-          className={`joy-divider joy-divider--vertical ${dashed ? 'joy-divider--dashed' : ''} ${className}`}
+          className={cx('joy-divider joy-divider--vertical', dashed && 'joy-divider--dashed', className)}
           role="separator"
+          aria-orientation="vertical"
           {...props}
         />
       );
@@ -24,7 +27,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
       return (
         <div
           ref={ref}
-          className={`joy-divider joy-divider--with-text joy-divider--${orientation} ${dashed ? 'joy-divider--dashed' : ''} ${className}`}
+          className={cx(`joy-divider joy-divider--with-text joy-divider--${orientation}`, dashed && 'joy-divider--dashed', className)}
           role="separator"
           {...props}
         >
@@ -36,7 +39,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
     return (
       <div
         ref={ref}
-        className={`joy-divider ${dashed ? 'joy-divider--dashed' : ''} ${className}`}
+        className={cx('joy-divider', dashed && 'joy-divider--dashed', className)}
         role="separator"
         {...props}
       />

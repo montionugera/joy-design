@@ -1,60 +1,99 @@
 import * as React from 'react';
+import { AlertCircle } from '@joymify/icons/react';
+import { useOverlay } from './useOverlay.js';
 
-export interface PopconfirmProps {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+export interface PopconfirmProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: React.ReactNode;
   okText?: string;
   cancelText?: string;
+  /** Controlled open state. Leave undefined for an uncontrolled popconfirm. */
   open?: boolean;
+  /**
+   * Called with the next open state whenever the panel wants to open or close: trigger click,
+   * Escape, outside click, confirm and cancel. Required to drive a controlled `open`
+   * (the Svelte twin's bindable `open`): the panel stays rendered until the parent sets `open` to false,
+   * so a controlled popconfirm without `onOpenChange` cannot be dismissed by Escape or an outside click.
+   */
+  onOpenChange?: (open: boolean) => void;
   className?: string;
   onConfirm?: () => void;
   onCancel?: () => void;
   children: React.ReactNode;
 }
 
+/** `ref` and `...rest` land on the root (`.joy-popconfirm`), like the Svelte twin. */
 export const Popconfirm = React.forwardRef<HTMLDivElement, PopconfirmProps>(
-  ({
-    title = 'Are you sure?',
-    okText = 'Confirm',
-    cancelText = 'Cancel',
-    open: controlledOpen,
-    className = '',
-    onConfirm,
-    onCancel,
-    children
-  }, ref) => {
+  (
+    {
+      title = 'Are you sure?',
+      okText = 'Confirm',
+      cancelText = 'Cancel',
+      open: controlledOpen,
+      onOpenChange,
+      className = '',
+      onConfirm,
+      onCancel,
+      children,
+      ...rest
+    },
+    ref
+  ) => {
+    const titleId = `${React.useId()}-title`;
     const [internalOpen, setInternalOpen] = React.useState(false);
-    const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const isControlled = controlledOpen !== undefined;
+    const isOpen = isControlled ? controlledOpen : internalOpen;
+    const triggerRef = React.useRef<HTMLDivElement | null>(null);
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
 
-    const handleConfirm = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (controlledOpen === undefined) setInternalOpen(false);
-      onConfirm?.();
+    const setOpen = (next: boolean) => {
+      if (!isControlled) setInternalOpen(next);
+      onOpenChange?.(next);
     };
 
-    const handleCancel = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (controlledOpen === undefined) setInternalOpen(false);
-      onCancel?.();
+    // The trigger wrapper is not focusable itself; focus goes back to the control inside it.
+    const focusTrigger = () => {
+      triggerRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
     };
+
+    // useOverlay gives Escape + outside-click dismissal and fixed positioning (above the trigger's
+    // overflow:hidden ancestors, in the popover layer). It does not focus anything, so focus the first
+    // button on open and hand focus back to the trigger on every way out.
+    useOverlay(isOpen, triggerRef, panelRef, () => {
+      setOpen(false);
+      focusTrigger();
+    });
+
+    React.useEffect(() => {
+      if (!isOpen) return;
+      panelRef.current?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+    }, [isOpen]);
+
+    const settle = (callback?: () => void) => (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setOpen(false);
+      focusTrigger();
+      callback?.();
+    };
+    const handleConfirm = settle(onConfirm);
+    const handleCancel = settle(onCancel);
 
     return (
-      <div
-        ref={ref}
-        className={`joy-popconfirm ${className}`.trim()}
-      >
-        <div onClick={() => { if (controlledOpen === undefined) setInternalOpen(!isOpen); }}>
+      <div {...rest} ref={ref} className={cx('joy-popconfirm', className)}>
+        <div ref={triggerRef} className="joy-popconfirm__trigger" onClick={() => setOpen(!isOpen)}>
           {children}
         </div>
 
         {isOpen && (
-          <div className="joy-popconfirm__panel" role="dialog" aria-modal="true">
+          <div ref={panelRef} className="joy-popconfirm__panel" role="alertdialog" aria-labelledby={titleId}>
             <div className="joy-popconfirm__title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--joy-color-status-warning, #f59e0b)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <span>{title}</span>
+              <span className="joy-popconfirm__icon">
+                <AlertCircle size="1rem" />
+              </span>
+              <span id={titleId}>{title}</span>
             </div>
             <div className="joy-popconfirm__buttons">
               <button
@@ -66,7 +105,7 @@ export const Popconfirm = React.forwardRef<HTMLDivElement, PopconfirmProps>(
               </button>
               <button
                 type="button"
-                className="joy-button joy-button--primary joy-button--sm"
+                className="joy-button joy-button--solid joy-button--sm"
                 onClick={handleConfirm}
               >
                 {okText}

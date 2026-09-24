@@ -1,6 +1,8 @@
-import React from 'react';
+import * as React from 'react';
 
-export interface EmptyStateProps {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+export interface EmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: string;
   description?: string;
   icon?: React.ReactNode;
@@ -8,21 +10,17 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
-  title,
-  description,
-  icon,
-  action,
-  className = ''
-}) => {
-  return (
-    <div className={`joy-empty-state ${className}`}>
-      {icon && <div className="joy-empty-state__icon">{icon}</div>}
-      <h3 className="joy-empty-state__title">{title}</h3>
-      {description && <p className="joy-empty-state__desc">{description}</p>}
-      {action && <div className="joy-empty-state__action">{action}</div>}
-    </div>
-  );
-};
+export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
+  ({ title, description, icon, action, className = '', ...rest }, ref) => {
+    return (
+      <div ref={ref} className={cx('joy-empty-state', className)} {...rest}>
+        {icon && <div className="joy-empty-state__icon">{icon}</div>}
+        <h3 className="joy-empty-state__title">{title}</h3>
+        {description && <p className="joy-empty-state__desc">{description}</p>}
+        {action && <div className="joy-empty-state__action">{action}</div>}
+      </div>
+    );
+  }
+);
 
 EmptyState.displayName = 'EmptyState';

@@ -10,6 +10,8 @@
 		children?: Snippet;
 		class?: string;
 		style?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
@@ -20,7 +22,9 @@
 		gap = 8,
 		children,
 		class: className = '',
-		style: customStyle = ''
+		style: customStyle = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	const justifyMap: Record<string, string> = {
@@ -45,7 +49,7 @@
 	);
 </script>
 
-<div class="joy-flex {className}" style={computedStyle}>
+<div bind:this={ref} class="joy-flex {className}" style={computedStyle} {...rest}>
 	{#if children}
 		{@render children()}
 	{/if}

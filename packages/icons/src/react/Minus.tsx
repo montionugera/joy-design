@@ -29,11 +29,11 @@ export const Minus: React.FC<IconProps> = ({
   >
     <path
 		d="M7 12H17"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"
-	/><circle cx="12" cy="12" r="9" stroke=color strokeWidth="1.5" />
+	/><circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5" />
   </svg>
 );
 

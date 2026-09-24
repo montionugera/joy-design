@@ -29,13 +29,13 @@ export const Publish: React.FC<IconProps> = ({
   >
     <path
 		d="M13 14H6V4H14V7"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/><path
 		d="M10 9H19M19 9L16 6M19 9L16 12"
-		stroke=color
+		stroke={color}
 		strokeWidth="1.5"
 		strokeLinecap="round"
 		strokeLinejoin="round"

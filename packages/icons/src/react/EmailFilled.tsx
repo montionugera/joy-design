@@ -27,7 +27,7 @@ export const EmailFilled: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <path d="M4 7H20V17H4V7Z" fill=color /><path
+    <path d="M4 7H20V17H4V7Z" fill={color} /><path
 		d="M4 7L12 13L20 7"
 		stroke="var(--bg-canvas)"
 		strokeWidth="1.5"

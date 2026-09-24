@@ -27,9 +27,9 @@ export const SearchFilled: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="11" cy="11" r="7" fill=color /><path
+    <circle cx="11" cy="11" r="7" fill={color} /><path
 		d="M16 16L20 20"
-		stroke=color
+		stroke={color}
 		strokeWidth="2.5"
 		strokeLinecap="round"
 	/>

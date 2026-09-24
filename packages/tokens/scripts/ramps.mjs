@@ -263,7 +263,9 @@ export function generateAllTokens() {
     },
     // Border
     "border": {
-      "subtle": { "value": "{color.navy.700}", "type": "color" },
+      // F-038 D2b: navy-700 was 1.05:1 against the dark card (rows, headers and chips invisible); this is 1.34:1,
+      // matching the light hairline (1.37:1). Literal, like accent.subtle: the ramp has no step between 700 and 400.
+      "subtle": { "value": "#22324b", "type": "color" },
       "default": { "value": "{color.navy.400}", "type": "color" },
       "strong": { "value": "{color.navy.300}", "type": "color" },
       "focus": { "value": "{color.gold.300}", "type": "color" },
@@ -279,22 +281,23 @@ export function generateAllTokens() {
       "gradient-end": { "value": "{color.gold.400}", "type": "color" },
       "highlight": { "value": "{color.gold.200}", "type": "color" }
     },
-    // Status
+    // Status. F-038 D2b: the *-bg fills are a 65/35 mix of the 900 and 700 stops (literals, like accent.subtle) so an
+    // alert/badge/tag sits visibly off the dark card (1.10-1.19:1, was 1.04-1.07:1); fg text stays >= 7.5:1.
     "status": {
       "success-fg": { "value": "{color.status.success.300}", "type": "color" },
-      "success-bg": { "value": "{color.status.success.900}", "type": "color" },
+      "success-bg": { "value": "#0d2d0f", "type": "color" },
       "success-border": { "value": "{color.status.success.700}", "type": "color" },
       "warning-fg": { "value": "{color.status.warning.300}", "type": "color" },
-      "warning-bg": { "value": "{color.status.warning.900}", "type": "color" },
+      "warning-bg": { "value": "#3a1e00", "type": "color" },
       "warning-border": { "value": "{color.status.warning.700}", "type": "color" },
       "danger-fg": { "value": "{color.status.danger.300}", "type": "color" },
-      "danger-bg": { "value": "{color.status.danger.900}", "type": "color" },
+      "danger-bg": { "value": "#470d0e", "type": "color" },
       "danger-border": { "value": "{color.status.danger.700}", "type": "color" },
       "danger-solid-bg": { "value": "{color.status.danger.600}", "type": "color" },
       "danger-solid-fg": { "value": "#ffffff", "type": "color" },
       "danger-solid-border": { "value": "{color.status.danger.700}", "type": "color" },
       "info-fg": { "value": "{color.status.info.300}", "type": "color" },
-      "info-bg": { "value": "{color.status.info.900}", "type": "color" },
+      "info-bg": { "value": "#0b2741", "type": "color" },
       "info-border": { "value": "{color.status.info.700}", "type": "color" }
     },
     // Focus ring

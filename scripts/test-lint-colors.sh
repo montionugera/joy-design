@@ -34,4 +34,36 @@ if (cd "$fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react
   exit 1
 fi
 
+# Wave 3: display/feedback/navigation/overlay names and shared helpers are strict too;
+# a non-listed name in the same directory must stay a warning.
+wave3_dir=$(mktemp -d)
+trap 'rm -rf "$fixture_dir" "$wave3_dir"' EXIT
+mkdir -p "$wave3_dir/packages/react/src" "$wave3_dir/packages/svelte/src/lib"
+cp "$literal_file" "$wave3_dir/packages/react/src/Alert.tsx"
+if (cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-3 strict file (react Alert.tsx)" >&2
+  exit 1
+fi
+rm "$wave3_dir/packages/react/src/Alert.tsx"
+
+cp "$literal_file" "$wave3_dir/packages/svelte/src/lib/Modal.svelte"
+if (cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/svelte/src/lib) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-3 strict file (svelte Modal.svelte)" >&2
+  exit 1
+fi
+rm "$wave3_dir/packages/svelte/src/lib/Modal.svelte"
+
+cp "$literal_file" "$wave3_dir/packages/react/src/chart-core.ts"
+if (cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-3 shared helper (chart-core.ts)" >&2
+  exit 1
+fi
+rm "$wave3_dir/packages/react/src/chart-core.ts"
+
+cp "$literal_file" "$wave3_dir/packages/react/src/PricingCard.tsx"
+(cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1 || {
+  echo "expected default mode to only warn on a literal in a non-strict file (PricingCard.tsx)" >&2
+  exit 1
+}
+
 echo "PASS scripts/test-lint-colors.sh"

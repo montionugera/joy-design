@@ -27,7 +27,7 @@ export const FaceSmileFilled: React.FC<IconProps> = ({
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="10" fill=color /><path
+    <circle cx="12" cy="12" r="10" fill={color} /><path
 		d="M8.5 14.5C8.5 14.5 10 16.5 12 16.5C14 16.5 15.5 14.5 15.5 14.5"
 		stroke="var(--bg-canvas)"
 		strokeWidth="1.5"

@@ -11,6 +11,8 @@
 		size?: Size;
 		status?: Status;
 		color?: string;
+		class?: string;
+		ref?: HTMLDivElement | null;
 	}
 
 	let {
@@ -20,7 +22,10 @@
 		shape = 'circle',
 		size = 'md',
 		status = 'none',
-		color
+		color,
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	let imgError = $state(false);
@@ -36,10 +41,12 @@
 </script>
 
 <div
-	class="joy-avatar joy-avatar--{shape} joy-avatar--{size}"
-	style="background-color: {color || ''};"
+	bind:this={ref}
+	class="joy-avatar joy-avatar--{shape} joy-avatar--{size} {className}"
+	style={color ? `background-color: ${color};` : undefined}
 	role="img"
 	aria-label={name || alt}
+	{...rest}
 >
 	{#if src && !imgError}
 		<img
