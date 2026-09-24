@@ -166,6 +166,10 @@ let clientCodeCache;
 const clientCode = () => (clientCodeCache ??= compile(fs.readFileSync(libFile, 'utf8'), { generate: 'client', filename: libFile }).js.code
   .replace(/^import .*$/gm, '')
   .replace('export default function', 'function'));
+const names = ['Cpu', 'Layers', 'Menu', 'Smartphone', 'Drawer', 'HeroSection', 'LogoCloud', 'FeatureGrid', 'FeatureCard', 'StatsSection', 'CTASection', 'FAQSection', 'SiteFooter'];
+// Parsed once; the `$` stand-in and the stubs stay per call, so each run is still isolated.
+let clientFactoryCache;
+const clientFactory = () => (clientFactoryCache ??= new Function('$', 'props', ...names, `${clientCode()}\nreturn LandingPage({}, props);`));
 function runClient(props) {
   const created = [];
   const binds = [];
@@ -202,8 +206,7 @@ function runClient(props) {
       }
     }
   });
-  const names = ['Cpu', 'Layers', 'Menu', 'Smartphone', 'Drawer', 'HeroSection', 'LogoCloud', 'FeatureGrid', 'FeatureCard', 'StatsSection', 'CTASection', 'FAQSection', 'SiteFooter'];
-  new Function('$', 'props', ...names, `${clientCode()}\nreturn LandingPage({}, props);`)($, props, ...names.map(stub));
+  clientFactory()($, props, ...names.map(stub));
   const flush = () => effects.forEach((fn) => fn());
   return { created, all, binds, propFlags, calls, flush };
 }

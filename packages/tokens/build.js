@@ -5397,11 +5397,7 @@ a.joy-logo-cloud__item:focus-visible {
   /* The skip-link target is focused programmatically (tabindex -1), never by Tab: no ring around the whole landmark. */
   outline: none;
 }
-.joy-landing-page__slot {
-  max-width: 1200px;
-  margin: 0 auto 48px auto;
-  padding: 0 24px;
-}
+.joy-landing-page__slot,
 .joy-landing-page__features {
   max-width: 1200px;
   margin: 0 auto 48px auto;

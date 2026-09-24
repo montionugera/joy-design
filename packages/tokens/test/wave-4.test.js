@@ -774,9 +774,20 @@ test('F-039 L4 CSS: full-width sections and cards size their own border box', ()
 // ── F-039 L5a: SiteFooter CSS contract ──
 // Bounded at the next top-level comment header (a comment at the start of a line), so CSS a later lane appends after the
 // footer (LandingPage) is never policed by the footer checks. A later block must start with such a header.
-const footerStart = themeCss.indexOf('/* ── Landing Page Suite: SiteFooter ── */');
-const footerEndRel = themeCss.slice(footerStart + 10).search(/\n\/\*/);
-const footerBlock = themeCss.slice(footerStart, footerEndRel === -1 ? undefined : footerStart + 10 + footerEndRel);
+const blockToNextHeader = (header) => {
+  const start = themeCss.indexOf(header);
+  const endRel = themeCss.slice(start + 10).search(/\n\/\*/);
+  return themeCss.slice(start, endRel === -1 ? undefined : start + 10 + endRel);
+};
+const footerBlock = blockToNextHeader('/* ── Landing Page Suite: SiteFooter ── */');
+// Every colour token a block reads must resolve in both themes (dark comes from the token remap, never a literal).
+const assertColourTokensInBothThemes = (cssBlock) => {
+  const used = [...new Set([...cssBlock.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]))].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
+  assert.ok(used.length >= 4, `sanity: ${used.join(', ')}`);
+  for (const token of used) {
+    assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
+  }
+};
 // selector lists may span lines, so match "any text without braces or @" up to the declaration block
 const footerRules = [...footerBlock.matchAll(/(?:^|[{}]\s*|\n)([^@{}\n][^{}@]*)\{([^}]*)\}/g)].map((m) => ({ selector: m[1].trim(), body: m[2] }));
 
@@ -857,20 +868,14 @@ test('F-039 L5a contrast: footer text pairs pass WCAG AA in both themes on the c
 });
 
 test('F-039 L5a CSS: every colour token the footer reads has a light and a dark value', () => {
-  const used = [...new Set([...footerBlock.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]))].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
-  assert.ok(used.length >= 4, `sanity: ${used.join(', ')}`);
-  for (const token of used) {
-    assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
-  }
+  assertColourTokensInBothThemes(footerBlock);
 });
 
 // ── F-039 L5b: LandingPage header / mobile menu CSS contract ──
-const pageStart = themeCss.indexOf('/* ── Landing Page Suite: LandingPage ── */');
-const pageEndRel = themeCss.slice(pageStart + 10).search(/\n\/\*/);
-const pageBlock = themeCss.slice(pageStart, pageEndRel === -1 ? undefined : pageStart + 10 + pageEndRel);
+const pageBlock = blockToNextHeader('/* ── Landing Page Suite: LandingPage ── */');
 
 test('F-039 L5b CSS: the LandingPage block exists, is tokens-only and has no blur, gradient text or tracked caps', () => {
-  assert.ok(pageStart > 0, 'the block opens with a top-level comment header');
+  assert.ok(pageBlock.startsWith('/* ── Landing Page Suite: LandingPage ── */'), 'the block opens with a top-level comment header');
   for (const sel of ['.joy-landing-page', '.joy-landing-header', '.joy-landing-header__brand', '.joy-landing-header__nav', '.joy-landing-header__link', '.joy-landing-drawer__link', '.joy-landing-skip']) {
     assert.ok(pageBlock.includes(sel), `${sel} is defined`);
   }
@@ -926,11 +931,7 @@ test('F-039 L5b contrast: header, drawer and skip-link text pass WCAG AA in both
 });
 
 test('F-039 L5b CSS: every colour token the LandingPage block reads has a light and a dark value', () => {
-  const used = [...new Set([...pageBlock.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]))].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
-  assert.ok(used.length >= 4, `sanity: ${used.join(', ')}`);
-  for (const token of used) {
-    assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
-  }
+  assertColourTokensInBothThemes(pageBlock);
 });
 
 // ── F-039 L5b fix round 1 ──
