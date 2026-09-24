@@ -92,6 +92,16 @@ Format: what was decided, why, cost if it turns out wrong.
 - **Known verification limit.** Component-level click tests are element-tree (React) and stand-in (Svelte) tests; real interaction is proven only in Playwright against the hub (same class vocabulary, same script pattern).
 - **Taste review rounds.** Round 1 on the C3 screenshots (2085a62): FIX, 0 P0, 7 P1, 16 P2. T1 and T2 closed all seven P1s (orphan stat card, bare tags, cream dark CTA slab, heavy busy/disabled buttons, frame switcher overprint, cramped stats at 375, simulator without pricing) and most P2s; P2-2, P2-4, P2-5, P2-10, P2-13 and P2-14 went to the backlog. Screenshots were regenerated (bff30b9) and round 2 was dispatched in parallel with this record; its verdict is recorded by D3 in `screens/README.md`.
 
+### Final fixes (F1: taste review 2 and the three whole-branch reviews)
+
+- **A metric claim is never ellipsized (taste review 2, P1-A; supersedes 22a0b9d).** The stats change pill wraps (`white-space: normal; text-wrap: balance; max-width: 100%`, the inner `.joy-stat-item__change-text` breaks an oversized token with `overflow-wrap: anywhere`), at most two lines by design; the default copy stays short. Values stay `nowrap`-equivalent (never split mid-number) through the container type steps. Tests that asserted the ellipsis now assert the whole text is visible (scroll width within client width, no `text-overflow`), the pill inside its card and at most two lines, at 320 and 375px in both hub views, the simulator Mobile frame, the real-component page and a standalone sweep.
+- **Two columns or one at phone width: chosen by measurement.** Both hub views at 320px and 375px keep the compact 2x2 grid (audit SVL-068): the narrowest card is 123px (simulator, 320px) and 127px (blocks, 320px), and 154px at 375px, all readable. The reviewer's ~85px cards came from the hub blocks demo wrapper stacking 24px of its own padding on the section's 16px (a 40px gutter each side). The hub now uses 12px wrapper padding and no section inline padding under 480px. A single column only applies when the container is narrower than 15rem (below that two columns leave cards under ~115px): a sidebar or an embedded frame, not a phone.
+- **One phone breakpoint: `max-width: 479px` for every landing section** (hero and CTA already used it; logo cloud, stats and FAQ moved from 480px). Library-wide 480px rules of other components are untouched.
+- **Ref and handler tests for HeroSection, CTASection and LandingAction (final-B I-1).** Each mutation (drop React `ref={ref}`, drop or move Svelte `bind:this`, drop any of the four Hero/CTA handlers, drop the LandingAction link `onclick`, stop the inert-link `preventDefault`, drop the Button-branch `onclick`) turns exactly one new test red. The earlier sentence that all lanes had wiring tests is corrected in the A1 ruling above.
+- **Strict colour lint now covers 30 landing files** (the 14 names plus the internal `LandingAction`, both extensions; supersedes the "28 files" line under Gates). React `children` is omitted from the props types of HeroSection, CTASection, PricingCard, FeatureCard, StatsSection, LogoCloud, FAQSection and TestimonialCard (their Svelte twins reject children; a scratch `tsc` probe accepts `id`, `data-*`, `aria-*` and rejects children on all eight). The Svelte package index now exports the `PricingMatrixRow` type. The new-tab label is "(opens in a new tab)" in LogoCloud and SiteFooter (both twins).
+- **Undocumented deviations, now recorded.** (1) The primary CTA rests on `--joy-elevation-accent-1` (a 1px, 2px-blur gold shadow) and deepens to `--joy-elevation-accent-2` on hover; spec item 1 said `--joy-elevation-2`. Plan decision 2 reused the Wave 2 accent shadows so the CTA matches the library's solid button; kept. (2) The library-wide Button rule: any `.joy-button[aria-disabled="true"]` looks disabled and gets `pointer-events: none` (needed so the inert hero and CTA links look and behave disabled); now listed in the README breaking-changes list.
+- **Docs honesty.** README names `titleGradient` and `.joy-button--glass` literally; RXF-152 is `verify-only` (the React twin forwarded `aria-label` at the wave base), giving 117 closed, 49 verify-only, 2 deferred; the FAQ default subtitle no longer has words over 12 characters; the frame-width Playwright spec waits on the transition instead of a fixed 400ms sleep.
+
 ## 2. Deferred and parked items
 
 The two deferred audit issues are in `issue-coverage.md`:
@@ -106,7 +116,7 @@ Parked (found in review or by lanes, judged not worth blocking; "both" means bot
 - **Taste P2-2, P2-4, P2-5, P2-10, P2-14** (see section 3).
 - **Hub simulator at a 375 frame in a wide window** shows the desktop header (the frame-width deviation above).
 - **Stats at 481-660px** stayed one column in L4; superseded by the T1 container queries (compact two columns in narrow containers), recorded for history.
-- **Hub blocks view at a 320px window** leaves a 210px stats grid where "14 chains" wraps to two lines at the smallest type step (hub chrome, not the component).
+- **Hub blocks view at a 320px window** leaves a 210px stats grid where "14 chains" wraps to two lines at the smallest type step (hub chrome, not the component). Resolved in F1: the demo wrapper padding under 480px is 12px with no section inline padding, so the 320px window now gives 127px cards.
 - **Section anchors** `#telemetry`, `#features`, `#faq` are fixed ids, so two LandingPages on one screen share them (menu and main ids are per-instance).
 - **React `toggleIndex` functional updater** (FAQ) not used; safe for discrete clicks.
 - **Hub `toggleFaq` does not close siblings** (the showcase demonstrates `allowMultiple`).
@@ -142,6 +152,14 @@ Parked (found in review or by lanes, judged not worth blocking; "both" means bot
 22. **FAQ and footer heading levels are fixed** (`<h6>` testimonial author, `<h4>` footer column titles can skip levels): a `headingLevel` prop later. TestimonialCard initials take the first two letters rather than first and last initials.
 23. **PricingMatrix discriminated-union types** for `columns`/`rows`, and an `onSelect(event)` handler shape; both are public-API decisions.
 24. **Playwright contrast helper ignores background images** other than gradients on the measured node.
+
+25. **Disabled outline is nearly identical to the enabled outline in light** (taste review 2): only a greyer label separates them. Suggested: `border-style: dashed` or `border-color: var(--joy-border-subtle)` with `--joy-text-disabled` on a `--joy-surface-sunken` background, keeping the label at 3:1 or better.
+26. **Featured plan has no lift over its neighbours** (taste review 2; extends item 10): a `box-shadow: var(--joy-elevation-2)` on `.joy-pricing-card--featured` only.
+27. **The neutral "No change" trend renders as bare bold text while up and down trends are pills** (taste review 2): give it the same pill with `--joy-neutral-subtle` and `--joy-text-secondary` and a flat-line icon (touches both twins, the hub copy and tests).
+28. **Pricing showcase row widths** (taste review 2): the "Loading and disabled" row uses two wide cards while the plans row uses three narrow ones, so widths jump; reuse the three-column grid with an empty third cell or an equal `max-inline-size`. Hub-only.
+29. **Comparison matrix has no scroll affordance at 375px** (taste review 2; same as item 11): "Profe..." is cut with no edge fade.
+30. **Footer is one long column of three link lists at 375px** (taste review 2, P2-11): two columns exist from 480px; a two-column phone layout or collapsible groups would shorten it.
+31. **Features heading and pricing exist only in the hub simulator** (extends item 15): the LandingPage twins do not render them.
 
 ## 4. Process notes and lessons
 
