@@ -144,7 +144,7 @@ test('F-039 L2: the forwarded ref lands on the root element in every branch', ()
   }
 });
 
-test('F-039 L2: defaults match the Svelte twin (period, features list, no badge)', () => {
+test('F-039 L2: defaults match the Svelte twin (period, no badge, no description)', () => {
   const html = card();
   assert.match(html, /class="joy-pricing-card__period">\/month</);
   assert.ok(!html.includes('joy-pricing-card__badge') && !html.includes('joy-pricing-card__desc'));
