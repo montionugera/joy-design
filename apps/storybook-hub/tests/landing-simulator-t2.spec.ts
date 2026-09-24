@@ -143,7 +143,13 @@ test.describe("simulator body (generated from the components)", () => {
       test(`${theme}: ${label} frame at a 1280 window keeps every grid full and the pricing cards in their frame`, async ({ page }) => {
         await open(page, "landing-preview", 1280, theme);
         await page.getByRole("button", { name: new RegExp(`^${label}`) }).click();
-        await page.waitForTimeout(400);
+        // wait for the frame's max-width transition to finish instead of sleeping for its duration
+        await expect
+          .poll(() => page.evaluate(() => document.getAnimations().length), { message: "the frame width transition ends" })
+          .toBe(0);
+        await expect
+          .poll(() => page.evaluate(() => Math.round(document.getElementById("simulator-viewport-frame")!.getBoundingClientRect().width)))
+          .toBeLessThanOrEqual(frame + 4);
         const all = await page.evaluate(measureRows, { root: SIM, sels: GRIDS });
         for (const g of all) expect(g.full.every(Boolean), `${g.selector} in the ${frame}px frame: rows ${g.perRow.join("+")}`).toBe(true);
         const escaped = await page.evaluate(

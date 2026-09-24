@@ -2,7 +2,7 @@
 
 The spec requires that every SVL- and landing RXF- issue is resolved or deferred with a reason. This table is the machine-checked record: `node .claude/refined_backlog/F-039-wave-4-landing-suite-hero-and-cta-depth/research/id-coverage.mjs` reads `audit-landing-svelte.md` for the SVL rows and `audit-react-forms-landing.md` for the severities of a fixed list of 78 RXF rows embedded in the script, reads this file for the statuses, prints the summary line and exits 1 if an ID is missing, listed twice, outside the universe, has an empty or unknown status, has an empty Where cell, carries a different severity than the audit, or is deferred without a reason.
 
-Totals: 168 issues = 118 closed, 48 verify-only (already clean), 2 deferred, 0 n/a (out of scope).
+Totals: 168 issues = 117 closed, 49 verify-only (already clean), 2 deferred, 0 n/a (out of scope).
 
 ## Status meanings
 
@@ -188,7 +188,7 @@ Totals: 168 issues = 118 closed, 48 verify-only (already clean), 2 deferred, 0 n
 | RXF-149 | P1 | closed | CTASection.tsx, L1 c36b742, 96b19d3 | As SVL-025 (`React.useId`) |
 | RXF-150 | P1 | closed | PricingMatrix.tsx, L2 c5b7e8b | As SVL-036 |
 | RXF-151 | P1 | closed | LogoCloud twins, L4 f506683, 892b4b2 | Section labelled by its title (per-instance id); caller `aria-label` wins |
-| RXF-152 | P1 | closed | StatsSection twins, L4 f506683 | Caller `aria-label` forwarded through rest in both twins (Props typed for it); no fixed English label by default |
+| RXF-152 | P1 | verify-only (already clean) | StatsSection twins, L4 f506683 (typing only) | The React twin already spread `...props` onto the root `<section>` at the wave base 85141e1, so a caller `aria-label` was forwarded before this wave; f506683 only changed the trend markup and the list key, and the Svelte Props typing. The audit's default label was deliberately not added (no fixed English label). Reclassified from closed in F1 (final review C M-2) |
 | RXF-154 | P1 | verify-only (already clean) | PricingCard CSS, L2 c5b7e8b | As SVL-033 |
 | RXF-160 | P2 | closed | HeroSection.tsx, L1 c36b742 | As SVL-013 |
 | RXF-161 | P2 | closed | CTASection.tsx, L1 c36b742 | As SVL-024 |
