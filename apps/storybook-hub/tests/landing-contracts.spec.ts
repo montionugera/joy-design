@@ -19,6 +19,7 @@ import {
 
 const themes: Theme[] = ["light", "dark"];
 const PAGE = "#simulator-page-container";
+const MIN_TARGET = 43.5; // 44px minus 0.5px: Chromium measured a 44px target at 43.99997px (same tolerance as d271622)
 const PHONE = { width: 375, height: 812 };
 const DESKTOP = { width: 1280, height: 800 };
 
@@ -71,8 +72,8 @@ for (const theme of themes) {
         const r = el.getBoundingClientRect();
         return { width: r.width, height: r.height };
       });
-      expect(box.width, "menu button width").toBeGreaterThanOrEqual(44);
-      expect(box.height, "menu button height").toBeGreaterThanOrEqual(44);
+      expect(box.width, "menu button width").toBeGreaterThanOrEqual(MIN_TARGET);
+      expect(box.height, "menu button height").toBeGreaterThanOrEqual(MIN_TARGET);
       await expect(menu).toHaveAttribute("aria-expanded", "false");
 
       await menu.click();
@@ -83,7 +84,7 @@ for (const theme of themes) {
       expect(count, "drawer nav links").toBeGreaterThanOrEqual(3);
       for (let i = 0; i < count; i++) {
         const height = await links.nth(i).evaluate((el) => el.getBoundingClientRect().height);
-        expect(height, `drawer link ${i} height`).toBeGreaterThanOrEqual(44);
+        expect(height, `drawer link ${i} height`).toBeGreaterThanOrEqual(MIN_TARGET);
       }
 
       await page.keyboard.press("Escape");

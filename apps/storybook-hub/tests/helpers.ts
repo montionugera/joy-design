@@ -151,7 +151,18 @@ export async function installContrastTools(page: Page) {
         const style = getComputedStyle(node);
         if (style.backgroundImage.includes("gradient(")) {
           const stops = style.backgroundImage.match(/(?:rgba?|color|oklab|oklch|lab|lch|hsla?)\([^)]*\)/g) ?? [];
-          bases = stops.map((stop) => window.__rgba(stop).slice(0, 3));
+          // A gradient this helper cannot read (fewer than two parsed colours) or one with a translucent stop has no
+          // single surface to measure against: fail loudly rather than return Infinity or treat it as opaque black.
+          if (stops.length < 2) {
+            throw new Error(`__surfaces: cannot read the gradient colours of ${window.__describe(node)}: ${style.backgroundImage}`);
+          }
+          bases = stops.map((stop) => {
+            const colour = window.__rgba(stop);
+            if (colour[3] < 1) {
+              throw new Error(`__surfaces: translucent gradient stop ${stop} on ${window.__describe(node)}`);
+            }
+            return colour.slice(0, 3);
+          });
           break;
         }
         const colour = window.__rgba(style.backgroundColor);
@@ -255,8 +266,19 @@ export async function measureButtonContrast(page: Page, selector: string): Promi
       return {
         className: button.className,
         text: (label.textContent ?? "").trim(),
+        // checkVisibility also looks at ancestors: display:none, content-visibility, and (with the two flags) opacity 0
+        // and visibility:hidden anywhere up the chain. Both spellings of the flags are passed (older/newer Chromium).
         visible:
-          rect.width > 0 && rect.height > 0 && labelStyle.visibility !== "hidden" && Number(labelStyle.opacity) > 0,
+          rect.width > 0 &&
+          rect.height > 0 &&
+          labelStyle.visibility !== "hidden" &&
+          Number(labelStyle.opacity) > 0 &&
+          label.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+            opacityProperty: true,
+            visibilityProperty: true,
+          } as CheckVisibilityOptions),
         min,
         gradient: buttonStyle.backgroundImage.includes("gradient("),
         surfaces,

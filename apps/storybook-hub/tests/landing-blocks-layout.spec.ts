@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { openLandingBlocks } from "./helpers";
+import { openLandingBlocks, setTheme, type Theme } from "./helpers";
 
 // F-039 C1b: the hub landing blocks demos are the real component markup, so their layout is a contract, measured
 // from bounding boxes. Every row of a lead FeatureGrid fills the grid (no orphan cell in the last row), bento spans
@@ -92,29 +92,32 @@ for (const id of BENTO_GRIDS) {
     }
   });
 
-  test(`bento grid ${id} cards span N of 12 columns at 1280px`, async ({ page }) => {
-    await openLandingBlocks(page, 1280);
-    const result = await page.evaluate((gridId) => {
-      const grid = document.querySelector<HTMLElement>(`#${gridId}`)!;
-      const style = getComputedStyle(grid);
-      const gap = parseFloat(style.columnGap);
-      const gridWidth = grid.getBoundingClientRect().width;
-      return {
-        gap,
-        gridWidth,
-        cards: Array.from(grid.children).map((c) => {
-          const match = c.className.match(/joy-bento-card--col-(?:span-)?(\d+)/);
-          return { span: match ? Number(match[1]) : 0, width: c.getBoundingClientRect().width };
-        }),
-      };
-    }, id);
-    // A card spanning N of 12 tracks is N tracks plus the N-1 gaps between them.
-    const track = (result.gridWidth - 11 * result.gap) / 12;
-    for (const { span, width } of result.cards) {
-      expect(span, "card has a span class").toBeGreaterThan(0);
-      expect(Math.abs(width - (span * track + (span - 1) * result.gap)), `span ${span}`).toBeLessThanOrEqual(2);
-    }
-  });
+  for (const theme of ["light", "dark"] as Theme[]) {
+    test(`bento grid ${id} cards span N of 12 columns at 1280px in ${theme}`, async ({ page }) => {
+      await openLandingBlocks(page, 1280);
+      await setTheme(page, theme);
+      const result = await page.evaluate((gridId) => {
+        const grid = document.querySelector<HTMLElement>(`#${gridId}`)!;
+        const style = getComputedStyle(grid);
+        const gap = parseFloat(style.columnGap);
+        const gridWidth = grid.getBoundingClientRect().width;
+        return {
+          gap,
+          gridWidth,
+          cards: Array.from(grid.children).map((c) => {
+            const match = c.className.match(/joy-bento-card--col-(?:span-)?(\d+)/);
+            return { span: match ? Number(match[1]) : 0, width: c.getBoundingClientRect().width };
+          }),
+        };
+      }, id);
+      // A card spanning N of 12 tracks is N tracks plus the N-1 gaps between them.
+      const track = (result.gridWidth - 11 * result.gap) / 12;
+      for (const { span, width } of result.cards) {
+        expect(span, "card has a span class").toBeGreaterThan(0);
+        expect(Math.abs(width - (span * track + (span - 1) * result.gap)), `span ${span}`).toBeLessThanOrEqual(2);
+      }
+    });
+  }
 }
 
 test("bento demos use every span from 1 to 12 in both class families", async ({ page }) => {

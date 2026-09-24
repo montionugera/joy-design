@@ -27,12 +27,21 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const themeCss = fs.readFileSync(path.resolve(__dirname, "../../../packages/tokens/dist/theme.css"), "utf8");
-const ssr: { react: string; svelte: string } = JSON.parse(
-  execFileSync("node", [path.resolve(__dirname, "../scripts/render-landing-ssr.mjs")], {
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-  }),
-);
+const script = path.resolve(__dirname, "../scripts/render-landing-ssr.mjs");
+const raw = execFileSync(process.execPath, [script], {
+  encoding: "utf8",
+  timeout: 60_000,
+  // the two default pages are ~15 KB each; 16 MB leaves room for growth without hiding a runaway output
+  maxBuffer: 16 * 1024 * 1024,
+});
+const ssr = JSON.parse(raw) as Record<string, unknown>;
+for (const twin of ["react", "svelte"]) {
+  const html = ssr[twin];
+  if (typeof html !== "string" || !html.includes('class="joy-landing-page')) {
+    throw new Error(`render-landing-ssr.mjs did not return the ${twin} LandingPage markup (got ${typeof html})`);
+  }
+}
+const markup = ssr as { react: string; svelte: string };
 
 const twins = ["react", "svelte"] as const;
 const themes: Theme[] = ["light", "dark"];
@@ -40,12 +49,13 @@ const viewports = [
   { width: 375, height: 812 },
   { width: 1280, height: 800 },
 ] as const;
+const MIN_TARGET = 43.5; // 44px minus 0.5px: Chromium measured a 44px target at 43.99997px (same tolerance as d271622)
 const PAGE = ".joy-landing-page";
 
 async function openComponentPage(page: Page, twin: (typeof twins)[number], theme: Theme, viewport: (typeof viewports)[number]) {
   await page.setViewportSize(viewport);
   await page.setContent(
-    `<!doctype html><html data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>landing</title><style>${themeCss}</style></head><body>${ssr[twin]}</body></html>`,
+    `<!doctype html><html data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>landing</title><style>${themeCss}</style></head><body>${markup[twin]}</body></html>`,
   );
   await installPageTools(page);
   await installContrastTools(page);
@@ -104,8 +114,8 @@ for (const twin of twins) {
               const r = el.getBoundingClientRect();
               return { width: r.width, height: r.height };
             });
-            expect(box.width, "menu button width").toBeGreaterThanOrEqual(44);
-            expect(box.height, "menu button height").toBeGreaterThanOrEqual(44);
+            expect(box.width, "menu button width").toBeGreaterThanOrEqual(MIN_TARGET);
+            expect(box.height, "menu button height").toBeGreaterThanOrEqual(MIN_TARGET);
             await expect(menu).toBeVisible();
             await expect(nav).toBeHidden();
           } else {
@@ -117,3 +127,46 @@ for (const twin of twins) {
     }
   }
 }
+
+// Dark text sweep on the real components (1280, dark): the same five surfaces as the hub contract in
+// landing-contracts.spec.ts, on the component page without hub CSS.
+const darkSurfaces = [".joy-feature-card", ".joy-stats-section", ".joy-faq-section", ".joy-site-footer", ".joy-logo-cloud"];
+for (const twin of twins) {
+  test(`${twin} LandingPage text is readable on every surface in dark at 1280px`, async ({ page }) => {
+    await openComponentPage(page, twin, "dark", viewports[1]);
+    for (const selector of darkSurfaces) {
+      const sweep = await page.evaluate(
+        ({ page: root, sel }) => {
+          const results = Array.from(document.querySelectorAll(`${root} ${sel}`)).map((el) => window.__lowContrast(el, 4.5));
+          return {
+            checked: results.reduce((sum, r) => sum + r.checked, 0),
+            failures: results.flatMap((r) => r.failures),
+          };
+        },
+        { page: PAGE, sel: selector },
+      );
+      expect(sweep.checked, `${twin} ${selector} text elements measured`).toBeGreaterThan(0);
+      expect(sweep.failures, `${twin} ${selector} text below 4.5:1`).toEqual([]);
+    }
+  });
+}
+
+// Self-test of the measuring helper: a gradient it cannot resolve to opaque colours must throw, not pass silently.
+test("__surfaces refuses a gradient with a transparent stop", async ({ page }) => {
+  await page.setContent(
+    `<!doctype html><body><div id="t" style="background-image: linear-gradient(transparent, red)">x</div><div id="ok" style="background-image: linear-gradient(red, blue)">x</div></body>`,
+  );
+  await installPageTools(page);
+  await installContrastTools(page);
+  const ok = await page.evaluate(() => window.__surfaces(document.querySelector("#ok")!));
+  expect(ok.length, "an opaque two-stop gradient yields one surface per stop").toBe(2);
+  const message = await page.evaluate(() => {
+    try {
+      window.__surfaces(document.querySelector("#t")!);
+      return "no error";
+    } catch (error) {
+      return String(error);
+    }
+  });
+  expect(message).toMatch(/__surfaces/);
+});
