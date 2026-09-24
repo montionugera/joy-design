@@ -35,10 +35,10 @@ export { MarkdownEditor, type MarkdownEditorProps } from './MarkdownEditor.js';
 
 // Wave 5: Landing Page Architecture & Enterprise Workflow Suite
 export { BentoGrid, type BentoGridProps } from './BentoGrid.js';
-export { BentoCard, type BentoCardProps } from './BentoCard.js';
+export { BentoCard, type BentoCardProps, type BentoColSpan } from './BentoCard.js';
 export { HeroSection, type HeroSectionProps } from './HeroSection.js';
 export { PricingCard, type PricingCardProps } from './PricingCard.js';
-export { PricingMatrix, type PricingMatrixProps } from './PricingMatrix.js';
+export { PricingMatrix, type PricingMatrixProps, type PricingMatrixRow } from './PricingMatrix.js';
 export { TestimonialCard, type TestimonialCardProps } from './TestimonialCard.js';
 export { Steps, type StepsProps, type StepItem } from './Steps.js';
 export { Timeline, type TimelineProps, type TimelineItem } from './Timeline.js';

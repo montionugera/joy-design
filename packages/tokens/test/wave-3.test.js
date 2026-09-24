@@ -45,9 +45,14 @@ test('Wave 3 parity-check script exports COMPONENTS with at least 60 entries', (
   assert.strictEqual(new Set(mod.COMPONENTS).size, mod.COMPONENTS.length, 'COMPONENTS must not contain duplicates');
 });
 
-test('Wave 3 parity-check script exports REF_FORWARDING with exactly 19 entries', () => {
+const WAVE_3_REF_FORWARDING = ['Alert', 'AvatarGroup', 'Badge', 'Breadcrumb', 'Drawer', 'Dropdown', 'EmptyState', 'ImagePreview', 'MarkdownViewer', 'MetricTile', 'Modal', 'Pagination', 'Progress', 'Skeleton', 'StatCard', 'Table', 'Tabs', 'Toast', 'Tooltip'];
+
+test('Wave 3 parity-check script exports REF_FORWARDING containing all 19 Wave 3 names (later waves may extend it)', () => {
   assert.ok(Array.isArray(mod.REF_FORWARDING), 'REF_FORWARDING must be exported as an array');
-  assert.strictEqual(mod.REF_FORWARDING.length, 19, 'REF_FORWARDING must contain exactly 19 names');
+  for (const name of WAVE_3_REF_FORWARDING) {
+    assert.ok(mod.REF_FORWARDING.includes(name), `REF_FORWARDING must contain ${name}`);
+  }
+  assert.strictEqual(new Set(mod.REF_FORWARDING).size, mod.REF_FORWARDING.length, 'REF_FORWARDING must not contain duplicates');
   for (const name of ['Notification', 'Popconfirm']) {
     assert.ok(!mod.REF_FORWARDING.includes(name), `${name} already uses forwardRef and must not be listed`);
   }

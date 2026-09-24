@@ -4,16 +4,16 @@ export interface BentoGridProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
 }
 
-export const BentoGrid: React.FC<BentoGridProps> = ({
+export const BentoGrid = React.forwardRef<HTMLDivElement, BentoGridProps>(({
   children,
   className = '',
   ...props
-}) => {
+}, ref) => {
   return (
-    <div className={`joy-bento-grid ${className}`} {...props}>
+    <div ref={ref} className={`joy-bento-grid ${className}`} {...props}>
       {children}
     </div>
   );
-};
+});
 
 BentoGrid.displayName = 'BentoGrid';

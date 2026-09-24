@@ -60,9 +60,57 @@ if (cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/s
 fi
 rm "$wave3_dir/packages/react/src/chart-core.ts"
 
-cp "$literal_file" "$wave3_dir/packages/react/src/PricingCard.tsx"
+cp "$literal_file" "$wave3_dir/packages/react/src/Carousel.tsx"
 (cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1 || {
-  echo "expected default mode to only warn on a literal in a non-strict file (PricingCard.tsx)" >&2
+  echo "expected default mode to only warn on a literal in a non-strict file (Carousel.tsx)" >&2
+  exit 1
+}
+rm "$wave3_dir/packages/react/src/Carousel.tsx"
+
+# Wave 4: the 14 landing twins are strict too. Sample one hero, one svelte page and one
+# matrix twin; a non-listed name in the same directory must still only warn.
+wave4_dir=$(mktemp -d)
+trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir"' EXIT
+mkdir -p "$wave4_dir/packages/react/src" "$wave4_dir/packages/svelte/src/lib"
+cp "$literal_file" "$wave4_dir/packages/react/src/HeroSection.tsx"
+if (cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-4 landing file (react HeroSection.tsx)" >&2
+  exit 1
+fi
+rm "$wave4_dir/packages/react/src/HeroSection.tsx"
+
+cp "$literal_file" "$wave4_dir/packages/svelte/src/lib/LandingPage.svelte"
+if (cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/svelte/src/lib) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-4 landing file (svelte LandingPage.svelte)" >&2
+  exit 1
+fi
+rm "$wave4_dir/packages/svelte/src/lib/LandingPage.svelte"
+
+cp "$literal_file" "$wave4_dir/packages/react/src/PricingMatrix.tsx"
+if (cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-4 landing file (react PricingMatrix.tsx)" >&2
+  exit 1
+fi
+rm "$wave4_dir/packages/react/src/PricingMatrix.tsx"
+
+# LandingAction is the internal helper both hero and CTA twins use (not exported), so it is strict in both extensions.
+cp "$literal_file" "$wave4_dir/packages/react/src/LandingAction.tsx"
+if (cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-4 landing helper (react LandingAction.tsx)" >&2
+  exit 1
+fi
+rm "$wave4_dir/packages/react/src/LandingAction.tsx"
+
+cp "$literal_file" "$wave4_dir/packages/svelte/src/lib/LandingAction.svelte"
+if (cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/svelte/src/lib) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a wave-4 landing helper (svelte LandingAction.svelte)" >&2
+  exit 1
+fi
+rm "$wave4_dir/packages/svelte/src/lib/LandingAction.svelte"
+
+cp "$literal_file" "$wave4_dir/packages/react/src/Carousel.tsx"
+(cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1 || {
+  echo "expected default mode to only warn on a literal in a non-strict file next to landing twins (Carousel.tsx)" >&2
   exit 1
 }
 

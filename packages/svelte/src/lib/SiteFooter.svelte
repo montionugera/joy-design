@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
   interface FooterLink {
     label: string;
@@ -16,10 +17,11 @@
     name: string;
     href: string;
     icon?: Snippet;
+    /** Svelte-only legacy field (React passes an element through `icon`): raw markup, trusted input only. */
     svgHtml?: string;
   }
 
-  interface Props {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class' | 'children'> {
     brandTitle?: string;
     brandDescription?: string;
     brandLogo?: Snippet;
@@ -27,20 +29,24 @@
     copyright?: string;
     socialLinks?: SocialLink[];
     class?: string;
+    ref?: HTMLElement | null;
   }
 
   let {
     brandTitle = 'Joymify',
-    brandDescription = 'High-velocity institutional quantitative design system and trading infrastructure.',
+    brandDescription = 'A design system for building clear, fast financial apps.',
     brandLogo,
     columns,
     copyright = `© ${new Date().getFullYear()} Joymify Inc. All rights reserved.`,
     socialLinks = [],
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 </script>
 
-<footer role="contentinfo" class="joy-site-footer {className}">
+<!-- A <footer> that is not inside sectioning content is already the page's contentinfo landmark: no explicit role. -->
+<footer bind:this={ref} class="joy-site-footer {className}" {...rest}>
   <div class="joy-site-footer__inner">
     <div class="joy-site-footer__brand">
       <div class="joy-site-footer__brand-title">
@@ -64,7 +70,8 @@
                 href={link.href}
                 class="joy-site-footer__link"
                 target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noreferrer noopener' : undefined}
+                aria-label={link.external ? `${link.label} (opens in a new tab)` : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
               >
                 {link.label}
               </a>
@@ -84,13 +91,16 @@
             href={social.href}
             class="joy-site-footer__social-link"
             title={social.name}
+            aria-label="{social.name} (opens in a new tab)"
             target="_blank"
-            rel="noreferrer noopener"
+            rel="noopener noreferrer"
           >
             {#if social.icon}
               {@render social.icon()}
             {:else if social.svgHtml}
               {@html social.svgHtml}
+            {:else}
+              {social.name}
             {/if}
           </a>
         {/each}

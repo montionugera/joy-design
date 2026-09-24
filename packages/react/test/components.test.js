@@ -285,7 +285,7 @@ test('React standard library components implement accessible traits and forwardR
 
   const ctaSection = fs.readFileSync(path.resolve('./src/CTASection.tsx'), 'utf8');
   assert.ok(ctaSection.includes('joy-cta-section'), 'CTASection must render joy-cta-section class');
-  assert.ok(ctaSection.includes('joy-button--glass'), 'CTASection must use glass button for contrast safety');
+  assert.ok(!ctaSection.includes('joy-button--glass') && ctaSection.includes('variant="outline"'), 'CTASection must not use the removed glass button; its secondary action is the outline variant');
 
   const faqSection = fs.readFileSync(path.resolve('./src/FAQSection.tsx'), 'utf8');
   assert.ok(faqSection.includes('joy-faq-section'), 'FAQSection must render joy-faq-section class');
@@ -294,7 +294,7 @@ test('React standard library components implement accessible traits and forwardR
 
   const siteFooter = fs.readFileSync(path.resolve('./src/SiteFooter.tsx'), 'utf8');
   assert.ok(siteFooter.includes('joy-site-footer'), 'SiteFooter must render joy-site-footer class');
-  assert.ok(siteFooter.includes('role="contentinfo"'), 'SiteFooter must implement accessible role=contentinfo');
+  assert.ok(/<footer\b/.test(siteFooter) && !siteFooter.includes('role="contentinfo"'), 'SiteFooter is a native <footer> (implicit contentinfo); the explicit role was redundant, see landing-footer.test.js');
 
   // Wave 13C: Full Page Combine Component & Theme Palettes
   const landingPage = fs.readFileSync(path.resolve('./src/LandingPage.tsx'), 'utf8');
@@ -483,35 +483,8 @@ test('F-037 lane review: Mentions/Rate/Select twin parity, Input type, Segmented
 });
 
 // F-038 Wave 3 lane C-L1: Avatar, AvatarGroup, Badge, Tag, Divider (rendered behavior, not just source strings)
-import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-
-const requireFromHere = createRequire(import.meta.url);
-
-/** Transpile a source file (.tsx/.ts) to CJS on the fly and load it. Relative ./X.js imports resolve to sibling .tsx/.ts; `@joymify/icons/react` resolves to the icons package source. */
-const moduleCache = new Map();
-function loadFile(file, cache = moduleCache) {
-  if (cache.has(file)) return cache.get(file);
-  const ts = requireFromHere('typescript');
-  const out = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
-  }).outputText;
-  const mod = { exports: {} };
-  const localRequire = (id) => {
-    if (id === '@joymify/icons/react') return loadFile(fileURLToPath(new URL('../../icons/src/react.ts', import.meta.url)), cache);
-    const m = id.match(/^\.\/([\w/-]+)\.js$/);
-    if (!m) return requireFromHere(id);
-    const base = path.join(path.dirname(file), m[1]);
-    return loadFile(fs.existsSync(`${base}.tsx`) ? `${base}.tsx` : `${base}.ts`, cache);
-  };
-  new Function('require', 'module', 'exports', out)(localRequire, mod, mod.exports);
-  cache.set(file, mod.exports);
-  return mod.exports;
-}
-
-function loadComponent(name, cache = moduleCache) {
-  return loadFile(fileURLToPath(new URL(`../src/${name}.tsx`, import.meta.url)), cache);
-}
+import { loadFile, loadComponent, requireFromHere } from './helpers/load-tsx.js';
 
 test('F-038 C-L1: display twins forward refs, spread rest props, and match Svelte markup', () => {
   const React = requireFromHere('react');

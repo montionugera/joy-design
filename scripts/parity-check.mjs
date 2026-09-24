@@ -64,7 +64,24 @@ export const COMPONENTS = [
   'Tooltip',
   'BarChart',
   'LineChart',
-  'CandlestickChart'
+  'CandlestickChart',
+  // Wave 4 (F-039)
+  'HeroSection',
+  'CTASection',
+  'PricingCard',
+  'PricingMatrix',
+  'FeatureCard',
+  'FeatureGrid',
+  'BentoCard',
+  'BentoGrid',
+  'LogoCloud',
+  'StatsSection',
+  'TestimonialCard',
+  'FAQSection',
+  'SiteFooter',
+  'LandingPage',
+  // internal (not exported): the action button both landing twins render; no ref/rest by design
+  'LandingAction'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a
@@ -90,7 +107,44 @@ export const REF_FORWARDING = [
   'Table',
   'Tabs',
   'Toast',
-  'Tooltip'
+  'Tooltip',
+  // Wave 4 (F-039)
+  'HeroSection',
+  'CTASection',
+  'PricingCard',
+  'PricingMatrix',
+  'FeatureCard',
+  'FeatureGrid',
+  'BentoCard',
+  'BentoGrid',
+  'LogoCloud',
+  'StatsSection',
+  'TestimonialCard',
+  'FAQSection',
+  'SiteFooter',
+  'LandingPage'
+];
+
+// Svelte components that must destructure `ref = $bindable(null)`, spread
+// `{...rest}` on the root element and expose the root via `bind:this={ref}`.
+// Starts empty: each landing lane appends its own names in the commit that
+// makes them clean, so the gate never goes red ahead of the code.
+export const SVELTE_REF_REST = [
+  // Wave 4 (F-039)
+  'HeroSection',
+  'CTASection',
+  'PricingCard',
+  'PricingMatrix',
+  'FeatureCard',
+  'FeatureGrid',
+  'BentoCard',
+  'BentoGrid',
+  'LogoCloud',
+  'StatsSection',
+  'TestimonialCard',
+  'FAQSection',
+  'SiteFooter',
+  'LandingPage'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).
@@ -485,6 +539,46 @@ export function checkRefForwarding(rootDir = process.cwd()) {
   return failures;
 }
 
+// Splits a .svelte file into comment-free script text (JS comments stripped) and
+// comment-free markup (<script> blocks removed, HTML comments stripped), so a
+// `{...rest}` object spread or a string in the script can never satisfy a markup
+// check, and a "<!--" string in the script cannot swallow the markup.
+// Limitation: a <script> tag written inside an HTML comment is read as a script.
+export function splitSvelteSource(src) {
+  const scripts = [];
+  const rest = src.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/g, (_, body) => {
+    scripts.push(body);
+    return '';
+  });
+  return {
+    script: stripComments(scripts.join('\n')),
+    markup: rest.replace(/<!--[\s\S]*?-->/g, '')
+  };
+}
+
+// Svelte twin of checkRefForwarding: every listed component must destructure a
+// bindable `ref`, spread `{...rest}` and bind the root element to `ref`.
+// Failure shape: { component, missing: ['ref' | 'restSpread' | 'bindThis'] }
+// (or ['file'] when the component file does not exist).
+export function checkSvelteRefRest(rootDir = process.cwd(), names = SVELTE_REF_REST) {
+  const failures = [];
+  for (const component of names) {
+    const file = path.resolve(rootDir, `packages/svelte/src/lib/${component}.svelte`);
+    if (!fs.existsSync(file)) {
+      failures.push({ component, missing: ['file'] });
+      continue;
+    }
+    const { script, markup } = splitSvelteSource(fs.readFileSync(file, 'utf8'));
+    const missing = [];
+    // The destructure lives in <script>; the spread and the binding must be on markup.
+    if (!/\bref\s*=\s*\$bindable\s*(?:<[^()]*>)?\s*\(\s*null\s*\)/.test(script)) missing.push('ref');
+    if (!/\{\s*\.\.\.(?:props|\w*[Rr]est\w*)\s*\}/.test(markup)) missing.push('restSpread');
+    if (!/\bbind:this=\{\s*ref\s*\}/.test(markup)) missing.push('bindThis');
+    if (missing.length > 0) failures.push({ component, missing });
+  }
+  return failures;
+}
+
 export function runParityCheck(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const themeCssPath = path.resolve(rootDir, 'packages/tokens/dist/theme.css');
@@ -598,6 +692,15 @@ export function runParityCheck(options = {}) {
       // A missing React file is already reported once by the file-exists check above.
       if (missing.includes('file')) continue;
       checks.push({ component, check: `ref forwarding (${missing.join(', ')})`, status: 'FAIL' });
+      totalViolations += 1;
+    }
+  }
+
+  if (side !== 'react') {
+    for (const { component, missing } of checkSvelteRefRest(rootDir)) {
+      // A missing Svelte file of a COMPONENTS entry is already reported by the file-exists check above.
+      if (missing.includes('file') && COMPONENTS.includes(component)) continue;
+      checks.push({ component, check: `Svelte ref/rest (${missing.join(', ')})`, status: 'FAIL' });
       totalViolations += 1;
     }
   }

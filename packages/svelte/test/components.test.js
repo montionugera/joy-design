@@ -261,7 +261,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const ctaSection = fs.readFileSync(path.resolve('./src/lib/CTASection.svelte'), 'utf8');
   assert.ok(ctaSection.includes('joy-cta-section'), 'CTASection must render joy-cta-section class');
-  assert.ok(ctaSection.includes('joy-button--glass'), 'CTASection must use glass button for contrast safety');
+  assert.ok(!ctaSection.includes('joy-button--glass') && ctaSection.includes('variant="outline"'), 'CTASection must not use the removed glass button; its secondary action is the outline variant');
 
   const faqSection = fs.readFileSync(path.resolve('./src/lib/FAQSection.svelte'), 'utf8');
   assert.ok(faqSection.includes('joy-faq-section'), 'FAQSection must render joy-faq-section class');
@@ -270,7 +270,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const siteFooter = fs.readFileSync(path.resolve('./src/lib/SiteFooter.svelte'), 'utf8');
   assert.ok(siteFooter.includes('joy-site-footer'), 'SiteFooter must render joy-site-footer class');
-  assert.ok(siteFooter.includes('role="contentinfo"'), 'SiteFooter must implement accessible role=contentinfo');
+  assert.ok(/<footer\b/.test(siteFooter) && !siteFooter.includes('role="contentinfo"'), 'SiteFooter is a native <footer> (implicit contentinfo); the explicit role was redundant, see landing-footer.test.js');
 
   // Wave 13C: Full Page Combine Component & Theme Palettes
   const landingPage = fs.readFileSync(path.resolve('./src/lib/LandingPage.svelte'), 'utf8');

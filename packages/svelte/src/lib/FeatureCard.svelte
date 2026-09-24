@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  interface Props {
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'title'> {
     title: string;
     description: string;
     icon?: Snippet;
@@ -10,6 +11,7 @@
     linkHref?: string;
     onlinkclick?: () => void;
     class?: string;
+    ref?: HTMLDivElement | null;
   }
 
   let {
@@ -18,13 +20,23 @@
     icon,
     badge,
     linkText,
-    linkHref = '#',
+    linkHref,
     onlinkclick,
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
+
+  // Modified clicks (new tab, new window, download) and non-primary buttons are left to the browser: the handler only
+  // takes over a plain primary click on a link that also has a real href.
+  function handleLinkClick(e: MouseEvent) {
+    if (!onlinkclick || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    onlinkclick();
+  }
 </script>
 
-<div class="joy-feature-card {className}">
+<div bind:this={ref} class="joy-feature-card {className}" {...rest}>
   {#if badge}
     <div class="joy-feature-card__badge">
       {@render badge()}
@@ -38,21 +50,12 @@
   <h3 class="joy-feature-card__title">{title}</h3>
   <p class="joy-feature-card__desc">{description}</p>
   {#if linkText}
-    <a
-      href={linkHref}
-      class="joy-feature-card__link"
-      onclick={(e) => {
-        if (onlinkclick) {
-          e.preventDefault();
-          onlinkclick();
-        }
-      }}
-    >
-      {linkText}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-        <polyline points="12 5 19 12 12 19"></polyline>
-      </svg>
-    </a>
+    <!-- A handler with no destination is an action, not a link: a real button, so there is no fake "#" anchor to
+         middle-click or scroll to the top of the page. -->
+    {#if linkHref === undefined && onlinkclick}
+      <button type="button" class="joy-feature-card__link" onclick={() => onlinkclick()}>{linkText}</button>
+    {:else}
+      <a href={linkHref ?? '#'} class="joy-feature-card__link" onclick={handleLinkClick}>{linkText}</a>
+    {/if}
   {/if}
 </div>

@@ -153,19 +153,19 @@ Their tests (`overlay-utils`, `chart-core`, `roving-utils`, `pagination-utils`, 
 
 The Wave 2 rule is unchanged: Svelte handler props are all lowercase (`onclose`, `onchange`, `onselect`, `onsort`, `onopenchange`) and use `class`; React handler props are camelCase (`onClose`, `onChange`, `onSelect`, `onSort`, `onOpenChange`) and use `className`.
 
-`node scripts/parity-check.mjs` covers 60 components (`COMPONENTS`). It exits non-zero on any of:
+`node scripts/parity-check.mjs` covers 75 components (`COMPONENTS`: the 21 Wave 2 controls, the 39 Wave 3 components, the 14 Wave 4 landing components and the internal `LandingAction`). It exits non-zero on any of:
 
 - **Class diff**: `joy-*` classes present in only one twin, including CSS custom properties (`--joy-space-gap`) and dynamic prefixes (`joy-progress--status-*`), which are compared but need no theme rule.
 - **Undefined class**: a fully spelled class with no rule in `dist/theme.css`; `STRUCTURAL_CLASSES` is a small allowlist of unstyled hook classes, honoured only while both twins carry the hook.
 - **Prop diff**: prop names in one twin only, plus the exact `CONTRACT` props for the Wave 2 controls. Handlers compare case-insensitively.
 - **Handler casing per side**: Svelte handler props must be lowercase, React handler props camelCase (`HANDLER_CASING_EXCEPTIONS` is empty).
-- **`REF_FORWARDING`**: the 19 named React components must `forwardRef` and spread `...rest`/`...props`.
+- **`REF_FORWARDING`**: the 33 named React components (the Wave 2 and Wave 3 set plus the 14 landing names) must `forwardRef` and spread `...rest`/`...props`.
 
 Modes: default (twin), `--side svelte`, `--side react` (single-side checks used while a twin is still being built), and `--json` (machine-readable result). Run `node scripts/parity-check.mjs --side react` to see the React-only gaps.
 
 ### Gates
 
-- **Strict colour lint**: `bash scripts/lint-colors.sh` hard-fails on foreign colour literals in every file matched by `strict_file_pattern` (the 21 Wave 2 controls, the 39 Wave 3 components in both packages, and the shared helper modules) and only warns elsewhere (landing sections, other waves). `bash scripts/lint-colors.sh --strict <files>` checks an explicit file list; `scripts/test-lint-colors.sh` holds the fixtures.
+- **Strict colour lint**: `bash scripts/lint-colors.sh` hard-fails on foreign colour literals in every file matched by `strict_file_pattern` (the 21 Wave 2 controls, the 39 Wave 3 components and the 14 Wave 4 landing components in both packages, and the shared helper modules) and only warns elsewhere (other waves, for example `Carousel`). `bash scripts/lint-colors.sh --strict <files>` checks an explicit file list; `scripts/test-lint-colors.sh` holds the fixtures.
 - **Unit tests**: `pnpm -r test` (icons, tokens, svelte, react).
 - **Playwright contracts**: `apps/storybook-hub/tests/display-contracts.spec.ts` (no real horizontal overflow at 375px in light and dark, Popconfirm above Modal with Escape closing it first, Drawer as a bottom sheet at 375px and a side panel at 1280px, 44px pagination/tab/menu/dropdown/close controls on the coarse-pointer project, no purple or hard-coded white, no side stripes, chart HUD contrast of 4.5:1 or more, Pagination compact and windowed modes). Run `PLAYWRIGHT_PORT=6117 pnpm --filter storybook-hub exec playwright test`; the config defaults to port 6116, so set a different `PLAYWRIGHT_PORT` per worktree or an already-running server from another worktree is silently reused.
 - **Screenshots**: `F038_SCREENS=1 PLAYWRIGHT_PORT=6117 pnpm --filter storybook-hub exec playwright test tests/screens-f038.spec.ts --project=desktop-chrome` writes 44 PNGs (11 names x light/dark x 375/1280) to `.claude/refined_backlog/F-038-wave-3-display-feedback-navigation-and-o/research/screens/` (index in that folder's `README.md`).
@@ -198,3 +198,81 @@ Rationale for each lives in `.claude/refined_backlog/F-038-wave-3-display-feedba
 - **Menu keeps `role="menu"`** even in navigation-style usage (the brief and audit required it); screen readers announce a menu for site navigation. Consumers can override `role` through `...rest`.
 - **`Flex` responsive direction** (SVD-032) is a feature request and is deferred.
 - **No TypeScript gate**: the repo has no `tsc` / `@types/react`, and `packages/react/package.json` `types` points at a missing file, so React typings are not compile-checked.
+
+## Landing suite (Wave 4)
+
+Wave 4 brings the 14 landing components to the same standard in both `@joymify/svelte` and `@joymify/react`: `HeroSection`, `CTASection`, `PricingCard`, `PricingMatrix`, `FeatureCard`, `FeatureGrid`, `BentoCard`, `BentoGrid`, `LogoCloud`, `FAQSection`, `StatsSection`, `TestimonialCard`, `SiteFooter` and `LandingPage`. An internal twin, `LandingAction` (not exported from either index), renders the CTA button for `HeroSection` and `CTASection`: without `href` it composes `Button`, with `href` it renders an anchor, and a disabled or loading link drops its `href` and leaves the tab order. The full record of rulings, deviations and deferrals is in `.claude/refined_backlog/F-039-wave-4-landing-suite-hero-and-cta-depth/research/rulings-and-deferrals.md`; the per-issue status of every audit finding is in `research/issue-coverage.md` next to it.
+
+### Props (notable components)
+
+`HeroSection` and `CTASection` share the CTA props. Defaults differ: the hero uses `Get started free` / `Explore documentation`, the CTA band uses `Get started today` / `Contact sales`.
+
+| Prop | HeroSection | CTASection |
+| --- | --- | --- |
+| `badgeText`, `titleEmphasis`, `subtitle`, `previewSlot` | yes | no |
+| `title` | optional | required |
+| `description` | no | optional |
+| `primaryCtaText`, `secondaryCtaText` | strings, defaults above | strings, defaults above |
+| `primaryHref`, `secondaryHref` | anchor instead of button | anchor instead of button |
+| `primaryLoading`, `primaryDisabled`, `secondaryDisabled` | boolean, default `false` | boolean, default `false` |
+| Click handlers | Svelte `onprimaryclick` / `onsecondaryclick`, React `onPrimaryClick` / `onSecondaryClick` | same |
+
+`titleEmphasis` renders a `<span class="joy-hero__title-emphasis">` in solid `--joy-accent-text` (never a gradient). `previewSlot` is a Svelte `Snippet` and a React `ReactNode`.
+
+| Component | Props worth knowing |
+| --- | --- |
+| `FeatureGrid` | `layout`: `'lead'` (default) or `'uniform'`. From 900px `lead` is three columns with the first card spanning two and the last card filling its row, for any card count; below 900px it is one column. `columns` (`2`, `3`, `4`, default `3`) applies only with `layout="uniform"`, where it is a maximum (auto-fit). |
+| `FeatureCard` | `title`, `description`, `icon`, `badge` (Svelte snippets, React nodes), `linkText`, `linkHref`, `onlinkclick` (Svelte) / `onLinkClick` (React). A handler without `linkHref` renders a `<button>`. |
+| `BentoGrid`, `BentoCard` | `BentoCard` takes `colSpan` (1 to 12, default `4`; anything else falls back to 4), `title`, `description`, `badge`, children. Every span from 1 to 12 has a CSS rule; below 900px every card is full width. |
+| `PricingCard` | `title`, `price` (required), `description`, `period` (default `/month`), `features`, `ctaText`, `featured`, `badge`, `loading`, `disabled`, `onselect` (Svelte) / `onSelect` (React). |
+| `PricingMatrix` | Children card grid by default. Optional data props `columns` (string array) and `rows` (`{ label, values }[]`, where a value is a string or a boolean) render a real table inside a scroll region instead; pass both or neither (a lone data prop is ignored). `rowHeaderLabel` (default `Feature`) and `label` (default `Pricing plans`, names the scroll region). |
+| `LogoCloud` | `title`, `logos`. Logos are `currentColor` at `--joy-text-muted` with no invert filter. |
+| `FAQSection` | `title`, `subtitle`, `items`, `allowMultiple`. Ids are per instance; closed answers stay in the DOM with `hidden`. |
+| `StatsSection` | `stats`. An inline-size container; the column count follows the container width and the stat count. |
+| `TestimonialCard` | `quote`, `authorName`, `authorRole`, `avatarSrc`, `avatarInitials`, `rating` (default `5`, clamped to 0 to 5 whole stars). |
+| `SiteFooter` | `brandTitle` (default `Joymify`), `brandDescription`, `brandLogo`, `columns` (required, `{ title, links: { label, href, external? }[] }[]`), `copyright` (defaults to the current year), `socialLinks`. It renders a plain `<footer>` with no explicit role, so it is the page `contentinfo` landmark only when it is not nested in `section` or `article`. Svelte `socialLinks` entries may also carry a trusted-input `svgHtml` string; React passes an element through `icon`. |
+| `LandingPage` | `palette` (`joymify` default, `obsidian`, `quantum`, `cyberpunk`, `titanium`; a plain `data-palette` attribute, the theme is decided by `data-theme` alone), `interactiveSlot`, deploy and docs handlers (Svelte `ondeployclick` / `ondocsclick`, React `onDeployClick` / `onDocsClick`). Under 768px the header collapses to a menu button that opens a `Drawer`. It renders its own skip link (`.joy-landing-skip`) and its own `<main>`, so render it as the page body and never inside another `<main>`. |
+
+### Casing rule
+
+The Wave 2 and Wave 3 rule applies to every landing component. React handler props are camelCase (`onPrimaryClick`, `onDeployClick`), use `className`, and forward the root element ref with `React.forwardRef` and `...rest`. Svelte handler props are all lowercase (`onprimaryclick`, `ondeployclick`), use `class`, expose the root through `ref = $bindable(null)` and spread `{...rest}`. Every landing Svelte `Props` interface now extends the root element's `HTMLAttributes` (with `class`, `children` and `title` omitted where redefined), so `aria-*` and `data-*` attributes type-check. `LandingAction` is the exception: it is internal and has no rest spread.
+
+### Design rules
+
+- **No slop**: no `&bull;` or middle-dot separators, no gradient text, no glass or `backdrop-filter`, no tracked uppercase eyebrows, no side-stripe borders, no arrows in link text, no identical icon-card grid (`FeatureGrid` leads with one wide card). Stat values use `--joy-accent-text` and rating stars use `--joy-status-warning-fg`.
+- **Fluid type**: section headings (hero, CTA, FAQ, the hub features heading) use the display clamps. Card titles use fixed scale tokens (`--joy-font-size-2xl` for feature cards, `--joy-font-size-xl` for bento cards). This is a deliberate deviation from the original "every heading fluid" line: the clamps split words in 150 to 220px cards.
+- **Dark treatment is token-driven**: no `[data-theme]` component selectors were added (the phase-b cap of 15 is untouched); surfaces, borders and text flip through the token remap, including for OS-level dark.
+- **Layout**: `StatsSection` uses container queries (`@container joy-stats`), so it adapts inside frames and sidebars. `PricingMatrix` cards are a wrapping flex row. `FeatureGrid` `lead` spans keep every row edge to edge. Viewport breakpoints: 899 (bento and feature grids collapse to one column; from 900 the wide layouts apply), 767 (LandingPage header collapses to a menu button and Drawer, footer padding tightens), 480 to 767 (footer link groups pair up in two columns), 639 (footer bottom row stacks), 479 (hero and CTA action buttons stack, CTA band padding shrinks) and 480 (the Drawer is the Wave 3 bottom sheet). The 767 and 639 values are deliberate, so 768 and 640 keep the wide layout.
+
+### Generated hub blocks
+
+`apps/storybook-hub` has two landing views: `#landing-preview` (the full-page simulator: generated from the real components except the hand-written header, toolbar and scripts, plus a hub-only features heading and pricing section around the `LandingPage` output) and `#landing-blocks` (Bento and Landing Suite blocks). Both are produced by SSR-rendering the Svelte components:
+
+```bash
+node apps/storybook-hub/scripts/gen-landing-blocks.mjs --write   # regenerate
+node apps/storybook-hub/scripts/gen-landing-blocks.mjs --check   # fail on drift
+```
+
+**Regenerate after any landing component markup change.** `packages/svelte/test/hub-landing-blocks.test.js` fails on drift, so a forgotten `--write` turns `pnpm -r test` red. The simulator frame-width toggle only changes the frame width; media queries follow the real browser window.
+
+### Tests, gates and screenshots
+
+- **Unit tests**: `pnpm -r test`. Landing coverage lives in `packages/svelte/test/landing-*.test.js`, `packages/svelte/test/hub-landing-blocks.test.js` and the React equivalents. Svelte tests render through `packages/svelte/test/helpers/render-svelte.js` and React tests load TSX through `packages/react/test/helpers/load-tsx.js`.
+- **Playwright**: `PLAYWRIGHT_PORT=6120 pnpm --filter storybook-hub exec playwright test --workers=3`. Landing specs in `apps/storybook-hub/tests/`: `landing-contracts` (hub views at 375 and 1280, light and dark), `landing-component-page` (real React and Svelte components on `dist/theme.css` only, no hub CSS and no reset, so the hub cannot mask a component defect), `landing-cta-contrast`, `landing-stats-*` (grid and overflow), `landing-blocks-*` (layout and states), `landing-simulator-t2`, `landing-layout-t1`, `landing-pricing-grid` and `landing-button-states`. Set a distinct `PLAYWRIGHT_PORT` per worktree or a server from another worktree is silently reused.
+- **Screenshots**: `F039_SCREENS=1 PLAYWRIGHT_PORT=6120 pnpm --filter storybook-hub exec playwright test tests/screens-f039.spec.ts --project=desktop-chrome` writes the PNGs to `.claude/refined_backlog/F-039-wave-4-landing-suite-hero-and-cta-depth/research/screens/`.
+- **Parity gate**: `COMPONENTS` and `REF_FORWARDING` in `scripts/parity-check.mjs` list the 14 landing names, and the new `SVELTE_REF_REST` list (checked by `checkSvelteRefRest`) requires each listed Svelte component to destructure `ref = $bindable(null)`, spread `{...rest}` and bind the root to `ref`.
+- **Strict colour lint**: `strict_file_pattern` in `scripts/lint-colors.sh` now includes the 14 landing names and the internal `LandingAction` helper, so all 30 landing files hard-fail on foreign colour literals.
+
+### Breaking and visible changes (Wave 4)
+
+- **`titleGradient` is removed from `HeroSection`; use `titleEmphasis`** in both twins, with no alias (an alias would keep the banned gradient API alive). Consumers that still pass `titleGradient` get no emphasis and no error: the old prop is spread onto the root element as an unknown attribute, so search your code for the name and rename it.
+- **`.joy-button--glass` is removed**, together with its hover rule. Use `joy-button--outline`. Markup that still carries the class silently loses its styling.
+- **Any `.joy-button` with `aria-disabled="true"` now looks disabled and gets `pointer-events: none`**, in every component, not only the landing suite (it used to look enabled). A consumer using the focusable-disabled pattern (`aria-disabled="true"` on a button that shows a tooltip) no longer receives hover or click events on it; keep such a button on `disabled` semantics or move the tooltip to a wrapper.
+- **`FeatureGrid` default changed from the uniform column grid to `layout="lead"`** (the first card is wider; the last card fills its row). To keep the old look, pass `layout="uniform"` together with `columns`.
+- **React `LogoCloud` `forwardRef` element type changed from `HTMLDivElement` to `HTMLElement`** (the root element is now a `<section>`, so `HTMLDivElement` no longer matches). Update the `ref` typing in consumers, for example `useRef<HTMLElement>(null)`.
+- **`SiteFooter` no longer sets `role="contentinfo"`**: the implicit landmark applies unless the footer is nested in `section` or `article`. Footer links have a 44px minimum height at every pointer type.
+- **`PricingMatrix` gained optional `columns` / `rows` data props** (additive; the children card grid is unchanged).
+- **CTA band restyle**: a raised surface with an accent wash and a strong border in both themes. The light band is no longer navy.
+- **`LandingPage` renders its own `<main>` and a skip link**: do not nest it inside another `<main>`.
+- **Svelte landing `Props` extend the element attributes**, so extra attributes are typed and forwarded to the root.
+- **Card titles use fixed scale tokens** instead of the display clamps.

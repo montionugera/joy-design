@@ -1,5 +1,9 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import { Cpu, Layers, Menu, Smartphone } from '@joymify/icons';
+  import Badge from './Badge.svelte';
+  import Drawer from './Drawer.svelte';
   import HeroSection from './HeroSection.svelte';
   import LogoCloud from './LogoCloud.svelte';
   import FeatureGrid from './FeatureGrid.svelte';
@@ -9,12 +13,18 @@
   import FAQSection from './FAQSection.svelte';
   import SiteFooter from './SiteFooter.svelte';
 
-  interface Props {
+  /**
+   * A full-page template: it renders its own banner, `<main>` and footer landmarks, so render it as the page body and
+   * not inside another `<main>` (that would nest two main landmarks).
+   */
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+    /** A plain `data-palette` attribute; the theme is decided by `data-theme` alone. */
     palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium';
     ondeployclick?: () => void;
     ondocsclick?: () => void;
     interactiveSlot?: Snippet;
     class?: string;
+    ref?: HTMLDivElement | null;
   }
 
   let {
@@ -22,8 +32,23 @@
     ondeployclick,
     ondocsclick,
     interactiveSlot,
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
+
+  // Unique per instance: two landing pages never share the menu panel or the main landmark id.
+  const uid = $props.id();
+  const menuId = `${uid}-menu`;
+  const mainId = `${uid}-main`;
+
+  let menuOpen = $state(false);
+  const closeMenu = () => (menuOpen = false);
+  const navLinks = [
+    { label: 'Features', href: '#features' },
+    { label: 'Telemetry', href: '#telemetry' },
+    { label: 'FAQ', href: '#faq' }
+  ];
 
   const logoList = [
     {
@@ -45,25 +70,25 @@
   ];
 
   const statsList = [
-    { label: 'P99 Order Latency', value: '4.2 μs', description: 'Kernel bypass colocation', change: '-14% vs L1', trend: 'up' as const },
-    { label: 'Historical Uptime', value: '99.999%', description: 'Dual active-active failover', change: 'Zero downtime', trend: 'up' as const },
+    { label: 'P99 Order Latency', value: '4.2 μs', description: 'Kernel bypass colocation', change: '14% faster vs L1', trend: 'up' as const },
+    { label: 'Historical Uptime', value: '99.999%', description: 'Two live sites, instant failover', change: 'Zero downtime', trend: 'up' as const },
     { label: 'Monthly Volume', value: '$48.2B', description: 'Settled across 14 networks', change: '+32% MoM', trend: 'up' as const },
     { label: 'Settlement Chains', value: '14 Chains', description: 'Instant cross-L2 finality', change: 'EVM & SVM', trend: 'up' as const }
   ];
 
   const faqList = [
     {
-      question: 'How are sub-5ms chart rendering benchmarks maintained?',
-      answer: 'Decoupled double-buffered canvas layers, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers eliminate GC pauses.',
+      question: 'How do charts stay under 5 ms?',
+      answer: 'Charts draw on two canvas layers, thin out dense data with a downsampling step and reuse preallocated buffers, so garbage collection never stalls a frame.',
       defaultOpen: true
     },
     {
-      question: 'Can the color palette be switched at runtime?',
-      answer: 'Yes. All components leverage canonical CSS custom properties (--joy-surface-*, --joy-border, --gold-400), enabling instant runtime palette swaps with zero DOM reflows.'
+      question: 'Can the color theme change at runtime?',
+      answer: 'Yes. Every component reads shared CSS custom properties, so a new theme applies the moment the variables change.'
     },
     {
-      question: 'How do tables render on mobile viewports under 768px?',
-      answer: 'With responsive stack mode, rows automatically convert into stacked cards where data-label attributes label each value cleanly without horizontal cutoff.'
+      question: 'How do tables look on phones?',
+      answer: 'Below 768px each row becomes a stacked card and every value keeps its label, so nothing is cut off.'
     }
   ];
 
@@ -79,7 +104,7 @@
     {
       title: 'Resources',
       links: [
-        { label: 'Documentation', href: '#' },
+        { label: 'Docs', href: '#' },
         { label: 'Design Tokens', href: '#' },
         { label: 'API Reference', href: '#' }
       ]
@@ -95,100 +120,136 @@
   ];
 </script>
 
-<div data-palette={palette} class="joy-landing-page {className}">
-  {/* Header */}
-  <header class="joy-landing-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1200px; margin: 0 auto; width: 100%;">
-    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.25rem; color: var(--joy-text-primary, #0f172a);">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold-400, #c49a3a);">
+<div bind:this={ref} data-palette={palette} class="joy-landing-page {className}" {...rest}>
+  <a class="joy-landing-skip" href="#{mainId}">Skip to main content</a>
+
+  <header class="joy-landing-header">
+    <div class="joy-landing-header__brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
       </svg>
-      <span>Joymify Quant</span>
+      <span>Joymify Design</span>
     </div>
-    <nav style="display: flex; align-items: center; gap: 20px;">
-      <a href="#features" style="font-size: 0.875rem; font-weight: 600; color: var(--joy-color-text-muted, #64748b); text-decoration: none;">Features</a>
-      <a href="#telemetry" style="font-size: 0.875rem; font-weight: 600; color: var(--joy-color-text-muted, #64748b); text-decoration: none;">Telemetry</a>
-      <a href="#faq" style="font-size: 0.875rem; font-weight: 600; color: var(--joy-color-text-muted, #64748b); text-decoration: none;">FAQ</a>
-      <button
-        type="button"
-        class="joy-button joy-button--solid joy-button--sm"
-        onclick={ondeployclick}
-      >
+    <nav class="joy-landing-header__nav" aria-label="Primary">
+      {#each navLinks as link, i (`${i}-${link.href}`)}
+        <a class="joy-landing-header__link" href={link.href}>{link.label}</a>
+      {/each}
+      <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick={ondeployclick}>
         Launch Terminal
       </button>
     </nav>
+    <button
+      type="button"
+      class="joy-button joy-button--ghost joy-button--icon-only joy-landing-header__menu"
+      aria-label="Open menu"
+      aria-expanded={menuOpen}
+      aria-controls={menuId}
+      onclick={() => (menuOpen = true)}
+    >
+      <Menu size="1.25rem" />
+    </button>
   </header>
 
-  <HeroSection
-    badgeText="Institutional Engine &bull; Sub-5μs Execution"
-    title="Deterministic Financial Telemetry &"
-    titleGradient="Quantitative UI Systems"
-    subtitle="Engineered for high-frequency trading desks, liquidity aggregators, and institutional asset portals requiring strict sub-5ms rendering budgets."
-    primaryCtaText="Deploy Quantitative Node"
-    secondaryCtaText="Read Whitepaper"
-    onprimaryclick={ondeployclick}
-    onsecondaryclick={ondocsclick}
-  />
+  <!-- Below 768px the inline nav is hidden; the same links live in this drawer (a bottom sheet at 480px and below). -->
+  <Drawer id={menuId} open={menuOpen} title="Menu" onclose={closeMenu}>
+    <nav class="joy-landing-drawer__nav" aria-label="Mobile">
+      {#each navLinks as link, i (`${i}-${link.href}`)}
+        <a class="joy-landing-drawer__link" href={link.href} onclick={closeMenu}>{link.label}</a>
+      {/each}
+    </nav>
+    {#snippet footer()}
+      <button
+        type="button"
+        class="joy-button joy-button--solid joy-button--lg joy-button--block"
+        onclick={() => {
+          closeMenu();
+          ondeployclick?.();
+        }}
+      >
+        Launch Terminal
+      </button>
+    {/snippet}
+  </Drawer>
 
-  <LogoCloud
-    title="Trusted by Premier Quantitative Desks & Liquidity Providers"
-    logos={logoList}
-  />
-
-  <div id="telemetry">
-    <StatsSection stats={statsList} />
-  </div>
-
-  {#if interactiveSlot}
-    <div style="max-width: 1200px; margin: 0 auto 48px auto; padding: 0 24px;">
-      {@render interactiveSlot()}
-    </div>
-  {/if}
-
-  <div id="features" style="max-width: 1200px; margin: 0 auto 48px auto; padding: 0 24px;">
-    <FeatureGrid columns={3}>
-      {#snippet children()}
-        <FeatureCard
-          title="Sub-Microsecond Matching"
-          description="FPGA co-located order matching rings processing up to 2.4M ops/sec with deterministic tick dispatch."
-          linkText="Learn more"
-          linkHref="#features"
-        />
-        <FeatureCard
-          title="Institutional Color Palettes"
-          description="Five mathematically calibrated dark & light themes guaranteeing WCAG 2.2 AA contrast on every component."
-          linkText="Inspect tokens"
-          linkHref="#features"
-        />
-        <FeatureCard
-          title="Adaptive Mobile Viewports"
-          description="Responsive stacking modes transform complex multi-column market tables into crisp cards on mobile screens."
-          linkText="View demo"
-          linkHref="#features"
-        />
-      {/snippet}
-    </FeatureGrid>
-  </div>
-
-  <div id="faq">
-    <FAQSection
-      title="Frequently Asked Questions"
-      subtitle="Institutional queries regarding architecture, performance bounds, and security compliance."
-      items={faqList}
+  <main id={mainId} tabindex="-1">
+    <HeroSection
+      badgeText="Sub-5μs execution engine"
+      title="Live market data and"
+      titleEmphasis="fast trading screens"
+      subtitle="Built for trading desks and portals that need every chart, table and price to render in under 5 ms."
+      primaryCtaText="Deploy a node"
+      secondaryCtaText="Read the whitepaper"
+      onprimaryclick={ondeployclick}
+      onsecondaryclick={ondocsclick}
     />
-  </div>
 
-  <CTASection
-    title="Ready to Transform Your Institutional Trading Platform?"
-    description="Experience deterministic UI latency, high-density financial tables, and verified WCAG 2.2 contrast."
-    primaryCtaText="Deploy Quantitative Node"
-    secondaryCtaText="Contact Sales"
-    onprimaryclick={ondeployclick}
-    onsecondaryclick={ondocsclick}
-  />
+    <LogoCloud title="Trusted by trading desks and liquidity providers" logos={logoList} />
+
+    <div id="telemetry">
+      <StatsSection stats={statsList} />
+    </div>
+
+    {#if interactiveSlot}
+      <div class="joy-landing-page__slot">
+        {@render interactiveSlot()}
+      </div>
+    {/if}
+
+    <div id="features" class="joy-landing-page__features">
+      <FeatureGrid columns={3}>
+        {#snippet children()}
+          <FeatureCard
+            title="Fast order matching"
+            description="Co-located matching engines process up to 2.4M orders a second with steady, predictable timing."
+            linkText="See the engine"
+            linkHref="#features"
+          >
+            {#snippet icon()}<Cpu size="1.5rem" />{/snippet}
+            {#snippet badge()}<Badge variant="brand" size="sm">FPGA-Core</Badge>{/snippet}
+          </FeatureCard>
+          <FeatureCard
+            title="Tested light and dark themes"
+            description="Light and dark themes keep text at WCAG 2.2 AA contrast on every component."
+            linkText="Browse tokens"
+            linkHref="#features"
+          >
+            {#snippet icon()}<Layers size="1.5rem" />{/snippet}
+            {#snippet badge()}<Badge variant="success" size="sm">WCAG AA</Badge>{/snippet}
+          </FeatureCard>
+          <FeatureCard
+            title="Tables that fit phones"
+            description="Wide market tables turn into clear stacked cards on small screens."
+            linkText="Try the demo"
+            linkHref="#features"
+          >
+            {#snippet icon()}<Smartphone size="1.5rem" />{/snippet}
+            {#snippet badge()}<Badge variant="warning" size="sm">Adaptive</Badge>{/snippet}
+          </FeatureCard>
+        {/snippet}
+      </FeatureGrid>
+    </div>
+
+    <div id="faq">
+      <FAQSection
+        title="Frequently asked questions"
+        subtitle="Answers on architecture, speed and security."
+        items={faqList}
+      />
+    </div>
+
+    <CTASection
+      title="Build fast, exact trading interfaces"
+      description="Get low-latency screens, dense financial tables and verified WCAG 2.2 contrast in one design system."
+      primaryCtaText="Deploy a node"
+      secondaryCtaText="Contact sales"
+      onprimaryclick={ondeployclick}
+      onsecondaryclick={ondocsclick}
+    />
+  </main>
 
   <SiteFooter
     brandTitle="Joymify Design"
-    brandDescription="Enterprise quantitative UI and design token architecture."
+    brandDescription="Design tokens and UI parts for trading products."
     columns={footerCols}
   />
 </div>

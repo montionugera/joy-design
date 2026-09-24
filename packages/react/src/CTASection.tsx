@@ -1,51 +1,51 @@
 import React from 'react';
+import { LandingAction } from './LandingAction.js';
 
-export interface CTASectionProps extends React.HTMLAttributes<HTMLElement> {
+export interface CTASectionProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
   title: string;
   description?: string;
   primaryCtaText?: string;
   secondaryCtaText?: string;
-  onPrimaryClick?: () => void;
-  onSecondaryClick?: () => void;
+  primaryHref?: string;
+  secondaryHref?: string;
+  primaryLoading?: boolean;
+  primaryDisabled?: boolean;
+  secondaryDisabled?: boolean;
+  onPrimaryClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  onSecondaryClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 export const CTASection = React.forwardRef<HTMLElement, CTASectionProps>(({
   title,
   description,
-  primaryCtaText = 'Get Started Today',
-  secondaryCtaText = 'Contact Sales',
+  primaryCtaText = 'Get started today',
+  secondaryCtaText = 'Contact sales',
+  primaryHref,
+  secondaryHref,
+  primaryLoading = false,
+  primaryDisabled = false,
+  secondaryDisabled = false,
   onPrimaryClick,
   onSecondaryClick,
   className = '',
   ...props
 }, ref) => {
+  const titleId = `joy-cta-title-${React.useId()}`;
   return (
-    <section ref={ref} className={`joy-cta-section ${className}`} {...props}>
+    <section ref={ref} className={`joy-cta-section ${className}`} aria-labelledby={props['aria-label'] ? undefined : titleId} {...props}>
       <div className="joy-cta-section__container">
-        <h2 className="joy-cta-section__title">{title}</h2>
+        <h2 className="joy-cta-section__title" id={titleId}>{title}</h2>
         {description && <p className="joy-cta-section__desc">{description}</p>}
         <div className="joy-cta-section__actions">
           {primaryCtaText && (
-            <button
-              type="button"
-              className="joy-button joy-button--solid joy-button--lg"
-              onClick={onPrimaryClick}
-            >
+            <LandingAction variant="solid" href={primaryHref} loading={primaryLoading} disabled={primaryDisabled} onClick={onPrimaryClick}>
               {primaryCtaText}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
+            </LandingAction>
           )}
           {secondaryCtaText && (
-            <button
-              type="button"
-              className="joy-button joy-button--glass joy-button--lg"
-              onClick={onSecondaryClick}
-            >
+            <LandingAction variant="outline" href={secondaryHref} disabled={secondaryDisabled} onClick={onSecondaryClick}>
               {secondaryCtaText}
-            </button>
+            </LandingAction>
           )}
         </div>
       </div>

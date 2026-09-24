@@ -187,18 +187,7 @@ const componentStyles = `
 .joy-button--link { background: none; border-color: transparent; color: var(--joy-text-link); padding-inline: 0; }
 .joy-button--link:hover:not(:disabled),
 .joy-button--link.joy-button--demo-hover:not(:disabled) { text-decoration: underline; text-underline-offset: 0.2em; }
-.joy-button--glass {
-  background: var(--joy-surface-raised);
-  border-color: var(--joy-border-subtle);
-  color: var(--joy-text-primary);
-  box-shadow: var(--joy-elevation-1);
-}
-.joy-button--glass:hover:not(:disabled) {
-  background: var(--joy-surface-raised);
-  border-color: var(--joy-border-default);
-  color: var(--joy-text-primary);
-  box-shadow: var(--joy-elevation-2);
-}
+.joy-button[aria-disabled="true"],
 .joy-button:disabled {
   background-color: var(--joy-surface-disabled);
   background-image: none;
@@ -208,6 +197,7 @@ const componentStyles = `
   transform: none;
   box-shadow: none;
 }
+.joy-button[aria-disabled="true"] { pointer-events: none; }
 
 /* Overlay primitive */
 .joy-overlay {
@@ -2504,37 +2494,47 @@ h1, h2, h3, .joy-display {
 .joy-bento-card {
   position: relative;
   border-radius: var(--joy-radius-card);
-  background-color: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
+  background-color: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
   padding: 24px;
   overflow: hidden;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.25s cubic-bezier(0.08, 0.82, 0.17, 1), box-shadow 0.25s, border-color 0.25s;
+  transition: transform var(--joy-duration-normal) var(--joy-ease-out), box-shadow var(--joy-duration-normal) var(--joy-ease-out), background-color var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-bento-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--joy-elevation-3);
-  border-color: var(--joy-border-default);
+  background-color: var(--joy-accent-subtle);
 }
+/* Every span 1..12 exists as both --col-N (what BentoCard emits) and --col-span-N (the documented alias). */
+.joy-bento-card--col-1, .joy-bento-card--col-span-1 { grid-column: span 1; }
+.joy-bento-card--col-2, .joy-bento-card--col-span-2 { grid-column: span 2; }
 .joy-bento-card--col-3, .joy-bento-card--col-span-3 { grid-column: span 3; }
 .joy-bento-card--col-4, .joy-bento-card--col-span-4 { grid-column: span 4; }
+.joy-bento-card--col-5, .joy-bento-card--col-span-5 { grid-column: span 5; }
 .joy-bento-card--col-6, .joy-bento-card--col-span-6 { grid-column: span 6; }
+.joy-bento-card--col-7, .joy-bento-card--col-span-7 { grid-column: span 7; }
 .joy-bento-card--col-8, .joy-bento-card--col-span-8 { grid-column: span 8; }
+.joy-bento-card--col-9, .joy-bento-card--col-span-9 { grid-column: span 9; }
+.joy-bento-card--col-10, .joy-bento-card--col-span-10 { grid-column: span 10; }
+.joy-bento-card--col-11, .joy-bento-card--col-span-11 { grid-column: span 11; }
 .joy-bento-card--col-12, .joy-bento-card--col-span-12 { grid-column: span 12; }
-.joy-bento-card--col-span-1 { grid-column: span 1; }
-.joy-bento-card--col-span-2 { grid-column: span 2; }
-.joy-bento-card--col-span-5 { grid-column: span 5; }
-.joy-bento-card--col-span-7 { grid-column: span 7; }
-.joy-bento-card--col-span-9 { grid-column: span 9; }
-.joy-bento-card--col-span-10 { grid-column: span 10; }
-.joy-bento-card--col-span-11 { grid-column: span 11; }
-@media (max-width: 900px) {
-  .joy-bento-card--col-3, .joy-bento-card--col-4, .joy-bento-card--col-6, .joy-bento-card--col-8,
-  .joy-bento-card--col-span-2, .joy-bento-card--col-span-3, .joy-bento-card--col-span-4,
-  .joy-bento-card--col-span-5, .joy-bento-card--col-span-6, .joy-bento-card--col-span-7,
-  .joy-bento-card--col-span-8, .joy-bento-card--col-span-9, .joy-bento-card--col-span-10 {
+/* Under 900px the 12-column grid is one column: every span except 12 (already full width) becomes full width. */
+@media (max-width: 899px) {
+  .joy-bento-card--col-1, .joy-bento-card--col-span-1,
+  .joy-bento-card--col-2, .joy-bento-card--col-span-2,
+  .joy-bento-card--col-3, .joy-bento-card--col-span-3,
+  .joy-bento-card--col-4, .joy-bento-card--col-span-4,
+  .joy-bento-card--col-5, .joy-bento-card--col-span-5,
+  .joy-bento-card--col-6, .joy-bento-card--col-span-6,
+  .joy-bento-card--col-7, .joy-bento-card--col-span-7,
+  .joy-bento-card--col-8, .joy-bento-card--col-span-8,
+  .joy-bento-card--col-9, .joy-bento-card--col-span-9,
+  .joy-bento-card--col-10, .joy-bento-card--col-span-10,
+  .joy-bento-card--col-11, .joy-bento-card--col-span-11 {
     grid-column: span 12;
   }
 }
@@ -2544,27 +2544,31 @@ h1, h2, h3, .joy-display {
   gap: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   margin-bottom: 12px;
 }
 .joy-bento-card__title {
-  font-size: 1.125rem;
+  font-size: var(--joy-font-size-xl);
   font-weight: 700;
-  letter-spacing: -0.015em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin: 0 0 8px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-bento-card__desc {
   font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   line-height: 1.5;
   margin: 0 0 16px 0;
 }
+/* Content (usually a chip row) starts where the card text starts and sits at the bottom of the card, so chips do not float mid-card. */
 .joy-bento-card__content {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 /* Hero Section */
@@ -2580,24 +2584,26 @@ h1, h2, h3, .joy-display {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  border-radius: 9999px;
+  border-radius: var(--joy-radius-pill);
   background-color: var(--joy-accent-subtle);
-  border: 1px solid var(--joy-accent-default);
-  color: var(--joy-accent-default);
+  border: 1px solid var(--joy-border-default);
+  color: var(--joy-accent-text);
   font-size: 0.8125rem;
   font-weight: 600;
   margin-bottom: 24px;
 }
 .joy-hero__title {
-  font-size: 2.75rem;
+  font-size: var(--joy-font-size-display-md);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.15;
   color: var(--joy-text-primary);
   margin: 0 0 20px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
-.joy-hero__title-gradient {
-  color: var(--joy-text-primary);
+.joy-hero__title-emphasis {
+  color: var(--joy-accent-text);
 }
 .joy-hero__subtitle {
   font-size: 1.125rem;
@@ -2614,12 +2620,28 @@ h1, h2, h3, .joy-display {
   flex-wrap: wrap;
   margin-bottom: 36px;
 }
+/* With nothing below the actions (no preview) the hero padding is the only gap to the next section: 36px of margin on top of it left ~110px of dead space. */
+.joy-hero__ctas:last-child {
+  margin-bottom: 0;
+}
+.joy-hero .joy-button--solid:hover:not(:disabled),
+.joy-cta-section .joy-button--solid:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+/* The shared pressed fill (--joy-accent-hover) is 4.20:1 under the label in light. In the landing containers the pressed fill is the
+   gradient end stop instead (4.75:1 light, 7.18:1 dark); the inset pressed shadow (from the shared rule) still reads as "pushed in". */
+.joy-hero .joy-button--solid:active:not(:disabled),
+.joy-cta-section .joy-button--solid:active:not(:disabled),
+.joy-pricing-card .joy-button--solid:active:not(:disabled) {
+  transform: none;
+  background-color: var(--joy-accent-gradient-end);
+}
 .joy-hero .joy-button--outline,
+.joy-hero__secondary-cta,
 .kinetic-overlay .joy-button--outline {
   background: var(--joy-surface-raised);
-  border-color: var(--joy-border-default);
+  border-color: var(--joy-border-strong);
   color: var(--joy-text-primary);
-  
 }
 .joy-hero .joy-button--outline:hover:not(:disabled),
 .kinetic-overlay .joy-button--outline:hover:not(:disabled) {
@@ -2636,30 +2658,102 @@ h1, h2, h3, .joy-display {
   padding: 16px;
   overflow: hidden;
 }
+@media (max-width: 479px) {
+  .joy-hero__ctas,
+  .joy-cta-section__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .joy-hero__ctas .joy-button,
+  .joy-cta-section__actions .joy-button {
+    width: 100%;
+  }
+}
 
 /* Pricing Matrix */
 .joy-pricing-matrix {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
 }
+/* Plan cards wrap by the width they have and grow to fill their row, so a card never sits alone next to an empty cell:
+   16rem basis means one column below ~34rem, three across from ~51rem, and a short last row stretches. Four cards use a
+   wider basis so they read as 2 by 2 instead of 3 + 1. No viewport query and no container: it holds in a narrow frame. */
+.joy-pricing-matrix:not(.joy-pricing-matrix--table) > * {
+  box-sizing: border-box;
+  flex: 1 1 min(100%, 16rem);
+  min-width: 0;
+}
+.joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(4):last-child) > * {
+  flex-basis: min(100%, 24rem);
+}
+/* Data variant (columns + rows): a real table inside a scroll region, not the card grid. */
+.joy-pricing-matrix--table {
+  display: block;
+}
+.joy-pricing-matrix__scroll {
+  overflow-x: auto;
+  isolation: isolate;
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  background: var(--joy-surface-card);
+}
+.joy-pricing-matrix__scroll:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+/* Sticky, scrolling and the opaque first column come from .joy-table--scroll (Wave 3); these rules add the
+   centred value columns, row headers that stay opaque, and a direction-aware sticky offset. */
+.joy-pricing-matrix__table td,
+.joy-pricing-matrix__table thead th {
+  text-align: center;
+}
+.joy-pricing-matrix__table th:first-child {
+  text-align: start;
+  left: auto;
+  inset-inline-start: 0;
+  /* Cap the pinned column so a long row label wraps instead of taking most of a 375px scroller. */
+  box-sizing: border-box;
+  max-inline-size: min(40vw, 14rem);
+  overflow-wrap: anywhere;
+}
+.joy-pricing-matrix__table tbody th {
+  background: var(--joy-surface-card);
+  font-weight: 500;
+  border-bottom: 1px solid var(--joy-border-subtle);
+}
+.joy-pricing-matrix__table tbody tr:last-child th {
+  border-bottom: none;
+}
+.joy-pricing-matrix__table tbody tr:hover th:first-child {
+  background-color: var(--joy-accent-subtle);
+}
+.joy-pricing-matrix__mark {
+  display: inline-flex;
+  vertical-align: middle;
+}
+.joy-pricing-matrix__mark--yes {
+  color: var(--joy-status-success-fg);
+}
+.joy-pricing-matrix__mark--no {
+  color: var(--joy-text-secondary);
+}
 .joy-pricing-card {
   position: relative;
   border-radius: var(--joy-radius-card);
-  background-color: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
+  background-color: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  transition: all 0.25s cubic-bezier(0.08, 0.82, 0.17, 1);
+  transition: box-shadow var(--joy-duration-normal) var(--joy-ease-out), border-color var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-pricing-card--featured {
   border-color: var(--joy-accent-default);
-  box-shadow: var(--joy-elevation-3);
-  transform: scale(1.02);
+  box-shadow: var(--joy-elevation-2);
 }
 .joy-pricing-card__badge {
   position: absolute;
@@ -2667,40 +2761,45 @@ h1, h2, h3, .joy-display {
   left: 50%;
   transform: translateX(-50%);
   padding: 4px 12px;
-  border-radius: 9999px;
-  background: var(--joy-accent-default);
-  color: var(--joy-text-on-accent);
-  color: var(--joy-text-inverse);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  border-radius: var(--joy-radius-pill);
+  border: 1px solid var(--joy-border-default);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
 }
 .joy-pricing-card__title {
-  font-size: 1.25rem;
+  font-size: var(--joy-font-size-xl);
   font-weight: 700;
   margin: 0 0 8px 0;
   color: var(--joy-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-pricing-card__desc {
-  font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   margin: 0 0 20px 0;
 }
 .joy-pricing-card__price {
-  font-size: 2.25rem;
-  font-weight: 800;
+  font-size: var(--joy-font-size-display-sm);
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin-bottom: 24px;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 4px;
+  overflow-wrap: anywhere;
 }
 .joy-pricing-card__period {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 500;
-  color: var(--joy-text-muted);
+  letter-spacing: normal;
+  color: var(--joy-text-secondary);
 }
 .joy-pricing-card__features {
   list-style: none;
@@ -2713,21 +2812,33 @@ h1, h2, h3, .joy-display {
 }
 .joy-pricing-card__feature {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
+}
+.joy-pricing-card__check {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--joy-status-success-fg);
+}
+.joy-pricing-card__cta {
+  margin-top: auto;
+  min-height: max(44px, var(--joy-control-height-md));
 }
 
 /* Testimonial Card */
 .joy-testimonial-card {
+  box-sizing: border-box;
   border-radius: var(--joy-radius-card);
-  background-color: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
+  background-color: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
   box-shadow: var(--joy-elevation-2);
 }
 .joy-testimonial-card__stars {
@@ -2736,27 +2847,40 @@ h1, h2, h3, .joy-display {
   color: var(--joy-status-warning-fg);
 }
 .joy-testimonial-card__quote {
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  font-size: var(--joy-font-size-md);
+  line-height: 1.6;
   color: var(--joy-text-primary);
   font-style: italic;
   margin: 0;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 .joy-testimonial-card__author {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+/* The initials fallback is a quiet accent disc: accent-subtle with accent-text, in both themes. */
+.joy-testimonial-card .joy-avatar {
+  flex-shrink: 0;
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+}
+.joy-testimonial-card__author-info {
+  min-width: 0;
+}
 .joy-testimonial-card__author-info h6 {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 600;
   color: var(--joy-text-primary);
+  overflow-wrap: anywhere;
 }
 .joy-testimonial-card__author-info p {
   margin: 0;
-  font-size: 0.75rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
 }
 
 /* Steps (Ant Design Parity) */
@@ -4668,75 +4792,134 @@ h1, h2, h3, .joy-display {
   margin: 0 auto;
 }
 .joy-feature-grid--cols-2 {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
 }
 .joy-feature-grid--cols-3 {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 }
 .joy-feature-grid--cols-4 {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+/* Lead layout (default; layout="uniform" opts out). From 900px the grid is 3 columns and the first card leads by
+   spanning 2. The last row must never leave an empty cell, so the final card gets an explicit span by card count,
+   written generally so it holds for any number of cards:
+     :first-child                          span 2   (the lead card; card 2 fills its row)
+     :nth-child(3n):last-child             span 3   (3, 6, 9, 12 cards: the last card is a full row)
+     :nth-child(3n+1):last-child           span 2   (4, 7, 10 cards: the last row is 1 + 2)
+     :first-child:last-child               span 3   (1 card; declared last so it beats the 3n+1 rule)
+   5, 8 and 11 cards need no extra rule (the last row is 1 + 1 + 1). Under 900px it is one column, and the columns
+   prop only applies to layout="uniform". The lead card's title steps up to the display scale (it is 2 columns wide, so
+   it does not break mid-word); every other card title stays on the card scale. */
+@media (min-width: 900px) {
+  .joy-feature-grid--lead {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .joy-feature-grid--lead > :first-child {
+    grid-column: span 2;
+  }
+  .joy-feature-grid--lead > :nth-child(3n):last-child {
+    grid-column: span 3;
+  }
+  .joy-feature-grid--lead > :nth-child(3n+1):last-child {
+    grid-column: span 2;
+  }
+  .joy-feature-grid--lead > :first-child:last-child {
+    grid-column: span 3;
+  }
+  .joy-feature-grid--lead > :first-child .joy-feature-card__title {
+    font-size: var(--joy-font-size-display-sm);
+  }
+}
+@media (max-width: 899px) {
+  .joy-feature-grid--lead {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .joy-feature-card {
   position: relative;
-  background-color: var(--joy-surface-card);
+  background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
   padding: 28px 24px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition: transform var(--joy-duration-normal) var(--joy-ease-out), box-shadow var(--joy-duration-normal) var(--joy-ease-out), border-color var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-feature-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--joy-elevation-2);
-  border-color: var(--joy-accent-default);
+  border-color: var(--joy-accent-text);
 }
 .joy-feature-card__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--joy-radius-control);
-  background: var(--joy-accent-subtle);
-  color: var(--joy-accent-default);
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
 }
+.joy-feature-card__icon svg {
+  width: 20px;
+  height: 20px;
+}
+/* In normal flow above the icon and title: an absolutely positioned badge covered wrapped titles. */
 .joy-feature-card__badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  align-self: flex-start;
+  margin-bottom: 16px;
 }
 .joy-feature-card__title {
-  font-size: 1.125rem;
+  font-size: var(--joy-font-size-2xl);
   font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin: 0 0 10px 0;
-  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-feature-card__desc {
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--joy-text-muted);
-  margin: 0 0 16px 0;
+  color: var(--joy-text-secondary);
+  margin: 0 0 12px 0;
   flex: 1;
 }
+/* Anchor or button (a handler with no href renders a button): same look, 44px touch height, no trailing arrow. */
 .joy-feature-card__link {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--joy-accent-default);
+  color: var(--joy-text-link);
   text-decoration: none;
-  transition: gap 0.15s ease;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 .joy-feature-card__link:hover {
-  gap: 10px;
+  text-decoration: underline;
+}
+.joy-feature-card__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
 }
 
 /* ── Landing Page Suite: LogoCloud ── */
 .joy-logo-cloud {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -4744,11 +4927,12 @@ h1, h2, h3, .joy-display {
   text-align: center;
 }
 .joy-logo-cloud__title {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 600;
-  
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
   margin: 0 0 28px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-logo-cloud__logos {
   display: flex;
@@ -4757,72 +4941,131 @@ h1, h2, h3, .joy-display {
   flex-wrap: wrap;
   gap: 36px 48px;
 }
+/* Logos draw in currentColor: muted on the canvas, ink on hover. Colour logos (images) are greyed until hovered. */
 .joy-logo-cloud__item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.65;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  max-width: 100%;
+  color: var(--joy-text-muted);
   filter: grayscale(100%);
-  color: var(--joy-text-primary);
+  transition: color var(--joy-duration-fast) var(--joy-ease-out), filter var(--joy-duration-fast) var(--joy-ease-out);
   text-decoration: none;
 }
-.joy-logo-cloud__item:hover {
-  opacity: 1;
+.joy-logo-cloud__item svg,
+.joy-logo-cloud__item img {
+  max-width: 100%;
+  height: auto;
+}
+a.joy-logo-cloud__item {
+  min-width: 44px;
+  min-height: 44px;
+}
+a.joy-logo-cloud__item:hover {
+  color: var(--joy-text-primary);
   filter: grayscale(0%);
-  transform: scale(1.04);
+}
+a.joy-logo-cloud__item:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 4px;
+  border-radius: var(--joy-radius-control);
+}
+@media (max-width: 479px) {
+  .joy-logo-cloud {
+    padding: 32px 16px;
+  }
+  .joy-logo-cloud__logos {
+    gap: 24px 28px;
+  }
 }
 
 /* ── Landing Page Suite: StatsSection ── */
 .joy-stats-section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 48px 24px;
+  /* Columns AND type follow the width the section really gets (a hub frame or a sidebar layout is narrower than the
+     window), so every step below is a container query, never a media query. Inline-size containment would collapse the
+     section to its padding inside a shrink-to-fit parent (a flex item or inline-block without a width), so it also
+     declares the natural inline size it takes there. */
+  container-type: inline-size;
+  container-name: joy-stats;
+  contain-intrinsic-inline-size: 20rem;
 }
+/* Compact by default: two columns of small cards, and an odd last card takes the whole row, so no width leaves a card
+   alone beside an empty cell. The steps further down widen the grid only when every column can hold a 9 character mono
+   value ("1,204,551", "14 Chains") on one line at the type size of that step. */
 .joy-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.joy-stats-grid > .joy-stat-item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 .joy-stat-item {
-  background-color: var(--joy-surface-card);
+  box-sizing: border-box;
+  background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
-  padding: 24px 20px;
+  padding: 16px 12px;
+  min-width: 0;
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 .joy-stat-item__value {
   font-family: var(--joy-font-family-mono);
-  font-size: 2.25rem;
-  font-weight: 800;
+  font-size: var(--joy-font-size-xl);
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  color: var(--joy-accent-default);
+  color: var(--joy-accent-text);
   margin-bottom: 8px;
+  /* A value that fits its cell is never split (the container steps size a 9 character number to fit). anywhere only
+     breaks a token that cannot fit at all, so an extreme value stays inside its cell instead of pushing the page
+     sideways; the cell is min-width: 0 so the grid track can shrink to it. */
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__label {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 600;
   color: var(--joy-text-primary);
   margin-bottom: 4px;
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__desc {
-  font-size: 0.8125rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 .joy-stat-item__change {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.75rem;
+  font-size: var(--joy-font-size-xs);
   font-weight: 700;
   margin-top: 8px;
   padding: 2px 8px;
-  border-radius: 9999px;
+  border-radius: var(--joy-radius-pill);
+  /* A metric claim is never cut off: a change that does not fit on one line wraps inside the pill (balanced, two lines by
+     design; the default copy is short) instead of being ellipsized, and the pill never grows past its card. */
+  white-space: normal;
+  text-wrap: balance;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.joy-stat-item__change-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* The trend caret is sized from the pill's own type step (1em of --joy-font-size-xs), so it scales with it. */
+.joy-stat-item__change svg {
+  flex: none;
+  width: 1em;
+  height: 1em;
 }
 .joy-stat-item__change--positive {
   background: var(--joy-status-success-bg);
@@ -4832,9 +5075,99 @@ h1, h2, h3, .joy-display {
   background: var(--joy-status-danger-bg);
   color: var(--joy-status-danger-fg);
 }
+/* The arrow carries the trend visually; this says it in words for assistive tech. */
+.joy-stat-item__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+/* Phones: the section itself is padded tighter (a media query is right for the section's own padding). */
+@media (max-width: 479px) {
+  .joy-stats-section {
+    padding: 32px 16px;
+  }
+}
+/* Type and padding follow the container. 9 mono characters are ~5.4em wide: xl (23px, ~124px) fits a 150px cell, so
+   containers narrower than ~312px step to lg, and narrower than ~272px to md. */
+@container joy-stats (width < 19.5rem) {
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-lg);
+  }
+  .joy-stat-item__change {
+    gap: 2px;
+    padding: 2px 6px;
+  }
+}
+@container joy-stats (width < 17rem) {
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-md);
+  }
+}
+/* Under 15rem two columns leave cards below ~115px, where descriptions break into four short lines: one column is the
+   honest layout. Measured: a 320px phone still gets two columns of 123px or more (both hub views), so this step only
+   applies to boxes narrower than a phone (a sidebar, an embedded frame). */
+@container joy-stats (width < 15rem) {
+  .joy-stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Wider containers, by how many stats there are. From 30rem the cards get roomy (3xl values). 3 and 6 stats make three
+   columns from 45rem, 4 make four from 60rem, 5 make five from 69rem (each column then holds a 9 character 3xl value
+   on one line); every other count keeps two columns (an odd last card spans) so no row is ever short. */
+@container joy-stats (min-width: 30rem) {
+  .joy-stats-grid {
+    gap: 24px;
+  }
+  .joy-stat-item {
+    padding: 24px 20px;
+  }
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-3xl);
+  }
+}
+@container joy-stats (min-width: 45rem) {
+  .joy-stats-grid:has(> :nth-child(3):last-child),
+  .joy-stats-grid:has(> :nth-child(6):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .joy-stats-grid:has(> :nth-child(3):last-child) > .joy-stat-item:last-child {
+    grid-column: auto;
+  }
+  .joy-stats-grid:has(> :nth-child(7)) {
+    grid-template-columns: repeat(auto-fit, minmax(min(224px, 100%), 1fr));
+  }
+  .joy-stats-grid:has(> :nth-child(7)) > .joy-stat-item:last-child {
+    grid-column: auto;
+  }
+}
+@container joy-stats (min-width: 60rem) {
+  .joy-stats-grid:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@container joy-stats (min-width: 69rem) {
+  .joy-stats-grid:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .joy-stats-grid:has(> :nth-child(5):last-child) > .joy-stat-item:last-child {
+    grid-column: auto;
+  }
+  .joy-stats-grid:has(> :nth-child(5):last-child) > .joy-stat-item {
+    padding-inline: 12px;
+  }
+}
 
 /* ── Landing Page Suite: CTASection ── */
 .joy-cta-section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -4842,18 +5175,25 @@ h1, h2, h3, .joy-display {
 }
 .joy-cta-section__container {
   position: relative;
-  background: var(--joy-surface-inverse);
-  border: 1px solid var(--joy-border-default);
+  text-align: center;
+  /* A raised panel in both themes (white on the cream page, lifted navy on the dark page), never the inverse surface:
+     that token is navy in light but CREAM in dark, which made the band the brightest slab of the dark page. There is no
+     colour-scheme on the theme, so a two-value colour function is not available and the band is one token-driven treatment. */
+  background: var(--joy-surface-raised);
+  background-image: radial-gradient(ellipse 70% 90% at 50% 0%, var(--joy-accent-subtle), var(--joy-surface-raised));
+  border: 1px solid var(--joy-border-strong);
   border-radius: var(--joy-radius-overlay);
   padding: 64px 32px;
   box-shadow: var(--joy-elevation-3);
 }
 .joy-cta-section__title {
-  font-size: 2.25rem;
+  font-size: var(--joy-font-size-display-sm);
   font-weight: 800;
   color: var(--joy-text-primary);
   margin: 0 0 16px 0;
   line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-cta-section__desc {
   font-size: 1.125rem;
@@ -4869,9 +5209,82 @@ h1, h2, h3, .joy-display {
   gap: 16px;
   flex-wrap: wrap;
 }
+.joy-cta-section__container .joy-button--outline {
+  background: transparent;
+  border-color: var(--joy-border-strong);
+  color: var(--joy-text-primary);
+}
+.joy-cta-section__container .joy-button--solid {
+  border-color: var(--joy-text-on-accent);
+}
+.joy-cta-section__container .joy-button--outline:hover:not(:disabled),
+.joy-cta-section__container .joy-button--outline:active:not(:disabled) {
+  background: transparent;
+}
+.joy-cta-section__container .joy-button--outline:hover:not(:disabled):not(:focus-visible),
+.joy-cta-section__container .joy-button--outline:active:not(:disabled):not(:focus-visible) {
+  box-shadow: inset 0 0 0 1px var(--joy-border-strong);
+}
+@media (max-width: 479px) {
+  .joy-cta-section {
+    padding: 32px 16px;
+  }
+  .joy-cta-section__container {
+    padding: 40px 20px;
+  }
+}
+
+/* ── Landing containers: busy and unavailable buttons ── */
+/* Scoped to the hero, the CTA band and the pricing card: the shared .joy-button rules are untouched. A disabled button is an
+   outline-weight chip (never a solid fill heavier than a live button) and always keeps a visible 1px border so its shape
+   survives on a dark page. A busy button is also disabled to the browser, but it keeps its variant identity (gold gradient,
+   outline border) so "working" never reads as "unavailable". */
+.joy-hero .joy-button:disabled,
+.joy-hero .joy-button[aria-disabled="true"] {
+  background: var(--joy-surface-disabled);
+  border-color: var(--joy-border-default);
+  color: var(--joy-text-disabled);
+  box-shadow: none;
+}
+.joy-cta-section .joy-button:disabled,
+.joy-cta-section .joy-button[aria-disabled="true"],
+.joy-pricing-card .joy-button:disabled,
+.joy-pricing-card .joy-button[aria-disabled="true"] {
+  background: transparent;
+  border-color: var(--joy-border-default);
+  color: var(--joy-text-disabled);
+  box-shadow: none;
+}
+.joy-hero .joy-button--solid.joy-button--loading,
+.joy-cta-section .joy-button--solid.joy-button--loading,
+.joy-pricing-card .joy-button--solid.joy-button--loading {
+  background-color: var(--joy-accent-default);
+  background-image: linear-gradient(180deg, var(--joy-accent-default), var(--joy-accent-gradient-end));
+  border-color: var(--joy-accent-gradient-end);
+  color: var(--joy-text-on-accent);
+  box-shadow: inset 0 1px 0 var(--joy-accent-highlight), var(--joy-elevation-accent-1);
+  cursor: progress;
+}
+.joy-cta-section__container .joy-button--solid.joy-button--loading {
+  border-color: var(--joy-text-on-accent);
+}
+.joy-hero .joy-button--outline.joy-button--loading {
+  background: var(--joy-surface-raised);
+  border-color: var(--joy-border-strong);
+  color: var(--joy-text-primary);
+  cursor: progress;
+}
+.joy-cta-section .joy-button--outline.joy-button--loading,
+.joy-pricing-card .joy-button--outline.joy-button--loading {
+  background: transparent;
+  border-color: var(--joy-border-strong);
+  color: var(--joy-text-primary);
+  cursor: progress;
+}
 
 /* ── Landing Page Suite: FAQSection ── */
 .joy-faq-section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 840px;
   margin: 0 auto;
@@ -4882,15 +5295,20 @@ h1, h2, h3, .joy-display {
   margin-bottom: 36px;
 }
 .joy-faq-section__title {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: var(--joy-font-size-display-sm);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin: 0 0 12px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-faq-section__subtitle {
-  font-size: 1rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-md);
+  color: var(--joy-text-secondary);
   margin: 0;
+  text-wrap: pretty;
 }
 .joy-faq-list {
   display: flex;
@@ -4900,16 +5318,19 @@ h1, h2, h3, .joy-display {
 .joy-faq-item {
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-control);
-  background-color: var(--joy-surface-card);
+  background-color: var(--joy-surface-raised);
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-faq-item--open {
-  border-color: var(--joy-accent-default);
+  border-color: var(--joy-border-strong);
 }
+/* A real button: 44px tall, ink text; hover only tints the row (gold text on a light card fails contrast). */
 .joy-faq-item__trigger {
+  box-sizing: border-box;
   width: 100%;
-  padding: 18px 20px;
+  min-height: 44px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4918,67 +5339,100 @@ h1, h2, h3, .joy-display {
   border: none;
   cursor: pointer;
   text-align: left;
-  font-size: 1.0625rem;
+  font: inherit;
+  font-size: var(--joy-font-size-md);
   font-weight: 600;
+  line-height: 1.4;
   color: var(--joy-text-primary);
-  transition: color 0.15s ease;
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-faq-item__trigger:hover {
-  color: var(--joy-accent-default);
+  background-color: var(--joy-accent-subtle);
+}
+.joy-faq-item__trigger:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+.joy-faq-item__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 .joy-faq-item__icon {
+  display: inline-flex;
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--joy-accent-default);
+  transition: transform var(--joy-duration-normal) var(--joy-ease-out);
+  color: var(--joy-accent-text);
 }
 .joy-faq-item--open .joy-faq-item__icon {
   transform: rotate(180deg);
 }
 .joy-faq-item__content {
-  padding: 0 20px 20px 20px;
-  font-size: 0.9375rem;
+  padding: 4px 20px 20px 20px;
+  font-size: var(--joy-font-size-md);
   line-height: 1.65;
-  color: var(--joy-text-muted);
+  color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 479px) {
+  .joy-faq-section {
+    padding: 32px 16px;
+  }
 }
 
 /* ── Landing Page Suite: SiteFooter ── */
 .joy-site-footer {
+  box-sizing: border-box;
   width: 100%;
   background-color: var(--joy-surface-card);
   border-top: 1px solid var(--joy-border-default);
   padding: 64px 24px 32px 24px;
+  color: var(--joy-text-secondary);
 }
 .joy-site-footer__inner {
   max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 2fr repeat(auto-fit, minmax(160px, 1fr));
+  /* Flex, not an auto-fit grid: growing items always fill their row, so 2 to 5 link columns never leave an empty cell (an auto-fit track count next to a fixed brand span did). */
+  display: flex;
+  flex-wrap: wrap;
   gap: 48px 32px;
 }
+.joy-site-footer__brand {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.joy-site-footer__column {
+  flex: 1 1 0;
+  min-width: 100px;
+}
 .joy-site-footer__brand-title {
-  font-size: 1.25rem;
+  font-size: var(--joy-font-size-xl);
   font-weight: 800;
   color: var(--joy-text-primary);
   margin: 0 0 12px 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  overflow-wrap: anywhere;
 }
 .joy-site-footer__brand-desc {
-  font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   line-height: 1.6;
   max-width: 320px;
   margin: 0 0 20px 0;
+  overflow-wrap: anywhere;
 }
 .joy-site-footer__col-title {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 700;
-  
   color: var(--joy-text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-site-footer__links {
   list-style: none;
@@ -4986,16 +5440,26 @@ h1, h2, h3, .joy-display {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 .joy-site-footer__link {
-  font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   text-decoration: none;
-  transition: color 0.15s ease;
+  overflow-wrap: anywhere;
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-site-footer__link:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-text-primary);
+  text-decoration: underline;
+}
+.joy-site-footer__link:focus-visible,
+.joy-site-footer__social-link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
 }
 .joy-site-footer__bottom {
   max-width: 1200px;
@@ -5007,21 +5471,217 @@ h1, h2, h3, .joy-display {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
-  font-size: 0.8125rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
 }
 .joy-site-footer__socials {
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 .joy-site-footer__social-link {
-  color: var(--joy-text-muted);
-  transition: color 0.15s ease;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  font-size: var(--joy-font-size-sm);
+  text-decoration: none;
+  box-sizing: border-box;
+  color: var(--joy-text-secondary);
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-site-footer__social-link:hover {
-  color: var(--joy-accent-default);
+  color: var(--joy-text-primary);
+}
+@media (min-width: 1024px) {
+  .joy-site-footer__brand {
+    flex: 2 1 0;
+    min-width: 240px;
+  }
+}
+@media (max-width: 767px) {
+  .joy-site-footer {
+    padding: 48px 16px 24px 16px;
+  }
+  .joy-site-footer__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  /* 480 to 767px: the link groups pair up in two columns (one long single column was ~600px tall). The brand keeps its own
+     row and a last group that would sit alone in a row takes the whole row, so no width leaves an empty cell. */
+  .joy-site-footer__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .joy-site-footer__brand,
+  .joy-site-footer__column:last-child:nth-child(even) {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 639px) {
+  .joy-site-footer__bottom {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    margin-top: 32px;
+  }
+}
+
+/* ── Landing Page Suite: LandingPage ── */
+.joy-landing-page {
+  position: relative;
+  /* The page paints its own surface and text colour, so it is legible on a bare page (no consumer body style). */
+  background-color: var(--joy-surface-canvas);
+  color: var(--joy-text-primary);
+  /* Belt and braces only: the composed page has no horizontal overflow without it (probed with no reset, guard off); a stray wide child must never scroll the page sideways. */
+  overflow-x: clip;
+}
+.joy-landing-page > main:focus {
+  /* The skip-link target is focused programmatically (tabindex -1), never by Tab: no ring around the whole landmark. */
+  outline: none;
+}
+.joy-landing-page__slot,
+.joy-landing-page__features {
+  max-width: 1200px;
+  margin: 0 auto 48px auto;
+  padding: 0 24px;
+}
+.joy-landing-skip {
+  /* Fixed to the viewport, not the page root, so a page embedded below other content never shows it through. */
+  position: fixed;
+  top: var(--joy-space-2);
+  left: var(--joy-space-2);
+  z-index: var(--joy-z-sticky);
+  padding: var(--joy-space-2) var(--joy-space-4);
+  border-radius: var(--joy-radius-control);
+  background-color: var(--joy-surface-inverse);
+  color: var(--joy-text-inverse);
+  font-size: var(--joy-font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.joy-landing-skip:focus-visible {
+  transform: none;
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+}
+.joy-landing-header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--joy-space-4);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--joy-space-4) var(--joy-space-6);
+}
+.joy-landing-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-2);
+  min-width: 0;
+  font-size: var(--joy-font-size-xl);
+  font-weight: 800;
+  color: var(--joy-text-primary);
+  overflow-wrap: anywhere;
+}
+.joy-landing-header__brand > svg {
+  flex-shrink: 0;
+  color: var(--joy-accent-text);
+}
+.joy-landing-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-5);
+}
+.joy-landing-header__link,
+.joy-landing-drawer__link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--joy-font-size-sm);
+  font-weight: 600;
+  color: var(--joy-text-secondary);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-landing-header__link:hover,
+.joy-landing-drawer__link:hover {
+  color: var(--joy-text-primary);
+  text-decoration: underline;
+}
+.joy-landing-header__link:focus-visible,
+.joy-landing-drawer__link:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--joy-radius-control);
+}
+.joy-landing-header .joy-landing-header__menu {
+  /* Two classes, so the base .joy-button display never wins over the desktop hide. */
+  display: none;
+  /* .joy-button--icon-only has no width without a size class, and the medium control is 40px on fine pointers. */
+  min-width: 44px;
+  min-height: 44px;
+}
+.joy-landing-drawer__nav {
+  display: flex;
+  flex-direction: column;
+}
+.joy-landing-drawer__link {
+  font-size: var(--joy-font-size-lg);
+  color: var(--joy-text-primary);
+}
+@media (max-width: 767px) {
+  .joy-landing-header {
+    padding: var(--joy-space-3) var(--joy-space-4);
+  }
+  .joy-landing-header__nav {
+    display: none;
+  }
+  .joy-landing-header .joy-landing-header__menu {
+    display: inline-flex;
+  }
+}
+
+/* ── Landing sections: section heading and pricing layout ── */
+.joy-landing-page__section-header {
+  box-sizing: border-box;
+  max-width: 840px;
+  margin: 0 auto 36px auto;
+  text-align: center;
+}
+.joy-landing-page__section-title {
+  font-size: var(--joy-font-size-display-sm);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--joy-text-primary);
+  margin: 0 0 12px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.joy-landing-page__section-subtitle {
+  font-size: var(--joy-font-size-md);
+  color: var(--joy-text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+}
+.joy-landing-page__pricing {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto 48px auto;
+  padding: 0 24px;
+}
+.joy-landing-page__pricing > .joy-pricing-matrix + .joy-pricing-matrix {
+  margin-top: 32px;
 }
 
 `;
