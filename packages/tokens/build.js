@@ -5630,6 +5630,76 @@ a.joy-logo-cloud__item:focus-visible {
   }
 }
 
+/* ── Landing sections: section heading and pricing layout ── */
+.joy-landing-page__section-header {
+  box-sizing: border-box;
+  max-width: 840px;
+  margin: 0 auto 36px auto;
+  text-align: center;
+}
+.joy-landing-page__section-title {
+  font-size: var(--joy-font-size-display-sm);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--joy-text-primary);
+  margin: 0 0 12px 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.joy-landing-page__section-subtitle {
+  font-size: var(--joy-font-size-md);
+  color: var(--joy-text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+}
+.joy-landing-page__pricing {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto 48px auto;
+  padding: 0 24px;
+}
+.joy-landing-page__pricing > .joy-pricing-matrix + .joy-pricing-matrix {
+  margin-top: 32px;
+}
+  /* Plan cards never leave an empty cell: the columns follow the width of the section (not the window, a frame or a sidebar
+     can be narrower) and the card count. One column by default, two from 32rem with an odd last card taking its row, and
+     three from 50rem when there are exactly three cards. Designed for one to four cards; more fall back to auto-fit.
+     (Indented on purpose: the CSS tests end a block at the next comment that starts a line.) */
+.joy-landing-page__pricing,
+.joy-pricing-fit {
+  container-type: inline-size;
+  container-name: joy-pricing;
+}
+.joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table),
+.joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) {
+  grid-template-columns: minmax(0, 1fr);
+}
+@container joy-pricing (min-width: 32rem) {
+  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table),
+  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :last-child:nth-child(odd):not(:only-child),
+  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :last-child:nth-child(odd):not(:only-child) {
+    grid-column: 1 / -1;
+  }
+  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(5)),
+  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(5)) {
+    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  }
+}
+@container joy-pricing (min-width: 50rem) {
+  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child),
+  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :nth-child(3):last-child,
+  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :nth-child(3):last-child {
+    grid-column: auto;
+  }
+}
+
 `;
 
 const canonicalVars = [

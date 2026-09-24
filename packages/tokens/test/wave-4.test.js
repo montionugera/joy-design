@@ -1061,3 +1061,23 @@ test('F-039 L5b fix CSS: the page root paints canvas surface and primary text, a
   assert.match(rule(pageBlock, '.joy-landing-skip'), /position:\s*fixed/);
   assert.match(rule(pageBlock, '.joy-landing-page > main:focus'), /outline:\s*none/);
 });
+
+// ── F-039 T2: landing section heading and pricing layout ──
+const sectionsBlock = blockToNextHeader('/* ── Landing sections: section heading and pricing layout ── */');
+
+test('F-039 T2 CSS: the section heading uses the display scale like the FAQ title, on tokens only', () => {
+  assert.match(rule(sectionsBlock, '.joy-landing-page__section-title'), /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(rule(sectionsBlock, '.joy-landing-page__section-subtitle'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.ok(!/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(|var\([^)]*,/i.test(sectionsBlock), 'no colour literal and no var() fallback');
+  for (const token of ['--joy-text-primary', '--joy-text-secondary']) assert.ok(tokenMaps.light[token] !== undefined && tokenMaps.dark[token] !== undefined, `${token} has both themes`);
+});
+
+test('F-039 T2 CSS: plan cards follow the section width by card count (container query), one column by default', () => {
+  assert.match(sectionsBlock, /container-type:\s*inline-size/);
+  assert.match(sectionsBlock, /@container joy-pricing \(min-width: 32rem\)/);
+  assert.match(sectionsBlock, /@container joy-pricing \(min-width: 50rem\)/);
+  assert.match(sectionsBlock, /:has\(> :nth-child\(3\):last-child\)/, 'exactly three cards get three columns');
+  assert.match(sectionsBlock, /:last-child:nth-child\(odd\):not\(:only-child\)/, 'an odd last card takes its row instead of leaving an empty cell');
+  assert.ok(!/@media/.test(sectionsBlock), 'no viewport query: a hub frame or sidebar can be narrower than the window');
+  assert.ok(sectionsBlock.includes(':not(.joy-pricing-matrix--table)'), 'the data table variant keeps its own layout');
+});
