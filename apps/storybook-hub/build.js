@@ -2997,7 +2997,7 @@ export async function executeHedge(symbol: string, size: number) {
             <h4>Pricing Matrix & Subscription Tiers</h4>
           </div>
           <div style="padding: 24px;">
-            <div class="joy-pricing-matrix">
+            <div class="joy-pricing-matrix" role="region" aria-label="Pricing plans">
               <div class="joy-pricing-card">
                 <h3 class="joy-pricing-card__title">Developer</h3>
                 <p class="joy-pricing-card__desc">Core design tokens, SVG vector icons, and standard UI primitives.</p>

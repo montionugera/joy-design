@@ -424,9 +424,9 @@ test('F-039 L2 contrast: pricing token pairs pass in both themes (computed)', ()
     ['status-success-fg', 'surface-card', 3, 'matrix check icon'],
     ['text-secondary', 'surface-card', 3, 'matrix minus icon'],
     ['text-primary', 'surface-card', 4.5, 'matrix cells and pinned row headers'],
-    // The featured edge is decorative emphasis (the card is not an interactive control) and is backed by elevation-2.
-    // accent-default on raised is 2.62:1 in light, so the floor here is the measured value, not the 3:1 UI bar.
-    ['accent-default', 'surface-raised', 2.5, 'featured card border']
+    ['text-primary', 'accent-subtle', 4.5, 'matrix row header on hover'],
+    ['text-secondary', 'accent-subtle', 4.5, 'matrix minus icon on hover'],
+    ['status-success-fg', 'accent-subtle', 3, 'matrix check icon on hover']
   ];
   for (const theme of ['light', 'dark']) {
     for (const [fg, bg, min, why] of pairs) {
@@ -444,4 +444,25 @@ test('F-039 L2 CSS: every token a pricing rule reads has a dark value (light+dar
     assert.ok(tokenMaps.light[token] !== undefined, `light defines ${token}`);
     assert.ok(tokenMaps.dark[token] !== undefined, `dark defines ${token}`);
   }
+});
+
+// RULING (F-039 L2, code review minor 1): the featured card keeps a 1px --joy-accent-default border even though it
+// measures 2.62:1 on --joy-surface-raised in light (7.78:1 in dark). WCAG 1.4.11 does not bind: the card is not an
+// interactive control and "featured" is never conveyed by the border alone. It is also carried by the badge text, the
+// solid (not outline) CTA and --joy-elevation-2, so the border is redundant, decorative emphasis. Alternatives are
+// worse (border-strong loses the gold identity, accent-text is a muddy frame, accent-hover borrows a state token).
+// Cost if wrong: the featured edge reads faint in light; the cheap fix is a gold-tinted --joy-elevation-accent-1 ring.
+// The floor below only guards against token drift, it is not a claim that 2.6:1 meets the 3:1 UI bar.
+test('F-039 L2 contrast RULING: featured border is decorative emphasis, measured and pinned, dark passes 3:1', () => {
+  const on = (theme) => contrastRatio(tokenMaps[theme]['--joy-accent-default'], tokenMaps[theme]['--joy-surface-raised']);
+  assert.ok(on('dark') >= 3, `dark: ${on('dark').toFixed(2)}:1`);
+  assert.ok(on('light') >= 2.5 && on('light') < 3, `light drifted from the ruled 2.62:1: ${on('light').toFixed(2)}`);
+  assert.match(rule(pricingBlock, '.joy-pricing-card--featured'), /border-color:\s*var\(--joy-accent-default\)/);
+});
+
+test('F-039 L2 CSS: the pinned first column is capped so a long row label cannot take most of the scroller', () => {
+  const first = rule(pricingBlock, '.joy-pricing-matrix__table th:first-child');
+  assert.match(first, /box-sizing:\s*border-box/);
+  assert.match(first, /max-inline-size:\s*min\(40vw,\s*14rem\)/);
+  assert.match(first, /overflow-wrap:\s*anywhere/);
 });

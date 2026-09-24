@@ -1,5 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { compile } from 'svelte/compiler';
+import { render } from 'svelte/server';
 import { compileSvelte, renderSvelte as renderRaw } from './helpers/render-svelte.js';
 
 // F-039 L2: PricingCard + PricingMatrix (Svelte twin). The React twin asserts the same expectations in
@@ -111,5 +116,54 @@ test('F-039 L2: matrix forwards class and rest to the root in both modes', async
     const root = openTag(await matrix({ ...props, class: 'extra', 'data-testid': 'm' }));
     assert.match(root, /class="joy-pricing-matrix[^"]*\bextra"/);
     assert.match(root, /data-testid="m"/);
+  }
+});
+
+const libFile = (name) => fileURLToPath(new URL(`../src/lib/${name}.svelte`, import.meta.url));
+
+test('F-039 L2: onselect reaches the plan button, with the featured variant (real PricingCard, recording Button stub)', async () => {
+  // SSR cannot click, so the compiled PricingCard is rendered next to a stub Button that records the props it receives.
+  const dir = fs.mkdtempSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '.tmp-pricing-btn-'));
+  try {
+    fs.writeFileSync(path.join(dir, 'PricingCard.svelte'), fs.readFileSync(libFile('PricingCard'), 'utf8'));
+    fs.writeFileSync(path.join(dir, 'Button.svelte'), `<script>let props = $props(); globalThis.__joyPricingButton = props;</script><button></button>`);
+    await renderRaw('Badge', {}); // registers the .svelte load hook
+    const { default: Card } = await import(pathToFileURL(path.join(dir, 'PricingCard.svelte')).href);
+    const handler = () => {};
+    for (const [featured, variant] of [[false, 'outline'], [true, 'solid']]) {
+      render(Card, { props: { title: 'Pro', price: '$29', featured, onselect: handler } }).body; // .body forces the lazy render
+      const btn = globalThis.__joyPricingButton;
+      assert.strictEqual(btn.onclick, handler, `featured=${featured}`);
+      assert.strictEqual(btn.variant, variant);
+      assert.strictEqual(btn.block, true);
+    }
+    render(Card, { props: { title: 'Pro', price: '$29' } }).body;
+    assert.strictEqual(globalThis.__joyPricingButton.onclick, undefined);
+  } finally {
+    delete globalThis.__joyPricingButton;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('F-039 L2: ref is bound on the root of every branch (client compile output, one bind_this per root)', () => {
+  // Server rendering ignores bind:this, so the compiled client output is the observable contract. PricingMatrix has two
+  // roots (data and grid) and parity-check only needs one binding anywhere, so count them here.
+  const binds = (name) => (compile(fs.readFileSync(libFile(name), 'utf8'), { generate: 'client', filename: libFile(name) }).js.code.match(/\$\.bind_this\(/g) || []).length;
+  assert.strictEqual(binds('PricingCard'), 1);
+  assert.strictEqual(binds('PricingMatrix'), 2);
+});
+
+test('F-039 L2: defaults match the React twin (period, no badge, no description)', async () => {
+  const html = await card();
+  assert.match(html, /class="joy-pricing-card__period">\/month</);
+  assert.ok(!html.includes('joy-pricing-card__badge') && !html.includes('joy-pricing-card__desc'));
+});
+
+test('F-039 L2: columns without rows (or rows without columns) fall back to the children card grid', async () => {
+  for (const partial of [{ columns: DATA.columns }, { rows: DATA.rows }]) {
+    const html = await matrix(partial, '<div class="kid">x</div>');
+    assert.ok(html.includes('<div class="kid">x</div>'), 'children still rendered');
+    assert.match(html, /role="region"[^>]*aria-label="Pricing plans"|aria-label="Pricing plans"[^>]*role="region"/);
+    assert.ok(!html.includes('<table') && !html.includes('joy-pricing-matrix--table'));
   }
 });

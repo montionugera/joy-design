@@ -6,6 +6,10 @@ export interface PricingMatrixRow {
   values: Array<string | boolean>;
 }
 
+// `columns` and `rows` are a pair. Pass both for the data variant (a real table in a scroll region, `label` names that
+// region; an `aria-label` passed through rest lands on the non-landmark wrapper). Pass only one, or neither, and the
+// component renders the children card grid instead (the lone data prop is ignored). Each row's `values` should have one
+// entry per column; a shorter or longer row renders a ragged table.
 export interface PricingMatrixProps extends React.HTMLAttributes<HTMLDivElement> {
   columns?: string[];
   rows?: PricingMatrixRow[];

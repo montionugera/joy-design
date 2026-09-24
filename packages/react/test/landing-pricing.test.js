@@ -106,3 +106,55 @@ test('F-039 L2: matrix forwards className and rest to the root in both modes', (
     assert.match(html, /^<div class="joy-pricing-matrix[^"]*\bextra"[^>]*data-testid="m"/);
   }
 });
+
+// Behaviour without a DOM: call the forwardRef render function and inspect the element it returns (React 19 keeps
+// `ref` in props). Neither component uses hooks, so no render context is needed.
+const { Button } = loadComponent('Button');
+const findAll = (node, type, found = []) => {
+  if (Array.isArray(node)) node.forEach((n) => findAll(n, type, found));
+  else if (node && typeof node === 'object' && node.props) {
+    if (node.type === type) found.push(node);
+    findAll(node.props.children, type, found);
+  }
+  return found;
+};
+
+test('F-039 L2: onSelect reaches the plan button, with the featured variant', () => {
+  const handler = () => {};
+  for (const [featured, variant] of [[false, 'outline'], [true, 'solid']]) {
+    const [btn] = findAll(PricingCard.render({ title: 'Pro', price: '$29', featured, onSelect: handler }, null), Button);
+    assert.strictEqual(btn.props.onClick, handler, `featured=${featured}`);
+    assert.strictEqual(btn.props.variant, variant);
+    assert.strictEqual(btn.props.block, true);
+  }
+  const [none] = findAll(PricingCard.render({ title: 'Pro', price: '$29' }, null), Button);
+  assert.strictEqual(none.props.onClick, undefined);
+});
+
+test('F-039 L2: the forwarded ref lands on the root element in every branch', () => {
+  const ref = React.createRef();
+  const cases = {
+    'PricingCard': PricingCard.render({ title: 'Pro', price: '$29' }, ref),
+    'PricingMatrix grid': PricingMatrix.render({}, ref),
+    'PricingMatrix table': PricingMatrix.render({ ...DATA }, ref)
+  };
+  for (const [name, el] of Object.entries(cases)) {
+    assert.strictEqual(el.type, 'div', `${name} root is the div`);
+    assert.strictEqual(el.props.ref, ref, `${name} forwards ref to its root`);
+  }
+});
+
+test('F-039 L2: defaults match the Svelte twin (period, features list, no badge)', () => {
+  const html = card();
+  assert.match(html, /class="joy-pricing-card__period">\/month</);
+  assert.ok(!html.includes('joy-pricing-card__badge') && !html.includes('joy-pricing-card__desc'));
+});
+
+test('F-039 L2: columns without rows (or rows without columns) fall back to the children card grid', () => {
+  for (const partial of [{ columns: DATA.columns }, { rows: DATA.rows }]) {
+    const html = matrix(partial, React.createElement('div', { className: 'kid' }, 'x'));
+    assert.ok(html.includes('<div class="kid">x</div>'), 'children still rendered');
+    assert.match(html, /role="region"[^>]*aria-label="Pricing plans"/);
+    assert.ok(!html.includes('<table') && !html.includes('joy-pricing-matrix--table'));
+  }
+});

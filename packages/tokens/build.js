@@ -2687,6 +2687,10 @@ h1, h2, h3, .joy-display {
   text-align: start;
   left: auto;
   inset-inline-start: 0;
+  /* Cap the pinned column so a long row label wraps instead of taking most of a 375px scroller. */
+  box-sizing: border-box;
+  max-inline-size: min(40vw, 14rem);
+  overflow-wrap: anywhere;
 }
 .joy-pricing-matrix__table tbody th {
   background: var(--joy-surface-card);
