@@ -4130,7 +4130,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Measured inside the colocation window
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster vs L1
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4144,7 +4144,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Two-site failover
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> Zero downtime
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> No outages
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4447,9 +4447,9 @@ export async function executeHedge(symbol: string, size: number) {
       </section>
       <!-- landing-blocks:generated:end -->
 
-      <!-- View: Full Page Simulator (Preview the Look) -->
+      <!-- View: Full page simulator -->
       <section id="view-landing-preview" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">Full Page Simulator (Preview the Look)</h2>
+        <h2 style="margin: 0 0 8px 0;">Full page simulator</h2>
         <p class="header-tagline">The full landing page template, built from the same classes and structure as the LandingPage components. Switch the frame width, then narrow the browser window to see the mobile menu open as a drawer.</p>
 
         <!-- Top Simulator Controls Toolbar -->

@@ -5945,8 +5945,9 @@ a.joy-logo-cloud__item:focus-visible {
   .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :nth-child(3):last-child,
-  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table) > :nth-child(3):last-child {
+  /* The :has() carries the specificity needed to undo the odd-last span above (indented on purpose, see above). */
+  .joy-landing-page__pricing .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) > :nth-child(3):last-child,
+  .joy-pricing-fit .joy-pricing-matrix:not(.joy-pricing-matrix--table):has(> :nth-child(3):last-child) > :nth-child(3):last-child {
     grid-column: auto;
   }
 }

@@ -193,8 +193,8 @@ const matrix = await R('PricingMatrix', { id: 'blocks-matrix', label: 'Compare p
 
 const stats = await R('StatsSection', {
   stats: [
-    { label: 'P99 order latency', value: '4.2 \u00b5s', description: 'Measured inside the colocation window', change: '14% faster vs L1', trend: 'up' },
-    { label: 'Gateway uptime', value: '99.999%', description: 'Two-site failover', change: 'Zero downtime', trend: 'up' },
+    { label: 'P99 order latency', value: '4.2 \u00b5s', description: 'Measured inside the colocation window', change: '14% faster', trend: 'up' },
+    { label: 'Gateway uptime', value: '99.999%', description: 'Two-site failover', change: 'No outages', trend: 'up' },
     { label: 'Monthly volume', value: '$48.2B', description: 'Routed across all venues', change: '3% lower', trend: 'down' },
     { label: 'Settlement networks', value: '14 chains', description: 'Bridged through one API', change: 'No change', trend: 'neutral' },
   ],
