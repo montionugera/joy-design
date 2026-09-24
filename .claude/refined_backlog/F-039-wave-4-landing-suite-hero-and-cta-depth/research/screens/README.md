@@ -11,9 +11,9 @@ when the view is taller than Chromium's 16384px screenshot limit, as `landing-bl
 
 | Name | What it shows |
 | --- | --- |
-| `landing-preview-*` | Full "Landing Page Simulator" hub view (`#landing-preview`): simulator toolbar plus the whole simulated page (header, hero, features, bento, pricing, FAQ, CTA band, footer) |
-| `landing-blocks-*` | Full "Landing Blocks" hub view (`#landing-blocks`), split into parts (2 at 1280, 4 at 375; the 375 `-part4` is a 95px footer strip) |
-| `landing-page-simulator-*` | Only the `#simulator-page-container` element: the page itself without the hub toolbar |
+| `landing-preview-*` | Full "Landing Page Simulator" hub view (`#landing-preview`): simulator toolbar plus the whole simulated page, generated from the real components (header, hero, features heading, bento, pricing section, FAQ, CTA band, footer); the features heading and pricing section are added by the simulator around `LandingPage` output |
+| `landing-blocks-*` | Full "Landing Blocks" hub view (`#landing-blocks`), split into parts (2 at 1280, 4 at 375; the 375 `-part4` is a 595px closing strip) |
+| `landing-page-simulator-*` | Only the `#simulator-page-container` element: the simulated page itself without the hub toolbar |
 | `drawer-open-*` | Landing header menu opened on the preview at 375px (the Wave 3 Drawer as a bottom sheet with the navigation links) |
 | `hero-states-*` | "Hero states (HeroSection)" block: default with title emphasis, primary loading, primary disabled, both buttons as links |
 | `bento-matrix-*` | "Bento grid (BentoGrid, BentoCard)" block: the showcase bento with 6/8/4/12-column cards |
@@ -25,12 +25,16 @@ Every name exists at both widths in both themes except `drawer-open` (see below)
 Element shots (`landing-page-simulator`, blocks) are the element's own box, so their width is the hub content column minus
 padding (for example 347 or 936 px), not the nominal viewport width.
 
+Refreshed after the taste-review fixes (components and CSS, hub simulator): same 38 file names as before, none stale, none added;
+every file is under 1 MB (largest `landing-blocks-dark-1280x800-part1`, 0.95 MB).
+
 ## Known deviations
 
 - **Simulator frame width (assumption 5).** Layout breakpoints (the 767px mobile-nav rule, the 899px and 479px rules) are
   `@media` rules, which follow the real browser window, not the simulator frame. The "Mobile (375px)" frame in a wide window
   therefore narrows the frame but keeps the desktop layout rules, so the header can squeeze. The hub says so in the toolbar
-  note. The screenshots and the contract use a real 375px viewport instead. Filed as a backlog idea (Wave 5 owns the hub chrome).
+  note ("The frame changes width only. Layout breakpoints follow the browser window"); this limitation is unchanged by the
+  taste-review fixes. The screenshots and the contract use a real 375px viewport instead. Filed as a backlog idea (Wave 5 owns the hub chrome).
 - **`drawer-open` is 375-only.** The header menu button (and the drawer it opens) exists only below 768px; at 1280 the
   navigation is inline and `.joy-landing-header__menu` is hidden, so there is no drawer state to capture. There is no
   `drawer-open-*-1280x800.png`.
