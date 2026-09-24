@@ -1,7 +1,10 @@
-import { contrastRatio } from '../../scripts/color.mjs';
-
-/** WCAG 2.x contrast ratio between two hex colours (re-exported so tests need one helper import). */
-export { contrastRatio };
+/** Yield [name, value] for each `--custom-prop: value` declaration in a CSS block body. */
+function* declarations(body) {
+  for (const line of body.split(';')) {
+    const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
+    if (match) yield [match[1].trim(), match[2].trim()];
+  }
+}
 
 /**
  * Parse dist/theme.css into resolved light/dark token maps (var() chains resolved to hex where possible).
@@ -17,13 +20,7 @@ export function parseCssTokens(css) {
   const rootRegex = /:root\s*\{([^}]+)\}/g;
   let rootMatch;
   while ((rootMatch = rootRegex.exec(css)) !== null) {
-    const lines = rootMatch[1].split(';');
-    for (const line of lines) {
-      const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
-      if (match) {
-        lightVars[match[1].trim()] = match[2].trim();
-      }
-    }
+    for (const [name, value] of declarations(rootMatch[1])) lightVars[name] = value;
   }
 
   // 2. Extract and parse ALL [data-theme="dark"] blocks in document order (last wins)
@@ -32,17 +29,11 @@ export function parseCssTokens(css) {
   let darkBlockCount = 0;
   while ((darkMatch = darkBlockRegex.exec(css)) !== null) {
     darkBlockCount++;
-    const lines = darkMatch[1].split(';');
-    for (const line of lines) {
-      const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
-      if (match) {
-        const varName = match[1].trim();
-        const varVal = match[2].trim();
-        if (varName.startsWith('--joy-')) {
-          darkVarCounts[varName] = (darkVarCounts[varName] || 0) + 1;
-        }
-        darkVars[varName] = varVal;
+    for (const [name, value] of declarations(darkMatch[1])) {
+      if (name.startsWith('--joy-')) {
+        darkVarCounts[name] = (darkVarCounts[name] || 0) + 1;
       }
+      darkVars[name] = value;
     }
   }
 
@@ -57,13 +48,7 @@ export function parseCssTokens(css) {
   let mediaMatch;
   const mediaDarkVars = {};
   while ((mediaMatch = mediaDarkRegex.exec(css)) !== null) {
-    const lines = mediaMatch[1].split(';');
-    for (const line of lines) {
-      const match = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
-      if (match) {
-        mediaDarkVars[match[1].trim()] = match[2].trim();
-      }
-    }
+    for (const [name, value] of declarations(mediaMatch[1])) mediaDarkVars[name] = value;
   }
 
   function resolveValue(val, store, depth = 0) {

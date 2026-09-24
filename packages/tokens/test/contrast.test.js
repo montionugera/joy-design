@@ -3,12 +3,8 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  hexToRgb,
-  srgbToLinear,
-  relativeLuminance
-} from '../scripts/color.mjs';
-import { parseCssTokens, contrastRatio as computeContrast } from './helpers/css-tokens.js';
+import { contrastRatio } from '../scripts/color.mjs';
+import { parseCssTokens } from './helpers/css-tokens.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -115,7 +111,7 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
       continue;
     }
 
-    const ratio = computeContrast(fgVal, bgVal);
+    const ratio = contrastRatio(fgVal, bgVal);
     const pass = ratio >= item.min;
     results.push({
       pair: `${item.fg} (${fgVal}) on ${item.bg} (${bgVal})`,

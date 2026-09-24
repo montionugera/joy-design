@@ -8,6 +8,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const scriptPath = path.resolve(__dirname, '../../../scripts/parity-check.mjs');
 const mod = await import(pathToFileURL(scriptPath).href);
+const repoRoot = path.resolve(__dirname, '../../..');
+
+// runParityCheck needs the real theme.css; mirror it into a temp tree.
+function mirrorThemeCss(tmp) {
+  fs.mkdirSync(path.join(tmp, 'packages/tokens/dist'), { recursive: true });
+  fs.copyFileSync(path.join(repoRoot, 'packages/tokens/dist/theme.css'), path.join(tmp, 'packages/tokens/dist/theme.css'));
+}
 
 function withTempSvelteDir(files, fn) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-svelte-ref-'));
@@ -39,7 +46,7 @@ const BAD = `<script lang="ts">
 test('Wave 4 A1 SVELTE_REF_REST is exported, starts empty and the checker is a function', () => {
   assert.ok(Array.isArray(mod.SVELTE_REF_REST), 'SVELTE_REF_REST must be exported as an array');
   assert.strictEqual(typeof mod.checkSvelteRefRest, 'function', 'checkSvelteRefRest must be exported');
-  assert.deepStrictEqual(mod.checkSvelteRefRest(path.resolve(__dirname, '../../..')), [], 'the shipped tree has no ref/rest failures');
+  assert.deepStrictEqual(mod.checkSvelteRefRest(repoRoot), [], 'the shipped tree has no ref/rest failures');
 });
 
 test('Wave 4 A1 checkSvelteRefRest reports exactly the non-compliant file with the right missing entries', () => {
@@ -74,13 +81,10 @@ test('Wave 4 A1 checkSvelteRefRest reports each missing piece independently and 
 });
 
 test('Wave 4 A1 runParityCheck turns a Svelte ref/rest failure into a FAIL row in twin and svelte mode but not react mode', () => {
-  const root = path.resolve(__dirname, '../../..');
   const original = mod.SVELTE_REF_REST.slice();
   try {
     withTempSvelteDir({ Bad: BAD }, (tmp) => {
-      // Real theme.css is needed by runParityCheck; mirror it into the temp tree.
-      fs.mkdirSync(path.join(tmp, 'packages/tokens/dist'), { recursive: true });
-      fs.copyFileSync(path.join(root, 'packages/tokens/dist/theme.css'), path.join(tmp, 'packages/tokens/dist/theme.css'));
+      mirrorThemeCss(tmp);
       mod.SVELTE_REF_REST.push('Bad');
       for (const side of [null, 'svelte']) {
         const result = mod.runParityCheck({ rootDir: tmp, side });
@@ -193,12 +197,10 @@ test('Wave 4 A1 checkSvelteRefRest strips JS comments only in script and HTML co
 });
 
 test('Wave 4 A1 runParityCheck does not double-report a missing Svelte file that COMPONENTS already reports, but does report one that it does not', () => {
-  const root = path.resolve(__dirname, '../../..');
   const original = mod.SVELTE_REF_REST.slice();
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-svelte-dedupe-'));
   try {
-    fs.mkdirSync(path.join(tmp, 'packages/tokens/dist'), { recursive: true });
-    fs.copyFileSync(path.join(root, 'packages/tokens/dist/theme.css'), path.join(tmp, 'packages/tokens/dist/theme.css'));
+    mirrorThemeCss(tmp);
     const inComponents = mod.COMPONENTS[0];
     mod.SVELTE_REF_REST.push(inComponents, 'NotInComponentsGone');
     const { checks } = mod.runParityCheck({ rootDir: tmp, side: 'svelte' });
