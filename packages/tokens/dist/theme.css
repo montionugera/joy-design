@@ -2908,20 +2908,71 @@ h1, h2, h3, .joy-display {
   max-width: 1080px;
   margin: 0 auto;
 }
+@media (max-width: 899px) {
+  .joy-pricing-matrix {
+    grid-template-columns: 1fr;
+  }
+}
+/* Data variant (columns + rows): a real table inside a scroll region, not the card grid. */
+.joy-pricing-matrix--table {
+  display: block;
+}
+.joy-pricing-matrix__scroll {
+  overflow-x: auto;
+  isolation: isolate;
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  background: var(--joy-surface-card);
+}
+.joy-pricing-matrix__scroll:focus-visible {
+  outline: var(--joy-focus-ring);
+  outline-offset: -2px;
+}
+/* Sticky, scrolling and the opaque first column come from .joy-table--scroll (Wave 3); these rules add the
+   centred value columns, row headers that stay opaque, and a direction-aware sticky offset. */
+.joy-pricing-matrix__table td,
+.joy-pricing-matrix__table thead th {
+  text-align: center;
+}
+.joy-pricing-matrix__table th:first-child {
+  text-align: start;
+  left: auto;
+  inset-inline-start: 0;
+}
+.joy-pricing-matrix__table tbody th {
+  background: var(--joy-surface-card);
+  font-weight: 500;
+  border-bottom: 1px solid var(--joy-border-subtle);
+}
+.joy-pricing-matrix__table tbody tr:last-child th {
+  border-bottom: none;
+}
+.joy-pricing-matrix__table tbody tr:hover th:first-child {
+  background-color: var(--joy-accent-subtle);
+}
+.joy-pricing-matrix__mark {
+  display: inline-flex;
+  vertical-align: middle;
+}
+.joy-pricing-matrix__mark--yes {
+  color: var(--joy-status-success-fg);
+}
+.joy-pricing-matrix__mark--no {
+  color: var(--joy-text-secondary);
+}
 .joy-pricing-card {
   position: relative;
   border-radius: var(--joy-radius-card);
-  background-color: var(--joy-surface-card);
-  border: 1px solid var(--joy-border-subtle);
+  background-color: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  transition: all 0.25s cubic-bezier(0.08, 0.82, 0.17, 1);
+  transition: box-shadow var(--joy-duration-normal) var(--joy-ease-out), border-color var(--joy-duration-normal) var(--joy-ease-out);
 }
 .joy-pricing-card--featured {
   border-color: var(--joy-accent-default);
-  box-shadow: var(--joy-elevation-3);
-  transform: scale(1.02);
+  box-shadow: var(--joy-elevation-2);
 }
 .joy-pricing-card__badge {
   position: absolute;
@@ -2929,40 +2980,45 @@ h1, h2, h3, .joy-display {
   left: 50%;
   transform: translateX(-50%);
   padding: 4px 12px;
-  border-radius: 9999px;
-  background: var(--joy-accent-default);
-  color: var(--joy-text-on-accent);
-  color: var(--joy-text-inverse);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  border-radius: var(--joy-radius-pill);
+  border: 1px solid var(--joy-border-default);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
 }
 .joy-pricing-card__title {
-  font-size: 1.25rem;
+  font-size: var(--joy-font-size-xl);
   font-weight: 700;
   margin: 0 0 8px 0;
   color: var(--joy-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .joy-pricing-card__desc {
-  font-size: 0.875rem;
-  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
   margin: 0 0 20px 0;
 }
 .joy-pricing-card__price {
-  font-size: 2.25rem;
-  font-weight: 800;
+  font-size: var(--joy-font-size-display-sm);
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--joy-text-primary);
   margin-bottom: 24px;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 4px;
+  overflow-wrap: anywhere;
 }
 .joy-pricing-card__period {
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   font-weight: 500;
-  color: var(--joy-text-muted);
+  letter-spacing: normal;
+  color: var(--joy-text-secondary);
 }
 .joy-pricing-card__features {
   list-style: none;
@@ -2975,10 +3031,20 @@ h1, h2, h3, .joy-display {
 }
 .joy-pricing-card__feature {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  font-size: 0.875rem;
+  font-size: var(--joy-font-size-sm);
   color: var(--joy-text-secondary);
+  overflow-wrap: anywhere;
+}
+.joy-pricing-card__check {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--joy-status-success-fg);
+}
+.joy-pricing-card__cta {
+  margin-top: auto;
+  min-height: max(44px, var(--joy-control-height-md));
 }
 
 /* Testimonial Card */

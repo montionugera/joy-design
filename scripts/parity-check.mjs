@@ -68,6 +68,8 @@ export const COMPONENTS = [
   // Wave 4 (F-039)
   'HeroSection',
   'CTASection',
+  'PricingCard',
+  'PricingMatrix',
   // internal (not exported): the action button both landing twins render; no ref/rest by design
   'LandingAction'
 ];
@@ -98,7 +100,9 @@ export const REF_FORWARDING = [
   'Tooltip',
   // Wave 4 (F-039)
   'HeroSection',
-  'CTASection'
+  'CTASection',
+  'PricingCard',
+  'PricingMatrix'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
@@ -108,7 +112,9 @@ export const REF_FORWARDING = [
 export const SVELTE_REF_REST = [
   // Wave 4 (F-039)
   'HeroSection',
-  'CTASection'
+  'CTASection',
+  'PricingCard',
+  'PricingMatrix'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).

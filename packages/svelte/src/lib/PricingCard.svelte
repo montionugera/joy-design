@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Check } from '@joymify/icons';
+	import Button from './Button.svelte';
+
 	interface Props {
 		title: string;
 		description?: string;
@@ -8,8 +11,11 @@
 		ctaText?: string;
 		featured?: boolean;
 		badge?: string;
+		loading?: boolean;
+		disabled?: boolean;
 		onselect?: () => void;
 		class?: string;
+		ref?: HTMLDivElement | null;
 	}
 
 	let {
@@ -18,15 +24,19 @@
 		price,
 		period = '/month',
 		features = [],
-		ctaText = 'Get Started',
+		ctaText = 'Get started',
 		featured = false,
 		badge,
+		loading = false,
+		disabled = false,
 		onselect,
-		class: className = ''
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 </script>
 
-<div class="joy-pricing-card {featured ? 'joy-pricing-card--featured' : ''} {className}">
+<div bind:this={ref} class="joy-pricing-card {featured ? 'joy-pricing-card--featured' : ''} {className}" {...rest}>
 	{#if badge}
 		<div class="joy-pricing-card__badge">{badge}</div>
 	{/if}
@@ -45,21 +55,21 @@
 		<ul class="joy-pricing-card__features">
 			{#each features as feature}
 				<li class="joy-pricing-card__feature">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--joy-color-status-success, #10b981); flex-shrink: 0;">
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
+					<span class="joy-pricing-card__check"><Check size="18" /></span>
 					<span>{feature}</span>
 				</li>
 			{/each}
 		</ul>
 	{/if}
 
-	<button
-		type="button"
-		class="joy-button {featured ? 'joy-button--solid' : 'joy-button--outline'} joy-button--md"
-		style="width: 100%; margin-top: auto;"
+	<Button
+		variant={featured ? 'solid' : 'outline'}
+		block
+		{loading}
+		{disabled}
 		onclick={onselect}
+		class="joy-pricing-card__cta"
 	>
 		{ctaText}
-	</button>
+	</Button>
 </div>

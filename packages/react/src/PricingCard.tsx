@@ -1,4 +1,6 @@
 import React, { forwardRef } from 'react';
+import { Check } from '@joymify/icons/react';
+import { Button } from './Button.js';
 
 export interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -9,6 +11,8 @@ export interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
   ctaText?: string;
   featured?: boolean;
   badge?: string;
+  loading?: boolean;
+  disabled?: boolean;
   onSelect?: () => void;
 }
 
@@ -20,12 +24,14 @@ export const PricingCard = forwardRef<HTMLDivElement, PricingCardProps>(
       price,
       period = '/month',
       features = [],
-      ctaText = 'Get Started',
+      ctaText = 'Get started',
       featured = false,
       badge,
+      loading = false,
+      disabled = false,
       onSelect,
       className = '',
-      ...props
+      ...rest
     },
     ref
   ) => {
@@ -33,7 +39,7 @@ export const PricingCard = forwardRef<HTMLDivElement, PricingCardProps>(
       <div
         ref={ref}
         className={`joy-pricing-card ${featured ? 'joy-pricing-card--featured' : ''} ${className}`}
-        {...props}
+        {...rest}
       >
         {badge && <div className="joy-pricing-card__badge">{badge}</div>}
 
@@ -49,33 +55,25 @@ export const PricingCard = forwardRef<HTMLDivElement, PricingCardProps>(
           <ul className="joy-pricing-card__features">
             {features.map((feature, idx) => (
               <li key={idx} className="joy-pricing-card__feature">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ color: 'var(--joy-color-status-success, #10b981)', flexShrink: 0 }}
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+                <span className="joy-pricing-card__check">
+                  <Check size="18" />
+                </span>
                 <span>{feature}</span>
               </li>
             ))}
           </ul>
         )}
 
-        <button
-          type="button"
-          className={`joy-button ${featured ? 'joy-button--solid' : 'joy-button--outline'} joy-button--md`}
-          style={{ width: '100%', marginTop: 'auto' }}
+        <Button
+          variant={featured ? 'solid' : 'outline'}
+          block
+          loading={loading}
+          disabled={disabled}
           onClick={onSelect}
+          className="joy-pricing-card__cta"
         >
           {ctaText}
-        </button>
+        </Button>
       </div>
     );
   }

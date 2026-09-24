@@ -3019,7 +3019,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <span>Community Discord support</span>
                   </li>
                 </ul>
-                <button type="button" class="joy-button joy-button--outline joy-button--md" style="width: 100%; margin-top: auto;" onclick="showDemoToast('Developer tier selected', 'info')">Start Free</button>
+                <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta" onclick="showDemoToast('Developer tier selected', 'info')">Start Free</button>
               </div>
 
               <div class="joy-pricing-card joy-pricing-card--featured">
@@ -3048,7 +3048,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <span>24/7 Priority SLA response</span>
                   </li>
                 </ul>
-                <button type="button" class="joy-button joy-button--solid joy-button--md" style="width: 100%; margin-top: auto;" onclick="showDemoToast('Professional tier selected', 'success')">Upgrade to Pro</button>
+                <button type="button" class="joy-button joy-button--solid joy-button--md joy-button--block joy-pricing-card__cta" onclick="showDemoToast('Professional tier selected', 'success')">Upgrade to Pro</button>
               </div>
 
               <div class="joy-pricing-card">
@@ -3072,7 +3072,7 @@ export async function executeHedge(symbol: string, size: number) {
                     <span>Dedicated Technical Account Mgr</span>
                   </li>
                 </ul>
-                <button type="button" class="joy-button joy-button--outline joy-button--md" style="width: 100%; margin-top: auto;" onclick="showDemoToast('Institutional sales inquiry dispatched', 'info')">Contact Enterprise</button>
+                <button type="button" class="joy-button joy-button--outline joy-button--md joy-button--block joy-pricing-card__cta" onclick="showDemoToast('Institutional sales inquiry dispatched', 'info')">Contact Enterprise</button>
               </div>
             </div>
           </div>

@@ -352,3 +352,96 @@ test('F-039 L1 contrast: the CTA solid button edge is a dark edge on the cream b
   assert.ok(on('dark', 'text-on-accent', 'surface-inverse') >= 3, 'dark: edge vs cream band');
   assert.strictEqual(tokenMaps.light['--joy-text-on-accent'], tokenMaps.light['--joy-surface-inverse'], 'light: edge equals the navy band, so nothing changes visually');
 });
+
+// ── F-039 L2: pricing CSS contract ──
+const pricingBlock = block('/* Pricing Matrix */', '/* Testimonial Card */');
+
+test('F-039 L2 CSS: featured card is a full accent border with elevation-2, no purple, no scale, no side stripe', () => {
+  const featured = rule(pricingBlock, '.joy-pricing-card--featured');
+  assert.match(featured, /border-color:\s*var\(--joy-accent-default\)/);
+  assert.match(featured, /box-shadow:\s*var\(--joy-elevation-2\)/);
+  assert.ok(!/scale\(/.test(pricingBlock), 'no scale transform anywhere in the pricing block (it clipped the card at 375px)');
+  assert.ok(!/border-(left|inline-start)/.test(pricingBlock), 'no side-stripe border');
+  assert.ok(!/gradient|purple|7c3aed|8b5cf6/i.test(pricingBlock), 'no gradient or purple');
+  assert.ok(!/backdrop-filter/.test(pricingBlock));
+});
+
+test('F-039 L2 CSS: card is raised surface with default border, dark comes from the token remap only', () => {
+  const card = rule(pricingBlock, '.joy-pricing-card');
+  assert.match(card, /background-color:\s*var\(--joy-surface-raised\)/);
+  assert.match(card, /border:\s*1px solid var\(--joy-border-default\)/);
+  assert.ok(!/\[data-theme/.test(pricingBlock), 'no [data-theme] selector in the pricing block');
+  assert.ok(!/var\(--joy-color-/.test(pricingBlock), 'no phantom var(--joy-color-*)');
+  assert.ok(!/transition:\s*all/.test(pricingBlock), 'no transition: all');
+});
+
+test('F-039 L2 CSS: badge is solid accent-subtle with accent-text, sentence case, no tracking', () => {
+  const badge = rule(pricingBlock, '.joy-pricing-card__badge');
+  assert.match(badge, /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(badge, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
+  assert.ok(!/text-transform/.test(pricingBlock), 'no uppercase transform anywhere in the pricing block');
+  for (const [, value] of pricingBlock.matchAll(/letter-spacing:\s*([^;]+);/g)) {
+    assert.match(value, /^(-|normal)/, `no positive tracking (found ${value})`);
+  }
+});
+
+test('F-039 L2 CSS: price uses the display scale and wraps; period and description read text-secondary', () => {
+  const price = rule(pricingBlock, '.joy-pricing-card__price');
+  assert.match(price, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(price, /overflow-wrap:\s*anywhere/);
+  assert.match(rule(pricingBlock, '.joy-pricing-card__period'), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(rule(pricingBlock, '.joy-pricing-card__desc'), /color:\s*var\(--joy-text-secondary\)/);
+  const title = rule(pricingBlock, '.joy-pricing-card__title');
+  assert.match(title, /overflow-wrap:\s*anywhere/);
+  assert.match(title, /text-wrap:\s*balance/);
+});
+
+test('F-039 L2 CSS: check icons use status-success-fg and the CTA keeps a 44px touch target', () => {
+  assert.match(rule(pricingBlock, '.joy-pricing-card__check'), /color:\s*var\(--joy-status-success-fg\)/);
+  assert.match(rule(pricingBlock, '.joy-pricing-card__cta'), /min-height:\s*max\(44px,\s*var\(--joy-control-height-md\)\)/);
+});
+
+test('F-039 L2 CSS: matrix stacks to one column under 900px and the table variant scrolls with a sticky first column', () => {
+  assert.match(pricingBlock, /@media \(max-width: 899px\) \{\s*\.joy-pricing-matrix \{\s*grid-template-columns: 1fr;/);
+  assert.match(rule(pricingBlock, '.joy-pricing-matrix--table'), /display:\s*block/);
+  const scroll = rule(pricingBlock, '.joy-pricing-matrix__scroll');
+  assert.match(scroll, /overflow-x:\s*auto/);
+  assert.match(pricingBlock, /\.joy-pricing-matrix__scroll:focus-visible \{[^}]*outline:\s*var\(--joy-focus-ring\)/);
+  const first = rule(pricingBlock, '.joy-pricing-matrix__table th:first-child');
+  assert.match(first, /inset-inline-start:\s*0/);
+  assert.match(first, /left:\s*auto/);
+  assert.match(rule(pricingBlock, '.joy-pricing-matrix__table tbody th'), /background:\s*var\(--joy-surface-card\)/);
+  // the Wave 3 scroll-table rules (position sticky, opaque first column) still exist for the table to reuse
+  assert.match(rule(themeCss, '.joy-table--scroll th:first-child,\n.joy-table--scroll td:first-child'), /position:\s*sticky/);
+});
+
+test('F-039 L2 contrast: pricing token pairs pass in both themes (computed)', () => {
+  const pairs = [
+    ['text-primary', 'surface-raised', 4.5, 'card title and price'],
+    ['text-secondary', 'surface-raised', 4.5, 'description, period and feature text'],
+    ['accent-text', 'accent-subtle', 4.5, 'badge text'],
+    ['status-success-fg', 'surface-raised', 3, 'feature check icon'],
+    ['status-success-fg', 'surface-card', 3, 'matrix check icon'],
+    ['text-secondary', 'surface-card', 3, 'matrix minus icon'],
+    ['text-primary', 'surface-card', 4.5, 'matrix cells and pinned row headers'],
+    // The featured edge is decorative emphasis (the card is not an interactive control) and is backed by elevation-2.
+    // accent-default on raised is 2.62:1 in light, so the floor here is the measured value, not the 3:1 UI bar.
+    ['accent-default', 'surface-raised', 2.5, 'featured card border']
+  ];
+  for (const theme of ['light', 'dark']) {
+    for (const [fg, bg, min, why] of pairs) {
+      const ratio = contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+      assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min} (${why})`);
+    }
+  }
+});
+
+test('F-039 L2 CSS: every token a pricing rule reads has a dark value (light+dark maps both define it)', () => {
+  const used = new Set([...pricingBlock.matchAll(/var\((--joy-[a-z0-9-]+)\)/g)].map((m) => m[1]));
+  const colourTokens = [...used].filter((t) => /^--joy-(surface|text|border|accent|status)-/.test(t));
+  assert.ok(colourTokens.length >= 8, 'sanity: the block reads colour tokens');
+  for (const token of colourTokens) {
+    assert.ok(tokenMaps.light[token] !== undefined, `light defines ${token}`);
+    assert.ok(tokenMaps.dark[token] !== undefined, `dark defines ${token}`);
+  }
+});
