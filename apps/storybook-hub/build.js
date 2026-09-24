@@ -1444,7 +1444,8 @@ ${inlinedThemeCss}
       font-weight: 400;
     }
     @media (max-width: 480px) {
-      .segmented-control--frames {
+      /* Two classes: the phone rule for every .segmented-control (further down) must not win with its own column count. */
+      .segmented-control.segmented-control--frames {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -4449,7 +4450,7 @@ export async function executeHedge(symbol: string, size: number) {
 
       <!-- View: Full page simulator -->
       <section id="view-landing-preview" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">Full page simulator</h2>
+        <h2 class="landing-demo-title">Full page simulator</h2>
         <p class="header-tagline">The full landing page template, built from the same classes and structure as the LandingPage components. Switch the frame width, then narrow the browser window to see the mobile menu open as a drawer.</p>
 
         <!-- Top Simulator Controls Toolbar -->

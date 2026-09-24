@@ -178,6 +178,7 @@ test.describe("frame width switcher", () => {
           return {
             texts: buttons.map((b) => b.innerText.replace(/\s+/g, " ").trim()),
             overlaps,
+            rows: new Set(rects.map((r) => Math.round(r.top))).size,
             clipped: buttons.filter((b) => b.scrollWidth > b.clientWidth + 1).length,
             outside: rects.filter((r) => r.left < box.left - 1 || r.right > box.right + 1).length,
             controlRight: box.right,
@@ -188,6 +189,7 @@ test.describe("frame width switcher", () => {
           };
         });
         expect(m.overlaps, `segments overlapping at ${width}: ${m.texts.join(" | ")}`).toEqual([]);
+        expect(m.rows, "the three segments sit in one row").toBe(1);
         expect(m.clipped, "segments whose text is wider than the segment").toBe(0);
         expect(m.outside, "segments outside the control").toBe(0);
         expect(m.controlRight, "control inside the window").toBeLessThanOrEqual(m.vw);
