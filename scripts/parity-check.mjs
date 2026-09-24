@@ -64,7 +64,10 @@ export const COMPONENTS = [
   'Tooltip',
   'BarChart',
   'LineChart',
-  'CandlestickChart'
+  'CandlestickChart',
+  // Wave 4 (F-039)
+  'HeroSection',
+  'CTASection'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a
@@ -90,14 +93,21 @@ export const REF_FORWARDING = [
   'Table',
   'Tabs',
   'Toast',
-  'Tooltip'
+  'Tooltip',
+  // Wave 4 (F-039)
+  'HeroSection',
+  'CTASection'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
 // `{...rest}` on the root element and expose the root via `bind:this={ref}`.
 // Starts empty: each landing lane appends its own names in the commit that
 // makes them clean, so the gate never goes red ahead of the code.
-export const SVELTE_REF_REST = [];
+export const SVELTE_REF_REST = [
+  // Wave 4 (F-039)
+  'HeroSection',
+  'CTASection'
+];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).
 export const NORMALISE = {

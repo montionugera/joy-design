@@ -285,7 +285,7 @@ test('React standard library components implement accessible traits and forwardR
 
   const ctaSection = fs.readFileSync(path.resolve('./src/CTASection.tsx'), 'utf8');
   assert.ok(ctaSection.includes('joy-cta-section'), 'CTASection must render joy-cta-section class');
-  assert.ok(ctaSection.includes('joy-button--glass'), 'CTASection must use glass button for contrast safety');
+  assert.ok(!ctaSection.includes('joy-button--glass') && ctaSection.includes('variant="outline"'), 'CTASection must not use the removed glass button; its secondary action is the outline variant');
 
   const faqSection = fs.readFileSync(path.resolve('./src/FAQSection.tsx'), 'utf8');
   assert.ok(faqSection.includes('joy-faq-section'), 'FAQSection must render joy-faq-section class');

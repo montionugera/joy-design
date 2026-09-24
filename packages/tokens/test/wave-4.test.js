@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { contrastRatio } from '../scripts/color.mjs';
+import { parseCssTokens } from './helpers/css-tokens.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const scriptPath = path.resolve(__dirname, '../../../scripts/parity-check.mjs');
@@ -217,5 +219,100 @@ test('Wave 4 A1 runParityCheck does not double-report a missing Svelte file that
     fs.rmSync(tmp, { recursive: true, force: true });
     mod.SVELTE_REF_REST.length = 0;
     mod.SVELTE_REF_REST.push(...original);
+  }
+});
+
+// ── F-039 L1: hero + CTA CSS contract (reads the committed dist/theme.css, never runs the build) ──
+const themeCss = fs.readFileSync(path.resolve(__dirname, '../dist/theme.css'), 'utf8');
+const tokenMaps = parseCssTokens(themeCss);
+const block = (from, to) => themeCss.slice(themeCss.indexOf(from), themeCss.indexOf(to));
+const heroBlock = block('/* Hero Section */', '/* Pricing Matrix */');
+const ctaBlock = block('/* ── Landing Page Suite: CTASection ── */', '/* ── Landing Page Suite: FAQSection ── */');
+const rule = (css, selector) => {
+  const m = css.match(new RegExp(`(?:^|\\n)${selector.replace(/[.[\]"=()]/g, '\\$&')}\\s*\\{([^}]*)\\}`));
+  assert.ok(m, `${selector} rule exists`);
+  return m[1];
+};
+
+test('F-039 L1 CSS: glass button, gradient title and decorative blur are gone', () => {
+  assert.ok(!themeCss.includes('joy-button--glass'), 'no .joy-button--glass in theme.css');
+  assert.ok(!themeCss.includes('title-gradient'), 'no title-gradient class in theme.css');
+  assert.ok(!/backdrop-filter/.test(heroBlock), 'no backdrop-filter in the hero block');
+  assert.ok(!/backdrop-filter/.test(ctaBlock), 'no backdrop-filter in the CTA block');
+  assert.ok(!/background-clip/.test(heroBlock + ctaBlock), 'no gradient text clip');
+});
+
+test('F-039 L1 CSS: hero and CTA titles are fluid, wrap long words and balance lines', () => {
+  const display = (name) => themeCss.match(new RegExp(`--joy-font-size-display-${name}:\\s*([^;]+);`))[1];
+  assert.match(display('md'), /^clamp\(/);
+  assert.match(display('sm'), /^clamp\(/);
+  const hero = rule(heroBlock, '.joy-hero__title');
+  assert.match(hero, /font-size:\s*var\(--joy-font-size-display-md\)/);
+  assert.match(hero, /overflow-wrap:\s*anywhere/);
+  assert.match(hero, /text-wrap:\s*balance/);
+  const cta = rule(ctaBlock, '.joy-cta-section__title');
+  assert.match(cta, /font-size:\s*var\(--joy-font-size-display-sm\)/);
+  assert.match(cta, /overflow-wrap:\s*anywhere/);
+  assert.match(cta, /text-wrap:\s*balance/);
+  assert.match(rule(heroBlock, '.joy-hero__title-emphasis'), /^\s*color:\s*var\(--joy-accent-text\);\s*$/);
+});
+
+test('F-039 L1 CSS: badge uses accent-text on accent-subtle; hero outline reads strong border and primary text', () => {
+  const badge = rule(heroBlock, '.joy-hero__badge');
+  assert.match(badge, /background-color:\s*var\(--joy-accent-subtle\)/);
+  assert.match(badge, /color:\s*var\(--joy-accent-text\)/);
+  assert.match(badge, /border:\s*1px solid var\(--joy-border-default\)/);
+  assert.ok(!/text-transform|letter-spacing/.test(badge), 'no tracked caps eyebrow');
+  assert.ok(themeCss.includes('.kinetic-overlay .joy-button--outline'), 'the hub hero overlay selector is kept in the shared rule');
+  const outline = rule(heroBlock, '.joy-hero .joy-button--outline,\n.joy-hero__secondary-cta,\n.kinetic-overlay .joy-button--outline');
+  assert.match(outline, /border-color:\s*var\(--joy-border-strong\)/);
+  assert.match(outline, /color:\s*var\(--joy-text-primary\)/);
+});
+
+test('F-039 L1 CSS: hero and CTA solid buttons lift 1px on hover and settle on active; actions stack under 480px', () => {
+  assert.match(
+    rule(heroBlock, '.joy-hero .joy-button--solid:hover:not(:disabled),\n.joy-cta-section .joy-button--solid:hover:not(:disabled)'),
+    /transform:\s*translateY\(-1px\)/
+  );
+  assert.match(
+    rule(heroBlock, '.joy-hero .joy-button--solid:active:not(:disabled),\n.joy-cta-section .joy-button--solid:active:not(:disabled)'),
+    /transform:\s*none/
+  );
+  assert.match(heroBlock, /@media \(max-width: 479px\) \{[\s\S]*?\.joy-hero__ctas,\n\s*\.joy-cta-section__actions \{\s*flex-direction: column;\s*align-items: stretch;[\s\S]*?width: 100%;/);
+});
+
+test('F-039 L1 CSS: the CTA band is an inverse surface and every text on it is the inverse text token', () => {
+  assert.match(rule(ctaBlock, '.joy-cta-section__container'), /background:\s*var\(--joy-surface-inverse\)/);
+  assert.match(rule(ctaBlock, '.joy-cta-section__title'), /color:\s*var\(--joy-text-inverse\)/);
+  assert.match(rule(ctaBlock, '.joy-cta-section__desc'), /color:\s*var\(--joy-text-inverse\)/);
+  const outline = rule(ctaBlock, '.joy-cta-section .joy-button--outline');
+  assert.match(outline, /color:\s*var\(--joy-text-inverse\)/);
+  assert.match(outline, /border-color:\s*var\(--joy-text-inverse\)/);
+  assert.ok(!/--joy-text-primary/.test(ctaBlock), 'text-primary is 1.11:1 on the inverse band, never used inside it');
+  assert.match(ctaBlock, /@media \(max-width: 479px\) \{\s*\.joy-cta-section \{\s*padding: 32px 16px;[\s\S]*?padding: 40px 20px;/);
+});
+
+test('F-039 L1 CSS: a link-based action that is disabled or loading looks and behaves disabled', () => {
+  assert.match(themeCss, /\.joy-button\[aria-disabled="true"\],\n\.joy-button:disabled \{[^}]*pointer-events:\s*none/);
+});
+
+test('F-039 L1 contrast: hero and CTA token pairs pass WCAG AA in both themes (computed)', () => {
+  const pairs = [
+    // [foreground, background, minimum, why]
+    ['text-primary', 'surface-raised', 4.5, 'hero outline button text'],
+    ['accent-text', 'surface-canvas', 4.5, 'title emphasis on the hero canvas'],
+    ['accent-text', 'accent-subtle', 4.5, 'hero badge text'],
+    ['text-inverse', 'surface-inverse', 4.5, 'CTA band title, description and outline button text'],
+    ['text-on-accent', 'accent-default', 4.5, 'solid button label, gradient start'],
+    ['text-on-accent', 'accent-gradient-end', 4.5, 'solid button label, gradient end'],
+    ['border-strong', 'surface-raised', 3, 'hero outline button border'],
+    ['border-strong', 'surface-canvas', 3, 'CTA band border against the page'],
+    ['text-inverse', 'surface-inverse', 3, 'CTA outline button border on the band']
+  ];
+  for (const theme of ['light', 'dark']) {
+    for (const [fg, bg, min, why] of pairs) {
+      const ratio = contrastRatio(tokenMaps[theme][`--joy-${fg}`], tokenMaps[theme][`--joy-${bg}`]);
+      assert.ok(ratio >= min, `${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min} (${why})`);
+    }
   }
 });

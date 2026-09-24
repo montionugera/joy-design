@@ -121,7 +121,7 @@
   <HeroSection
     badgeText="Institutional Engine &bull; Sub-5μs Execution"
     title="Deterministic Financial Telemetry &"
-    titleGradient="Quantitative UI Systems"
+    titleEmphasis="Quantitative UI Systems"
     subtitle="Engineered for high-frequency trading desks, liquidity aggregators, and institutional asset portals requiring strict sub-5ms rendering budgets."
     primaryCtaText="Deploy Quantitative Node"
     secondaryCtaText="Read Whitepaper"

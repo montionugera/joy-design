@@ -1,53 +1,59 @@
 <script lang="ts">
+  import LandingAction from './LandingAction.svelte';
+
   interface Props {
     title: string;
     description?: string;
     primaryCtaText?: string;
     secondaryCtaText?: string;
-    onprimaryclick?: () => void;
-    onsecondaryclick?: () => void;
+    primaryHref?: string;
+    secondaryHref?: string;
+    primaryLoading?: boolean;
+    primaryDisabled?: boolean;
+    secondaryDisabled?: boolean;
+    onprimaryclick?: (e: MouseEvent) => void;
+    onsecondaryclick?: (e: MouseEvent) => void;
     class?: string;
+    ref?: HTMLElement | null;
   }
 
   let {
     title,
     description,
-    primaryCtaText = 'Get Started Today',
-    secondaryCtaText = 'Contact Sales',
+    primaryCtaText = 'Get started today',
+    secondaryCtaText = 'Contact sales',
+    primaryHref,
+    secondaryHref,
+    primaryLoading = false,
+    primaryDisabled = false,
+    secondaryDisabled = false,
     onprimaryclick,
     onsecondaryclick,
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
+
+  const uid = $props.id();
+  const titleId = `joy-cta-title-${uid}`;
 </script>
 
-<section class="joy-cta-section {className}">
+<section bind:this={ref} class="joy-cta-section {className}" aria-labelledby={titleId} {...rest}>
   <div class="joy-cta-section__container">
-    <h2 class="joy-cta-section__title">{title}</h2>
+    <h2 class="joy-cta-section__title" id={titleId}>{title}</h2>
     {#if description}
       <p class="joy-cta-section__desc">{description}</p>
     {/if}
     <div class="joy-cta-section__actions">
       {#if primaryCtaText}
-        <button
-          type="button"
-          class="joy-button joy-button--solid joy-button--lg"
-          onclick={onprimaryclick}
-        >
+        <LandingAction variant="solid" href={primaryHref} loading={primaryLoading} disabled={primaryDisabled} onclick={onprimaryclick}>
           {primaryCtaText}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
-        </button>
+        </LandingAction>
       {/if}
       {#if secondaryCtaText}
-        <button
-          type="button"
-          class="joy-button joy-button--glass joy-button--lg"
-          onclick={onsecondaryclick}
-        >
+        <LandingAction variant="outline" href={secondaryHref} disabled={secondaryDisabled} onclick={onsecondaryclick}>
           {secondaryCtaText}
-        </button>
+        </LandingAction>
       {/if}
     </div>
   </div>
