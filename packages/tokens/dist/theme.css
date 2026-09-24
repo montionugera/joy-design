@@ -5222,11 +5222,20 @@ a.joy-logo-cloud__item:focus-visible {
   max-width: 1200px;
   margin: 0 auto;
   padding: 48px 24px;
+  /* The column count follows the width the section really gets (a hub frame or a sidebar layout is narrower than the
+     window), so the steps below are container queries, not media queries. */
+  container-type: inline-size;
+  container-name: joy-stats;
 }
+/* Compact by default: two columns, and an odd last card takes the whole row, so no width leaves a card alone beside an
+   empty cell. The counts below widen the grid only when every column can hold a 7 character mono value on one line. */
 .joy-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.joy-stats-grid > .joy-stat-item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 .joy-stat-item {
   box-sizing: border-box;
@@ -5273,6 +5282,17 @@ a.joy-logo-cloud__item:focus-visible {
   margin-top: 8px;
   padding: 2px 8px;
   border-radius: var(--joy-radius-pill);
+  /* A pill is one short line: it never wraps into a multi-line blob (the copy is kept short; see the phone steps for
+     the tighter padding at 320px). */
+  white-space: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+/* The trend caret is sized from the pill's own type step (1em of --joy-font-size-xs), so it scales with it. */
+.joy-stat-item__change svg {
+  flex: none;
+  width: 1em;
+  height: 1em;
 }
 .joy-stat-item__change--positive {
   background: var(--joy-status-success-bg);
@@ -5300,10 +5320,6 @@ a.joy-logo-cloud__item:focus-visible {
   .joy-stats-section {
     padding: 32px 16px;
   }
-  .joy-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
   .joy-stat-item {
     padding: 16px 12px;
   }
@@ -5311,10 +5327,56 @@ a.joy-logo-cloud__item:focus-visible {
     font-size: var(--joy-font-size-xl);
   }
 }
+/* Wider containers, by how many stats there are. 3 and 6 stats make three columns from 40rem, 4 make four from 52rem,
+   5 make five from 64rem; every other count keeps two columns (an odd last card spans) so no row is ever short. */
+@container joy-stats (min-width: 30rem) {
+  .joy-stats-grid {
+    gap: 24px;
+  }
+}
+@container joy-stats (min-width: 40rem) {
+  .joy-stats-grid:has(> :nth-child(3):last-child),
+  .joy-stats-grid:has(> :nth-child(6):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .joy-stats-grid:has(> :nth-child(3):last-child) > .joy-stat-item:last-child {
+    grid-column: auto;
+  }
+  .joy-stats-grid:has(> :nth-child(7)) {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  }
+  .joy-stats-grid:has(> :nth-child(7)) > .joy-stat-item:last-child {
+    grid-column: auto;
+  }
+}
+@container joy-stats (min-width: 52rem) {
+  .joy-stats-grid:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@container joy-stats (min-width: 64rem) {
+  .joy-stats-grid:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .joy-stats-grid:has(> :nth-child(5):last-child) > .joy-stat-item:last-child {
+    grid-column: auto;
+  }
+  /* five cards share 1152px at most: a tighter gap and side padding keep a 9 character value on one line */
+  .joy-stats-grid:has(> :nth-child(5):last-child) {
+    gap: 16px;
+  }
+  .joy-stats-grid:has(> :nth-child(5):last-child) > .joy-stat-item {
+    padding-inline: 12px;
+  }
+}
 /* 320px class phones: a half-width cell has ~114px, so a 9 character mono value ("1,204,551") needs the next step down. */
 @media (max-width: 360px) {
   .joy-stat-item__value {
     font-size: var(--joy-font-size-lg);
+  }
+  .joy-stat-item__change {
+    gap: 2px;
+    padding: 2px 6px;
   }
 }
 

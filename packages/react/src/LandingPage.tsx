@@ -57,7 +57,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
-          <span>Joymify Quant</span>
+          <span>Joymify Design</span>
         </div>
         <nav className="joy-landing-header__nav" aria-label="Primary">
           {NAV_LINKS.map((link, i) => (
@@ -167,7 +167,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
         <div id="telemetry">
           <StatsSection
             stats={[
-              { label: 'P99 Order Latency', value: '4.2 μs', description: 'Kernel bypass colocation', change: '-14% vs L1', trend: 'up' },
+              { label: 'P99 Order Latency', value: '4.2 μs', description: 'Kernel bypass colocation', change: '14% faster vs L1', trend: 'up' },
               { label: 'Historical Uptime', value: '99.999%', description: 'Two live sites, instant failover', change: 'Zero downtime', trend: 'up' },
               { label: 'Monthly Volume', value: '$48.2B', description: 'Settled across 14 networks', change: '+32% MoM', trend: 'up' },
               { label: 'Settlement Chains', value: '14 Chains', description: 'Instant cross-L2 finality', change: 'EVM & SVM', trend: 'up' }
@@ -211,7 +211,7 @@ export const LandingPage = React.forwardRef<HTMLDivElement, LandingPageProps>(({
         {/* FAQ Section */}
         <div id="faq">
           <FAQSection
-            title="Frequently Asked Questions"
+            title="Frequently asked questions"
             subtitle="Answers on architecture, speed and security."
             items={[
               {

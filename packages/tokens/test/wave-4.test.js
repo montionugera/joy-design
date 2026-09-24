@@ -640,8 +640,6 @@ test('F-039 L4 CSS: stats card is raised, values are accent-text, text is second
 
 test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with smaller values', () => {
   const small = mediaBody(statsBlock, 'max-width: 480px');
-  assert.match(small, /\.joy-stats-grid \{[^}]*grid-template-columns:\s*repeat\(2, 1fr\)/);
-  assert.match(small, /\.joy-stats-grid \{[^}]*gap:\s*12px/);
   assert.match(small, /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-xl\)/, 'so a 7 character mono value fits a half-width card');
   assert.match(mediaBody(statsBlock, 'max-width: 360px'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-lg\)/, 'a 9 character value fits the ~114px cell at 320px');
   const value = rule(statsBlock, '.joy-stat-item__value');
@@ -650,7 +648,35 @@ test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with 
   assert.match(value, /overflow-wrap:\s*anywhere/, 'an extreme token breaks inside its cell instead of overflowing the page');
   assert.ok(!/word-break:\s*(break-all|break-word)/.test(value), 'never force-break tokens that fit');
   assert.match(rule(statsBlock, '.joy-stat-item'), /min-width:\s*0/, 'the grid item can shrink to its track');
-  assert.match(rule(statsBlock, '.joy-stats-grid'), /repeat\(auto-fit, minmax\(min\(220px, 100%\), 1fr\)\)/, 'wider screens keep the auto-fit grid');
+  // F-039 T1 (taste review P1-1/P1-6): the compact grid is the default and it is the container, not the window, that widens it.
+  const grid = rule(statsBlock, '.joy-stats-grid');
+  assert.match(grid, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/, 'two compact columns by default');
+  assert.match(grid, /gap:\s*12px/);
+  assert.match(rule(statsBlock, '.joy-stats-section'), /container-type:\s*inline-size/, 'columns follow the width the section gets (hub frames, sidebars)');
+  assert.match(statsBlock, /\.joy-stats-grid > \.joy-stat-item:last-child:nth-child\(odd\) \{\s*grid-column:\s*1 \/ -1;/, 'an odd last card takes the whole row instead of sitting alone');
+});
+
+test('F-039 T1 CSS: the stats grid widens by stat count in container steps, never by a fixed 3-column rule', () => {
+  const step = (min) => {
+    const m = statsBlock.match(new RegExp('@container joy-stats \\(min-width: ' + min + '\\) \\{([\\s\\S]*?)\n\\}\n'));
+    assert.ok(m, 'container step ' + min);
+    return m[1];
+  };
+  assert.match(step('40rem'), /:nth-child\(3\):last-child\),\s*\.joy-stats-grid:has\(> :nth-child\(6\):last-child\) \{\s*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/, '3 and 6 stats: three columns');
+  assert.match(step('52rem'), /:nth-child\(4\):last-child\) \{\s*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/, '4 stats: four columns, 3 + 1 never');
+  assert.match(step('64rem'), /:nth-child\(5\):last-child\) \{\s*grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/, '5 stats: five columns');
+  assert.match(step('40rem'), /:nth-child\(7\)\) \{\s*grid-template-columns:\s*repeat\(auto-fit, minmax\(min\(220px, 100%\), 1fr\)\)/, 'a long list keeps the auto-fit grid');
+  assert.ok(!/repeat\(3, minmax\(0, 1fr\)\)/.test(rule(statsBlock, '.joy-stats-grid')), 'no unconditional 3 column grid');
+});
+
+test('F-039 T1 CSS: a trend pill is one line and its caret follows the pill type step', () => {
+  const pill = rule(statsBlock, '.joy-stat-item__change');
+  assert.match(pill, /white-space:\s*nowrap/, 'no multi-line pill blobs');
+  assert.match(pill, /max-width:\s*100%/);
+  assert.match(pill, /font-size:\s*var\(--joy-font-size-xs\)/);
+  const caret = rule(statsBlock, '.joy-stat-item__change svg');
+  assert.match(caret, /width:\s*1em/);
+  assert.match(caret, /height:\s*1em/);
 });
 
 test('F-039 L4 CSS: testimonial stars are warning-fg, the avatar fallback is accent-subtle on accent-text, no purple, no stripe', () => {

@@ -69,7 +69,7 @@
   ];
 
   const statsList = [
-    { label: 'P99 Order Latency', value: '4.2 μs', description: 'Kernel bypass colocation', change: '-14% vs L1', trend: 'up' as const },
+    { label: 'P99 Order Latency', value: '4.2 μs', description: 'Kernel bypass colocation', change: '14% faster vs L1', trend: 'up' as const },
     { label: 'Historical Uptime', value: '99.999%', description: 'Two live sites, instant failover', change: 'Zero downtime', trend: 'up' as const },
     { label: 'Monthly Volume', value: '$48.2B', description: 'Settled across 14 networks', change: '+32% MoM', trend: 'up' as const },
     { label: 'Settlement Chains', value: '14 Chains', description: 'Instant cross-L2 finality', change: 'EVM & SVM', trend: 'up' as const }
@@ -127,7 +127,7 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
       </svg>
-      <span>Joymify Quant</span>
+      <span>Joymify Design</span>
     </div>
     <nav class="joy-landing-header__nav" aria-label="Primary">
       {#each navLinks as link, i (`${i}-${link.href}`)}
@@ -230,7 +230,7 @@
 
     <div id="faq">
       <FAQSection
-        title="Frequently Asked Questions"
+        title="Frequently asked questions"
         subtitle="Answers on architecture, speed and security."
         items={faqList}
       />
