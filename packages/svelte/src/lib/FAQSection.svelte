@@ -30,6 +30,7 @@
   const uid = $props.id();
 
   // Until the reader toggles something, the open items are the ones marked defaultOpen; after that their choice wins.
+  // The choice is stored by index: if `items` is reordered or inserted into afterwards, the same positions stay open.
   const defaultOpen = $derived(items.flatMap((item, idx) => (item.defaultOpen ? [idx] : [])));
   let chosen = $state<number[] | null>(null);
   const openIndexes = $derived(chosen ?? defaultOpen);

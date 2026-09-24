@@ -165,6 +165,7 @@ const internals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_
 function mount(C, props, ref = null) {
   const slots = [];
   return {
+    setProps(next) { props = next; },
     render() {
       let cursor = 0;
       const previous = internals.H;
@@ -224,6 +225,56 @@ test('F-039 L4: every trigger carries its own click handler (the wiring is on th
 });
 
 // ---------------------------------------------------------------- shared contracts
+
+test('F-039 L4: LogoCloud title ids are scoped per instance and each section points at its own title', () => {
+  const both = renderToStaticMarkup(h('div', null, h(LogoCloud, { title: 'A', logos: [] }), h(LogoCloud, { title: 'B', logos: [] })));
+  const titles = [...both.matchAll(/<section[^>]*aria-labelledby="([^"]+)"[^>]*><p class="joy-logo-cloud__title" id="([^"]+)">/g)];
+  assert.strictEqual(titles.length, 2);
+  for (const [, labelledby, id] of titles) assert.strictEqual(labelledby, id, 'the label points at its own title');
+  assert.notStrictEqual(titles[0][2], titles[1][2], 'two clouds on one page do not share a title id');
+});
+
+test('F-039 L4: FAQ trigger and answer ids point at each other inside each of two instances', () => {
+  const both = renderToStaticMarkup(h('div', null, h(FAQSection, { items: ITEMS }), h(FAQSection, { items: ITEMS })));
+  const sections = both.split('<section').slice(1);
+  assert.strictEqual(sections.length, 2);
+  const seen = new Set();
+  for (const section of sections) {
+    for (const [, controls] of section.matchAll(/aria-controls="([^"]+)"/g)) {
+      assert.ok(section.includes(`<div id="${controls}"`), 'aria-controls resolves inside its own section');
+      assert.ok(!seen.has(controls), 'and no other section uses that id');
+      seen.add(controls);
+    }
+  }
+  assert.strictEqual(seen.size, 6);
+});
+
+test('F-039 L4: list keys are unique and stable even when content repeats', () => {
+  const dupe = [{ question: 'Same?', answer: 'a' }, { question: 'Same?', answer: 'b' }];
+  const keysOf = (tree, pred) => findAll(tree, pred).map((n) => n.key);
+  const faqKeys = keysOf(mount(FAQSection, { items: dupe }).render(), (n) => typeof n.props.className === 'string' && n.props.className.startsWith('joy-faq-item'));
+  const faqItems = faqKeys.filter((k) => k !== null);
+  assert.strictEqual(faqItems.length, 2);
+  assert.strictEqual(new Set(faqItems).size, 2, 'FAQ keys');
+  const statKeys = keysOf(StatsSection.render({ stats: [{ label: 'X', value: 1 }, { label: 'X', value: 2 }] }, null), (n) => n.props.className === 'joy-stat-item');
+  assert.strictEqual(new Set(statKeys).size, 2, 'stat keys');
+  const logoKeys = keysOf(mount(LogoCloud, { logos: [{ name: 'Same', logo: LOGO }, { name: 'Same', logo: LOGO }] }).render(), (n) => n.props.className === 'joy-logo-cloud__item');
+  assert.strictEqual(new Set(logoKeys).size, 2, 'logo keys');
+});
+
+// PINNED LIMITATION: the reader's open/closed choice is stored by index. Before any click the open items follow
+// `defaultOpen` of the current items; after a click the same positions stay open even if `items` is reordered.
+test('F-039 L4: FAQ open state follows defaultOpen until the first click, then is pinned by index', () => {
+  const app = mount(FAQSection, { items: ITEMS });
+  assert.deepStrictEqual(expanded(app.render()), [true, false, false]);
+  app.setProps({ items: [{ ...ITEMS[1], defaultOpen: true }, { ...ITEMS[0], defaultOpen: false }, ITEMS[2]] });
+  assert.deepStrictEqual(expanded(app.render()), [true, false, false], 'no click yet: it follows the new defaultOpen (position 0)');
+  app.setProps({ items: [ITEMS[1], ITEMS[2], ITEMS[0]] });
+  assert.deepStrictEqual(expanded(app.render()), [false, false, true], 'no click yet: it follows the new defaultOpen (position 2)');
+  buttons(app.render())[1].props.onClick();
+  app.setProps({ items: [ITEMS[2], ITEMS[1], ITEMS[0]] });
+  assert.deepStrictEqual(expanded(app.render()), [false, true, false], 'after a click the same index stays open whatever now sits there');
+});
 
 test('F-039 L4: every twin forwards className and rest props to its root element', () => {
   const extra = { className: 'extra', 'data-testid': 'root', id: 'r1' };

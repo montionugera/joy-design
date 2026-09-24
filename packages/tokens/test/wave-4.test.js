@@ -611,7 +611,8 @@ test('F-039 L4 CSS: logo cloud wraps and centres, draws in currentColor at muted
   const item = rule(logoBlock, '.joy-logo-cloud__item');
   assert.match(item, /(^|[\s;])color:\s*var\(--joy-text-muted\)/, 'inline svg logos use currentColor, which is muted');
   assert.ok(!/opacity/.test(logoBlock), 'no opacity: it would push muted logos further below contrast');
-  assert.match(rule(logoBlock, '.joy-logo-cloud__item:hover'), /color:\s*var\(--joy-text-primary\)/);
+  assert.match(rule(logoBlock, 'a.joy-logo-cloud__item:hover'), /color:\s*var\(--joy-text-primary\)/, 'only links recolour on hover');
+  assert.ok(!/(^|\n)\.joy-logo-cloud__item:hover/.test(logoBlock), 'a non-interactive logo has no hover affordance');
   const title = rule(logoBlock, '.joy-logo-cloud__title');
   assert.match(title, /color:\s*var\(--joy-text-secondary\)/);
   assert.ok(!/text-transform|letter-spacing/.test(title), 'sentence case, normal tracking');
@@ -642,6 +643,10 @@ test('F-039 L4 CSS: at 480px and below the stats become a compact 2x2 grid with 
   assert.match(small, /\.joy-stats-grid \{[^}]*grid-template-columns:\s*repeat\(2, 1fr\)/);
   assert.match(small, /\.joy-stats-grid \{[^}]*gap:\s*12px/);
   assert.match(small, /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-xl\)/, 'so a 7 character mono value fits a half-width card');
+  assert.match(mediaBody(statsBlock, 'max-width: 360px'), /\.joy-stat-item__value \{[^}]*font-size:\s*var\(--joy-font-size-lg\)/, 'a 9 character value fits the ~114px cell at 320px');
+  const value = rule(statsBlock, '.joy-stat-item__value');
+  assert.match(value, /overflow-wrap:\s*normal/, 'a number is never split mid-token');
+  assert.ok(!/overflow-wrap:\s*anywhere|word-break:\s*(break-all|break-word)/.test(value));
   assert.match(rule(statsBlock, '.joy-stats-grid'), /repeat\(auto-fit, minmax\(min\(220px, 100%\), 1fr\)\)/, 'wider screens keep the auto-fit grid');
 });
 
@@ -683,15 +688,17 @@ test('F-039 L4 CSS: FAQ item is raised with a default border, the open item take
   assert.match(item, /border:\s*1px solid var\(--joy-border-default\)/);
   assert.match(rule(faqBlock, '.joy-faq-item--open'), /border-color:\s*var\(--joy-border-strong\)/);
   assert.match(rule(faqBlock, '.joy-faq-item__content'), /color:\s*var\(--joy-text-secondary\)/);
-  assert.match(rule(faqBlock, '.joy-faq-item__subtitle'.replace('item__subtitle', 'section__subtitle')), /color:\s*var\(--joy-text-secondary\)/);
+  assert.match(rule(faqBlock, '.joy-faq-section__subtitle'), /color:\s*var\(--joy-text-secondary\)/);
 });
 
-test('F-039 L4 CSS: FAQ chevron rotates on open through a token transition, and a hidden answer is display: none', () => {
+test('F-039 L4 CSS: FAQ chevron rotates on open through a token transition, and hidden is left to the UA', () => {
   const icon = rule(faqBlock, '.joy-faq-item__icon');
   assert.match(icon, /transition:\s*transform var\(--joy-duration-normal\) var\(--joy-ease-out\)/);
   assert.match(icon, /(^|[\s;])color:\s*var\(--joy-accent-text\)/);
   assert.match(rule(faqBlock, '.joy-faq-item--open .joy-faq-item__icon'), /transform:\s*rotate\(180deg\)/);
-  assert.match(rule(faqBlock, '.joy-faq-item__content[hidden]'), /display:\s*none/);
+  // The UA rule already hides [hidden]. No author rule may force display on/off, or hidden="until-found" (find-in-page reveal, SVL-061 backlog) could not be adopted later.
+  assert.ok(!/display:/.test(rule(faqBlock, '.joy-faq-item__content')), 'the answer sets no display');
+  assert.ok(!/\[hidden\]/.test(faqBlock), 'no [hidden] override');
 });
 
 test('F-039 L4 CSS: the four blocks have no purple, glass, stripe, [data-theme], phantom token, fallback or transition: all', () => {

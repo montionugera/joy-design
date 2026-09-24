@@ -4946,7 +4946,7 @@ a.joy-logo-cloud__item {
   min-width: 44px;
   min-height: 44px;
 }
-.joy-logo-cloud__item:hover {
+a.joy-logo-cloud__item:hover {
   color: var(--joy-text-primary);
   filter: grayscale(0%);
 }
@@ -4994,7 +4994,9 @@ a.joy-logo-cloud__item:focus-visible {
   line-height: 1.1;
   color: var(--joy-accent-text);
   margin-bottom: 8px;
-  overflow-wrap: anywhere;
+  /* A number is never split mid-token: a value wraps at spaces only, and the phone steps below size it to fit. */
+  overflow-wrap: normal;
+  word-break: normal;
 }
 .joy-stat-item__label {
   font-size: var(--joy-font-size-sm);
@@ -5055,6 +5057,12 @@ a.joy-logo-cloud__item:focus-visible {
   }
   .joy-stat-item__value {
     font-size: var(--joy-font-size-xl);
+  }
+}
+/* 320px class phones: a half-width cell has ~114px, so a 9 character mono value ("1,204,551") needs the next step down. */
+@media (max-width: 360px) {
+  .joy-stat-item__value {
+    font-size: var(--joy-font-size-lg);
   }
 }
 
@@ -5228,9 +5236,6 @@ a.joy-logo-cloud__item:focus-visible {
   line-height: 1.65;
   color: var(--joy-text-secondary);
   overflow-wrap: anywhere;
-}
-.joy-faq-item__content[hidden] {
-  display: none;
 }
 @media (max-width: 480px) {
   .joy-faq-section {

@@ -27,7 +27,7 @@ export const LogoCloud = React.forwardRef<HTMLElement, LogoCloudProps>(({
             // The logo is a graphic, so the link's name comes from aria-label, and the new-tab behaviour is disclosed.
             return (
               <a
-                key={item.name || idx}
+                key={`${idx}-${item.name}`}
                 href={item.href}
                 className="joy-logo-cloud__item"
                 title={item.name}
@@ -40,7 +40,7 @@ export const LogoCloud = React.forwardRef<HTMLElement, LogoCloudProps>(({
             );
           }
           return (
-            <div key={item.name || idx} className="joy-logo-cloud__item" title={item.name} role="img" aria-label={item.name}>
+            <div key={`${idx}-${item.name}`} className="joy-logo-cloud__item" title={item.name} role="img" aria-label={item.name}>
               {item.logo}
             </div>
           );

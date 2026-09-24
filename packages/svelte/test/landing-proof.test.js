@@ -146,13 +146,6 @@ test('F-039 L4: FAQSection trigger is a real button that controls an answer whic
   assert.strictEqual(new Set([...markup.matchAll(/ id="([^"]+)"/g)].map((m) => m[1])).size, 6, 'every id is unique');
 });
 
-test('F-039 L4: FAQSection ids carry the per-instance $props.id() prefix, not a bare index', async () => {
-  const ids = [...(await faq()).matchAll(/ id="([^"]+)"/g)].map((m) => m[1]);
-  assert.strictEqual(ids.length, 6);
-  for (const id of ids) assert.match(id, /^[\w-]+-(trigger|answer)-\d$/);
-  assert.ok(ids.every((id) => !id.startsWith('faq-')), 'not the old global faq-answer-N ids');
-});
-
 test('F-039 L4: FAQSection chevron is an @joymify/icons icon inside the rotating wrapper, and the title is sentence case', async () => {
   const markup = await faq();
   assert.strictEqual((markup.match(/<span class="joy-faq-item__icon" aria-hidden="true"><svg [^>]*><polyline points="6 9 12 15 18 9">/g) || []).length, 3);
@@ -167,7 +160,7 @@ test('F-039 L4: FAQSection chevron is an @joymify/icons icon inside the rotating
 // recorded template effects then write to the nodes, and the tests re-run those effects and read the attributes back.
 // It records WHICH node each delegated handler and each bind:this setter is attached to.
 const libFile = (name) => fileURLToPath(new URL(`../src/lib/${name}.svelte`, import.meta.url));
-function runClient(name, props) {
+function runClient(name, props, { propsId = 'uid' } = {}) {
   const code = compile(fs.readFileSync(libFile(name), 'utf8'), { generate: 'client', filename: libFile(name) }).js.code
     .replace(/^import .*$/gm, '')
     .replace('export default function', 'function');
@@ -188,12 +181,13 @@ function runClient(name, props) {
         case 'only_child': return derivedNode;
         case 'prop': return (p, k, _flags, fallback) => (...args) => (args.length ? (p[k] = args[0]) : (p[k] === undefined ? fallback : p[k]));
         case 'rest_props': return () => ({});
-        case 'props_id': return () => 'uid';
+        case 'props_id': return () => propsId;
         case 'state': return (v) => ({ v });
         case 'set': return (s, v) => { s.v = v; };
         case 'derived': return (fn) => ({ fn });
         case 'get': return (d) => (d.fn ? d.fn() : d.v);
         case 'template_effect': return (fn) => { effects.push(fn); fn(); };
+        case 'attribute_effect': return (el, fn) => { el.spread = fn(); touched.add(el); };
         case 'set_attribute': return (el, attr, value) => { el.attrs[attr] = value; touched.add(el); };
         case 'each': return (_node, _flags, items, _key, render) => { items().forEach((value, i) => render({}, { fn: () => value }, i)); };
         case 'if': return (_node, render) => render((branch) => branch({}));
@@ -229,6 +223,58 @@ test('F-039 L4: the click handler is on each FAQ trigger button (the node that c
   run.delegated[0].handler();
   run.rerun();
   assert.deepStrictEqual(expanded(), [true, false, false]);
+});
+
+test('F-039 L4: FAQ ids are built from the per-instance $props.id(), so two sections never share an id, and each trigger controls its own answer', () => {
+  const a = runClient('FAQSection', { items: ITEMS }, { propsId: 'idA' });
+  const b = runClient('FAQSection', { items: ITEMS }, { propsId: 'idB' });
+  const all = new Set();
+  for (const [run, prefix] of [[a, 'idA'], [b, 'idB']]) {
+    const panels = [...run.touched].filter((n) => n.attrs['aria-labelledby'] !== undefined);
+    assert.strictEqual(panels.length, 3);
+    for (const d of run.delegated) {
+      const { id, 'aria-controls': controls } = d.el.attrs;
+      assert.ok(id.startsWith(prefix) && controls.startsWith(prefix), `${id} / ${controls} carry the instance prefix`);
+      const panel = panels.find((n) => n.attrs.id === controls);
+      assert.ok(panel, 'aria-controls resolves to a panel of the same instance');
+      assert.strictEqual(panel.attrs['aria-labelledby'], id, 'and that panel is labelled by this trigger');
+      all.add(id).add(controls);
+    }
+  }
+  assert.strictEqual(all.size, 12, 'no id is shared between the two instances');
+});
+
+test('F-039 L4: LogoCloud title id is scoped per instance and the section is labelled by its own title', () => {
+  const ids = ['idA', 'idB'].map((propsId) => {
+    const run = runClient('LogoCloud', { title: 'Trusted', logos: LOGOS }, { propsId });
+    const section = run.created[0];
+    const title = [...run.touched].find((n) => n.attrs.id !== undefined && n.attrs.id.includes('title'));
+    assert.ok(title, 'the title paragraph gets an id');
+    assert.ok(title.attrs.id.includes(propsId), 'built from the instance id');
+    assert.strictEqual(section.spread['aria-labelledby'], title.attrs.id, 'the section is labelled by its own title');
+    return title.attrs.id;
+  });
+  assert.notStrictEqual(ids[0], ids[1]);
+});
+
+// PINNED LIMITATION: the reader's open/closed choice is stored by index. Before any click the open items follow
+// `defaultOpen` of the current items; after a click the same positions stay open even if `items` is reordered.
+test('F-039 L4: FAQ open state follows defaultOpen until the first click, then is pinned by index', () => {
+  const props = { items: ITEMS };
+  const run = runClient('FAQSection', props);
+  const expanded = () => run.delegated.map((d) => d.el.attrs['aria-expanded']);
+  assert.deepStrictEqual(expanded(), [true, false, false]);
+  props.items = [{ ...ITEMS[1], defaultOpen: true }, { ...ITEMS[0], defaultOpen: false }, ITEMS[2]];
+  run.rerun();
+  assert.deepStrictEqual(expanded(), [true, false, false], 'no click yet: follows the new defaultOpen (position 0)');
+  props.items = [ITEMS[1], ITEMS[2], { ...ITEMS[0], defaultOpen: false }];
+  props.items[2].defaultOpen = true;
+  run.rerun();
+  assert.deepStrictEqual(expanded(), [false, false, true], 'no click yet: follows the new defaultOpen (position 2)');
+  run.delegated[1].handler();
+  props.items = [ITEMS[2], ITEMS[1], ITEMS[0]];
+  run.rerun();
+  assert.deepStrictEqual(expanded(), [false, true, false], 'after a click the same index stays open whatever now sits there');
 });
 
 test('F-039 L4: allowMultiple keeps other items open and toggles each independently', () => {

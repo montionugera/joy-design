@@ -3114,7 +3114,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
               <p class="joy-testimonial-card__quote">"Dark mode coherence is unmatched. Zero unstyled background leaks and crisp 138-vector asset suite that matches Ant Design enterprise rigor."</p>
               <div class="joy-testimonial-card__author">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-info-fg);">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md">
                   <span class="joy-avatar__fallback">ML</span>
                 </div>
                 <div class="joy-testimonial-card__author-info">

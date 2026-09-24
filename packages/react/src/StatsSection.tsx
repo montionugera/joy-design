@@ -21,7 +21,7 @@ export const StatsSection = React.forwardRef<HTMLElement, StatsSectionProps>(({
     <section ref={ref} className={`joy-stats-section ${className}`} {...props}>
       <div className="joy-stats-grid">
         {stats.map((item, idx) => (
-          <div key={item.label || idx} className="joy-stat-item">
+          <div key={`${idx}-${item.label}`} className="joy-stat-item">
             <div className="joy-stat-item__value">{item.value}</div>
             <div className="joy-stat-item__label">{item.label}</div>
             {item.description && (

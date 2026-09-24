@@ -25,6 +25,7 @@ export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
   const uid = React.useId();
 
   // Until the reader toggles something, the open items are the ones marked defaultOpen; after that their choice wins.
+  // The choice is stored by index: if `items` is reordered or inserted into afterwards, the same positions stay open.
   const defaultOpen = items.flatMap((item, idx) => (item.defaultOpen ? [idx] : []));
   const [chosen, setChosen] = useState<number[] | null>(null);
   const openIndexes = chosen ?? defaultOpen;
@@ -53,7 +54,7 @@ export const FAQSection = React.forwardRef<HTMLElement, FAQSectionProps>(({
 
           return (
             <div
-              key={item.question || idx}
+              key={`${idx}-${item.question}`}
               className={isOpen ? 'joy-faq-item joy-faq-item--open' : 'joy-faq-item'}
             >
               <button
