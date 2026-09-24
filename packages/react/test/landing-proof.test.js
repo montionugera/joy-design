@@ -74,10 +74,26 @@ test('F-039 L4: StatsSection change carries a tone class only for up and down, p
     'joy-stat-item__change joy-stat-item__change--negative',
     'joy-stat-item__change'
   ]);
-  assert.match(markup, /<span class="joy-stat-item__sr">Trend up:<\/span>-14%/);
-  assert.match(markup, /<span class="joy-stat-item__sr">Trend down:<\/span>-2%/);
+  assert.match(markup, /<span class="joy-stat-item__sr">Trend up:<\/span><span class="joy-stat-item__change-text">-14%<\/span>/);
+  assert.match(markup, /<span class="joy-stat-item__sr">Trend down:<\/span><span class="joy-stat-item__change-text">-2%<\/span>/);
   assert.strictEqual((markup.match(/joy-stat-item__sr/g) || []).length, 2, 'neutral trend adds no direction words');
   assert.strictEqual((markup.match(/<svg aria-hidden="true"/g) || []).length, 2, 'trend arrows are decorative');
+});
+
+// F-039 T1 fix round 2: text-overflow does not apply to an inline-flex pill, so the change text lives in its own span
+// (`joy-stat-item__change-text`, ellipsised by the CSS) and the direction words stay outside it. No title/aria-label copy of
+// the text: the words are already in the DOM, so a second name would be announced twice.
+test('F-039 T1: the change text sits inside .joy-stat-item__change-text, direction words and caret stay outside it', () => {
+  const markup = html(StatsSection, { stats: STATS });
+  const pills = [...markup.matchAll(/<div class="joy-stat-item__change[^"]*">([\s\S]*?)<\/div>/g)].map((m) => m[1]);
+  assert.strictEqual(pills.length, 3);
+  const texts = pills.map((pill) => (pill.match(/<span class="joy-stat-item__change-text">([^<]*)<\/span>/) || [])[1]);
+  assert.deepStrictEqual(texts, ['-14%', '-2%', 'flat'], 'every change (also the neutral one) is wrapped');
+  for (const pill of pills) {
+    assert.ok(!/change-text">[^<]*<(svg|span)/.test(pill), 'the inner span holds text only');
+    assert.ok(!/title=|aria-label=/.test(pill), 'no duplicated accessible name');
+  }
+  assert.match(pills[0], /<svg[\s\S]*<\/svg>\s*<span class="joy-stat-item__sr">Trend up:<\/span>\s*<span class="joy-stat-item__change-text">/);
 });
 
 // ---------------------------------------------------------------- TestimonialCard

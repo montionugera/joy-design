@@ -45,7 +45,7 @@ export const StatsSection = React.forwardRef<HTMLElement, StatsSectionProps>(({
                     <span className="joy-stat-item__sr">{item.trend === 'up' ? 'Trend up:' : 'Trend down:'}</span>
                   </>
                 )}
-                {item.change}
+                <span className="joy-stat-item__change-text">{item.change}</span>
               </div>
             )}
           </div>

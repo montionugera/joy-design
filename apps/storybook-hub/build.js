@@ -4131,7 +4131,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Measured inside the colocation window
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">14% faster</span>
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4145,7 +4145,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Two-site failover
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--positive">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> No outages
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">No outages</span>
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4159,7 +4159,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Routed across all venues
                   </p>
                   <div class="joy-stat-item__change joy-stat-item__change--negative">
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg> <span class="joy-stat-item__sr">Trend down:</span> 3% lower
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg> <span class="joy-stat-item__sr">Trend down:</span> <span class="joy-stat-item__change-text">3% lower</span>
                   </div>
                 </div>
                 <div class="joy-stat-item">
@@ -4173,7 +4173,7 @@ export async function executeHedge(symbol: string, size: number) {
                     Bridged through one API
                   </p>
                   <div class="joy-stat-item__change">
-                    No change
+                    <span class="joy-stat-item__change-text">No change</span>
                   </div>
                 </div>
               </div>
@@ -4583,7 +4583,7 @@ export async function executeHedge(symbol: string, size: number) {
                           Kernel bypass colocation
                         </p>
                         <div class="joy-stat-item__change joy-stat-item__change--positive">
-                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> 14% faster vs L1
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">14% faster vs L1</span>
                         </div>
                       </div>
                       <div class="joy-stat-item">
@@ -4597,7 +4597,7 @@ export async function executeHedge(symbol: string, size: number) {
                           Two live sites, instant failover
                         </p>
                         <div class="joy-stat-item__change joy-stat-item__change--positive">
-                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> Zero downtime
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">Zero downtime</span>
                         </div>
                       </div>
                       <div class="joy-stat-item">
@@ -4611,7 +4611,7 @@ export async function executeHedge(symbol: string, size: number) {
                           Settled across 14 networks
                         </p>
                         <div class="joy-stat-item__change joy-stat-item__change--positive">
-                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> +32% MoM
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">+32% MoM</span>
                         </div>
                       </div>
                       <div class="joy-stat-item">
@@ -4625,7 +4625,7 @@ export async function executeHedge(symbol: string, size: number) {
                           Instant cross-L2 finality
                         </p>
                         <div class="joy-stat-item__change joy-stat-item__change--positive">
-                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> EVM &amp; SVM
+                          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">EVM &amp; SVM</span>
                         </div>
                       </div>
                     </div>

@@ -5291,13 +5291,18 @@ a.joy-logo-cloud__item:focus-visible {
   margin-top: 8px;
   padding: 2px 8px;
   border-radius: var(--joy-radius-pill);
-  /* A pill is one short line: it never wraps into a multi-line blob. Keep the copy short; a longer one is cut at the
-     card edge (ellipsis) instead of spilling out of the card. */
+  /* A pill is one short line: it never wraps into a multi-line blob. Keep the copy short; a longer one is ellipsized by
+     the inner text span below (an ellipsis has no effect on an inline-flex container itself), so it stays inside
+     the card. */
   white-space: nowrap;
   max-width: 100%;
   box-sizing: border-box;
+}
+.joy-stat-item__change-text {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* The trend caret is sized from the pill's own type step (1em of --joy-font-size-xs), so it scales with it. */
 .joy-stat-item__change svg {

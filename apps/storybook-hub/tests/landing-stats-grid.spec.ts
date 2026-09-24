@@ -64,7 +64,7 @@ const section = (stats: Stat[], n: number) =>
     .slice(0, n)
     .map(
       ([value, label, desc, change]) =>
-        `<div class="joy-stat-item"><div class="joy-stat-item__value">${value}</div><div class="joy-stat-item__label">${label}</div><p class="joy-stat-item__desc">${desc}</p><div class="joy-stat-item__change joy-stat-item__change--positive"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg> ${change}</div></div>`,
+        `<div class="joy-stat-item"><div class="joy-stat-item__value">${value}</div><div class="joy-stat-item__label">${label}</div><p class="joy-stat-item__desc">${desc}</p><div class="joy-stat-item__change joy-stat-item__change--positive"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg> <span class="joy-stat-item__sr">Trend up:</span> <span class="joy-stat-item__change-text">${change}</span></div></div>`,
     )
     .join("")}</div></section>`;
 
@@ -203,6 +203,80 @@ for (const theme of ["light", "dark"] as const) {
         }
       }
     }
+  });
+}
+
+// text-overflow does not apply to an inline-flex pill, so a long pill was hard-clipped mid-word with no ellipsis
+// (review N-1). The text lives in `.joy-stat-item__change-text`; a too-long change must be ellipsised there and the pill
+// must stay inside its card. The 40 character string is deliberately far too long for a 375px card.
+for (const theme of ["light", "dark"] as const) {
+  test(`stats grid: a long pill is ellipsised inside its card at 375px in ${theme}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 900 });
+    const long: Stat[] = [
+      ...pageStats.slice(0, 3),
+      [
+        "14 Chains",
+        "Settlement Chains",
+        "Instant cross-L2 finality",
+        "Settled across every one of 14 chains",
+      ],
+    ];
+    await page.setContent(shell(theme, section(long, 4)));
+    const pills = await page.evaluate(() =>
+      Array.from(
+        document.querySelectorAll<HTMLElement>(".joy-stat-item__change"),
+      ).map((pill) => {
+        const text = pill.querySelector<HTMLElement>(
+          ".joy-stat-item__change-text",
+        );
+        const card = pill.closest(".joy-stat-item")!.getBoundingClientRect();
+        const style = text ? getComputedStyle(text) : null;
+        return {
+          hasText: text !== null,
+          truncated: text ? text.scrollWidth > text.clientWidth : false,
+          textOverflow: style?.textOverflow,
+          overflow: style?.overflowX,
+          whiteSpace: style?.whiteSpace,
+          pillInside: pill.getBoundingClientRect().right <= card.right + 0.5,
+          textInsidePill: text
+            ? text.getBoundingClientRect().right <=
+              pill.getBoundingClientRect().right + 0.5
+            : false,
+        };
+      }),
+    );
+    expect(
+      pills.every((p) => p.hasText),
+      "every pill has the inner text span",
+    ).toBe(true);
+    expect(
+      pills[3].truncated,
+      "the 40 character string really is too long for the card",
+    ).toBe(true);
+    for (const [i, p] of pills.entries()) {
+      expect(p.pillInside, `pill ${i} stays inside its card`).toBe(true);
+      expect(p.textInsidePill, `pill ${i} text stays inside the pill`).toBe(
+        true,
+      );
+      if (p.truncated) {
+        expect(
+          p.textOverflow,
+          `pill ${i}: a clipped text shows an ellipsis`,
+        ).toBe("ellipsis");
+        expect(
+          p.overflow,
+          `pill ${i}: the ellipsis needs overflow hidden`,
+        ).toBe("hidden");
+        expect(p.whiteSpace).toBe("nowrap");
+      }
+    }
+    // the default copy is short enough to show whole
+    expect(
+      pills.slice(0, 3).every((p) => !p.truncated),
+      "the default pills are not clipped",
+    ).toBe(true);
   });
 }
 

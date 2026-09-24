@@ -44,7 +44,7 @@
               </svg>
               <span class="joy-stat-item__sr">{item.trend === 'up' ? 'Trend up:' : 'Trend down:'}</span>
             {/if}
-            {item.change}
+            <span class="joy-stat-item__change-text">{item.change}</span>
           </div>
         {/if}
       </div>

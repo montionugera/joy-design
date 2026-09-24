@@ -754,6 +754,12 @@ test('F-039 T1 CSS: a trend pill is one line and its caret follows the pill type
   assert.match(pill, /white-space:\s*nowrap/, 'no multi-line pill blobs');
   assert.match(pill, /max-width:\s*100%/);
   assert.match(pill, /font-size:\s*var\(--joy-font-size-xs\)/);
+  assert.ok(!/text-overflow/.test(pill), 'text-overflow has no effect on the inline-flex pill itself; it lives on the inner text span');
+  const text = rule(statsBlock, '.joy-stat-item__change-text');
+  assert.match(text, /text-overflow:\s*ellipsis/);
+  assert.match(text, /overflow:\s*hidden/);
+  assert.match(text, /white-space:\s*nowrap/);
+  assert.match(text, /min-width:\s*0/, 'the flex item can shrink below its text');
   const caret = rule(statsBlock, '.joy-stat-item__change svg');
   assert.match(caret, /width:\s*1em/);
   assert.match(caret, /height:\s*1em/);
