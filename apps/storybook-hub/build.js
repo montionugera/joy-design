@@ -2929,7 +2929,7 @@ export async function executeHedge(symbol: string, size: number) {
             <p class="kinetic-subtitle">Institutional order routing, dark-mode financial telemetry, and deterministic UI components engineered for maximum density and accessibility.</p>
             <div class="kinetic-actions">
               <button class="joy-button joy-button--solid joy-button--md" onclick="triggerCanvasBurst(event); showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy Solution</button>
-              <button class="joy-button joy-button--glass joy-button--md" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
+              <button class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Viewing API Documentation', 'info')">Read Whitepaper</button>
             </div>
             <div class="kinetic-hint">Move cursor or touch to perturb 3D particle constellation &bull; Click to pulse shockwave</div>
           </div>
@@ -3338,7 +3338,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <p class="joy-cta-section__desc">Join premier market makers and trading desks deploying Joymify's deterministic design tokens and low-latency financial chart suite.</p>
                 <div class="joy-cta-section__actions">
                   <button type="button" class="joy-button joy-button--solid joy-button--lg" onclick="showDemoToast('Initiating Enterprise deployment pipeline', 'success')">Deploy Solution</button>
-                  <button type="button" class="joy-button joy-button--glass joy-button--lg" onclick="showDemoToast('Institutional Demo schedule opened', 'info')">Schedule Institutional Demo</button>
+                  <button type="button" class="joy-button joy-button--outline joy-button--lg" onclick="showDemoToast('Institutional Demo schedule opened', 'info')">Schedule Institutional Demo</button>
                 </div>
               </div>
             </div>
@@ -3503,7 +3503,7 @@ export async function executeHedge(symbol: string, size: number) {
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                       Deploy Production Node
                     </button>
-                    <button type="button" class="joy-button joy-button--glass joy-button--lg joy-hero__secondary-cta">
+                    <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                       Read Protocol Spec
                     </button>
@@ -3694,7 +3694,7 @@ export async function executeHedge(symbol: string, size: number) {
                   <button type="button" class="joy-button joy-button--solid joy-button--lg" style="box-shadow: 0 4px 14px transparent;">
                     Start Free Trial
                   </button>
-                  <button type="button" class="joy-button joy-button--glass joy-button--lg">
+                  <button type="button" class="joy-button joy-button--outline joy-button--lg">
                     Contact Institutional Sales
                   </button>
                 </div>
