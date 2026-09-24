@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { setTheme } from "./helpers";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -34,27 +35,12 @@ const pageStats: Stat[] = [
   ["1,204,551", "Trades", "Filled today", "+3% DoD"],
   ["12 ms", "Median", "Round trip", "-2 ms"],
 ];
-// the values of the hub simulator and blocks views (their pill copy is longer and belongs to the hub task)
+// the copy of the hub blocks view (the simulator shows the page copy above)
 const hubStats: Stat[] = [
-  [
-    "4.2 µs",
-    "P99 order latency",
-    "Measured inside the colocation window",
-    "14% faster than benchmark",
-  ],
-  ["99.999%", "Gateway uptime", "Two-site failover", "Zero unplanned downtime"],
-  [
-    "$48.2B",
-    "Monthly volume",
-    "Routed across all venues",
-    "3% below last month",
-  ],
-  [
-    "14 chains",
-    "Settlement networks",
-    "Bridged through one API",
-    "No change this quarter",
-  ],
+  ["4.2 µs", "P99 order latency", "Measured inside the colocation window", "14% faster"],
+  ["99.999%", "Gateway uptime", "Two-site failover", "No outages"],
+  ["$48.2B", "Monthly volume", "Routed across all venues", "3% lower"],
+  ["14 chains", "Settlement networks", "Bridged through one API", "No change"],
   ["1,204,551", "Trades", "Filled today", "+3% DoD"],
   ["12 ms", "Median", "Round trip", "-2 ms"],
 ];
@@ -107,6 +93,11 @@ const measure = (root: string = "body") => {
         parseFloat(cs.paddingBottom);
       return Math.round(box / Math.max(line, parseFloat(cs.fontSize)));
     });
+    // a metric claim is never cut off: the change text has to fit its own box (no ellipsis, no clipping)
+    const pillCut = pills.filter((pill) => {
+      const text = pill.querySelector<HTMLElement>(".joy-stat-item__change-text") ?? pill;
+      return text.scrollWidth > text.clientWidth + 1 || getComputedStyle(text).textOverflow === "ellipsis";
+    }).length;
     return {
       width: g.width,
       n: cells.length,
@@ -118,6 +109,7 @@ const measure = (root: string = "body") => {
       ),
       valueLines,
       pillLines,
+      pillCut,
       pillOutside: pills.filter(
         (pill, i) => pill.getBoundingClientRect().right > rects[i].right + 0.5,
       ).length,
@@ -131,6 +123,7 @@ const measure = (root: string = "body") => {
 
 // the column count a reader should see for n stats in a container of `width` px (the container steps of the CSS)
 const expectedColumns = (n: number, width: number) => {
+  if (width < 15 * 16) return 1;
   if (width >= 69 * 16 && n === 5) return 5;
   if (width >= 60 * 16 && n === 4) return 4;
   if (width >= 45 * 16 && (n === 3 || n === 6)) return 3;
@@ -149,9 +142,11 @@ const check = (r: Result, where: string) => {
   expect(r.valueLines, `${where}: every value on one line`).toEqual(
     r.valueLines.map(() => 1),
   );
-  expect(r.pillLines, `${where}: one-line pills`).toEqual(
-    r.pillLines.map(() => 1),
-  );
+  expect(
+    r.pillLines.every((n) => n >= 1 && n <= 2),
+    `${where}: pills wrap to at most 2 lines (${r.pillLines.join(",")})`,
+  ).toBe(true);
+  expect(r.pillCut, `${where}: no change text is cut off`).toBe(0);
   expect(r.pillOutside, `${where}: pills stay inside their card`).toBe(0);
   expect(r.cellOverflow, `${where}: no card overflows`).toBe(0);
   expect(r.pageOverflow, `${where}: no sideways scroll`).toBe(0);
@@ -160,7 +155,7 @@ const check = (r: Result, where: string) => {
 const widths = [320, 375, 480, 768, 900, 1024, 1280] as const;
 for (const theme of ["light", "dark"] as const) {
   for (const width of widths) {
-    test(`stats grid: no orphan, one-line values and pills for 2 to 6 stats at ${width}px in ${theme}`, async ({
+    test(`stats grid: no orphan, one-line values and whole pills for 2 to 6 stats at ${width}px in ${theme}`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 900 });
@@ -206,79 +201,92 @@ for (const theme of ["light", "dark"] as const) {
   });
 }
 
-// text-overflow does not apply to an inline-flex pill, so a long pill was hard-clipped mid-word with no ellipsis
-// (review N-1). The text lives in `.joy-stat-item__change-text`; a too-long change must be ellipsised there and the pill
-// must stay inside its card. The 40 character string is deliberately far too long for a 375px card.
+// F-039 F1 (taste review 2, P1-A): a metric claim is never cut off. A change that does not fit on one line wraps inside its
+// pill (the review saw "14% faster vs..." with an ellipsis); the pill stays inside its card and the full text is visible.
+// The 37 character string is deliberately far longer than the default copy: it must still wrap whole, not clip.
 for (const theme of ["light", "dark"] as const) {
-  test(`stats grid: a long pill is ellipsised inside its card at 375px in ${theme}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 375, height: 900 });
-    const long: Stat[] = [
-      ...pageStats.slice(0, 3),
-      [
-        "14 Chains",
-        "Settlement Chains",
-        "Instant cross-L2 finality",
-        "Settled across every one of 14 chains",
-      ],
-    ];
-    await page.setContent(shell(theme, section(long, 4)));
-    const pills = await page.evaluate(() =>
-      Array.from(
-        document.querySelectorAll<HTMLElement>(".joy-stat-item__change"),
-      ).map((pill) => {
-        const text = pill.querySelector<HTMLElement>(
-          ".joy-stat-item__change-text",
-        );
-        const card = pill.closest(".joy-stat-item")!.getBoundingClientRect();
-        const style = text ? getComputedStyle(text) : null;
-        return {
-          hasText: text !== null,
-          truncated: text ? text.scrollWidth > text.clientWidth : false,
-          textOverflow: style?.textOverflow,
-          overflow: style?.overflowX,
-          whiteSpace: style?.whiteSpace,
-          pillInside: pill.getBoundingClientRect().right <= card.right + 0.5,
-          textInsidePill: text
-            ? text.getBoundingClientRect().right <=
-              pill.getBoundingClientRect().right + 0.5
-            : false,
-        };
-      }),
-    );
-    expect(
-      pills.every((p) => p.hasText),
-      "every pill has the inner text span",
-    ).toBe(true);
-    expect(
-      pills[3].truncated,
-      "the 40 character string really is too long for the card",
-    ).toBe(true);
-    for (const [i, p] of pills.entries()) {
-      expect(p.pillInside, `pill ${i} stays inside its card`).toBe(true);
-      expect(p.textInsidePill, `pill ${i} text stays inside the pill`).toBe(
-        true,
+  for (const width of [320, 375]) {
+    test(`stats grid: a long pill wraps whole inside its card at ${width}px in ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      const long: Stat[] = [
+        ...pageStats.slice(0, 3),
+        [
+          "14 Chains",
+          "Settlement Chains",
+          "Instant cross-L2 finality",
+          "Settled across every one of 14 chains",
+        ],
+      ];
+      await page.setContent(shell(theme, section(long, 4)));
+      const pills = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll<HTMLElement>(".joy-stat-item__change"),
+        ).map((pill) => {
+          const text = pill.querySelector<HTMLElement>(
+            ".joy-stat-item__change-text",
+          );
+          const card = pill.closest(".joy-stat-item")!.getBoundingClientRect();
+          const style = text ? getComputedStyle(text) : null;
+          const cs = getComputedStyle(pill);
+          const line = parseFloat(cs.fontSize) * 1.25;
+          return {
+            hasText: text !== null,
+            cut: text ? text.scrollWidth > text.clientWidth + 1 : true,
+            textOverflow: style?.textOverflow,
+            whiteSpace: style?.whiteSpace,
+            lines: Math.round(
+              (pill.getBoundingClientRect().height -
+                parseFloat(cs.paddingTop) -
+                parseFloat(cs.paddingBottom)) /
+                line,
+            ),
+            pillInside: pill.getBoundingClientRect().right <= card.right + 0.5,
+            textInsidePill: text
+              ? text.getBoundingClientRect().right <=
+                pill.getBoundingClientRect().right + 0.5
+              : false,
+          };
+        }),
       );
-      if (p.truncated) {
-        expect(
-          p.textOverflow,
-          `pill ${i}: a clipped text shows an ellipsis`,
-        ).toBe("ellipsis");
-        expect(
-          p.overflow,
-          `pill ${i}: the ellipsis needs overflow hidden`,
-        ).toBe("hidden");
-        expect(p.whiteSpace).toBe("nowrap");
+      for (const [i, p] of pills.entries()) {
+        expect(p.hasText, `pill ${i} has the inner text span`).toBe(true);
+        expect(p.cut, `pill ${i}: the whole text is visible`).toBe(false);
+        expect(p.textOverflow, `pill ${i}: no ellipsis`).not.toBe("ellipsis");
+        expect(p.whiteSpace, `pill ${i}: the text may wrap`).toBe("normal");
+        expect(p.pillInside, `pill ${i} stays inside its card`).toBe(true);
+        expect(p.textInsidePill, `pill ${i} text stays inside the pill`).toBe(
+          true,
+        );
       }
-    }
-    // the default copy is short enough to show whole
-    expect(
-      pills.slice(0, 3).every((p) => !p.truncated),
-      "the default pills are not clipped",
-    ).toBe(true);
-  });
+      // the default copy stays short: at most 2 lines by design
+      for (const [i, p] of pills.slice(0, 3).entries())
+        expect(p.lines, `default pill ${i}: at most 2 lines`).toBeLessThanOrEqual(2);
+      expect(pills[3].lines, "the long string really wraps").toBeGreaterThanOrEqual(2);
+    });
+  }
 }
+
+// Below ~15rem of container width two columns leave cards under ~115px, and copy wraps to 4 lines: one column is the honest layout.
+test("stats grid: a container narrower than 15rem uses one column and every card fills the row", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  for (const content of [192, 224, 236]) {
+    await page.setContent(
+      shell("light", `<div style="width:${content + 48}px">${section(pageStats, 4)}</div>`),
+    );
+    const [r] = await page.evaluate(measure);
+    expect(r.perRow, `container ${content}px: one card per row`).toEqual([1, 1, 1, 1]);
+    check(r, `4 stats in a ${content}px container`);
+  }
+  await page.setContent(
+    shell("light", `<div style="width:${240 + 48}px">${section(pageStats, 4)}</div>`),
+  );
+  const [wide] = await page.evaluate(measure);
+  expect(wide.perRow, "240px container keeps compact two columns").toEqual([2, 2]);
+});
 
 test("stats grid: a 390px and a 454px wrapper in a 1280px window keep 99.999% and 14 Chains whole", async ({
   page,
@@ -361,4 +369,78 @@ for (const view of ["landing-preview", "landing-blocks"] as const) {
       }
     }
   });
+}
+
+// F-039 F1 (taste review 2, P1-A): on a phone the stats fill the hub frame (no double gutter from the demo wrapper), the two
+// columns are wide enough to read (cards of 120px or more at 320px), every change text is fully visible (no ellipsis, no
+// clip) in at most 2 lines, and the pill stays inside its card. Both hub views, the simulator in its Mobile frame too.
+for (const theme of ["light", "dark"] as const) {
+  for (const width of [320, 375]) {
+    for (const view of ["landing-preview", "landing-blocks"] as const) {
+      test(`stats grid: hub ${view} at ${width}px fills its frame and shows every change whole in ${theme}`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/#${view}`);
+        await page.waitForLoadState("networkidle");
+        await setTheme(page, theme);
+        const facts = await page.evaluate(measureHubStats, view);
+        expect(facts.length, `${view} shows a stats grid`).toBeGreaterThan(0);
+        for (const f of facts) {
+          expect(f.cutTexts, `${view} at ${width}: cut change texts`).toEqual([]);
+          expect(f.ellipsis, `${view} at ${width}: no ellipsis`).toBe(0);
+          expect(f.maxLines, `${view} at ${width}: pill lines`).toBeLessThanOrEqual(2);
+          expect(f.outside, `${view} at ${width}: pills outside their card`).toBe(0);
+          expect(f.minCard, `${view} at ${width}: narrowest card`).toBeGreaterThanOrEqual(120);
+          expect(f.gutter, `${view} at ${width}: gutter between frame and first card`).toBeLessThanOrEqual(24);
+        }
+      });
+    }
+  }
+}
+
+test("stats grid: the simulator Mobile frame in a 1280px window shows every change whole", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/#landing-preview");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: /^Mobile/ }).click();
+  await expect
+    .poll(() => page.evaluate(() => document.getElementById("simulator-viewport-frame")!.getBoundingClientRect().width))
+    .toBeLessThanOrEqual(380);
+  const facts = await page.evaluate(measureHubStats, "landing-preview");
+  expect(facts.length).toBeGreaterThan(0);
+  for (const f of facts) {
+    expect(f.cutTexts).toEqual([]);
+    expect(f.maxLines).toBeLessThanOrEqual(2);
+    expect(f.outside).toBe(0);
+    expect(f.minCard).toBeGreaterThanOrEqual(120);
+  }
+});
+
+// Runs in the page: what a reader sees of the stats in one hub view.
+function measureHubStats(view: string) {
+  const root = document.getElementById(`view-${view}`)!;
+  return Array.from(root.querySelectorAll<HTMLElement>(".joy-stats-section"))
+    .filter((s) => s.getBoundingClientRect().width > 0)
+    .map((section) => {
+      const cards = Array.from(section.querySelectorAll<HTMLElement>(".joy-stat-item"));
+      const frame = (section.closest(".simulator-frame, .playground-box") as HTMLElement).getBoundingClientRect();
+      const pills = cards.map((c) => c.querySelector<HTMLElement>(".joy-stat-item__change")!);
+      const texts = pills.map((p) => p.querySelector<HTMLElement>(".joy-stat-item__change-text")!);
+      const lines = pills.map((p) => {
+        const cs = getComputedStyle(p);
+        return Math.round(
+          (p.getBoundingClientRect().height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) /
+            (parseFloat(cs.fontSize) * 1.25),
+        );
+      });
+      return {
+        cutTexts: texts.filter((t) => t.scrollWidth > t.clientWidth + 1).map((t) => t.textContent),
+        ellipsis: texts.filter((t) => getComputedStyle(t).textOverflow === "ellipsis").length,
+        maxLines: Math.max(...lines),
+        outside: pills.filter((p, i) => p.getBoundingClientRect().right > cards[i].getBoundingClientRect().right + 0.5).length,
+        minCard: Math.min(...cards.map((c) => c.getBoundingClientRect().width)),
+        gutter: Math.round(cards[0].getBoundingClientRect().left - frame.left),
+      };
+    });
 }

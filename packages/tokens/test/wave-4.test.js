@@ -760,20 +760,24 @@ test('F-039 T1 CSS: the stats grid widens by stat count in container steps, neve
   assert.ok(!/repeat\(3, minmax\(0, 1fr\)\)/.test(rule(statsBlock, '.joy-stats-grid')), 'no unconditional 3 column grid');
 });
 
-test('F-039 T1 CSS: a trend pill is one line and its caret follows the pill type step', () => {
+test('F-039 F1 CSS: a trend pill wraps (balanced) instead of being ellipsized, and its caret follows the pill type step', () => {
   const pill = rule(statsBlock, '.joy-stat-item__change');
-  assert.match(pill, /white-space:\s*nowrap/, 'no multi-line pill blobs');
+  assert.match(pill, /white-space:\s*normal/, 'a metric claim wraps, it is never cut off');
+  assert.match(pill, /text-wrap:\s*balance/);
   assert.match(pill, /max-width:\s*100%/);
   assert.match(pill, /font-size:\s*var\(--joy-font-size-xs\)/);
-  assert.ok(!/text-overflow/.test(pill), 'text-overflow has no effect on the inline-flex pill itself; it lives on the inner text span');
+  assert.ok(!/text-overflow|white-space:\s*nowrap/.test(pill), 'no ellipsis or nowrap on the pill');
   const text = rule(statsBlock, '.joy-stat-item__change-text');
-  assert.match(text, /text-overflow:\s*ellipsis/);
-  assert.match(text, /overflow:\s*hidden/);
-  assert.match(text, /white-space:\s*nowrap/);
+  assert.ok(!/text-overflow|overflow:\s*hidden|white-space:\s*nowrap/.test(text), 'the text span never clips a metric');
   assert.match(text, /min-width:\s*0/, 'the flex item can shrink below its text');
+  assert.match(text, /overflow-wrap:\s*anywhere/, 'a token wider than the card breaks inside it instead of overflowing');
   const caret = rule(statsBlock, '.joy-stat-item__change svg');
   assert.match(caret, /width:\s*1em/);
   assert.match(caret, /height:\s*1em/);
+});
+
+test('F-039 F1 CSS: below 15rem of container the stats grid is one column', () => {
+  assert.match(step('joy-stats', 'width < 15rem'), /\.joy-stats-grid \{\s*grid-template-columns:\s*minmax\(0, 1fr\)/);
 });
 
 test('F-039 L4 CSS: testimonial stars are warning-fg, the avatar fallback is accent-subtle on accent-text, no purple, no stripe', () => {

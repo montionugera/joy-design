@@ -106,6 +106,33 @@ for (const twin of twins) {
           }
         });
 
+        // F-039 F1 (taste review 2, P1-A): a metric claim is never cut off, on the page a consumer really gets.
+        test("stat change pills show their whole text in at most 2 lines inside their card", async ({ page }) => {
+          const facts = await page.evaluate(() => {
+            const pills = Array.from(document.querySelectorAll<HTMLElement>(".joy-stat-item__change"));
+            return pills.map((pill) => {
+              const text = pill.querySelector<HTMLElement>(".joy-stat-item__change-text")!;
+              const card = pill.closest(".joy-stat-item")!.getBoundingClientRect();
+              const cs = getComputedStyle(pill);
+              return {
+                label: text.textContent,
+                cut: text.scrollWidth > text.clientWidth + 1 || getComputedStyle(text).textOverflow === "ellipsis",
+                lines: Math.round(
+                  (pill.getBoundingClientRect().height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) /
+                    (parseFloat(cs.fontSize) * 1.25),
+                ),
+                inside: pill.getBoundingClientRect().right <= card.right + 0.5,
+              };
+            });
+          });
+          expect(facts.length, "the default page shows stat pills").toBeGreaterThan(0);
+          for (const f of facts) {
+            expect(f.cut, `${f.label}: fully visible`).toBe(false);
+            expect(f.lines, `${f.label}: lines`).toBeLessThanOrEqual(2);
+            expect(f.inside, `${f.label}: inside its card`).toBe(true);
+          }
+        });
+
         test("header shows the menu button below 768px and the inline nav from 768px", async ({ page }) => {
           const menu = page.locator(`${PAGE} .joy-landing-header__menu`);
           const nav = page.locator(`${PAGE} .joy-landing-header__nav`);

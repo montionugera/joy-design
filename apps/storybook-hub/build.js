@@ -1509,6 +1509,19 @@ ${inlinedThemeCss}
     .landing-demo--flush {
       padding: 0;
     }
+    /* Phones: the demo wrapper and the stats section would both pad the grid (24px + 16px each side), leaving ~127px cards
+       at 375px. The wrapper takes 12px and the stats section adds none, so the two columns fill the frame. */
+    @media (max-width: 479px) {
+      .landing-demo {
+        padding: 12px;
+      }
+      .landing-demo--flush {
+        padding: 0;
+      }
+      .landing-demo .joy-stats-section {
+        padding-inline: 0;
+      }
+    }
     .landing-demo__note {
       margin: 0 0 20px 0;
       font-size: 0.8125rem;

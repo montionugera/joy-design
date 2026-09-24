@@ -5046,18 +5046,16 @@ a.joy-logo-cloud__item:focus-visible {
   margin-top: 8px;
   padding: 2px 8px;
   border-radius: var(--joy-radius-pill);
-  /* A pill is one short line: it never wraps into a multi-line blob. Keep the copy short; a longer one is ellipsized by
-     the inner text span below (an ellipsis has no effect on an inline-flex container itself), so it stays inside
-     the card. */
-  white-space: nowrap;
+  /* A metric claim is never cut off: a change that does not fit on one line wraps inside the pill (balanced, two lines by
+     design; the default copy is short) instead of being ellipsized, and the pill never grows past its card. */
+  white-space: normal;
+  text-wrap: balance;
   max-width: 100%;
   box-sizing: border-box;
 }
 .joy-stat-item__change-text {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 /* The trend caret is sized from the pill's own type step (1em of --joy-font-size-xs), so it scales with it. */
 .joy-stat-item__change svg {
@@ -5106,6 +5104,14 @@ a.joy-logo-cloud__item:focus-visible {
 @container joy-stats (width < 17rem) {
   .joy-stat-item__value {
     font-size: var(--joy-font-size-md);
+  }
+}
+/* Under 15rem two columns leave cards below ~115px, where descriptions break into four short lines: one column is the
+   honest layout. Measured: a 320px phone still gets two columns of 123px or more (both hub views), so this step only
+   applies to boxes narrower than a phone (a sidebar, an embedded frame). */
+@container joy-stats (width < 15rem) {
+  .joy-stats-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 /* Wider containers, by how many stats there are. From 30rem the cards get roomy (3xl values). 3 and 6 stats make three

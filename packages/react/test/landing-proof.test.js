@@ -81,7 +81,7 @@ test('F-039 L4: StatsSection change carries a tone class only for up and down, p
 });
 
 // F-039 T1 fix round 2: text-overflow does not apply to an inline-flex pill, so the change text lives in its own span
-// (`joy-stat-item__change-text`, ellipsised by the CSS) and the direction words stay outside it. No title/aria-label copy of
+// (`joy-stat-item__change-text`, which the CSS lets wrap, never clip) and the direction words stay outside it. No title/aria-label copy of
 // the text: the words are already in the DOM, so a second name would be announced twice.
 test('F-039 T1: the change text sits inside .joy-stat-item__change-text, direction words and caret stay outside it', () => {
   const markup = html(StatsSection, { stats: STATS });
