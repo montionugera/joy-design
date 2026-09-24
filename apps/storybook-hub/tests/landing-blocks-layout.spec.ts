@@ -82,12 +82,17 @@ for (const id of BENTO_GRIDS) {
     const result = await page.evaluate((gridId) => {
       const grid = document.querySelector<HTMLElement>(`#${gridId}`)!;
       const gridWidth = grid.getBoundingClientRect().width;
+      // Decorative filler tiles (aria-hidden) are dropped under 900px; every remaining card is full width.
+      const cards = Array.from(grid.children).filter((c) => c.getAttribute("aria-hidden") !== "true");
+      const fillers = Array.from(grid.children).filter((c) => c.getAttribute("aria-hidden") === "true");
       return {
         gridWidth,
-        widths: Array.from(grid.children).map((c) => c.getBoundingClientRect().width),
+        widths: cards.map((c) => c.getBoundingClientRect().width),
+        fillersHidden: fillers.every((c) => getComputedStyle(c).display === "none"),
       };
     }, id);
     expect(result.widths.length).toBeGreaterThan(0);
+    expect(result.fillersHidden, "empty filler tiles are not shown as blank cards").toBe(true);
     for (const width of result.widths) {
       expect(Math.abs(width - result.gridWidth)).toBeLessThanOrEqual(1);
     }
