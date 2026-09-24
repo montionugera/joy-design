@@ -21,9 +21,6 @@ export const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(({
   className = '',
   ...props
 }, ref) => {
-  // A handler with no destination is an action, not a link: a real button, so there is no fake "#" anchor to
-  // middle-click or scroll to the top of the page.
-  const asButton = linkHref === undefined && !!onLinkClick;
   // Modified clicks (new tab, new window, download) and non-primary buttons are left to the browser: the handler only
   // takes over a plain primary click on a link that also has a real href.
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -37,8 +34,10 @@ export const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(({
       {icon && <div className="joy-feature-card__icon">{icon}</div>}
       <h3 className="joy-feature-card__title">{title}</h3>
       <p className="joy-feature-card__desc">{description}</p>
-      {linkText && (asButton ? (
-        <button type="button" className="joy-feature-card__link" onClick={() => onLinkClick?.()}>
+      {linkText && (linkHref === undefined && onLinkClick ? (
+        // A handler with no destination is an action, not a link: a real button, so there is no fake "#" anchor to
+        // middle-click or scroll to the top of the page.
+        <button type="button" className="joy-feature-card__link" onClick={() => onLinkClick()}>
           {linkText}
         </button>
       ) : (

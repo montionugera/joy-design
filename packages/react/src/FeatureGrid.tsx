@@ -27,7 +27,7 @@ export const FeatureGrid = React.forwardRef<HTMLDivElement, FeatureGridProps>(({
   return (
     <div
       ref={ref}
-      className={`joy-feature-grid joy-feature-grid--cols-${cols} ${layout === 'uniform' ? '' : 'joy-feature-grid--lead'} ${className}`}
+      className={`joy-feature-grid joy-feature-grid--cols-${cols}${layout === 'uniform' ? '' : ' joy-feature-grid--lead'} ${className}`}
       {...props}
     >
       {children}

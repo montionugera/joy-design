@@ -34,7 +34,7 @@
 
 <div
   bind:this={ref}
-  class="joy-feature-grid joy-feature-grid--cols-{cols} {layout === 'uniform' ? '' : 'joy-feature-grid--lead'} {className}"
+  class="joy-feature-grid joy-feature-grid--cols-{cols}{layout === 'uniform' ? '' : ' joy-feature-grid--lead'} {className}"
   {...rest}
 >
   {@render children()}
