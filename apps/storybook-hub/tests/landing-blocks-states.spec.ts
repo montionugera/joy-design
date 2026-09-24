@@ -1,14 +1,10 @@
 import { test, expect } from "@playwright/test";
+import { openLandingBlocks } from "./helpers";
 
 // F-039 C1b: the hub landing blocks show every state the hero and FAQ components can be in, using the classes and
 // attributes the real components render.
 
-test.beforeEach(async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/#landing-blocks");
-  await page.waitForLoadState("networkidle");
-  await expect(page.locator("#view-landing-blocks")).toHaveClass(/active/);
-});
+test.beforeEach(({ page }) => openLandingBlocks(page, 1280));
 
 test("hero demos show default, loading and disabled primary buttons", async ({ page }) => {
   const heroes = page.locator("#view-landing-blocks .joy-hero");

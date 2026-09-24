@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { openLandingBlocks } from "./helpers";
 
 // F-039 C1b: the hub landing blocks demos are the real component markup, so their layout is a contract, measured
 // from bounding boxes. Every row of a lead FeatureGrid fills the grid (no orphan cell in the last row), bento spans
@@ -6,13 +7,6 @@ import { test, expect, type Page } from "@playwright/test";
 // first column pinned.
 
 const LEAD_COUNTS = [3, 4, 5, 6] as const;
-
-async function openBlocks(page: Page, width: number) {
-  await page.setViewportSize({ width, height: 900 });
-  await page.goto("/#landing-blocks");
-  await page.waitForLoadState("networkidle");
-  await expect(page.locator("#view-landing-blocks")).toHaveClass(/active/);
-}
 
 type Box = { left: number; right: number; top: number; width: number };
 
@@ -31,14 +25,14 @@ async function leadRows(page: Page, count: number) {
       if (row) row.push(card);
       else rows.push([card]);
     }
-    return { gridWidth: g.width, cardCount: cards.length, rows, cards };
+    return { gridWidth: g.width, cardCount: cards.length, rows };
   }, count);
 }
 
 for (const width of [1280, 1000]) {
   for (const count of LEAD_COUNTS) {
     test(`lead grid with ${count} cards fills every row at ${width}px`, async ({ page }) => {
-      await openBlocks(page, width);
+      await openLandingBlocks(page, width);
       const { gridWidth, cardCount, rows } = await leadRows(page, count);
 
       expect(cardCount).toBe(count);
@@ -63,7 +57,7 @@ for (const width of [1280, 1000]) {
 
 for (const count of LEAD_COUNTS) {
   test(`lead grid with ${count} cards is one column at 375px`, async ({ page }) => {
-    await openBlocks(page, 375);
+    await openLandingBlocks(page, 375);
     const { gridWidth, rows, cardCount } = await leadRows(page, count);
     expect(rows.length).toBe(cardCount);
     for (const row of rows) {
@@ -78,7 +72,7 @@ const BENTO_GRIDS = ["blocks-bento-showcase", "blocks-bento-cols", "blocks-bento
 
 for (const id of BENTO_GRIDS) {
   test(`bento grid ${id} is full width per card at 375px`, async ({ page }) => {
-    await openBlocks(page, 375);
+    await openLandingBlocks(page, 375);
     const result = await page.evaluate((gridId) => {
       const grid = document.querySelector<HTMLElement>(`#${gridId}`)!;
       const gridWidth = grid.getBoundingClientRect().width;
@@ -99,7 +93,7 @@ for (const id of BENTO_GRIDS) {
   });
 
   test(`bento grid ${id} cards span N of 12 columns at 1280px`, async ({ page }) => {
-    await openBlocks(page, 1280);
+    await openLandingBlocks(page, 1280);
     const result = await page.evaluate((gridId) => {
       const grid = document.querySelector<HTMLElement>(`#${gridId}`)!;
       const style = getComputedStyle(grid);
@@ -124,7 +118,7 @@ for (const id of BENTO_GRIDS) {
 }
 
 test("bento demos use every span from 1 to 12 in both class families", async ({ page }) => {
-  await openBlocks(page, 1280);
+  await openLandingBlocks(page, 1280);
   const used = await page.evaluate(() => {
     const collect = (gridId: string, pattern: RegExp) =>
       Array.from(document.querySelectorAll(`#${gridId} > *`))
@@ -141,7 +135,7 @@ test("bento demos use every span from 1 to 12 in both class families", async ({ 
 });
 
 test("pricing table scrolls sideways at 375px and pins its first column", async ({ page }) => {
-  await openBlocks(page, 375);
+  await openLandingBlocks(page, 375);
   const scroller = page.locator("#blocks-matrix .joy-pricing-matrix__scroll");
   await scroller.scrollIntoViewIfNeeded();
 

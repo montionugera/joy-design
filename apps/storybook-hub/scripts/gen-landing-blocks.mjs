@@ -34,27 +34,26 @@ function tidy(html) {
   return html
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/ style="[^"]*"/g, '')
-    .replace(/class="([^"]*)"/g, (_, c) => `class="${c.split(/\s+/).filter(Boolean).join(' ')}"`)
-    .replace(/ (aria-busy="true"|disabled="")/g, ' $1');
+    .replace(/class="([^"]*)"/g, (_, c) => `class="${c.split(/\s+/).filter(Boolean).join(' ')}"`);
 }
-const R = async (name, props = {}, children) => tidy(await renderSvelte(name, props, children === undefined ? {} : { children }));
+const R = async (name, props = {}, children) => tidy(await renderSvelte(name, props, { children }));
 // Every component instance renders with the uid s1: rename it so ids stay unique on the page.
 const uniq = (html, uid) => html.replace(/\bs1\b/g, uid);
 const badge = (variant, text) => R('Badge', { variant, size: 'sm' }, text);
 
 // ── indenter: line breaks and depth for block-level tags only (inline whitespace is left as the component rendered it)
 const BLOCK = 'div|section|ul|li|footer|header|p|h1|h2|h3|h4|h5|h6|table|thead|tbody|tr|th|td|article|nav';
-function pretty(html, base = 0) {
-  const re = new RegExp(`(<\\/?(?:${BLOCK})(?:\\s[^>]*)?>)`, 'g');
-  const parts = html.split(re).filter((p) => p.trim() !== '');
-  let depth = base;
+const BLOCK_TAG = new RegExp(`(<\\/?(?:${BLOCK})(?:\\s[^>]*)?>)`, 'g');
+const CLOSE_TAG = new RegExp(`^<\\/(?:${BLOCK})>`);
+const OPEN_TAG = new RegExp(`^<(?:${BLOCK})(?:\\s|>)`);
+function pretty(html) {
+  const parts = html.split(BLOCK_TAG).filter((p) => p.trim() !== '');
+  let depth = 0;
   const out = [];
   for (const p of parts) {
-    const close = new RegExp(`^<\\/(?:${BLOCK})>`).test(p);
-    const open = new RegExp(`^<(?:${BLOCK})(?:\\s|>)`).test(p);
-    if (close) depth -= 1;
+    if (CLOSE_TAG.test(p)) depth -= 1;
     out.push('  '.repeat(Math.max(depth, 0)) + p.trim());
-    if (open) depth += 1;
+    if (OPEN_TAG.test(p)) depth += 1;
   }
   return out.join('\n');
 }
@@ -71,16 +70,18 @@ const cards = [
 ];
 
 async function featureCard(c) {
-  return R('FeatureCard', { title: c.title, description: c.description, linkText: c.linkText, linkHref: c.linkHref, icon: snip(c.icon), badge: snip(await badge(c.badge[0], c.badge[1])) });
+  return R('FeatureCard', { ...c, icon: snip(c.icon), badge: snip(await badge(...c.badge)) });
 }
 async function featureGrid(n, layout, id, columns) {
   const inner = (await Promise.all(cards.slice(0, n).map(featureCard))).join('');
   return R('FeatureGrid', { layout, id, ...(columns ? { columns } : {}) }, inner);
 }
 
-const spanLabel = (n) => (n >= 3 ? `${n} of 12` : undefined);
+// BentoCard: spans below 3 columns suit decorative tiles only.
+const DECORATIVE_BELOW = 3;
+const spanLabel = (n) => (n >= DECORATIVE_BELOW ? `${n} of 12` : undefined);
 async function bentoTile(n, alias) {
-  const html = await R('BentoCard', { colSpan: n, title: spanLabel(n), 'aria-hidden': n < 3 ? 'true' : undefined });
+  const html = await R('BentoCard', { colSpan: n, title: spanLabel(n), 'aria-hidden': n < DECORATIVE_BELOW ? 'true' : undefined });
   return alias ? html.replace(`joy-bento-card--col-${n}`, `joy-bento-card--col-span-${n}`) : html;
 }
 const spanRows = [[12], [1, 11], [2, 10], [3, 9], [4, 8], [5, 7], [6, 6]];
@@ -112,8 +113,8 @@ async function showcaseBento() {
 const heroSubtitle = 'Ready-made sections that share tokens, states and keyboard behaviour with the rest of the system.';
 
 // ── assemble ───────────────────────────────────────────────────────────────
-function box(title, note, body, { flush = false, id } = {}) {
-  return `<div class="playground-box"${id ? ` id="${id}"` : ''}>
+function box(title, note, body, { flush = false } = {}) {
+  return `<div class="playground-box">
   <div class="playground-header">
     <h4>${title}</h4>
   </div>
@@ -279,9 +280,8 @@ ${group('Primary disabled', frame(heroDisabled))}
 ${group('Both as links', frame(heroLink))}
 </div>`));
 
-const leadDemos = [3, 4, 5, 6];
 const leadHtml = [];
-for (const n of leadDemos) leadHtml.push(group(`${n} cards, lead layout`, await featureGrid(n, 'lead', `blocks-feature-lead-${n}`)));
+for (const n of [3, 4, 5, 6]) leadHtml.push(group(`${n} cards, lead layout`, await featureGrid(n, 'lead', `blocks-feature-lead-${n}`)));
 sections.push(box('Feature grid (FeatureGrid)', 'The lead layout is the default: from 900px the first card spans two of three columns and the last card fills its row, so any number of cards leaves no empty cell. Below 900px it is one column.',
   `<div class="landing-demo__stack">
 ${leadHtml.join('\n')}
@@ -313,9 +313,8 @@ ${group('Primary loading, secondary disabled', ctaStates)}
 </div>`));
 sections.push(box('Footer (SiteFooter)', null, footer, { flush: true }));
 
-let body = sections.map((s) => pretty(s, 0)).join('\n\n');
+let body = sections.map(pretty).join('\n\n');
 
-// Undo the indenter's re-flow of <pre-formatted> hub scaffolding is unnecessary: only block tags moved.
 // Escape for a JS template literal, then restore the intended icon expressions.
 body = body.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
 body = body.replace(/@@ICON:([A-Za-z0-9]+):([0-9a-z%]+)@@/g, (_, n, s) => '${simIcon("' + n + '", "' + s + '")}');

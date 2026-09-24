@@ -1,8 +1,8 @@
 import { expect, type Page } from "@playwright/test";
 
 /**
- * Helpers shared by the F-038 specs (display-contracts.spec.ts, screens-f038.spec.ts).
- * The F-036/F-037 specs do not use them and are untouched.
+ * Helpers shared by the F-038 specs (display-contracts.spec.ts, screens-f038.spec.ts) and the
+ * F-039 landing-blocks specs. The F-036/F-037 specs do not use them and are untouched.
  */
 
 declare global {
@@ -14,6 +14,14 @@ declare global {
     /** Hub function that repaints chart/image canvases from the current theme tokens. */
     redrawHubCharts?(): void;
   }
+}
+
+/** Opens the hub's Landing blocks view at the given viewport width. */
+export async function openLandingBlocks(page: Page, width: number) {
+  await page.setViewportSize({ width, height: 900 });
+  await page.goto("/#landing-blocks");
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator("#view-landing-blocks")).toHaveClass(/active/);
 }
 
 export const modalContainer = "#demo-modal-container";

@@ -50,9 +50,13 @@ test('F-039 L5b: the header has the menu button (closed, labelled, controlling i
   assert.ok(!markup.includes('joy-drawer'), 'a closed drawer renders nothing');
 });
 
+const NAV_CLASS = /^joy-landing-(skip|header|drawer)/;
+const classSet = (markup) =>
+  new Set([...markup.matchAll(/class="([^"]*)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => NAV_CLASS.test(c)));
+
 test('F-039 L5b: the header class vocabulary is exactly the five landing-header classes (the hub simulator must match)', () => {
   const head = header(renderPage());
-  const classes = new Set([...head.matchAll(/class="([^"]*)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('joy-landing-header')));
+  const classes = classSet(head);
   assert.deepStrictEqual([...classes].sort(), [
     'joy-landing-header',
     'joy-landing-header__brand',
@@ -66,10 +70,6 @@ test('F-039 L5b: the header class vocabulary is exactly the five landing-header 
 // F-039 C1a: the hub simulator (apps/storybook-hub/build.js) hand-writes the landing header, skip link and mobile drawer
 // contents between two marker comments. The header/skip classes come from the SSR'd page; the drawer contents are
 // closed (rendered by nothing) at SSR, so their classes are read from the component source. The two sets must be equal.
-const NAV_CLASS = /^joy-landing-(skip|header|drawer)/;
-const classSet = (markup) =>
-  new Set([...markup.matchAll(/class="([^"]*)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => NAV_CLASS.test(c)));
-
 test('F-039 C1a: the hub simulator header uses exactly the landing component header, skip and drawer class set', () => {
   const hub = fs.readFileSync(new URL('../../../apps/storybook-hub/build.js', import.meta.url), 'utf8');
   assert.strictEqual(hub.split('<!-- landing-header:start -->').length, 2, 'exactly one start marker');
@@ -77,7 +77,7 @@ test('F-039 C1a: the hub simulator header uses exactly the landing component hea
   const between = hub.slice(hub.indexOf('<!-- landing-header:start -->'), hub.indexOf('<!-- landing-header:end -->'));
   const hubClasses = classSet(between);
   const markup = renderPage();
-  const skip = markup.match(/<a\b[^>]*joy-landing-skip[^>]*>/)[0];
+  const skip = tags(markup, 'a').find((t) => attr(t, 'class') === 'joy-landing-skip');
   const componentClasses = classSet(skip + header(markup));
   const source = fs.readFileSync(new URL('../src/LandingPage.tsx', import.meta.url), 'utf8');
   for (const c of source.match(/joy-landing-drawer[\w-]*/g) || []) componentClasses.add(c);

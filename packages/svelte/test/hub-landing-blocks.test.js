@@ -28,7 +28,6 @@ test('the drift check turns red when a component class changes (scratch copy, re
   // A scratch root with the same layout the generator expects: components, SSR helper, build.js; node_modules is linked.
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'joy-hub-blocks-'));
   try {
-    fs.mkdirSync(path.join(scratch, 'packages/svelte/test'), { recursive: true });
     fs.mkdirSync(path.join(scratch, 'apps/storybook-hub'), { recursive: true });
     fs.cpSync(path.join(repoRoot, 'packages/svelte/src'), path.join(scratch, 'packages/svelte/src'), { recursive: true });
     fs.cpSync(path.join(repoRoot, 'packages/svelte/test/helpers'), path.join(scratch, 'packages/svelte/test/helpers'), { recursive: true });
