@@ -242,6 +242,12 @@ test('F-039 L4: allowMultiple keeps other items open and toggles each independen
   assert.deepStrictEqual(expanded(), [false, false, true]);
 });
 
+test('F-039 L4: StatsSection accepts an accessible name from the caller (no fixed English label baked in)', async () => {
+  const root = openTag(await renderSvelte('StatsSection', { stats: STATS, 'aria-label': 'Key metrics' }));
+  assert.match(root, /aria-label="Key metrics"/);
+  assert.ok(!openTag(await renderSvelte('StatsSection', { stats: STATS,  })).includes('aria-label'), 'unnamed by default');
+});
+
 test('F-039 L4: ref is bound once per twin, on the root element, and writes the element back to the bindable prop', () => {
   const sentinel = { el: true };
   const propsFor = {

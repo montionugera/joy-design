@@ -2815,6 +2815,7 @@ h1, h2, h3, .joy-display {
 
 /* Testimonial Card */
 .joy-testimonial-card {
+  box-sizing: border-box;
   border-radius: var(--joy-radius-card);
   background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
@@ -4903,6 +4904,7 @@ h1, h2, h3, .joy-display {
 
 /* ── Landing Page Suite: LogoCloud ── */
 .joy-logo-cloud {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -4964,6 +4966,7 @@ a.joy-logo-cloud__item:focus-visible {
 
 /* ── Landing Page Suite: StatsSection ── */
 .joy-stats-section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -4975,6 +4978,7 @@ a.joy-logo-cloud__item:focus-visible {
   gap: 24px;
 }
 .joy-stat-item {
+  box-sizing: border-box;
   background-color: var(--joy-surface-raised);
   border: 1px solid var(--joy-border-default);
   border-radius: var(--joy-radius-card);
@@ -5133,6 +5137,7 @@ a.joy-logo-cloud__item:focus-visible {
 
 /* ── Landing Page Suite: FAQSection ── */
 .joy-faq-section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 840px;
   margin: 0 auto;

@@ -752,3 +752,11 @@ test('F-039 L4 CSS: the dark-gap components (feature card, stats, faq, logo clou
     }
   }
 });
+
+// A full-width section with padding overflows the page by its padding unless it sizes its own box (found by the L4
+// Chromium probe at 375px: the section was 100% + 48px wide on a page with no global reset).
+test('F-039 L4 CSS: full-width sections and cards size their own border box', () => {
+  for (const [css, sel] of [[logoBlock, '.joy-logo-cloud'], [statsBlock, '.joy-stats-section'], [statsBlock, '.joy-stat-item'], [faqBlock, '.joy-faq-section'], [testimonialBlock, '.joy-testimonial-card']]) {
+    assert.match(rule(css, sel), /box-sizing:\s*border-box/, `${sel} sets box-sizing`);
+  }
+});

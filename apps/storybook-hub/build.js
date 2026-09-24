@@ -2796,7 +2796,7 @@ ${navigationHtml}
             <div style="margin-top: 8px;">
               <h5 style="margin: 0 0 8px 0; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--joy-text-muted);">AvatarGroup (Overlapping Team Stack)</h5>
               <div class="joy-avatar-group">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-accent-default);"><span class="joy-avatar__fallback">AM</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">AM</span></div>
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-success-fg);"><span class="joy-avatar__fallback">BL</span></div>
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-warning-fg);"><span class="joy-avatar__fallback">CR</span></div>
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-text-muted);"><span class="joy-avatar__fallback">+4</span></div>
@@ -3094,7 +3094,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
               <p class="joy-testimonial-card__quote">"The transition from generic UI kits to Joymify Design was immediate. High-density financial views and Svelte 5 Rune reactivity cut our portal re-render overhead by 40%."</p>
               <div class="joy-testimonial-card__author">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-accent-default);">
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md">
                   <span class="joy-avatar__fallback">AK</span>
                 </div>
                 <div class="joy-testimonial-card__author-info">
@@ -3131,7 +3131,7 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
           <div style="padding: 24px;">
             <div class="joy-logo-cloud">
-              <p class="joy-logo-cloud__title">Trusted by Institutional Trading Desks & Tier-1 Liquidity Providers</p>
+              <p class="joy-logo-cloud__title">Trusted by institutional trading desks and tier-1 liquidity providers</p>
               <div class="joy-logo-cloud__logos">
                 <div class="joy-logo-cloud__item">
                   <svg width="120" height="32" viewBox="0 0 120 32" fill="none">
@@ -3293,31 +3293,31 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="joy-faq-section" style="padding: 0;">
               <div class="joy-faq-list">
                 <div class="joy-faq-item joy-faq-item--open" id="faq-item-1">
-                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-1')">
-                    <span>How does Joymify guarantee 60 FPS rendering under 100k candlestick points?</span>
-                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  <button type="button" id="faq-trigger-1" class="joy-faq-item__trigger" aria-expanded="true" aria-controls="faq-answer-1" onclick="toggleFaq('faq-item-1')">
+                    <span class="joy-faq-item__label">How does Joymify guarantee 60 FPS rendering under 100k candlestick points?</span>
+                    <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
-                  <div class="joy-faq-item__content">
+                  <div class="joy-faq-item__content" id="faq-answer-1" role="region" aria-labelledby="faq-trigger-1">
                     Through dual-layer canvas decoupling, O(log N) binary search viewport culling, Largest-Triangle-Three-Buckets (LTTB) downsampling, and pre-allocated circular RingBuffers that prevent garbage collection thrashing during real-time tick streaming.
                   </div>
                 </div>
 
                 <div class="joy-faq-item" id="faq-item-2">
-                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-2')">
-                    <span>Can we hot-swap institutional theme palettes without re-rendering?</span>
-                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  <button type="button" id="faq-trigger-2" class="joy-faq-item__trigger" aria-expanded="false" aria-controls="faq-answer-2" onclick="toggleFaq('faq-item-2')">
+                    <span class="joy-faq-item__label">Can we hot-swap institutional theme palettes without re-rendering?</span>
+                    <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
-                  <div class="joy-faq-item__content">
+                  <div class="joy-faq-item__content" id="faq-answer-2" role="region" aria-labelledby="faq-trigger-2" hidden>
                     Yes. All styling is driven by CSS custom properties (--joy-surface-*, --joy-border, --joy-text-primary, --gold-400). Swapping theme attributes dynamically updates the entire layout instantly with zero layout shifts and verified WCAG contrast.
                   </div>
                 </div>
 
                 <div class="joy-faq-item" id="faq-item-3">
-                  <button type="button" class="joy-faq-item__trigger" onclick="toggleFaq('faq-item-3')">
-                    <span>How do financial tables adapt to mobile smartphone viewports?</span>
-                    <svg class="joy-faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  <button type="button" id="faq-trigger-3" class="joy-faq-item__trigger" aria-expanded="false" aria-controls="faq-answer-3" onclick="toggleFaq('faq-item-3')">
+                    <span class="joy-faq-item__label">How do financial tables adapt to mobile smartphone viewports?</span>
+                    <span class="joy-faq-item__icon" aria-hidden="true"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
-                  <div class="joy-faq-item__content">
+                  <div class="joy-faq-item__content" id="faq-answer-3" role="region" aria-labelledby="faq-trigger-3" hidden>
                     With responsive stack mode enabled (.joy-table--responsive-stack), tables below 768px transform rows into individual card layouts, utilizing data-label attributes to present column keys alongside ticker values with zero horizontal cutoff.
                   </div>
                 </div>
@@ -3513,8 +3513,8 @@ export async function executeHedge(symbol: string, size: number) {
 
               <!-- 3. LogoCloud -->
               <section class="joy-logo-cloud" style="padding: 40px 24px;">
-                <p class="joy-logo-cloud__title">Trusted by Institutional Desks & Liquidity Providers Worldwide</p>
-                <div class="joy-logo-cloud__grid">
+                <p class="joy-logo-cloud__title">Trusted by institutional desks and liquidity providers worldwide</p>
+                <div class="joy-logo-cloud__logos">
                   <div class="joy-logo-cloud__item">
                     <svg width="130" height="32" viewBox="0 0 120 32" fill="none"><rect x="2" y="6" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2"/><path d="M12 10v12M6 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="30" y="21" font-family="sans-serif" font-weight="700" font-size="14" fill="currentColor">QUANTUM</text></svg>
                   </div>
@@ -4560,11 +4560,14 @@ export async function executeHedge(symbol: string, size: number) {
       hubCloseDialog('demo-drawer-container');
     }
 
-    function toggleFaq(id) {
-      const item = document.getElementById(id);
-      if (item) {
-        item.classList.toggle('joy-faq-item--open');
-      }
+    function toggleFaq(ref) {
+      const item = typeof ref === 'string' ? document.getElementById(ref) : ref && ref.closest('.joy-faq-item');
+      if (!item) return;
+      const open = item.classList.toggle('joy-faq-item--open');
+      const trigger = item.querySelector('[aria-expanded]');
+      if (trigger) trigger.setAttribute('aria-expanded', String(open));
+      const content = item.querySelector('.joy-faq-item__content');
+      if (content) content.hidden = !open;
     }
 
     function showDemoToast(msg, variant = 'info') {
