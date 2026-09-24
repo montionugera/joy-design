@@ -1,7 +1,8 @@
 <script lang="ts">
   import LandingAction from './LandingAction.svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  interface Props {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class' | 'children' | 'title'> {
     title: string;
     description?: string;
     primaryCtaText?: string;

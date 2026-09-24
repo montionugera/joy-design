@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Check } from '@joymify/icons';
 	import Button from './Button.svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props {
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'title' | 'onselect'> {
 		title: string;
 		description?: string;
 		price: string;
