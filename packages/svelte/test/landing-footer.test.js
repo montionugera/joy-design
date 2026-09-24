@@ -59,8 +59,7 @@ test('F-039 L5a: brand title, logo snippet, copyright and every column render; t
 });
 
 test('F-039 L5a: an external column link opens in a new tab with rel and a disclosure label; internal links stay plain', async () => {
-  const links = tags(await renderSvelte({ columns: COLUMNS }), 'a');
-  const [pricing, changelog, about] = links;
+  const [pricing, changelog, about] = tags(await renderSvelte({ columns: COLUMNS }), 'a');
   for (const internal of [pricing, about]) {
     assert.ok(!/target=|rel=|aria-label=/.test(internal), `internal link stays plain: ${internal}`);
   }

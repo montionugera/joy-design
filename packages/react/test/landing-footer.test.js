@@ -119,8 +119,7 @@ test('F-039 L5a: list keys are unique even when titles, labels and names repeat 
   const socialKeys = keys(tree, (n) => n.props.className === 'joy-site-footer__social-link');
   assert.strictEqual(new Set(socialKeys).size, 2, 'social keys');
   // links of one column share a parent: their keys must differ within that parent
-  const firstColumnLinks = keys(tree, (n) => n.type === 'li').slice(0, 2);
-  assert.strictEqual(new Set(firstColumnLinks).size, 2, 'link keys within a column');
+  assert.strictEqual(new Set(linkKeys.slice(0, 2)).size, 2, 'link keys within a column');
 });
 
 test('F-039 L5a: the forwarded ref lands on the root <footer>, not a descendant', () => {
