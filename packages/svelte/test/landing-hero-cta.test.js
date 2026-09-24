@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { render } from 'svelte/server';
+import { compile } from 'svelte/compiler';
 import { compileSvelte, renderSvelte as renderRaw } from './helpers/render-svelte.js';
 
 // F-039 L1: HeroSection + CTASection (Svelte twin). The React twin asserts the same expectations in
@@ -136,4 +137,101 @@ test('F-039 L1: a consumer aria-label names the CTA section instead of being hid
   assert.ok(!/<section\b[^>]*aria-labelledby/.test(html));
   const own = await renderSvelte('CTASection', { title: 'One', 'aria-labelledby': 'mine' });
   assert.match(own, /<section\b[^>]*aria-labelledby="mine"/);
+});
+
+// F-039 F1 (final review I-1): ref placement and event wiring, without a DOM. The compiled CLIENT component runs against a
+// stand-in for svelte/internal/client that hands out DISTINCT nodes (created[0] is the root template node) and records
+// which node each bind:this and each delegated handler is attached to. Child components are recording stubs, so a click
+// handler is checked where it really lands: on the LandingAction it is handed to, or on the anchor it is delegated from.
+const libFile = (name) => fileURLToPath(new URL(`../src/lib/${name}.svelte`, import.meta.url));
+function runClient(name, props, childNames = []) {
+  const code = compile(fs.readFileSync(libFile(name), 'utf8'), { generate: 'client', filename: libFile(name) }).js.code
+    .replace(/^import .*$/gm, '')
+    .replace('export default function', 'function');
+  const created = [];
+  const delegated = [];
+  const binds = [];
+  const calls = {};
+  const noop = () => noop;
+  const $ = new Proxy({}, {
+    get: (_, key) => {
+      switch (key) {
+        case 'from_html': return (html) => () => { const node = { html }; created.push(node); return node; };
+        case 'child':
+        case 'sibling':
+        case 'first_child':
+        case 'only_child': return () => ({ derived: true });
+        case 'props_id': return () => 'uid';
+        case 'prop': return (p, k, _flags, fallback) => (...args) => (args.length ? (p[k] = args[0]) : (p[k] === undefined ? fallback : p[k]));
+        case 'rest_props': return () => ({});
+        case 'derived': return (fn) => ({ fn });
+        case 'get': return (d) => d.fn();
+        case 'if': return (_node, render) => render((branch) => branch({}));
+        case 'delegated': return (event, el, handler) => { delegated.push({ event, el, handler }); };
+        case 'bind_this': return (el, setter) => { binds.push({ el, setter }); };
+        default: return noop;
+      }
+    }
+  });
+  const stubs = childNames.map((child) => (_anchor, p) => { (calls[child] ??= []).push(p); });
+  new Function('$', 'props', ...childNames, `${code}\nreturn ${name}({}, props);`)($, props, ...stubs);
+  return { created, delegated, binds, calls };
+}
+
+test('F-039 F1: bind:this is on the root <section> of HeroSection and CTASection and writes the element to ref', () => {
+  const sentinel = { el: true };
+  for (const [name, extra] of [['HeroSection', {}], ['CTASection', { title: 'T' }]]) {
+    const props = { ...extra, ref: null };
+    const { binds, created } = runClient(name, props, ['LandingAction']);
+    assert.strictEqual(binds.length, 1, `${name} calls bind_this once`);
+    assert.strictEqual(binds[0].el, created[0], `${name} binds the root element, not a descendant`);
+    assert.ok(/^<section\b/.test(created[0].html), `${name} root template node is the <section> (${created[0].html})`);
+    binds[0].setter(sentinel);
+    assert.strictEqual(props.ref, sentinel, `${name} writes the element to ref`);
+  }
+});
+
+test('F-039 F1: onprimaryclick and onsecondaryclick reach the matching LandingAction, with its variant', () => {
+  const primary = () => {};
+  const secondary = () => {};
+  for (const [name, extra] of [['HeroSection', {}], ['CTASection', { title: 'T' }]]) {
+    const { calls } = runClient(name, { ...extra, onprimaryclick: primary, onsecondaryclick: secondary }, ['LandingAction']);
+    const [first, second] = calls.LandingAction;
+    assert.strictEqual(calls.LandingAction.length, 2, `${name} renders two actions`);
+    assert.strictEqual(first.onclick, primary, `${name} primary`);
+    assert.strictEqual(first.variant, 'solid');
+    assert.strictEqual(second.onclick, secondary, `${name} secondary`);
+    assert.strictEqual(second.variant, 'outline');
+  }
+});
+
+test('F-039 F1: LandingAction hands the handler to Button when there is no href, and delegates the click on the anchor when there is', () => {
+  let calls = 0;
+  const handler = () => { calls += 1; };
+  const asButton = runClient('LandingAction', { onclick: handler }, ['Button']);
+  assert.strictEqual(asButton.calls.Button[0].onclick, handler, 'Button gets the handler');
+  assert.strictEqual(asButton.delegated.length, 0, 'no anchor handler without an href');
+
+  const link = runClient('LandingAction', { href: '/x', onclick: handler });
+  assert.strictEqual(link.delegated.length, 1);
+  const { event, el, handler: run } = link.delegated[0];
+  assert.strictEqual(event, 'click');
+  assert.ok(!el.derived && /^<a\b/.test(el.html), `the click is delegated from the anchor itself (${el.html})`);
+  const click = { prevented: 0, preventDefault() { this.prevented += 1; } };
+  run(click);
+  assert.deepStrictEqual([calls, click.prevented], [1, 0], 'an enabled link runs the handler and leaves navigation to the browser');
+  const modified = { metaKey: true, prevented: 0, preventDefault() { this.prevented += 1; } };
+  run(modified);
+  assert.strictEqual(modified.prevented, 0, 'a modified click is never cancelled by the component');
+});
+
+test('F-039 F1: a disabled or loading LandingAction link swallows the click and never calls the handler', () => {
+  let calls = 0;
+  const handler = () => { calls += 1; };
+  for (const state of [{ disabled: true }, { loading: true }]) {
+    const { delegated } = runClient('LandingAction', { href: '/x', onclick: handler, ...state });
+    const click = { prevented: 0, preventDefault() { this.prevented += 1; } };
+    delegated[0].handler(click);
+    assert.deepStrictEqual([calls, click.prevented], [0, 1], `${JSON.stringify(state)}: preventDefault called, handler not called`);
+  }
 });

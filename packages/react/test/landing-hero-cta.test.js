@@ -165,3 +165,17 @@ test('F-039 L1: an inert link swallows clicks, an enabled link and a button pass
   assert.strictEqual(LandingAction({ href: '/x', onClick: handler }).props.onClick, handler);
   assert.strictEqual(LandingAction({ onClick: handler }).props.onClick, handler);
 });
+
+// F-039 F1 (final review I-1): the forwarded ref lands on the root <section>, not on an inner element and not nowhere.
+// The forwardRef marker alone (first test) stays green when `ref={ref}` is dropped from the root.
+test('F-039 F1: the forwarded ref lands on the root section of HeroSection and CTASection', () => {
+  for (const [C, extra] of [[HeroSection, {}], [CTASection, { title: 'T' }]]) {
+    const ref = React.createRef();
+    let tree;
+    // CTASection uses useId, so the render function runs inside a probe component
+    const Probe = () => { tree = C.render({ ...extra }, ref); return null; };
+    renderToStaticMarkup(React.createElement(Probe));
+    assert.strictEqual(tree.type, 'section', `${C.displayName} root element`);
+    assert.strictEqual(tree.props.ref, ref, `${C.displayName} forwards ref to its root`);
+  }
+});
