@@ -3016,7 +3016,7 @@ export async function executeHedge(symbol: string, size: number) {
               Fast, clear <span class="joy-hero__title-emphasis">order screens for busy desks</span>
             </h1>
             <p class="joy-hero__subtitle">
-              Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens. Move the cursor to nudge the particles; click to send a pulse.
+              Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.
             </p>
             <div class="joy-hero__ctas">
               <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Deploy solution</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read the guide</span>  </button>
@@ -7189,6 +7189,32 @@ export async function executeHedge(symbol: string, size: number) {
         kineticCtx.fill();
       }
       kineticCtx.globalAlpha = 1;
+      clearKineticTextArea();
+    }
+
+    /**
+     * Keeps the hero copy on the plain card surface: every text line box and CTA of the HeroSection, padded, is cut out
+     * of the painted field, so particles never lower the text contrast. Line boxes are read live (fonts load late).
+     */
+    function clearKineticTextArea() {
+      const hero = kineticCanvas.parentElement.querySelector('.joy-hero');
+      if (!hero) return;
+      const origin = kineticCanvas.getBoundingClientRect();
+      const rects = [];
+      hero.querySelectorAll('.joy-hero__title, .joy-hero__subtitle').forEach((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        rects.push(...range.getClientRects());
+      });
+      hero.querySelectorAll('.joy-hero__badge, .joy-hero__ctas .joy-button').forEach((el) => rects.push(el.getBoundingClientRect()));
+      const pad = 10;
+      kineticCtx.save();
+      kineticCtx.globalCompositeOperation = 'destination-out';
+      kineticCtx.fillStyle = kineticPalette.muted;
+      for (const r of rects) {
+        kineticCtx.fillRect(r.left - origin.left - pad, r.top - origin.top - pad, r.width + pad * 2, r.height + pad * 2);
+      }
+      kineticCtx.restore();
     }
 
     // Hero CTAs are SSR markup from the generator; their actions are wired here.

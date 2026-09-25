@@ -275,7 +275,7 @@ const kineticHero = await R('HeroSection', {
   badgeText: 'Interactive particle field',
   title: 'Fast, clear',
   titleEmphasis: 'order screens for busy desks',
-  subtitle: 'Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens. Move the cursor to nudge the particles; click to send a pulse.',
+  subtitle: 'Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.',
   primaryCtaText: 'Deploy solution',
   secondaryCtaText: 'Read the guide',
 });

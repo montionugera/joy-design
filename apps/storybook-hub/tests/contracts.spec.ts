@@ -245,6 +245,54 @@ test.describe("Storybook Hub Quality Contracts", () => {
           ];
         });
         expect(palette, `palette ${theme}`).toEqual(tokens);
+        // Hero copy and CTAs sit on the card surface: no particle or link is painted under them.
+        await page.mouse.move(640, 300);
+        await page.waitForTimeout(250);
+        const painted = await page.evaluate(() => {
+          const canvas = document.getElementById(
+            "kinetic-particle-canvas",
+          ) as HTMLCanvasElement;
+          const ctx = canvas.getContext("2d")!;
+          const box = canvas.getBoundingClientRect();
+          const sx = canvas.width / box.width;
+          const sy = canvas.height / box.height;
+          const hero = document.querySelector(
+            "#kinetic-hero-container .joy-hero",
+          )!;
+          const rects: DOMRect[] = [];
+          for (const el of Array.from(
+            hero.querySelectorAll(".joy-hero__title, .joy-hero__subtitle"),
+          )) {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            rects.push(...Array.from(range.getClientRects()));
+          }
+          for (const el of Array.from(
+            hero.querySelectorAll(
+              ".joy-hero__badge, .joy-hero__ctas .joy-button",
+            ),
+          ))
+            rects.push(el.getBoundingClientRect());
+          const hits: string[] = [];
+          for (const r of rects) {
+            const x = Math.floor((r.left - box.left) * sx);
+            const y = Math.floor((r.top - box.top) * sy);
+            const w = Math.max(1, Math.floor(r.width * sx));
+            const h = Math.max(1, Math.floor(r.height * sy));
+            const data = ctx.getImageData(x, y, w, h).data;
+            let n = 0;
+            for (let i = 3; i < data.length; i += 4) if (data[i] > 0) n++;
+            if (n)
+              hits.push(
+                `${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)}: ${n} px`,
+              );
+          }
+          return { checked: rects.length, hits };
+        });
+        expect(painted.checked, "text rects found").toBeGreaterThan(3);
+        expect(painted.hits, `canvas paint under hero text (${theme})`).toEqual(
+          [],
+        );
       }
       const a = await snapshot(page);
       await page.waitForTimeout(300);
