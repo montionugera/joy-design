@@ -38,16 +38,13 @@ echo "2a. Self-testing the gate scripts (lint-colors, epic-check)..."
 bash scripts/test-lint-colors.sh
 bash scripts/test-epic-check.sh
 
-echo "2b. WCAG 2.2 AA contrast gate for semantic tokens (both themes)..."
-node --test packages/tokens/test/contrast.test.js
-
-echo "2c. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
+echo "2b. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
 pnpm check
 
-echo "2d. Running workspace unit tests..."
+echo "2c. Running workspace unit tests (includes the WCAG 2.2 AA contrast gate, packages/tokens/test/contrast.test.js)..."
 pnpm -r test
 
-echo "2e. Checking Svelte/React parity contract..."
+echo "2d. Checking Svelte/React parity contract..."
 node scripts/parity-check.mjs
 
 echo "3. Compiling Storybook Hub..."
