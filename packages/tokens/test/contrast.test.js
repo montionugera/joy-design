@@ -96,6 +96,16 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
     { fg: '--joy-status-danger-solid-fg', bg: '--joy-status-danger-solid-bg', theme: 'Dark', role: 'Danger Solid Button', min: 4.5 },
     { fg: '--joy-status-info-fg', bg: '--joy-status-info-bg', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
     { fg: '--joy-status-info-fg', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Status Text / Surface', min: 4.5 },
+
+    // F-043 brand
+    { fg: '--joy-brand-mark-on-tile', bg: '--joy-brand-tile', theme: 'Light', role: 'Brand mark / Tile', min: 3.0 },
+    { fg: '--joy-brand-mark', bg: '--joy-surface-canvas', theme: 'Light', role: 'Brand mark / Canvas', min: 3.0 },
+    { fg: '--joy-brand-ink', bg: '--joy-surface-canvas', theme: 'Light', role: 'Brand ink / Canvas', min: 4.5 },
+    { fg: '--joy-brand-ink-on-tile', bg: '--joy-brand-tile', theme: 'Light', role: 'Brand ink / Tile', min: 4.5 },
+    { fg: '--joy-brand-mark-on-tile', bg: '--joy-brand-tile', theme: 'Dark', role: 'Brand mark / Tile', min: 3.0 },
+    { fg: '--joy-brand-mark', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Brand mark / Canvas', min: 3.0 },
+    { fg: '--joy-brand-ink', bg: '--joy-surface-canvas', theme: 'Dark', role: 'Brand ink / Canvas', min: 4.5 },
+    { fg: '--joy-brand-ink-on-tile', bg: '--joy-brand-tile', theme: 'Dark', role: 'Brand ink / Tile', min: 4.5 },
   ];
 
   const results = [];

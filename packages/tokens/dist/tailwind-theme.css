@@ -93,6 +93,12 @@
   --color-joy-status-info-fg: #17446f;
   --color-joy-status-info-bg: #e6f0f9;
   --color-joy-status-info-border: #8fbceb;
+  --color-joy-brand-tile: #14253e;
+  --color-joy-brand-mark: #856515;
+  --color-joy-brand-mark-on-tile: #c49a3a;
+  --color-joy-brand-mark-contrast: #fdfaf3;
+  --color-joy-brand-ink: #14253e;
+  --color-joy-brand-ink-on-tile: #f8f3e8;
   --spacing-joy-1: 4px;
   --spacing-joy-2: 8px;
   --spacing-joy-3: 12px;
@@ -112,6 +118,7 @@
   --radius-joy-pill: 9999px;
   --font-joy-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-joy-mono: JetBrains Mono, Menlo, monospace;
+  --font-joy-display: "Cormorant Garamond", "Noto Serif", Georgia, serif;
   --text-joy-xs: 0.75rem;
   --text-joy-sm: 0.875rem;
   --text-joy-md: 1rem;

@@ -110,6 +110,7 @@ export interface JoyTokens {
   'control-height-lg': string;
   'font-family-sans': string;
   'font-family-mono': string;
+  'font-family-display': string;
   'surface-canvas': string;
   'surface-card': string;
   'surface-raised': string;
@@ -159,6 +160,12 @@ export interface JoyTokens {
   'elevation-accent-1': string;
   'elevation-accent-2': string;
   'elevation-accent-inset': string;
+  'brand-tile': string;
+  'brand-mark': string;
+  'brand-mark-on-tile': string;
+  'brand-mark-contrast': string;
+  'brand-ink': string;
+  'brand-ink-on-tile': string;
   /**
    * @deprecated Use 'accent-default' instead
    */

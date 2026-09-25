@@ -111,6 +111,7 @@
   --joy-control-height-lg: 48px;
   --joy-font-family-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   --joy-font-family-mono: JetBrains Mono, Menlo, monospace;
+  --joy-font-family-display: "Cormorant Garamond", "Noto Serif", Georgia, serif;
   --joy-surface-canvas: #f8f3e8;
   --joy-surface-card: #ffffff;
   --joy-surface-raised: #ffffff;
@@ -160,6 +161,12 @@
   --joy-elevation-accent-1: 0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08);
   --joy-elevation-accent-2: 0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12);
   --joy-elevation-accent-inset: inset 0 2px 4px rgba(133, 101, 21, 0.35);
+  --joy-brand-tile: #14253e;
+  --joy-brand-mark: #856515;
+  --joy-brand-mark-on-tile: #c49a3a;
+  --joy-brand-mark-contrast: #fdfaf3;
+  --joy-brand-ink: #14253e;
+  --joy-brand-ink-on-tile: #f8f3e8;
   /* ── Canonical Brand Invariants ── */
   --navy-500: #14253e;
   --gold-400: #c49a3a;
@@ -282,6 +289,12 @@
   --joy-elevation-accent-1: 0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
   --joy-elevation-accent-2: 0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6);
   --joy-elevation-accent-inset: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  --joy-brand-tile: #14253e;
+  --joy-brand-mark: #dab362;
+  --joy-brand-mark-on-tile: #c49a3a;
+  --joy-brand-mark-contrast: #fdfaf3;
+  --joy-brand-ink: #f8f3e8;
+  --joy-brand-ink-on-tile: #f8f3e8;
   --joy-color-surface-canvas: var(--joy-surface-canvas);
   --joy-color-surface-card: var(--joy-surface-card);
   --joy-color-border-subtle: var(--joy-border-subtle);
@@ -342,6 +355,12 @@
   --joy-elevation-accent-1: 0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
   --joy-elevation-accent-2: 0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6);
   --joy-elevation-accent-inset: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  --joy-brand-tile: #14253e;
+  --joy-brand-mark: #dab362;
+  --joy-brand-mark-on-tile: #c49a3a;
+  --joy-brand-mark-contrast: #fdfaf3;
+  --joy-brand-ink: #f8f3e8;
+  --joy-brand-ink-on-tile: #f8f3e8;
   --joy-color-surface-canvas: var(--joy-surface-canvas);
   --joy-color-surface-card: var(--joy-surface-card);
   --joy-color-border-subtle: var(--joy-border-subtle);

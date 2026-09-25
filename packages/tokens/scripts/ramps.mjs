@@ -237,6 +237,15 @@ export function generateAllTokens() {
       "accent-1": { "value": "0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)", "type": "shadow" },
       "accent-2": { "value": "0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)", "type": "shadow" },
       "accent-inset": { "value": "inset 0 2px 4px rgba(133, 101, 21, 0.35)", "type": "shadow" }
+    },
+    // F-043 Brand
+    "brand": {
+      "tile": { "value": "{color.navy.500}", "type": "color" },
+      "mark": { "value": "{color.gold.600}", "type": "color" },
+      "mark-on-tile": { "value": "{color.gold.400}", "type": "color" },
+      "mark-contrast": { "value": "{color.cream.50}", "type": "color" },
+      "ink": { "value": "{color.navy.500}", "type": "color" },
+      "ink-on-tile": { "value": "{color.cream.100}", "type": "color" }
     }
   };
 
@@ -311,6 +320,15 @@ export function generateAllTokens() {
       "accent-1": { "value": "0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)", "type": "shadow" },
       "accent-2": { "value": "0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6)", "type": "shadow" },
       "accent-inset": { "value": "inset 0 2px 4px rgba(0, 0, 0, 0.45)", "type": "shadow" }
+    },
+    // F-043 Brand
+    "brand": {
+      "tile": { "value": "{color.navy.500}", "type": "color" },
+      "mark": { "value": "{color.gold.300}", "type": "color" },
+      "mark-on-tile": { "value": "{color.gold.400}", "type": "color" },
+      "mark-contrast": { "value": "{color.cream.50}", "type": "color" },
+      "ink": { "value": "{color.cream.100}", "type": "color" },
+      "ink-on-tile": { "value": "{color.cream.100}", "type": "color" }
     }
   };
 
@@ -430,7 +448,8 @@ export function generateAllTokens() {
     "font": {
       "family": {
         "sans": { "value": "Inter, -apple-system, BlinkMacSystemFont, sans-serif", "type": "fontFamily" },
-        "mono": { "value": "JetBrains Mono, Menlo, monospace", "type": "fontFamily" }
+        "mono": { "value": "JetBrains Mono, Menlo, monospace", "type": "fontFamily" },
+        "display": { "value": "\"Cormorant Garamond\", \"Noto Serif\", Georgia, serif", "type": "fontFamily" }
       }
     }
   };

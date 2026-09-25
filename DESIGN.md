@@ -47,6 +47,12 @@ colors:
   status-info-fg: "#17446f"
   status-info-bg: "#e6f0f9"
   status-info-border: "#8fbceb"
+  brand-tile: "#14253e"
+  brand-mark: "#856515"
+  brand-mark-on-tile: "#c49a3a"
+  brand-mark-contrast: "#fdfaf3"
+  brand-ink: "#14253e"
+  brand-ink-on-tile: "#f8f3e8"
   surface-canvas-dark: "#0d1624"
   surface-card-dark: "#111b2b"
   surface-raised-dark: "#14253e"
@@ -88,6 +94,12 @@ colors:
   status-info-fg-dark: "#8fbceb"
   status-info-bg-dark: "#0b2741"
   status-info-border-dark: "#17446f"
+  brand-tile-dark: "#14253e"
+  brand-mark-dark: "#dab362"
+  brand-mark-on-tile-dark: "#c49a3a"
+  brand-mark-contrast-dark: "#fdfaf3"
+  brand-ink-dark: "#f8f3e8"
+  brand-ink-on-tile-dark: "#f8f3e8"
 typography:
   display:
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
@@ -293,6 +305,12 @@ The contract. Light and dark values for every role.
 | `--joy-elevation-accent-1` | `0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)` | `0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)` |
 | `--joy-elevation-accent-2` | `0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)` | `0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6)` |
 | `--joy-elevation-accent-inset` | `inset 0 2px 4px rgba(133, 101, 21, 0.35)` | `inset 0 2px 4px rgba(0, 0, 0, 0.45)` |
+| `--joy-brand-tile` | `#14253e` | `#14253e` |
+| `--joy-brand-mark` | `#856515` | `#dab362` |
+| `--joy-brand-mark-on-tile` | `#c49a3a` | `#c49a3a` |
+| `--joy-brand-mark-contrast` | `#fdfaf3` | `#fdfaf3` |
+| `--joy-brand-ink` | `#14253e` | `#f8f3e8` |
+| `--joy-brand-ink-on-tile` | `#f8f3e8` | `#f8f3e8` |
 
 ### Measured contrast
 
