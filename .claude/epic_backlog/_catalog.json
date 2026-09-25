@@ -3,10 +3,11 @@
     "id": "E-001",
     "title": "Production-grade design system: token-driven dark mode, mobile-first components, brand color ramps, hero CTA and full state coverage",
     "created_at": "2026-09-22T00:45:59.668359+00:00",
-    "status": "open",
+    "status": "verifying",
     "release_version": null,
     "verified_sha": null,
     "verified_at": null,
-    "split_approved_by": null
+    "split_approved_by": null,
+    "verifying_sha": "04691abfb1d0f31fc10f7bc4e067f92a95434b5c"
   }
 ]
