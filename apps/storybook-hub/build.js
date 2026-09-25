@@ -7080,6 +7080,10 @@ export async function executeHedge(symbol: string, size: number) {
         kineticPalette = hubKineticPalette();
         if (kineticAnimId === null) syncKinetic();
       }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      // Web fonts can land after the still frame: repaint so the text cut-outs match the final line boxes.
+      if (document.fonts) document.fonts.ready.then(() => {
+        if (kineticAnimId === null) syncKinetic();
+      });
       document.addEventListener('visibilitychange', syncKinetic);
       kineticReduce.addEventListener('change', syncKinetic);
       kineticCoarse.addEventListener('change', syncKinetic);
