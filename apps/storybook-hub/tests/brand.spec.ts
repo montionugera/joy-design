@@ -88,3 +88,56 @@ test("F-043: brand asset downloads are real images", async ({
     expect(res.headers()["content-type"]).toMatch(/image\/(svg\+xml|png)/);
   }
 });
+
+// Fix round (final review Important #1): the shared .joy-button--outline sets its own `color`,
+// which used to win over the banner's `color: var(--joy-brand-ink-on-tile)`, so the secondary CTA
+// rendered dark ink (1.11:1 text, 1.91:1 border) on the navy tile in light theme. Both a
+// `.joy-brand-banner .joy-button--outline` override and this test cover default, hover and
+// focus-visible: the override sets color/border-color once, so those states inherit it unless a
+// pseudo-class re-wins (hover/active here only touch `background`/`box-shadow`, never `color` or
+// `border-color`), and this test asserts the resting values against the WCAG floors (4.5:1 text,
+// 3:1 border) in both themes, computed from getComputedStyle against the real theme.css.
+for (const theme of ["light", "dark"] as const) {
+  test(`F-043: BrandBanner secondary CTA is readable in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto("/#brand");
+    await setTheme(page, theme);
+    await page.addStyleTag({
+      content: "*, *::before, *::after { transition: none !important; }",
+    });
+
+    const result = await page.evaluate(() => {
+      const parse = (value: string) =>
+        (value.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+      const luminance = ([r, g, b]: number[]) => {
+        const lin = (c: number) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+      };
+      const ratio = (fg: number[], bg: number[]) => {
+        const [hi, lo] = [luminance(fg), luminance(bg)].sort((x, y) => y - x);
+        return (hi + 0.05) / (lo + 0.05);
+      };
+      const banner = document.querySelector("#view-brand .joy-brand-banner")!;
+      const button = banner.querySelector(".joy-button--outline")!;
+      const bannerBg = parse(getComputedStyle(banner).backgroundColor);
+      const style = getComputedStyle(button);
+      return {
+        textRatio: ratio(parse(style.color), bannerBg),
+        borderRatio: ratio(parse(style.borderTopColor), bannerBg),
+      };
+    });
+
+    expect(
+      result.textRatio,
+      `secondary CTA text contrast in ${theme}`,
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      result.borderRatio,
+      `secondary CTA border contrast in ${theme}`,
+    ).toBeGreaterThanOrEqual(3);
+  });
+}

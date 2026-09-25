@@ -3051,6 +3051,26 @@ h1, h2, h3, .joy-display {
   gap: 16px;
   flex-wrap: wrap;
 }
+/* Fix round (final review Important #1): the shared .joy-button--outline sets its own color
+   (--joy-text-primary), which wins over the banner's color: var(--joy-brand-ink-on-tile) on
+   .joy-brand-banner itself, so the secondary CTA rendered dark ink on the navy tile -- 1.11:1 for
+   the text and 1.91:1 for the border, both failing WCAG (4.5:1 text, 3:1 non-text). --joy-brand-tile
+   and --joy-brand-ink-on-tile are the same value in both themes, so one override covers light and
+   dark. Mirrors .joy-cta-section__container's outline override: transparent background always (the
+   hero's "raised surface" hover would be invisible in dark, where --joy-surface-raised equals the
+   tile colour), an inset ring on hover/active instead of a fill change. */
+.joy-brand-banner .joy-button--outline {
+  color: var(--joy-brand-ink-on-tile);
+  border-color: var(--joy-brand-ink-on-tile);
+}
+.joy-brand-banner .joy-button--outline:hover:not(:disabled),
+.joy-brand-banner .joy-button--outline:active:not(:disabled) {
+  background: transparent;
+}
+.joy-brand-banner .joy-button--outline:hover:not(:disabled):not(:focus-visible),
+.joy-brand-banner .joy-button--outline:active:not(:disabled):not(:focus-visible) {
+  box-shadow: inset 0 0 0 1px var(--joy-brand-ink-on-tile);
+}
 
 /* Pricing Matrix */
 .joy-pricing-matrix {
