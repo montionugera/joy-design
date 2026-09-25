@@ -22,7 +22,11 @@ test('F-043: Ribbon renders label, variant and tone classes, readable by default
 test('F-043: BrandBanner renders title in a heading, decorative lattice, no gradient, CTA via LandingAction', () => {
   const html = banner({ title: 'One quiet product.', lede: 'Built deliberately.', primaryCtaText: 'Try Algo Trading', primaryCtaHref: '/algo' });
   assert.match(html, /<h2[^>]*>One quiet product\.<\/h2>/);
-  assert.match(html, /<svg[^>]*aria-hidden="true"/);
+  // Fix round (final review Minor 7): `<svg[^>]*aria-hidden="true"` could match any icon svg; scope
+  // it to the lattice class and require at least one path (the diamond grid), not just an empty svg.
+  const lattice = html.match(/<svg class="joy-brand-banner__lattice"[^>]*aria-hidden="true"[\s\S]*?<\/svg>/);
+  assert.ok(lattice, 'lattice svg with aria-hidden is present');
+  assert.match(lattice[0], /<path\b/);
   assert.ok(!/gradient/i.test(html));
   assert.match(html, /href="\/algo"/);
   assert.ok(!/#[0-9a-f]{3,6}\b/i.test(html));
