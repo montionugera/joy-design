@@ -1450,6 +1450,11 @@ ${inlinedThemeCss}
       align-items: center;
       gap: var(--joy-space-3);
     }
+    .hub-market-search {
+      width: min(100%, 220px);
+      padding: 6px 12px;
+      font-size: var(--joy-font-size-sm);
+    }
     /* Phone tier: the topbar is menu + brand + theme toggle; the framework switcher moves into the drawer. */
     @media (max-width: 767px) {
       .topbar {
@@ -1476,6 +1481,10 @@ ${inlinedThemeCss}
       }
       .canvas {
         padding: var(--joy-space-6) var(--joy-space-4);
+      }
+      /* 16px text keeps iOS Safari from zooming the page when the field takes focus. */
+      .hub-market-search {
+        font-size: var(--joy-font-size-md);
       }
     }
     @media (max-width: 480px) {
@@ -2448,7 +2457,7 @@ ${navigationHtml}
           <div class="playground-header">
             <h4>Live Quant Market Feeds</h4>
             <div style="display: flex; gap: 10px; align-items: center;">
-              <input type="text" id="market-search-input" class="joy-input" placeholder="Filter pairs (e.g. BTC, ETH)..." style="width: 220px; padding: 6px 12px; font-size: 0.8125rem;" oninput="handleMarketFilter(this.value)">
+              <input type="search" id="market-search-input" class="joy-input hub-market-search" placeholder="Filter pairs, e.g. BTC" aria-label="Filter pairs" oninput="handleMarketFilter(this.value)">
               <button class="joy-button joy-button--solid joy-button--sm" onclick="simulateRandomTick()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Random Tick
               </button>

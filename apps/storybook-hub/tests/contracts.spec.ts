@@ -457,6 +457,25 @@ test.describe("Storybook Hub Quality Contracts", () => {
   });
 });
 
+test("Contract 9b: the hub's market filter is 16px on phones so iOS does not zoom on focus", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop-chrome", "viewports are set explicitly");
+  for (const [width, min] of [
+    [375, 16],
+    [1280, 12],
+  ] as const) {
+    await page.goto("about:blank");
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/#financial-table");
+    await page.waitForLoadState("networkidle");
+    const input = page.locator("#market-search-input");
+    await expect(input).toBeVisible();
+    const size = await input.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(size, `font-size at ${width}`).toBeGreaterThanOrEqual(min);
+    const box = (await input.boundingBox())!;
+    expect(box.x + box.width, `fits at ${width}`).toBeLessThanOrEqual(width);
+  }
+});
+
 test.describe("Contract 6: every manifest view at 375 and 1280, light and dark", () => {
   test.beforeEach(({}, info) => {
     test.skip(
