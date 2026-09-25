@@ -146,27 +146,23 @@ function renderFormsMatrix() {
   </div>`;
 }
 
-// Brand mark: an inline <svg> built straight from @joymify/brand's MARK geometry, coloured with
-// var(--joy-brand-*) custom properties so it never drifts from the Svelte/React BrandMark
-// component or bakes in a resolved hex the way the downloadable assets do (see F-043 brief).
-// Used only for the `.brand-logo` sidebar/topbar sites, which already paint their own
-// var(--joy-accent-default) tile background, so this is the bare (no rect, no dot) form, coloured
-// with the contrast token designed to read against that kind of tile.
-function brandMarkSvg(size) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK.viewBox}" width="${size}" height="${size}" role="img" aria-label="Joymify" focusable="false"><path d="${MARK.outline}" fill="none" stroke="var(--joy-brand-mark-contrast)" stroke-width="${MARK.outlineWidth}"/><path d="${MARK.inner}" fill="var(--joy-brand-mark-contrast)"/></svg>`;
-}
-
-// Brand mark preview for the Brand view's size/tile grid: mirrors BrandMark.svelte's own
-// tile/bare branches exactly (rect + outline + inner + contrast dot when tile, bare outline +
-// inner otherwise) so the hub demo can never drift from the real component.
-function brandMarkPreview(size, tile) {
+// Brand mark: the single inline-<svg> builder for every mark rendered in the hub (the `.brand-logo`
+// header sites, the Brand nav icon, and the Brand view's size/tile grid). Mirrors BrandMark.svelte's
+// own tile/bare branches exactly (rect + outline + inner + contrast dot when tile, bare outline +
+// inner otherwise) so it can never drift from the real component, and geometry always comes from
+// @joymify/brand's MARK with var(--joy-brand-*) fills, never a resolved hex.
+// `decorative` drops the img role/label for sites where an adjacent visible label already names the
+// mark (the header logos sit next to "Joymify Design" text; the nav icon sits next to its own link
+// label) — without it, screen readers would announce "Joymify" twice.
+function brandMarkPreview(size, tile, decorative = false) {
   const color = tile ? "var(--joy-brand-mark-on-tile)" : "var(--joy-brand-mark)";
   let markup = "";
   if (tile) markup += `<rect width="32" height="32" rx="${MARK.tileRx}" fill="var(--joy-brand-tile)"/>`;
   markup += `<path d="${MARK.outline}" fill="none" stroke="${color}" stroke-width="${MARK.outlineWidth}"/>`;
   markup += `<path d="${MARK.inner}" fill="${color}"/>`;
   if (tile) markup += `<circle cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}" fill="var(--joy-brand-mark-contrast)"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK.viewBox}" width="${size}" height="${size}" role="img" aria-label="Joymify" focusable="false" class="joy-brand-mark">${markup}</svg>`;
+  const label = decorative ? 'aria-hidden="true"' : 'role="img" aria-label="Joymify"';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK.viewBox}" width="${size}" height="${size}" ${label} focusable="false" class="joy-brand-mark">${markup}</svg>`;
 }
 
 // Wordmark preview for the Brand view: mirrors Wordmark.svelte's SSR output (padding: 0, the mark
@@ -194,7 +190,7 @@ function brandBannerLatticeSvg() {
 }
 
 const navIcons = {
-  brand: brandMarkPreview(16, false),
+  brand: brandMarkPreview(16, false, true),
   overview: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
   tokens: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>`,
   propsSpec: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
@@ -673,15 +669,9 @@ ${inlinedThemeCss}
     .brand-logo {
       width: 34px;
       height: 34px;
-      background: var(--joy-accent-default);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--joy-text-on-accent);
-      font-weight: 700;
-      font-size: var(--joy-font-size-lg);
-      box-shadow: var(--joy-elevation-1);
     }
     .brand-info h2 {
       margin: 0;
@@ -773,8 +763,6 @@ ${inlinedThemeCss}
     .brand-logo.brand-logo--compact {
       width: 28px;
       height: 28px;
-      font-size: var(--joy-font-size-sm);
-      box-shadow: none;
     }
     #btn-theme-toggle.hub-theme-toggle {
       flex-shrink: 0;
@@ -1607,7 +1595,7 @@ ${inlinedThemeCss}
   <!-- Sidebar -->
   <aside class="sidebar" id="hub-sidebar" aria-label="Component navigation">
     <div class="brand">
-      <div class="brand-logo">${brandMarkSvg(20)}</div>
+      <div class="brand-logo">${brandMarkPreview(20, true, true)}</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
         <span>v2.2 OpenDesign Integrated</span>
@@ -1632,7 +1620,7 @@ ${navigationHtml}
         <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Open navigation" aria-controls="hub-sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">${brandMarkSvg(16)}</span><span class="topbar-brand__name">Joymify Design</span></span>
+        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">${brandMarkPreview(16, true, true)}</span><span class="topbar-brand__name">Joymify Design</span></span>
       </div>
       <div class="topbar__end">
         <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-theme-toggle" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme">
@@ -1794,8 +1782,8 @@ ${navigationHtml}
                 <h2 class="joy-brand-banner__title">Trade with clarity</h2>
                 <p class="joy-brand-banner__lede">A calmer way to see your portfolio.</p>
                 <div class="joy-brand-banner__ctas">
-                  <a class="joy-button joy-button--solid joy-button--md" href="#"><span class="joy-button__label">Get started</span></a>
-                  <a class="joy-button joy-button--outline joy-button--md" href="#"><span class="joy-button__label">Learn more</span></a>
+                  <a class="joy-button joy-button--solid joy-button--md" href="#brand"><span class="joy-button__label">Get started</span></a>
+                  <a class="joy-button joy-button--outline joy-button--md" href="#brand"><span class="joy-button__label">Learn more</span></a>
                 </div>
               </div>
             </section>
@@ -7527,15 +7515,20 @@ if (fs.existsSync(tokensSrc)) {
 }
 
 // Downloadable brand assets (F-043): every generated file in @joymify/brand's assets/ folder,
-// plus a copy of favicon.svg at the site root for the <link rel="icon"> above.
+// plus a copy of favicon.svg at the site root for the <link rel="icon"> above. The <link> is
+// unconditional, so a missing/empty folder must fail the build loudly rather than silently ship a
+// 404 favicon and downloads; dotfiles (e.g. macOS .DS_Store) and any subfolder are skipped, only
+// regular files are copied.
 const brandAssetsSrc = path.join(__dirname, "../../packages/brand/assets");
-if (fs.existsSync(brandAssetsSrc)) {
-  const brandOutDir = path.join(outDir, "brand");
-  fs.mkdirSync(brandOutDir, { recursive: true });
-  for (const file of fs.readdirSync(brandAssetsSrc)) {
-    fs.copyFileSync(path.join(brandAssetsSrc, file), path.join(brandOutDir, file));
-  }
-  fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
+if (!fs.existsSync(brandAssetsSrc)) {
+  throw new Error(`Brand assets folder not found: ${brandAssetsSrc}. Run "pnpm --filter @joymify/brand build" first.`);
 }
+const brandOutDir = path.join(outDir, "brand");
+fs.mkdirSync(brandOutDir, { recursive: true });
+for (const entry of fs.readdirSync(brandAssetsSrc, { withFileTypes: true })) {
+  if (!entry.isFile() || entry.name.startsWith(".")) continue;
+  fs.copyFileSync(path.join(brandAssetsSrc, entry.name), path.join(brandOutDir, entry.name));
+}
+fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
 
 console.log("Built Storybook Hub static distribution in", outDir);

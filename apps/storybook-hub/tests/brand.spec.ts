@@ -30,12 +30,42 @@ for (const theme of ["light", "dark"] as const) {
     });
     await page.goto("/#brand");
     await setTheme(page, theme);
+    const view = page.locator("#view-brand");
     await expect(
-      page.getByRole("heading", { name: /brand/i }).first(),
+      view.getByRole("heading", { name: "Brand Assets", exact: true }),
     ).toBeVisible();
-    await expect(page.locator(".joy-ribbon").first()).toBeVisible();
-    await expect(page.locator(".joy-brand-banner")).toBeVisible();
+    await expect(view.locator(".joy-ribbon").first()).toBeVisible();
+    await expect(view.locator(".joy-brand-banner")).toBeVisible();
     expect(errors).toEqual([]);
+  });
+}
+
+for (const theme of ["light", "dark"] as const) {
+  test(`F-043: colour token values are resolved at runtime in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto("/#brand");
+    await setTheme(page, theme);
+    const cells = page.locator("#view-brand .token-value[data-token]");
+    await expect(cells).toHaveCount(6);
+    const results = await cells.evaluateAll((els) =>
+      els.map((el) => {
+        const token = el.getAttribute("data-token")!;
+        return {
+          token,
+          text: (el.textContent ?? "").trim(),
+          resolved: getComputedStyle(document.documentElement)
+            .getPropertyValue(token)
+            .trim(),
+        };
+      }),
+    );
+    for (const { token, text, resolved } of results) {
+      expect(text, `${token} in ${theme}`).not.toBe("");
+      expect(text, `${token} in ${theme} matches getComputedStyle`).toBe(
+        resolved,
+      );
+    }
   });
 }
 
@@ -44,14 +74,16 @@ test("F-043: brand asset downloads are real images", async ({
   request,
 }) => {
   await page.goto("/#brand");
-  const hrefs = await page
-    .locator("a[download]")
+  const rawHrefs = await page
+    .locator("#view-brand a[download]")
     .evaluateAll((as) =>
       as.map((a) => (a as HTMLAnchorElement).getAttribute("href")),
     );
+  const hrefs = rawHrefs.filter((href): href is string => Boolean(href));
+  expect(hrefs.length).toBe(rawHrefs.length);
   expect(hrefs.length).toBeGreaterThanOrEqual(10);
   for (const href of hrefs) {
-    const res = await request.get(href!);
+    const res = await request.get(href);
     expect(res.status()).toBe(200);
     expect(res.headers()["content-type"]).toMatch(/image\/(svg\+xml|png)/);
   }
