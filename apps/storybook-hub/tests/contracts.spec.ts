@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { installContrastTools, installPageTools, setTheme, settle } from './helpers';
+import { hitSize, installContrastTools, installPageTools, setTheme, settle } from './helpers';
 
 test.describe('Storybook Hub Quality Contracts', () => {
 
@@ -201,6 +201,47 @@ test.describe('Storybook Hub Quality Contracts', () => {
         }
       }
     }
+  });
+
+  test('Contract 9: phone chrome, 44px hit areas, framework switcher in the drawer', async ({ page }, info) => {
+    test.skip(info.project.name !== 'desktop-chrome', 'viewports are set explicitly');
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/#button');
+    await page.waitForLoadState('networkidle');
+    const menu = page.locator('#mobile-menu-toggle');
+    await expect(menu).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('.topbar .framework-pill')).toBeHidden();
+    for (const sel of ['#mobile-menu-toggle', '#btn-theme-toggle']) {
+      const s = await hitSize(page, sel);
+      expect(s.width, `${sel} width`).toBeGreaterThanOrEqual(43.5);
+      expect(s.height, `${sel} height`).toBeGreaterThanOrEqual(43.5);
+    }
+    await menu.click();
+    await expect(menu).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('.sidebar [data-framework]')).toHaveCount(2);
+    for (const sel of ['.sidebar-close-btn', '.sidebar [data-framework="svelte"]', '.sidebar [data-framework="react"]']) {
+      const s = await hitSize(page, sel);
+      expect(s.width, `${sel} width`).toBeGreaterThanOrEqual(43.5);
+      expect(s.height, `${sel} height`).toBeGreaterThanOrEqual(43.5);
+    }
+    await page.locator('.sidebar [data-framework="react"]').click();
+    await expect(page.locator('.sidebar [data-framework="react"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#btn-tab-react')).toHaveClass(/active/);
+    await expect(page.locator('#btn-tab-react')).toHaveAttribute('aria-pressed', 'true');
+    // Focus stays inside the open drawer, forwards and backwards.
+    for (const key of ['Tab', 'Shift+Tab']) {
+      for (let i = 0; i < 60; i++) {
+        await page.keyboard.press(key);
+        expect(await page.evaluate(() => !!document.activeElement?.closest('.sidebar')), `${key} ${i}`).toBe(true);
+      }
+    }
+    await page.keyboard.press('Escape');
+    await expect(menu).toHaveAttribute('aria-expanded', 'false');
+    await expect(menu).toBeFocused();
+    // Desktop: switcher back in the topbar, drawer copy hidden.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(page.locator('.topbar .framework-pill')).toBeVisible();
+    await expect(page.locator('.framework-pill--drawer')).toBeHidden();
   });
 
 });

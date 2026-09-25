@@ -703,34 +703,75 @@ ${inlinedThemeCss}
       gap: var(--joy-space-2);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--joy-z-sticky);
     }
-    #btn-theme-toggle {
+    .topbar__start,
+    .topbar__end {
+      display: flex;
+      align-items: center;
+      gap: var(--joy-space-3);
       flex-shrink: 0;
+    }
+    .topbar-brand {
+      display: none;
+      align-items: center;
+      gap: var(--joy-space-2);
+      font-size: var(--joy-font-size-md);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      white-space: nowrap;
+    }
+    .brand-logo.brand-logo--compact {
+      width: 28px;
+      height: 28px;
+      font-size: var(--joy-font-size-sm);
+      box-shadow: none;
+    }
+    #btn-theme-toggle.hub-theme-toggle {
+      flex-shrink: 0;
+      gap: var(--joy-space-2);
+      border: 1px solid var(--hub-chrome-border);
+    }
+    .hub-theme-toggle__icon {
+      display: inline-flex;
+      align-items: center;
     }
     .framework-pill {
       display: inline-flex;
       flex-wrap: nowrap;
       background: var(--joy-surface-sunken);
-      border-radius: 9999px;
+      border: 1px solid var(--hub-chrome-border);
+      border-radius: var(--joy-radius-pill);
       padding: 3px;
+    }
+    .framework-pill--drawer {
+      display: none;
     }
     .framework-btn {
       border: none;
       background: transparent;
       padding: 6px 14px;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 600;
-      border-radius: 9999px;
+      border-radius: var(--joy-radius-pill);
       cursor: pointer;
-      color: var(--joy-text-muted);
-      transition: all var(--joy-duration-fast);
+      color: var(--joy-text-secondary);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
       white-space: nowrap;
+    }
+    .framework-btn:hover {
+      color: var(--joy-text-primary);
     }
     .framework-btn.active {
       background: var(--joy-surface-card);
       color: var(--joy-accent-text);
-      box-shadow: 0 1px 4px transparent;
+      box-shadow: var(--joy-elevation-1);
+    }
+    .framework-btn:focus-visible,
+    .mobile-menu-btn:focus-visible,
+    .sidebar-close-btn:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: 2px;
     }
     .content-area {
       max-width: 1080px;
@@ -1022,22 +1063,6 @@ ${inlinedThemeCss}
       vertical-align: middle;
       margin-right: 8px;
     }
-    .badge-runes {
-      background: var(--joy-accent-default);
-      color: var(--joy-text-on-accent);
-      font-size: 0.6875rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-    }
-    .badge-react {
-      background: var(--joy-surface-inverse);
-      color: var(--joy-text-inverse);
-      font-size: 0.6875rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-    }
 
     /* ── Coherent Dark Mode Overrides for Hub UI ── */
     [data-theme="dark"] .playground-box {
@@ -1101,7 +1126,7 @@ ${inlinedThemeCss}
       background: transparent;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-      z-index: 998;
+      z-index: var(--joy-z-backdrop);
       opacity: 0;
       transition: opacity 0.25s ease;
     }
@@ -1109,60 +1134,34 @@ ${inlinedThemeCss}
       display: block;
       opacity: 1;
     }
-    .mobile-menu-btn {
-      display: none;
-      appearance: none;
-      -webkit-appearance: none;
-      background: var(--joy-surface-sunken);
-      border: 1px solid var(--joy-border-default);
-      border-radius: 8px;
-      padding: 7px 10px;
-      cursor: pointer;
-      color: var(--joy-text-secondary);
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
-      transition: all 150ms ease;
-    }
-    .mobile-menu-btn:hover {
-      background: var(--joy-border-default);
-      color: var(--joy-surface-card);
-    }
+    .mobile-menu-btn,
     .sidebar-close-btn {
       display: none;
       appearance: none;
       -webkit-appearance: none;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--joy-radius-md);
+      cursor: pointer;
+      color: var(--joy-text-secondary);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
+    }
+    .mobile-menu-btn {
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--hub-chrome-border);
+    }
+    .sidebar-close-btn {
       background: transparent;
       border: none;
-      font-size: 1.25rem;
-      cursor: pointer;
-      color: var(--joy-text-muted);
-      padding: 4px 8px;
-      border-radius: 6px;
       margin-left: auto;
     }
+    .mobile-menu-btn:hover,
     .sidebar-close-btn:hover {
-      background: var(--joy-surface-sunken);
-      color: var(--joy-surface-card);
-    }
-    [data-theme="dark"] .sidebar-backdrop {
-      background: transparent;
-    }
-    [data-theme="dark"] .mobile-menu-btn {
       background: var(--joy-surface-raised);
-      border-color: var(--joy-text-secondary);
-      color: var(--joy-border-default);
-    }
-    [data-theme="dark"] .mobile-menu-btn:hover {
-      background: var(--joy-text-secondary);
-      color: var(--joy-surface-card);
-    }
-    [data-theme="dark"] .sidebar-close-btn {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .sidebar-close-btn:hover {
-      background: var(--joy-surface-raised);
-      color: var(--joy-surface-card);
+      color: var(--joy-text-primary);
     }
 
     /* ── Interactive 3D Kinetic Particle Canvas ── */
@@ -1254,10 +1253,9 @@ ${inlinedThemeCss}
 
     /* ── Responsive Mobile & Tablet Rules ── */
     @media (max-width: 900px) {
-      .mobile-menu-btn {
-        display: inline-flex;
-      }
-      .sidebar-close-btn {
+      .mobile-menu-btn,
+      .sidebar-close-btn,
+      .topbar-brand {
         display: inline-flex;
       }
       .sidebar {
@@ -1266,7 +1264,7 @@ ${inlinedThemeCss}
         left: 0;
         bottom: 0;
         width: 280px;
-        z-index: 999;
+        z-index: var(--joy-z-drawer);
         transform: translateX(-100%);
         transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         box-shadow: none;
@@ -1282,9 +1280,6 @@ ${inlinedThemeCss}
       .topbar {
         padding: 0 16px;
         flex-wrap: nowrap;
-      }
-      .topbar-target-label {
-        display: none;
       }
       .content-area {
         padding: 20px 14px 60px;
@@ -1480,28 +1475,42 @@ ${inlinedThemeCss}
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
     }
-    @media (max-width: 640px) {
+    /* Phone tier: the topbar is menu + brand + theme toggle; the framework switcher moves into the drawer. */
+    @media (max-width: 767px) {
       .topbar {
-        padding: var(--joy-space-2) var(--joy-space-3);
-        align-items: center;
-        flex-wrap: nowrap;
+        padding: var(--joy-space-2) var(--joy-space-4);
       }
-      .topbar > div {
-        flex-wrap: nowrap;
+      .topbar__start,
+      .topbar__end {
+        gap: var(--joy-space-2);
       }
+      #btn-theme-toggle.hub-theme-toggle {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      .framework-pill--topbar {
+        display: none;
+      }
+      .framework-pill--drawer {
+        display: flex;
+        margin: var(--joy-space-3) var(--joy-space-4) 0;
+      }
+      .framework-pill--drawer .framework-btn {
+        flex: 1 1 0;
+        min-height: 44px;
+      }
+    }
+    @media (max-width: 480px) {
       #theme-label {
         display: none;
       }
-      #btn-theme-toggle {
-        padding: 0 var(--joy-space-2);
-        min-width: var(--joy-control-height-sm);
-        flex-shrink: 0;
+      #btn-theme-toggle.hub-theme-toggle {
+        padding: 0;
       }
+    }
+    @media (max-width: 640px) {
       .joy-select-wrapper--open .joy-select__listbox.joy-overlay--sheet {
         position: fixed;
-      }
-      .framework-pill {
-        display: none;
       }
       .controls-table,
       .controls-table tbody,
@@ -1535,16 +1544,20 @@ ${inlinedThemeCss}
   <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileMenu(false)"></div>
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="hub-sidebar" aria-label="Component navigation">
     <div class="brand">
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
         <span>v2.2 OpenDesign Integrated</span>
       </div>
-      <button class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close sidebar">
+      <button type="button" class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close navigation">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
+    </div>
+    <div class="framework-pill framework-pill--drawer" role="group" aria-label="Code framework">
+      <button type="button" class="framework-btn active" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
+      <button type="button" class="framework-btn" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
     </div>
     <nav class="nav">
 ${navigationHtml}
@@ -1554,27 +1567,22 @@ ${navigationHtml}
   <!-- Main Canvas Area -->
   <main class="main">
     <div class="topbar">
-      <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-        <button class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Toggle navigation">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <div class="topbar__start">
+        <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Open navigation" aria-controls="hub-sidebar" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-        <span class="topbar-target-label" style="font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Target Suite:</span>
-        <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
+        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">J</span><span class="topbar-brand__name">Joymify Design</span></span>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme" style="gap: 6px; border: 1px solid var(--joy-border-default); flex-shrink: 0;">
-          <span id="theme-icon" style="display:inline-flex;align-items:center;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      <div class="topbar__end">
+        <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-theme-toggle" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme">
+          <span id="theme-icon" class="hub-theme-toggle__icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </span>
           <span id="theme-label">Dark theme</span>
         </button>
-        <div class="framework-pill">
-          <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
-            <span class="badge-runes">SVELTE 5</span> Runes
-          </button>
-          <button class="framework-btn" id="btn-tab-react" onclick="setFramework('react')">
-            <span class="badge-react">REACT 19</span> Modern
-          </button>
+        <div class="framework-pill framework-pill--topbar" role="group" aria-label="Code framework">
+          <button type="button" class="framework-btn active" id="btn-tab-svelte" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
+          <button type="button" class="framework-btn" id="btn-tab-react" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
         </div>
       </div>
     </div>
@@ -5566,30 +5574,60 @@ export async function executeHedge(symbol: string, size: number) {
       }
     }
 
+    // The sidebar is an off-canvas drawer at the same width the stylesheet's drawer media query uses.
+    const drawerMedia = window.matchMedia('(max-width: 900px)');
+
     function toggleMobileMenu(open) {
-      const sidebar = document.querySelector('.sidebar');
+      const sidebar = document.getElementById('hub-sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
+      const menuBtn = document.getElementById('mobile-menu-toggle');
       if (!sidebar || !backdrop) return;
       if (open === undefined) {
         open = !sidebar.classList.contains('open');
       }
+      if (open && !drawerMedia.matches) return;
+      if (!open && !sidebar.classList.contains('open')) return;
+      sidebar.classList.toggle('open', open);
+      backdrop.classList.toggle('active', open);
+      if (menuBtn) menuBtn.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
       if (open) {
-        sidebar.classList.add('open');
-        backdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
         const closeBtn = sidebar.querySelector('.sidebar-close-btn');
         if (closeBtn) closeBtn.focus();
-      } else {
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('active');
-        document.body.style.overflow = '';
+      } else if (menuBtn && sidebar.contains(document.activeElement)) {
+        menuBtn.focus();
       }
+    }
+
+    /** Visible, enabled controls inside the open drawer, in tab order. */
+    function drawerFocusables(sidebar) {
+      return Array.from(sidebar.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter((el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden');
     }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         toggleMobileMenu(false);
+        return;
       }
+      const sidebar = document.getElementById('hub-sidebar');
+      if (e.key !== 'Tab' || !sidebar || !sidebar.classList.contains('open')) return;
+      const items = drawerFocusables(sidebar);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = sidebar.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    drawerMedia.addEventListener('change', (e) => {
+      if (!e.matches) toggleMobileMenu(false);
     });
 
     function switchView(viewName, updateHash = true) {
@@ -5645,8 +5683,11 @@ export async function executeHedge(symbol: string, size: number) {
 
     function setFramework(fw) {
       activeFramework = fw;
-      document.getElementById('btn-tab-svelte').classList.toggle('active', fw === 'svelte');
-      document.getElementById('btn-tab-react').classList.toggle('active', fw === 'react');
+      document.querySelectorAll('[data-framework]').forEach((btn) => {
+        const on = btn.getAttribute('data-framework') === fw;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', String(on));
+      });
       updateCodeSnippets();
     }
 
