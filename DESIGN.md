@@ -634,14 +634,7 @@ The mark is a gold diamond on a navy tile, not a square and not a circle: outlin
 
 Display font: `--joy-font-family-display` (`"Cormorant Garamond", "Noto Serif", Georgia, serif`). joy-design does not load the font; consumers do.
 
-| Token | Light | Dark |
-| --- | --- | --- |
-| `--joy-brand-tile` | `#14253e` | `#14253e` |
-| `--joy-brand-mark` | `#856515` | `#dab362` |
-| `--joy-brand-mark-on-tile` | `#c49a3a` | `#c49a3a` |
-| `--joy-brand-mark-contrast` | `#fdfaf3` | `#fdfaf3` |
-| `--joy-brand-ink` | `#14253e` | `#f8f3e8` |
-| `--joy-brand-ink-on-tile` | `#f8f3e8` | `#f8f3e8` |
+Colour roles: `--joy-brand-tile`, `--joy-brand-mark`, `--joy-brand-mark-on-tile`, `--joy-brand-mark-contrast`, `--joy-brand-ink`, `--joy-brand-ink-on-tile` — light and dark values are in the [Semantic layer](#semantic-layer) table above.
 
 ### Don'ts
 
