@@ -146,6 +146,13 @@ function renderFormsMatrix() {
   </div>`;
 }
 
+// Outline + filled-inner path pair for the diamond mark in a single `color`, shared by every mark
+// render site below (the standalone mark preview and the mark embedded in the wordmark) so the two
+// can't drift apart.
+function markOutlineAndInner(color) {
+  return `<path d="${MARK.outline}" fill="none" stroke="${color}" stroke-width="${MARK.outlineWidth}"/><path d="${MARK.inner}" fill="${color}"/>`;
+}
+
 // Brand mark: the single inline-<svg> builder for every mark rendered in the hub (the `.brand-logo`
 // header sites, the Brand nav icon, and the Brand view's size/tile grid). Mirrors BrandMark.svelte's
 // own tile/bare branches exactly (rect + outline + inner + contrast dot when tile, bare outline +
@@ -158,8 +165,7 @@ function brandMarkPreview(size, tile, decorative = false) {
   const color = tile ? "var(--joy-brand-mark-on-tile)" : "var(--joy-brand-mark)";
   let markup = "";
   if (tile) markup += `<rect width="32" height="32" rx="${MARK.tileRx}" fill="var(--joy-brand-tile)"/>`;
-  markup += `<path d="${MARK.outline}" fill="none" stroke="${color}" stroke-width="${MARK.outlineWidth}"/>`;
-  markup += `<path d="${MARK.inner}" fill="${color}"/>`;
+  markup += markOutlineAndInner(color);
   if (tile) markup += `<circle cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}" fill="var(--joy-brand-mark-contrast)"/>`;
   const label = decorative ? 'aria-hidden="true"' : 'role="img" aria-label="Joymify"';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK.viewBox}" width="${size}" height="${size}" ${label} focusable="false" class="joy-brand-mark">${markup}</svg>`;
@@ -172,7 +178,7 @@ function brandWordmarkPreview(tone, height) {
   const isCream = tone === "cream";
   const glyphColor = isCream ? "var(--joy-brand-ink-on-tile)" : "var(--joy-brand-ink)";
   const markColor = isCream ? "var(--joy-brand-mark-on-tile)" : "var(--joy-brand-mark)";
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="Joymify" class="joy-wordmark" overflow="visible"><title>Joymify</title><g transform="translate(${markX} ${markY}) scale(${markScale(markSize)})"><path d="${MARK.outline}" fill="none" stroke="${markColor}" stroke-width="${MARK.outlineWidth}"/><path d="${MARK.inner}" fill="${markColor}"/></g><path d="${WORDMARK.d}" fill="${glyphColor}" transform="translate(${glyphX} ${glyphY}) scale(${glyphScale})"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="Joymify" class="joy-wordmark" overflow="visible"><title>Joymify</title><g transform="translate(${markX} ${markY}) scale(${markScale(markSize)})">${markOutlineAndInner(markColor)}</g><path d="${WORDMARK.d}" fill="${glyphColor}" transform="translate(${glyphX} ${glyphY}) scale(${glyphScale})"/></svg>`;
 }
 
 // Decorative diamond lattice for the BrandBanner demo: the same grid + right-edge fade as
@@ -188,6 +194,25 @@ function brandBannerLatticeSvg() {
     .join("");
   return `<svg class="joy-brand-banner__lattice" viewBox="0 0 ${lattice.width} ${lattice.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${diamonds}</svg>`;
 }
+
+// Every generated file in @joymify/brand's assets/ folder (mark, wordmark, favicon, hero banner, OG
+// card variants): read once here so the Brand view's download links (below) and the dist copy step
+// at the end of this file always list the exact same files, with no separate hardcoded list to drift
+// out of sync with the folder. The <link rel="icon"> further below is unconditional, so a missing or
+// empty folder must fail the build loudly rather than silently ship a 404 favicon and downloads;
+// dotfiles (e.g. macOS .DS_Store) and any subfolder are skipped, only regular files are read. Sorted
+// into the kit's canonical mark -> favicon -> wordmark -> banner -> OG-card order, since readdirSync's
+// own order isn't guaranteed stable across filesystems.
+const brandAssetsSrc = path.join(__dirname, "../../packages/brand/assets");
+if (!fs.existsSync(brandAssetsSrc)) {
+  throw new Error(`Brand assets folder not found: ${brandAssetsSrc}. Run "pnpm --filter @joymify/brand build" first.`);
+}
+const brandAssetDisplayOrder = ["mark.svg", "mark-bare.svg", "favicon.svg", "favicon-32.png", "apple-touch-icon.png", "wordmark-cream.svg", "wordmark-deep.svg", "hero-banner.svg", "og-card.svg", "og-card.png"];
+const brandAssetFiles = fs
+  .readdirSync(brandAssetsSrc, { withFileTypes: true })
+  .filter((entry) => entry.isFile() && !entry.name.startsWith("."))
+  .map((entry) => entry.name)
+  .sort((a, b) => brandAssetDisplayOrder.indexOf(a) - brandAssetDisplayOrder.indexOf(b));
 
 const navIcons = {
   brand: brandMarkPreview(16, false, true),
@@ -1731,7 +1756,7 @@ ${navigationHtml}
           <div class="playground-header"><h4>Wordmark</h4></div>
           <div class="canvas" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--joy-space-4);">
             <div>${brandWordmarkPreview("deep", 40)}</div>
-            <div style="background: var(--joy-brand-tile); padding: 16px; border-radius: var(--joy-radius-md);">${brandWordmarkPreview("cream", 40)}</div>
+            <div style="background: var(--joy-brand-tile); padding: var(--joy-space-4); border-radius: var(--joy-radius-md);">${brandWordmarkPreview("cream", 40)}</div>
           </div>
         </div>
 
@@ -1801,7 +1826,7 @@ ${navigationHtml}
         <div class="playground-box">
           <div class="playground-header"><h4>Download the asset kit</h4></div>
           <div class="canvas" style="display: flex; flex-wrap: wrap; gap: var(--joy-space-2);">
-            ${["mark.svg", "mark-bare.svg", "favicon.svg", "favicon-32.png", "apple-touch-icon.png", "wordmark-cream.svg", "wordmark-deep.svg", "hero-banner.svg", "og-card.svg", "og-card.png"]
+            ${brandAssetFiles
               .map(
                 (file) =>
                   `<a class="joy-button joy-button--outline joy-button--sm" download href="brand/${file}"><span class="joy-button__label">${file}</span></a>`,
@@ -7514,20 +7539,12 @@ if (fs.existsSync(tokensSrc)) {
   fs.copyFileSync(tokensSrc, path.join(outDir, "theme.css"));
 }
 
-// Downloadable brand assets (F-043): every generated file in @joymify/brand's assets/ folder,
-// plus a copy of favicon.svg at the site root for the <link rel="icon"> above. The <link> is
-// unconditional, so a missing/empty folder must fail the build loudly rather than silently ship a
-// 404 favicon and downloads; dotfiles (e.g. macOS .DS_Store) and any subfolder are skipped, only
-// regular files are copied.
-const brandAssetsSrc = path.join(__dirname, "../../packages/brand/assets");
-if (!fs.existsSync(brandAssetsSrc)) {
-  throw new Error(`Brand assets folder not found: ${brandAssetsSrc}. Run "pnpm --filter @joymify/brand build" first.`);
-}
+// Downloadable brand assets (F-043): copy the files listed in brandAssetFiles (read above) into the
+// dist output, plus a copy of favicon.svg at the site root for the <link rel="icon"> above.
 const brandOutDir = path.join(outDir, "brand");
 fs.mkdirSync(brandOutDir, { recursive: true });
-for (const entry of fs.readdirSync(brandAssetsSrc, { withFileTypes: true })) {
-  if (!entry.isFile() || entry.name.startsWith(".")) continue;
-  fs.copyFileSync(path.join(brandAssetsSrc, entry.name), path.join(brandOutDir, entry.name));
+for (const file of brandAssetFiles) {
+  fs.copyFileSync(path.join(brandAssetsSrc, file), path.join(brandOutDir, file));
 }
 fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
 
