@@ -1819,7 +1819,7 @@ ${navigationHtml}
           <div class="playground-header"><h4>Do and don't</h4></div>
           <div class="canvas" style="display: flex; flex-direction: column; gap: var(--joy-space-3);">
             ${hubAlert("success", "Do", "Keep the diamond mark's proportions and clear space intact; use the --joy-brand-* tokens for colour.")}
-            ${hubAlert("danger", "Don't", "Recolor the mark outside the --joy-brand-* tokens, stretch it off its aspect ratio, or crowd it inside the clear-space margin.")}
+            ${hubAlert("danger", "Don't", "Recolor the mark outside the --joy-brand-* tokens, stretch it off its aspect ratio, or crowd it inside the clear-space margin. Do not substitute the square mark some products still ship — the diamond is canonical. Gold is a signature, not a wash: never a large field, a page background or a card background.")}
           </div>
         </div>
 
