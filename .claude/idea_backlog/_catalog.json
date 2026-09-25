@@ -268,5 +268,11 @@
     "title": "untrack the 451 node_modules/.pnpm files committed in release 2.22",
     "created_at": "2026-09-25T18:29:18.702388+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-045",
+    "title": "Adopt @joymify/brand diamond favicon + og-card in joymify-portal (replace gold square)",
+    "created_at": "2026-09-25T21:27:09.501783+00:00",
+    "promoted_to": null
   }
 ]
