@@ -16,6 +16,8 @@ declare global {
     __describe(el: Element): string;
     /** Hub function that repaints chart/image canvases from the current theme tokens. */
     redrawHubCharts?(): void;
+    /** F-040: the colours the kinetic hero canvas draws with, read from the theme tokens at call time. */
+    hubKineticPalette?(): { accents: string[]; muted: string };
     /** WCAG contrast ratio of two opaque [r, g, b] colours. */
     __contrast(fg: number[], bg: number[]): number;
     /**
@@ -25,12 +27,19 @@ declare global {
      */
     __surfaces(el: Element): number[][];
     /** Text colour (SVG text: fill) against every surface of `__surfaces`; `min` is the lowest ratio. */
-    __textRatio(el: Element): { min: number; fg: number[]; surfaces: number[][] };
+    __textRatio(el: Element): {
+      min: number;
+      fg: number[];
+      surfaces: number[][];
+    };
     /**
      * Every visible text element under `root` (`checked` counts them, so an empty sweep cannot pass) whose contrast is
      * below `floor`, as "tag.class: text (ratio)".
      */
-    __lowContrast(root: Element, floor: number): { checked: number; failures: string[] };
+    __lowContrast(
+      root: Element,
+      floor: number,
+    ): { checked: number; failures: string[] };
   }
 }
 
@@ -153,16 +162,23 @@ export async function installContrastTools(page: Page) {
       for (let node: Element | null = el; node; node = node.parentElement) {
         const style = getComputedStyle(node);
         if (style.backgroundImage.includes("gradient(")) {
-          const stops = style.backgroundImage.match(/(?:rgba?|color|oklab|oklch|lab|lch|hsla?)\([^)]*\)/g) ?? [];
+          const stops =
+            style.backgroundImage.match(
+              /(?:rgba?|color|oklab|oklch|lab|lch|hsla?)\([^)]*\)/g,
+            ) ?? [];
           // A gradient this helper cannot read (fewer than two parsed colours) or one with a translucent stop has no
           // single surface to measure against: fail loudly rather than return Infinity or treat it as opaque black.
           if (stops.length < 2) {
-            throw new Error(`__surfaces: cannot read the gradient colours of ${window.__describe(node)}: ${style.backgroundImage}`);
+            throw new Error(
+              `__surfaces: cannot read the gradient colours of ${window.__describe(node)}: ${style.backgroundImage}`,
+            );
           }
           bases = stops.map((stop) => {
             const colour = window.__rgba(stop);
             if (colour[3] < 1) {
-              throw new Error(`__surfaces: translucent gradient stop ${stop} on ${window.__describe(node)}`);
+              throw new Error(
+                `__surfaces: translucent gradient stop ${stop} on ${window.__describe(node)}`,
+              );
             }
             return colour.slice(0, 3);
           });
@@ -174,20 +190,30 @@ export async function installContrastTools(page: Page) {
           if (colour[3] >= 1) break;
         }
       }
-      return bases.map((base) => layers.reduceRight((under, layer) => over(layer, under), base));
+      return bases.map((base) =>
+        layers.reduceRight((under, layer) => over(layer, under), base),
+      );
     };
     window.__textRatio = (el) => {
       const style = getComputedStyle(el);
-      const colour = window.__rgba(el instanceof SVGElement ? style.fill : style.color);
+      const colour = window.__rgba(
+        el instanceof SVGElement ? style.fill : style.color,
+      );
       const surfaces = window.__surfaces(el);
-      const ratios = surfaces.map((surface) => window.__contrast(over(colour, surface), surface));
+      const ratios = surfaces.map((surface) =>
+        window.__contrast(over(colour, surface), surface),
+      );
       return { min: Math.min(...ratios), fg: colour, surfaces };
     };
     window.__lowContrast = (root, floor) => {
       const failures: string[] = [];
       let checked = 0;
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-      for (let node = walker.currentNode as Element | null; node; node = walker.nextNode() as Element | null) {
+      for (
+        let node = walker.currentNode as Element | null;
+        node;
+        node = walker.nextNode() as Element | null
+      ) {
         const own = Array.from(node.childNodes)
           .filter((child) => child.nodeType === Node.TEXT_NODE)
           .map((child) => child.textContent ?? "")
@@ -195,11 +221,20 @@ export async function installContrastTools(page: Page) {
           .trim();
         if (!own) continue;
         const rect = node.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0 || rect.bottom <= 0 || rect.right <= 0) continue;
+        if (
+          rect.width === 0 ||
+          rect.height === 0 ||
+          rect.bottom <= 0 ||
+          rect.right <= 0
+        )
+          continue;
         if (getComputedStyle(node).visibility === "hidden") continue;
         checked++;
         const { min } = window.__textRatio(node);
-        if (min < floor) failures.push(`${window.__describe(node)}: "${own.slice(0, 30)}" (${min.toFixed(2)})`);
+        if (min < floor)
+          failures.push(
+            `${window.__describe(node)}: "${own.slice(0, 30)}" (${min.toFixed(2)})`,
+          );
       }
       return { checked, failures };
     };
@@ -225,7 +260,11 @@ export async function measureOverflow(page: Page, rootSelector: string) {
     };
     const beyond: string[] = [];
     for (const el of Array.from(root.querySelectorAll("*"))) {
-      if (el.closest(".joy-landing-skip") || getComputedStyle(el).position === "fixed") continue;
+      if (
+        el.closest(".joy-landing-skip") ||
+        getComputedStyle(el).position === "fixed"
+      )
+        continue;
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) continue;
       if (rect.right > viewport + 0.5 && !clipped(el)) {
@@ -258,38 +297,47 @@ export type ButtonContrast = {
  * Contrast of every button matching `selector`: the real label (`.joy-button__label`, or the button itself) against
  * the surface it paints on. A gradient button (the solid variant) is measured against BOTH gradient stops.
  */
-export async function measureButtonContrast(page: Page, selector: string): Promise<ButtonContrast[]> {
+export async function measureButtonContrast(
+  page: Page,
+  selector: string,
+): Promise<ButtonContrast[]> {
   return page.evaluate((sel) => {
-    return Array.from(document.querySelectorAll<HTMLElement>(sel)).map((button) => {
-      const label = button.querySelector<HTMLElement>(".joy-button__label") ?? button;
-      const rect = label.getBoundingClientRect();
-      const labelStyle = getComputedStyle(label);
-      const buttonStyle = getComputedStyle(button);
-      const { min, surfaces } = window.__textRatio(label);
-      return {
-        className: button.className,
-        text: (label.textContent ?? "").trim(),
-        // checkVisibility also looks at ancestors: display:none, content-visibility, and (with the two flags) opacity 0
-        // and visibility:hidden anywhere up the chain. Both spellings of the flags are passed (older/newer Chromium).
-        visible:
-          rect.width > 0 &&
-          rect.height > 0 &&
-          labelStyle.visibility !== "hidden" &&
-          Number(labelStyle.opacity) > 0 &&
-          label.checkVisibility({
-            checkOpacity: true,
-            checkVisibilityCSS: true,
-            opacityProperty: true,
-            visibilityProperty: true,
-          } as CheckVisibilityOptions),
-        min,
-        gradient: buttonStyle.backgroundImage.includes("gradient("),
-        surfaces,
-        stops: ["--joy-accent-default", "--joy-accent-gradient-end"].map((name) =>
-          window.__rgba(buttonStyle.getPropertyValue(name).trim()).slice(0, 3),
-        ),
-      };
-    });
+    return Array.from(document.querySelectorAll<HTMLElement>(sel)).map(
+      (button) => {
+        const label =
+          button.querySelector<HTMLElement>(".joy-button__label") ?? button;
+        const rect = label.getBoundingClientRect();
+        const labelStyle = getComputedStyle(label);
+        const buttonStyle = getComputedStyle(button);
+        const { min, surfaces } = window.__textRatio(label);
+        return {
+          className: button.className,
+          text: (label.textContent ?? "").trim(),
+          // checkVisibility also looks at ancestors: display:none, content-visibility, and (with the two flags) opacity 0
+          // and visibility:hidden anywhere up the chain. Both spellings of the flags are passed (older/newer Chromium).
+          visible:
+            rect.width > 0 &&
+            rect.height > 0 &&
+            labelStyle.visibility !== "hidden" &&
+            Number(labelStyle.opacity) > 0 &&
+            label.checkVisibility({
+              checkOpacity: true,
+              checkVisibilityCSS: true,
+              opacityProperty: true,
+              visibilityProperty: true,
+            } as CheckVisibilityOptions),
+          min,
+          gradient: buttonStyle.backgroundImage.includes("gradient("),
+          surfaces,
+          stops: ["--joy-accent-default", "--joy-accent-gradient-end"].map(
+            (name) =>
+              window
+                .__rgba(buttonStyle.getPropertyValue(name).trim())
+                .slice(0, 3),
+          ),
+        };
+      },
+    );
   }, selector);
 }
 
@@ -308,7 +356,10 @@ export type PressedButtonContrast = {
  * (page.mouse.down), the colour transition is waited out, the label is measured against the pressed fill, then the
  * pointer leaves the button before it is released so no click is fired. Works in both Playwright projects.
  */
-export async function measurePressedButtonContrast(page: Page, selector: string): Promise<PressedButtonContrast> {
+export async function measurePressedButtonContrast(
+  page: Page,
+  selector: string,
+): Promise<PressedButtonContrast> {
   const button = page.locator(selector).first();
   await button.scrollIntoViewIfNeeded();
   const box = await button.boundingBox();
@@ -318,7 +369,11 @@ export async function measurePressedButtonContrast(page: Page, selector: string)
   try {
     await button.evaluate(async (el) => {
       // :active is set by the browser on mousedown; wait for it and for the pressed-state transition to finish
-      for (let i = 0; i < 100 && !(el.matches(":active") && el.getAnimations().length === 0); i++) {
+      for (
+        let i = 0;
+        i < 100 && !(el.matches(":active") && el.getAnimations().length === 0);
+        i++
+      ) {
         await new Promise((resolve) => setTimeout(resolve, 20));
       }
     });
@@ -341,15 +396,31 @@ export async function measurePressedButtonContrast(page: Page, selector: string)
 }
 
 /** Asserts a pressed button is really pressed, is a flat fill (the gradient is gone) and its label is >= 4.5:1 on it. */
-export function expectReadablePressedButton(measured: PressedButtonContrast, where: string) {
-  expect(measured.pressed, `${where}: the button is :active while measured`).toBe(true);
+export function expectReadablePressedButton(
+  measured: PressedButtonContrast,
+  where: string,
+) {
+  expect(
+    measured.pressed,
+    `${where}: the button is :active while measured`,
+  ).toBe(true);
   expect(measured.text.length, `${where}: label`).toBeGreaterThan(0);
-  expect(measured.surfaces.length, `${where}: pressed surfaces`).toBeGreaterThan(0);
-  expect(measured.min, `${where} pressed contrast (${measured.className})`).toBeGreaterThanOrEqual(4.5);
+  expect(
+    measured.surfaces.length,
+    `${where}: pressed surfaces`,
+  ).toBeGreaterThan(0);
+  expect(
+    measured.min,
+    `${where} pressed contrast (${measured.className})`,
+  ).toBeGreaterThanOrEqual(4.5);
 }
 
 /** Asserts the label of every measured button is visible, non-empty and >= 4.5:1 on every surface it can sit on. */
-export function expectReadableButtons(buttons: ButtonContrast[], expectedCount: number, where: string) {
+export function expectReadableButtons(
+  buttons: ButtonContrast[],
+  expectedCount: number,
+  where: string,
+) {
   expect(buttons.length, `${where}: number of buttons`).toBe(expectedCount);
   for (const button of buttons) {
     const name = `${where}: "${button.text}"`;
@@ -360,32 +431,57 @@ export function expectReadableButtons(buttons: ButtonContrast[], expectedCount: 
       expect(button.surfaces.length, `${name} gradient stops`).toBe(2);
       button.surfaces.forEach((surface, index) => {
         surface.forEach((channel, i) =>
-          expect(Math.abs(channel - button.stops[index][i]), `${name} stop ${index} is the accent token`).toBeLessThanOrEqual(2),
+          expect(
+            Math.abs(channel - button.stops[index][i]),
+            `${name} stop ${index} is the accent token`,
+          ).toBeLessThanOrEqual(2),
         );
       });
     }
-    expect(button.min, `${name} contrast (${button.className})`).toBeGreaterThanOrEqual(4.5);
+    expect(
+      button.min,
+      `${name} contrast (${button.className})`,
+    ).toBeGreaterThanOrEqual(4.5);
   }
 }
 
-const manifestFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../src/navigation.manifest.json");
+const manifestFile = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../src/navigation.manifest.json",
+);
 const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8")) as {
   categories: { views: { id: string }[] }[];
 };
 /** Every view id in the navigation manifest, in sidebar order (38 at the time of writing). */
-export const HUB_VIEWS: string[] = manifest.categories.flatMap((c) => c.views.map((v) => v.id));
+export const HUB_VIEWS: string[] = manifest.categories.flatMap((c) =>
+  c.views.map((v) => v.id),
+);
 
 /** Hub chrome (F-040 decision 3). Component demo markup (.joy-*) is not chrome. */
 export const HUB_CHROME = [
-  ".topbar", ".topbar *", ".sidebar", ".sidebar *", ".sidebar-backdrop",
-  ".view-panel.active > h1", ".view-panel.active > h2", ".view-panel.active > .header-tagline",
-  ".view-panel.active .playground-header", ".view-panel.active .playground-header *",
-  ".view-panel.active .component-header", ".view-panel.active .component-header *",
-  ".view-panel.active .code-snippet", ".view-panel.active .tokens-table", ".view-panel.active .tokens-table *",
-  ".view-panel.active .controls-table", ".view-panel.active .controls-table td",
-  ".view-panel.active .segmented-control", ".view-panel.active .segment-btn",
-  ".view-panel.active .icon-card", ".view-panel.active .icon-card *",
-  ".view-panel.active .hub-card", ".view-panel.active .kinetic-canvas-container",
+  ".topbar",
+  ".topbar *",
+  ".sidebar",
+  ".sidebar *",
+  ".sidebar-backdrop",
+  ".view-panel.active > h1",
+  ".view-panel.active > h2",
+  ".view-panel.active > .header-tagline",
+  ".view-panel.active .playground-header",
+  ".view-panel.active .playground-header *",
+  ".view-panel.active .component-header",
+  ".view-panel.active .component-header *",
+  ".view-panel.active .code-snippet",
+  ".view-panel.active .tokens-table",
+  ".view-panel.active .tokens-table *",
+  ".view-panel.active .controls-table",
+  ".view-panel.active .controls-table td",
+  ".view-panel.active .segmented-control",
+  ".view-panel.active .segment-btn",
+  ".view-panel.active .icon-card",
+  ".view-panel.active .icon-card *",
+  ".view-panel.active .hub-card",
+  ".view-panel.active .kinetic-canvas-container",
 ].join(", ");
 
 /** Rendered size of the first element matching `selector`. */
@@ -417,18 +513,38 @@ export async function measureHubOverflow(page: Page) {
       return false;
     };
     const cut: string[] = [];
-    for (const el of Array.from(main.querySelectorAll(".view-panel.active *, .topbar, .topbar *"))) {
-      if (getComputedStyle(el).position === "fixed" || el.closest("[aria-hidden='true'], .joy-landing-skip")) continue;
+    for (const el of Array.from(
+      main.querySelectorAll(".view-panel.active *, .topbar, .topbar *"),
+    )) {
+      if (
+        getComputedStyle(el).position === "fixed" ||
+        el.closest("[aria-hidden='true'], .joy-landing-skip")
+      )
+        continue;
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) continue;
-      if (rect.right > viewport + 0.5 && !scrolls(el)) cut.push(`${window.__describe(el)} right=${rect.right.toFixed(1)}`);
+      if (rect.right > viewport + 0.5 && !scrolls(el))
+        cut.push(`${window.__describe(el)} right=${rect.right.toFixed(1)}`);
     }
     const textClip: string[] = [];
     for (const el of Array.from(document.querySelectorAll("*"))) {
-      const s = getComputedStyle(el) as CSSStyleDeclaration & { webkitBackgroundClip?: string };
-      if (s.backgroundClip === "text" || s.webkitBackgroundClip === "text") textClip.push(window.__describe(el));
+      const s = getComputedStyle(el) as CSSStyleDeclaration & {
+        webkitBackgroundClip?: string;
+      };
+      if (s.backgroundClip === "text" || s.webkitBackgroundClip === "text")
+        textClip.push(window.__describe(el));
     }
-    return { mainScrollWidth: main.scrollWidth, mainClientWidth: main.clientWidth, cut, textClip };
+    return {
+      mainScrollWidth: main.scrollWidth,
+      mainClientWidth: main.clientWidth,
+      cut,
+      textClip,
+    };
   });
-  return { viewport: base.viewport, documentScrollWidth: base.documentScrollWidth, beyond: base.beyond, ...extra };
+  return {
+    viewport: base.viewport,
+    documentScrollWidth: base.documentScrollWidth,
+    beyond: base.beyond,
+    ...extra,
+  };
 }

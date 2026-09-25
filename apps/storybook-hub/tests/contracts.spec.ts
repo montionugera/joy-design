@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import {
   HUB_VIEWS,
   hitSize,
@@ -102,8 +102,12 @@ test.describe("Storybook Hub Quality Contracts", () => {
         await installPageTools(page);
         const m = await measureHubOverflow(page);
         const where = `${view} ${vp.width}x${vp.height}`;
-        expect(m.documentScrollWidth, `${where}: document`).toBeLessThanOrEqual(m.viewport);
-        expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(m.mainClientWidth + 1);
+        expect(m.documentScrollWidth, `${where}: document`).toBeLessThanOrEqual(
+          m.viewport,
+        );
+        expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(
+          m.mainClientWidth + 1,
+        );
       }
     }
   });
@@ -156,31 +160,151 @@ test.describe("Storybook Hub Quality Contracts", () => {
     ).toEqual([]);
   });
 
-  test("Contract 5: Interactive 3D Kinetic Canvas on Landing Blocks", async ({
-    page,
-  }) => {
-    await page.goto("/#landing-blocks");
-    await page.waitForLoadState("networkidle");
+  test("Contract 5: kinetic hero is HeroSection over a token-palette canvas that honours motion, pointer and visibility", async ({
+    browser,
+  }, info) => {
+    test.skip(
+      info.project.name !== "desktop-chrome",
+      "context options are set explicitly",
+    );
+    const baseURL = info.project.use.baseURL;
+    const open = async (
+      opts: Parameters<typeof browser.newContext>[0] = {},
+    ) => {
+      const context = await browser.newContext({
+        baseURL,
+        viewport: { width: 1280, height: 800 },
+        ...opts,
+      });
+      const page = await context.newPage();
+      const errors: string[] = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto("/#landing-blocks");
+      await page.waitForLoadState("networkidle");
+      await page.locator("#kinetic-hero-container").scrollIntoViewIfNeeded();
+      if (!opts.hasTouch) {
+        // The field paints once the hero is on screen (IntersectionObserver); wait for the first painted frame.
+        await page.waitForFunction(() => {
+          const c = document.getElementById(
+            "kinetic-particle-canvas",
+          ) as HTMLCanvasElement;
+          if (!c.width || !c.height) return false;
+          const data = c
+            .getContext("2d")!
+            .getImageData(0, 0, c.width, c.height).data;
+          for (let i = 3; i < data.length; i += 4) if (data[i] > 0) return true;
+          return false;
+        });
+      }
+      return { context, page, errors };
+    };
+    const snapshot = (page: Page) =>
+      page.evaluate(() =>
+        (
+          document.getElementById(
+            "kinetic-particle-canvas",
+          ) as HTMLCanvasElement
+        ).toDataURL(),
+      );
 
-    const canvas = page.locator("#kinetic-particle-canvas");
-    await expect(canvas).toBeVisible();
+    // Default: the hero is the real component, the canvas animates in the theme's palette.
+    const normal = await open();
+    try {
+      const { page } = normal;
+      await expect(
+        page.locator("#kinetic-hero-container .joy-hero .joy-hero__title"),
+      ).toBeVisible();
+      await expect(
+        page.locator(
+          "#kinetic-hero-container .joy-hero__ctas .joy-button--solid",
+        ),
+      ).toHaveCount(1);
+      expect(
+        await page
+          .locator(
+            '[class*="kinetic-title"], [class*="kinetic-overlay"], [class*="kinetic-badge"]',
+          )
+          .count(),
+      ).toBe(0);
+      for (const theme of ["light", "dark"] as const) {
+        await setTheme(page, theme);
+        const [palette, tokens] = await page.evaluate(() => {
+          const cs = getComputedStyle(document.documentElement);
+          const v = (n: string) => cs.getPropertyValue(n).trim();
+          return [
+            window.hubKineticPalette!(),
+            {
+              accents: [
+                v("--joy-accent-default"),
+                v("--joy-accent-hover"),
+                v("--joy-accent-active"),
+              ],
+              muted: v("--joy-text-muted"),
+            },
+          ];
+        });
+        expect(palette, `palette ${theme}`).toEqual(tokens);
+      }
+      const a = await snapshot(page);
+      await page.waitForTimeout(300);
+      expect(await snapshot(page), "animates by default").not.toBe(a);
+      // A hidden view schedules no animation frames.
+      await page.evaluate(() => {
+        const w = window as unknown as { __rafCount: number };
+        w.__rafCount = 0;
+        const raf = window.requestAnimationFrame.bind(window);
+        window.requestAnimationFrame = (cb) => {
+          w.__rafCount++;
+          return raf(cb);
+        };
+      });
+      await page.evaluate(() => (window.location.hash = "#button"));
+      await expect(page.locator("#view-button")).toHaveClass(/active/);
+      await page.waitForTimeout(200);
+      const count = () =>
+        page.evaluate(
+          () => (window as unknown as { __rafCount: number }).__rafCount,
+        );
+      const before = await count();
+      await page.waitForTimeout(500);
+      expect(
+        (await count()) - before,
+        "no rAF loop while the hero is hidden",
+      ).toBeLessThanOrEqual(1);
+      expect(normal.errors).toEqual([]);
+    } finally {
+      await normal.context.close();
+    }
 
-    // Verify canvas size is non-zero
-    const box = await canvas.boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.width).toBeGreaterThan(100);
-    expect(box!.height).toBeGreaterThan(100);
+    // Reduced motion: one still frame, nothing moves.
+    const still = await open({ reducedMotion: "reduce" });
+    try {
+      const s1 = await snapshot(still.page);
+      await still.page.waitForTimeout(400);
+      expect(await snapshot(still.page), "static under reduced motion").toBe(
+        s1,
+      );
+      expect(still.errors).toEqual([]);
+    } finally {
+      await still.context.close();
+    }
 
-    // Trigger mouse interaction
-    const container = page.locator("#kinetic-hero-container");
-    await container.hover({ position: { x: 200, y: 150 } });
-    await page.mouse.move(250, 180);
-    await page.waitForTimeout(100);
-
-    // Verify no uncaught console errors
-    const errors: string[] = [];
-    page.on("pageerror", (err) => errors.push(err.message));
-    expect(errors).toEqual([]);
+    // Coarse pointer: a static gradient of the same hue instead of the canvas.
+    const touch = await open({
+      hasTouch: true,
+      isMobile: true,
+      viewport: { width: 375, height: 812 },
+    });
+    try {
+      const bg = await touch.page
+        .locator("#kinetic-hero-container")
+        .evaluate((el) => getComputedStyle(el).backgroundImage);
+      expect(bg, "coarse pointer gets a gradient").toContain("gradient(");
+      await expect(touch.page.locator("#kinetic-particle-canvas")).toBeHidden();
+      expect(touch.errors).toEqual([]);
+    } finally {
+      await touch.context.close();
+    }
   });
 
   test("Contract 7: theme resolved before first paint, honours prefers-color-scheme, persists", async ({
@@ -335,7 +459,10 @@ test.describe("Storybook Hub Quality Contracts", () => {
 
 test.describe("Contract 6: every manifest view at 375 and 1280, light and dark", () => {
   test.beforeEach(({}, info) => {
-    test.skip(info.project.name !== "desktop-chrome", "viewports are set explicitly");
+    test.skip(
+      info.project.name !== "desktop-chrome",
+      "viewports are set explicitly",
+    );
   });
   for (const view of HUB_VIEWS) {
     test(view, async ({ page }, info) => {
@@ -353,12 +480,22 @@ test.describe("Contract 6: every manifest view at 375 and 1280, light and dark",
           await setTheme(page, theme);
           const m = await measureHubOverflow(page);
           const where = `${view} ${theme} ${vp.width}`;
-          expect(m.documentScrollWidth, `${where}: document`).toBeLessThanOrEqual(m.viewport);
-          expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(m.mainClientWidth + 1);
+          expect(
+            m.documentScrollWidth,
+            `${where}: document`,
+          ).toBeLessThanOrEqual(m.viewport);
+          expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(
+            m.mainClientWidth + 1,
+          );
           expect(m.beyond, `${where}: elements past the viewport`).toEqual([]);
-          expect(m.cut, `${where}: content cut off past the viewport`).toEqual([]);
+          expect(m.cut, `${where}: content cut off past the viewport`).toEqual(
+            [],
+          );
           expect(m.textClip, `${where}: background-clip text`).toEqual([]);
-          await page.screenshot({ path: info.outputPath(`${view}-${theme}-${vp.width}.png`), animations: "disabled" });
+          await page.screenshot({
+            path: info.outputPath(`${view}-${theme}-${vp.width}.png`),
+            animations: "disabled",
+          });
         }
       }
     });
