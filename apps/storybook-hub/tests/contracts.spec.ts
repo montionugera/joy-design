@@ -74,10 +74,12 @@ test.describe("Storybook Hub Quality Contracts", () => {
     await expect(sidebar).not.toHaveClass(/open/);
     await expect(backdrop).not.toHaveClass(/active/);
 
-    // Open drawer
+    // Open drawer: focus moves into it (to the close button), so a keyboard user isn't left behind
+    // on the now-hidden trigger button.
     await menuBtn.click();
     await expect(sidebar).toHaveClass(/open/);
     await expect(backdrop).toHaveClass(/active/);
+    await expect(closeBtn).toBeFocused();
 
     // Close via close button
     await closeBtn.click();
