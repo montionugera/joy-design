@@ -28,7 +28,7 @@ export const CameraFilled: React.FC<IconProps> = ({
 		stroke={color}
 		strokeWidth={strokeWidth}
 		strokeLinecap="round"
-	/><circle cx="12" cy="13" r="3" fill="var(--bg-canvas)" />
+	/><circle cx="12" cy="13" r="3" fill="var(--joy-surface-canvas)" />
   </svg>
 );
 

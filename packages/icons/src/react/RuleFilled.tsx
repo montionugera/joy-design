@@ -25,7 +25,7 @@ export const RuleFilled: React.FC<IconProps> = ({
   >
     <path d="M12 3L4 6V11C4 16.5 12 21 12 21C12 21 20 16.5 20 11V6L12 3Z" fill={color} /><path
 		d="M8 12H16"
-		stroke="var(--bg-canvas)"
+		stroke="var(--joy-surface-canvas)"
 		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 	/>

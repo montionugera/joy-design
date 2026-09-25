@@ -71,6 +71,8 @@ function svelteTree(html) {
   return root.children;
 }
 
+const KNOCKOUT = 'var(--joy-surface-canvas)';
+
 const CASES = [
   { label: 'defaults', props: {} },
   { label: 'size and colour', props: { size: '20px', color: 'var(--joy-accent-default)' } },
@@ -93,8 +95,18 @@ for (const name of svelteNames) {
       const root = react[0].attrs;
       assert.strictEqual(root.width, String(props.size ?? '1em'), `${name} (${label}) width must follow size`);
       assert.strictEqual(root.height, String(props.size ?? '1em'), `${name} (${label}) height must follow size`);
-      const painted = JSON.stringify(react);
-      assert.ok(painted.includes(`"${props.color ?? 'currentColor'}"`), `${name} (${label}) must paint with the color prop`);
+      const paints = [];
+      const collect = (nodes) => nodes.forEach((n) => {
+        for (const k of ['stroke', 'fill']) if (n.attrs[k] !== undefined && n.attrs[k] !== 'none') paints.push(n.attrs[k]);
+        collect(n.children);
+      });
+      collect(react);
+      assert.ok(paints.length > 0, `${name} (${label}) paints nothing`);
+      // Filled icons knock details out of the shape with the canvas surface token; nothing else may paint.
+      const color = String(props.color ?? 'currentColor');
+      const stray = paints.filter((p) => p !== color && p !== KNOCKOUT);
+      assert.deepStrictEqual(stray, [], `${name} (${label}) must paint only with the color prop or ${KNOCKOUT}`);
+      assert.ok(paints.includes(color), `${name} (${label}) must paint with the color prop`);
     }
   });
 }

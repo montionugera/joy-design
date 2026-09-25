@@ -15,5 +15,5 @@
 		stroke={color}
 		stroke-width={strokeWidth}
 		stroke-linecap="round"
-	/><circle cx="12" cy="13" r="3" fill="var(--bg-canvas)" />
+	/><circle cx="12" cy="13" r="3" fill="var(--joy-surface-canvas)" />
 </svg>

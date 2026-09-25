@@ -12,7 +12,7 @@
 >
 	<circle cx="12" cy="12" r="10" fill={color} /><path
 		d="M7 12H17"
-		stroke="var(--bg-canvas)"
+		stroke="var(--joy-surface-canvas)"
 		stroke-width={strokeWidth}
 		stroke-linecap="round"
 		stroke-linejoin="round"

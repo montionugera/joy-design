@@ -15,17 +15,17 @@
 		fill={color}
 	/><path
 		d="M8 12C8 12 9.5 14 12 14C14.5 14 16 12 16 12"
-		stroke="var(--bg-canvas)"
+		stroke="var(--joy-surface-canvas)"
 		stroke-width={strokeWidth}
 		stroke-linecap="round"
 	/><path
 		d="M8.5 9.5C8.5 8.5 9.5 8.5 9.5 9.5"
-		stroke="var(--bg-canvas)"
+		stroke="var(--joy-surface-canvas)"
 		stroke-width={strokeWidth}
 		stroke-linecap="round"
 	/><path
 		d="M14.5 9.5C14.5 8.5 15.5 8.5 15.5 9.5"
-		stroke="var(--bg-canvas)"
+		stroke="var(--joy-surface-canvas)"
 		stroke-width={strokeWidth}
 		stroke-linecap="round"
 	/>

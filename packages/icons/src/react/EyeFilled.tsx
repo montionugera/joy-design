@@ -26,7 +26,7 @@ export const EyeFilled: React.FC<IconProps> = ({
     <path
 		d="M12 5C7 5 3 12 3 12C3 12 7 19 12 19C17 19 21 12 21 12C21 12 17 5 12 5Z"
 		fill={color}
-	/><circle cx="12" cy="12" r="3" fill="var(--bg-canvas)" />
+	/><circle cx="12" cy="12" r="3" fill="var(--joy-surface-canvas)" />
   </svg>
 );
 
