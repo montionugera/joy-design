@@ -37,6 +37,7 @@ run_playwright_contracts() {
 echo "==> Epic design-system check <=="
 run_step "color lint" bash scripts/lint-colors.sh
 run_step "parity check" node scripts/parity-check.mjs
+run_step "design doc drift" node scripts/gen-design-md.mjs --check
 run_step "type check" pnpm check
 run_step "pnpm workspace tests" pnpm -r test
 run_step "Storybook Hub build" node apps/storybook-hub/build.js
@@ -45,4 +46,4 @@ if ! run_playwright_contracts; then
   exit 1
 fi
 
-echo "PASS epic-check: color lint, parity, type check, workspace tests, hub build, and Playwright contracts."
+echo "PASS epic-check: color lint, parity, design doc drift, type check, workspace tests, hub build, and Playwright contracts."

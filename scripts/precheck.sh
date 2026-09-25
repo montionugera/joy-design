@@ -47,6 +47,12 @@ pnpm -r test
 echo "2d. Checking Svelte/React parity contract..."
 node scripts/parity-check.mjs
 
+echo "2e. Running script and docs-contract tests (scripts/test/*.test.mjs)..."
+node --test 'scripts/test/*.test.mjs'
+
+echo "2f. Checking DESIGN.md and README generated regions are up to date (scripts/gen-design-md.mjs --check)..."
+node scripts/gen-design-md.mjs --check
+
 echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js
 

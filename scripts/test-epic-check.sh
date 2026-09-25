@@ -27,7 +27,7 @@ chmod +x "$fixture_dir/bin/pnpm" "$fixture_dir/bin/node" "$fixture_dir/bin/playw
 
 export EPIC_CHECK_LOG="$fixture_dir/checks.log"
 PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >/dev/null
-expected=$'node scripts/parity-check.mjs\npnpm check\npnpm -r test\nnode apps/storybook-hub/build.js\nplaywright test'
+expected=$'node scripts/parity-check.mjs\nnode scripts/gen-design-md.mjs --check\npnpm check\npnpm -r test\nnode apps/storybook-hub/build.js\nplaywright test'
 [[ $(cat "$EPIC_CHECK_LOG") == "$expected" ]] || fail "unexpected step order: $(tr '\n' '|' < "$EPIC_CHECK_LOG")"
 
 : > "$EPIC_CHECK_LOG"
@@ -36,6 +36,6 @@ if EPIC_CHECK_FAIL_PNPM=1 PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic
   exit 1
 fi
 grep -q 'FAIL epic-check: type check' "$fixture_dir/failure.log" || fail "missing type-check failure message"
-[[ $(cat "$EPIC_CHECK_LOG") == $'node scripts/parity-check.mjs\npnpm check' ]] || fail "epic-check continued after a failed step"
+[[ $(cat "$EPIC_CHECK_LOG") == $'node scripts/parity-check.mjs\nnode scripts/gen-design-md.mjs --check\npnpm check' ]] || fail "epic-check continued after a failed step"
 
 echo "PASS scripts/test-epic-check.sh"
