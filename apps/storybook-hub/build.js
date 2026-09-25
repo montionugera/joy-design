@@ -806,6 +806,12 @@ ${inlinedThemeCss}
       outline: 2px solid var(--joy-border-focus);
       outline-offset: 2px;
     }
+    .hub-card__desc {
+      color: var(--joy-text-muted);
+      font-size: var(--joy-font-size-sm);
+      margin: 0;
+      line-height: 1.5;
+    }
 
     /* Component Canvas & Docs */
     .view-panel {
@@ -1620,7 +1626,7 @@ ${navigationHtml}
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/tokens</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               W3C DTCG tokens with OpenDesign posture integration, GPU spring motion curves, and hairline borders.
             </p>
           </div>
@@ -1630,7 +1636,7 @@ ${navigationHtml}
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Svelte 5 Runes</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/svelte</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               Zero-overhead Runes ($state, $props, $derived, $bindable) engineered for real-time order books and high-FPS canvases.
             </p>
           </div>
@@ -1640,7 +1646,7 @@ ${navigationHtml}
               <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> React 19 Ready</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/react</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               Strict WAI-ARIA accessible React 19 component library with forwardRef support and zero runtime CSS overhead.
             </p>
           </div>
@@ -1650,7 +1656,7 @@ ${navigationHtml}
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> OpenDesign Postures</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">Modern & Utility</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               Unified Linear/Vercel modern-minimal and Datadog/GitHub tech-utility postures with frosted surfaces & hairline borders.
             </p>
           </div>
