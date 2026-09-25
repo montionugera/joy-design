@@ -5623,7 +5623,11 @@ export async function executeHedge(symbol: string, size: number) {
       sidebar.classList.toggle('open', open);
       backdrop.classList.toggle('active', open);
       if (menuBtn) menuBtn.setAttribute('aria-expanded', String(open));
-      document.body.style.overflow = open ? 'hidden' : '';
+      // body is already overflow: hidden at every viewport (it never scrolls); .main is the element that
+      // actually scrolls behind the drawer, so it is the one that needs locking. Mirrors openLandingDrawer's
+      // scroll lock on the simulator's .main.
+      const scroller = document.querySelector('.main');
+      if (scroller) scroller.style.overflowY = open ? 'hidden' : '';
       if (open) {
         const closeBtn = sidebar.querySelector('.sidebar-close-btn');
         if (closeBtn) closeBtn.focus();

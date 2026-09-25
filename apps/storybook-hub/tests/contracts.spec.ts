@@ -95,6 +95,22 @@ test.describe("Storybook Hub Quality Contracts", () => {
     await expect(sidebar).toHaveClass(/open/);
     await page.keyboard.press("Escape");
     await expect(sidebar).not.toHaveClass(/open/);
+
+    // The page <body> is overflow: hidden at every viewport (it never scrolls), so a scroll lock that
+    // sets document.body.style.overflow is a no-op. The drawer must lock .main instead, the element
+    // that actually scrolls behind it (the backdrop already blocks pointer/wheel input from reaching
+    // .main, so the observable contract here is the CSS state .main is left in, not a wheel delta).
+    const main = page.locator(".main");
+    await expect
+      .poll(() => main.evaluate((el) => el.scrollHeight - el.clientHeight))
+      .toBeGreaterThan(50);
+    await menuBtn.click();
+    await expect(sidebar).toHaveClass(/open/);
+    await expect(main).toHaveCSS("overflow-y", "hidden");
+
+    await closeBtn.click();
+    await expect(sidebar).not.toHaveClass(/open/);
+    await expect(main).not.toHaveCSS("overflow-y", "hidden");
   });
 
   // The in-between widths (Contract 6 covers 375 and 1280 on every view), sampled on several view families; one test
