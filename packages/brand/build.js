@@ -5,11 +5,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { markSvg, wordmarkSvg, ogCardSvg, heroBannerSvg } from './src/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 
 const PALETTE_KEYS = ['tile', 'mark', 'mark-on-tile', 'mark-contrast', 'ink', 'ink-on-tile'];
 
@@ -22,12 +24,32 @@ function isHexColor(value) {
 }
 
 /**
+ * Locates the installed @joymify/tokens package directory via Node's own
+ * node_modules search order (require.resolve.paths), rather than a
+ * hardcoded relative "../tokens" path. @joymify/tokens is declared as a
+ * devDependency (workspace:*) precisely so this resolves through the
+ * package manager/turbo's dependency graph instead of directory layout
+ * assumptions; it also gives turbo's `^build` pipeline the edge it needs to
+ * build tokens before brand.
+ */
+function resolveTokensDir() {
+  const searchPaths = require.resolve.paths('@joymify/tokens') || [];
+  for (const base of searchPaths) {
+    const candidate = path.join(base, '@joymify/tokens');
+    if (fs.existsSync(path.join(candidate, 'package.json'))) {
+      return candidate;
+    }
+  }
+  throw new Error('readPalette: could not resolve the @joymify/tokens package directory');
+}
+
+/**
  * Reads the FIRST (light, `:root`) declaration of each --joy-brand-* token
  * from @joymify/tokens' built theme.css, and returns a camelCased palette
  * object. Builds tokens first if dist/theme.css doesn't exist yet.
  */
 export function readPalette() {
-  const tokensDir = path.resolve(__dirname, '../tokens');
+  const tokensDir = resolveTokensDir();
   const themePath = path.join(tokensDir, 'dist/theme.css');
 
   if (!fs.existsSync(themePath)) {
@@ -97,6 +119,15 @@ async function main() {
   console.log('build: wrote brand assets to', outDir);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+function isMainModule() {
+  if (!process.argv[1]) return false;
+  try {
+    return import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href;
+  } catch {
+    return false;
+  }
+}
+
+if (isMainModule()) {
   await main();
 }

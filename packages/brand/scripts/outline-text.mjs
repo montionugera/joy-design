@@ -45,9 +45,22 @@ function assertNoNotdef(font, text) {
 // decimal part is itself tiny float noise (e.g. 1e-14 from unitsPerEm
 // scaling), that concatenation produces an invalid numeric string
 // ("1e-14e+2"), so Math.round() returns NaN — silently corrupting the path
-// data with literal "NaN" tokens. Rounding every coordinate ourselves before
-// serializing avoids ever handing it a fractional part in exponential form.
-const round6 = (n) => Math.round(n * 1e6) / 1e6;
+// data with literal "NaN" tokens.
+//
+// Rounding to 6 decimals first is NOT enough to prevent this: dividing by
+// 1e6 to round can itself land a coordinate just above an integer boundary
+// (e.g. intending -1024 but storing -1023.999999), and opentype's own
+// decimalPart = float - Math.floor(float) then produces a *new* sub-1e-6
+// residual (e.g. 9.999999974752427e-7) from that boundary case — recreating
+// the exact same bug one level down.
+//
+// Rounding to 2 decimals instead — the same precision toPathData(2) itself
+// asks for — means opentype's internal rounding pass is a no-op on values
+// we already handed it at that precision, which removes the class of
+// boundary cases above. That still is not a mathematical proof against every
+// possible float, so round2Path() re-checks the final path data for "NaN" or
+// exponential notation and throws rather than silently writing either.
+const round2 = (n) => Math.round(n * 100) / 100;
 
 function outline(fontPath, text) {
   const font = loadFont(fontPath);
@@ -58,19 +71,27 @@ function outline(fontPath, text) {
 
   // Translate so the bbox starts at x=0, and round away float noise.
   for (const cmd of path.commands) {
-    if ('x' in cmd) cmd.x = round6(cmd.x - bbox.x1);
-    if ('x1' in cmd) cmd.x1 = round6(cmd.x1 - bbox.x1);
-    if ('x2' in cmd) cmd.x2 = round6(cmd.x2 - bbox.x1);
-    if ('y' in cmd) cmd.y = round6(cmd.y);
-    if ('y1' in cmd) cmd.y1 = round6(cmd.y1);
-    if ('y2' in cmd) cmd.y2 = round6(cmd.y2);
+    if ('x' in cmd) cmd.x = round2(cmd.x - bbox.x1);
+    if ('x1' in cmd) cmd.x1 = round2(cmd.x1 - bbox.x1);
+    if ('x2' in cmd) cmd.x2 = round2(cmd.x2 - bbox.x1);
+    if ('y' in cmd) cmd.y = round2(cmd.y);
+    if ('y1' in cmd) cmd.y1 = round2(cmd.y1);
+    if ('y2' in cmd) cmd.y2 = round2(cmd.y2);
+  }
+
+  const d = path.toPathData(2);
+  if (/NaN|e[-+]/.test(d)) {
+    throw new Error(
+      `outline-text: generated path data for "${text}" contains NaN or exponential notation ` +
+        '(the opentype.js roundDecimal bug was not fully avoided by rounding) — refusing to write it.'
+    );
   }
 
   return {
-    d: path.toPathData(2),
-    width: Math.round((bbox.x2 - bbox.x1) * 100) / 100,
-    height: Math.round((bbox.y2 - bbox.y1) * 100) / 100,
-    baseline: Math.round(-bbox.y1 * 100) / 100
+    d,
+    width: round2(bbox.x2 - bbox.x1),
+    height: round2(bbox.y2 - bbox.y1),
+    baseline: round2(-bbox.y1)
   };
 }
 

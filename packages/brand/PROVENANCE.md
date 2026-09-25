@@ -4,9 +4,10 @@
 
 - **Name:** Cormorant Garamond
 - **Weights used:** 500 (medium, normal) for the wordmark; 400 (regular, italic) for the tagline
-- **Package:** `@fontsource/cormorant-garamond` (devDependency here, outlining only — never shipped as a runtime font asset by this package)
+- **Package:** `@fontsource/cormorant-garamond` version `5.3.0` (per `pnpm-lock.yaml`; devDependency here, outlining only — never shipped as a runtime font asset by this package)
 - **Licence:** SIL Open Font License 1.1
 - **Upstream:** https://github.com/CatharsisFonts/Cormorant
+- **Outlining tool:** `opentype.js` version `2.0.0` (per `pnpm-lock.yaml`; see the NaN workaround note in `scripts/outline-text.mjs`)
 
 The wordmark and tagline are outlined to static SVG path data at build time
 (see `scripts/outline-text.mjs`), so no font file or `@font-face` is needed

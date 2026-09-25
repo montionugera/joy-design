@@ -29,6 +29,9 @@ importers:
       '@fontsource/cormorant-garamond':
         specifier: ^5.3.0
         version: 5.3.0
+      '@joymify/tokens':
+        specifier: workspace:*
+        version: link:../tokens
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2

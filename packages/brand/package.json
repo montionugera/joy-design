@@ -17,6 +17,7 @@
   "devDependencies": {
     "opentype.js": "^2.0.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
-    "@resvg/resvg-js": "^2.6.2"
+    "@resvg/resvg-js": "^2.6.2",
+    "@joymify/tokens": "workspace:*"
   }
 }

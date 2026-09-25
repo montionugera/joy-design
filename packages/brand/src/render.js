@@ -66,7 +66,11 @@ export function wordmarkSvg({ palette, tone = 'deep' }) {
   const lockupHeight = 80;
   const wordmarkTargetHeight = 40;
 
-  const scale = wordmarkTargetHeight / WORDMARK.baseline;
+  // Rounded once here and reused for every layout computation below, so the
+  // centring/width math always agrees with the transform="scale(...)" that
+  // actually gets rendered (an unrounded scale used for layout but a rounded
+  // one in the transform silently drifts the result off-centre).
+  const scale = round2(wordmarkTargetHeight / WORDMARK.baseline);
   const wmWidth = round2(WORDMARK.width * scale);
   const width = round2(wmWidth + 96);
 
@@ -103,7 +107,8 @@ export function ogCardSvg({ palette }) {
   const markSize = 96;
   const gap = 32;
   const wordmarkTargetHeight = 96;
-  const scale = wordmarkTargetHeight / WORDMARK.baseline;
+  // Rounded once and reused throughout (see the comment in wordmarkSvg).
+  const scale = round2(wordmarkTargetHeight / WORDMARK.baseline);
   const wmWidth = round2(WORDMARK.width * scale);
   const lockupWidth = round2(markSize + gap + wmWidth);
   const lockupX = round2((width - lockupWidth) / 2);
@@ -116,10 +121,15 @@ export function ogCardSvg({ palette }) {
   const wordmarkY = round2(markCenterY + scale * (WORDMARK.baseline - WORDMARK.height / 2));
 
   const taglineTargetHeight = 36;
-  const taglineScale = taglineTargetHeight / TAGLINE.baseline;
+  // Rounded once and reused throughout (see the comment in wordmarkSvg).
+  const taglineScale = round2(taglineTargetHeight / TAGLINE.baseline);
   const taglineWidth = round2(TAGLINE.width * taglineScale);
   const taglineX = round2((width - taglineWidth) / 2);
-  const taglineY = round2(lockupCenterY + markSize / 2 + 64);
+  // +80 (not +64): the wordmark's descenders (e.g. the "y" in Joymify) reach
+  // well below its baseline, so a small gap here crowds the tagline's cap
+  // line against them. +80 clears the descenders with room to spare while
+  // staying well above the rule at height - 48.
+  const taglineY = round2(lockupCenterY + markSize / 2 + 80);
 
   const ruleInset = 48;
   const ruleY = round2(height - ruleInset);
@@ -158,6 +168,13 @@ export function heroBannerSvg({ palette }) {
   const rows = Math.ceil(height / cell) + 1;
   const fadeStart = width * 0.55;
   const maxOpacity = 0.35;
+  // Diamonds are sampled at cell centres, so the rightmost one actually
+  // drawn is centred at (width - cell/2), not at the viewBox edge (width).
+  // Normalising by (width - fadeStart) would therefore always fall short of
+  // maxOpacity (0.33 instead of 0.35). Normalise by the distance from
+  // fadeStart to that last reachable centre instead, so the last column
+  // hits maxOpacity exactly.
+  const fadeRange = width - cell / 2 - fadeStart;
 
   let diamonds = '';
   for (let row = 0; row < rows; row += 1) {
@@ -166,7 +183,7 @@ export function heroBannerSvg({ palette }) {
       const y = row * cell;
       const centerX = x + cell / 2;
       if (centerX <= fadeStart) continue;
-      const opacity = round2(Math.min(maxOpacity, (maxOpacity * (centerX - fadeStart)) / (width - fadeStart)));
+      const opacity = round2(Math.min(maxOpacity, (maxOpacity * (centerX - fadeStart)) / fadeRange));
       if (opacity <= 0) continue;
       diamonds += `<g transform="translate(${x} ${y}) scale(2)"><path d="${MARK.outline}" fill="none" stroke="${palette.markOnTile}" stroke-width="0.5" stroke-opacity="${opacity}"/></g>`;
     }
