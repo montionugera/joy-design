@@ -499,12 +499,12 @@ The last command writes the 16 acceptance screenshots (landing, primitives, form
 | `favicon.svg` | 32 | same as `mark.svg`, with `<title>Joymify</title>` |
 | `favicon-32.png`, `apple-touch-icon.png` | 32, 180 | raster fallbacks |
 | `wordmark-deep.svg`, `wordmark-cream.svg` | mark + "Joymify" lockup | on light and dark surfaces |
-| `og-card.svg`, `og-card.png` | 1200x630 | social share card: navy field, diamond, wordmark, tagline, thin gold rule |
-| `hero-banner.svg` | 1600x560 | decorative navy banner with a fine gold diamond lattice fading to one side, no text |
+| `og-card.svg`, `og-card.png` | 1200×630 | social share card: navy field, diamond, wordmark, tagline, thin gold rule |
+| `hero-banner.svg` | 1600×560 | decorative navy banner with a fine gold diamond lattice fading to one side, no text |
 
 ### Adoption
 
-Favicon and Open Graph tags, served from wherever a consumer copies `packages/brand/assets/` (e.g. `static/brand/`):
+Favicon and Open Graph tags, served from wherever a consumer copies `packages/brand/assets/` (e.g. `static/brand/`). A bundler-aware consumer can instead import a file directly through the package's `./assets/*` export, e.g. `@joymify/brand/assets/favicon.svg`:
 
 ```html
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">

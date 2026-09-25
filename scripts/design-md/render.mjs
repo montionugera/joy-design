@@ -212,7 +212,7 @@ Colour roles: ${roles.join(', ')} — light and dark values are in the [Semantic
 - Do not recolour the mark or wordmark outside the \`--joy-brand-*\` roles above.
 - Do not stretch or skew the mark or wordmark; scale it uniformly.
 - Do not substitute the square mark some products still ship; the diamond is canonical.
-- Gold is a signature, not a wash: it marks the diamond and thin rules, never a fill or a background.`;
+- Gold is a signature, not a wash: never a large field, a page background or a card background. The two sanctioned small-area gold fills are the mark's inner diamond and the \`Ribbon\` \`gold\` tone.`;
 }
 
 function dosAndDonts() {
