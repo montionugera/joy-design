@@ -81,21 +81,24 @@ test.describe("Storybook Hub Quality Contracts", () => {
     await expect(sidebar).not.toHaveClass(/open/);
   });
 
-  test("Contract 3: Zero Document-Level Horizontal Overflow", async ({
-    page,
-  }) => {
-    const viewports = [
-      { width: 320, height: 568 },
-      { width: 390, height: 844 },
-      { width: 768, height: 1024 },
-      { width: 899, height: 900 },
-      { width: 900, height: 900 },
-      { width: 1280, height: 800 },
-    ];
-
-    // The in-between widths (Contract 6 covers 375 and 1280 on every view) sampled on several view families.
-    for (const view of ["overview", "button", "forms", "table"]) {
-      for (const vp of viewports) {
+  // The in-between widths (Contract 6 covers 375 and 1280 on every view), sampled on several view families; one test
+  // per view so a loaded machine cannot push six page loads past the per-test timeout.
+  for (const view of ["overview", "button", "forms", "table"]) {
+    test(`Contract 3: Zero Document-Level Horizontal Overflow (${view})`, async ({
+      page,
+    }, info) => {
+      test.skip(
+        info.project.name !== "desktop-chrome",
+        "viewports are set explicitly",
+      );
+      for (const vp of [
+        { width: 320, height: 568 },
+        { width: 390, height: 844 },
+        { width: 768, height: 1024 },
+        { width: 899, height: 900 },
+        { width: 900, height: 900 },
+        { width: 1280, height: 800 },
+      ]) {
         await page.goto("about:blank");
         await page.setViewportSize(vp);
         await page.goto(`/#${view}`);
@@ -109,9 +112,12 @@ test.describe("Storybook Hub Quality Contracts", () => {
         expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(
           m.mainClientWidth + 1,
         );
+        expect(m.cut, `${where}: content cut off past the viewport`).toEqual(
+          [],
+        );
       }
-    }
-  });
+    });
+  }
 
   test("Contract 4: Semantic Navigation Taxonomy (Zero visible Wave labels)", async ({
     page,
