@@ -19,10 +19,6 @@ export const PraiseFilled: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -33,17 +29,17 @@ export const PraiseFilled: React.FC<IconProps> = ({
 	/><path
 		d="M8 12C8 12 9.5 14 12 14C14.5 14 16 12 16 12"
 		stroke="var(--bg-canvas)"
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 	/><path
 		d="M8.5 9.5C8.5 8.5 9.5 8.5 9.5 9.5"
 		stroke="var(--bg-canvas)"
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 	/><path
 		d="M14.5 9.5C14.5 8.5 15.5 8.5 15.5 9.5"
 		stroke="var(--bg-canvas)"
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 	/>
   </svg>

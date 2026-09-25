@@ -19,18 +19,14 @@ export const Compass: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5" /><path
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth={strokeWidth} /><path
 		d="M10 14L15 9L14 10L9 15L10 14Z"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/>

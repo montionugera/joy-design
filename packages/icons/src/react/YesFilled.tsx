@@ -19,10 +19,6 @@ export const YesFilled: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -30,7 +26,7 @@ export const YesFilled: React.FC<IconProps> = ({
     <circle cx="12" cy="12" r="10" fill={color} /><path
 		d="M8 12.5L10.5 15L16 9"
 		stroke="var(--bg-canvas)"
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/>

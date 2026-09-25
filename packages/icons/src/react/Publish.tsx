@@ -19,10 +19,6 @@ export const Publish: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -30,13 +26,13 @@ export const Publish: React.FC<IconProps> = ({
     <path
 		d="M13 14H6V4H14V7"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/><path
 		d="M10 9H19M19 9L16 6M19 9L16 12"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/>

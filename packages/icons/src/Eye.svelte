@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { size = '1em', color = 'currentColor' } = $props<{ size?: string; color?: string }>();
+	let { size = '1em', color = 'currentColor', strokeWidth = 1.5 } = $props<{ size?: string; color?: string; strokeWidth?: number | string }>();
 </script>
 
 <svg
@@ -13,8 +13,8 @@
 	<path
 		d="M12 5C7 5 3 12 3 12C3 12 7 19 12 19C17 19 21 12 21 12C21 12 17 5 12 5Z"
 		stroke={color}
-		stroke-width="1.5"
+		stroke-width={strokeWidth}
 		stroke-linecap="round"
 		stroke-linejoin="round"
-	/><circle cx="12" cy="12" r="3" stroke={color} stroke-width="1.5" />
+	/><circle cx="12" cy="12" r="3" stroke={color} stroke-width={strokeWidth} />
 </svg>

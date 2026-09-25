@@ -19,10 +19,6 @@ export const LockCloseFilled: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -30,7 +26,7 @@ export const LockCloseFilled: React.FC<IconProps> = ({
     <rect x="5" y="10" width="14" height="10" rx="2" fill={color} /><path
 		d="M8 10V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V10"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 	/>
   </svg>

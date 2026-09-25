@@ -19,10 +19,6 @@ export const ArrowLeft: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -30,7 +26,7 @@ export const ArrowLeft: React.FC<IconProps> = ({
     <path
 		d="M15 18L9 12L15 6"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/>
