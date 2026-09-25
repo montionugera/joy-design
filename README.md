@@ -490,6 +490,8 @@ The last command writes the 16 acceptance screenshots (landing, primitives, form
 
 `packages/brand` (`@joymify/brand`) is the single source for the Joymify mark, wordmark, hero banner and social card. Geometry (`src/geometry.js`) and pure SVG renderers (`src/render.js`) take a palette built from the light-theme `--joy-brand-*` values in `packages/tokens/dist/theme.css`, so every asset traces back to the tokens, never a hand-typed hex. `node packages/brand/build.js` regenerates the committed files below; a drift test in `packages/brand/test/` fails if the committed output and a fresh build disagree. See the generated [Brand](DESIGN.md#brand) section of `DESIGN.md` for the mark geometry, the wordmark padding/overflow rules, the `--joy-brand-*` table and the Don'ts.
 
+The `Wordmark` component's glyph deliberately overflows about 8% of its height on each edge (it renders with `overflow: visible`), so a parent must not clip it with `overflow: hidden` unless that parent also adds matching padding back.
+
 ### Assets (`packages/brand/assets/`)
 
 | File | Size | Use |
