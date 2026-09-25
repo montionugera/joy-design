@@ -45,31 +45,32 @@ export function heroLattice({ width = 1600, height = 560, cell = 64, fadeStart, 
 }
 
 /**
- * The mark + wordmark lockup from wordmark-*.svg, parameterised by the total lockup `height`
- * (the canonical asset uses 80). The mark fills 0.6 of the lockup height; the margin around it
- * (and the gap before the glyph) is 0.2 of the lockup height; the glyph is scaled to a cap height
- * of 0.5 of the lockup height (asset ratios: mark 48, margin/gap 16, glyph 40, all out of a 80px
- * lockup — 48/80 = 0.6, 16/80 = 0.2, 40/80 = 0.5, and 40/48 / 16/48 are exactly the ratios the
- * review pinned as canonical). `withMark: false` drops the mark, its margin and the gap, and
- * centres the glyph on the full lockup height instead.
+ * The mark + wordmark lockup from wordmark-*.svg, parameterised by the total lockup `height` and
+ * an outer `padding`. The canonical asset ratios (Fix round 2 ruling) are relative to the MARK
+ * size, not the lockup height: gap = markSize / 3 and glyph cap height = markSize * 5/6 (mark 48,
+ * gap 16, glyph 40 — 16/48 and 40/48). `padding` is asset-only outer whitespace: the mark is
+ * inset by `padding` on every side, so `markSize = height - 2 * padding`. The static asset passes
+ * `padding = 0.2 * height` (its committed 16px margin on an 80px lockup); components pass
+ * `padding: 0` so the mark fills the full component height with no drift from that asset
+ * (`markSize === height`). `withMark: false` drops the mark, its padding and the gap, and scales
+ * the glyph straight off the lockup `height` (still 5/6 of it) centred on the full box instead.
  */
-export function wordmarkLayout({ height = 80, withMark = true } = {}) {
-  const margin = round2(height * 0.2);
-  const markSize = withMark ? round2(height * 0.6) : 0;
-  const markX = withMark ? margin : 0;
-  const markY = withMark ? margin : 0;
-  const gap = withMark ? margin : 0;
+export function wordmarkLayout({ height = 80, withMark = true, padding = 0 } = {}) {
+  const markSize = withMark ? round2(height - 2 * padding) : 0;
+  const markX = withMark ? round2(padding) : 0;
+  const markY = withMark ? round2(padding) : 0;
+  const gap = withMark ? round2(markSize / 3) : 0;
   // Without a mark there is nothing to centre on, so the glyph centres on the full lockup height
   // instead (markY/markSize are both 0 in that case, which would otherwise centre on y=0).
   const markCenterY = withMark ? markY + markSize / 2 : height / 2;
 
-  const glyphTargetHeight = round2(height * 0.5);
+  const glyphTargetHeight = round2((withMark ? markSize : height) * (5 / 6));
   const glyphScale = round2(glyphTargetHeight / WORDMARK.baseline);
   const glyphWidth = round2(WORDMARK.width * glyphScale);
   const glyphX = round2(markX + markSize + gap);
   const glyphY = round2(markCenterY + glyphScale * (WORDMARK.baseline - WORDMARK.height / 2));
 
-  const width = round2(glyphX + glyphWidth + (withMark ? margin : 0));
+  const width = round2(glyphX + glyphWidth + (withMark ? round2(padding) : 0));
 
   return { width, height, markX, markY, markSize, markCenterY, glyphX, glyphY, glyphScale, glyphWidth };
 }

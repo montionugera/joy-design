@@ -78,4 +78,4 @@ export interface WordmarkLayout {
   glyphWidth: number;
 }
 
-export declare function wordmarkLayout(options?: { height?: number; withMark?: boolean }): WordmarkLayout;
+export declare function wordmarkLayout(options?: { height?: number; withMark?: boolean; padding?: number }): WordmarkLayout;

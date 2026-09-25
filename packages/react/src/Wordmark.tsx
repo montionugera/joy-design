@@ -24,7 +24,9 @@ export function Wordmark({ tone = 'deep', height = 32, withMark = true, title = 
   const glyphColor = isCream ? 'var(--joy-brand-ink-on-tile)' : 'var(--joy-brand-ink)';
   const markColor = isCream ? 'var(--joy-brand-mark-on-tile)' : 'var(--joy-brand-mark)';
 
-  const layout = wordmarkLayout({ height: lockupHeight, withMark });
+  // padding: 0 — no outer whitespace, unlike the downloadable asset, so the mark fills the full
+  // component height (markSize === height).
+  const layout = wordmarkLayout({ height: lockupHeight, withMark, padding: 0 });
 
   return (
     <svg

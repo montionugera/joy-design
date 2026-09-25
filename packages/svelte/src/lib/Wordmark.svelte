@@ -25,7 +25,9 @@
   const glyphColor = $derived(isCream ? 'var(--joy-brand-ink-on-tile)' : 'var(--joy-brand-ink)');
   const markColor = $derived(isCream ? 'var(--joy-brand-mark-on-tile)' : 'var(--joy-brand-mark)');
 
-  const layout = $derived(wordmarkLayout({ height: lockupHeight, withMark }));
+  // padding: 0 — no outer whitespace, unlike the downloadable asset, so the mark fills the full
+  // component height (markSize === height).
+  const layout = $derived(wordmarkLayout({ height: lockupHeight, withMark, padding: 0 }));
 </script>
 
 <svg

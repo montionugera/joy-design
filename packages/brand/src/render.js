@@ -76,9 +76,13 @@ export function markSvg({ palette, tile = true, size = 32, title = 'Joymify' }) 
 // side of the 48px mark, plus the 16px gap, plus a matching 16px right
 // margin after the wordmark).
 export function wordmarkSvg({ palette, tone = 'deep' }) {
+  const lockupHeightIn = 80;
   const { width, height: lockupHeight, markX, markY, markSize, glyphX, glyphY, glyphScale } = wordmarkLayout({
-    height: 80,
-    withMark: true
+    height: lockupHeightIn,
+    withMark: true,
+    // The static asset's own outer whitespace (16px on an 80px lockup) — not part of the
+    // mark:gap:glyph ratio, so components pass padding: 0 instead (see layout.js).
+    padding: round2(lockupHeightIn * 0.2)
   });
 
   const isCream = tone === 'cream';

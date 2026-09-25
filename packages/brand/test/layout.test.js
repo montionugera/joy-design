@@ -8,6 +8,13 @@ import { WORDMARK } from '../src/geometry.js';
 // components can no longer drift apart. These tests pin the exact numbers the canonical asset
 // build depends on (packages/brand/test/brand.test.js's drift test proves render.js still produces
 // byte-identical output using these helpers).
+//
+// Fix round 2 (controller-found regression): wordmarkLayout used to bake the asset's own outer
+// whitespace (16px on an 80px lockup) into every caller, so <Wordmark height={32}> rendered a
+// ~19px mark with padding instead of a mark filling the full 32px. The mark:gap:glyph ratio
+// (48:16:40, i.e. gap = markSize/3 and glyph cap height = markSize*5/6) is canonical; the outer
+// margin is asset-only and is now an explicit `padding` option the static asset opts into and
+// components leave at 0.
 
 test('F-043: heroLattice defaults match the canonical hero-banner.svg grid', () => {
   const lattice = heroLattice();
@@ -39,8 +46,9 @@ test('F-043: heroLattice is a pure function of its options (no shared/mutated st
   assert.strictEqual(a.diamondScale, 1);
 });
 
-test('F-043: wordmarkLayout(height: 80, withMark: true) reproduces the canonical asset ratios (mark 48/80, margin/gap 16/80, glyph 40/80)', () => {
-  const layout = wordmarkLayout({ height: 80, withMark: true });
+test('F-043: wordmarkLayout(height: 80, padding: 16) reproduces the canonical asset numbers (mark 48/80, margin+gap 16, glyph 40)', () => {
+  // padding: 16 = 0.2 * 80, exactly what render.js's wordmarkSvg passes for the static asset.
+  const layout = wordmarkLayout({ height: 80, withMark: true, padding: 16 });
   assert.strictEqual(layout.markSize, 48);
   assert.strictEqual(layout.markX, 16);
   assert.strictEqual(layout.markY, 16);
@@ -49,23 +57,43 @@ test('F-043: wordmarkLayout(height: 80, withMark: true) reproduces the canonical
 
   const expectedScale = Math.round((40 / WORDMARK.baseline) * 100) / 100;
   assert.strictEqual(layout.glyphScale, expectedScale);
-  assert.strictEqual(layout.width, layout.glyphWidth + 96);
+  assert.strictEqual(layout.width, layout.glyphWidth + 96); // 16 (mark x) + 48 + 16 (gap) + 16 (right padding)
 });
 
-test('F-043: wordmarkLayout(withMark: false) drops the mark and centres the glyph on the full height', () => {
-  const withMark = wordmarkLayout({ height: 80, withMark: true });
+test('F-043: wordmarkLayout(padding: 0) fills the full height with the mark — no asset whitespace baked in', () => {
+  // This is the regression the controller found: components pass padding: 0 and must get
+  // markSize === height, not the asset's 0.6-of-height mark with margin around it.
+  const layout = wordmarkLayout({ height: 48, withMark: true, padding: 0 });
+  assert.strictEqual(layout.markSize, 48);
+  assert.strictEqual(layout.markX, 0);
+  assert.strictEqual(layout.markY, 0);
+  // The 48:16:40 ratio (gap = markSize/3, glyph cap height = markSize*5/6) still holds, driven by
+  // the mark size rather than a fraction of a padded lockup height.
+  assert.strictEqual(layout.glyphX - layout.markSize, 16); // gap = 48/3 = 16
+  const expectedScale = Math.round(((48 * 5) / 6 / WORDMARK.baseline) * 100) / 100; // glyph cap height 40
+  assert.strictEqual(layout.glyphScale, expectedScale);
+
+  // And at an arbitrary height, markSize still equals height exactly with no padding.
+  assert.strictEqual(wordmarkLayout({ height: 32, padding: 0 }).markSize, 32);
+});
+
+test('F-043: wordmarkLayout(withMark: false) drops the mark and scales/centres the glyph on the full height', () => {
+  const withMark = wordmarkLayout({ height: 80, withMark: true, padding: 0 });
   const withoutMark = wordmarkLayout({ height: 80, withMark: false });
   assert.strictEqual(withoutMark.markSize, 0);
   assert.strictEqual(withoutMark.markX, 0);
   assert.strictEqual(withoutMark.glyphX, 0);
-  assert.strictEqual(withoutMark.markCenterY, 40); // still the full-height centre (80 / 2)
-  // The glyph itself is still scaled to 0.5 of the lockup height either way.
+  assert.strictEqual(withoutMark.markCenterY, 40); // the full-height centre (80 / 2)
+  // Without a mark the glyph is scaled straight off the lockup height (still 5/6 of it), so it
+  // matches the with-mark case here because with-mark also has padding: 0 (markSize === height).
   assert.strictEqual(withoutMark.glyphScale, withMark.glyphScale);
   assert.ok(withoutMark.width < withMark.width);
 });
 
-test('F-043: wordmarkLayout scales proportionally at other heights', () => {
-  const layout = wordmarkLayout({ height: 32, withMark: true });
-  assert.strictEqual(layout.markSize, Math.round(32 * 0.6 * 100) / 100);
-  assert.strictEqual(layout.markX, Math.round(32 * 0.2 * 100) / 100);
+test('F-043: wordmarkLayout derives markSize from height and padding at any size', () => {
+  const layout = wordmarkLayout({ height: 100, withMark: true, padding: 10 });
+  assert.strictEqual(layout.markSize, 80); // 100 - 2*10
+  assert.strictEqual(layout.markX, 10);
+  assert.strictEqual(layout.markY, 10);
+  assert.strictEqual(layout.glyphX - layout.markSize - layout.markX, Math.round((80 / 3) * 100) / 100); // gap
 });

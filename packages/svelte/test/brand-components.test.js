@@ -44,3 +44,15 @@ test('F-043: Wordmark renders outlined glyphs, labelled, tone-aware', async () =
   assert.ok(!/<svg[\s\S]*<svg/.test(noMark));
   assert.ok(!noMark.includes(MARK.outline));
 });
+
+// Fix round 2 (controller-found regression): wordmarkLayout used to bake the downloadable asset's
+// outer padding into every caller, so <Wordmark height={32}> rendered a ~19px mark with padding
+// instead of a mark filling the full 32px component height. Pin markSize === height at the
+// component level: the mark group's own 0..32 native geometry is scaled 1:1 (`scale(1)`) and sits
+// at the origin (`translate(0 0)`) when height is 32, the component's default.
+test('F-043: Wordmark mark fills the full component height (height: 32 -> markSize 32, no asset padding)', async () => {
+  const html = await renderSvelte('Wordmark', { height: 32 });
+  assert.match(html, /viewBox="0 0 [\d.]+ 32"/);
+  assert.match(html, /width="[\d.]+" height="32"/);
+  assert.match(html, /<g transform="translate\(0 0\) scale\(1\)">/);
+});
