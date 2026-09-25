@@ -93,7 +93,8 @@ export interface OverlayRect {
 
 export interface OverlayNode {
   classList: { add(...c: string[]): void; remove(...c: string[]): void };
-  style: Record<string, string>;
+  // The inline-style properties openOverlay writes; a real CSSStyleDeclaration satisfies it.
+  style: { position: string; top: string; left: string; minWidth: string };
   getBoundingClientRect(): OverlayRect;
   contains(node: unknown): boolean;
   focus(): void;

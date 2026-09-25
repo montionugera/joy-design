@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
-export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface TagProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'onChange'> {
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'default';
   closable?: boolean;
   checkable?: boolean;

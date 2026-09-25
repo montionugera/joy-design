@@ -10,7 +10,7 @@ export interface TransferItem {
   disabled?: boolean;
 }
 
-export interface TransferProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TransferProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   dataSource: TransferItem[];
   targetKeys?: string[];
   titles?: [string, string];
