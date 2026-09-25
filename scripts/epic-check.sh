@@ -35,6 +35,12 @@ run_playwright_contracts() {
 }
 
 echo "==> Epic design-system check <=="
+# psrw runs this hook in a fresh detached worktree with no installed deps. Some
+# node_modules/.pnpm files are tracked in git, so the dir alone proves nothing:
+# .modules.yaml is untracked and written only by a completed pnpm install.
+if [[ ! -f "${EPIC_CHECK_NODE_MODULES:-node_modules}/.modules.yaml" ]]; then
+  run_step "dependency install" pnpm install --frozen-lockfile --prefer-offline
+fi
 run_step "color lint" bash scripts/lint-colors.sh
 run_step "parity check" node scripts/parity-check.mjs
 run_step "design doc drift" node scripts/gen-design-md.mjs --check
