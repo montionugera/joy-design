@@ -566,6 +566,7 @@ ${inlinedThemeCss}
       --hub-code-bg: var(--joy-surface-sunken);
       --hub-code-fg: var(--joy-text-primary);
       --hub-drawer-edge: var(--joy-elevation-3);
+      --hub-scrim: var(--joy-surface-inverse);
     }
     [data-theme="dark"] {
       --hub-sidebar-bg: var(--joy-surface-card);
@@ -574,6 +575,8 @@ ${inlinedThemeCss}
       --hub-code-bg: var(--joy-surface-sunken);
       --hub-code-fg: var(--joy-text-primary);
       --hub-drawer-edge: 1px 0 0 var(--joy-border-strong);
+      /* surface-inverse is cream in dark, so the scrim uses the darkest neutral to dim rather than wash out. */
+      --hub-scrim: var(--joy-color-neutral-950);
     }
     * {
       box-sizing: border-box;
@@ -1133,7 +1136,7 @@ ${inlinedThemeCss}
       display: none;
       position: fixed;
       inset: 0;
-      background: color-mix(in srgb, var(--joy-surface-inverse) 55%, transparent);
+      background: color-mix(in srgb, var(--hub-scrim) 55%, transparent);
       z-index: var(--joy-z-backdrop);
       opacity: 0;
       transition: opacity var(--joy-duration-normal) ease;
@@ -1462,7 +1465,7 @@ ${inlinedThemeCss}
     }
     @media (prefers-reduced-motion: reduce) {
       .sidebar, .sidebar.open, .sidebar-backdrop, .nav-item, .framework-btn, .mobile-menu-btn, .sidebar-close-btn,
-      .segment-btn, .icon-card, .hub-card, .view-panel.active {
+      .segment-btn, .icon-card, .hub-card, .view-panel.active, .simulator-frame {
         transition: none;
         animation: none;
       }
@@ -2896,7 +2899,7 @@ export async function executeHedge(symbol: string, size: number) {
         <div class="playground-box">
           <div class="playground-header">
             <h4>Icon system (138 vector assets for Svelte 5 and React 19)</h4>
-            <div id="copy-toast-banner" style="font-size: 0.8125rem; color: var(--joy-status-success-fg); font-weight: 600; display: none;">Copied to clipboard!</div>
+            <div id="copy-toast-banner" style="font-size: var(--joy-font-size-sm); color: var(--joy-status-success-fg); font-weight: 600; display: none;">Copied to clipboard</div>
           </div>
           <div style="padding: 24px;">
             <div class="icon-grid">

@@ -441,6 +441,27 @@ test.describe("Storybook Hub Quality Contracts", () => {
           ).toBeGreaterThan(0);
           expect(result.failures, `${root} ${theme} ${width}`).toEqual([]);
         }
+        if (width < 900) {
+          // The drawer scrim dims the page in both themes: composited over the canvas it is darker, never a light wash.
+          const [canvas, dimmed] = await page.evaluate(() => {
+            const body = window.__rgba(
+              getComputedStyle(document.body).backgroundColor,
+            );
+            const scrim = window.__rgba(
+              getComputedStyle(document.getElementById("sidebar-backdrop")!)
+                .backgroundColor,
+            );
+            const mixed = [0, 1, 2].map(
+              (i) => scrim[i] * scrim[3] + body[i] * (1 - scrim[3]),
+            );
+            const lum = (c: number[]) =>
+              0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+            return [lum(body), lum(mixed)];
+          });
+          expect(dimmed, `scrim darkens the ${theme} canvas`).toBeLessThan(
+            canvas * 0.8,
+          );
+        }
       }
     }
   });
