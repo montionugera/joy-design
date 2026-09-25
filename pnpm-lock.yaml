@@ -50,6 +50,9 @@ importers:
 
   packages/react:
     dependencies:
+      '@joymify/brand':
+        specifier: workspace:*
+        version: link:../brand
       '@joymify/icons':
         specifier: workspace:*
         version: link:../icons
@@ -72,6 +75,9 @@ importers:
 
   packages/svelte:
     dependencies:
+      '@joymify/brand':
+        specifier: workspace:*
+        version: link:../brand
       '@joymify/icons':
         specifier: workspace:*
         version: link:../icons

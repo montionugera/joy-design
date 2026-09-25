@@ -2671,6 +2671,110 @@ h1, h2, h3, .joy-display {
   }
 }
 
+/* Brand mark + wordmark: inline SVG logos, coloured entirely through --joy-brand-* custom
+   properties (see packages/brand) so they track the active theme; these block classes exist so a
+   consumer can target sizing/spacing, not for any colour of their own. */
+.joy-brand-mark {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.joy-wordmark {
+  display: inline-block;
+}
+
+/* Ribbon: a small label badge. The "corner" variant is absolutely positioned and rotated 45deg,
+   so its parent must set position: relative; overflow: hidden for the band to clip cleanly. */
+.joy-ribbon {
+  display: inline-block;
+  box-sizing: border-box;
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.4;
+  white-space: nowrap;
+  padding: 4px 12px;
+}
+.joy-ribbon--inline {
+  display: inline-flex;
+  align-items: center;
+  padding-right: 20px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+}
+.joy-ribbon--corner {
+  position: absolute;
+  top: 16px;
+  right: -40px;
+  width: 160px;
+  text-align: center;
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+.joy-ribbon--gold {
+  background: var(--joy-accent-default);
+  color: var(--joy-text-on-accent);
+}
+.joy-ribbon--navy {
+  background: var(--joy-brand-tile);
+  color: var(--joy-brand-ink-on-tile);
+}
+
+/* Brand Banner: a tile-toned marketing band with a decorative diamond lattice behind the copy. */
+.joy-brand-banner {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--joy-brand-tile);
+  color: var(--joy-brand-ink-on-tile);
+  padding: 48px 32px;
+  border-radius: var(--joy-radius-overlay);
+}
+.joy-brand-banner--center {
+  text-align: center;
+}
+.joy-brand-banner--center .joy-brand-banner__content {
+  margin: 0 auto;
+}
+.joy-brand-banner--center .joy-brand-banner__ctas {
+  justify-content: center;
+}
+.joy-brand-banner__lattice {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.joy-brand-banner__content {
+  position: relative;
+  max-width: 640px;
+}
+.joy-brand-banner__eyebrow {
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  letter-spacing: normal;
+  margin: 0 0 8px 0;
+  opacity: 0.85;
+}
+.joy-brand-banner__title {
+  font-family: var(--joy-font-family-display);
+  font-weight: 500;
+  font-size: var(--joy-font-size-display-md);
+  color: var(--joy-brand-ink-on-tile);
+  margin: 0 0 12px 0;
+}
+.joy-brand-banner__lede {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  opacity: 0.92;
+}
+.joy-brand-banner__ctas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 /* Pricing Matrix */
 .joy-pricing-matrix {
   display: flex;

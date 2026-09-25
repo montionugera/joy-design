@@ -102,3 +102,8 @@ export { CTASection, type CTASectionProps } from './CTASection.js';
 export { FAQSection, type FAQSectionProps, type FAQItem } from './FAQSection.js';
 export { SiteFooter, type SiteFooterProps, type FooterColumn, type FooterLink, type SocialLink } from './SiteFooter.js';
 export { LandingPage, type LandingPageProps } from './LandingPage.js';
+// F-043: Brand Asset Kit
+export { BrandMark, type BrandMarkProps } from './BrandMark.js';
+export { Wordmark, type WordmarkProps } from './Wordmark.js';
+export { Ribbon, type RibbonProps } from './Ribbon.js';
+export { BrandBanner, type BrandBannerProps } from './BrandBanner.js';

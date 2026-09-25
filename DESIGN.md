@@ -623,6 +623,10 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | SiteFooter | `.joy-site-footer` | - | - | hover, focus-visible |
 | LandingPage | `.joy-landing-page` | sm, md, lg | - | hover, focus-visible, active, disabled, loading |
 | LandingAction | `.joy-button` | sm, md, lg | block, danger, ghost, icon-only, link, outline, solid, wave | hover, focus-visible, active, disabled, loading |
+| BrandMark | `.joy-brand-mark` | - | - | - |
+| Wordmark | `.joy-wordmark` | - | - | - |
+| Ribbon | `.joy-ribbon` | - | corner, gold, inline, navy | - |
+| BrandBanner | `.joy-brand-banner` | - | center | - |
 
 ## Do's and Don'ts
 
