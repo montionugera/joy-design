@@ -71,6 +71,14 @@
 		}
 	});
 
+	// Re-apply the theme override in place on later changes; onMount above
+	// only sets it once when the chart instance is created.
+	$effect(() => {
+		if (chartInstance) {
+			chartInstance.setTheme(theme);
+		}
+	});
+
 	function handleKeyDown(e: KeyboardEvent) {
 		if (!chartInstance) return;
 		if (e.key === 'ArrowLeft') {

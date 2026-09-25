@@ -406,6 +406,17 @@ export class JoyChartCore {
     this.render();
   }
 
+  /**
+   * Update the explicit theme override in place and repaint. Cheaper than
+   * recreating the instance: `drawGrid`/`drawCrosshair` already read
+   * `this.options.theme` fresh on every render(), so mutating it and
+   * repainting is enough — no listeners to rebind, no canvas to leak.
+   */
+  public setTheme(theme: 'light' | 'dark' | undefined) {
+    this.options.theme = theme;
+    this.render();
+  }
+
   public setSeries(series: SeriesConfig[]) {
     this.isCandlestick = false;
     this.seriesList = series;

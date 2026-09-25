@@ -67,6 +67,12 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
       }
     }, [data]);
 
+    // Re-apply the theme override in place on later changes; the mount effect
+    // above only sets it once when the chart instance is created.
+    useEffect(() => {
+      chartInstanceRef.current?.setTheme(theme);
+    }, [theme]);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e);
       if (!chartInstanceRef.current) return;

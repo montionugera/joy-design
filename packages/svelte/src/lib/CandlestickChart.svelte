@@ -66,6 +66,14 @@
 		}
 	});
 
+	// Re-apply the theme override in place on later changes; onMount above
+	// only sets it once when the chart instance is created.
+	$effect(() => {
+		if (chartInstance) {
+			chartInstance.setTheme(theme);
+		}
+	});
+
 	let chartLabel = $derived(describeCandlestickChart(data));
 	let summary = $derived(summaryWindow(data, 'candle'));
 	let hasVolume = $derived(data.some((d) => d.volume != null));

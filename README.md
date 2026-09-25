@@ -38,6 +38,7 @@ Import the stylesheet once: `import '@joymify/tokens/theme.css'`. Light is the d
 - **No fallbacks.** Write `var(--joy-text-primary)`, never `var(--joy-text-primary, #333)`. The lint rejects fallbacks because they hide a missing stylesheet.
 - **Icons (Wave 6).** Svelte icons now accept `strokeWidth` like the React icons (default `1.5`). The React filled and custom icons (such as `HeartFilled` and `ArrowLeft`) no longer stroke the root `<svg>`, so filled shapes lose the outline they wrongly had, and `strokeWidth` now takes effect. React `ZoomOut` draws a minus rather than a vertical bar. Filled icons cut their details out with `--joy-surface-canvas`.
 - **React charts (Wave 6).** `BarChart`, `LineChart` and `CandlestickChart` now honour the `theme` prop. Before, it was never read and threw a ReferenceError when the chart mounted.
+- **Chart `theme` prop is now live, both twins (Wave 6 review fix).** `BarChart`, `LineChart` and `CandlestickChart` used to apply `theme` only once, at mount — a later change to the prop was silently ignored. Both React and Svelte twins now re-apply it on every change via a new `JoyChartCore.setTheme(theme)` method, which mutates the existing chart instance in place and repaints (no instance recreation, no leaked canvas listeners).
 
 ## Quality gates
 
