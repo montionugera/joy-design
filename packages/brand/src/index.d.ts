@@ -79,3 +79,6 @@ export interface WordmarkLayout {
 }
 
 export declare function wordmarkLayout(options?: { height?: number; withMark?: boolean; padding?: number }): WordmarkLayout;
+
+// Scale factor for the diamond mark's native 32x32 viewBox to render at `size` px.
+export declare function markScale(size: number): number;

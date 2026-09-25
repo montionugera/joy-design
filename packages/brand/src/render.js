@@ -4,11 +4,7 @@
 // rounded to 2 decimals so builds are deterministic.
 
 import { MARK, WORDMARK, TAGLINE } from './geometry.js';
-import { heroLattice, wordmarkLayout } from './layout.js';
-
-function round2(n) {
-  return Math.round(n * 100) / 100;
-}
+import { heroLattice, wordmarkLayout, markScale, round2 } from './layout.js';
 
 function escapeXml(text) {
   return String(text)
@@ -32,7 +28,7 @@ function markGroup(palette, tile) {
 
 // Places the mark (native 0..32 space) at (x, y) scaled so it renders at `size`.
 function markGroupAt({ palette, tile, x, y, size }) {
-  const scale = round2(size / 32);
+  const scale = markScale(size);
   return `<g transform="translate(${round2(x)} ${round2(y)}) scale(${scale})">${markGroup(palette, tile)}</g>`;
 }
 

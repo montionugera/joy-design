@@ -7,8 +7,19 @@
 
 import { WORDMARK } from './geometry.js';
 
-function round2(n) {
+// Exported (not just module-local) so render.js can import it instead of keeping its own copy —
+// the two files used to each define this identically.
+export function round2(n) {
   return Math.round(n * 100) / 100;
+}
+
+/**
+ * Scale factor for the diamond mark's native 32x32 viewBox to render at `size` px. Shared by
+ * heroLattice's diamondScale below, render.js's markGroupAt, and the Wordmark components' own
+ * mark group — all three used to derive `round2(size / 32)` independently.
+ */
+export function markScale(size) {
+  return round2(size / 32);
 }
 
 /**
@@ -41,7 +52,7 @@ export function heroLattice({ width = 1600, height = 560, cell = 64, fadeStart, 
     }
   }
 
-  return { width, height, cell, diamondScale: round2(cell / 32), diamonds };
+  return { width, height, cell, diamondScale: markScale(cell), diamonds };
 }
 
 /**

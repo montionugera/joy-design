@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MARK, WORDMARK, wordmarkLayout } from '@joymify/brand';
+import { MARK, WORDMARK, wordmarkLayout, markScale } from '@joymify/brand';
 
 // The "Joymify" outlined wordmark, optionally paired with the bare diamond mark. Geometry AND
 // layout (the mark/gap/glyph proportions) come from @joymify/brand's `wordmarkLayout` — the same
@@ -15,8 +15,6 @@ export interface WordmarkProps {
   title?: string;
   className?: string;
 }
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function Wordmark({ tone = 'deep', height = 32, withMark = true, title = 'Joymify', className = '' }: WordmarkProps) {
   const lockupHeight = Number.isFinite(height) && height > 0 ? height : 32;
@@ -46,7 +44,7 @@ export function Wordmark({ tone = 'deep', height = 32, withMark = true, title = 
     >
       <title>{title}</title>
       {withMark && (
-        <g transform={`translate(${layout.markX} ${layout.markY}) scale(${round2(layout.markSize / 32)})`}>
+        <g transform={`translate(${layout.markX} ${layout.markY}) scale(${markScale(layout.markSize)})`}>
           <path d={MARK.outline} fill="none" stroke={markColor} strokeWidth={MARK.outlineWidth} />
           <path d={MARK.inner} fill={markColor} />
         </g>
