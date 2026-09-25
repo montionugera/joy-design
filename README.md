@@ -276,3 +276,56 @@ node apps/storybook-hub/scripts/gen-landing-blocks.mjs --check   # fail on drift
 - **`LandingPage` renders its own `<main>` and a skip link**: do not nest it inside another `<main>`.
 - **Svelte landing `Props` extend the element attributes**, so extra attributes are typed and forwarded to the root.
 - **Card titles use fixed scale tokens** instead of the display clamps.
+
+## Storybook hub (Wave 5)
+
+`apps/storybook-hub/build.js` generates the hub page (`apps/storybook-hub/dist/index.html`): stylesheet, 38 manifest views and the runtime script. Wave 5 rebuilt its chrome for phones and dark mode.
+
+### Layout tiers
+
+| Width | Chrome |
+| --- | --- |
+| over 900px | Sidebar always shown; topbar has the theme toggle and the Svelte/React switcher. |
+| 900px and below | The sidebar becomes an off-canvas drawer (`#hub-sidebar`, `z-index: var(--joy-z-drawer)`) behind a scrim. The topbar shows the menu button (`aria-controls`, `aria-expanded`) and the brand. While open, Tab stays inside the drawer; Escape closes it and returns focus to the menu button. A closed drawer is `visibility: hidden`, so its links leave the tab order. |
+| 767px and below | The topbar is menu button, brand and theme toggle only. The framework switcher moves into the drawer. Content uses 16px gutters, and token and props tables scroll sideways inside labelled, focusable regions (`.hub-scroll-x`). |
+| 480px and below | The theme toggle is icon-only. It keeps its `aria-label`. |
+
+The menu button, drawer close, theme toggle (on phones) and the drawer's framework buttons are at least 44px square. Framework buttons carry `data-framework` and `aria-pressed`, and `setFramework()` keeps both copies in sync.
+
+### Theme and colour
+
+- **Theme is resolved before the first paint.** An inline `<head>` script sets `data-theme` from `localStorage['joy-theme']`, or from `prefers-color-scheme` when nothing is saved. The toggle stores the choice; its label reads "Dark theme" / "Light theme" and its `aria-label` says "Switch to dark theme" / "Switch to light theme".
+- **Token-only colours.** The hub stylesheet uses `--joy-*` tokens, plus `--hub-*` chrome aliases (`--hub-sidebar-bg`, `--hub-topbar-bg`, `--hub-chrome-border`, `--hub-code-bg`, `--hub-code-fg`, `--hub-drawer-edge`, `--hub-scrim`). The drawer scrim is `--hub-scrim` at 55% (the inverse surface in light, the darkest neutral in dark, so it always dims). The aliases are defined once in `:root` and once in `[data-theme="dark"]`, and every one resolves to a token. There are no `div[style*=...]` dark-mode patches. `bash scripts/lint-colors.sh --strict apps/storybook-hub/build.js` reports 0.
+- **No slop in the chrome.** There is no glass (`backdrop-filter`), gradient text, tracked uppercase labels, arrow suffixes, middle dots or numbered markers. Font sizes use `--joy-font-size-*`, z-index uses `--joy-z-*`, and transitions run 150-250ms on `--joy-duration-*`. They switch off under `prefers-reduced-motion`.
+
+### Heroes and the particle field
+
+- The landing view (`#overview`) opens with a real `HeroSection` render. Its "Browse components" and "Read the tokens" buttons are wired in `build.js`.
+- The kinetic hero in `#landing-blocks` is also a `HeroSection` render, placed over a decorative canvas. Both come from `scripts/gen-landing-blocks.mjs`, which now owns a fourth region, `overview-hero`. Regenerate with `--write` and check with `--check`, as for the other regions.
+- The particle canvas reads `--joy-accent-default`, `--joy-accent-hover`, `--joy-accent-active` and `--joy-text-muted` through `window.hubKineticPalette()`, and re-reads them whenever `data-theme` changes.
+- Under reduced motion the canvas draws one still frame. On a coarse pointer the canvas is hidden and a still accent gradient shows instead.
+- Frames only run while an `IntersectionObserver` sees the hero and the tab is visible, capped at 60fps. The field never paints under the hero text or CTAs.
+- One component fix landed with this wave: `.joy-radio-group` gained `flex-wrap: wrap`, because a horizontal group of long options ran off a 375px screen.
+
+### Contracts and screenshots
+
+`apps/storybook-hub/tests/contracts.spec.ts` covers the hub in these contracts. Most run on the `desktop-chrome` project and set their own viewports.
+
+- **Contract 5**: the kinetic hero is a `HeroSection`; the palette follows the theme; no paint sits under the hero text; the field is still under reduced motion, hidden on a touch pointer, and schedules no frames while off screen.
+- **Contract 6**: every manifest view at 375px and 1280px, in light and dark. It checks for no document or `.main` horizontal overflow, no element past the viewport, no content cut off inside an `overflow: hidden` box, and no `background-clip: text`. It writes one screenshot per view, theme and width to `apps/storybook-hub/test-results/` (gitignored).
+- **Contract 7**: `data-theme` is right at the first animation frame for an OS light or dark preference, and a saved choice wins after reload.
+- **Contract 8**: topbar and sidebar text has a contrast ratio of at least 4.5:1 in both themes, at 375px and 1280px.
+- **Contract 8b**: card outlines stay visible against the canvas and the card surface in both themes; Contract 8 also checks that the drawer scrim darkens the page in both themes.
+- **Contract 9**: phone chrome, 44px hit areas, the drawer focus trap and the framework switcher in the drawer.
+- **Contract 9b**: the market filter is 16px on phones, so iOS does not zoom on focus.
+- **Contract 10**: the slop sweep over every view, plus reduced motion.
+
+Run them:
+
+```bash
+node apps/storybook-hub/build.js
+cd apps/storybook-hub && PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/contracts.spec.ts --project=desktop-chrome
+F040_SCREENS=1 PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/screens-f040.spec.ts --project=desktop-chrome
+```
+
+The last command writes the 16 acceptance screenshots (landing, primitives, forms and data display, at 375px and 1280px, light and dark) to `.claude/refined_backlog/F-040-wave-5-storybook-hub-mobile-layout-dark/research/screens/`. The per-issue status of the hub audit (HUB-001 to HUB-070), including the deferrals, is in `research/issue-coverage.md` in the same folder.

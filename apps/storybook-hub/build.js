@@ -539,6 +539,16 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('joy-theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <title>Joymify Design System & Component Portal</title>
   <style id="joy-theme-inline">
 ${inlinedThemeCss}
@@ -550,6 +560,23 @@ ${inlinedThemeCss}
   <style>
     :root {
       --sidebar-width: 280px;
+      --hub-sidebar-bg: var(--joy-surface-card);
+      --hub-topbar-bg: var(--joy-surface-card);
+      --hub-chrome-border: var(--joy-border-default);
+      --hub-code-bg: var(--joy-surface-sunken);
+      --hub-code-fg: var(--joy-text-primary);
+      --hub-drawer-edge: var(--joy-elevation-3);
+      --hub-scrim: var(--joy-surface-inverse);
+    }
+    [data-theme="dark"] {
+      --hub-sidebar-bg: var(--joy-surface-card);
+      --hub-topbar-bg: var(--joy-surface-card);
+      --hub-chrome-border: var(--joy-border-strong);
+      --hub-code-bg: var(--joy-surface-sunken);
+      --hub-code-fg: var(--joy-text-primary);
+      --hub-drawer-edge: 1px 0 0 var(--joy-border-strong);
+      /* surface-inverse is cream in dark, so the scrim uses the darkest neutral to dim rather than wash out. */
+      --hub-scrim: var(--joy-color-neutral-950);
     }
     * {
       box-sizing: border-box;
@@ -579,8 +606,8 @@ ${inlinedThemeCss}
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background: var(--joy-surface-card);
-      border-right: 1px solid var(--joy-border-default);
+      background: var(--hub-sidebar-bg);
+      border-right: 1px solid var(--hub-chrome-border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -603,19 +630,19 @@ ${inlinedThemeCss}
       justify-content: center;
       color: var(--joy-text-on-accent);
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: var(--joy-font-size-lg);
       box-shadow: var(--joy-elevation-1);
     }
     .brand-info h2 {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--joy-font-size-md);
       font-weight: 700;
       color: var(--joy-text-primary);
       letter-spacing: -0.01em;
     }
     .brand-info span {
-      font-size: 0.75rem;
-      color: var(--joy-accent-default);
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-accent-text);
       font-weight: 600;
     }
     .nav {
@@ -624,11 +651,9 @@ ${inlinedThemeCss}
       padding: 16px 12px;
     }
     .nav-section {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--joy-text-muted);
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
       padding: 10px 12px 6px;
       margin-top: 8px;
     }
@@ -638,12 +663,12 @@ ${inlinedThemeCss}
       gap: 10px;
       padding: 8px 12px;
       border-radius: 6px;
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 500;
       color: var(--joy-text-secondary);
       text-decoration: none;
       cursor: pointer;
-      transition: all var(--joy-duration-fast);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
     }
     .nav-item:hover {
       background: var(--joy-surface-sunken);
@@ -655,7 +680,7 @@ ${inlinedThemeCss}
       font-weight: 600;
     }
     .nav-item .icon {
-      font-size: 1rem;
+      font-size: var(--joy-font-size-md);
     }
 
     /* Main Content */
@@ -667,10 +692,8 @@ ${inlinedThemeCss}
     }
     .topbar {
       min-height: 60px;
-      border-bottom: var(--joy-border-hairline);
-      background: var(--joy-surface-overlay);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--hub-chrome-border);
+      background: var(--hub-topbar-bg);
       padding: 0 32px;
       display: flex;
       align-items: center;
@@ -679,40 +702,115 @@ ${inlinedThemeCss}
       gap: var(--joy-space-2);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--joy-z-sticky);
     }
-    #btn-theme-toggle {
+    .topbar__start,
+    .topbar__end {
+      display: flex;
+      align-items: center;
+      gap: var(--joy-space-3);
       flex-shrink: 0;
+    }
+    .topbar-brand {
+      display: none;
+      align-items: center;
+      gap: var(--joy-space-2);
+      font-size: var(--joy-font-size-md);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      white-space: nowrap;
+    }
+    .brand-logo.brand-logo--compact {
+      width: 28px;
+      height: 28px;
+      font-size: var(--joy-font-size-sm);
+      box-shadow: none;
+    }
+    #btn-theme-toggle.hub-theme-toggle {
+      flex-shrink: 0;
+      gap: var(--joy-space-2);
+      border: 1px solid var(--hub-chrome-border);
+    }
+    .hub-theme-toggle__icon {
+      display: inline-flex;
+      align-items: center;
     }
     .framework-pill {
       display: inline-flex;
       flex-wrap: nowrap;
       background: var(--joy-surface-sunken);
-      border-radius: 9999px;
+      border: 1px solid var(--hub-chrome-border);
+      border-radius: var(--joy-radius-pill);
       padding: 3px;
+    }
+    .framework-pill--drawer {
+      display: none;
     }
     .framework-btn {
       border: none;
       background: transparent;
       padding: 6px 14px;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 600;
-      border-radius: 9999px;
+      border-radius: var(--joy-radius-pill);
       cursor: pointer;
-      color: var(--joy-text-muted);
-      transition: all var(--joy-duration-fast);
+      color: var(--joy-text-secondary);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
       white-space: nowrap;
+    }
+    .framework-btn:hover {
+      color: var(--joy-text-primary);
     }
     .framework-btn.active {
       background: var(--joy-surface-card);
-      color: var(--joy-accent-default);
-      box-shadow: 0 1px 4px transparent;
+      color: var(--joy-accent-text);
+      box-shadow: var(--joy-elevation-1);
+    }
+    .framework-btn:focus-visible,
+    .mobile-menu-btn:focus-visible,
+    .sidebar-close-btn:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: 2px;
     }
     .content-area {
       max-width: 1080px;
       width: 100%;
       margin: 0 auto;
       padding: 36px 32px 64px;
+    }
+    /* Overview landing cards: keyboard-reachable (role="link" + tabindex), not inline styles. */
+    /* Stacked demo controls inside a forms matrix cell get breathing room between field groups. */
+    [data-matrix="forms"] > section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--joy-space-3);
+    }
+    [data-matrix="forms"] > section > h3 {
+      margin: 0;
+    }
+    .hub-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+      gap: var(--joy-space-4);
+      margin-bottom: var(--joy-space-8);
+    }
+    .hub-card {
+      display: block;
+      background: var(--joy-surface-card);
+      border: 1px solid var(--hub-chrome-border);
+      border-radius: var(--joy-radius-lg);
+      padding: var(--joy-space-6);
+      cursor: pointer;
+    }
+    .hub-card:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: 2px;
+    }
+    .hub-card__desc {
+      color: var(--joy-text-muted);
+      font-size: var(--joy-font-size-sm);
+      margin: 0;
+      line-height: 1.5;
     }
 
     /* Component Canvas & Docs */
@@ -726,14 +824,14 @@ ${inlinedThemeCss}
     .header-tagline {
       margin-top: 4px;
       color: var(--joy-text-muted);
-      font-size: 1rem;
+      font-size: var(--joy-font-size-md);
       margin-bottom: 24px;
     }
     .playground-box {
       background: var(--joy-surface-card);
-      border: 1px solid var(--joy-border-default);
+      border: 1px solid var(--hub-chrome-border);
       border-radius: 12px;
-      box-shadow: 0 2px 8px transparent;
+      box-shadow: none;
       margin-bottom: 32px;
       overflow: hidden;
     }
@@ -750,7 +848,7 @@ ${inlinedThemeCss}
     }
     .playground-header h4 {
       margin: 0;
-      font-size: 0.9375rem;
+      font-size: var(--joy-font-size-md);
       font-weight: 600;
       color: var(--joy-text-primary);
       min-width: 0;
@@ -764,9 +862,9 @@ ${inlinedThemeCss}
     }
     .component-card {
       background: var(--joy-surface-card);
-      border: 1px solid var(--joy-border-default);
+      border: 1px solid var(--hub-chrome-border);
       border-radius: 12px;
-      box-shadow: 0 2px 8px transparent;
+      box-shadow: none;
       margin-bottom: 32px;
       overflow: hidden;
     }
@@ -786,14 +884,14 @@ ${inlinedThemeCss}
       flex: 1 1 auto;
     }
     .component-title {
-      font-size: 0.9375rem;
+      font-size: var(--joy-font-size-md);
       font-weight: 600;
       color: var(--joy-text-primary);
       overflow-wrap: break-word;
       word-break: break-word;
     }
     .component-desc {
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-muted);
       margin-top: 4px;
       line-height: 1.4;
@@ -804,8 +902,6 @@ ${inlinedThemeCss}
       padding: 24px;
       display: flex;
       background-color: var(--joy-surface-card);
-      background-image: radial-gradient(var(--joy-border-default) 1.2px, transparent 0);
-      background-size: 20px 20px;
       min-width: 0;
       overflow-x: auto;
     }
@@ -837,7 +933,7 @@ ${inlinedThemeCss}
       grid-template-columns: minmax(0, 1fr);
     }
     /* The always-open Tooltip demo sits on the tooltip layer, above modals and drawers; hide it while a hub dialog is open so it does not float over the overlay. */
-    body:has([data-hub-dialog][style*="display: block"]) .joy-tooltip[data-static] {
+    body.hub-dialog-open .joy-tooltip[data-static] {
       visibility: hidden;
     }
     .hub-matrix__cell {
@@ -845,11 +941,9 @@ ${inlinedThemeCss}
     }
     .hub-matrix__cell > h4 {
       margin: 0 0 var(--joy-space-2);
-      font-size: 0.75rem;
+      font-size: var(--joy-font-size-xs);
       font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--joy-text-muted);
+      color: var(--joy-text-secondary);
     }
     .hub-row {
       display: flex;
@@ -859,7 +953,7 @@ ${inlinedThemeCss}
     }
     .hub-pane {
       padding: var(--joy-space-3);
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
     }
     .hub-pane p {
@@ -900,27 +994,17 @@ ${inlinedThemeCss}
       border-top: 1px solid var(--joy-border-default);
       background: var(--joy-surface-card);
       border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-    [data-theme="dark"] .controls-table {
-      background: var(--joy-surface-card);
-      border-top-color: var(--joy-text-secondary);
+      font-size: var(--joy-font-size-sm);
     }
     .controls-table td {
       padding: 14px 24px;
       border-bottom: 1px solid var(--joy-surface-sunken);
       vertical-align: middle;
     }
-    [data-theme="dark"] .controls-table td {
-      border-bottom-color: var(--joy-surface-raised);
-    }
     .controls-table td:first-child {
       font-weight: 600;
       color: var(--joy-text-secondary);
       width: 180px;
-    }
-    [data-theme="dark"] .controls-table td:first-child {
-      color: var(--joy-text-muted);
     }
     .segmented-control {
       display: inline-flex;
@@ -938,12 +1022,12 @@ ${inlinedThemeCss}
       border: none;
       background: transparent;
       padding: 6px 14px;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 500;
       color: var(--joy-text-muted);
       border-radius: 6px;
       cursor: pointer;
-      transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast), box-shadow var(--joy-duration-fast);
       font-family: inherit;
       white-space: nowrap;
     }
@@ -954,33 +1038,35 @@ ${inlinedThemeCss}
       background: var(--joy-surface-card);
       color: var(--joy-text-primary);
       font-weight: 600;
-      box-shadow: 0 1px 3px transparent, 0 1px 2px transparent;
-    }
-    [data-theme="dark"] .segmented-control {
-      background: var(--joy-surface-canvas);
-      border-color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .segment-btn {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .segment-btn:hover {
-      color: var(--joy-text-primary);
-    }
-    [data-theme="dark"] .segment-btn.active {
-      background: var(--joy-surface-raised);
-      color: var(--joy-text-primary);
-      box-shadow: 0 1px 3px transparent;
+      box-shadow: none;
     }
     .code-snippet {
-      background: var(--joy-surface-inverse);
-      color: var(--joy-text-inverse);
+      background: var(--hub-code-bg);
+      color: var(--hub-code-fg);
+      border: 1px solid var(--hub-chrome-border);
       padding: 16px 20px;
       border-radius: 8px;
       font-family: var(--joy-font-family-mono);
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       overflow-x: auto;
       margin-top: 16px;
       line-height: 1.5;
+    }
+    .hub-scroll-x {
+      overflow-x: auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--joy-radius-md);
+    }
+    .hub-scroll-x--spaced {
+      margin-bottom: var(--joy-space-6);
+    }
+    .hub-scroll-x:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: 2px;
+    }
+    .hub-scroll-x > table {
+      min-width: 480px;
     }
     .tokens-table {
       width: 100%;
@@ -989,7 +1075,7 @@ ${inlinedThemeCss}
       border-radius: 8px;
       border: 1px solid var(--joy-border-default);
       overflow: hidden;
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
     }
     .tokens-table th, .tokens-table td {
       padding: 12px 16px;
@@ -1009,91 +1095,8 @@ ${inlinedThemeCss}
       vertical-align: middle;
       margin-right: 8px;
     }
-    .badge-runes {
-      background: var(--joy-accent-default);
-      color: var(--joy-text-on-accent);
-      font-size: 0.6875rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-    }
-    .badge-react {
-      background: var(--joy-surface-inverse);
-      color: var(--joy-text-inverse);
-      font-size: 0.6875rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-    }
 
     /* ── Coherent Dark Mode Overrides for Hub UI ── */
-    [data-theme="dark"] body {
-      background-color: var(--joy-surface-canvas);
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .sidebar {
-      background: var(--joy-surface-card);
-      border-right-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .brand {
-      border-bottom-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .brand-info h2 {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .nav-section {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .nav-item {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .nav-item:hover {
-      background: var(--joy-surface-raised);
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .nav-item.active {
-      background: var(--joy-accent-subtle);
-      color: var(--joy-accent-text);
-    }
-    [data-theme="dark"] .topbar {
-      background: transparent;
-      border-bottom-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .framework-pill {
-      background: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .framework-btn {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .framework-btn.active {
-      background: var(--joy-surface-card);
-      color: var(--joy-accent-text);
-    }
-    [data-theme="dark"] .playground-box {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-      box-shadow: 0 4px 12px transparent;
-    }
-    [data-theme="dark"] .playground-header {
-      background: var(--joy-surface-raised);
-      border-bottom-color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .playground-header h4 {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .tokens-table {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .tokens-table th {
-      background: var(--joy-surface-raised);
-      border-bottom-color: var(--joy-text-secondary);
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .tokens-table td {
-      border-bottom-color: var(--joy-surface-raised);
-      color: var(--joy-border-default);
-    }
     /* Icon Gallery Styling */
     .icon-grid {
       display: grid;
@@ -1112,12 +1115,12 @@ ${inlinedThemeCss}
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 150ms ease;
+      transition: background-color var(--joy-duration-fast), border-color var(--joy-duration-fast), color var(--joy-duration-fast), transform var(--joy-duration-fast);
     }
     .icon-card:hover {
       border-color: var(--joy-accent-default);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px transparent;
+      box-shadow: none;
     }
     .icon-preview {
       display: flex;
@@ -1126,54 +1129,13 @@ ${inlinedThemeCss}
       color: var(--joy-text-secondary);
     }
     .icon-name {
-      font-size: 0.75rem;
+      font-size: var(--joy-font-size-xs);
       font-weight: 500;
       color: var(--joy-text-muted);
       text-align: center;
       word-break: break-all;
     }
-    [data-theme="dark"] .icon-card {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .icon-card:hover {
-      border-color: var(--joy-accent-default);
-      box-shadow: 0 4px 12px transparent;
-    }
-    [data-theme="dark"] .icon-preview {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .icon-name {
-      color: var(--joy-text-muted);
-    }
 
-    /* Coherent Dark Mode for All Containers & Component Cards */
-    [data-theme="dark"] .header-tagline {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .content-area div[style*="background: var(--joy-surface-card)"] {
-      background: var(--joy-surface-card) !important;
-      border-color: var(--joy-surface-raised) !important;
-    }
-    [data-theme="dark"] .content-area div[style*="background: var(--joy-surface-raised)"] {
-      background: var(--joy-surface-raised) !important;
-      border-color: var(--joy-text-secondary) !important;
-    }
-    [data-theme="dark"] .component-card {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-      box-shadow: 0 4px 12px transparent;
-    }
-    [data-theme="dark"] .component-header {
-      background: var(--joy-surface-raised);
-      border-bottom-color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .component-title {
-      color: var(--joy-surface-raised);
-    }
-    [data-theme="dark"] .component-desc {
-      color: var(--joy-text-muted);
-    }
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
     }
@@ -1183,83 +1145,58 @@ ${inlinedThemeCss}
       display: none;
       position: fixed;
       inset: 0;
-      background: transparent;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 998;
+      background: color-mix(in srgb, var(--hub-scrim) 55%, transparent);
+      z-index: var(--joy-z-backdrop);
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: opacity var(--joy-duration-normal) ease;
     }
     .sidebar-backdrop.active {
       display: block;
       opacity: 1;
     }
-    .mobile-menu-btn {
-      display: none;
-      appearance: none;
-      -webkit-appearance: none;
-      background: var(--joy-surface-sunken);
-      border: 1px solid var(--joy-border-default);
-      border-radius: 8px;
-      padding: 7px 10px;
-      cursor: pointer;
-      color: var(--joy-text-secondary);
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
-      transition: all 150ms ease;
-    }
-    .mobile-menu-btn:hover {
-      background: var(--joy-border-default);
-      color: var(--joy-surface-card);
-    }
+    .mobile-menu-btn,
     .sidebar-close-btn {
       display: none;
       appearance: none;
       -webkit-appearance: none;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--joy-radius-md);
+      cursor: pointer;
+      color: var(--joy-text-secondary);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
+    }
+    .mobile-menu-btn {
+      background: transparent;
+      border: 1px solid var(--hub-chrome-border);
+    }
+    .sidebar-close-btn {
       background: transparent;
       border: none;
-      font-size: 1.25rem;
-      cursor: pointer;
-      color: var(--joy-text-muted);
-      padding: 4px 8px;
-      border-radius: 6px;
       margin-left: auto;
     }
+    .mobile-menu-btn:hover,
     .sidebar-close-btn:hover {
-      background: var(--joy-surface-sunken);
-      color: var(--joy-surface-card);
-    }
-    [data-theme="dark"] .sidebar-backdrop {
-      background: transparent;
-    }
-    [data-theme="dark"] .mobile-menu-btn {
       background: var(--joy-surface-raised);
-      border-color: var(--joy-text-secondary);
-      color: var(--joy-border-default);
-    }
-    [data-theme="dark"] .mobile-menu-btn:hover {
-      background: var(--joy-text-secondary);
-      color: var(--joy-surface-card);
-    }
-    [data-theme="dark"] .sidebar-close-btn {
-      color: var(--joy-text-muted);
-    }
-    [data-theme="dark"] .sidebar-close-btn:hover {
-      background: var(--joy-surface-raised);
-      color: var(--joy-surface-card);
+      color: var(--joy-text-primary);
     }
 
     /* ── Interactive 3D Kinetic Particle Canvas ── */
+    /* Kinetic hero: a HeroSection over a decorative particle canvas. Only positioning glue targets .joy-hero. */
     .kinetic-canvas-container {
       position: relative;
       width: 100%;
       min-height: 380px;
-      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      border-radius: var(--joy-radius-lg);
       overflow: hidden;
-      border: 1px solid var(--joy-border-default);
-      background: var(--joy-surface-canvas);
-      margin-bottom: 28px;
+      border: 1px solid var(--hub-chrome-border);
+      background: var(--joy-surface-card);
+      margin-bottom: var(--joy-space-6);
     }
     .kinetic-canvas {
       position: absolute;
@@ -1269,83 +1206,29 @@ ${inlinedThemeCss}
       display: block;
       cursor: crosshair;
     }
-    .kinetic-overlay {
+    .kinetic-canvas-container > .joy-hero {
       position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px 40px;
-      text-align: center;
-      pointer-events: none;
+      z-index: var(--joy-z-base);
     }
-    .kinetic-overlay * {
-      pointer-events: auto;
+    /* No animation: a still wash in the accent hue stands in for the moving field. */
+    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+      .kinetic-canvas-container {
+        background-image:
+          radial-gradient(circle at 25% 20%, var(--joy-accent-subtle), transparent 60%),
+          radial-gradient(circle at 80% 85%, var(--joy-accent-subtle), transparent 55%);
+      }
     }
-    .kinetic-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 9999px;
-      background: var(--joy-accent-subtle);
-      border: 1px solid var(--joy-border-default);
-      color: var(--joy-accent-text);
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-bottom: 18px;
-    }
-    .kinetic-badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--joy-status-success-fg);
-      box-shadow: 0 0 8px var(--joy-status-success-fg);
-    }
-    .kinetic-title {
-      font-size: 2.25rem;
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      line-height: 1.2;
-      color: var(--joy-text-primary);
-      margin: 0 0 14px 0;
-      max-width: 720px;
-      overflow-wrap: anywhere;
-      text-wrap: balance;
-    }
-    .kinetic-title-emphasis {
-      color: var(--joy-accent-text);
-    }
-    .kinetic-subtitle {
-      font-size: 1rem;
-      color: var(--joy-text-secondary);
-      max-width: 620px;
-      margin: 0 0 24px 0;
-      line-height: 1.6;
-    }
-    .kinetic-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .kinetic-hint {
-      margin-top: 20px;
-      font-size: 0.75rem;
-      color: var(--joy-text-secondary);
-    }
-    [data-theme="dark"] .kinetic-canvas-container {
-      border-color: var(--joy-surface-raised);
+    @media (pointer: coarse) {
+      .kinetic-canvas {
+        display: none;
+      }
     }
 
     /* ── Responsive Mobile & Tablet Rules ── */
     @media (max-width: 900px) {
-      .mobile-menu-btn {
-        display: inline-flex;
-      }
-      .sidebar-close-btn {
+      .mobile-menu-btn,
+      .sidebar-close-btn,
+      .topbar-brand {
         display: inline-flex;
       }
       .sidebar {
@@ -1354,14 +1237,18 @@ ${inlinedThemeCss}
         left: 0;
         bottom: 0;
         width: 280px;
-        z-index: 999;
+        z-index: var(--joy-z-drawer);
         transform: translateX(-100%);
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Closed drawer leaves the tab order: visibility flips after the slide-out, before the slide-in. */
+        visibility: hidden;
+        transition: transform var(--joy-duration-normal) var(--joy-motion-easing-decelerate), visibility 0s linear var(--joy-duration-normal);
         box-shadow: none;
       }
       .sidebar.open {
         transform: translateX(0);
-        box-shadow: 6px 0 28px transparent;
+        visibility: visible;
+        transition: transform var(--joy-duration-normal) var(--joy-motion-easing-decelerate), visibility 0s;
+        box-shadow: var(--hub-drawer-edge);
       }
       .main {
         width: 100vw;
@@ -1371,22 +1258,9 @@ ${inlinedThemeCss}
         padding: 0 16px;
         flex-wrap: nowrap;
       }
-      .topbar-target-label {
-        display: none;
-      }
       .content-area {
-        padding: 20px 14px 60px;
+        padding: var(--joy-space-5) var(--joy-space-4) var(--joy-space-12);
         max-width: 100%;
-        overflow-x: hidden;
-      }
-      .kinetic-title {
-        font-size: 1.5rem;
-      }
-      .kinetic-subtitle {
-        font-size: 0.875rem;
-      }
-      .kinetic-overlay {
-        padding: 32px 16px 28px;
       }
       .form-showcase-grid {
         grid-template-columns: 1fr !important;
@@ -1422,7 +1296,7 @@ ${inlinedThemeCss}
       gap: 10px;
     }
     .simulator-label {
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 600;
       color: var(--joy-text-secondary);
       white-space: nowrap;
@@ -1467,7 +1341,7 @@ ${inlinedThemeCss}
       background: var(--joy-surface-sunken);
       border: 1px solid var(--joy-border-default);
       border-radius: 8px;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
       margin-bottom: 16px;
     }
@@ -1482,7 +1356,7 @@ ${inlinedThemeCss}
     .simulator-frame {
       width: 100%;
       max-width: 100%;
-      transition: max-width 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition: max-width var(--joy-duration-normal) var(--joy-motion-easing-decelerate);
       background: var(--joy-surface-canvas);
       border-radius: 16px;
       border: 1px solid var(--joy-border-default);
@@ -1494,13 +1368,26 @@ ${inlinedThemeCss}
     }
     .simulator-note {
       margin: 0;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
     }
 
     /* Landing blocks view: layout for the demo wrappers only; the blocks themselves are styled by theme.css. */
+    .view-panel > h2,
     .landing-demo-title {
-      margin: 0 0 8px 0;
+      margin: 0 0 var(--joy-space-2);
+      font-size: var(--joy-font-size-xl);
+      line-height: 1.25;
+    }
+    .hub-demo-label {
+      margin: 0 0 var(--joy-space-2);
+      font-size: var(--joy-font-size-sm);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+    }
+    .hub-header-note {
+      font-size: var(--joy-font-size-sm);
+      color: var(--joy-text-muted);
     }
     .landing-demo {
       padding: 24px;
@@ -1524,7 +1411,7 @@ ${inlinedThemeCss}
     }
     .landing-demo__note {
       margin: 0 0 20px 0;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
       max-width: 72ch;
     }
@@ -1538,7 +1425,7 @@ ${inlinedThemeCss}
     }
     .landing-demo__label {
       margin: 0 0 12px 0;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 600;
       color: var(--joy-text-secondary);
     }
@@ -1565,45 +1452,76 @@ ${inlinedThemeCss}
       gap: 16px;
     }
 
-    /* Token-driven corrections keep the hub's chrome aligned with the component system. */
-    [data-theme="dark"] body,
-    [data-theme="dark"] .brand-info h2,
-    [data-theme="dark"] .nav-item:hover,
-    [data-theme="dark"] .playground-header h4,
-    [data-theme="dark"] .tokens-table th,
-    [data-theme="dark"] .icon-preview,
-    [data-theme="dark"] .component-title {
-      color: var(--joy-text-primary);
+    .hub-demo-footer {
+      padding: var(--joy-space-3) var(--joy-space-5);
+      background: var(--joy-surface-raised);
+      border-top: 1px solid var(--hub-chrome-border);
+      font-size: var(--joy-font-size-sm);
     }
-    [data-theme="dark"] .topbar {
-      background: var(--joy-surface-overlay);
-      border-bottom-color: var(--joy-border-subtle);
+    .hub-metric-row {
+      background: var(--joy-surface-raised);
+      padding: var(--joy-space-3);
+      border-radius: var(--joy-radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--joy-space-3);
     }
-    [data-theme="dark"] .component-canvas {
-      background-color: var(--joy-surface-card);
+    .hub-market-search {
+      width: min(100%, 220px);
+      padding: 6px 12px;
+      font-size: var(--joy-font-size-sm);
     }
-    @media (max-width: 640px) {
+    @media (prefers-reduced-motion: reduce) {
+      .sidebar, .sidebar.open, .sidebar-backdrop, .nav-item, .framework-btn, .mobile-menu-btn, .sidebar-close-btn,
+      .segment-btn, .icon-card, .hub-card, .view-panel.active, .simulator-frame {
+        transition: none;
+        animation: none;
+      }
+    }
+    /* Phone tier: the topbar is menu + brand + theme toggle; the framework switcher moves into the drawer. */
+    @media (max-width: 767px) {
       .topbar {
-        padding: var(--joy-space-2) var(--joy-space-3);
-        align-items: center;
-        flex-wrap: nowrap;
+        padding: var(--joy-space-2) var(--joy-space-4);
       }
-      .topbar > div {
-        flex-wrap: nowrap;
+      .topbar__start,
+      .topbar__end {
+        gap: var(--joy-space-2);
       }
+      #btn-theme-toggle.hub-theme-toggle {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      .framework-pill--topbar {
+        display: none;
+      }
+      .framework-pill--drawer {
+        display: flex;
+        margin: var(--joy-space-3) var(--joy-space-4) 0;
+      }
+      .framework-pill--drawer .framework-btn {
+        flex: 1 1 0;
+        min-height: 44px;
+      }
+      .canvas {
+        padding: var(--joy-space-6) var(--joy-space-4);
+      }
+      /* 16px text keeps iOS Safari from zooming the page when the field takes focus. */
+      .hub-market-search {
+        font-size: var(--joy-font-size-md);
+      }
+    }
+    @media (max-width: 480px) {
       #theme-label {
         display: none;
       }
-      #btn-theme-toggle {
-        padding: 0 var(--joy-space-2);
-        min-width: var(--joy-control-height-sm);
-        flex-shrink: 0;
+      #btn-theme-toggle.hub-theme-toggle {
+        padding: 0;
       }
+    }
+    @media (max-width: 640px) {
       .joy-select-wrapper--open .joy-select__listbox.joy-overlay--sheet {
         position: fixed;
-      }
-      .framework-pill {
-        display: none;
       }
       .controls-table,
       .controls-table tbody,
@@ -1627,7 +1545,7 @@ ${inlinedThemeCss}
       .segment-btn {
         flex: 1 0 auto;
         padding: 6px 4px;
-        font-size: 0.75rem;
+        font-size: var(--joy-font-size-xs);
         text-align: center;
       }
     }
@@ -1637,16 +1555,20 @@ ${inlinedThemeCss}
   <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileMenu(false)"></div>
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="hub-sidebar" aria-label="Component navigation">
     <div class="brand">
       <div class="brand-logo">J</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
         <span>v2.2 OpenDesign Integrated</span>
       </div>
-      <button class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close sidebar">
+      <button type="button" class="sidebar-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close navigation">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
+    </div>
+    <div class="framework-pill framework-pill--drawer" role="group" aria-label="Code framework">
+      <button type="button" class="framework-btn active" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
+      <button type="button" class="framework-btn" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
     </div>
     <nav class="nav">
 ${navigationHtml}
@@ -1656,27 +1578,22 @@ ${navigationHtml}
   <!-- Main Canvas Area -->
   <main class="main">
     <div class="topbar">
-      <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-        <button class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Toggle navigation">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <div class="topbar__start">
+        <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Open navigation" aria-controls="hub-sidebar" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-        <span class="topbar-target-label" style="font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Target Suite:</span>
-        <span class="joy-badge joy-badge--brand joy-badge--sm" style="white-space: nowrap;">Multi-Platform Enterprise</span>
+        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">J</span><span class="topbar-brand__name">Joymify Design</span></span>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-        <button class="joy-button joy-button--ghost joy-button--sm" id="btn-theme-toggle" onclick="toggleTheme()" style="gap: 6px; border: 1px solid var(--joy-border-default); flex-shrink: 0;">
-          <span id="theme-icon" style="display:inline-flex;align-items:center;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      <div class="topbar__end">
+        <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-theme-toggle" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme">
+          <span id="theme-icon" class="hub-theme-toggle__icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </span>
-          <span id="theme-label">Dark Mode</span>
+          <span id="theme-label">Dark theme</span>
         </button>
-        <div class="framework-pill">
-          <button class="framework-btn active" id="btn-tab-svelte" onclick="setFramework('svelte')">
-            <span class="badge-runes">SVELTE 5</span> Runes
-          </button>
-          <button class="framework-btn" id="btn-tab-react" onclick="setFramework('react')">
-            <span class="badge-react">REACT 19</span> Modern
-          </button>
+        <div class="framework-pill framework-pill--topbar" role="group" aria-label="Code framework">
+          <button type="button" class="framework-btn active" id="btn-tab-svelte" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
+          <button type="button" class="framework-btn" id="btn-tab-react" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
         </div>
       </div>
     </div>
@@ -1685,50 +1602,61 @@ ${navigationHtml}
 
       <!-- View: Overview -->
       <section id="view-overview" class="view-panel">
-        <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Enterprise Component Architecture</div>
-        <h1 style="margin: 0; font-size: 2rem; color: var(--joy-accent-default);">Joymify Design System</h1>
-        <p class="header-tagline">
-          Enterprise multi-platform design tokens specification and production component library built for 
-          <strong>Quant</strong>, <strong>JoyCoach</strong>, <strong>AssetStudio</strong>, and <strong>JoyQuest</strong>.
-        </p>
+        <!-- overview-hero:generated:start -->
+        <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the HeroSection component: do not edit by hand. -->
+        <section class="joy-hero">
+          <div class="joy-hero__badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Design system
+          </div>
+          <h1 class="joy-hero__title">
+            Joymify Design <span class="joy-hero__title-emphasis">System</span>
+          </h1>
+          <p class="joy-hero__subtitle">
+            Design tokens and production components for Quant, JoyCoach, AssetStudio and JoyQuest, in Svelte 5 and React 19.
+          </p>
+          <div class="joy-hero__ctas">
+            <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Browse components</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read the tokens</span>  </button>
+          </div>
+        </section>
+        <!-- overview-hero:generated:end -->
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px;">
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('tokens')">
+        <div class="hub-card-grid">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/tokens" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/tokens</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               W3C DTCG tokens with OpenDesign posture integration, GPU spring motion curves, and hairline borders.
             </p>
           </div>
 
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('button'); setFramework('svelte');">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/svelte" onclick="switchView('button'); setFramework('svelte');" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Svelte 5 Runes</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/svelte</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               Zero-overhead Runes ($state, $props, $derived, $bindable) engineered for real-time order books and high-FPS canvases.
             </p>
           </div>
 
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('button'); setFramework('react');">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/react" onclick="switchView('button'); setFramework('react');" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> React 19 Ready</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">@joymify/react</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               Strict WAI-ARIA accessible React 19 component library with forwardRef support and zero runtime CSS overhead.
             </p>
           </div>
 
-          <div style="background: var(--joy-surface-card); padding: 24px; border-radius: 10px; border: var(--joy-border-hairline); cursor: pointer;" onclick="switchView('tokens')">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open Modern & Utility postures" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> OpenDesign Postures</span>
             </div>
             <h3 style="margin: 0 0 8px 0;">Modern & Utility</h3>
-            <p style="color: var(--joy-text-muted); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+            <p class="hub-card__desc">
               Unified Linear/Vercel modern-minimal and Datadog/GitHub tech-utility postures with frosted surfaces & hairline borders.
             </p>
           </div>
@@ -1748,7 +1676,8 @@ ${navigationHtml}
         <p class="header-tagline">Central source of truth defined in DTCG JSON format, compiled for CSS Variables and Tailwind v4.</p>
 
         <h3 style="margin-top: 24px;">Motion & Easing Tokens</h3>
-        <table class="tokens-table" style="margin-bottom: 24px;">
+        <div class="hub-scroll-x hub-scroll-x--spaced" tabindex="0" role="region" aria-label="Motion & Easing Tokens (token table, scrolls sideways)">
+        <table class="tokens-table">
           <thead>
             <tr>
               <th>Token Name</th>
@@ -1778,8 +1707,10 @@ ${navigationHtml}
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3>Core Brand & Surface Palette</h3>
+        <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Core Brand & Surface Palette (token table, scrolls sideways)">
         <table class="tokens-table">
           <thead>
             <tr>
@@ -1816,12 +1747,13 @@ ${navigationHtml}
             </tr>
           </tbody>
         </table>
+        </div>
       </section>
 
       <!-- View: Props & API Specs -->
       <section id="view-props-spec" class="view-panel">
         <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Component API Standards</div>
-        <h1 style="margin: 0 0 8px 0;">Component Props & API Specification</h1>
+        <h2>Component props and API specification</h2>
         <p class="header-tagline">
           Complete cross-framework contract specification for all 18 Joymify components across 
           <strong>Svelte 5 Runes</strong> and <strong>React 19 forwardRef</strong>.
@@ -1834,6 +1766,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--neutral joy-badge--sm">Action Primitive</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Button&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1900,6 +1833,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1910,6 +1844,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--success joy-badge--sm">Quant High-Throughput</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Table&gt; & Financial Trading Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1964,6 +1899,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1974,6 +1910,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--brand joy-badge--sm">Accessible Form Suite</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Select&gt;, &lt;Checkbox&gt; & &lt;RadioGroup&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -2004,6 +1941,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -2014,6 +1952,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--brand joy-badge--sm">Enterprise Overlays</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Modal&gt;, &lt;Drawer&gt; & &lt;Toast&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -2044,6 +1983,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -2054,6 +1994,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--neutral joy-badge--sm">Navigation & Feedbacks</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Pagination&gt; & &lt;Skeleton&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -2078,6 +2019,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </section>
@@ -2094,7 +2036,7 @@ ${navigationHtml}
               <h4>Live Interactive Canvas</h4>
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Active Preview</span>
             </div>
-            <div style="font-size: 0.8125rem; color: var(--joy-text-muted);">Click button or test controls below</div>
+            <div class="hub-header-note">Click the button or use the controls below</div>
           </div>
           <div class="canvas" id="button-canvas">
             <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()"><span class="joy-button__label">Click Me! (Clicked: <span id="click-counter">0</span>)</span></button>
@@ -2131,7 +2073,7 @@ ${navigationHtml}
                   <button class="joy-switch" id="btn-loading-switch" role="switch" aria-checked="false" onclick="toggleBtnLoading()">
                     <span class="joy-switch__thumb"></span>
                   </button>
-                  <span id="btn-loading-status" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-text-muted);">Idle</span>
+                  <span id="btn-loading-status" style="font-size: var(--joy-font-size-sm); font-weight: 500; color: var(--joy-text-muted);">Idle</span>
                 </div>
               </td>
             </tr>
@@ -2195,7 +2137,7 @@ ${navigationHtml}
                   <button class="joy-switch" id="input-error-switch" role="switch" aria-checked="false" onclick="toggleInputError()">
                     <span class="joy-switch__thumb"></span>
                   </button>
-                  <span id="input-error-status" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-text-muted);">Normal (No Error)</span>
+                  <span id="input-error-status" style="font-size: var(--joy-font-size-sm); font-weight: 500; color: var(--joy-text-muted);">Normal (No Error)</span>
                 </div>
               </td>
             </tr>
@@ -2351,7 +2293,7 @@ ${navigationHtml}
           <div class="canvas" style="min-height: 220px;">
             ${hubDropdown("demo-dropdown-menu")}
           </div>
-          <div style="padding: 12px 20px; background: var(--joy-surface-raised); border-top: 1px solid var(--joy-border-default); font-size: 0.875rem;">
+          <div class="hub-demo-footer">
             Selected action: <strong id="dropdown-selection-text" style="color: var(--joy-accent-default);">None</strong>
           </div>
         </div>
@@ -2539,7 +2481,7 @@ ${navigationHtml}
           <div class="playground-header">
             <h4>Live Quant Market Feeds</h4>
             <div style="display: flex; gap: 10px; align-items: center;">
-              <input type="text" id="market-search-input" class="joy-input" placeholder="Filter pairs (e.g. BTC, ETH)..." style="width: 220px; padding: 6px 12px; font-size: 0.8125rem;" oninput="handleMarketFilter(this.value)">
+              <input type="search" id="market-search-input" class="joy-input hub-market-search" placeholder="Filter pairs, e.g. BTC" aria-label="Filter pairs" oninput="handleMarketFilter(this.value)">
               <button class="joy-button joy-button--solid joy-button--sm" onclick="simulateRandomTick()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Random Tick
               </button>
@@ -2644,8 +2586,8 @@ ${navigationHtml}
               <p style="margin: 0 0 12px; font-size: 0.875rem; color: var(--joy-text-secondary); line-height: 1.5;">
                 Delta-neutral funding rate harvester with sub-millisecond execution routing on Vultr Kubernetes.
               </p>
-              <div style="background: var(--joy-surface-raised); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.8125rem; color: var(--joy-text-muted);">Annualized APY</span>
+              <div class="hub-metric-row">
+                <span style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted);">Annualized APY</span>
                 <strong style="color: var(--joy-status-success-fg); font-size: 1.1rem; font-family: var(--joy-font-family-mono);">+28.4%</strong>
               </div>
             </div>
@@ -2664,7 +2606,7 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto;">
             <div style="width: 100%;">
-              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Standard Date Picker</label>
+              <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Standard Date Picker</label>
               <div class="joy-date-picker" id="demo-date-picker-wrap">
                 <input type="date" class="joy-date-picker__input" id="demo-single-date" value="2026-09-19" onchange="handleDateChange(this.value)">
                 <span class="joy-date-picker__icon">
@@ -2680,7 +2622,7 @@ ${navigationHtml}
             </div>
 
             <div style="width: 100%;">
-              <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Financial Date Range Picker (Backtest Window)</label>
+              <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Financial Date Range Picker (Backtest Window)</label>
               <div class="joy-date-range-picker">
                 <div class="joy-date-picker">
                   <input type="date" class="joy-date-picker__input" id="demo-range-start" value="2026-01-01" onchange="handleRangeChange()">
@@ -2688,7 +2630,7 @@ ${navigationHtml}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                   </span>
                 </div>
-                <span class="joy-date-range-picker__sep">&rarr;</span>
+                <span class="joy-date-range-picker__sep" aria-hidden="true">to</span>
                 <div class="joy-date-picker">
                   <input type="date" class="joy-date-picker__input" id="demo-range-end" value="2026-09-19" onchange="handleRangeChange()">
                   <span class="joy-date-picker__icon">
@@ -2716,7 +2658,7 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="flex-direction: column; gap: 20px; align-items: stretch; max-width: 600px; margin: 0 auto;">
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Active Harvest Task (72%)</div>
+              <div style="font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Active Harvest Task (72%)</div>
               <div class="joy-progress">
                 <div class="joy-progress__outer">
                   <div class="joy-progress__inner">
@@ -2728,7 +2670,7 @@ ${navigationHtml}
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Completed Sync (100% Success)</div>
+              <div style="font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Completed Sync (100% Success)</div>
               <div class="joy-progress joy-progress--status-success">
                 <div class="joy-progress__outer">
                   <div class="joy-progress__inner">
@@ -2742,7 +2684,7 @@ ${navigationHtml}
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Failed Execution (Exception State)</div>
+              <div style="font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Failed Execution (Exception State)</div>
               <div class="joy-progress joy-progress--status-exception">
                 <div class="joy-progress__outer">
                   <div class="joy-progress__inner">
@@ -2858,7 +2800,7 @@ ${navigationHtml}
             </div>
 
             <div style="margin-top: 8px;">
-              <h5 style="margin: 0 0 8px 0; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--joy-text-muted);">AvatarGroup (Overlapping Team Stack)</h5>
+              <h5 class="hub-demo-label">Avatar group, overlapping team stack</h5>
               <div class="joy-avatar-group">
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">AM</span></div>
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-success-fg);"><span class="joy-avatar__fallback">BL</span></div>
@@ -2965,8 +2907,8 @@ export async function executeHedge(symbol: string, size: number) {
 
         <div class="playground-box">
           <div class="playground-header">
-            <h4>Icon System Collection (138 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
-            <div id="copy-toast-banner" style="font-size: 0.8125rem; color: var(--joy-status-success-fg); font-weight: 600; display: none;">Copied to clipboard!</div>
+            <h4>Icon system (138 vector assets for Svelte 5 and React 19)</h4>
+            <div id="copy-toast-banner" style="font-size: var(--joy-font-size-sm); color: var(--joy-status-success-fg); font-weight: 600; display: none;">Copied to clipboard</div>
           </div>
           <div style="padding: 24px;">
             <div class="icon-grid">
@@ -2985,30 +2927,6 @@ export async function executeHedge(symbol: string, size: number) {
         <p class="header-tagline">
           Every landing block in the states it can be in: hero (default, loading, disabled), feature grid with 3 to 6 cards, bento spans 1 to 12, pricing cards and comparison table, stats, testimonials, FAQ, logo cloud, call to action and footer. The markup is what the components render.
         </p>
-
-        <!-- Interactive 3D Kinetic Particle Hero Showcase -->
-        <div class="kinetic-canvas-container" id="kinetic-hero-container">
-          <canvas class="kinetic-canvas" id="kinetic-particle-canvas"></canvas>
-          <div class="kinetic-overlay">
-            <div class="kinetic-badge">
-              <span class="kinetic-badge-dot"></span>
-              <span>Interactive particle field, 60 FPS</span>
-            </div>
-            <h1 class="kinetic-title">
-              Fast, clear <span class="kinetic-title-emphasis">order screens</span> for busy desks
-            </h1>
-            <p class="kinetic-subtitle">
-              Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.
-            </p>
-            <div class="kinetic-actions">
-              <button type="button" class="joy-button joy-button--solid joy-button--md" onclick="triggerCanvasBurst(event); showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy solution</button>
-              <button type="button" class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Viewing API Documentation', 'info')">Read the guide</button>
-            </div>
-            <div class="kinetic-hint">
-              Move the cursor or touch to nudge the particles. Click to send a pulse.
-            </div>
-          </div>
-        </div>
 
         <div class="playground-box">
           <div class="playground-header">
@@ -3098,6 +3016,24 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="kinetic-canvas-container" id="kinetic-hero-container">
+          <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
+          <section class="joy-hero">
+            <div class="joy-hero__badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Interactive particle field
+            </div>
+            <h1 class="joy-hero__title">
+              Fast, clear <span class="joy-hero__title-emphasis">order screens for busy desks</span>
+            </h1>
+            <p class="joy-hero__subtitle">
+              Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.
+            </p>
+            <div class="joy-hero__ctas">
+              <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Deploy solution</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read the guide</span>  </button>
+            </div>
+          </section>
         </div>
 
         <div class="playground-box">
@@ -5119,7 +5055,7 @@ export async function executeHedge(symbol: string, size: number) {
         <!-- Splitter Demo -->
         <div class="playground-box" style="margin-bottom: 24px;">
           <div class="playground-header">
-            <h4>Splitter (Resizable Split Panes &bull; Drag Divider or Use Arrow Keys)</h4>
+            <h4>Splitter (drag the divider or use the arrow keys)</h4>
           </div>
           <div style="padding: 24px;">
             ${hubSplitter("horizontal", "<strong>Strategy Controls</strong><p>Arbitrage engine parameters, exchange API keys, and latency tolerances.</p>", "<strong>Execution Telemetry</strong><p>Live order matching logs, routing fills, and execution slip statistics.</p>", 200, "demo-splitter")}
@@ -5133,7 +5069,7 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
           <div style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 8px;">Space (Auto-Gap Buttons & Badges)</div>
+              <div style="font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 8px;">Space (Auto-Gap Buttons & Badges)</div>
               <div class="joy-space" style="gap: 12px; flex-wrap: wrap;">
                 <button class="joy-button joy-button--solid joy-button--sm">Deposit</button>
                 <button class="joy-button joy-button--outline joy-button--sm">Withdraw</button>
@@ -5146,7 +5082,7 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="joy-divider joy-divider--with-text"><span class="joy-divider__text">Dividers with Text</span></div>
 
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; margin-bottom: 8px;">Flex (Justify & Align Helpers)</div>
+              <div style="font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 8px;">Flex (Justify & Align Helpers)</div>
               <div class="joy-flex" style="justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--joy-surface-sunken); border-radius: 6px;">
                 <span>Total Staked Assets</span>
                 <span style="font-weight: 700; color: var(--joy-accent-default);">$4,892,120.00</span>
@@ -5173,7 +5109,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; color: var(--joy-text-muted); margin-bottom: 8px;">Segmented Time Horizon:</div>
+              <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted); margin-bottom: 8px;">Segmented Time Horizon:</div>
               <div class="joy-segmented" id="demo-segmented">
                 <button type="button" class="joy-segmented__item joy-segmented__item--active" onclick="selectSegment(this, '1h')">1H</button>
                 <button type="button" class="joy-segmented__item" onclick="selectSegment(this, '1d')">1D</button>
@@ -5184,7 +5120,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
 
             <div>
-              <div style="font-size: 0.8125rem; color: var(--joy-text-muted); margin-bottom: 8px;">Checkable Tags:</div>
+              <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted); margin-bottom: 8px;">Checkable Tags:</div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <span class="joy-tag joy-tag--checkable joy-tag--checked" onclick="this.classList.toggle('joy-tag--checked')">BTC</span>
                 <span class="joy-tag joy-tag--checkable joy-tag--checked" onclick="this.classList.toggle('joy-tag--checked')">ETH</span>
@@ -5348,7 +5284,7 @@ export async function executeHedge(symbol: string, size: number) {
               <div>
                 <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Execution Quality Rating:</div>
                 <div class="joy-rate" id="demo-rate" role="radiogroup" aria-label="Rating"></div>
-                <div id="rate-feedback" style="font-size: 0.8125rem; font-weight: 500; color: var(--joy-accent-default); margin-top: 6px;">4.5 Stars</div>
+                <div id="rate-feedback" style="font-size: var(--joy-font-size-sm); font-weight: 500; color: var(--joy-accent-default); margin-top: 6px;">4.5 Stars</div>
               </div>
             </div>
           </div>
@@ -5459,7 +5395,7 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="component-canvas" style="flex-direction: column; gap: 24px; align-items: stretch;">
             <!-- Horizontal Menu -->
             <div>
-              <div style="font-size: 0.8125rem; font-weight: 600; color: var(--joy-text-muted); margin-bottom: 8px;">Horizontal Menu:</div>
+              <div style="font-size: var(--joy-font-size-sm); font-weight: 600; color: var(--joy-text-muted); margin-bottom: 8px;">Horizontal Menu:</div>
               <ul class="joy-menu joy-menu--horizontal" role="menu" id="demo-menu-horiz">
                 <li class="joy-menu__item joy-menu__item--active" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
                   <span class="joy-menu__item-icon">
@@ -5486,7 +5422,7 @@ export async function executeHedge(symbol: string, size: number) {
             <div style="display: grid; grid-template-columns: 260px 1fr 220px; gap: 24px; align-items: start;">
               <!-- Inline Menu -->
               <div style="background: var(--joy-surface-sunken); border: 1px solid var(--joy-border-subtle); border-radius: 8px; overflow: hidden;">
-                <div style="padding: 10px 16px; font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); border-bottom: 1px solid var(--joy-border-subtle);">Sidebar Subscriptions</div>
+                <div style="padding: 10px 16px; font-weight: 600; font-size: var(--joy-font-size-sm); color: var(--joy-accent-default); border-bottom: 1px solid var(--joy-border-subtle);">Sidebar Subscriptions</div>
                 <ul class="joy-menu joy-menu--inline" role="menu" style="width: 100%; border: none;">
                   <li class="joy-menu__item joy-menu__item--active" role="menuitem" tabindex="0" onclick="selectMenuItem(this)">
                     <span>Spot Liquidity (AMM)</span>
@@ -5516,7 +5452,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Popconfirm Confirmation:</div>
                 <div style="display: flex; gap: 16px; align-items: center;">
                   ${hubPopconfirm("demo-popconfirm-panel", "Revoke API Key", "Revoke DMA Master Key?")}
-                  <span style="font-size: 0.8125rem; color: var(--joy-text-muted);">Prevents accidental destructive operations</span>
+                  <span style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted);">Prevents accidental destructive operations</span>
                 </div>
 
                 <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Spin Loading Indicators:</div>
@@ -5530,11 +5466,11 @@ export async function executeHedge(symbol: string, size: number) {
                 <!-- Wrapped Container with Spin Mask -->
                 <div class="joy-spin__container" id="demo-spin-container" style="background: var(--joy-surface-raised); border: 1px solid var(--joy-border-subtle); border-radius: 8px; padding: 16px; margin-top: 8px;">
                   <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 6px;">Live Book Depth Stream</div>
-                  <div style="font-size: 0.8125rem; color: var(--joy-text-muted);">Real-time aggregated L2 order depth feed from 6 venues.</div>
+                  <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted);">Real-time aggregated L2 order depth feed from 6 venues.</div>
                   <div class="joy-spin__mask" id="demo-spin-mask" style="display: none;" role="status">
                     <div class="joy-spin" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                       <svg class="joy-spin__indicator" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
-                      <span style="font-size: 0.8125rem; color: var(--joy-accent-default); font-weight: 500;">Rebalancing book...</span>
+                      <span style="font-size: var(--joy-font-size-sm); color: var(--joy-accent-default); font-weight: 500;">Rebalancing book...</span>
                     </div>
                   </div>
                 </div>
@@ -5542,7 +5478,7 @@ export async function executeHedge(symbol: string, size: number) {
 
               <!-- Anchor Navigation -->
               <div style="background: var(--joy-surface-sunken); border: 1px solid var(--joy-border-subtle); border-radius: 8px; padding: 16px;">
-                <div style="font-weight: 600; font-size: 0.8125rem; color: var(--joy-accent-default); margin-bottom: 10px;">Anchor Navigator</div>
+                <div style="font-weight: 600; font-size: var(--joy-font-size-sm); color: var(--joy-accent-default); margin-bottom: 10px;">Anchor Navigator</div>
                 <nav class="joy-anchor" role="navigation" aria-label="Demo Anchor">
                   <div class="joy-anchor__ink"></div>
                   <a href="#menu-demo" class="joy-anchor__link joy-anchor__link--active" aria-current="location" onclick="selectAnchor(this, event)">#menu-demo</a>
@@ -5628,56 +5564,107 @@ export async function executeHedge(symbol: string, size: number) {
     let isBtnLoading = false;
     let isSwitchOn = false;
 
+    /** Sets the theme toggle's icon, visible label and aria-label from the CURRENT theme (the state to switch away from). */
+    function syncThemeToggle(theme) {
+      const btn = document.getElementById('btn-theme-toggle');
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      const next = theme === 'dark' ? 'light' : 'dark';
+      if (icon) {
+        icon.innerHTML = theme === 'dark'
+          ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
+          : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+      }
+      if (label) {
+        label.innerText = theme === 'dark' ? 'Light theme' : 'Dark theme';
+      }
+      if (btn) {
+        btn.setAttribute('aria-label', 'Switch to ' + next + ' theme');
+      }
+    }
+
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('joy-theme', next); } catch (e) {}
-      const icon = document.getElementById('theme-icon');
-      const label = document.getElementById('theme-label');
-      if (icon) {
-        icon.innerHTML = next === 'dark'
-          ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>'
-          : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
-      }
-      if (label) {
-        label.innerText = next === 'dark' ? 'Light Mode' : 'Dark Mode';
-      }
+      syncThemeToggle(next);
       redrawHubCharts();
     }
 
-    // Restore saved theme on startup
-    try {
-      const savedTheme = localStorage.getItem('joy-theme');
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', savedTheme);
+    document.addEventListener('DOMContentLoaded', () => {
+      syncThemeToggle(document.documentElement.getAttribute('data-theme'));
+    });
+    // Any theme change (toggle, restore, tests, devtools) keeps the toggle's icon and labels truthful.
+    new MutationObserver(() => syncThemeToggle(document.documentElement.getAttribute('data-theme')))
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    /** Enter activates a role="link" .hub-card the same as a click (native <a> behaviour). */
+    function hubCardActivate(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        event.currentTarget.click();
       }
-    } catch (e) {}
+    }
+
+    // The sidebar is an off-canvas drawer at the same width the stylesheet's drawer media query uses.
+    const drawerMedia = window.matchMedia('(max-width: 900px)');
 
     function toggleMobileMenu(open) {
-      const sidebar = document.querySelector('.sidebar');
+      const sidebar = document.getElementById('hub-sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
+      const menuBtn = document.getElementById('mobile-menu-toggle');
       if (!sidebar || !backdrop) return;
       if (open === undefined) {
         open = !sidebar.classList.contains('open');
       }
+      if (open && !drawerMedia.matches) return;
+      if (!open && !sidebar.classList.contains('open')) return;
+      sidebar.classList.toggle('open', open);
+      backdrop.classList.toggle('active', open);
+      if (menuBtn) menuBtn.setAttribute('aria-expanded', String(open));
+      // body is already overflow: hidden at every viewport (it never scrolls); .main is the element that
+      // actually scrolls behind the drawer, so it is the one that needs locking. Mirrors openLandingDrawer's
+      // scroll lock on the simulator's .main.
+      const scroller = document.querySelector('.main');
+      if (scroller) scroller.style.overflowY = open ? 'hidden' : '';
       if (open) {
-        sidebar.classList.add('open');
-        backdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
         const closeBtn = sidebar.querySelector('.sidebar-close-btn');
         if (closeBtn) closeBtn.focus();
-      } else {
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('active');
-        document.body.style.overflow = '';
+      } else if (menuBtn && drawerMedia.matches && sidebar.contains(document.activeElement)) {
+        menuBtn.focus();
       }
+    }
+
+    /** Visible, enabled controls inside the open drawer, in tab order. */
+    function drawerFocusables(sidebar) {
+      return Array.from(sidebar.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter((el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden');
     }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         toggleMobileMenu(false);
+        return;
       }
+      const sidebar = document.getElementById('hub-sidebar');
+      if (e.key !== 'Tab' || !sidebar || !sidebar.classList.contains('open')) return;
+      const items = drawerFocusables(sidebar);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = sidebar.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    drawerMedia.addEventListener('change', (e) => {
+      if (!e.matches) toggleMobileMenu(false);
     });
 
     function switchView(viewName, updateHash = true) {
@@ -5733,8 +5720,11 @@ export async function executeHedge(symbol: string, size: number) {
 
     function setFramework(fw) {
       activeFramework = fw;
-      document.getElementById('btn-tab-svelte').classList.toggle('active', fw === 'svelte');
-      document.getElementById('btn-tab-react').classList.toggle('active', fw === 'react');
+      document.querySelectorAll('[data-framework]').forEach((btn) => {
+        const on = btn.getAttribute('data-framework') === fw;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', String(on));
+      });
       updateCodeSnippets();
     }
 
@@ -6049,7 +6039,7 @@ export async function executeHedge(symbol: string, size: number) {
       const start = document.getElementById('demo-range-start').value;
       const end = document.getElementById('demo-range-end').value;
       document.getElementById('range-date-feedback').innerText = start + ' to ' + end;
-      showDemoToast('Backtest window set: ' + start + ' → ' + end, 'info');
+      showDemoToast('Backtest window set: ' + start + ' to ' + end, 'info');
     }
 
     function copyIconName(name) {
@@ -6277,6 +6267,7 @@ export async function executeHedge(symbol: string, size: number) {
       const container = document.getElementById(containerId);
       container._hubOpener = document.activeElement;
       container.style.display = 'block';
+      document.body.classList.add('hub-dialog-open');
       const target = container.querySelector(focusSelector);
       if (target) target.focus();
     }
@@ -6284,6 +6275,8 @@ export async function executeHedge(symbol: string, size: number) {
       hubClosePanels();
       const container = document.getElementById(containerId);
       container.style.display = 'none';
+      const stillOpen = Array.from(document.querySelectorAll('[data-hub-dialog]')).some(function (c) { return c.style.display === 'block'; });
+      document.body.classList.toggle('hub-dialog-open', stillOpen);
       const opener = container._hubOpener;
       container._hubOpener = null;
       if (opener && opener.isConnected && opener.focus) opener.focus();
@@ -6998,26 +6991,71 @@ export async function executeHedge(symbol: string, size: number) {
         }
       }
 
-    // ── Interactive 3D Kinetic Particle Field Engine ──
+    // ── Kinetic particle hero ──
+    // A decorative canvas behind the HeroSection in #view-landing-blocks. Its colours come from the theme tokens
+    // (hubKineticPalette, re-read whenever data-theme changes). Under reduced motion it draws one still frame; on a
+    // coarse pointer it draws nothing (the stylesheet shows a still gradient instead). Frames are scheduled with
+    // requestAnimationFrame only while the hero is on screen and the tab is visible, capped at 60fps.
     let kineticCanvas, kineticCtx;
     let kineticParticles = [];
     let kineticAnimId = null;
+    let kineticVisible = false;
+    let kineticLastFrame = 0;
+    let kineticPalette = null;
     let kineticMouse = { x: -1000, y: -1000, vx: 0, vy: 0, lastX: -1000, lastY: -1000, isOver: false };
     const KINETIC_PARTICLE_COUNT = 90;
-    const canvasToken = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const KINETIC_FRAME_MS = 1000 / 60 - 1;
+    const KINETIC_FOV = 300;
+    const kineticReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const kineticCoarse = window.matchMedia('(pointer: coarse)');
+
+    function hubKineticPalette() {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (name) => cs.getPropertyValue(name).trim();
+      return {
+        accents: [v('--joy-accent-default'), v('--joy-accent-hover'), v('--joy-accent-active')],
+        muted: v('--joy-text-muted'),
+      };
+    }
+    window.hubKineticPalette = hubKineticPalette;
+
+    function kineticShouldAnimate() {
+      return !!kineticCanvas && kineticVisible && !document.hidden && !kineticReduce.matches && !kineticCoarse.matches;
+    }
+
+    function stopKinetic() {
+      if (kineticAnimId !== null) cancelAnimationFrame(kineticAnimId);
+      kineticAnimId = null;
+    }
+
+    function kineticTick(now) {
+      kineticAnimId = null;
+      if (!kineticShouldAnimate()) return;
+      if (now - kineticLastFrame >= KINETIC_FRAME_MS) {
+        kineticLastFrame = now;
+        drawKineticFrame(true);
+      }
+      kineticAnimId = requestAnimationFrame(kineticTick);
+    }
+
+    /** Starts, stops or repaints the field to match visibility, motion preference and pointer type. */
+    function syncKinetic() {
+      if (kineticShouldAnimate()) {
+        if (kineticAnimId === null) kineticAnimId = requestAnimationFrame(kineticTick);
+        return;
+      }
+      stopKinetic();
+      if (kineticCanvas && kineticVisible && kineticReduce.matches && !kineticCoarse.matches) drawKineticFrame(false);
+    }
 
     function initKineticCanvas() {
       kineticCanvas = document.getElementById('kinetic-particle-canvas');
-      if (!kineticCanvas) return;
+      const container = document.getElementById('kinetic-hero-container');
+      if (!kineticCanvas || !container) return;
       kineticCtx = kineticCanvas.getContext('2d');
-      resizeKineticCanvas();
+      kineticPalette = hubKineticPalette();
 
       kineticParticles = [];
-      const colors = [
-        canvasToken('--joy-accent-default'),
-        canvasToken('--joy-status-info-fg'),
-        canvasToken('--joy-accent-hover'),
-      ];
       for (let i = 0; i < KINETIC_PARTICLE_COUNT; i++) {
         kineticParticles.push({
           x: (Math.random() - 0.5) * 600,
@@ -7027,50 +7065,51 @@ export async function executeHedge(symbol: string, size: number) {
           vy: (Math.random() - 0.5) * 0.8,
           vz: (Math.random() - 0.5) * 0.4,
           baseRadius: 1.5 + Math.random() * 2,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          phase: Math.random() * Math.PI * 2
+          tone: i % 3,
+          phase: Math.random() * Math.PI * 2,
         });
       }
 
-      const container = document.getElementById('kinetic-hero-container');
-      if (container) {
-        container.addEventListener('mousemove', (e) => {
-          const rect = container.getBoundingClientRect();
-          const mx = e.clientX - rect.left;
-          const my = e.clientY - rect.top;
-          kineticMouse.vx = (mx - kineticMouse.lastX) * 0.3;
-          kineticMouse.vy = (my - kineticMouse.lastY) * 0.3;
-          kineticMouse.lastX = kineticMouse.x;
-          kineticMouse.lastY = kineticMouse.y;
-          kineticMouse.x = mx;
-          kineticMouse.y = my;
-          kineticMouse.isOver = true;
-        });
-        container.addEventListener('mouseleave', () => {
-          kineticMouse.isOver = false;
-          kineticMouse.x = -1000;
-          kineticMouse.y = -1000;
-        });
-        container.addEventListener('touchmove', (e) => {
-          if (e.touches.length > 0) {
-            const rect = container.getBoundingClientRect();
-            kineticMouse.x = e.touches[0].clientX - rect.left;
-            kineticMouse.y = e.touches[0].clientY - rect.top;
-            kineticMouse.isOver = true;
-          }
-        }, { passive: true });
-        container.addEventListener('touchend', () => {
-          kineticMouse.isOver = false;
-          kineticMouse.x = -1000;
-          kineticMouse.y = -1000;
-        });
-        container.addEventListener('click', triggerCanvasBurst);
-      }
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        kineticMouse.vx = (mx - kineticMouse.lastX) * 0.3;
+        kineticMouse.vy = (my - kineticMouse.lastY) * 0.3;
+        kineticMouse.lastX = kineticMouse.x;
+        kineticMouse.lastY = kineticMouse.y;
+        kineticMouse.x = mx;
+        kineticMouse.y = my;
+        kineticMouse.isOver = true;
+      });
+      container.addEventListener('mouseleave', () => {
+        kineticMouse.isOver = false;
+        kineticMouse.x = -1000;
+        kineticMouse.y = -1000;
+      });
+      container.addEventListener('click', triggerCanvasBurst);
 
-      window.addEventListener('resize', resizeKineticCanvas);
-      if (!kineticAnimId) {
-        animateKineticCanvas();
-      }
+      new IntersectionObserver((entries) => {
+        kineticVisible = entries[entries.length - 1].isIntersecting;
+        if (kineticVisible) resizeKineticCanvas();
+        syncKinetic();
+      }).observe(container);
+      // Theme switches (toggle, OS scheme, tests) all land on data-theme.
+      new MutationObserver(() => {
+        kineticPalette = hubKineticPalette();
+        if (kineticAnimId === null) syncKinetic();
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      // Web fonts can land after the still frame: repaint so the text cut-outs match the final line boxes.
+      if (document.fonts) document.fonts.ready.then(() => {
+        if (kineticAnimId === null) syncKinetic();
+      });
+      document.addEventListener('visibilitychange', syncKinetic);
+      kineticReduce.addEventListener('change', syncKinetic);
+      kineticCoarse.addEventListener('change', syncKinetic);
+      window.addEventListener('resize', () => {
+        resizeKineticCanvas();
+        if (kineticAnimId === null) syncKinetic();
+      });
     }
 
     function resizeKineticCanvas() {
@@ -7078,29 +7117,24 @@ export async function executeHedge(symbol: string, size: number) {
       const rect = kineticCanvas.parentElement ? kineticCanvas.parentElement.getBoundingClientRect() : null;
       if (!rect || rect.width === 0) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Assigning width/height resets the context transform, so the scale is applied exactly once per resize.
       kineticCanvas.width = rect.width * dpr;
       kineticCanvas.height = rect.height * dpr;
-      if (kineticCtx) {
-        kineticCtx.scale(dpr, dpr);
-      }
+      if (kineticCtx) kineticCtx.scale(dpr, dpr);
     }
 
     function triggerCanvasBurst(e) {
-      if (!kineticCanvas) return;
+      if (!kineticCanvas || !kineticShouldAnimate()) return;
       const container = document.getElementById('kinetic-hero-container');
-      const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: 600, height: 380 };
+      const rect = container.getBoundingClientRect();
       const clickX = e && e.clientX ? e.clientX - rect.left : rect.width / 2;
       const clickY = e && e.clientY ? e.clientY - rect.top : rect.height / 2;
       const cx = rect.width / 2;
       const cy = rect.height / 2;
-      const fov = 300;
-
-      kineticParticles.forEach(p => {
-        const scale = fov / (fov + p.z);
-        const px = cx + p.x * scale;
-        const py = cy + p.y * scale;
-        const dx = px - clickX;
-        const dy = py - clickY;
+      kineticParticles.forEach((p) => {
+        const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+        const dx = cx + p.x * scale - clickX;
+        const dy = cy + p.y * scale - clickY;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
         const force = Math.max(0, 180 - dist) / 180;
         p.vx += (dx / dist) * force * 14;
@@ -7109,127 +7143,114 @@ export async function executeHedge(symbol: string, size: number) {
       });
     }
 
-    function animateKineticCanvas() {
-      // Respect user motion preference and tab visibility
-      const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (document.hidden || prefersReducedMotion) {
-        kineticAnimId = setTimeout(animateKineticCanvas, 300);
-        return;
+    function stepKineticParticle(p, w, h) {
+      const rx = p.x * Math.cos(0.002) - p.z * Math.sin(0.002);
+      p.z = p.z * Math.cos(0.002) + p.x * Math.sin(0.002);
+      p.x = rx;
+      if (kineticMouse.isOver) {
+        const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+        const mdx = w / 2 + p.x * scale - kineticMouse.x;
+        const mdy = h / 2 + p.y * scale - kineticMouse.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < 140 && mdist > 0) {
+          const force = (140 - mdist) / 140;
+          p.vx += (mdx / mdist) * force * 1.5 + kineticMouse.vx * 0.05;
+          p.vy += (mdy / mdist) * force * 1.5 + kineticMouse.vy * 0.05;
+        }
       }
+      p.vx *= 0.94;
+      p.vy *= 0.94;
+      p.vz *= 0.94;
+      p.x += p.vx + Math.sin(p.phase) * 0.2;
+      p.y += p.vy + Math.cos(p.phase) * 0.2;
+      p.z += p.vz;
+      p.phase += 0.02;
+      const bx = w * 0.55;
+      const by = h * 0.55;
+      if (p.x < -bx || p.x > bx) { p.x = Math.max(-bx, Math.min(bx, p.x)); p.vx *= -1; }
+      if (p.y < -by || p.y > by) { p.y = Math.max(-by, Math.min(by, p.y)); p.vy *= -1; }
+      if (p.z < -160 || p.z > 160) { p.z = Math.max(-160, Math.min(160, p.z)); p.vz *= -1; }
+    }
 
-      kineticAnimId = requestAnimationFrame(animateKineticCanvas);
-      if (!kineticCanvas || !kineticCtx) return;
-
-      const panel = document.getElementById('view-landing-blocks');
-      if (!panel || !panel.classList.contains('active')) return;
-
-      const rect = kineticCanvas.parentElement ? kineticCanvas.parentElement.getBoundingClientRect() : null;
-      if (!rect || rect.width === 0) return;
+    /** Paints the field; advance=true moves the particles one step first (false = repaint the current still frame). */
+    function drawKineticFrame(advance) {
+      if (!kineticCtx || !kineticPalette) return;
+      const rect = kineticCanvas.parentElement.getBoundingClientRect();
+      if (rect.width === 0) return;
       const w = rect.width;
       const h = rect.height;
-      const cx = w / 2;
-      const cy = h / 2;
-      const fov = 300;
-
       kineticCtx.clearRect(0, 0, w, h);
 
-      const cosRot = Math.cos(0.002);
-      const sinRot = Math.sin(0.002);
-
-      const projected = [];
-      for (let i = 0; i < kineticParticles.length; i++) {
-        const p = kineticParticles[i];
-
-        const rx = p.x * cosRot - p.z * sinRot;
-        const rz = p.z * cosRot + p.x * sinRot;
-        p.x = rx;
-        p.z = rz;
-
-        const scale = fov / (fov + p.z);
-        const px = cx + p.x * scale;
-        const py = cy + p.y * scale;
-
-        if (kineticMouse.isOver) {
-          const mdx = px - kineticMouse.x;
-          const mdy = py - kineticMouse.y;
-          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-          if (mdist < 140 && mdist > 0) {
-            const force = (140 - mdist) / 140;
-            p.vx += (mdx / mdist) * force * 1.5 + (kineticMouse.vx * 0.05);
-            p.vy += (mdy / mdist) * force * 1.5 + (kineticMouse.vy * 0.05);
-          }
-        }
-
-        p.vx *= 0.94;
-        p.vy *= 0.94;
-        p.vz *= 0.94;
-        p.x += p.vx + Math.sin(p.phase) * 0.2;
-        p.y += p.vy + Math.cos(p.phase) * 0.2;
-        p.z += p.vz;
-        p.phase += 0.02;
-
-        const boundaryX = w * 0.55;
-        const boundaryY = h * 0.55;
-        if (p.x < -boundaryX) { p.x = -boundaryX; p.vx *= -1; }
-        if (p.x > boundaryX) { p.x = boundaryX; p.vx *= -1; }
-        if (p.y < -boundaryY) { p.y = -boundaryY; p.vy *= -1; }
-        if (p.y > boundaryY) { p.y = boundaryY; p.vy *= -1; }
-        if (p.z < -160) { p.z = -160; p.vz *= -1; }
-        if (p.z > 160) { p.z = 160; p.vz *= -1; }
-
-        const finalScale = fov / (fov + p.z);
-        projected.push({
-          x: cx + p.x * finalScale,
-          y: cy + p.y * finalScale,
-          scale: finalScale,
-          z: p.z,
-          radius: p.baseRadius * finalScale,
-          color: p.color
-        });
-      }
+      const projected = kineticParticles.map((p) => {
+        if (advance) stepKineticParticle(p, w, h);
+        const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+        return { x: w / 2 + p.x * scale, y: h / 2 + p.y * scale, scale, radius: p.baseRadius * scale, tone: p.tone };
+      });
 
       const maxDist = 85;
       kineticCtx.lineWidth = 0.75;
+      kineticCtx.strokeStyle = kineticPalette.muted;
       for (let i = 0; i < projected.length; i++) {
         const p1 = projected[i];
         for (let j = i + 1; j < projected.length; j++) {
           const p2 = projected[j];
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < maxDist) {
-            const alpha = (1 - dist / maxDist) * Math.min(p1.scale, p2.scale) * 0.35;
-            kineticCtx.save();
-            kineticCtx.globalAlpha = alpha;
-            kineticCtx.strokeStyle = canvasToken('--joy-accent-default');
-            kineticCtx.beginPath();
-            kineticCtx.moveTo(p1.x, p1.y);
-            kineticCtx.lineTo(p2.x, p2.y);
-            kineticCtx.stroke();
-            kineticCtx.restore();
-          }
+          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          if (dist >= maxDist) continue;
+          kineticCtx.globalAlpha = (1 - dist / maxDist) * Math.min(p1.scale, p2.scale) * 0.3;
+          kineticCtx.beginPath();
+          kineticCtx.moveTo(p1.x, p1.y);
+          kineticCtx.lineTo(p2.x, p2.y);
+          kineticCtx.stroke();
         }
       }
 
-      for (let i = 0; i < projected.length; i++) {
-        const p = projected[i];
-        const rad = Math.max(1, p.radius);
-        const glow = kineticCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 3);
-        glow.addColorStop(0, p.color);
-        glow.addColorStop(0.5, p.color);
-        glow.addColorStop(1, 'transparent');
-
-        kineticCtx.fillStyle = glow;
+      kineticCtx.globalAlpha = 0.85;
+      for (const p of projected) {
+        kineticCtx.fillStyle = kineticPalette.accents[p.tone];
         kineticCtx.beginPath();
-        kineticCtx.arc(p.x, p.y, rad * 3, 0, Math.PI * 2);
-        kineticCtx.fill();
-
-        kineticCtx.fillStyle = canvasToken('--joy-text-inverse');
-        kineticCtx.beginPath();
-        kineticCtx.arc(p.x, p.y, rad * 0.6, 0, Math.PI * 2);
+        kineticCtx.arc(p.x, p.y, Math.max(1, p.radius), 0, Math.PI * 2);
         kineticCtx.fill();
       }
+      kineticCtx.globalAlpha = 1;
+      clearKineticTextArea();
     }
+
+    /**
+     * Keeps the hero copy on the plain card surface: every text line box and CTA of the HeroSection, padded, is cut out
+     * of the painted field, so particles never lower the text contrast. Line boxes are read live (fonts load late).
+     */
+    function clearKineticTextArea() {
+      const hero = kineticCanvas.parentElement.querySelector('.joy-hero');
+      if (!hero) return;
+      const origin = kineticCanvas.getBoundingClientRect();
+      const rects = [];
+      hero.querySelectorAll('.joy-hero__title, .joy-hero__subtitle').forEach((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        rects.push(...range.getClientRects());
+      });
+      hero.querySelectorAll('.joy-hero__badge, .joy-hero__ctas .joy-button').forEach((el) => rects.push(el.getBoundingClientRect()));
+      const pad = 10;
+      kineticCtx.save();
+      kineticCtx.globalCompositeOperation = 'destination-out';
+      kineticCtx.fillStyle = kineticPalette.muted;
+      for (const r of rects) {
+        kineticCtx.fillRect(r.left - origin.left - pad, r.top - origin.top - pad, r.width + pad * 2, r.height + pad * 2);
+      }
+      kineticCtx.restore();
+    }
+
+    // Hero CTAs are SSR markup from the generator; their actions are wired here.
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest && e.target.closest('.joy-hero__ctas .joy-button');
+      if (!btn) return;
+      const primary = btn.classList.contains('joy-button--solid');
+      if (btn.closest('#view-overview')) {
+        switchView(primary ? 'button' : 'tokens');
+      } else if (btn.closest('#kinetic-hero-container')) {
+        showDemoToast(primary ? 'Deploying the pipeline' : 'Opening the API guide', primary ? 'success' : 'info');
+      }
+    });
 
     // Initial render
     setTimeout(() => {

@@ -2,11 +2,12 @@
 // full-page simulator `#view-landing-preview`.
 //
 // The markup in those views is the SSR output of the real Svelte components, so it can drift when a component
-// changes. This script owns three regions of build.js, each between a pair of markers, and is the only thing that should
+// changes. This script owns four regions of build.js, each between a pair of markers, and is the only thing that should
 // edit them. Do not edit a region by hand.
 //   <!-- landing-blocks:generated:start -->           ... <!-- landing-blocks:generated:end -->            the blocks view
 //   <!-- landing-simulator:generated:start -->        ... <!-- landing-simulator:generated:end -->         simulator <main> content
 //   <!-- landing-simulator-footer:generated:start --> ... <!-- landing-simulator-footer:generated:end -->  simulator footer
+//   <!-- overview-hero:generated:start -->            ... <!-- overview-hero:generated:end -->             hub landing hero
 // The simulator header (skip link, banner, drawer), the <main> wrapper and the toolbar stay hand-written (the drawer
 // wiring lives in build.js; packages/{svelte,react}/test/landing-page.test.js proves the header class set).
 // The simulator body is the real LandingPage render (default copy) plus three hub-only additions marked below: a features
@@ -259,24 +260,6 @@ const sections = [];
 sections.push(`<h2 class="landing-demo-title">Landing Blocks</h2>
 <p class="header-tagline">Every landing block in the states it can be in: hero (default, loading, disabled), feature grid with 3 to 6 cards, bento spans 1 to 12, pricing cards and comparison table, stats, testimonials, FAQ, logo cloud, call to action and footer. The markup is what the components render.</p>`);
 
-sections.push(`<!-- Interactive 3D Kinetic Particle Hero Showcase -->
-<div class="kinetic-canvas-container" id="kinetic-hero-container">
-  <canvas class="kinetic-canvas" id="kinetic-particle-canvas"></canvas>
-  <div class="kinetic-overlay">
-    <div class="kinetic-badge">
-      <span class="kinetic-badge-dot"></span>
-      <span>Interactive particle field, 60 FPS</span>
-    </div>
-    <h1 class="kinetic-title">Fast, clear <span class="kinetic-title-emphasis">order screens</span> for busy desks</h1>
-    <p class="kinetic-subtitle">Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.</p>
-    <div class="kinetic-actions">
-      <button type="button" class="joy-button joy-button--solid joy-button--md" onclick="triggerCanvasBurst(event); showDemoToast('Primary CTA triggered: Deploying pipeline', 'success')">Deploy solution</button>
-      <button type="button" class="joy-button joy-button--outline joy-button--md" onclick="showDemoToast('Viewing API Documentation', 'info')">Read the guide</button>
-    </div>
-    <div class="kinetic-hint">Move the cursor or touch to nudge the particles. Click to send a pulse.</div>
-  </div>
-</div>`);
-
 sections.push(box('Hero states (HeroSection)', 'Default with a title emphasis, then the primary button loading, disabled, and both buttons as links. The secondary button stays available in every state.',
   `<div class="landing-demo__stack">
 ${group('Default with title emphasis', frame(heroDefault))}
@@ -284,6 +267,22 @@ ${group('Primary loading', frame(heroLoading))}
 ${group('Primary disabled', frame(heroDisabled))}
 ${group('Both as links', frame(heroLink))}
 </div>`));
+
+// The kinetic hero: a HeroSection render over a decorative particle canvas (the canvas script lives in build.js and wires
+// the CTAs through a delegated listener, so this markup stays SSR output). Placed after the hero states box so the
+// states specs keep indexing the first three .joy-hero renders as default, loading and disabled.
+const kineticHero = await R('HeroSection', {
+  badgeText: 'Interactive particle field',
+  title: 'Fast, clear',
+  titleEmphasis: 'order screens for busy desks',
+  subtitle: 'Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.',
+  primaryCtaText: 'Deploy solution',
+  secondaryCtaText: 'Read the guide',
+});
+sections.push(`<div class="kinetic-canvas-container" id="kinetic-hero-container">
+  <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
+  ${kineticHero}
+</div>`);
 
 const leadHtml = [];
 for (const n of [3, 4, 5, 6]) leadHtml.push(group(`${n} cards, lead layout`, await featureGrid(n, 'lead', `blocks-feature-lead-${n}`)));
@@ -373,6 +372,16 @@ simMain = simMain.replace(faqOpen, pricingSection + faqOpen);
 
 const simBody = (html, depth) => indent(toTemplate(pretty(html)), depth);
 
+// The hub landing view (#view-overview) opens with a HeroSection render; its CTAs are wired in build.js.
+const overviewHero = await R('HeroSection', {
+  badgeText: 'Design system',
+  title: 'Joymify Design',
+  titleEmphasis: 'System',
+  subtitle: 'Design tokens and production components for Quant, JoyCoach, AssetStudio and JoyQuest, in Svelte 5 and React 19.',
+  primaryCtaText: 'Browse components',
+  secondaryCtaText: 'Read the tokens',
+});
+
 // ── regions ────────────────────────────────────────────────────────────────
 // `text` is everything from the start marker to the end marker inclusive; the first line sits after the indent that
 // precedes the marker in build.js.
@@ -385,6 +394,13 @@ const regions = [
 ${indent(body, 8)}
       </section>
       ${end}`,
+  },
+  {
+    name: 'overview-hero',
+    text: (start, end) => `${start}
+        <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the HeroSection component: do not edit by hand. -->
+${simBody(overviewHero, 8)}
+        ${end}`,
   },
   {
     name: 'landing-simulator',
