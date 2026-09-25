@@ -103,3 +103,8 @@ The audit suggested hex fallbacks such as `var(--x, #c49a3a)`. The token-only ru
 ## Deferred items
 
 - **HUB-069 (deferred, owner Wave 6).** There is no icon size or colour parity test between the Svelte and React packages. It belongs with the Wave 6 parity and docs work, not the hub.
+
+## Follow-ups found during F-040 (outside the HUB audit, not fixed here)
+
+- **P1 a11y, pre-existing:** the 38 sidebar nav items are rendered without an `href` (`navigationHtml` in `apps/storybook-hub/build.js`), so keyboard users cannot reach any view from the sidebar, and the drawer focus trap cycles only the close and framework buttons. File as its own idea; it changes navigation markup and the hash-routing contract.
+- **Minor, from the final review:** a 640px rule still styles `.controls-table` / `.segmented-control` off the 900/767/480 ladder; two scrim recipes exist (the hub drawer and the landing simulator drawer); Contract 7 proves the OS-preference and saved-choice behaviour but not the script's position before the stylesheets.

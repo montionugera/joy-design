@@ -1670,7 +1670,7 @@ ${navigationHtml}
         <p class="header-tagline">Central source of truth defined in DTCG JSON format, compiled for CSS Variables and Tailwind v4.</p>
 
         <h3 style="margin-top: 24px;">Motion & Easing Tokens</h3>
-        <div class="hub-scroll-x hub-scroll-x--spaced" tabindex="0" role="region" aria-label="Token table (scrolls sideways)">
+        <div class="hub-scroll-x hub-scroll-x--spaced" tabindex="0" role="region" aria-label="Motion & Easing Tokens (token table, scrolls sideways)">
         <table class="tokens-table">
           <thead>
             <tr>
@@ -1704,7 +1704,7 @@ ${navigationHtml}
         </div>
 
         <h3>Core Brand & Surface Palette</h3>
-        <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Token table (scrolls sideways)">
+        <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Core Brand & Surface Palette (token table, scrolls sideways)">
         <table class="tokens-table">
           <thead>
             <tr>
@@ -1760,7 +1760,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--neutral joy-badge--sm">Action Primitive</span>
           </div>
           <div style="padding: 16px 20px;">
-            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Button&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1838,7 +1838,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--success joy-badge--sm">Quant High-Throughput</span>
           </div>
           <div style="padding: 16px 20px;">
-            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Table&gt; & Financial Trading Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1904,7 +1904,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--brand joy-badge--sm">Accessible Form Suite</span>
           </div>
           <div style="padding: 16px 20px;">
-            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Select&gt;, &lt;Checkbox&gt; & &lt;RadioGroup&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1946,7 +1946,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--brand joy-badge--sm">Enterprise Overlays</span>
           </div>
           <div style="padding: 16px 20px;">
-            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Modal&gt;, &lt;Drawer&gt; & &lt;Toast&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1988,7 +1988,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--neutral joy-badge--sm">Navigation & Feedbacks</span>
           </div>
           <div style="padding: 16px 20px;">
-            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="&lt;Pagination&gt; & &lt;Skeleton&gt; Specification (props table, scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
