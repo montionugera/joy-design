@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { COMPONENTS } from '../parity-check.mjs';
 import { contrastRatio } from '../../packages/tokens/scripts/color.mjs';
-import { buildModel, componentMatrixRow, selectorsOf, resolveRef, kebab, deprecatedAliases } from '../design-md/model.mjs';
+import { buildModel, componentMatrixRow, selectorsOf, resolveRef, kebab, deprecatedAliases, contrastRows, CONTRAST_PAIRS } from '../design-md/model.mjs';
 import { renderDesignMd, replaceRegion } from '../design-md/render.mjs';
 import { inventory } from '../gen-design-md.mjs';
 
@@ -40,6 +40,25 @@ test('contrast rows are computed with the token colour maths and meet their mini
   }
   const failing = model.contrast.filter((r) => r.min !== null && !r.pass);
   assert.deepStrictEqual(failing, []);
+  // One row per pair per theme — a non-hex value used to `continue` past its pair silently,
+  // so DESIGN.md could quietly lose rows with nothing failing. Guard the count directly.
+  assert.strictEqual(model.contrast.length, CONTRAST_PAIRS.length * 2, 'every CONTRAST_PAIRS entry must produce a row in both themes');
+});
+
+test('a contrast pair that does not resolve to hex fails loudly instead of being silently dropped', () => {
+  const semantic = { light: {}, dark: {} };
+  for (const theme of ['light', 'dark']) {
+    for (const { fg, bg } of CONTRAST_PAIRS) {
+      for (const [group, role] of [fg, bg]) {
+        semantic[theme][group] ??= {};
+        semantic[theme][group][role] ??= { cssVar: `--joy-${group}-${role}`, value: '#000000' };
+      }
+    }
+  }
+  // Simulate a token-authoring bug: a contrast-pair role resolves to something other than hex
+  // (e.g. a stray rgba() string) instead of the flat hex every primitive is supposed to be.
+  semantic.light.text.primary = { cssVar: '--joy-text-primary', value: 'rgba(0, 0, 0, 0.5)' };
+  assert.throws(() => contrastRows(semantic), /did not resolve to hex/);
 });
 
 test('state matrix has one row per parity-gated component, read from the stylesheet', () => {

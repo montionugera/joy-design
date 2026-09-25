@@ -80,7 +80,7 @@ function semanticTheme(tokens, theme) {
 
 // Pairs the renderer reports. `min` is the WCAG 2.2 AA floor for that use; rows without a
 // minimum are informative (the role is not body text on that surface).
-const CONTRAST_PAIRS = [
+export const CONTRAST_PAIRS = [
   ...['primary', 'secondary', 'muted', 'link'].flatMap((role) =>
     ['canvas', 'card'].map((surface) => ({ fg: ['text', role], bg: ['surface', surface], min: 4.5 }))
   ),
@@ -100,7 +100,14 @@ export function contrastRows(semantic) {
       const f = semantic[theme][fg[0]]?.[fg[1]];
       const b = semantic[theme][bg[0]]?.[bg[1]];
       if (!f || !b) throw new Error(`gen-design-md: missing semantic role ${fg.join('.')} or ${bg.join('.')} in ${theme}`);
-      if (!HEX.test(f.value) || !HEX.test(b.value)) continue;
+      // A CONTRAST_PAIRS role that doesn't resolve to hex is a token authoring bug, not something
+      // to render around: silently skipping it used to drop the pair from DESIGN.md with no signal.
+      if (!HEX.test(f.value) || !HEX.test(b.value)) {
+        throw new Error(
+          `gen-design-md: ${theme} contrast pair ${fg.join('.')} vs ${bg.join('.')} did not resolve to hex ` +
+          `(${f.cssVar}=${JSON.stringify(f.value)}, ${b.cssVar}=${JSON.stringify(b.value)}) — fix the token, don't skip the pair`
+        );
+      }
       const ratio = Math.round(contrastRatio(f.value, b.value) * 100) / 100;
       rows.push({ theme, fg: f.cssVar, bg: b.cssVar, ratio, min, pass: min === null ? null : ratio >= min });
     }
