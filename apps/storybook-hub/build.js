@@ -627,18 +627,18 @@ ${inlinedThemeCss}
       justify-content: center;
       color: var(--joy-text-on-accent);
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: var(--joy-font-size-lg);
       box-shadow: var(--joy-elevation-1);
     }
     .brand-info h2 {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--joy-font-size-md);
       font-weight: 700;
       color: var(--joy-text-primary);
       letter-spacing: -0.01em;
     }
     .brand-info span {
-      font-size: 0.75rem;
+      font-size: var(--joy-font-size-xs);
       color: var(--joy-accent-text);
       font-weight: 600;
     }
@@ -648,11 +648,9 @@ ${inlinedThemeCss}
       padding: 16px 12px;
     }
     .nav-section {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--joy-text-muted);
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
       padding: 10px 12px 6px;
       margin-top: 8px;
     }
@@ -662,12 +660,12 @@ ${inlinedThemeCss}
       gap: 10px;
       padding: 8px 12px;
       border-radius: 6px;
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 500;
       color: var(--joy-text-secondary);
       text-decoration: none;
       cursor: pointer;
-      transition: all var(--joy-duration-fast);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
     }
     .nav-item:hover {
       background: var(--joy-surface-sunken);
@@ -679,7 +677,7 @@ ${inlinedThemeCss}
       font-weight: 600;
     }
     .nav-item .icon {
-      font-size: 1rem;
+      font-size: var(--joy-font-size-md);
     }
 
     /* Main Content */
@@ -693,8 +691,6 @@ ${inlinedThemeCss}
       min-height: 60px;
       border-bottom: 1px solid var(--hub-chrome-border);
       background: var(--hub-topbar-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       padding: 0 32px;
       display: flex;
       align-items: center;
@@ -804,7 +800,7 @@ ${inlinedThemeCss}
     .header-tagline {
       margin-top: 4px;
       color: var(--joy-text-muted);
-      font-size: 1rem;
+      font-size: var(--joy-font-size-md);
       margin-bottom: 24px;
     }
     .playground-box {
@@ -828,7 +824,7 @@ ${inlinedThemeCss}
     }
     .playground-header h4 {
       margin: 0;
-      font-size: 0.9375rem;
+      font-size: var(--joy-font-size-md);
       font-weight: 600;
       color: var(--joy-text-primary);
       min-width: 0;
@@ -864,14 +860,14 @@ ${inlinedThemeCss}
       flex: 1 1 auto;
     }
     .component-title {
-      font-size: 0.9375rem;
+      font-size: var(--joy-font-size-md);
       font-weight: 600;
       color: var(--joy-text-primary);
       overflow-wrap: break-word;
       word-break: break-word;
     }
     .component-desc {
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-muted);
       margin-top: 4px;
       line-height: 1.4;
@@ -923,11 +919,9 @@ ${inlinedThemeCss}
     }
     .hub-matrix__cell > h4 {
       margin: 0 0 var(--joy-space-2);
-      font-size: 0.75rem;
+      font-size: var(--joy-font-size-xs);
       font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--joy-text-muted);
+      color: var(--joy-text-secondary);
     }
     .hub-row {
       display: flex;
@@ -937,7 +931,7 @@ ${inlinedThemeCss}
     }
     .hub-pane {
       padding: var(--joy-space-3);
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
     }
     .hub-pane p {
@@ -978,7 +972,7 @@ ${inlinedThemeCss}
       border-top: 1px solid var(--joy-border-default);
       background: var(--joy-surface-card);
       border-collapse: collapse;
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
     }
     .controls-table td {
       padding: 14px 24px;
@@ -1006,12 +1000,12 @@ ${inlinedThemeCss}
       border: none;
       background: transparent;
       padding: 6px 14px;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 500;
       color: var(--joy-text-muted);
       border-radius: 6px;
       cursor: pointer;
-      transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast), box-shadow var(--joy-duration-fast);
       font-family: inherit;
       white-space: nowrap;
     }
@@ -1031,7 +1025,7 @@ ${inlinedThemeCss}
       padding: 16px 20px;
       border-radius: 8px;
       font-family: var(--joy-font-family-mono);
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       overflow-x: auto;
       margin-top: 16px;
       line-height: 1.5;
@@ -1059,7 +1053,7 @@ ${inlinedThemeCss}
       border-radius: 8px;
       border: 1px solid var(--joy-border-default);
       overflow: hidden;
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
     }
     .tokens-table th, .tokens-table td {
       padding: 12px 16px;
@@ -1104,7 +1098,7 @@ ${inlinedThemeCss}
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 150ms ease;
+      transition: background-color var(--joy-duration-fast), border-color var(--joy-duration-fast), color var(--joy-duration-fast), transform var(--joy-duration-fast);
     }
     .icon-card:hover {
       border-color: var(--joy-accent-default);
@@ -1118,7 +1112,7 @@ ${inlinedThemeCss}
       color: var(--joy-text-secondary);
     }
     .icon-name {
-      font-size: 0.75rem;
+      font-size: var(--joy-font-size-xs);
       font-weight: 500;
       color: var(--joy-text-muted);
       text-align: center;
@@ -1139,12 +1133,10 @@ ${inlinedThemeCss}
       display: none;
       position: fixed;
       inset: 0;
-      background: transparent;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: color-mix(in srgb, var(--joy-surface-inverse) 55%, transparent);
       z-index: var(--joy-z-backdrop);
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: opacity var(--joy-duration-normal) ease;
     }
     .sidebar-backdrop.active {
       display: block;
@@ -1292,7 +1284,7 @@ ${inlinedThemeCss}
       gap: 10px;
     }
     .simulator-label {
-      font-size: 0.875rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 600;
       color: var(--joy-text-secondary);
       white-space: nowrap;
@@ -1337,7 +1329,7 @@ ${inlinedThemeCss}
       background: var(--joy-surface-sunken);
       border: 1px solid var(--joy-border-default);
       border-radius: 8px;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
       margin-bottom: 16px;
     }
@@ -1352,7 +1344,7 @@ ${inlinedThemeCss}
     .simulator-frame {
       width: 100%;
       max-width: 100%;
-      transition: max-width 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition: max-width var(--joy-duration-normal) var(--joy-motion-easing-decelerate);
       background: var(--joy-surface-canvas);
       border-radius: 16px;
       border: 1px solid var(--joy-border-default);
@@ -1364,13 +1356,26 @@ ${inlinedThemeCss}
     }
     .simulator-note {
       margin: 0;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
     }
 
     /* Landing blocks view: layout for the demo wrappers only; the blocks themselves are styled by theme.css. */
+    .view-panel > h2,
     .landing-demo-title {
-      margin: 0 0 8px 0;
+      margin: 0 0 var(--joy-space-2);
+      font-size: var(--joy-font-size-xl);
+      line-height: 1.25;
+    }
+    .hub-demo-label {
+      margin: 0 0 var(--joy-space-2);
+      font-size: var(--joy-font-size-sm);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+    }
+    .hub-header-note {
+      font-size: var(--joy-font-size-sm);
+      color: var(--joy-text-muted);
     }
     .landing-demo {
       padding: 24px;
@@ -1394,7 +1399,7 @@ ${inlinedThemeCss}
     }
     .landing-demo__note {
       margin: 0 0 20px 0;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       color: var(--joy-text-secondary);
       max-width: 72ch;
     }
@@ -1408,7 +1413,7 @@ ${inlinedThemeCss}
     }
     .landing-demo__label {
       margin: 0 0 12px 0;
-      font-size: 0.8125rem;
+      font-size: var(--joy-font-size-sm);
       font-weight: 600;
       color: var(--joy-text-secondary);
     }
@@ -1454,6 +1459,13 @@ ${inlinedThemeCss}
       width: min(100%, 220px);
       padding: 6px 12px;
       font-size: var(--joy-font-size-sm);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .sidebar, .sidebar.open, .sidebar-backdrop, .nav-item, .framework-btn, .mobile-menu-btn, .sidebar-close-btn,
+      .segment-btn, .icon-card, .hub-card, .view-panel.active {
+        transition: none;
+        animation: none;
+      }
     }
     /* Phone tier: the topbar is menu + brand + theme toggle; the framework switcher moves into the drawer. */
     @media (max-width: 767px) {
@@ -1521,7 +1533,7 @@ ${inlinedThemeCss}
       .segment-btn {
         flex: 1 0 auto;
         padding: 6px 4px;
-        font-size: 0.75rem;
+        font-size: var(--joy-font-size-xs);
         text-align: center;
       }
     }
@@ -1729,7 +1741,7 @@ ${navigationHtml}
       <!-- View: Props & API Specs -->
       <section id="view-props-spec" class="view-panel">
         <div class="badge joy-badge joy-badge--brand joy-badge--md" style="margin-bottom: 12px;">Component API Standards</div>
-        <h1 style="margin: 0 0 8px 0;">Component Props & API Specification</h1>
+        <h2>Component props and API specification</h2>
         <p class="header-tagline">
           Complete cross-framework contract specification for all 18 Joymify components across 
           <strong>Svelte 5 Runes</strong> and <strong>React 19 forwardRef</strong>.
@@ -2012,7 +2024,7 @@ ${navigationHtml}
               <h4>Live Interactive Canvas</h4>
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Active Preview</span>
             </div>
-            <div style="font-size: 0.8125rem; color: var(--joy-text-muted);">Click button or test controls below</div>
+            <div class="hub-header-note">Click the button or use the controls below</div>
           </div>
           <div class="canvas" id="button-canvas">
             <button class="joy-button joy-button--solid joy-button--md" id="demo-btn" onclick="handleBtnClick()"><span class="joy-button__label">Click Me! (Clicked: <span id="click-counter">0</span>)</span></button>
@@ -2606,7 +2618,7 @@ ${navigationHtml}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                   </span>
                 </div>
-                <span class="joy-date-range-picker__sep">&rarr;</span>
+                <span class="joy-date-range-picker__sep" aria-hidden="true">to</span>
                 <div class="joy-date-picker">
                   <input type="date" class="joy-date-picker__input" id="demo-range-end" value="2026-09-19" onchange="handleRangeChange()">
                   <span class="joy-date-picker__icon">
@@ -2776,7 +2788,7 @@ ${navigationHtml}
             </div>
 
             <div style="margin-top: 8px;">
-              <h5 style="margin: 0 0 8px 0; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--joy-text-muted);">AvatarGroup (Overlapping Team Stack)</h5>
+              <h5 class="hub-demo-label">Avatar group, overlapping team stack</h5>
               <div class="joy-avatar-group">
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">AM</span></div>
                 <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-success-fg);"><span class="joy-avatar__fallback">BL</span></div>
@@ -2883,7 +2895,7 @@ export async function executeHedge(symbol: string, size: number) {
 
         <div class="playground-box">
           <div class="playground-header">
-            <h4>Icon System Collection (138 Vector Assets &bull; Dual Svelte 5 + React 19)</h4>
+            <h4>Icon system (138 vector assets for Svelte 5 and React 19)</h4>
             <div id="copy-toast-banner" style="font-size: 0.8125rem; color: var(--joy-status-success-fg); font-weight: 600; display: none;">Copied to clipboard!</div>
           </div>
           <div style="padding: 24px;">
@@ -5031,7 +5043,7 @@ export async function executeHedge(symbol: string, size: number) {
         <!-- Splitter Demo -->
         <div class="playground-box" style="margin-bottom: 24px;">
           <div class="playground-header">
-            <h4>Splitter (Resizable Split Panes &bull; Drag Divider or Use Arrow Keys)</h4>
+            <h4>Splitter (drag the divider or use the arrow keys)</h4>
           </div>
           <div style="padding: 24px;">
             ${hubSplitter("horizontal", "<strong>Strategy Controls</strong><p>Arbitrage engine parameters, exchange API keys, and latency tolerances.</p>", "<strong>Execution Telemetry</strong><p>Live order matching logs, routing fills, and execution slip statistics.</p>", 200, "demo-splitter")}
@@ -6008,7 +6020,7 @@ export async function executeHedge(symbol: string, size: number) {
       const start = document.getElementById('demo-range-start').value;
       const end = document.getElementById('demo-range-end').value;
       document.getElementById('range-date-feedback').innerText = start + ' to ' + end;
-      showDemoToast('Backtest window set: ' + start + ' → ' + end, 'info');
+      showDemoToast('Backtest window set: ' + start + ' to ' + end, 'info');
     }
 
     function copyIconName(name) {

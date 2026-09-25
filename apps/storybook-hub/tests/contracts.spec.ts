@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import {
+  HUB_CHROME,
   HUB_VIEWS,
   hitSize,
   installContrastTools,
@@ -457,8 +458,13 @@ test.describe("Storybook Hub Quality Contracts", () => {
   });
 });
 
-test("Contract 9b: the hub's market filter is 16px on phones so iOS does not zoom on focus", async ({ page }, info) => {
-  test.skip(info.project.name !== "desktop-chrome", "viewports are set explicitly");
+test("Contract 9b: the hub's market filter is 16px on phones so iOS does not zoom on focus", async ({
+  page,
+}, info) => {
+  test.skip(
+    info.project.name !== "desktop-chrome",
+    "viewports are set explicitly",
+  );
   for (const [width, min] of [
     [375, 16],
     [1280, 12],
@@ -469,7 +475,9 @@ test("Contract 9b: the hub's market filter is 16px on phones so iOS does not zoo
     await page.waitForLoadState("networkidle");
     const input = page.locator("#market-search-input");
     await expect(input).toBeVisible();
-    const size = await input.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    const size = await input.evaluate((el) =>
+      parseFloat(getComputedStyle(el).fontSize),
+    );
     expect(size, `font-size at ${width}`).toBeGreaterThanOrEqual(min);
     const box = (await input.boundingBox())!;
     expect(box.x + box.width, `fits at ${width}`).toBeLessThanOrEqual(width);
@@ -519,4 +527,142 @@ test.describe("Contract 6: every manifest view at 375 and 1280, light and dark",
       }
     });
   }
+});
+
+test.describe("Contract 10: hub chrome carries no slop", () => {
+  test.beforeEach(({}, info) => {
+    test.skip(info.project.name !== "desktop-chrome", "one project is enough");
+  });
+  const sweep = (page: Page) =>
+    page.evaluate((chrome) => {
+      const root = getComputedStyle(document.documentElement);
+      const tokens = (prefix: string) =>
+        new Set(
+          Array.from(document.styleSheets)
+            .flatMap((sheet) => {
+              try {
+                return Array.from(sheet.cssRules);
+              } catch {
+                return [];
+              }
+            })
+            .flatMap((rule) =>
+              rule instanceof CSSStyleRule ? Array.from(rule.style) : [],
+            )
+            .filter((name) => name.startsWith(prefix))
+            .map((name) => root.getPropertyValue(name).trim()),
+        );
+      const zTokens = tokens("--joy-z-");
+      const probe = document.createElement("span");
+      document.body.appendChild(probe);
+      const sizes = new Set(
+        Array.from(tokens("--joy-font-size-")).map((v) => {
+          probe.style.fontSize = v;
+          return getComputedStyle(probe).fontSize;
+        }),
+      );
+      probe.remove();
+      const issues: string[] = [];
+      const chromeText: string[] = [];
+      for (const el of Array.from(document.querySelectorAll(chrome))) {
+        const s = getComputedStyle(el);
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) continue;
+        const d = window.__describe(el);
+        if (s.backdropFilter && s.backdropFilter !== "none")
+          issues.push(`${d}: backdrop-filter ${s.backdropFilter}`);
+        if (s.textTransform === "uppercase" && parseFloat(s.letterSpacing) > 0)
+          issues.push(`${d}: tracked uppercase`);
+        if (s.zIndex !== "auto" && !zTokens.has(s.zIndex))
+          issues.push(`${d}: z-index ${s.zIndex} not a --joy-z-* token`);
+        const own = Array.from(el.childNodes)
+          .filter((n) => n.nodeType === Node.TEXT_NODE)
+          .map((n) => n.textContent ?? "")
+          .join("")
+          .trim();
+        if (own) {
+          chromeText.push(own);
+          if (!sizes.has(s.fontSize))
+            issues.push(
+              `${d}: font-size ${s.fontSize} not a --joy-font-size-* token`,
+            );
+        }
+        for (const x of s.transitionDuration.split(",")) {
+          const ms = parseFloat(x) * (x.trim().endsWith("ms") ? 1 : 1000);
+          if (ms !== 0 && (ms < 150 || ms > 250))
+            issues.push(`${d}: transition ${ms}ms`);
+        }
+      }
+      // Arrows and middle dots anywhere in the visible hub copy; 01/02 markers in chrome text only (demo data such as
+      // the TimePicker's "09 10 30 45" is component content, not a decorative marker).
+      const visible =
+        (document.querySelector(".main") as HTMLElement).innerText +
+        "\n" +
+        (document.querySelector(".sidebar") as HTMLElement).innerText;
+      if (/→/.test(visible)) issues.push("arrow glyph in visible copy");
+      if (/•|·/.test(visible)) issues.push("middle dot in visible copy");
+      if (chromeText.some((t) => /(^|\s)0[1-9](\s|$)/.test(t)))
+        issues.push("01/02 marker in hub chrome");
+      return issues;
+    }, HUB_CHROME);
+
+  for (const view of HUB_VIEWS) {
+    test(view, async ({ page }) => {
+      for (const width of [375, 1280]) {
+        await page.goto("about:blank"); // fresh document per viewport
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto(`/#${view}`);
+        await page.waitForLoadState("networkidle");
+        await installPageTools(page);
+        if (width < 900) {
+          await page.locator("#mobile-menu-toggle").click();
+          await settle(page);
+        }
+        expect(await sweep(page), `${view} ${width}`).toEqual([]);
+      }
+    });
+  }
+
+  test("reduced motion removes chrome transitions and view animations", async ({
+    browser,
+  }, info) => {
+    const context = await browser.newContext({
+      baseURL: info.project.use.baseURL,
+      reducedMotion: "reduce",
+      viewport: { width: 375, height: 812 },
+    });
+    try {
+      const page = await context.newPage();
+      await page.goto("/#button");
+      await page.waitForLoadState("networkidle");
+      const moving = await page.evaluate(() =>
+        [
+          ".sidebar",
+          ".sidebar-backdrop",
+          ".view-panel.active",
+          ".nav-item",
+          ".framework-btn",
+          ".mobile-menu-btn",
+          ".segment-btn",
+          ".icon-card",
+          ".hub-card",
+        ].flatMap((sel) =>
+          Array.from(document.querySelectorAll(sel))
+            .map((el) => getComputedStyle(el))
+            .filter(
+              (s) =>
+                s.transitionDuration
+                  .split(",")
+                  .some((d) => parseFloat(d) > 0.01) ||
+                (s.animationName !== "none" &&
+                  parseFloat(s.animationDuration) > 0.01),
+            )
+            .map(() => sel),
+        ),
+      );
+      expect([...new Set(moving)]).toEqual([]);
+    } finally {
+      await context.close();
+    }
+  });
 });
