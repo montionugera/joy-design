@@ -4,6 +4,7 @@
 // rounded to 2 decimals so builds are deterministic.
 
 import { MARK, WORDMARK, TAGLINE } from './geometry.js';
+import { heroLattice, wordmarkLayout } from './layout.js';
 
 function round2(n) {
   return Math.round(n * 100) / 100;
@@ -75,28 +76,19 @@ export function markSvg({ palette, tile = true, size = 32, title = 'Joymify' }) 
 // side of the 48px mark, plus the 16px gap, plus a matching 16px right
 // margin after the wordmark).
 export function wordmarkSvg({ palette, tone = 'deep' }) {
-  const markSize = 48;
-  const markX = 16;
-  const markY = 16;
-  const gap = 16;
-  const lockupHeight = 80;
-  const wordmarkTargetHeight = 40;
-
-  const { scale, width: wmWidth } = scaleGlyph(WORDMARK, wordmarkTargetHeight);
-  const width = round2(wmWidth + 96);
+  const { width, height: lockupHeight, markX, markY, markSize, glyphX, glyphY, glyphScale } = wordmarkLayout({
+    height: 80,
+    withMark: true
+  });
 
   const isCream = tone === 'cream';
   const wordmarkColor = isCream ? palette.inkOnTile : palette.ink;
-
-  const markCenterY = markY + markSize / 2;
-  const wordmarkX = markX + markSize + gap;
-  const wordmarkY = glyphBaselineY(markCenterY, WORDMARK, scale);
 
   let bg = '';
   if (isCream) bg = `<rect width="${width}" height="${lockupHeight}" fill="${palette.tile}"/>`;
 
   const markMarkup = markGroupAt({ palette, tile: isCream, x: markX, y: markY, size: markSize });
-  const wordmarkMarkup = textGroupAt({ glyph: WORDMARK, x: wordmarkX, y: wordmarkY, scale, color: wordmarkColor });
+  const wordmarkMarkup = textGroupAt({ glyph: WORDMARK, x: glyphX, y: glyphY, scale: glyphScale, color: wordmarkColor });
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${lockupHeight}" width="${width}" height="${lockupHeight}" role="img">` +
@@ -168,32 +160,11 @@ export function ogCardSvg({ palette }) {
 // outline diamond on a 64px grid, opacity fading from 0.35 at the right
 // edge to 0 at 55% width. Purely decorative — no text.
 export function heroBannerSvg({ palette }) {
-  const width = 1600;
-  const height = 560;
-  const cell = 64;
-  const cols = Math.ceil(width / cell);
-  const rows = Math.ceil(height / cell) + 1;
-  const fadeStart = width * 0.55;
-  const maxOpacity = 0.35;
-  // Diamonds are sampled at cell centres, so the rightmost one actually
-  // drawn is centred at (width - cell/2), not at the viewBox edge (width).
-  // Normalising by (width - fadeStart) would therefore always fall short of
-  // maxOpacity (0.33 instead of 0.35). Normalise by the distance from
-  // fadeStart to that last reachable centre instead, so the last column
-  // hits maxOpacity exactly.
-  const fadeRange = width - cell / 2 - fadeStart;
+  const { width, height, diamondScale, diamonds: cells } = heroLattice();
 
   let diamonds = '';
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      const x = col * cell;
-      const y = row * cell;
-      const centerX = x + cell / 2;
-      if (centerX <= fadeStart) continue;
-      const opacity = round2(Math.min(maxOpacity, (maxOpacity * (centerX - fadeStart)) / fadeRange));
-      if (opacity <= 0) continue;
-      diamonds += `<g transform="translate(${x} ${y}) scale(2)"><path d="${MARK.outline}" fill="none" stroke="${palette.markOnTile}" stroke-width="0.5" stroke-opacity="${opacity}"/></g>`;
-    }
+  for (const { x, y, opacity } of cells) {
+    diamonds += `<g transform="translate(${x} ${y}) scale(${diamondScale})"><path d="${MARK.outline}" fill="none" stroke="${palette.markOnTile}" stroke-width="0.5" stroke-opacity="${opacity}"/></g>`;
   }
 
   return (

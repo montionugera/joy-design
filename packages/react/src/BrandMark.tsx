@@ -12,7 +12,7 @@ export interface BrandMarkProps {
 }
 
 export function BrandMark({ size = 32, variant = 'tile', title, className = '' }: BrandMarkProps) {
-  const px = Number.isFinite(size) && (size as number) > 0 ? size : 32;
+  const px = Number.isFinite(size) && size > 0 ? size : 32;
   const isTile = variant === 'tile';
   const strokeColor = isTile ? 'var(--joy-brand-mark-on-tile)' : 'var(--joy-brand-mark)';
 

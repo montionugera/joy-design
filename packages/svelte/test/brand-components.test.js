@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { compileSvelte, renderSvelte as renderRaw } from './helpers/render-svelte.js';
+import { MARK } from '@joymify/brand';
 
 // F-043: BrandMark + Wordmark (Svelte twin). The React twin asserts the same expectations in
 // packages/react/test/brand-components.test.js.
@@ -39,5 +40,7 @@ test('F-043: Wordmark renders outlined glyphs, labelled, tone-aware', async () =
   assert.ok(!/<text\b/.test(deep));
   assert.match(deep, /var\(--joy-brand-ink\)/);
   assert.match(await renderSvelte('Wordmark', { tone: 'cream' }), /var\(--joy-brand-ink-on-tile\)/);
-  assert.ok(!/<svg[\s\S]*<svg/.test(await renderSvelte('Wordmark', { withMark: false })));
+  const noMark = await renderSvelte('Wordmark', { withMark: false });
+  assert.ok(!/<svg[\s\S]*<svg/.test(noMark));
+  assert.ok(!noMark.includes(MARK.outline));
 });

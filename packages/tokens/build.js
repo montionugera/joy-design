@@ -2698,7 +2698,9 @@ h1, h2, h3, .joy-display {
   display: inline-flex;
   align-items: center;
   padding-right: 20px;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+  /* An inward V (swallowtail notch), not an outward arrow point: the right edge cuts IN by 10px
+     at the vertical centre, it does not come to a point past the box. */
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%);
 }
 .joy-ribbon--corner {
   position: absolute;

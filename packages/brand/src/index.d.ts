@@ -42,3 +42,40 @@ export declare function wordmarkSvg(options: {
 export declare function ogCardSvg(options: { palette: BrandPalette }): string;
 
 export declare function heroBannerSvg(options: { palette: BrandPalette }): string;
+
+export interface LatticeCell {
+  x: number;
+  y: number;
+  opacity: number;
+}
+
+export interface HeroLattice {
+  width: number;
+  height: number;
+  cell: number;
+  diamondScale: number;
+  diamonds: LatticeCell[];
+}
+
+export declare function heroLattice(options?: {
+  width?: number;
+  height?: number;
+  cell?: number;
+  fadeStart?: number;
+  maxOpacity?: number;
+}): HeroLattice;
+
+export interface WordmarkLayout {
+  width: number;
+  height: number;
+  markX: number;
+  markY: number;
+  markSize: number;
+  markCenterY: number;
+  glyphX: number;
+  glyphY: number;
+  glyphScale: number;
+  glyphWidth: number;
+}
+
+export declare function wordmarkLayout(options?: { height?: number; withMark?: boolean }): WordmarkLayout;

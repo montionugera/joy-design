@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { MARK } from '@joymify/brand';
+  import { MARK, heroLattice } from '@joymify/brand';
   import LandingAction from './LandingAction.svelte';
 
   interface Props {
@@ -29,42 +29,18 @@
     class: className = ''
   }: Props = $props();
 
-  // Decorative diamond lattice, same grid + right-edge fade algorithm as @joymify/brand's
-  // heroBannerSvg (packages/brand/src/render.js), recomputed here (not imported) because that
-  // helper bakes in a resolved hex palette and a fixed role="img" wrapper; this one is a
-  // themeable `aria-hidden` overlay stroked with a `--joy-brand-*` custom property.
-  const LATTICE_WIDTH = 1600;
-  const LATTICE_HEIGHT = 560;
-  const LATTICE_CELL = 64;
-  const LATTICE_FADE_START = LATTICE_WIDTH * 0.55;
-  const LATTICE_MAX_OPACITY = 0.35;
-  const LATTICE_FADE_RANGE = LATTICE_WIDTH - LATTICE_CELL / 2 - LATTICE_FADE_START;
-
-  function buildLattice() {
-    const cols = Math.ceil(LATTICE_WIDTH / LATTICE_CELL);
-    const rows = Math.ceil(LATTICE_HEIGHT / LATTICE_CELL) + 1;
-    const diamonds: { x: number; y: number; opacity: number }[] = [];
-    for (let row = 0; row < rows; row += 1) {
-      for (let col = 0; col < cols; col += 1) {
-        const x = col * LATTICE_CELL;
-        const y = row * LATTICE_CELL;
-        const centerX = x + LATTICE_CELL / 2;
-        if (centerX <= LATTICE_FADE_START) continue;
-        const opacity = Math.min(LATTICE_MAX_OPACITY, (LATTICE_MAX_OPACITY * (centerX - LATTICE_FADE_START)) / LATTICE_FADE_RANGE);
-        if (opacity <= 0) continue;
-        diamonds.push({ x, y, opacity: Math.round(opacity * 100) / 100 });
-      }
-    }
-    return diamonds;
-  }
-
-  const lattice = buildLattice();
+  // Decorative diamond lattice: the same grid + right-edge fade as @joymify/brand's hero-banner.svg
+  // asset (packages/brand/src/render.js's heroBannerSvg), sourced from the shared `heroLattice`
+  // helper so the two can never drift apart. This is an `aria-hidden` overlay stroked with a
+  // `--joy-brand-*` custom property rather than heroBannerSvg's fixed role="img" + resolved-hex
+  // wrapper.
+  const lattice = heroLattice();
 </script>
 
-<section class="joy-brand-banner joy-brand-banner--{align} {className}">
-  <svg class="joy-brand-banner__lattice" viewBox="0 0 {LATTICE_WIDTH} {LATTICE_HEIGHT}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-    {#each lattice as diamond}
-      <g transform="translate({diamond.x} {diamond.y}) scale(2)">
+<section class="joy-brand-banner {className}" class:joy-brand-banner--center={align === 'center'}>
+  <svg class="joy-brand-banner__lattice" viewBox="0 0 {lattice.width} {lattice.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    {#each lattice.diamonds as diamond}
+      <g transform="translate({diamond.x} {diamond.y}) scale({lattice.diamondScale})">
         <path d={MARK.outline} fill="none" stroke="var(--joy-brand-mark-on-tile)" stroke-width="0.5" stroke-opacity={diamond.opacity} />
       </g>
     {/each}
