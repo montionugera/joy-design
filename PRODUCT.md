@@ -37,7 +37,7 @@ The interface should feel like a well-made instrument, dense where the data dema
 
 1. **Tokens or nothing.** Every colour, radius, space, shadow, duration and z-index comes from `@joymify/tokens`. A colour literal in a component is a bug, and `scripts/lint-colors.sh` fails the build on one.
 2. **Dark is designed, not derived.** The semantic surface, text, border, accent and status roles have their own dark values, and contrast is checked in both themes.
-3. **Every state, every size, every framework.** An interactive component is styled for each state it can reach: default, hover, focus-visible, active, disabled, and loading, error or selected where they apply. It ships at every size it offers (controls come in `sm`, `md` and `lg`; choice controls in `sm` and `md`), with a Svelte and a React twin held together by `scripts/parity-check.mjs`. The per-component matrix is in `DESIGN.md`.
+3. **Every state, every size, every framework.** An interactive component is styled for each state it can reach: default, hover, focus-visible, active, disabled, and loading, error or selected where they apply. It ships at every size it offers, with a Svelte and a React twin held together by `scripts/parity-check.mjs`. The per-component states and sizes are in the `DESIGN.md` state matrix.
 4. **The phone is the first viewport.** Design at 375px with 44px touch targets, 16px gutters and no horizontal scroll. Select-family overlays become bottom sheets on small screens.
 5. **Spend boldness once.** Each surface gets one signature moment, such as the hero CTA or the kinetic hub canvas. Everything else recedes.
 
