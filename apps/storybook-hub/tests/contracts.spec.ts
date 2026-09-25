@@ -40,6 +40,22 @@ test.describe("Storybook Hub Quality Contracts", () => {
     await expect(page.locator("#view-overview")).toHaveClass(/active/);
   });
 
+  test("Contract 1b: Enter key activates a hub-card the same as a click", async ({
+    page,
+  }) => {
+    await page.goto("/#overview");
+    await page.waitForLoadState("networkidle");
+
+    const card = page.locator('.hub-card[aria-label="Open @joymify/tokens"]');
+    await card.focus();
+    await expect(card).toBeFocused();
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator("#view-tokens")).toHaveClass(/active/);
+    await expect(page.locator("#view-tokens")).toBeVisible();
+    await expect(page.locator("#view-overview")).not.toHaveClass(/active/);
+  });
+
   test("Contract 2: Mobile Drawer Gestures & Focus Trapping (< 900px)", async ({
     page,
   }) => {
