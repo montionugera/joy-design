@@ -811,7 +811,7 @@ ${inlinedThemeCss}
       background: var(--joy-surface-card);
       border: 1px solid var(--joy-border-default);
       border-radius: 12px;
-      box-shadow: 0 2px 8px transparent;
+      box-shadow: none;
       margin-bottom: 32px;
       overflow: hidden;
     }
@@ -844,7 +844,7 @@ ${inlinedThemeCss}
       background: var(--joy-surface-card);
       border: 1px solid var(--joy-border-default);
       border-radius: 12px;
-      box-shadow: 0 2px 8px transparent;
+      box-shadow: none;
       margin-bottom: 32px;
       overflow: hidden;
     }
@@ -1022,7 +1022,7 @@ ${inlinedThemeCss}
       background: var(--joy-surface-card);
       color: var(--joy-text-primary);
       font-weight: 600;
-      box-shadow: 0 1px 3px transparent, 0 1px 2px transparent;
+      box-shadow: none;
     }
     .code-snippet {
       background: var(--hub-code-bg);
@@ -1068,7 +1068,7 @@ ${inlinedThemeCss}
     [data-theme="dark"] .playground-box {
       background: var(--joy-surface-card);
       border-color: var(--joy-surface-raised);
-      box-shadow: 0 4px 12px transparent;
+      box-shadow: none;
     }
     /* Icon Gallery Styling */
     .icon-grid {
@@ -1093,7 +1093,7 @@ ${inlinedThemeCss}
     .icon-card:hover {
       border-color: var(--joy-accent-default);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px transparent;
+      box-shadow: none;
     }
     .icon-preview {
       display: flex;
@@ -1112,7 +1112,7 @@ ${inlinedThemeCss}
     [data-theme="dark"] .component-card {
       background: var(--joy-surface-card);
       border-color: var(--joy-surface-raised);
-      box-shadow: 0 4px 12px transparent;
+      box-shadow: none;
     }
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
@@ -1472,8 +1472,20 @@ ${inlinedThemeCss}
       gap: 16px;
     }
 
-    [data-theme="dark"] .component-canvas {
-      background-color: var(--joy-surface-card);
+    .hub-demo-footer {
+      padding: var(--joy-space-3) var(--joy-space-5);
+      background: var(--joy-surface-raised);
+      border-top: 1px solid var(--hub-chrome-border);
+      font-size: var(--joy-font-size-sm);
+    }
+    .hub-metric-row {
+      background: var(--joy-surface-raised);
+      padding: var(--joy-space-3);
+      border-radius: var(--joy-radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--joy-space-3);
     }
     /* Phone tier: the topbar is menu + brand + theme toggle; the framework switcher moves into the drawer. */
     @media (max-width: 767px) {
@@ -2257,7 +2269,7 @@ ${navigationHtml}
           <div class="canvas" style="min-height: 220px;">
             ${hubDropdown("demo-dropdown-menu")}
           </div>
-          <div style="padding: 12px 20px; background: var(--joy-surface-raised); border-top: 1px solid var(--joy-border-default); font-size: 0.875rem;">
+          <div class="hub-demo-footer">
             Selected action: <strong id="dropdown-selection-text" style="color: var(--joy-accent-default);">None</strong>
           </div>
         </div>
@@ -2550,7 +2562,7 @@ ${navigationHtml}
               <p style="margin: 0 0 12px; font-size: 0.875rem; color: var(--joy-text-secondary); line-height: 1.5;">
                 Delta-neutral funding rate harvester with sub-millisecond execution routing on Vultr Kubernetes.
               </p>
-              <div style="background: var(--joy-surface-raised); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div class="hub-metric-row">
                 <span style="font-size: 0.8125rem; color: var(--joy-text-muted);">Annualized APY</span>
                 <strong style="color: var(--joy-status-success-fg); font-size: 1.1rem; font-family: var(--joy-font-family-mono);">+28.4%</strong>
               </div>
@@ -5566,9 +5578,9 @@ export async function executeHedge(symbol: string, size: number) {
       syncThemeToggle(document.documentElement.getAttribute('data-theme'));
     });
 
-    /** Enter/Space activates a role="link" .hub-card the same as a click (native <a>/<button> behaviour). */
+    /** Enter activates a role="link" .hub-card the same as a click (native <a> behaviour). */
     function hubCardActivate(event) {
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (event.key === 'Enter') {
         event.preventDefault();
         event.currentTarget.click();
       }

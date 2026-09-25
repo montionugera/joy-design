@@ -382,6 +382,10 @@ export const HUB_CHROME = [
   ".view-panel.active .playground-header", ".view-panel.active .playground-header *",
   ".view-panel.active .component-header", ".view-panel.active .component-header *",
   ".view-panel.active .code-snippet", ".view-panel.active .tokens-table", ".view-panel.active .tokens-table *",
+  ".view-panel.active .controls-table", ".view-panel.active .controls-table td",
+  ".view-panel.active .segmented-control", ".view-panel.active .segment-btn",
+  ".view-panel.active .icon-card", ".view-panel.active .icon-card *",
+  ".view-panel.active .hub-card", ".view-panel.active .kinetic-canvas-container",
 ].join(", ");
 
 /** Rendered size of the first element matching `selector`. */
