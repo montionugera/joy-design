@@ -46,6 +46,14 @@ missing_deps="$fixture_dir/no-such-node_modules"
 EPIC_CHECK_NODE_MODULES="$missing_deps" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >/dev/null
 [[ $(cat "$EPIC_CHECK_LOG") == $'pnpm install --frozen-lockfile --prefer-offline\n'"$expected" ]] || fail "deps not installed before the steps: $(tr '\n' '|' < "$EPIC_CHECK_LOG")"
 
+# Some node_modules/.pnpm files are tracked in git, so a fresh checkout has a
+# node_modules dir that pnpm never installed into: that must still install.
+tracked_only="$fixture_dir/tracked-only/node_modules"
+mkdir -p "$tracked_only/.pnpm"
+: > "$EPIC_CHECK_LOG"
+EPIC_CHECK_NODE_MODULES="$tracked_only" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >/dev/null
+[[ $(cat "$EPIC_CHECK_LOG") == $'pnpm install --frozen-lockfile --prefer-offline\n'"$expected" ]] || fail "a never-installed node_modules dir skipped the install: $(tr '\n' '|' < "$EPIC_CHECK_LOG")"
+
 : > "$EPIC_CHECK_LOG"
 if EPIC_CHECK_FAIL_INSTALL=1 EPIC_CHECK_NODE_MODULES="$missing_deps" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >"$fixture_dir/install.log" 2>&1; then
   fail "expected a failed dependency install to fail epic-check"
