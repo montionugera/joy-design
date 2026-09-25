@@ -34,8 +34,8 @@ if (cd "$fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react
   exit 1
 fi
 
-# Wave 3: display/feedback/navigation/overlay names and shared helpers are strict too;
-# a non-listed name in the same directory must stay a warning.
+# Wave 3: display/feedback/navigation/overlay names and shared helpers are strict.
+# Since Wave 6 every file is strict, including names no wave listed.
 wave3_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir" "$wave3_dir"' EXIT
 mkdir -p "$wave3_dir/packages/react/src" "$wave3_dir/packages/svelte/src/lib"
@@ -61,14 +61,14 @@ fi
 rm "$wave3_dir/packages/react/src/chart-core.ts"
 
 cp "$literal_file" "$wave3_dir/packages/react/src/Carousel.tsx"
-(cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1 || {
-  echo "expected default mode to only warn on a literal in a non-strict file (Carousel.tsx)" >&2
+if (cd "$wave3_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1; then
+  echo "expected default mode to reject a literal in a file no wave listed (Carousel.tsx)" >&2
   exit 1
-}
+fi
 rm "$wave3_dir/packages/react/src/Carousel.tsx"
 
 # Wave 4: the 14 landing twins are strict too. Sample one hero, one svelte page and one
-# matrix twin; a non-listed name in the same directory must still only warn.
+# matrix twin.
 wave4_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir"' EXIT
 mkdir -p "$wave4_dir/packages/react/src" "$wave4_dir/packages/svelte/src/lib"
@@ -108,10 +108,25 @@ if (cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/svelte/
 fi
 rm "$wave4_dir/packages/svelte/src/lib/LandingAction.svelte"
 
-cp "$literal_file" "$wave4_dir/packages/react/src/Carousel.tsx"
-(cd "$wave4_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/react/src) >/dev/null 2>&1 || {
-  echo "expected default mode to only warn on a literal in a non-strict file next to landing twins (Carousel.tsx)" >&2
+# Wave 6: with no arguments the lint scans every package (icons included) and the hub,
+# and any literal anywhere fails. Build a clean copy of the default targets, then add one literal.
+wave6_dir=$(mktemp -d)
+trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir"' EXIT
+mkdir -p "$wave6_dir/packages/svelte/src" "$wave6_dir/packages/react/src" "$wave6_dir/packages/icons/src" \
+  "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens"
+cp "$clean_file" "$wave6_dir/packages/svelte/src/Clean.svelte"
+cp "$clean_file" "$wave6_dir/packages/react/src/Clean.tsx"
+cp "$clean_file" "$wave6_dir/packages/icons/src/Clean.svelte"
+cp "$clean_file" "$wave6_dir/apps/storybook-hub/build.js"
+printf '%s\n' 'const componentStyles = `' '.x { color: var(--joy-text-primary); }' '`;' > "$wave6_dir/packages/tokens/build.js"
+(cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1 || {
+  echo "expected default mode to pass on a clean copy of every default target" >&2
   exit 1
 }
+cp "$literal_file" "$wave6_dir/packages/icons/src/Bad.svelte"
+if (cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1; then
+  echo "expected default mode to scan packages/icons/src and reject a literal there" >&2
+  exit 1
+fi
 
 echo "PASS scripts/test-lint-colors.sh"

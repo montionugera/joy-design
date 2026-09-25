@@ -83,7 +83,13 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm --filter storybook-hub exec playwright install --with-deps chromium
 
-      - name: Run Integration Checks
+      - name: Type check (pnpm check)
+        run: pnpm check
+
+      # integration.sh runs Gate 1 (scripts/precheck.sh): emoji policy, strict colour lint
+      # (scripts/lint-colors.sh), gate self-tests, contrast test, pnpm check, workspace tests,
+      # parity (scripts/parity-check.mjs), hub build and Playwright contracts.
+      - name: Gate 1 (scripts/precheck.sh via scripts/integration.sh)
         run: ./scripts/integration.sh
 
   # ── Job 2: Build & Push Image to GHCR ─────────────────────
