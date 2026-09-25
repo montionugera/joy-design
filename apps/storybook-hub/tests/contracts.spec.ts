@@ -10,6 +10,25 @@ import {
   settle,
 } from "./helpers";
 
+/**
+ * Samples `read()` repeatedly across `durationMs` instead of a single blind `waitForTimeout` before one
+ * check. Used for "stays the same" / "never exceeds" assertions, where expect.poll's eventually-true
+ * semantics don't fit: it returns every value seen across the window, not just the last one.
+ */
+async function sample<T>(
+  read: () => Promise<T>,
+  durationMs: number,
+  intervalMs = 50,
+): Promise<T[]> {
+  const values: T[] = [await read()];
+  const start = Date.now();
+  while (Date.now() - start < durationMs) {
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    values.push(await read());
+  }
+  return values;
+}
+
 test.describe("Storybook Hub Quality Contracts", () => {
   test("Contract 1: URL Hash Routing & Persistence across reloads", async ({
     page,
@@ -286,8 +305,12 @@ test.describe("Storybook Hub Quality Contracts", () => {
         });
         expect(palette, `palette ${theme}`).toEqual(tokens);
         // Hero copy and CTAs sit on the card surface: no particle or link is painted under them.
+        const beforeMove = await snapshot(page);
         await page.mouse.move(640, 300);
-        await page.waitForTimeout(250);
+        // Wait for the field to actually paint a new frame after the move, instead of guessing a fixed delay.
+        await expect
+          .poll(() => snapshot(page), { timeout: 2000 })
+          .not.toBe(beforeMove);
         const painted = await page.evaluate(() => {
           const canvas = document.getElementById(
             "kinetic-particle-canvas",
@@ -335,8 +358,7 @@ test.describe("Storybook Hub Quality Contracts", () => {
         );
       }
       const a = await snapshot(page);
-      await page.waitForTimeout(300);
-      expect(await snapshot(page), "animates by default").not.toBe(a);
+      await expect.poll(() => snapshot(page), { timeout: 2000 }).not.toBe(a);
       // A hidden view schedules no animation frames.
       await page.evaluate(() => {
         const w = window as unknown as { __rafCount: number };
@@ -349,15 +371,16 @@ test.describe("Storybook Hub Quality Contracts", () => {
       });
       await page.evaluate(() => (window.location.hash = "#button"));
       await expect(page.locator("#view-button")).toHaveClass(/active/);
-      await page.waitForTimeout(200);
       const count = () =>
         page.evaluate(
           () => (window as unknown as { __rafCount: number }).__rafCount,
         );
       const before = await count();
-      await page.waitForTimeout(500);
+      // Sample the counter across the window (instead of one blind wait then one read) so a transient
+      // extra frame right after the hash change and a resumed loop later are both caught.
+      const rafSamples = await sample(count, 700);
       expect(
-        (await count()) - before,
+        Math.max(...rafSamples) - before,
         "no rAF loop while the hero is hidden",
       ).toBeLessThanOrEqual(1);
       expect(normal.errors).toEqual([]);
@@ -369,10 +392,12 @@ test.describe("Storybook Hub Quality Contracts", () => {
     const still = await open({ reducedMotion: "reduce" });
     try {
       const s1 = await snapshot(still.page);
-      await still.page.waitForTimeout(400);
-      expect(await snapshot(still.page), "static under reduced motion").toBe(
-        s1,
-      );
+      // Sample across the window rather than one blind wait then one read: a mid-window flicker would
+      // otherwise be missed if it happened to settle back to s1 by the time of a single final check.
+      const stillSamples = await sample(() => snapshot(still.page), 400);
+      for (const s of stillSamples) {
+        expect(s, "static under reduced motion").toBe(s1);
+      }
       expect(still.errors).toEqual([]);
     } finally {
       await still.context.close();
