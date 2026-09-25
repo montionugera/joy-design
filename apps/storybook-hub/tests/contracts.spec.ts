@@ -1,8 +1,10 @@
 import { test, expect } from "@playwright/test";
 import {
+  HUB_VIEWS,
   hitSize,
   installContrastTools,
   installPageTools,
+  measureHubOverflow,
   setTheme,
   settle,
 } from "./helpers";
@@ -90,21 +92,19 @@ test.describe("Storybook Hub Quality Contracts", () => {
       { width: 1280, height: 800 },
     ];
 
-    for (const vp of viewports) {
-      await page.setViewportSize(vp);
-      await page.goto("/#overview");
-      await page.waitForLoadState("networkidle");
-
-      const isOverflowing = await page.evaluate(() => {
-        return (
-          document.documentElement.scrollWidth >
-          document.documentElement.clientWidth + 1
-        );
-      });
-      expect(
-        isOverflowing,
-        `Viewport ${vp.width}x${vp.height} must have no horizontal document overflow`,
-      ).toBe(false);
+    // The in-between widths (Contract 6 covers 375 and 1280 on every view) sampled on several view families.
+    for (const view of ["overview", "button", "forms", "table"]) {
+      for (const vp of viewports) {
+        await page.goto("about:blank");
+        await page.setViewportSize(vp);
+        await page.goto(`/#${view}`);
+        await page.waitForLoadState("networkidle");
+        await installPageTools(page);
+        const m = await measureHubOverflow(page);
+        const where = `${view} ${vp.width}x${vp.height}`;
+        expect(m.documentScrollWidth, `${where}: document`).toBeLessThanOrEqual(m.viewport);
+        expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(m.mainClientWidth + 1);
+      }
     }
   });
 
@@ -331,4 +331,36 @@ test.describe("Storybook Hub Quality Contracts", () => {
     await expect(page.locator(".topbar .framework-pill")).toBeVisible();
     await expect(page.locator(".framework-pill--drawer")).toBeHidden();
   });
+});
+
+test.describe("Contract 6: every manifest view at 375 and 1280, light and dark", () => {
+  test.beforeEach(({}, info) => {
+    test.skip(info.project.name !== "desktop-chrome", "viewports are set explicitly");
+  });
+  for (const view of HUB_VIEWS) {
+    test(view, async ({ page }, info) => {
+      for (const vp of [
+        { width: 375, height: 812 },
+        { width: 1280, height: 800 },
+      ]) {
+        await page.goto("about:blank"); // fresh document per viewport: a same-URL hash goto would not reload
+        await page.setViewportSize(vp);
+        await page.goto(`/#${view}`);
+        await page.waitForLoadState("networkidle");
+        await expect(page.locator(`#view-${view}`)).toHaveClass(/active/);
+        await installPageTools(page);
+        for (const theme of ["light", "dark"] as const) {
+          await setTheme(page, theme);
+          const m = await measureHubOverflow(page);
+          const where = `${view} ${theme} ${vp.width}`;
+          expect(m.documentScrollWidth, `${where}: document`).toBeLessThanOrEqual(m.viewport);
+          expect(m.mainScrollWidth, `${where}: .main`).toBeLessThanOrEqual(m.mainClientWidth + 1);
+          expect(m.beyond, `${where}: elements past the viewport`).toEqual([]);
+          expect(m.cut, `${where}: content cut off past the viewport`).toEqual([]);
+          expect(m.textClip, `${where}: background-clip text`).toEqual([]);
+          await page.screenshot({ path: info.outputPath(`${view}-${theme}-${vp.width}.png`), animations: "disabled" });
+        }
+      }
+    });
+  }
 });

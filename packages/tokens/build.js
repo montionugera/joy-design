@@ -1489,6 +1489,7 @@ select.joy-select__input {
 /* ── Radio & Radio Group ── */
 .joy-radio-group {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--joy-space-4);
   font-family: var(--joy-font-family-sans);
 }

@@ -394,3 +394,41 @@ export async function hitSize(page: Page, selector: string) {
   if (!box) throw new Error(`hitSize: ${selector} is not rendered`);
   return { width: box.width, height: box.height };
 }
+
+/**
+ * F-040 overflow sweep for the active hub view. `.main` is the scroller (body is overflow:hidden), so its own
+ * scrollWidth is checked as well as the document. `beyond` lists laid-out elements whose right edge passes the
+ * viewport outside an intentional scroll/clip region; `cut` is the same sweep where only a scroll container
+ * (overflow-x auto/scroll) excuses an element; `textClip` lists elements painted with background-clip: text.
+ * Requires installPageTools (for __describe).
+ */
+export async function measureHubOverflow(page: Page) {
+  const base = await measureOverflow(page, ".main");
+  const extra = await page.evaluate(() => {
+    const main = document.querySelector<HTMLElement>(".main")!;
+    const viewport = window.innerWidth;
+    // Stricter than measureOverflow: only a real scroll container (overflow-x auto/scroll) excuses an element. Content
+    // pushed past the viewport inside an overflow:hidden/clip box is cut off, which is the defect, not a pass.
+    const scrolls = (el: Element) => {
+      for (let n = el.parentElement; n && n !== main; n = n.parentElement) {
+        const { overflowX } = getComputedStyle(n);
+        if (overflowX === "auto" || overflowX === "scroll") return true;
+      }
+      return false;
+    };
+    const cut: string[] = [];
+    for (const el of Array.from(main.querySelectorAll(".view-panel.active *, .topbar, .topbar *"))) {
+      if (getComputedStyle(el).position === "fixed" || el.closest("[aria-hidden='true'], .joy-landing-skip")) continue;
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) continue;
+      if (rect.right > viewport + 0.5 && !scrolls(el)) cut.push(`${window.__describe(el)} right=${rect.right.toFixed(1)}`);
+    }
+    const textClip: string[] = [];
+    for (const el of Array.from(document.querySelectorAll("*"))) {
+      const s = getComputedStyle(el) as CSSStyleDeclaration & { webkitBackgroundClip?: string };
+      if (s.backgroundClip === "text" || s.webkitBackgroundClip === "text") textClip.push(window.__describe(el));
+    }
+    return { mainScrollWidth: main.scrollWidth, mainClientWidth: main.clientWidth, cut, textClip };
+  });
+  return { viewport: base.viewport, documentScrollWidth: base.documentScrollWidth, beyond: base.beyond, ...extra };
+}

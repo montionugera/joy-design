@@ -1036,6 +1036,22 @@ ${inlinedThemeCss}
       margin-top: 16px;
       line-height: 1.5;
     }
+    .hub-scroll-x {
+      overflow-x: auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--joy-radius-md);
+    }
+    .hub-scroll-x--spaced {
+      margin-bottom: var(--joy-space-6);
+    }
+    .hub-scroll-x:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: 2px;
+    }
+    .hub-scroll-x > table {
+      min-width: 480px;
+    }
     .tokens-table {
       width: 100%;
       border-collapse: collapse;
@@ -1266,11 +1282,15 @@ ${inlinedThemeCss}
         width: 280px;
         z-index: var(--joy-z-drawer);
         transform: translateX(-100%);
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Closed drawer leaves the tab order: visibility flips after the slide-out, before the slide-in. */
+        visibility: hidden;
+        transition: transform var(--joy-duration-normal) var(--joy-motion-easing-decelerate), visibility 0s linear var(--joy-duration-normal);
         box-shadow: none;
       }
       .sidebar.open {
         transform: translateX(0);
+        visibility: visible;
+        transition: transform var(--joy-duration-normal) var(--joy-motion-easing-decelerate), visibility 0s;
         box-shadow: var(--hub-drawer-edge);
       }
       .main {
@@ -1282,9 +1302,8 @@ ${inlinedThemeCss}
         flex-wrap: nowrap;
       }
       .content-area {
-        padding: 20px 14px 60px;
+        padding: var(--joy-space-5) var(--joy-space-4) var(--joy-space-12);
         max-width: 100%;
-        overflow-x: hidden;
       }
       .kinetic-title {
         font-size: 1.5rem;
@@ -1511,6 +1530,9 @@ ${inlinedThemeCss}
         flex: 1 1 0;
         min-height: 44px;
       }
+      .canvas {
+        padding: var(--joy-space-6) var(--joy-space-4);
+      }
     }
     @media (max-width: 480px) {
       #theme-label {
@@ -1666,7 +1688,8 @@ ${navigationHtml}
         <p class="header-tagline">Central source of truth defined in DTCG JSON format, compiled for CSS Variables and Tailwind v4.</p>
 
         <h3 style="margin-top: 24px;">Motion & Easing Tokens</h3>
-        <table class="tokens-table" style="margin-bottom: 24px;">
+        <div class="hub-scroll-x hub-scroll-x--spaced" tabindex="0" role="region" aria-label="Token table (scrolls sideways)">
+        <table class="tokens-table">
           <thead>
             <tr>
               <th>Token Name</th>
@@ -1696,8 +1719,10 @@ ${navigationHtml}
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3>Core Brand & Surface Palette</h3>
+        <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Token table (scrolls sideways)">
         <table class="tokens-table">
           <thead>
             <tr>
@@ -1734,6 +1759,7 @@ ${navigationHtml}
             </tr>
           </tbody>
         </table>
+        </div>
       </section>
 
       <!-- View: Props & API Specs -->
@@ -1752,6 +1778,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--neutral joy-badge--sm">Action Primitive</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1818,6 +1845,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1828,6 +1856,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--success joy-badge--sm">Quant High-Throughput</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1882,6 +1911,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1892,6 +1922,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--brand joy-badge--sm">Accessible Form Suite</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1922,6 +1953,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1932,6 +1964,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--brand joy-badge--sm">Enterprise Overlays</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1962,6 +1995,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1972,6 +2006,7 @@ ${navigationHtml}
             <span class="joy-badge joy-badge--neutral joy-badge--sm">Navigation & Feedbacks</span>
           </div>
           <div style="padding: 16px 20px;">
+            <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Props table (scrolls sideways)">
             <table class="joy-props-table">
               <thead>
                 <tr>
@@ -1996,6 +2031,7 @@ ${navigationHtml}
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </section>
@@ -5606,7 +5642,7 @@ export async function executeHedge(symbol: string, size: number) {
       if (open) {
         const closeBtn = sidebar.querySelector('.sidebar-close-btn');
         if (closeBtn) closeBtn.focus();
-      } else if (menuBtn && sidebar.contains(document.activeElement)) {
+      } else if (menuBtn && drawerMedia.matches && sidebar.contains(document.activeElement)) {
         menuBtn.focus();
       }
     }
