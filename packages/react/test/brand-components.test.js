@@ -56,3 +56,10 @@ test('F-043: Wordmark mark fills the full component height (height: 32 -> markSi
   assert.match(html, /width="[\d.]+" height="32"/);
   assert.match(html, /<g transform="translate\(0 0\) scale\(1\)">/);
 });
+
+// Fix round 3: at padding 0 the glyph's ink (it has a descender) is taller than the "height above
+// baseline" it is scaled by, so it pokes past the viewBox top/bottom by design. overflow="visible"
+// on the root svg lets that ink render instead of being clipped.
+test('F-043: Wordmark root svg opts out of the default SVG clip so the glyph descender is not cut off', () => {
+  assert.match(wordmark(), /<svg[^>]*overflow="visible"/);
+});

@@ -97,3 +97,32 @@ test('F-043: wordmarkLayout derives markSize from height and padding at any size
   assert.strictEqual(layout.markY, 10);
   assert.strictEqual(layout.glyphX - layout.markSize - layout.markX, Math.round((80 / 3) * 100) / 100); // gap
 });
+
+// Fix round 3 (controller-found regression in round 2): WORDMARK.baseline is the glyph's height
+// ABOVE the baseline, not its full ink height — the outline has a descender, so the full ink
+// height (WORDMARK.height) is taller. At padding 0 the glyph is scaled off `baseline`, so its ink
+// can extend past the returned `height` on both edges. This test pins that the overflow stays
+// small (under 0.1*H, both with and without a mark) and that the ink is still exactly centred on
+// H/2, so any future drift in the ratio or the centring math is caught here rather than only by
+// eyeballing a rendered component. (The components render this with `overflow: visible` — see
+// Wordmark.svelte / Wordmark.tsx — rather than clip it.)
+test('F-043: at padding 0 the glyph ink is centred on H/2 and its per-edge overflow stays under 0.1*H', () => {
+  for (const withMark of [true, false]) {
+    const layout = wordmarkLayout({ height: 32, withMark, padding: 0 });
+    const inkTop = layout.glyphY - layout.glyphScale * WORDMARK.baseline;
+    const inkBottom = layout.glyphY + layout.glyphScale * (WORDMARK.height - WORDMARK.baseline);
+    const inkCenter = (inkTop + inkBottom) / 2;
+
+    assert.ok(
+      Math.abs(inkCenter - layout.height / 2) < 0.01,
+      `withMark=${withMark}: ink centre ${inkCenter} should sit on H/2 (${layout.height / 2})`
+    );
+
+    const overflowTop = Math.max(0, -inkTop);
+    const overflowBottom = Math.max(0, inkBottom - layout.height);
+    assert.ok(overflowTop < 0.1 * layout.height, `withMark=${withMark}: top overflow ${overflowTop} should be < 0.1*H`);
+    assert.ok(overflowBottom < 0.1 * layout.height, `withMark=${withMark}: bottom overflow ${overflowBottom} should be < 0.1*H`);
+    // The overflow is real (this is what overflow: visible is for), not a false alarm from slack bounds.
+    assert.ok(overflowTop > 0 && overflowBottom > 0, `withMark=${withMark}: expected measurable overflow on both edges`);
+  }
+});

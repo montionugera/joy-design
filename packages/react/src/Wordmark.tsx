@@ -29,6 +29,11 @@ export function Wordmark({ tone = 'deep', height = 32, withMark = true, title = 
   const layout = wordmarkLayout({ height: lockupHeight, withMark, padding: 0 });
 
   return (
+    // Fix round 3: the glyph outline has a descender, so its full ink height (WORDMARK.height)
+    // exceeds the "height above baseline" it is scaled by (WORDMARK.baseline) — at padding 0 the
+    // ink pokes past the viewBox top and bottom by design (the mark:gap:glyph ratio is canonical,
+    // the box is not padded to fit it). overflow="visible" lets that ink render instead of being
+    // clipped by the svg's default overflow: hidden.
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 ${layout.width} ${lockupHeight}`}
@@ -37,6 +42,7 @@ export function Wordmark({ tone = 'deep', height = 32, withMark = true, title = 
       className={`joy-wordmark ${className}`}
       role="img"
       aria-label={title}
+      overflow="visible"
     >
       <title>{title}</title>
       {withMark && (

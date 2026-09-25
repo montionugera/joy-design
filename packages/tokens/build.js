@@ -2680,6 +2680,11 @@ h1, h2, h3, .joy-display {
 }
 .joy-wordmark {
   display: inline-block;
+  /* Fix round 3: the glyph outline's descender pokes past the viewBox at padding 0 by design (the
+     mark:gap:glyph ratio is canonical, the box is not padded to fit it) — the CSS property backs
+     up the svg element's own overflow="visible" attribute for browsers/contexts that prefer one
+     over the other. */
+  overflow: visible;
 }
 
 /* Ribbon: a small label badge. The "corner" variant is absolutely positioned and rotated 45deg,

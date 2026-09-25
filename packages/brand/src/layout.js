@@ -47,13 +47,19 @@ export function heroLattice({ width = 1600, height = 560, cell = 64, fadeStart, 
 /**
  * The mark + wordmark lockup from wordmark-*.svg, parameterised by the total lockup `height` and
  * an outer `padding`. The canonical asset ratios (Fix round 2 ruling) are relative to the MARK
- * size, not the lockup height: gap = markSize / 3 and glyph cap height = markSize * 5/6 (mark 48,
- * gap 16, glyph 40 — 16/48 and 40/48). `padding` is asset-only outer whitespace: the mark is
- * inset by `padding` on every side, so `markSize = height - 2 * padding`. The static asset passes
- * `padding = 0.2 * height` (its committed 16px margin on an 80px lockup); components pass
+ * size, not the lockup height: gap = markSize / 3 and glyph height above baseline = markSize * 5/6
+ * (mark 48, gap 16, glyph 40 — 16/48 and 40/48). `padding` is asset-only outer whitespace: the
+ * mark is inset by `padding` on every side, so `markSize = height - 2 * padding`. The static asset
+ * passes `padding = 0.2 * height` (its committed 16px margin on an 80px lockup); components pass
  * `padding: 0` so the mark fills the full component height with no drift from that asset
  * (`markSize === height`). `withMark: false` drops the mark, its padding and the gap, and scales
  * the glyph straight off the lockup `height` (still 5/6 of it) centred on the full box instead.
+ *
+ * `WORDMARK.baseline` is the glyph's height ABOVE the baseline, not its full ink height — the
+ * outline has a descender (e.g. the "y" in Joymify), so the full ink height (`WORDMARK.height`)
+ * is taller than that. At `padding: 0` this means the ink can extend past the returned `height`
+ * on both edges; callers must render with `overflow: visible` (Fix round 3) rather than clip it,
+ * since the mark:gap:glyph ratio is canonical and the box is not padded to fit the descender.
  */
 export function wordmarkLayout({ height = 80, withMark = true, padding = 0 } = {}) {
   const markSize = withMark ? round2(height - 2 * padding) : 0;
@@ -64,8 +70,9 @@ export function wordmarkLayout({ height = 80, withMark = true, padding = 0 } = {
   // instead (markY/markSize are both 0 in that case, which would otherwise centre on y=0).
   const markCenterY = withMark ? markY + markSize / 2 : height / 2;
 
-  const glyphTargetHeight = round2((withMark ? markSize : height) * (5 / 6));
-  const glyphScale = round2(glyphTargetHeight / WORDMARK.baseline);
+  // Height above the baseline (not the glyph's full ink height — see the doc comment above).
+  const glyphHeightAboveBaseline = round2((withMark ? markSize : height) * (5 / 6));
+  const glyphScale = round2(glyphHeightAboveBaseline / WORDMARK.baseline);
   const glyphWidth = round2(WORDMARK.width * glyphScale);
   const glyphX = round2(markX + markSize + gap);
   const glyphY = round2(markCenterY + glyphScale * (WORDMARK.baseline - WORDMARK.height / 2));
