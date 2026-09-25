@@ -122,7 +122,7 @@ test('F-043: display font family var is emitted', () => {
   - gold-400 on navy-500: 5.89
   - cream-100 on navy-500: 13.91
   - gold-300 on navy-900: 9.16
-- [ ] **Step 6:** Commit `feat(F-043): brand tokens and display font family`.
+- [ ] **Step 6:** Run `node scripts/gen-design-md.mjs` (regenerates DESIGN.md/README regions for the new token group), then commit `feat(F-043): brand tokens and display font family`.
 
 ### Task 2: `@joymify/brand` package: geometry, outlines, renderers, generated assets
 
@@ -140,7 +140,7 @@ test('F-043: display font family var is emitted', () => {
   - `packages/brand/test/brand.test.js`
 - Modify:
   - `scripts/lint-colors.sh`: add `packages/brand/src` and `packages/brand/build.js` to the default targets
-  - `scripts/test-lint-colors.sh` (~line 115): its sandbox must create `packages/brand/src`
+  - `scripts/test-lint-colors.sh` (lines ~117-126): its sandbox must create both the `packages/brand/src/` folder and a `packages/brand/build.js` file (a missing default target makes lint-colors exit 2)
   - `pnpm-lock.yaml`: via `pnpm install`
 
 **Interfaces:**
@@ -155,7 +155,7 @@ test('F-043: display font family var is emitted', () => {
   - `palette` is `{ tile, mark, markOnTile, markContrast, ink, inkOnTile }`, each a `#rrggbb` string
 - `package.json` fields:
   - `"name": "@joymify/brand", "version": "0.1.0", "type": "module"`
-  - `"exports": { ".": "./src/index.js", "./assets/*": "./assets/*" }`
+  - `"exports": { ".": { "types": "./src/index.d.ts", "default": "./src/index.js" }, "./assets/*": "./assets/*" }`, plus a hand-written `src/index.d.ts` declaring `MARK`, `WORDMARK`, `TAGLINE`, the render functions and a `BrandPalette` type. This follows the `@joymify/icons` pattern; without it, strict `tsc`/`svelte-check` fail with TS7016.
   - `"scripts": { "build": "node build.js", "test": "node --test test/*.test.js", "outline": "node scripts/outline-text.mjs" }`
   - devDependencies: `opentype.js`, `@fontsource/cormorant-garamond` (a version that still ships `.woff`), `@resvg/resvg-js`
 
@@ -163,7 +163,7 @@ Steps:
 
 - [ ] **Step 1:** Create `package.json`, then run `pnpm install` from the repo root (updates the lockfile).
 - [ ] **Step 2: outline script** `scripts/outline-text.mjs`:
-  - Load `@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-normal.woff` (wordmark) and `...-latin-400-italic.woff` (tagline) with `opentype.parse(fs.readFileSync(...).buffer)`.
+  - Load `@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-normal.woff` (wordmark) and `...-latin-400-italic.woff` (tagline) with `const b = fs.readFileSync(...); opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength))` (plain `.buffer` is a larger shared pool and throws "Unsupported OpenType signature").
   - Throw if any glyph maps to index 0 (`.notdef`).
   - `font.getPath(text, 0, 0, 100)`, get its `getBoundingBox()`, and translate by `-x1` so x starts at 0.
   - `toPathData(2)` (2 decimals).
@@ -332,7 +332,7 @@ test('F-043: Wordmark renders outlined glyphs, labelled, tone-aware', async () =
 });
 ```
 
-  (The React twin uses its own `renderReact` helper, with the same assertions.) The last assertion checks that `withMark:false` renders no nested mark. Render the wordmark as ONE `<svg>` containing a `<g>` for the mark and a `<path>` for the glyphs, so "no mark" means no `MARK.outline` path: assert `!html.includes(MARK.outline)`.
+  (The React twin has no compile step. It uses `loadComponent` + `renderToStaticMarkup`, exactly as `packages/react/test/landing-hero-cta.test.js:3-12` does. Drop the "compile with zero warnings" test there and keep every render assertion.) The last assertion checks that `withMark:false` renders no nested mark. Render the wordmark as ONE `<svg>` containing a `<g>` for the mark and a `<path>` for the glyphs, so "no mark" means no `MARK.outline` path: assert `!html.includes(MARK.outline)`.
 - [ ] **Step 2:** Run both test files. Expected: FAIL.
 - [ ] **Step 3:** Implement the Svelte components (runes: `let { size = 32, variant = 'tile', title, class: className = '' } = $props();`, `const px = $derived(Number.isFinite(size) && size > 0 ? size : 32);`), then the React twins.
 - [ ] **Step 4:** Add the exports and the `workspace:*` deps, run `pnpm install`, and add both names to parity-check `COMPONENTS`.
@@ -353,7 +353,7 @@ test('F-043: Wordmark renders outlined glyphs, labelled, tone-aware', async () =
   - `packages/svelte/src/lib/Ribbon.svelte`, `packages/svelte/src/lib/BrandBanner.svelte`
   - `packages/react/src/Ribbon.tsx`, `packages/react/src/BrandBanner.tsx`
   - Tests: `packages/svelte/test/brand-ribbon-banner.test.js`, `packages/react/test/brand-ribbon-banner.test.js`
-- Modify: both `index.ts`, and `scripts/parity-check.mjs` (`'Ribbon', 'BrandBanner'`)
+- Modify: both `index.ts`, `scripts/parity-check.mjs` (`'Ribbon', 'BrandBanner'`), and **`packages/tokens/build.js` `componentStyles` (line ~136)**. That is where every `.joy-*` component rule lives (HeroSection has no `<style>`), and parity-check fails any `.joy-*` class with no rule in theme.css. Rebuild tokens afterwards.
 
 **Interfaces:**
 - Consumes `MARK` from `@joymify/brand`, and `LandingAction` from its sibling file (relative import, exactly as `HeroSection` does).
@@ -407,7 +407,7 @@ test('F-043: BrandBanner renders title in a heading, decorative lattice, no grad
 ```
 
 - [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement Svelte, then React. Put component CSS in the same place the sibling components do (check where `HeroSection` styles live in each package and follow that).
+- [ ] **Step 3:** Implement Svelte, then React. Put all `.joy-ribbon*` and `.joy-brand-banner*` CSS in `componentStyles` in `packages/tokens/build.js`, not in component `<style>` blocks, then run `node packages/tokens/build.js`. The tokens phase-b tests (no hex, no var fallback, no side stripe) cover it.
 - [ ] **Step 4:** Add the exports and parity entries. Run the same five commands as Task 3, Step 5. Expected: all exit 0.
 - [ ] **Step 5:** Commit `feat(F-043): Ribbon and BrandBanner twins`.
 
@@ -422,8 +422,8 @@ test('F-043: BrandBanner renders title in a heading, decorative lattice, no grad
 - Modify: `apps/storybook-hub/build.js`:
   - the `.brand-logo` sites around lines 623, 1560, 1585
   - the view registry / hash routing (find the existing view pattern near line 5698)
-  - the output copy near lines 5134-5137
-- Test: `apps/storybook-hub/tests/brand.spec.ts` (match the existing Playwright spec folder; check `playwright.config.ts` `testDir`)
+  - the output copy near lines 7353-7356
+- Test: `apps/storybook-hub/tests/brand.spec.ts`. The route format is `/#brand` (existing tests use `/#tokens`). Switch themes with `setTheme` from `tests/helpers.ts:49`, not by setting the attribute. `.brand-logo` matches 2 elements, so assert each one (`.first()` / `.nth(1)`).
 
 **Interfaces:**
 - Consumes (RELATIVE imports only):
@@ -469,7 +469,7 @@ test('F-043: brand asset downloads are real images', async ({ page, request }) =
 });
 ```
 
-  Adapt the route format (`/#/brand` vs `#brand`) and the theme-toggle mechanism to whatever the hub already uses. Read the existing specs first.
+  Before running: change `/#/brand` to `/#brand`, use `setTheme(page, theme)` from `./helpers`, and replace `page.locator('.brand-logo')` text checks with per-element checks.
 - [ ] **Step 2:** Run `cd apps/storybook-hub && node build.js && npx playwright test tests/brand.spec.ts`. Expected: FAIL.
 - [ ] **Step 3: implement:**
   - `brandMarkSvg(size)`: a helper in build.js that returns an inline `<svg>` built from `MARK` with `var(--joy-brand-*)` fills. Replace the "J" text in all `.brand-logo` sites with it.
@@ -495,8 +495,9 @@ test('F-043: brand asset downloads are real images', async ({ page, request }) =
 ### Task 6: Docs, DESIGN.md generator, follow-up ideas, full Gate 1
 
 **Files:**
+- Note: Task 1 (new semantic group) and Tasks 3/4 (new `COMPONENTS`) change the generated DESIGN.md and README regions. **Every task from Task 1 on must run `node scripts/gen-design-md.mjs` and commit the regenerated output**, so that `precheck.sh` step 2f (`--check`) stays green per task.
 - Modify:
-  - `scripts/gen-design-md.mjs`: add a "Brand" section: mark geometry, wordmark rules, `--joy-brand-*` table, display font, Don'ts (no recolouring, no stretching, no square mark, gold is a signature)
+  - `scripts/design-md/render.mjs` (not gen-design-md.mjs; update `gen-design-md.test.mjs` if it asserts section lists): add a "Brand" section: mark geometry, wordmark rules, `--joy-brand-*` table, display font, Don'ts (no recolouring, no stretching, no square mark, gold is a signature)
   - regenerated `DESIGN.md`
   - `README.md`: a `packages/brand` bullet under Architecture, an assets table, and an adoption snippet. Keep it outside the `gen-design-md` generated regions.
 
@@ -534,3 +535,15 @@ Steps:
   - README, DESIGN.md, follow-ups, precheck: T6
   - Every acceptance criterion maps to a task.
 - Names are consistent: `--joy-font-family-display`, the `--joy-brand-mark-on-tile` palette key `markOnTile`, `readPalette`, `MARK`, `WORDMARK`, `TAGLINE`.
+
+## Audit trail
+- 2026-09-26 self-grill-audit: verdict safe-with-fixes. Corrected:
+  - opentype buffer slice;
+  - `index.d.ts` + types export;
+  - component CSS goes in tokens `componentStyles`;
+  - lint sandbox needs `build.js`;
+  - DESIGN.md regenerates every task, and the render.mjs location;
+  - hub route `/#brand` + `setTheme` + strict-mode locator;
+  - React tests use loadComponent/renderToStaticMarkup;
+  - copy line numbers.
+  - Open: none.
