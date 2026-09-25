@@ -25,7 +25,10 @@ export function inventory({ svelteIndex, reactIndex, components }) {
   const react = new Set([...reactIndex.matchAll(/export \{ ([A-Z]\w*)[,\s]/g)].map((m) => m[1]));
   const gated = new Set(components);
   return [...new Set([...svelte, ...react])]
-    .sort((a, b) => a.localeCompare(b))
+    // Code-point sort, not localeCompare: the generator's output must be identical on every
+    // machine/CI runner regardless of default locale/ICU, or `--check` can false-fail on drift
+    // that is really just a different collation order.
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     .map((name) => ({ name, svelte: svelte.has(name), react: react.has(name), gated: gated.has(name) }));
 }
 

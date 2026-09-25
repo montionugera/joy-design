@@ -97,10 +97,10 @@ A component or screen is done when all of these are true:
 | `BentoGrid` | yes | yes | parity-gated |
 | `Breadcrumb` | yes | yes | parity-gated |
 | `Button` | yes | yes | parity-gated |
+| `CTASection` | yes | yes | parity-gated |
 | `CandlestickChart` | yes | yes | parity-gated |
 | `Cascader` | - | yes | React only |
 | `Checkbox` | yes | yes | parity-gated |
-| `CTASection` | yes | yes | parity-gated |
 | `DatePicker` | yes | yes | parity-gated |
 | `DateRangePicker` | - | yes | React only |
 | `Divider` | yes | yes | parity-gated |
@@ -155,8 +155,8 @@ A component or screen is done when all of these are true:
 | `Tabs` | - | yes | React only |
 | `Tag` | yes | yes | parity-gated |
 | `TestimonialCard` | yes | yes | parity-gated |
-| `Timeline` | - | yes | React only |
 | `TimePicker` | yes | yes | parity-gated |
+| `Timeline` | - | yes | React only |
 | `Toast` | yes | yes | parity-gated |
 | `Tooltip` | yes | yes | parity-gated |
 | `Transfer` | - | yes | React only |
