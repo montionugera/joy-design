@@ -73,6 +73,15 @@ function svelteTree(html) {
 
 const KNOCKOUT = 'var(--joy-surface-canvas)';
 
+// Icons that legitimately hard-code a stroke-width regardless of the `strokeWidth` prop.
+// Each entry names the exact fixed weight and why it doesn't follow the knob.
+const STROKE_WIDTH_ALLOWLIST = {
+  // SearchFilled's magnifying-glass handle is a fixed decorative accent on a filled
+  // glyph, not an outline stroke — it keeps its weight at every strokeWidth setting
+  // in both twins, so it is exempt rather than made to track the prop.
+  SearchFilled: '2.5'
+};
+
 const CASES = [
   { label: 'defaults', props: {} },
   { label: 'size and colour', props: { size: '20px', color: 'var(--joy-accent-default)' } },
@@ -107,6 +116,20 @@ for (const name of svelteNames) {
       const stray = paints.filter((p) => p !== color && p !== KNOCKOUT);
       assert.deepStrictEqual(stray, [], `${name} (${label}) must paint only with the color prop or ${KNOCKOUT}`);
       assert.ok(paints.includes(color), `${name} (${label}) must paint with the color prop`);
+
+      if (props.strokeWidth !== undefined) {
+        const expected = STROKE_WIDTH_ALLOWLIST[name] ?? String(props.strokeWidth);
+        const strokeWidths = [];
+        const collectStrokeWidths = (nodes) => nodes.forEach((n) => {
+          if (n.attrs.stroke !== undefined && n.attrs.stroke !== 'none') strokeWidths.push(n.attrs['stroke-width']);
+          collectStrokeWidths(n.children);
+        });
+        collectStrokeWidths(react);
+        // Fully-filled icons (e.g. solid triangles) have no stroked nodes at all — nothing to assert.
+        for (const sw of strokeWidths) {
+          assert.strictEqual(sw, expected, `${name} (${label}) stroke-width must be ${expected}`);
+        }
+      }
     }
   });
 }
