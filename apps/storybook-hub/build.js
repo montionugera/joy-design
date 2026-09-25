@@ -779,6 +779,21 @@ ${inlinedThemeCss}
       padding: 36px 32px 64px;
     }
     /* Overview landing cards: keyboard-reachable (role="link" + tabindex), not inline styles. */
+    /* Stacked demo controls inside a forms matrix cell get breathing room between field groups. */
+    [data-matrix="forms"] > section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--joy-space-3);
+    }
+    [data-matrix="forms"] > section > h3 {
+      margin: 0;
+    }
+    .hub-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+      gap: var(--joy-space-4);
+      margin-bottom: var(--joy-space-8);
+    }
     .hub-card {
       display: block;
       background: var(--joy-surface-card);
@@ -808,7 +823,7 @@ ${inlinedThemeCss}
     }
     .playground-box {
       background: var(--joy-surface-card);
-      border: 1px solid var(--joy-border-default);
+      border: 1px solid var(--hub-chrome-border);
       border-radius: 12px;
       box-shadow: none;
       margin-bottom: 32px;
@@ -841,7 +856,7 @@ ${inlinedThemeCss}
     }
     .component-card {
       background: var(--joy-surface-card);
-      border: 1px solid var(--joy-border-default);
+      border: 1px solid var(--hub-chrome-border);
       border-radius: 12px;
       box-shadow: none;
       margin-bottom: 32px;
@@ -881,8 +896,6 @@ ${inlinedThemeCss}
       padding: 24px;
       display: flex;
       background-color: var(--joy-surface-card);
-      background-image: radial-gradient(var(--joy-border-default) 1.2px, transparent 0);
-      background-size: 20px 20px;
       min-width: 0;
       overflow-x: auto;
     }
@@ -1078,11 +1091,6 @@ ${inlinedThemeCss}
     }
 
     /* ── Coherent Dark Mode Overrides for Hub UI ── */
-    [data-theme="dark"] .playground-box {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-      box-shadow: none;
-    }
     /* Icon Gallery Styling */
     .icon-grid {
       display: grid;
@@ -1122,11 +1130,6 @@ ${inlinedThemeCss}
       word-break: break-all;
     }
 
-    [data-theme="dark"] .component-card {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-surface-raised);
-      box-shadow: none;
-    }
     [data-theme="dark"] .component-canvas {
       background-color: var(--joy-surface-card);
     }
@@ -1161,7 +1164,7 @@ ${inlinedThemeCss}
       transition: background-color var(--joy-duration-fast), color var(--joy-duration-fast);
     }
     .mobile-menu-btn {
-      background: var(--joy-surface-sunken);
+      background: transparent;
       border: 1px solid var(--hub-chrome-border);
     }
     .sidebar-close-btn {
@@ -1611,7 +1614,7 @@ ${navigationHtml}
         </section>
         <!-- overview-hero:generated:end -->
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 36px;">
+        <div class="hub-card-grid">
           <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/tokens" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
@@ -5586,6 +5589,9 @@ export async function executeHedge(symbol: string, size: number) {
     document.addEventListener('DOMContentLoaded', () => {
       syncThemeToggle(document.documentElement.getAttribute('data-theme'));
     });
+    // Any theme change (toggle, restore, tests, devtools) keeps the toggle's icon and labels truthful.
+    new MutationObserver(() => syncThemeToggle(document.documentElement.getAttribute('data-theme')))
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     /** Enter activates a role="link" .hub-card the same as a click (native <a> behaviour). */
     function hubCardActivate(event) {

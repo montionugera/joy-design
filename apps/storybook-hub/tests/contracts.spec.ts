@@ -553,6 +553,52 @@ test("Contract 9b: the hub's market filter is 16px on phones so iOS does not zoo
   }
 });
 
+test("Contract 8b: hub cards keep a visible outline against the canvas in both themes", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop-chrome", "one project is enough");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/#button");
+  await page.waitForLoadState("networkidle");
+  await installPageTools(page);
+  await installContrastTools(page);
+  for (const theme of ["light", "dark"] as const) {
+    await setTheme(page, theme);
+    const ratios = await page.evaluate(() =>
+      [
+        ".view-panel.active .playground-box",
+        ".view-panel.active .component-card",
+      ].flatMap((sel) =>
+        Array.from(document.querySelectorAll(sel)).map((el) => {
+          const border = window.__rgba(getComputedStyle(el).borderTopColor);
+          const canvas = window
+            .__rgba(getComputedStyle(document.body).backgroundColor)
+            .slice(0, 3);
+          const card = window
+            .__rgba(getComputedStyle(el).backgroundColor)
+            .slice(0, 3);
+          const mixed = [0, 1, 2].map(
+            (i) => border[i] * border[3] + canvas[i] * (1 - border[3]),
+          );
+          return {
+            sel,
+            canvas: window.__contrast(mixed, canvas),
+            card: window.__contrast(mixed, card),
+          };
+        }),
+      ),
+    );
+    expect(ratios.length, `${theme}: cards found`).toBeGreaterThan(0);
+    for (const r of ratios) {
+      // Hairline borders are decorative (not WCAG 1.4.11 controls) but must still read as an edge.
+      expect(
+        Math.min(r.canvas, r.card),
+        `${r.sel} border in ${theme}`,
+      ).toBeGreaterThanOrEqual(1.25);
+    }
+  }
+});
+
 test.describe("Contract 6: every manifest view at 375 and 1280, light and dark", () => {
   test.beforeEach(({}, info) => {
     test.skip(
