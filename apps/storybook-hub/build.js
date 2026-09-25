@@ -6189,7 +6189,7 @@ export async function executeHedge(symbol: string, size: number) {
       const container = document.getElementById(containerId);
       container._hubOpener = document.activeElement;
       container.style.display = 'block';
-      document.body.classList.toggle('hub-dialog-open', true);
+      document.body.classList.add('hub-dialog-open');
       const target = container.querySelector(focusSelector);
       if (target) target.focus();
     }
