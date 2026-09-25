@@ -1,0 +1,182 @@
+// SVG renderers for the Joymify brand kit. Every colour comes from the
+// `palette` argument (resolved from --joy-brand-* tokens by build.js) — this
+// file must never contain a hex literal. All numeric layout values are
+// rounded to 2 decimals so builds are deterministic.
+
+import { MARK, WORDMARK, TAGLINE } from './geometry.js';
+
+function round2(n) {
+  return Math.round(n * 100) / 100;
+}
+
+function escapeXml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Markup for the diamond mark, in its native 0..32 viewBox coordinate space.
+function markGroup(palette, tile) {
+  const strokeColor = tile ? palette.markOnTile : palette.mark;
+  const innerColor = strokeColor;
+  let markup = '';
+  if (tile) markup += `<rect width="32" height="32" rx="${MARK.tileRx}" fill="${palette.tile}"/>`;
+  markup += `<path d="${MARK.outline}" fill="none" stroke="${strokeColor}" stroke-width="${MARK.outlineWidth}"/>`;
+  markup += `<path d="${MARK.inner}" fill="${innerColor}"/>`;
+  if (tile) markup += `<circle cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}" fill="${palette.markContrast}"/>`;
+  return markup;
+}
+
+// Places the mark (native 0..32 space) at (x, y) scaled so it renders at `size`.
+function markGroupAt({ palette, tile, x, y, size }) {
+  const scale = round2(size / 32);
+  return `<g transform="translate(${round2(x)} ${round2(y)}) scale(${scale})">${markGroup(palette, tile)}</g>`;
+}
+
+// Places an outlined glyph (WORDMARK or TAGLINE). Glyph path space has x
+// starting at 0 (left edge) and y=0 at the text baseline, so (x, y) here is
+// where that baseline-left point lands in the parent coordinate space.
+function textGroupAt({ glyph, x, y, scale, color, opacity }) {
+  const op = opacity === undefined ? '' : ` fill-opacity="${opacity}"`;
+  return `<g transform="translate(${round2(x)} ${round2(y)}) scale(${round2(scale)})"><path d="${glyph.d}" fill="${color}"${op}/></g>`;
+}
+
+export function markSvg({ palette, tile = true, size = 32, title = 'Joymify' }) {
+  const s = round2(size);
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK.viewBox}" width="${s}" height="${s}" role="img">` +
+    `<title>${escapeXml(title)}</title>` +
+    markGroup(palette, tile) +
+    `</svg>`
+  );
+}
+
+// Lockup height 80: the mark at 48px, x=16 y=16; the wordmark scaled to
+// ~40px cap height, starting 16px after the mark, vertically centred on the
+// mark. Total width = WORDMARK.width * scale + 96 (16px margin on every
+// side of the 48px mark, plus the 16px gap, plus a matching 16px right
+// margin after the wordmark).
+export function wordmarkSvg({ palette, tone = 'deep' }) {
+  const markSize = 48;
+  const markX = 16;
+  const markY = 16;
+  const gap = 16;
+  const lockupHeight = 80;
+  const wordmarkTargetHeight = 40;
+
+  const scale = wordmarkTargetHeight / WORDMARK.baseline;
+  const wmWidth = round2(WORDMARK.width * scale);
+  const width = round2(wmWidth + 96);
+
+  const isCream = tone === 'cream';
+  const wordmarkColor = isCream ? palette.inkOnTile : palette.ink;
+
+  const markCenterY = markY + markSize / 2;
+  const wordmarkX = markX + markSize + gap;
+  const wordmarkY = round2(markCenterY + scale * (WORDMARK.baseline - WORDMARK.height / 2));
+
+  let bg = '';
+  if (isCream) bg = `<rect width="${width}" height="${lockupHeight}" fill="${palette.tile}"/>`;
+
+  const markMarkup = markGroupAt({ palette, tile: isCream, x: markX, y: markY, size: markSize });
+  const wordmarkMarkup = textGroupAt({ glyph: WORDMARK, x: wordmarkX, y: wordmarkY, scale, color: wordmarkColor });
+
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${lockupHeight}" width="${width}" height="${lockupHeight}" role="img">` +
+    `<title>Joymify</title>` +
+    bg +
+    markMarkup +
+    wordmarkMarkup +
+    `</svg>`
+  );
+}
+
+// 1200x630 social card: tile background, a hairline rule inset 48px from
+// the bottom, the mark + wordmark lockup (tile colours) roughly centred,
+// and the tagline below it at reduced opacity.
+export function ogCardSvg({ palette }) {
+  const width = 1200;
+  const height = 630;
+
+  const markSize = 96;
+  const gap = 32;
+  const wordmarkTargetHeight = 96;
+  const scale = wordmarkTargetHeight / WORDMARK.baseline;
+  const wmWidth = round2(WORDMARK.width * scale);
+  const lockupWidth = round2(markSize + gap + wmWidth);
+  const lockupX = round2((width - lockupWidth) / 2);
+  const lockupCenterY = 260;
+
+  const markX = lockupX;
+  const markY = round2(lockupCenterY - markSize / 2);
+  const markCenterY = markY + markSize / 2;
+  const wordmarkX = round2(markX + markSize + gap);
+  const wordmarkY = round2(markCenterY + scale * (WORDMARK.baseline - WORDMARK.height / 2));
+
+  const taglineTargetHeight = 36;
+  const taglineScale = taglineTargetHeight / TAGLINE.baseline;
+  const taglineWidth = round2(TAGLINE.width * taglineScale);
+  const taglineX = round2((width - taglineWidth) / 2);
+  const taglineY = round2(lockupCenterY + markSize / 2 + 64);
+
+  const ruleInset = 48;
+  const ruleY = round2(height - ruleInset);
+
+  const markMarkup = markGroupAt({ palette, tile: true, x: markX, y: markY, size: markSize });
+  const wordmarkMarkup = textGroupAt({ glyph: WORDMARK, x: wordmarkX, y: wordmarkY, scale, color: palette.inkOnTile });
+  const taglineMarkup = textGroupAt({
+    glyph: TAGLINE,
+    x: taglineX,
+    y: taglineY,
+    scale: taglineScale,
+    color: palette.inkOnTile,
+    opacity: 0.8
+  });
+
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img">` +
+    `<title>Joymify</title>` +
+    `<rect width="${width}" height="${height}" fill="${palette.tile}"/>` +
+    `<line x1="${ruleInset}" y1="${ruleY}" x2="${round2(width - ruleInset)}" y2="${ruleY}" stroke="${palette.markOnTile}" stroke-width="1"/>` +
+    markMarkup +
+    wordmarkMarkup +
+    taglineMarkup +
+    `</svg>`
+  );
+}
+
+// 1600x560 hero banner: tile background with a lattice of the mark's
+// outline diamond on a 64px grid, opacity fading from 0.35 at the right
+// edge to 0 at 55% width. Purely decorative — no text.
+export function heroBannerSvg({ palette }) {
+  const width = 1600;
+  const height = 560;
+  const cell = 64;
+  const cols = Math.ceil(width / cell);
+  const rows = Math.ceil(height / cell) + 1;
+  const fadeStart = width * 0.55;
+  const maxOpacity = 0.35;
+
+  let diamonds = '';
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const x = col * cell;
+      const y = row * cell;
+      const centerX = x + cell / 2;
+      if (centerX <= fadeStart) continue;
+      const opacity = round2(Math.min(maxOpacity, (maxOpacity * (centerX - fadeStart)) / (width - fadeStart)));
+      if (opacity <= 0) continue;
+      diamonds += `<g transform="translate(${x} ${y}) scale(2)"><path d="${MARK.outline}" fill="none" stroke="${palette.markOnTile}" stroke-width="0.5" stroke-opacity="${opacity}"/></g>`;
+    }
+  }
+
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img">` +
+    `<title>Joymify brand banner</title>` +
+    `<rect width="${width}" height="${height}" fill="${palette.tile}"/>` +
+    diamonds +
+    `</svg>`
+  );
+}

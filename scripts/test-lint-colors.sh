@@ -113,12 +113,14 @@ rm "$wave4_dir/packages/svelte/src/lib/LandingAction.svelte"
 wave6_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir"' EXIT
 mkdir -p "$wave6_dir/packages/svelte/src" "$wave6_dir/packages/react/src" "$wave6_dir/packages/icons/src" \
-  "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens"
+  "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens" "$wave6_dir/packages/brand/src"
 cp "$clean_file" "$wave6_dir/packages/svelte/src/Clean.svelte"
 cp "$clean_file" "$wave6_dir/packages/react/src/Clean.tsx"
 cp "$clean_file" "$wave6_dir/packages/icons/src/Clean.svelte"
 cp "$clean_file" "$wave6_dir/apps/storybook-hub/build.js"
 printf '%s\n' 'const componentStyles = `' '.x { color: var(--joy-text-primary); }' '`;' > "$wave6_dir/packages/tokens/build.js"
+cp "$clean_file" "$wave6_dir/packages/brand/src/Clean.js"
+cp "$clean_file" "$wave6_dir/packages/brand/build.js"
 (cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1 || {
   echo "expected default mode to pass on a clean copy of every default target" >&2
   exit 1
