@@ -27,12 +27,16 @@ EOF
 chmod +x "$fixture_dir/bin/pnpm" "$fixture_dir/bin/node" "$fixture_dir/bin/playwright"
 
 export EPIC_CHECK_LOG="$fixture_dir/checks.log"
-PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >/dev/null
+# An installed node_modules fixture, so these runs never depend on the caller's checkout.
+installed="$fixture_dir/installed/node_modules"
+mkdir -p "$installed"
+: > "$installed/.modules.yaml"
+EPIC_CHECK_NODE_MODULES="$installed" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >/dev/null
 expected=$'node scripts/parity-check.mjs\nnode scripts/gen-design-md.mjs --check\npnpm check\npnpm -r test\nnode apps/storybook-hub/build.js\nplaywright test'
 [[ $(cat "$EPIC_CHECK_LOG") == "$expected" ]] || fail "unexpected step order: $(tr '\n' '|' < "$EPIC_CHECK_LOG")"
 
 : > "$EPIC_CHECK_LOG"
-if EPIC_CHECK_FAIL_PNPM=1 PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >"$fixture_dir/failure.log" 2>&1; then
+if EPIC_CHECK_FAIL_PNPM=1 EPIC_CHECK_NODE_MODULES="$installed" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >"$fixture_dir/failure.log" 2>&1; then
   echo "expected a failed pnpm test step to fail epic-check" >&2
   exit 1
 fi
