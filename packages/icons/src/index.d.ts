@@ -1,8 +1,9 @@
 import type { Component } from "svelte";
 
 export interface IconProps {
-  size?: string;
+  size?: number | string;
   color?: string;
+  strokeWidth?: number | string;
 }
 
 export const Activity: Component<IconProps>;
