@@ -11,7 +11,8 @@
     }
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "check": "svelte-check --tsconfig ./tsconfig.json --threshold error"
   },
   "dependencies": {
     "@joymify/icons": "workspace:*",
@@ -19,5 +20,9 @@
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "svelte-check": "^4.7.6",
+    "typescript": "^5.9.3"
   }
 }

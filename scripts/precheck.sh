@@ -31,14 +31,27 @@ if violations:
 "
 echo "   Zero emoji policy verified."
 
-echo "2. Checking color-token integrity..."
+echo "2. Checking color-token integrity (strict: every package and the hub)..."
 bash scripts/lint-colors.sh
 
-echo "2b. Running workspace unit tests..."
+echo "2a. Self-testing the gate scripts (lint-colors, epic-check)..."
+bash scripts/test-lint-colors.sh
+bash scripts/test-epic-check.sh
+
+echo "2b. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
+pnpm check
+
+echo "2c. Running workspace unit tests (includes the WCAG 2.2 AA contrast gate, packages/tokens/test/contrast.test.js)..."
 pnpm -r test
 
-echo "2c. Checking Svelte/React parity contract..."
+echo "2d. Checking Svelte/React parity contract..."
 node scripts/parity-check.mjs
+
+echo "2e. Running script and docs-contract tests (scripts/test/*.test.mjs)..."
+node --test 'scripts/test/*.test.mjs'
+
+echo "2f. Checking DESIGN.md and README generated regions are up to date (scripts/gen-design-md.mjs --check)..."
+node scripts/gen-design-md.mjs --check
 
 echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js

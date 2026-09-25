@@ -1,9 +1,9 @@
 import React from "react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: string | number;
+  size?: number | string;
   color?: string;
-  strokeWidth?: number;
+  strokeWidth?: number | string;
 }
 
 export const CameraFilled: React.FC<IconProps> = ({
@@ -19,10 +19,6 @@ export const CameraFilled: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -30,9 +26,9 @@ export const CameraFilled: React.FC<IconProps> = ({
     <rect x="4" y="7" width="16" height="12" rx="2" fill={color} /><path
 		d="M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
-	/><circle cx="12" cy="13" r="3" fill="var(--bg-canvas)" />
+	/><circle cx="12" cy="13" r="3" fill="var(--joy-surface-canvas)" />
   </svg>
 );
 

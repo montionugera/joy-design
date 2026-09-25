@@ -14,7 +14,7 @@ export interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const BarChart = forwardRef<HTMLDivElement, BarChartProps>(
-  ({ series = [], height = 360, className = '', style, onKeyDown, ...props }, ref) => {
+  ({ series = [], height = 360, theme, className = '', style, onKeyDown, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -71,6 +71,12 @@ export const BarChart = forwardRef<HTMLDivElement, BarChartProps>(
         chartInstanceRef.current.setSeries(barSeries);
       }
     }, [barSeries]);
+
+    // Re-apply the theme override in place on later changes; the mount effect
+    // above only sets it once when the chart instance is created.
+    useEffect(() => {
+      chartInstanceRef.current?.setTheme(theme);
+    }, [theme]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e);

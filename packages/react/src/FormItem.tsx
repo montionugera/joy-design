@@ -72,7 +72,7 @@ export const FormItem = React.forwardRef<HTMLDivElement, FormItemProps>(
           effectiveLayout === 'horizontal' && 'joy-form-item--horizontal',
           !effectiveColon && 'joy-form-item--no-colon',
           effectiveAlign === 'left' && 'joy-form-item--label-left',
-          error && 'joy-form-item--error',
+          !!error && 'joy-form-item--error',
           className
         )}
         {...rest}

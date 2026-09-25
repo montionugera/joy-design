@@ -11,7 +11,7 @@ export interface UploadFile {
   percent?: number;
 }
 
-export interface UploadProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface UploadProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   fileList?: UploadFile[];
   dragger?: boolean;
   accept?: string;

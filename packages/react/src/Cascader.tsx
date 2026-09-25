@@ -12,7 +12,7 @@ export interface CascaderOption {
   isLeaf?: boolean;
 }
 
-export interface CascaderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CascaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   options: CascaderOption[];
   value?: string[];
   defaultValue?: string[];

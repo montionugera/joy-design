@@ -21,7 +21,7 @@ Parent: E-001. Runs last so it documents what shipped. Inputs: `research/audit-s
 
 ## Acceptance criteria
 
-- [ ] `scripts/precheck.sh` passes end to end with strict color lint; `pnpm check` passes.
-- [ ] `DESIGN.md` regenerates byte-identically from `scripts/gen-design-md.mjs`.
-- [ ] README renders the gate list and token contract; AGENTS.md has no reference to `--navy-500`-style raw variables as the contract (they are primitives, the contract is the semantic layer).
-- [ ] CI workflow file references the new gates.
+- [x] `scripts/precheck.sh` passes end to end with strict color lint; `pnpm check` passes.
+- [x] `DESIGN.md` regenerates byte-identically from `scripts/gen-design-md.mjs`.
+- [x] README renders the gate list and token contract; AGENTS.md has no reference to `--navy-500`-style raw variables as the contract (they are primitives, the contract is the semantic layer).
+- [x] CI workflow file references the new gates.

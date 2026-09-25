@@ -14,7 +14,7 @@ export interface CandlestickChartProps extends React.HTMLAttributes<HTMLDivEleme
 }
 
 export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps>(
-  ({ data = [], height = 420, className = '', style, onKeyDown, ...props }, ref) => {
+  ({ data = [], height = 420, theme, className = '', style, onKeyDown, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -66,6 +66,12 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
         chartInstanceRef.current.setCandlesticks(data);
       }
     }, [data]);
+
+    // Re-apply the theme override in place on later changes; the mount effect
+    // above only sets it once when the chart instance is created.
+    useEffect(() => {
+      chartInstanceRef.current?.setTheme(theme);
+    }, [theme]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e);

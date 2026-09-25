@@ -1,9 +1,9 @@
 import React from "react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: string | number;
+  size?: number | string;
   color?: string;
-  strokeWidth?: number;
+  strokeWidth?: number | string;
 }
 
 export const MyPublish: React.FC<IconProps> = ({
@@ -19,10 +19,6 @@ export const MyPublish: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
@@ -30,13 +26,13 @@ export const MyPublish: React.FC<IconProps> = ({
     <path
 		d="M10 6H18V18H10"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
-	/><circle cx="6" cy="10" r="2" stroke={color} strokeWidth="1.5" /><path
+	/><circle cx="6" cy="10" r="2" stroke={color} strokeWidth={strokeWidth} /><path
 		d="M3 16C3 14.3431 4.34315 13 6 13H8C8.55228 13 9 13.4477 9 14V16"
 		stroke={color}
-		strokeWidth="1.5"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 	/>
   </svg>

@@ -454,6 +454,34 @@ test('an explicit theme option still overrides the palette for grid and crosshai
   });
 });
 
+test('setTheme() updates the override on the SAME instance and repaints — no recreation needed', () => {
+  withCountingStyle({}, () => {
+    const base = recordingCanvas(); const overlay = recordingCanvas();
+    const chart = new JoyChartCore(base.canvas, overlay.canvas, { theme: 'light', showGrid: true, showCrosshair: true });
+    chart.setSeries([{ id: 's', type: 'line', data: [{ x: 1, y: 5 }, { x: 2, y: 8 }] }]);
+    // The grid is drawn first each render, so index 0 of a fresh recording is its first stroke.
+    assert.deepStrictEqual([base.strokes[0].style, base.strokes[0].alpha], ['black', 0.05], 'starts on the light override');
+
+    let gridStrokeIndex = base.strokes.length;
+    chart.setTheme('dark');
+    assert.deepStrictEqual(
+      [base.strokes[gridStrokeIndex].style, base.strokes[gridStrokeIndex].alpha],
+      ['white', 0.05],
+      'setTheme repaints the grid with the new override, in place, on the same chart instance'
+    );
+    overlay.listeners.mousemove({ clientX: 50, clientY: 40 });
+    assert.deepStrictEqual([overlay.strokes[0].style, overlay.strokes[0].alpha], ['white', 0.4], 'crosshair also follows the new override');
+
+    gridStrokeIndex = base.strokes.length;
+    chart.setTheme(undefined);
+    assert.deepStrictEqual(
+      [base.strokes[gridStrokeIndex].style, base.strokes[gridStrokeIndex].alpha],
+      ['#e3dccc', 1],
+      'clearing the override falls back to the token palette (--joy-border-subtle default)'
+    );
+  });
+});
+
 test('mousemove / wheel / drag redraws reuse the cached palette (no getComputedStyle re-read)', () => {
   withCountingStyle({ '--joy-accent-default': '#b8862c' }, (counter) => {
     const base = recordingCanvas(); const overlay = recordingCanvas();
