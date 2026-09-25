@@ -47,6 +47,11 @@ export function Wordmark({ tone = 'deep', height = 32, withMark = true, title = 
         <g transform={`translate(${layout.markX} ${layout.markY}) scale(${markScale(layout.markSize)})`}>
           <path d={MARK.outline} fill="none" stroke={markColor} strokeWidth={MARK.outlineWidth} />
           <path d={MARK.inner} fill={markColor} />
+          {/* Fix round (final review Minor 1): wordmark-cream.svg draws the tile mark's centre dot
+              (packages/brand/src/render.js markGroup, tile: isCream); the cream component skipped
+              it, so the same logo showed a dot in the download and none in the component. The
+              asset is canonical, so match its geometry (MARK.dot) here. */}
+          {isCream && <circle cx={MARK.dot.cx} cy={MARK.dot.cy} r={MARK.dot.r} fill="var(--joy-brand-mark-contrast)" />}
         </g>
       )}
       <path d={WORDMARK.d} fill={glyphColor} transform={`translate(${layout.glyphX} ${layout.glyphY}) scale(${layout.glyphScale})`} />

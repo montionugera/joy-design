@@ -41,7 +41,10 @@ test('F-043: Wordmark renders outlined glyphs, labelled, tone-aware', () => {
   assert.match(deep, /var\(--joy-brand-ink\)/);
   assert.match(wordmark({ tone: 'cream' }), /var\(--joy-brand-ink-on-tile\)/);
   const noMark = wordmark({ withMark: false });
-  assert.ok(!/<svg[\s\S]*<svg/.test(noMark));
+  // Fix round (final review Minor 7): the mark is the only element wrapped in a <g> (the glyph
+  // path itself is not), so withMark: false must drop that group entirely. The prior assertion
+  // (`!/<svg[\s\S]*<svg/`) was vacuous — Wordmark never nests an svg regardless of withMark.
+  assert.ok(!/<g\b/.test(noMark), 'no mark group when withMark is false');
   assert.ok(!noMark.includes(MARK.outline));
 });
 
@@ -62,4 +65,14 @@ test('F-043: Wordmark mark fills the full component height (height: 32 -> markSi
 // on the root svg lets that ink render instead of being clipped.
 test('F-043: Wordmark root svg opts out of the default SVG clip so the glyph descender is not cut off', () => {
   assert.match(wordmark(), /<svg[^>]*overflow="visible"/);
+});
+
+// Fix round (final review Minor 1): the cream lockup asset (wordmark-cream.svg) draws the tile
+// mark's centre dot; the cream component used to skip it, so the "same logo" showed a dot in the
+// download and none in the component. Cream must match the asset; deep must not gain a dot.
+test('F-043: Wordmark cream tone draws the centre dot to match wordmark-cream.svg; deep tone does not', () => {
+  const cream = wordmark({ tone: 'cream' });
+  assert.match(cream, /<circle[^>]*fill="var\(--joy-brand-mark-contrast\)"/);
+  const deep = wordmark();
+  assert.ok(!/<circle/.test(deep), 'deep tone has no centre dot');
 });

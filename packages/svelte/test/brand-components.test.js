@@ -63,3 +63,13 @@ test('F-043: Wordmark mark fills the full component height (height: 32 -> markSi
 test('F-043: Wordmark root svg opts out of the default SVG clip so the glyph descender is not cut off', async () => {
   assert.match(await renderSvelte('Wordmark', {}), /<svg[^>]*overflow="visible"/);
 });
+
+// Fix round (final review Minor 1): the cream lockup asset (wordmark-cream.svg) draws the tile
+// mark's centre dot; the cream component used to skip it, so the "same logo" showed a dot in the
+// download and none in the component. Cream must match the asset; deep must not gain a dot.
+test('F-043: Wordmark cream tone draws the centre dot to match wordmark-cream.svg; deep tone does not', async () => {
+  const cream = await renderSvelte('Wordmark', { tone: 'cream' });
+  assert.match(cream, /<circle[^>]*fill="var\(--joy-brand-mark-contrast\)"/);
+  const deep = await renderSvelte('Wordmark', {});
+  assert.ok(!/<circle/.test(deep), 'deep tone has no centre dot');
+});
