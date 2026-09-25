@@ -406,6 +406,10 @@ export function expectReadablePressedButton(
   ).toBe(true);
   expect(measured.text.length, `${where}: label`).toBeGreaterThan(0);
   expect(
+    measured.gradient,
+    `${where}: pressed fill is flat (gradient removed)`,
+  ).toBe(false);
+  expect(
     measured.surfaces.length,
     `${where}: pressed surfaces`,
   ).toBeGreaterThan(0);
