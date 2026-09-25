@@ -43,6 +43,22 @@ function textGroupAt({ glyph, x, y, scale, color, opacity }) {
   return `<g transform="translate(${round2(x)} ${round2(y)}) scale(${round2(scale)})"><path d="${glyph.d}" fill="${color}"${op}/></g>`;
 }
 
+// Scale factor + rendered width for a glyph outline at a target cap height.
+// Rounded once here and reused for every layout computation downstream, so
+// the centring/width math always agrees with the transform="scale(...)" that
+// actually gets rendered (an unrounded scale used for layout but a rounded
+// one in the transform silently drifts the result off-centre).
+function scaleGlyph(glyph, targetHeight) {
+  const scale = round2(targetHeight / glyph.baseline);
+  return { scale, width: round2(glyph.width * scale) };
+}
+
+// Baseline y (in the parent coordinate space) that vertically centres a
+// glyph of the given scale on a feature whose own centre is at markCenterY.
+function glyphBaselineY(markCenterY, glyph, scale) {
+  return round2(markCenterY + scale * (glyph.baseline - glyph.height / 2));
+}
+
 export function markSvg({ palette, tile = true, size = 32, title = 'Joymify' }) {
   const s = round2(size);
   return (
@@ -66,12 +82,7 @@ export function wordmarkSvg({ palette, tone = 'deep' }) {
   const lockupHeight = 80;
   const wordmarkTargetHeight = 40;
 
-  // Rounded once here and reused for every layout computation below, so the
-  // centring/width math always agrees with the transform="scale(...)" that
-  // actually gets rendered (an unrounded scale used for layout but a rounded
-  // one in the transform silently drifts the result off-centre).
-  const scale = round2(wordmarkTargetHeight / WORDMARK.baseline);
-  const wmWidth = round2(WORDMARK.width * scale);
+  const { scale, width: wmWidth } = scaleGlyph(WORDMARK, wordmarkTargetHeight);
   const width = round2(wmWidth + 96);
 
   const isCream = tone === 'cream';
@@ -79,7 +90,7 @@ export function wordmarkSvg({ palette, tone = 'deep' }) {
 
   const markCenterY = markY + markSize / 2;
   const wordmarkX = markX + markSize + gap;
-  const wordmarkY = round2(markCenterY + scale * (WORDMARK.baseline - WORDMARK.height / 2));
+  const wordmarkY = glyphBaselineY(markCenterY, WORDMARK, scale);
 
   let bg = '';
   if (isCream) bg = `<rect width="${width}" height="${lockupHeight}" fill="${palette.tile}"/>`;
@@ -107,9 +118,7 @@ export function ogCardSvg({ palette }) {
   const markSize = 96;
   const gap = 32;
   const wordmarkTargetHeight = 96;
-  // Rounded once and reused throughout (see the comment in wordmarkSvg).
-  const scale = round2(wordmarkTargetHeight / WORDMARK.baseline);
-  const wmWidth = round2(WORDMARK.width * scale);
+  const { scale, width: wmWidth } = scaleGlyph(WORDMARK, wordmarkTargetHeight);
   const lockupWidth = round2(markSize + gap + wmWidth);
   const lockupX = round2((width - lockupWidth) / 2);
   const lockupCenterY = 260;
@@ -118,12 +127,10 @@ export function ogCardSvg({ palette }) {
   const markY = round2(lockupCenterY - markSize / 2);
   const markCenterY = markY + markSize / 2;
   const wordmarkX = round2(markX + markSize + gap);
-  const wordmarkY = round2(markCenterY + scale * (WORDMARK.baseline - WORDMARK.height / 2));
+  const wordmarkY = glyphBaselineY(markCenterY, WORDMARK, scale);
 
   const taglineTargetHeight = 36;
-  // Rounded once and reused throughout (see the comment in wordmarkSvg).
-  const taglineScale = round2(taglineTargetHeight / TAGLINE.baseline);
-  const taglineWidth = round2(TAGLINE.width * taglineScale);
+  const { scale: taglineScale, width: taglineWidth } = scaleGlyph(TAGLINE, taglineTargetHeight);
   const taglineX = round2((width - taglineWidth) / 2);
   // +80 (not +64): the wordmark's descenders (e.g. the "y" in Joymify) reach
   // well below its baseline, so a small gap here crowds the tagline's cap
