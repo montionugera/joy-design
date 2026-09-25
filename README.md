@@ -12,6 +12,7 @@ Enterprise multi-platform design system and composed Storybook workshop powering
 | --- | --- |
 | `packages/tokens` (`@joymify/tokens`) | `src/tokens.json` is the only place colour values live. `node packages/tokens/build.js` generates `dist/theme.css` (CSS variables plus all component CSS), `dist/tailwind-theme.css` (Tailwind v4 `@theme`), and `dist/index.{js,cjs,d.ts}`. |
 | `packages/icons` (`@joymify/icons`) | SVG icons as Svelte 5 components (`@joymify/icons`) and React components (`@joymify/icons/react`), with identical rendering. |
+| `packages/brand` (`@joymify/brand`) | The Joymify brand kit: geometry (`src/geometry.js`), pure SVG renderers (`src/render.js`), and `build.js`, which reads the light-theme `--joy-brand-*` values from `packages/tokens/dist/theme.css` and writes the static files in `assets/` (see [Brand kit](#brand-kit) below). |
 | `packages/svelte` (`@joymify/svelte`) | Svelte 5 (Runes) components. |
 | `packages/react` (`@joymify/react`) | React 19 twins of the Svelte components: the same props, the same classes and ref forwarding. |
 | `apps/storybook-hub` | The static hub at design.joymify.com. `node apps/storybook-hub/build.js` writes `dist/`, which nginx serves (see `Dockerfile`). |
@@ -484,6 +485,42 @@ F040_SCREENS=1 PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/sc
 ```
 
 The last command writes the 16 acceptance screenshots (landing, primitives, forms and data display, at 375px and 1280px, light and dark) to `.claude/refined_backlog/F-040-wave-5-storybook-hub-mobile-layout-dark/research/screens/`. The per-issue status of the hub audit (HUB-001 to HUB-070), including the deferrals, is in `research/issue-coverage.md` in the same folder.
+
+## Brand kit
+
+`packages/brand` (`@joymify/brand`) is the single source for the Joymify mark, wordmark, hero banner and social card. Geometry (`src/geometry.js`) and pure SVG renderers (`src/render.js`) take a palette built from the light-theme `--joy-brand-*` values in `packages/tokens/dist/theme.css`, so every asset traces back to the tokens, never a hand-typed hex. `node packages/brand/build.js` regenerates the committed files below; a drift test in `packages/brand/test/` fails if the committed output and a fresh build disagree. See the generated [Brand](DESIGN.md#brand) section of `DESIGN.md` for the mark geometry, the wordmark padding/overflow rules, the `--joy-brand-*` table and the Don'ts.
+
+### Assets (`packages/brand/assets/`)
+
+| File | Size | Use |
+| --- | --- | --- |
+| `mark.svg` | 32 viewBox | diamond on navy tile, for app icons |
+| `mark-bare.svg` | 32 viewBox | gold diamond, transparent, for inline use |
+| `favicon.svg` | 32 | same as `mark.svg`, with `<title>Joymify</title>` |
+| `favicon-32.png`, `apple-touch-icon.png` | 32, 180 | raster fallbacks |
+| `wordmark-deep.svg`, `wordmark-cream.svg` | mark + "Joymify" lockup | on light and dark surfaces |
+| `og-card.svg`, `og-card.png` | 1200x630 | social share card: navy field, diamond, wordmark, tagline, thin gold rule |
+| `hero-banner.svg` | 1600x560 | decorative navy banner with a fine gold diamond lattice fading to one side, no text |
+
+### Adoption
+
+Favicon and Open Graph tags, served from wherever a consumer copies `packages/brand/assets/` (e.g. `static/brand/`):
+
+```html
+<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<meta property="og:image" content="https://<your-host>/brand/og-card.png">
+```
+
+Components, Svelte and React:
+
+```js
+import { BrandMark, Wordmark, Ribbon, BrandBanner } from '@joymify/svelte';
+```
+
+```jsx
+import { BrandMark, Wordmark, Ribbon, BrandBanner } from '@joymify/react';
+```
 
 ## Deprecated token aliases
 

@@ -106,7 +106,7 @@ test('DESIGN.md follows the Stitch format and is deterministic', () => {
   assert.deepStrictEqual(topKeys, ['name', 'description', 'colors', 'typography', 'rounded', 'spacing', 'components']);
   for (const line of fm.split('\n').filter((l) => /^ {2}[\w-]+: "#/.test(l))) assert.match(line, /: "#[0-9a-fA-F]{3,8}"$/);
   const headers = md.split('\n').filter((l) => /^## /.test(l));
-  assert.deepStrictEqual(headers, ['## Overview', '## Colors', '## Typography', '## Elevation', '## Components', "## Do's and Don'ts"]);
+  assert.deepStrictEqual(headers, ['## Overview', '## Colors', '## Typography', '## Elevation', '## Components', '## Brand', "## Do's and Don'ts"]);
   assert.doesNotMatch(md, /\d{4}-\d{2}-\d{2}/, 'no dates');
 });
 

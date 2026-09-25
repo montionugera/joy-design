@@ -628,6 +628,28 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Ribbon | `.joy-ribbon` | - | corner, gold, inline, navy | - |
 | BrandBanner | `.joy-brand-banner` | - | center | - |
 
+## Brand
+
+The mark is a gold diamond on a navy tile, not a square and not a circle: outline `M16 4 28 16 16 28 4 16Z`, inner fill `M16 9 23 16 16 23 9 16Z`, a centre dot, on a 32×32 tile with `rx=6`, defined once in `packages/brand/src/geometry.js`. The wordmark is "Joymify" in sentence case, set in the display font and converted to vector outlines (no live text, no font dependency at render time). The canonical mark : gap : glyph ratio is `48 : 16 : 40`. Components render the wordmark at padding 0, so the mark height equals the `height` prop and the glyph is drawn with `overflow: visible`, deliberately overflowing its box by about 8% of height on each edge; a parent that clips with `overflow: hidden` must add that padding back. Downloadable wordmark assets (`packages/brand/assets/`) bake in 16px padding at 80px height.
+
+Display font: `--joy-font-family-display` (`"Cormorant Garamond", "Noto Serif", Georgia, serif`). joy-design does not load the font; consumers do.
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| `--joy-brand-tile` | `#14253e` | `#14253e` |
+| `--joy-brand-mark` | `#856515` | `#dab362` |
+| `--joy-brand-mark-on-tile` | `#c49a3a` | `#c49a3a` |
+| `--joy-brand-mark-contrast` | `#fdfaf3` | `#fdfaf3` |
+| `--joy-brand-ink` | `#14253e` | `#f8f3e8` |
+| `--joy-brand-ink-on-tile` | `#f8f3e8` | `#f8f3e8` |
+
+### Don'ts
+
+- Do not recolour the mark or wordmark outside the `--joy-brand-*` roles above.
+- Do not stretch or skew the mark or wordmark; scale it uniformly.
+- Do not substitute the square mark some products still ship; the diamond is canonical.
+- Gold is a signature, not a wash: it marks the diamond and thin rules, never a fill or a background.
+
 ## Do's and Don'ts
 
 ### Do:
