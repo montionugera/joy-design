@@ -261,7 +261,7 @@ const navigationHtml = manifest.categories
     const items = cat.views
       .map((v) => {
         const iconSvg = navIcons[v.icon] || navIcons.overview;
-        return `      <a class="nav-item" onclick="switchView('${v.id}')">
+        return `      <a class="nav-item" href="#${v.id}" data-view="${v.id}">
         <span class="icon">${iconSvg}</span> ${v.label}
       </a>`;
       })
@@ -5850,12 +5850,12 @@ export async function executeHedge(symbol: string, size: number) {
         target.classList.add('active');
       }
 
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(el => {
-        const oc = el.getAttribute('onclick');
-        return oc && (oc.includes("'" + viewName + "'") || oc.includes('"' + viewName + '"'));
+      document.querySelectorAll('.nav-item').forEach(i => {
+        const current = i.dataset.view === viewName;
+        i.classList.toggle('active', current);
+        if (current) i.setAttribute('aria-current', 'page');
+        else i.removeAttribute('aria-current');
       });
-      if (activeNav) activeNav.classList.add('active');
 
       const main = document.querySelector('.main');
       if (main) main.scrollTop = 0;
