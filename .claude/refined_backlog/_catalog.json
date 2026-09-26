@@ -524,5 +524,14 @@
     "shipped_at": "2026-09-26T02:55:13.673098+00:00",
     "shipped_sha": "b08248db056285d625ccbc56aca53426178ce4f0",
     "promoted_at": "2026-09-26T04:09:21.120702+00:00"
+  },
+  {
+    "id": "F-044",
+    "title": "Hub sidebar nav items keyboard reachable via href",
+    "from_idea": "I-049",
+    "created_at": "2026-09-26T07:50:41.805838+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
