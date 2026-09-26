@@ -4,6 +4,8 @@ export type AvatarShape = 'circle' | 'square';
 export type AvatarSize = 'sm' | 'md' | 'lg';
 export type AvatarStatus = 'online' | 'offline' | 'none';
 
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   src?: string;
   alt?: string;
@@ -23,7 +25,7 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({
   status = 'none',
   color,
   className = '',
-  style = {},
+  style,
   ...props
 }, ref) => {
   const [imgError, setImgError] = useState(false);
@@ -42,8 +44,8 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({
   return (
     <div
       ref={ref}
-      className={`joy-avatar joy-avatar--${shape} joy-avatar--${size} ${className}`}
-      style={{ backgroundColor: color || undefined, ...style }}
+      className={cx(`joy-avatar joy-avatar--${shape} joy-avatar--${size}`, className)}
+      style={color ? { backgroundColor: color, ...style } : style}
       role="img"
       aria-label={name || alt}
       {...props}

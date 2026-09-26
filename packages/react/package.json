@@ -11,13 +11,20 @@
     }
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "check": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@joymify/brand": "workspace:*",
+    "@joymify/icons": "workspace:*",
     "@joymify/tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
   }
 }

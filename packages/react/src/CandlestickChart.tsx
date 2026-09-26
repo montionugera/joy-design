@@ -1,5 +1,11 @@
 import React, { forwardRef, useEffect, useRef, useState, useCallback } from 'react';
-import { JoyChartCore, type CandlestickDataPoint } from './chart-core.js';
+import {
+  JoyChartCore,
+  describeCandlestickChart,
+  formatCandleTime,
+  summaryWindow,
+  type CandlestickDataPoint
+} from './chart-core.js';
 
 export interface CandlestickChartProps extends React.HTMLAttributes<HTMLDivElement> {
   data: CandlestickDataPoint[];
@@ -8,7 +14,7 @@ export interface CandlestickChartProps extends React.HTMLAttributes<HTMLDivEleme
 }
 
 export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps>(
-  ({ data = [], height = 420, theme = 'light', className = '', style, onKeyDown, ...props }, ref) => {
+  ({ data = [], height = 420, theme, className = '', style, onKeyDown, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -61,6 +67,12 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
       }
     }, [data]);
 
+    // Re-apply the theme override in place on later changes; the mount effect
+    // above only sets it once when the chart instance is created.
+    useEffect(() => {
+      chartInstanceRef.current?.setTheme(theme);
+    }, [theme]);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e);
       if (!chartInstanceRef.current) return;
@@ -84,9 +96,14 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
       }
     };
 
-    const deltaPercent = hoveredCandle
-      ? ((hoveredCandle.close - hoveredCandle.open) / hoveredCandle.open) * 100
-      : 0;
+    const chartLabel = describeCandlestickChart(data);
+    const summary = summaryWindow(data, 'candle');
+    const hasVolume = data.some((d) => d.volume != null);
+
+    const deltaPercent =
+      hoveredCandle && hoveredCandle.open !== 0
+        ? ((hoveredCandle.close - hoveredCandle.open) / hoveredCandle.open) * 100
+        : 0;
 
     return (
       <div
@@ -117,13 +134,7 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
               <div className="joy-chart__hud-item">
                 <span className="joy-chart__hud-label">C:</span>
                 <span
-                  className="joy-chart__hud-value"
-                  style={{
-                    color:
-                      hoveredCandle.close >= hoveredCandle.open
-                        ? 'var(--joy-color-success, #10b981)'
-                        : 'var(--joy-color-error, #f43f5e)'
-                  }}
+                  className={`joy-chart__hud-value ${hoveredCandle.close >= hoveredCandle.open ? 'joy-chart__hud-value--bull' : 'joy-chart__hud-value--bear'}`}
                 >
                   {hoveredCandle.close.toFixed(2)}
                 </span>
@@ -131,13 +142,7 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
               <div className="joy-chart__hud-item">
                 <span className="joy-chart__hud-label">Chg:</span>
                 <span
-                  className="joy-chart__hud-value"
-                  style={{
-                    color:
-                      deltaPercent >= 0
-                        ? 'var(--joy-color-success, #10b981)'
-                        : 'var(--joy-color-error, #f43f5e)'
-                  }}
+                  className={`joy-chart__hud-value ${deltaPercent >= 0 ? 'joy-chart__hud-value--bull' : 'joy-chart__hud-value--bear'}`}
                 >
                   {deltaPercent >= 0 ? '+' : ''}
                   {deltaPercent.toFixed(2)}%
@@ -147,14 +152,42 @@ export const CandlestickChart = forwardRef<HTMLDivElement, CandlestickChartProps
           ) : (
             <div className="joy-chart__hud-item">
               <span className="joy-chart__hud-label">Interactive</span>
-              <span className="joy-chart__hud-value" style={{ color: 'var(--navy-500, #14253e)' }}>Candlestick Feed</span>
+              <span className="joy-chart__hud-value">Candlestick Feed</span>
             </div>
           )}
         </div>
 
-        <div className="joy-chart__canvas-container">
+        <div className="joy-chart__canvas-container" role="img" aria-label={chartLabel}>
           <canvas ref={baseCanvasRef} className="joy-chart__canvas-base" />
           <canvas ref={overlayCanvasRef} className="joy-chart__canvas-overlay" />
+        </div>
+
+        <div className="joy-chart__sr">
+          <table>
+            <caption>Candlestick data: {summary.note}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Open</th>
+                <th scope="col">High</th>
+                <th scope="col">Low</th>
+                <th scope="col">Close</th>
+                {hasVolume && <th scope="col">Volume</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {summary.rows.map((c, i) => (
+                <tr key={i}>
+                  <th scope="row">{formatCandleTime(c.time)}</th>
+                  <td>{c.open.toFixed(2)}</td>
+                  <td>{c.high.toFixed(2)}</td>
+                  <td>{c.low.toFixed(2)}</td>
+                  <td>{c.close.toFixed(2)}</td>
+                  {hasVolume && <td>{c.volume ?? ''}</td>}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );

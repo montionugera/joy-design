@@ -28,17 +28,17 @@ export { Progress, type ProgressProps, type ProgressStatus } from './Progress.js
 // Wave 4 Components (Ant Design Parity: Upload, Avatar, Slider, MarkdownViewer)
 export { Upload, type UploadProps, type UploadFile } from './Upload.js';
 export { Avatar, type AvatarProps, type AvatarShape, type AvatarSize, type AvatarStatus } from './Avatar.js';
-export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup.js';
+export { AvatarGroup, type AvatarGroupProps, type AvatarGroupItem } from './AvatarGroup.js';
 export { Slider, type SliderProps } from './Slider.js';
 export { MarkdownViewer, type MarkdownViewerProps } from './MarkdownViewer.js';
 export { MarkdownEditor, type MarkdownEditorProps } from './MarkdownEditor.js';
 
 // Wave 5: Landing Page Architecture & Enterprise Workflow Suite
 export { BentoGrid, type BentoGridProps } from './BentoGrid.js';
-export { BentoCard, type BentoCardProps } from './BentoCard.js';
+export { BentoCard, type BentoCardProps, type BentoColSpan } from './BentoCard.js';
 export { HeroSection, type HeroSectionProps } from './HeroSection.js';
 export { PricingCard, type PricingCardProps } from './PricingCard.js';
-export { PricingMatrix, type PricingMatrixProps } from './PricingMatrix.js';
+export { PricingMatrix, type PricingMatrixProps, type PricingMatrixRow } from './PricingMatrix.js';
 export { TestimonialCard, type TestimonialCardProps } from './TestimonialCard.js';
 export { Steps, type StepsProps, type StepItem } from './Steps.js';
 export { Timeline, type TimelineProps, type TimelineItem } from './Timeline.js';
@@ -74,10 +74,25 @@ export { Notification, type NotificationProps } from './Notification.js';
 export { Popconfirm, type PopconfirmProps } from './Popconfirm.js';
 export { Spin, type SpinProps } from './Spin.js';
 // Wave 10: Rich Media, Hierarchical Select & Accessible Overlay Suite
-export { Image, ImagePreview, type ImageProps, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
+export { Image, type ImageProps } from './Image.js';
+export { ImagePreview, type ImagePreviewProps, type ImageItem } from './ImagePreview.js';
 export { TreeSelect, type TreeSelectProps, type TreeNode } from './TreeSelect.js';
 export { Cascader, type CascaderProps, type CascaderOption } from './Cascader.js';
-export { lockBodyScroll, trapFocus } from './overlay-utils.js';
+export {
+  lockBodyScroll,
+  trapFocus,
+  openOverlay,
+  positionPanel,
+  isOutside,
+  isSheet,
+  SHEET_MAX_WIDTH,
+  type OverlayRect,
+  type OverlayNode,
+  type OverlayWindow,
+  type OverlayOptions,
+  type OverlayHandle
+} from './overlay-utils.js';
+export { useOverlay } from './useOverlay.js';
 // Wave 13B: Landing Page Component Suite
 export { FeatureCard, type FeatureCardProps } from './FeatureCard.js';
 export { FeatureGrid, type FeatureGridProps } from './FeatureGrid.js';
@@ -87,3 +102,8 @@ export { CTASection, type CTASectionProps } from './CTASection.js';
 export { FAQSection, type FAQSectionProps, type FAQItem } from './FAQSection.js';
 export { SiteFooter, type SiteFooterProps, type FooterColumn, type FooterLink, type SocialLink } from './SiteFooter.js';
 export { LandingPage, type LandingPageProps } from './LandingPage.js';
+// F-043: Brand Asset Kit
+export { BrandMark, type BrandMarkProps } from './BrandMark.js';
+export { Wordmark, type WordmarkProps } from './Wordmark.js';
+export { Ribbon, type RibbonProps } from './Ribbon.js';
+export { BrandBanner, type BrandBannerProps } from './BrandBanner.js';

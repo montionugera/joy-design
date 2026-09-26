@@ -1,6 +1,10 @@
 import * as React from 'react';
+import { Close } from '@joymify/icons/react';
+import { useDialog, useMergedRef } from './dialog-hooks.js';
 
-export interface ModalProps {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   open?: boolean;
   title?: string;
   onClose?: () => void;
@@ -9,60 +13,64 @@ export interface ModalProps {
   className?: string;
 }
 
-export const Modal: React.FC<ModalProps> = ({
-  open = false,
-  title,
-  onClose,
-  children,
-  footer,
-  className = ''
-}) => {
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
+/** `ref` and `...rest` land on the dialog element (`.joy-modal`), like the Svelte twin. */
+export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
+  ({ open = false, title, onClose, children, footer, className = '', ...rest }, ref) => {
+    // Unique per instance, so several modals (or a modal plus a drawer) never share a label id.
+    const titleId = `${React.useId()}-title`;
+    const dialogRef = React.useRef<HTMLDivElement | null>(null);
+    const setDialogRef = useMergedRef(ref, dialogRef);
+    // Only the topmost dialog answers Escape, and a popover/menu/tooltip inside claims it first
+    // (preventDefault) so it closes alone; dialogs claim it too so an outer one does not also close.
+    useDialog(open, dialogRef, (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
         onClose?.();
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, onClose]);
+    });
 
-  if (!open) return null;
+    if (!open) return null;
 
-  return (
-    <div
-      className="joy-modal-backdrop"
-      role="presentation"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose?.();
-      }}
-    >
+    return (
       <div
-        className={`joy-modal ${className}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
+        className="joy-modal-backdrop"
+        role="presentation"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose?.();
+        }}
       >
-        <div className="joy-modal__header">
-          <h3 id="modal-title" className="joy-modal__title">
-            {title}
-          </h3>
-          <button
-            type="button"
-            className="joy-modal__close"
-            onClick={onClose}
-            aria-label="Close dialog"
-          >
-            &times;
-          </button>
+        <div
+          {...rest}
+          ref={setDialogRef}
+          className={cx('joy-modal', className)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}
+          aria-label={rest['aria-label'] ?? (title ? undefined : 'Dialog')}
+        >
+          <div className="joy-modal__header">
+            {title ? (
+              <h3 id={titleId} className="joy-modal__title">
+                {title}
+              </h3>
+            ) : null}
+            <button
+              type="button"
+              className="joy-modal__close"
+              onClick={() => onClose?.()}
+              aria-label="Close dialog"
+            >
+              <Close size="1.25rem" />
+            </button>
+          </div>
+
+          <div className="joy-modal__body">{children}</div>
+
+          {footer ? <div className="joy-modal__footer">{footer}</div> : null}
         </div>
-
-        <div className="joy-modal__body">{children}</div>
-
-        {footer && <div className="joy-modal__footer">{footer}</div>}
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
 Modal.displayName = 'Modal';

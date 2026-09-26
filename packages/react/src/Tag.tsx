@@ -1,6 +1,8 @@
 import React, { forwardRef } from 'react';
 
-export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
+
+export interface TagProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'onChange'> {
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'default';
   closable?: boolean;
   checkable?: boolean;
@@ -34,7 +36,12 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
     return (
       <span
         ref={ref}
-        className={`joy-tag joy-tag--${color} ${checkable ? 'joy-tag--checkable' : ''} ${checked ? 'joy-tag--checked' : ''} ${className}`}
+        className={cx(
+          `joy-tag joy-tag--${color}`,
+          checkable && 'joy-tag--checkable',
+          checked && 'joy-tag--checked',
+          className
+        )}
         role={checkable ? 'checkbox' : 'status'}
         aria-checked={checkable ? checked : undefined}
         tabIndex={checkable ? 0 : undefined}
@@ -53,14 +60,6 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
             type="button"
             className="joy-tag__close"
             aria-label="Close tag"
-            style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              padding: '0 0 0 4px',
-              display: 'inline-flex',
-              alignItems: 'center'
-            }}
             onClick={(e) => {
               e.stopPropagation();
               onClose?.();

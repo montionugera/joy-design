@@ -29,12 +29,84 @@ export interface SeriesConfig {
 }
 
 export interface ChartOptions {
+  /**
+   * Explicit override only. Leave unset (the default) so grid and crosshair
+   * strokes follow the live CSS-variable palette and therefore the active theme.
+   */
   theme?: 'light' | 'dark';
   smooth?: boolean; // Monotone cubic hermite spline
   showGrid?: boolean;
   showCrosshair?: boolean;
   enableZoomPan?: boolean;
   onHoverPoint?: (point: ChartPoint | CandlestickDataPoint | null) => void;
+}
+
+/**
+ * Token-driven canvas color palette. Reads live CSS custom properties from the
+ * canvas element so chart rendering stays correct across light/dark themes
+ * without hardcoded hex. Read once per render() and cached for pointer-driven
+ * repaints (mousemove / wheel / drag); the data-theme observer, the
+ * prefers-color-scheme listener and the 'joy-theme-change' event call render()
+ * so the canvas repaints, and re-reads the palette, immediately on theme toggle.
+ */
+export interface ChartPalette {
+  textSecondary: string;
+  textPrimary: string;
+  bull: string;
+  bear: string;
+  border: string;
+  accent: string;
+  onAccent: string;
+}
+
+export function readChartPalette(canvas: HTMLCanvasElement): ChartPalette {
+  const styles = getComputedStyle(canvas);
+  const v = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback;
+  return {
+    textSecondary: v('--joy-text-secondary', '#3c3a35'),
+    textPrimary: v('--joy-text-primary', '#1f1c13'),
+    bull: v('--joy-status-success-fg', '#1a4f1f'),
+    bear: v('--joy-status-danger-fg', '#9f3331'),
+    border: v('--joy-border-subtle', '#e3dccc'),
+    accent: v('--joy-accent-default', '#c49a3a'),
+    onAccent: v('--joy-text-on-accent', '#14253e'),
+  };
+}
+
+/**
+ * Accessible-summary helpers shared by BarChart / LineChart / CandlestickChart
+ * (canvas is opaque to assistive tech, so each chart exposes a role="img"
+ * label plus a visually hidden, row-capped data table).
+ */
+export const CHART_SUMMARY_MAX_ROWS = 20;
+
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+export function describeSeriesChart(kind: 'Bar' | 'Line', series: SeriesConfig[]): string {
+  const points = series.reduce((sum, s) => sum + s.data.length, 0);
+  return `${kind} chart, ${plural(series.length, 'series', 'series')}, ${plural(points, 'point')}`;
+}
+
+export function describeCandlestickChart(data: CandlestickDataPoint[]): string {
+  return `Candlestick chart, ${plural(data.length, 'candle')}`;
+}
+
+/** Most recent `max` rows of `data`, plus a caption fragment noting truncation. */
+export function summaryWindow<T>(
+  data: T[],
+  noun = 'point',
+  max: number = CHART_SUMMARY_MAX_ROWS
+): { rows: T[]; note: string } {
+  const truncated = data.length > max;
+  return {
+    rows: truncated ? data.slice(-max) : data,
+    note: truncated ? `last ${max} of ${plural(data.length, noun)}` : plural(data.length, noun)
+  };
+}
+
+export function formatCandleTime(time: number): string {
+  const d = new Date(time);
+  return Number.isNaN(d.getTime()) ? String(time) : `${d.toISOString().slice(0, 16).replace('T', ' ')} UTC`;
 }
 
 /**
@@ -299,6 +371,8 @@ export class JoyChartCore {
   private dragStartViewMinX = 0;
   private dragStartViewMaxX = 0;
   private boundListeners: { element: HTMLElement; event: string; handler: EventListener }[] = [];
+  private themeCleanups: (() => void)[] = [];
+  private palette: ChartPalette | null = null;
 
   constructor(
     baseCanvas: HTMLCanvasElement,
@@ -310,7 +384,6 @@ export class JoyChartCore {
     this.baseCtx = baseCanvas.getContext('2d')!;
     this.overlayCtx = overlayCanvas.getContext('2d')!;
     this.options = {
-      theme: 'light',
       smooth: true,
       showGrid: true,
       showCrosshair: true,
@@ -330,6 +403,17 @@ export class JoyChartCore {
       this.candlestickTimes[i] = data[i].time;
     }
     this.autoFit();
+    this.render();
+  }
+
+  /**
+   * Update the explicit theme override in place and repaint. Cheaper than
+   * recreating the instance: `drawGrid`/`drawCrosshair` already read
+   * `this.options.theme` fresh on every render(), so mutating it and
+   * repainting is enough — no listeners to rebind, no canvas to leak.
+   */
+  public setTheme(theme: 'light' | 'dark' | undefined) {
+    this.options.theme = theme;
     this.render();
   }
 
@@ -405,25 +489,42 @@ export class JoyChartCore {
     }
   }
 
+  /** Cached palette; read from the DOM only on first use or after render() invalidated it. */
+  private getPalette(): ChartPalette {
+    return (this.palette ??= readChartPalette(this.baseCanvas));
+  }
+
+  /** Full repaint that re-reads the CSS-variable palette (once) first. */
   public render() {
+    this.palette = null;
+    this.paint();
+  }
+
+  /** Repaint with the cached palette (pointer-driven redraws must not hit getComputedStyle). */
+  private paint() {
     if (this.width <= 0 || this.height <= 0) return;
     const ctx = this.baseCtx;
     ctx.clearRect(0, 0, this.width, this.height);
+    const palette = this.getPalette();
 
     if (this.options.showGrid) {
-      this.drawGrid(ctx);
+      this.drawGrid(ctx, palette);
     }
 
     if (this.isCandlestick) {
-      this.drawCandlesticks(ctx);
+      this.drawCandlesticks(ctx, palette);
     } else {
-      this.drawSeries(ctx);
+      this.drawSeries(ctx, palette);
     }
   }
 
-  private drawGrid(ctx: CanvasRenderingContext2D) {
-    const isDark = this.options.theme === 'dark';
-    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+  private drawGrid(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
+    // Explicit `theme` override: neutral white/black at low alpha. Otherwise the token palette.
+    const override = this.options.theme;
+    const gridStroke = override ? (override === 'dark' ? 'white' : 'black') : palette.border;
+    const gridAlpha = override ? 0.05 : 1;
+    ctx.strokeStyle = gridStroke;
+    ctx.globalAlpha = gridAlpha;
     ctx.lineWidth = 1;
 
     // Horizontal grid lines
@@ -435,10 +536,12 @@ export class JoyChartCore {
       ctx.lineTo(this.width, y);
       ctx.stroke();
 
+      ctx.globalAlpha = 1;
       const price = this.viewMaxY - (i / ySteps) * (this.viewMaxY - this.viewMinY);
-      ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
+      ctx.fillStyle = palette.textSecondary;
       ctx.font = '10px monospace';
       ctx.fillText(price.toFixed(2), this.width - 55, y - 4);
+      ctx.globalAlpha = gridAlpha;
     }
 
     // Vertical grid lines
@@ -450,9 +553,10 @@ export class JoyChartCore {
       ctx.lineTo(x, this.height);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1;
   }
 
-  private drawCandlesticks(ctx: CanvasRenderingContext2D) {
+  private drawCandlesticks(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
     if (this.candlestickData.length === 0) return;
 
     // Binary search visible range in O(log N) with 0 allocations
@@ -470,8 +574,8 @@ export class JoyChartCore {
     if (visible.length === 0) return;
 
     const candleWidth = Math.max(2, (this.width / visible.length) * 0.7);
-    const bullColor = '#10b981'; // Green
-    const bearColor = '#ef4444'; // Red
+    const bullColor = palette.bull;
+    const bearColor = palette.bear;
 
     for (let i = 0; i < visible.length; i++) {
       const c = visible[i];
@@ -502,7 +606,7 @@ export class JoyChartCore {
     }
   }
 
-  private drawSeries(ctx: CanvasRenderingContext2D) {
+  private drawSeries(ctx: CanvasRenderingContext2D, palette: ChartPalette) {
     this.seriesList.forEach(series => {
       if (series.data.length === 0) return;
 
@@ -522,6 +626,8 @@ export class JoyChartCore {
 
       if (points.length === 0) return;
 
+      const color = series.color || palette.accent;
+
       if (series.type === 'bar') {
         const barWidth = Math.max(2, (this.width / Math.max(1, points.length)) * 0.7);
         ctx.fillStyle = color;
@@ -537,7 +643,6 @@ export class JoyChartCore {
         return;
       }
 
-      const color = series.color || '#c49a3a';
       ctx.strokeStyle = color;
       ctx.lineWidth = series.lineWidth || 2;
       ctx.lineJoin = 'round';
@@ -607,6 +712,26 @@ export class JoyChartCore {
     this.boundListeners.push({ element: element as HTMLElement, event, handler });
   }
 
+  /**
+   * Self-contained theme repaint: theme.css switches on the root `data-theme`
+   * attribute and on `prefers-color-scheme`, so observe both. No-op without a DOM.
+   */
+  private watchTheme() {
+    const repaint = () => this.render();
+    if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined' && document.documentElement) {
+      const observer = new MutationObserver(repaint);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      this.themeCleanups.push(() => observer.disconnect());
+    }
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      if (media && typeof media.addEventListener === 'function') {
+        media.addEventListener('change', repaint);
+        this.themeCleanups.push(() => media.removeEventListener('change', repaint));
+      }
+    }
+  }
+
   private bindEvents() {
     this.addListener(this.overlayCanvas, 'mousedown', ((e: MouseEvent) => {
       if (!this.options.enableZoomPan) return;
@@ -620,6 +745,13 @@ export class JoyChartCore {
       this.isDragging = false;
     }) as EventListener);
 
+    // Re-read the token-driven palette and repaint on theme toggle so the
+    // canvas never lags a light/dark switch (see readChartPalette above).
+    this.addListener(window, 'joy-theme-change', (() => {
+      this.render();
+    }) as EventListener);
+    this.watchTheme();
+
     this.addListener(this.overlayCanvas, 'mousemove', ((e: MouseEvent) => {
       const rect = this.overlayCanvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -631,11 +763,11 @@ export class JoyChartCore {
         const shift = (deltaX / this.width) * range;
         this.viewMinX = this.dragStartViewMinX - shift;
         this.viewMaxX = this.dragStartViewMaxX - shift;
-        this.render();
+        this.paint();
       }
 
       if (this.options.showCrosshair) {
-        this.drawCrosshair(mouseX, mouseY);
+        this.drawCrosshair(mouseX, mouseY, this.getPalette());
       }
     }) as EventListener);
 
@@ -654,8 +786,8 @@ export class JoyChartCore {
       this.viewMinX = mouseDataX - leftSpan * factor;
       this.viewMaxX = mouseDataX + rightSpan * factor;
 
-      this.render();
-      this.drawCrosshair(mouseX, e.clientY - rect.top);
+      this.paint();
+      this.drawCrosshair(mouseX, e.clientY - rect.top, this.getPalette());
     }) as EventListener);
 
     this.addListener(this.overlayCanvas, 'mouseleave', (() => {
@@ -664,11 +796,13 @@ export class JoyChartCore {
     }) as EventListener);
   }
 
-  private drawCrosshair(mouseX: number, mouseY: number) {
+  private drawCrosshair(mouseX: number, mouseY: number, palette: ChartPalette) {
     const ctx = this.overlayCtx;
     ctx.clearRect(0, 0, this.width, this.height);
 
-    ctx.strokeStyle = this.options.theme === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)';
+    const override = this.options.theme;
+    ctx.strokeStyle = override ? (override === 'dark' ? 'white' : 'black') : palette.textPrimary;
+    ctx.globalAlpha = override === 'light' ? 0.3 : 0.4;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
 
@@ -686,12 +820,13 @@ export class JoyChartCore {
     ctx.lineTo(this.width, y);
     ctx.stroke();
     ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
 
     // Price Tracking Pill
     const price = this.toDataY(mouseY);
-    ctx.fillStyle = '#c49a3a';
+    ctx.fillStyle = palette.accent;
     ctx.fillRect(this.width - 60, mouseY - 10, 56, 20);
-    ctx.fillStyle = '#14253e';
+    ctx.fillStyle = palette.onAccent;
     ctx.font = '10px monospace';
     ctx.fillText(price.toFixed(2), this.width - 54, mouseY + 4);
 
@@ -711,5 +846,7 @@ export class JoyChartCore {
       element.removeEventListener(event, handler);
     }
     this.boundListeners = [];
+    for (const cleanup of this.themeCleanups) cleanup();
+    this.themeCleanups = [];
   }
 }

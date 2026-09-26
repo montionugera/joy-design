@@ -9,24 +9,26 @@
 	interface Props {
 		items?: TimelineItem[];
 		class?: string;
+		ref?: HTMLUListElement | null;
+		[key: string]: any;
 	}
 
 	let {
 		items = [],
-		class: className = ''
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 </script>
 
-<ul class="joy-timeline {className}" role="list">
+<ul bind:this={ref} class="joy-timeline {className}" role="list" {...rest}>
 	{#each items as item}
 		<li class="joy-timeline__item">
 			<div class="joy-timeline__dot joy-timeline__dot--{item.status || 'primary'}"></div>
 			<div class="joy-timeline__content">
-				<div style="font-weight: 600;">{item.title}</div>
+				<div class="joy-timeline__title">{item.title}</div>
 				{#if item.description}
-					<div style="color: var(--joy-color-text-muted, #64748b); font-size: 0.8125rem; margin-top: 2px;">
-						{item.description}
-					</div>
+					<div class="joy-timeline__description">{item.description}</div>
 				{/if}
 				{#if item.time}
 					<div class="joy-timeline__time">{item.time}</div>

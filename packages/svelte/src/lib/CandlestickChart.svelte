@@ -1,22 +1,33 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { JoyChartCore, type CandlestickDataPoint } from './chart-core.js';
+	import {
+		JoyChartCore,
+		describeCandlestickChart,
+		formatCandleTime,
+		summaryWindow,
+		type CandlestickDataPoint
+	} from './chart-core.js';
 
 	interface Props {
 		data: CandlestickDataPoint[];
 		height?: number;
 		theme?: 'light' | 'dark';
 		class?: string;
+		style?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
 		data = [],
 		height = 420,
-		theme = 'light',
-		class: className = ''
+		theme,
+		class: className = '',
+		style = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
-	let container: HTMLDivElement;
 	let baseCanvas: HTMLCanvasElement;
 	let overlayCanvas: HTMLCanvasElement;
 	let chartInstance: JoyChartCore | null = null;
@@ -35,8 +46,8 @@
 			? new ResizeObserver(() => chartInstance?.resize())
 			: null;
 
-		if (container && ro) {
-			ro.observe(container);
+		if (ref && ro) {
+			ro.observe(ref);
 		}
 
 		const handleResize = () => chartInstance?.resize();
@@ -54,6 +65,18 @@
 			chartInstance.setCandlesticks(data);
 		}
 	});
+
+	// Re-apply the theme override in place on later changes; onMount above
+	// only sets it once when the chart instance is created.
+	$effect(() => {
+		if (chartInstance) {
+			chartInstance.setTheme(theme);
+		}
+	});
+
+	let chartLabel = $derived(describeCandlestickChart(data));
+	let summary = $derived(summaryWindow(data, 'candle'));
+	let hasVolume = $derived(data.some((d) => d.volume != null));
 
 	let deltaPercent = $derived(
 		hoveredCandle && hoveredCandle.open !== 0
@@ -83,14 +106,17 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<!-- The chart region is focusable on purpose: keyboard users pan/zoom it (see the aria-label). -->
 <div
-	bind:this={container}
+	bind:this={ref}
 	tabindex="0"
 	onkeydown={handleKeyDown}
 	class="joy-chart {className}"
-	style="height: {height}px;"
+	style="height: {height}px; {style}"
 	role="region"
 	aria-label="Interactive Candlestick Financial Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset."
+	{...rest}
 >
 	<div class="joy-chart__hud" aria-live="polite">
 		{#if hoveredCandle}
@@ -109,8 +135,7 @@
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">C:</span>
 				<span
-					class="joy-chart__hud-value"
-					style="color: {hoveredCandle.close >= hoveredCandle.open ? 'var(--joy-color-success, #10b981)' : 'var(--joy-color-error, #f43f5e)'};"
+					class="joy-chart__hud-value {hoveredCandle.close >= hoveredCandle.open ? 'joy-chart__hud-value--bull' : 'joy-chart__hud-value--bear'}"
 				>
 					{hoveredCandle.close.toFixed(2)}
 				</span>
@@ -118,8 +143,7 @@
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">Chg:</span>
 				<span
-					class="joy-chart__hud-value"
-					style="color: {deltaPercent >= 0 ? 'var(--joy-color-success, #10b981)' : 'var(--joy-color-error, #f43f5e)'};"
+					class="joy-chart__hud-value {deltaPercent >= 0 ? 'joy-chart__hud-value--bull' : 'joy-chart__hud-value--bear'}"
 				>
 					{deltaPercent >= 0 ? '+' : ''}{deltaPercent.toFixed(2)}%
 				</span>
@@ -127,13 +151,41 @@
 		{:else}
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">Interactive</span>
-				<span class="joy-chart__hud-value" style="color: var(--navy-500, #14253e);">Candlestick Feed</span>
+				<span class="joy-chart__hud-value">Candlestick Feed</span>
 			</div>
 		{/if}
 	</div>
 
-	<div class="joy-chart__canvas-container">
+	<div class="joy-chart__canvas-container" role="img" aria-label={chartLabel}>
 		<canvas bind:this={baseCanvas} class="joy-chart__canvas-base"></canvas>
 		<canvas bind:this={overlayCanvas} class="joy-chart__canvas-overlay"></canvas>
+	</div>
+
+	<div class="joy-chart__sr">
+		<table>
+			<caption>Candlestick data: {summary.note}</caption>
+			<thead>
+				<tr>
+					<th scope="col">Time</th>
+					<th scope="col">Open</th>
+					<th scope="col">High</th>
+					<th scope="col">Low</th>
+					<th scope="col">Close</th>
+					{#if hasVolume}<th scope="col">Volume</th>{/if}
+				</tr>
+			</thead>
+			<tbody>
+				{#each summary.rows as c}
+					<tr>
+						<th scope="row">{formatCandleTime(c.time)}</th>
+						<td>{c.open.toFixed(2)}</td>
+						<td>{c.high.toFixed(2)}</td>
+						<td>{c.low.toFixed(2)}</td>
+						<td>{c.close.toFixed(2)}</td>
+						{#if hasVolume}<td>{c.volume ?? ''}</td>{/if}
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	</div>
 </div>

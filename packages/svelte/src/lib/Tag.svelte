@@ -10,6 +10,7 @@
 		onchange?: (checked: boolean) => void;
 		children?: Snippet;
 		class?: string;
+		ref?: HTMLSpanElement | null;
 	}
 
 	let {
@@ -20,7 +21,9 @@
 		onclose,
 		onchange,
 		children,
-		class: className = ''
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	function handleClick() {
@@ -32,6 +35,8 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <span
+	bind:this={ref}
+	{...rest}
 	class="joy-tag joy-tag--{color} {checkable ? 'joy-tag--checkable' : ''} {checked ? 'joy-tag--checked' : ''} {className}"
 	role={checkable ? 'checkbox' : 'status'}
 	aria-checked={checkable ? checked : undefined}
@@ -48,7 +53,6 @@
 			type="button"
 			class="joy-tag__close"
 			aria-label="Close tag"
-			style="border: none; background: transparent; cursor: pointer; padding: 0 0 0 4px; display: inline-flex; align-items: center;"
 			onclick={(e) => {
 				e.stopPropagation();
 				onclose?.();

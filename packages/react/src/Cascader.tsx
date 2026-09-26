@@ -1,4 +1,8 @@
 import * as React from 'react';
+import { useOverlay } from './useOverlay.js';
+import { ChevronDown, ChevronRight, Close } from '@joymify/icons/react';
+
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
 export interface CascaderOption {
   value: string;
@@ -8,7 +12,7 @@ export interface CascaderOption {
   isLeaf?: boolean;
 }
 
-export interface CascaderProps {
+export interface CascaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   options: CascaderOption[];
   value?: string[];
   defaultValue?: string[];
@@ -35,7 +39,8 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
       displayRender,
       onChange,
       className = '',
-      style
+      style,
+      ...rest
     },
     ref
   ) => {
@@ -43,17 +48,21 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
     const [internalValue, setInternalValue] = React.useState<string[]>(defaultValue);
     const selectedValue = controlledValue !== undefined ? controlledValue : internalValue;
 
-    // Active column selection path while drilling down
     const [activePath, setActivePath] = React.useState<CascaderOption[]>([]);
-    const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const [activeCol, setActiveCol] = React.useState(0);
+    const [activeRow, setActiveRow] = React.useState(0);
 
-    // Sync active path with selectedValue when opened
+    const controlRef = React.useRef<HTMLDivElement | null>(null);
+    const panelRef = React.useRef<HTMLDivElement | null>(null);
+
+    useOverlay(open, controlRef, panelRef, () => setOpen(false));
+
     React.useEffect(() => {
       if (open) {
         const path: CascaderOption[] = [];
         let currentOptions = options;
         for (const val of selectedValue) {
-          const match = currentOptions.find(opt => opt.value === val);
+          const match = currentOptions.find((opt) => opt.value === val);
           if (match) {
             path.push(match);
             currentOptions = match.children || [];
@@ -62,23 +71,13 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
           }
         }
         setActivePath(path);
+        setActiveCol(Math.max(0, path.length - 1));
+        const lastColOptions = path.length > 1 && path[path.length - 2].children ? path[path.length - 2].children! : options;
+        const lastIndex = lastColOptions.findIndex((opt) => opt.value === path[path.length - 1]?.value);
+        setActiveRow(Math.max(0, lastIndex));
       }
     }, [open, selectedValue, options]);
 
-    // Close on outside click
-    React.useEffect(() => {
-      const handleOutsideClick = (e: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-          setOpen(false);
-        }
-      };
-      if (open) {
-        document.addEventListener('mousedown', handleOutsideClick);
-      }
-      return () => document.removeEventListener('mousedown', handleOutsideClick);
-    }, [open]);
-
-    // Calculate columns based on activePath
     const columns = React.useMemo(() => {
       const cols: CascaderOption[][] = [options];
       for (const selected of activePath) {
@@ -94,11 +93,14 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
 
       const nextPath = [...activePath.slice(0, colIndex), option];
       setActivePath(nextPath);
+      setActiveCol(colIndex);
 
-      const hasChildren = option.children && option.children.length > 0;
+      const hasChildren = Boolean(option.children && option.children.length > 0);
       if (!hasChildren || changeOnSelect) {
-        const nextValue = nextPath.map(o => o.value);
-        setInternalValue(nextValue);
+        const nextValue = nextPath.map((o) => o.value);
+        if (controlledValue === undefined) {
+          setInternalValue(nextValue);
+        }
         onChange?.(nextValue, nextPath);
         if (!hasChildren) {
           setOpen(false);
@@ -108,18 +110,69 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
 
     const handleClear = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setInternalValue([]);
+      if (controlledValue === undefined) {
+        setInternalValue([]);
+      }
       setActivePath([]);
       onChange?.([], []);
     };
 
-    // Calculate display label
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (disabled) return;
+
+      if (!open) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setOpen(true);
+        }
+        return;
+      }
+
+      const currentColOptions = columns[activeCol] || [];
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (activeRow < currentColOptions.length - 1) {
+          setActiveRow(activeRow + 1);
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (activeRow > 0) {
+          setActiveRow(activeRow - 1);
+        }
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const currentOption = currentColOptions[activeRow];
+        if (currentOption && currentOption.children && currentOption.children.length > 0 && !currentOption.disabled) {
+          handleSelectOption(currentOption, activeCol);
+          setActiveCol(activeCol + 1);
+          setActiveRow(0);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (activeCol > 0) {
+          const prevCol = activeCol - 1;
+          const prevOption = activePath[prevCol];
+          const prevColOptions = columns[prevCol] || [];
+          const prevRow = prevOption ? prevColOptions.findIndex((o) => o.value === prevOption.value) : 0;
+          setActiveCol(prevCol);
+          setActiveRow(Math.max(0, prevRow));
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const currentOption = currentColOptions[activeRow];
+        if (currentOption && !currentOption.disabled) {
+          handleSelectOption(currentOption, activeCol);
+        }
+      }
+    };
+
     const displayLabel = React.useMemo(() => {
       if (selectedValue.length === 0) return '';
       const labels: string[] = [];
       let currentOptions = options;
       for (const val of selectedValue) {
-        const match = currentOptions.find(opt => opt.value === val);
+        const match = currentOptions.find((opt) => opt.value === val);
         if (match) {
           labels.push(match.label);
           currentOptions = match.children || [];
@@ -132,163 +185,94 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
 
     return (
       <div
-        ref={(node) => {
-          containerRef.current = node;
-          if (typeof ref === 'function') ref(node);
-          else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-        }}
-        className={`joy-cascader ${disabled ? 'joy-cascader--disabled' : ''} ${className}`}
-        style={{
-          position: 'relative',
-          display: 'inline-block',
-          width: '100%',
-          ...style
-        }}
+        ref={ref}
+        className={cx(
+          'joy-cascader',
+          disabled && 'joy-cascader--disabled',
+          open && 'joy-cascader--open',
+          className
+        )}
+        style={style}
+        {...rest}
       >
         {/* Selector Input Trigger */}
         <div
+          ref={controlRef}
           role="combobox"
           aria-expanded={open}
           aria-haspopup="listbox"
           tabIndex={disabled ? -1 : 0}
-          onClick={() => !disabled && setOpen(o => !o)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              setOpen(o => !o);
-            } else if (e.key === 'Escape') {
-              setOpen(false);
-            }
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            minHeight: 36,
-            padding: '4px 10px',
-            border: '1px solid var(--joy-border, #23354e)',
-            borderRadius: 6,
-            backgroundColor: 'var(--joy-surface-card, #14253e)',
-            color: 'var(--joy-text-primary, #f8f3e8)',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            boxSizing: 'border-box'
-          }}
+          className="joy-cascader__control"
+          onClick={() => !disabled && setOpen((o) => !o)}
+          onKeyDown={handleKeyDown}
         >
-          <span style={{ fontSize: 13, color: displayLabel ? 'inherit' : '#94a3b8' }}>
-            {displayLabel || placeholder}
-          </span>
+          {displayLabel ? (
+            <span className="joy-cascader__value">{displayLabel}</span>
+          ) : (
+            <span className="joy-cascader__placeholder">{placeholder}</span>
+          )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {allowClear && selectedValue.length > 0 && !disabled && (
-              <button
-                type="button"
-                onClick={handleClear}
-                title="Clear selection"
-                aria-label="Clear selection"
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            )}
-
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              style={{
-                transform: open ? 'rotate(180deg)' : 'none',
-                transition: 'transform 0.2s ease',
-                color: '#94a3b8'
-              }}
+          {allowClear && selectedValue.length > 0 && !disabled && (
+            <button
+              type="button"
+              className="joy-cascader__clear"
+              onClick={handleClear}
+              aria-label="Clear selection"
             >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
+              <Close width={14} height={14} />
+            </button>
+          )}
+
+          <span className="joy-cascader__arrow" aria-hidden="true">
+            <ChevronDown width={14} height={14} />
+          </span>
         </div>
 
         {/* Multi-column Cascader Panels */}
         {open && (
           <div
+            ref={panelRef}
             role="listbox"
             aria-label="Cascader option panels"
-            className="joy-cascader-menus"
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 4px)',
-              left: 0,
-              zIndex: 1000,
-              display: 'flex',
-              borderRadius: 6,
-              backgroundColor: 'var(--joy-surface-card, #14253e)',
-              border: '1px solid var(--joy-border, #23354e)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
-              overflow: 'hidden'
-            }}
+            className="joy-cascader__panel joy-overlay"
+            tabIndex={-1}
           >
-            {columns.map((colOptions, colIdx) => (
-              <ul
-                key={colIdx}
-                role="group"
-                style={{
-                  listStyle: 'none',
-                  margin: 0,
-                  padding: 4,
-                  minWidth: 140,
-                  maxHeight: 220,
-                  overflowY: 'auto',
-                  borderRight: colIdx < columns.length - 1 ? '1px solid var(--joy-border, #23354e)' : 'none'
-                }}
-              >
-                {colOptions.map(option => {
-                  const isActive = activePath[colIdx]?.value === option.value;
-                  const hasChildren = option.children && option.children.length > 0;
+            <div className="joy-cascader__columns">
+              {columns.map((colOptions, colIdx) => (
+                <ul
+                  key={colIdx}
+                  role="menu"
+                  className="joy-cascader__column"
+                >
+                  {colOptions.map((option, rowIdx) => {
+                    const isActive = activePath[colIdx]?.value === option.value;
+                    const hasChildren = Boolean(option.children && option.children.length > 0);
+                    const isFocused = colIdx === activeCol && rowIdx === activeRow;
 
-                  return (
-                    <li
-                      key={option.value}
-                      role="option"
-                      aria-selected={isActive}
-                      onClick={() => handleSelectOption(option, colIdx)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '6px 10px',
-                        borderRadius: 4,
-                        fontSize: 13,
-                        cursor: option.disabled ? 'not-allowed' : 'pointer',
-                        opacity: option.disabled ? 0.5 : 1,
-                        backgroundColor: isActive ? 'rgba(196, 154, 58, 0.15)' : 'transparent',
-                        color: isActive ? 'var(--gold-400, #c49a3a)' : 'var(--joy-text-primary, #f8f3e8)',
-                        transition: 'background-color 0.15s ease'
-                      }}
-                    >
-                      <span>{option.label}</span>
-                      {hasChildren && (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            ))}
+                    return (
+                      <li
+                        key={option.value}
+                        role="menuitem"
+                        aria-expanded={hasChildren ? isActive : undefined}
+                        tabIndex={isFocused ? 0 : -1}
+                        className={cx(
+                          'joy-cascader__item',
+                          isActive && 'joy-cascader__item--active'
+                        )}
+                        onClick={() => handleSelectOption(option, colIdx)}
+                      >
+                        <span>{option.label}</span>
+                        {hasChildren && (
+                          <span className="joy-cascader__item-arrow" aria-hidden="true">
+                            <ChevronRight width={12} height={12} />
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -1,23 +1,39 @@
 <script lang="ts">
+	import { Check, Copy } from '@joymify/icons';
+
 	interface Props {
 		content?: string;
 		allowCopy?: boolean;
+		class?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
 		content = '',
-		allowCopy = true
+		allowCopy = true,
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	let copiedBlockIndex = $state<number | null>(null);
+	let resetTimer: ReturnType<typeof setTimeout> | undefined;
 
-	function copyToClipboard(text: string, index: number) {
-		navigator.clipboard?.writeText(text);
+	async function copyToClipboard(text: string, index: number) {
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch {
+			return; // no clipboard access (insecure context, permission denied): do not claim success
+		}
 		copiedBlockIndex = index;
-		setTimeout(() => {
+		clearTimeout(resetTimer);
+		resetTimer = setTimeout(() => {
 			if (copiedBlockIndex === index) copiedBlockIndex = null;
 		}, 2000);
 	}
+
+	$effect(() => () => clearTimeout(resetTimer));
 
 	// Minimal high-performance, stream-safe Markdown tokenizer inspired by Tencent Cherry Markdown
 	const parsedBlocks = $derived.by(() => {
@@ -117,7 +133,7 @@
 	}
 </script>
 
-<div class="joy-markdown" role="region" aria-label="Markdown content">
+<div bind:this={ref} class="joy-markdown {className}" role="region" aria-label="Markdown content" {...rest}>
 	{#each parsedBlocks as block, i}
 		{#if block.type === 'h1'}
 			<h1>{@html formatInline(block.content)}</h1>
@@ -130,16 +146,16 @@
 		{:else if block.type === 'quote'}
 			<blockquote>{@html formatInline(block.content)}</blockquote>
 		{:else if block.type === 'hr'}
-			<hr style="border: none; border-top: 1px solid var(--joy-color-border-subtle, #e2e8f0); margin: 1.5em 0;" />
+			<hr />
 		{:else if block.type === 'code'}
 			<pre class="joy-markdown__pre"><code>{block.content}</code>{#if allowCopy}<button
 					type="button"
 					class="joy-markdown__copy-btn"
 					onclick={() => copyToClipboard(block.content, i)}
-					aria-label="Copy code snippet"
-				><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>{copiedBlockIndex === i ? 'Copied' : 'Copy'}</button>{/if}</pre>
+					aria-label="Copy code to clipboard"
+				>{#if copiedBlockIndex === i}<Check size="14" />Copied{:else}<Copy size="14" />Copy{/if}</button><span class="joy-markdown__status" role="status">{copiedBlockIndex === i ? 'Copied to clipboard' : ''}</span>{/if}</pre>
 		{:else if block.type === 'table' && block.rows && block.rows.length > 0}
-			<div style="overflow-x: auto;">
+			<div class="joy-markdown__table-wrap">
 				<table class="joy-markdown__table">
 					<thead>
 						<tr>

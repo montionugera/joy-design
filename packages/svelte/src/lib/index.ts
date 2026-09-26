@@ -36,9 +36,11 @@ export { default as MarkdownEditor } from './MarkdownEditor.svelte';
 // Wave 5 Components (Landing Page Architecture & Enterprise Workflow Suite)
 export { default as BentoGrid } from './BentoGrid.svelte';
 export { default as BentoCard } from './BentoCard.svelte';
+export type { BentoColSpan } from './BentoCard.svelte';
 export { default as HeroSection } from './HeroSection.svelte';
 export { default as PricingCard } from './PricingCard.svelte';
 export { default as PricingMatrix } from './PricingMatrix.svelte';
+export type { PricingMatrixRow } from './PricingMatrix.svelte';
 export { default as TestimonialCard } from './TestimonialCard.svelte';
 export { default as Steps, type StepItem } from './Steps.svelte';
 export { default as Timeline, type TimelineItem } from './Timeline.svelte';
@@ -78,7 +80,20 @@ export { default as Image } from './Image.svelte';
 export { default as ImagePreview, type ImageItem } from './ImagePreview.svelte';
 export { default as TreeSelect, type TreeNode } from './TreeSelect.svelte';
 export { default as Cascader, type CascaderOption } from './Cascader.svelte';
-export { lockBodyScroll, trapFocus } from './overlay-utils.js';
+export {
+  lockBodyScroll,
+  trapFocus,
+  openOverlay,
+  positionPanel,
+  isOutside,
+  isSheet,
+  SHEET_MAX_WIDTH,
+  type OverlayRect,
+  type OverlayNode,
+  type OverlayWindow,
+  type OverlayOptions,
+  type OverlayHandle
+} from './overlay-utils.js';
 // Wave 13B: Landing Page Component Suite
 export { default as FeatureCard } from './FeatureCard.svelte';
 export { default as FeatureGrid } from './FeatureGrid.svelte';
@@ -88,3 +103,8 @@ export { default as CTASection } from './CTASection.svelte';
 export { default as FAQSection } from './FAQSection.svelte';
 export { default as SiteFooter } from './SiteFooter.svelte';
 export { default as LandingPage } from './LandingPage.svelte';
+// F-043: Brand Asset Kit
+export { default as BrandMark } from './BrandMark.svelte';
+export { default as Wordmark } from './Wordmark.svelte';
+export { default as Ribbon } from './Ribbon.svelte';
+export { default as BrandBanner } from './BrandBanner.svelte';

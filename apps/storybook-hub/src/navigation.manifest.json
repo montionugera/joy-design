@@ -7,6 +7,7 @@
       "label": "Getting Started",
       "views": [
         { "id": "overview", "label": "Overview & Architecture", "icon": "overview" },
+        { "id": "brand", "label": "Brand Assets", "icon": "brand" },
         { "id": "tokens", "label": "Design Tokens & Motion", "icon": "tokens" },
         { "id": "props-spec", "label": "Props & API Specs", "icon": "propsSpec" }
       ]
@@ -26,11 +27,10 @@
       "id": "navigation-workflow",
       "label": "Navigation & Workflow",
       "views": [
-        { "id": "nav-feedback", "label": "Navigation & Feedback", "icon": "navigation" },
+        { "id": "navigation-workflow", "label": "Navigation & Workflow", "icon": "workflow" },
+        { "id": "nav-feedback", "label": "Menu, Anchor & Feedback Demos", "icon": "navigation" },
         { "id": "tabs", "label": "Tabs Layout", "icon": "tabs" },
-        { "id": "enterprise-workflow", "label": "Steps, Timeline & Result", "icon": "workflow" },
-        { "id": "pagination", "label": "Pagination Controls", "icon": "pagination" },
-        { "id": "enterprise-display", "label": "Breadcrumb & StatCard", "icon": "enterpriseDisplay" }
+        { "id": "pagination", "label": "Pagination Controls", "icon": "pagination" }
       ]
     },
     {
@@ -52,6 +52,7 @@
       "id": "data-display-feedback",
       "label": "Data Display & Feedback",
       "views": [
+        { "id": "data-display-feedback", "label": "Data Display & Feedback", "icon": "enterpriseDisplay" },
         { "id": "table", "label": "Table (Compact)", "icon": "table" },
         { "id": "financial-table", "label": "Live Trading Orderbook", "icon": "financialTable" },
         { "id": "metric", "label": "MetricTile (Quant)", "icon": "metric" },
@@ -72,7 +73,7 @@
       "label": "Enterprise & Telemetry",
       "views": [
         { "id": "landing-blocks", "label": "Bento & Landing Suite", "icon": "landing" },
-        { "id": "landing-preview", "label": "Full Page Simulator (Preview the Look)", "icon": "landing" },
+        { "id": "landing-preview", "label": "Full page simulator", "icon": "landing" },
         { "id": "charts", "label": "High-Perf Financial Charts", "icon": "charts" }
       ]
     }

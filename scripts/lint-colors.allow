@@ -1,0 +1,20 @@
+# One regex per line. Keep entries narrow and explain the CSS-variable source.
+# The only entries below are scoped to chart-core.ts (Wave 3 A1): its
+# readChartPalette() fallbacks and its theme-branching translucent strokes.
+
+# Wave 3 A1: readChartPalette() in chart-core.ts reads live CSS custom
+# properties via getComputedStyle and only falls back to these hex literals
+# when a --joy-* variable is unset (e.g. non-browser test environments).
+# These are JS default-argument literals, not un-token-driven CSS, so they
+# are intentionally allowlisted narrowly to this call shape. Entries are
+# scoped to chart-core.ts by anchoring on the "<path>:<line>:" prefix that
+# lint-colors.sh's rg hit lines carry, so no other file can ride on them.
+(^|/)chart-core\.ts:[0-9]+:.*v\('--joy-[a-z-]+', '#[0-9a-fA-F]{3,8}'\)
+
+# Wave 3 A1 (RXD-010 close-out): chart-core.ts grid-line and crosshair-line
+# strokeStyle assignments that ternary-branch on isDark/theme between two
+# rgba(...) translucent-overlay literals. A single opacity value is not
+# representable as one semantic token, and these already branch correctly
+# per theme, so they are legitimate theme-branching translucent strokes, not
+# un-tokenized CSS.
+(^|/)chart-core\.ts:[0-9]+:.*ctx\.strokeStyle = .*\? 'rgba\([0-9, .]+\)' : 'rgba\([0-9, .]+\)'

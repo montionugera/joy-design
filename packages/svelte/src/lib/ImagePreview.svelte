@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { lockBodyScroll, trapFocus } from './overlay-utils.js';
+	import { untrack } from 'svelte';
+	import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons';
+	import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
+	import { createOpenerTracker } from './dialog-opener.js';
 
 	export interface ImageItem {
 		src: string;
@@ -12,19 +14,24 @@
 		src?: string;
 		items?: (string | ImageItem)[];
 		current?: number;
-		onClose: () => void;
-		onChange?: (current: number) => void;
+		onclose: () => void;
+		onchange?: (current: number) => void;
 		class?: string;
+		/** The mask/dialog element (`.joy-image-preview-mask`). */
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
 		open = false,
 		src,
 		items = [],
-		current = 0,
-		onClose,
-		onChange,
-		class: className = ''
+		current,
+		onclose,
+		onchange,
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	let normalizedItems = $derived.by(() => {
@@ -38,7 +45,12 @@
 	});
 
 	let internalCurrent = $state(0);
-	let currentIndex = $derived(current !== undefined ? current : internalCurrent);
+	// Controlled when `current` is passed, uncontrolled otherwise (arrow keys and buttons advance
+	// `internalCurrent`). Clamped, so a stale `current` past the end never shows "5 / 2" next to the first image.
+	let requestedIndex = $derived(current !== undefined ? current : internalCurrent);
+	let currentIndex = $derived(
+		Math.min(Math.max(0, requestedIndex), Math.max(0, normalizedItems.length - 1))
+	);
 	let currentItem = $derived(normalizedItems[currentIndex] || normalizedItems[0] || { src: '' });
 
 	let scale = $state(1);
@@ -51,27 +63,30 @@
 	let startPosX = 0;
 	let startPosY = 0;
 
-	let dialogEl: HTMLDivElement;
-
+	// Reset transforms on open and whenever the shown image changes, like the React twin.
 	$effect(() => {
-		if (open) {
-			scale = 1;
-			rotate = 0;
-			posX = 0;
-			posY = 0;
-		}
+		void open;
+		void currentIndex;
+		untrack(handleReset);
 	});
 
+	// Captured before the dialog's children mount, so an autofocused child cannot become the "opener" (see dialog-opener.ts).
+	const opener = createOpenerTracker();
+	$effect.pre(() => opener.sync(open));
+
 	$effect(() => {
-		if (!open) return;
+		if (!open || !ref) return;
+		const previouslyFocused = opener.current;
 		const unlock = lockBodyScroll();
-		let cleanupTrap = () => {};
-		if (dialogEl) {
-			cleanupTrap = trapFocus(dialogEl);
-		}
+		const handle = registerDialog();
+		dialog = handle;
+		const cleanupTrap = trapFocus(ref);
 		return () => {
-			unlock();
 			cleanupTrap();
+			handle.unregister();
+			if (dialog === handle) dialog = null;
+			unlock();
+			if (previouslyFocused?.isConnected) previouslyFocused.focus();
 		};
 	});
 
@@ -79,14 +94,14 @@
 		if (normalizedItems.length <= 1) return;
 		const nextIdx = (currentIndex - 1 + normalizedItems.length) % normalizedItems.length;
 		internalCurrent = nextIdx;
-		onChange?.(nextIdx);
+		onchange?.(nextIdx);
 	}
 
 	function handleNext() {
 		if (normalizedItems.length <= 1) return;
 		const nextIdx = (currentIndex + 1) % normalizedItems.length;
 		internalCurrent = nextIdx;
-		onChange?.(nextIdx);
+		onchange?.(nextIdx);
 	}
 
 	function handleZoomIn() {
@@ -112,27 +127,19 @@
 		posY = 0;
 	}
 
+	// Set while open; only the topmost dialog answers keys (a preview inside a modal closes alone).
+	let dialog: DialogHandle | null = null;
+
 	function handleKeyDown(e: KeyboardEvent) {
-		if (!open) return;
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			onClose();
-		} else if (e.key === 'ArrowLeft') {
-			e.preventDefault();
-			handlePrev();
-		} else if (e.key === 'ArrowRight') {
-			e.preventDefault();
-			handleNext();
-		} else if (e.key === '+' || e.key === '=') {
-			e.preventDefault();
-			handleZoomIn();
-		} else if (e.key === '-' || e.key === '_') {
-			e.preventDefault();
-			handleZoomOut();
-		} else if (e.key === 'r' || e.key === 'R') {
-			e.preventDefault();
-			handleRotateRight();
-		}
+		if (!open || e.defaultPrevented || !dialog?.isTopmost()) return;
+		if (e.key === 'Escape') onclose();
+		else if (e.key === 'ArrowLeft') handlePrev();
+		else if (e.key === 'ArrowRight') handleNext();
+		else if (e.key === '+' || e.key === '=') handleZoomIn();
+		else if (e.key === '-' || e.key === '_') handleZoomOut();
+		else if (e.key === 'r' || e.key === 'R') handleRotateRight();
+		else return;
+		e.preventDefault();
 	}
 
 	function handleMouseDown(e: MouseEvent) {
@@ -160,137 +167,74 @@
 
 {#if open}
 	<div
-		bind:this={dialogEl}
+		{...rest}
+		bind:this={ref}
 		role="dialog"
 		aria-modal="true"
-		aria-label="Image Preview"
+		aria-label={rest['aria-label'] ?? 'Image preview'}
 		class="joy-image-preview-mask {className}"
-		style="position: fixed; inset: 0; z-index: 1050; background-color: rgba(13, 24, 41, 0.88); backdrop-filter: blur(6px); display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none;"
 		onclick={(e) => {
-			if (e.target === e.currentTarget) onClose();
+			rest.onclick?.(e);
+			if (e.target === e.currentTarget) onclose();
 		}}
 	>
 		<!-- Operations Toolbar -->
-		<div
-			class="joy-image-preview-toolbar"
-			role="toolbar"
-			aria-label="Preview tools"
-			style="position: absolute; bottom: 24px; z-index: 1060; display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-radius: 24px; background-color: rgba(20, 37, 62, 0.9); border: 1px solid rgba(248, 243, 232, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);"
-		>
-			<button type="button" onclick={handleZoomIn} title="Zoom In (+)" aria-label="Zoom In" class="joy-preview-btn">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<circle cx="11" cy="11" r="8" />
-					<line x1="21" y1="21" x2="16.65" y2="16.65" />
-					<line x1="11" y1="8" x2="11" y2="14" />
-					<line x1="8" y1="11" x2="14" y2="11" />
-				</svg>
+		<div class="joy-image-preview-toolbar" role="toolbar" aria-label="Preview tools">
+			<button type="button" onclick={handleZoomIn} title="Zoom in (+)" aria-label="Zoom in" class="joy-image-preview-btn">
+				<ZoomIn size="1.25rem" />
 			</button>
 
-			<button type="button" onclick={handleZoomOut} title="Zoom Out (-)" aria-label="Zoom Out" class="joy-preview-btn">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<circle cx="11" cy="11" r="8" />
-					<line x1="21" y1="21" x2="16.65" y2="16.65" />
-					<line x1="8" y1="11" x2="14" y2="11" />
-				</svg>
+			<button type="button" onclick={handleZoomOut} title="Zoom out (-)" aria-label="Zoom out" class="joy-image-preview-btn">
+				<ZoomOut size="1.25rem" />
 			</button>
 
-			<button type="button" onclick={handleRotateLeft} title="Rotate Counterclockwise" aria-label="Rotate Counterclockwise" class="joy-preview-btn">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-					<path d="M3 3v5h5" />
-				</svg>
+			<button type="button" onclick={handleRotateLeft} title="Rotate left" aria-label="Rotate left" class="joy-image-preview-btn">
+				<span class="joy-image-preview-btn__icon--flip"><RefreshCw size="1.25rem" /></span>
 			</button>
 
-			<button type="button" onclick={handleRotateRight} title="Rotate Clockwise (R)" aria-label="Rotate Clockwise" class="joy-preview-btn">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-					<path d="M21 3v5h-5" />
-				</svg>
+			<button type="button" onclick={handleRotateRight} title="Rotate right (R)" aria-label="Rotate right" class="joy-image-preview-btn">
+				<RefreshCw size="1.25rem" />
 			</button>
 
-			<button type="button" onclick={handleReset} title="Reset" aria-label="Reset Zoom and Rotation" class="joy-preview-btn">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-					<path d="M21 3v5h-5" />
-					<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-					<path d="M8 16H3v5" />
-				</svg>
+			<button type="button" onclick={handleReset} title="Reset" aria-label="Reset zoom and rotation" class="joy-image-preview-btn">
+				<Minimize2 size="1.25rem" />
 			</button>
 
-			<button type="button" onclick={onClose} title="Close (Esc)" aria-label="Close Preview" class="joy-preview-btn" style="color: #f8f3e8; background-color: rgba(196, 154, 58, 0.2);">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
+			<button type="button" onclick={onclose} title="Close (Esc)" aria-label="Close preview" class="joy-image-preview-btn joy-image-preview-btn--close">
+				<Close size="1.25rem" />
 			</button>
 		</div>
 
 		<!-- Gallery Indicators & Prev/Next -->
 		{#if normalizedItems.length > 1}
-			<div style="position: absolute; top: 24px; color: var(--cream-100, #f8f3e8); font-family: monospace; font-size: 14px; background-color: rgba(20, 37, 62, 0.8); padding: 4px 12px; border-radius: 12px;">
+			<div class="joy-image-preview-counter">
 				{currentIndex + 1} / {normalizedItems.length}
 			</div>
 
-			<button type="button" onclick={handlePrev} aria-label="Previous image" class="joy-nav-btn" style="left: 24px;">
-				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<polyline points="15 18 9 12 15 6" />
-				</svg>
+			<button type="button" onclick={handlePrev} aria-label="Previous image" class="joy-image-preview-nav joy-image-preview-nav--prev">
+				<ChevronLeft size="1.5rem" />
 			</button>
 
-			<button type="button" onclick={handleNext} aria-label="Next image" class="joy-nav-btn" style="right: 24px;">
-				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<polyline points="9 18 15 12 9 6" />
-				</svg>
+			<button type="button" onclick={handleNext} aria-label="Next image" class="joy-image-preview-nav joy-image-preview-nav--next">
+				<ChevronRight size="1.5rem" />
 			</button>
 		{/if}
 
 		<!-- Image Stage -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; cursor: {scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'};"
+			class="joy-image-preview-stage"
+			class:joy-image-preview-stage--zoomed={scale > 1}
+			class:joy-image-preview-stage--dragging={isDragging}
 			onmousedown={handleMouseDown}
 		>
 			<img
+				class="joy-image-preview-img"
 				src={currentItem.src}
 				alt={currentItem.alt || 'Preview image'}
 				draggable="false"
-				style="max-width: 90vw; max-height: 85vh; object-fit: contain; transform: translate({posX}px, {posY}px) scale({scale}) rotate({rotate}deg); transition: {isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'}; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5); border-radius: 4px;"
+				style="transform: translate({posX}px, {posY}px) scale({scale}) rotate({rotate}deg);"
 			/>
 		</div>
 	</div>
 {/if}
-
-<style>
-	.joy-preview-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		border: none;
-		background-color: rgba(255, 255, 255, 0.08);
-		color: var(--cream-100, #f8f3e8);
-		cursor: pointer;
-		transition: background-color 0.15s ease, transform 0.1s ease;
-	}
-	.joy-preview-btn:hover {
-		background-color: rgba(255, 255, 255, 0.18);
-	}
-	.joy-nav-btn {
-		position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
-		z-index: 1060;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		border: 1px solid rgba(248, 243, 232, 0.2);
-		background-color: rgba(20, 37, 62, 0.85);
-		color: var(--cream-100, #f8f3e8);
-		cursor: pointer;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-	}
-</style>

@@ -10,6 +10,7 @@
 
 	interface Props {
 		value?: DateRangeValue;
+		defaultValue?: DateRangeValue;
 		min?: string;
 		max?: string;
 		disabled?: boolean;
@@ -17,17 +18,23 @@
 		startId?: string;
 		endId?: string;
 		onchange?: (v: DateRangeValue) => void;
+		class?: string;
+		ref?: HTMLDivElement | null;
 	}
 
 	let {
-		value = $bindable({ start: '', end: '' }),
+		defaultValue = { start: '', end: '' },
+		value = $bindable(defaultValue),
 		min,
 		max,
 		disabled = false,
 		error = false,
 		startId,
 		endId,
-		onchange
+		onchange,
+		class: className = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
 	function commit(next: DateRangeValue) {
@@ -52,7 +59,11 @@
 	const endMin = $derived(value.start || min);
 </script>
 
-<div class="joy-date-range-picker" class:joy-date-range-picker--disabled={disabled}>
+<div
+	bind:this={ref}
+	class="joy-date-range-picker {disabled ? 'joy-date-range-picker--disabled' : ''} {className}"
+	{...rest}
+>
 	<DatePicker
 		value={value.start}
 		{min}
@@ -62,7 +73,7 @@
 		id={startId}
 		onchange={handleStartChange}
 	/>
-	<span class="joy-date-range-picker__sep" aria-hidden="true">→</span>
+	<span class="joy-date-range-picker__sep" aria-hidden="true">to</span>
 	<DatePicker
 		value={value.end}
 		min={endMin}
@@ -73,26 +84,3 @@
 		onchange={handleEndChange}
 	/>
 </div>
-
-<style>
-	.joy-date-range-picker {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.joy-date-range-picker :global(.joy-date-picker) {
-		flex: 1 1 0;
-		min-width: 0;
-	}
-
-	.joy-date-range-picker__sep {
-		color: var(--joy-color-text-muted, #64748b);
-		font-size: 14px;
-		flex: 0 0 auto;
-	}
-
-	.joy-date-range-picker--disabled .joy-date-range-picker__sep {
-		color: var(--joy-color-text-disabled, #94a3b8);
-	}
-</style>

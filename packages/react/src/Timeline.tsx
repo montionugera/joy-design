@@ -19,18 +19,8 @@ export const Timeline = forwardRef<HTMLUListElement, TimelineProps>(
           <li key={idx} className="joy-timeline__item">
             <div className={`joy-timeline__dot joy-timeline__dot--${item.status || 'primary'}`} />
             <div className="joy-timeline__content">
-              <div style={{ fontWeight: 600 }}>{item.title}</div>
-              {item.description && (
-                <div
-                  style={{
-                    color: 'var(--joy-color-text-muted, #64748b)',
-                    fontSize: '0.8125rem',
-                    marginTop: '2px'
-                  }}
-                >
-                  {item.description}
-                </div>
-              )}
+              <div className="joy-timeline__title">{item.title}</div>
+              {item.description && <div className="joy-timeline__description">{item.description}</div>}
               {item.time && <div className="joy-timeline__time">{item.time}</div>}
             </div>
           </li>

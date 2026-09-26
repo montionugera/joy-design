@@ -29,12 +29,13 @@ export const Space = forwardRef<HTMLDivElement, SpaceProps>(
     ref
   ) => {
     const gapPx = typeof size === 'number' ? size : sizeMap[size] || 8;
-    const computedStyle: React.CSSProperties = {
-      gap: `${gapPx}px`,
+    const computedStyle = {
+      '--joy-space-gap': `${gapPx}px`,
+      gap: 'var(--joy-space-gap)',
       flexWrap: wrap ? 'wrap' : undefined,
       alignItems: align,
       ...style
-    };
+    } as React.CSSProperties;
 
     return (
       <div

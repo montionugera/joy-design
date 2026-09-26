@@ -1,44 +1,50 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+  import { ChevronDown } from '@joymify/icons';
+
   interface FAQItem {
     question: string;
     answer: string;
     defaultOpen?: boolean;
   }
 
-  interface Props {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class' | 'children' | 'title'> {
     title?: string;
     subtitle?: string;
     items: FAQItem[];
     allowMultiple?: boolean;
     class?: string;
+    ref?: HTMLElement | null;
   }
 
   let {
-    title = 'Frequently Asked Questions',
-    subtitle = 'Everything you need to know about our institutional trading and liquidity infrastructure.',
+    title = 'Frequently asked questions',
+    subtitle = 'Everything you need to know about our trading and liquidity services.',
     items,
     allowMultiple = false,
-    class: className = ''
+    class: className = '',
+    ref = $bindable(null),
+    ...rest
   }: Props = $props();
 
-  let openIndexes = $state<number[]>(
-    items.map((item, idx) => (item.defaultOpen ? idx : -1)).filter((idx) => idx !== -1)
-  );
+  const uid = $props.id();
+
+  // Until the reader toggles something, the open items are the ones marked defaultOpen; after that their choice wins.
+  // The choice is stored by index: if `items` is reordered or inserted into afterwards, the same positions stay open.
+  const defaultOpen = $derived(items.flatMap((item, idx) => (item.defaultOpen ? [idx] : [])));
+  let chosen = $state<number[] | null>(null);
+  const openIndexes = $derived(chosen ?? defaultOpen);
 
   function toggleIndex(index: number) {
     if (allowMultiple) {
-      if (openIndexes.includes(index)) {
-        openIndexes = openIndexes.filter((i) => i !== index);
-      } else {
-        openIndexes = [...openIndexes, index];
-      }
+      chosen = openIndexes.includes(index) ? openIndexes.filter((i) => i !== index) : [...openIndexes, index];
     } else {
-      openIndexes = openIndexes.includes(index) ? [] : [index];
+      chosen = openIndexes.includes(index) ? [] : [index];
     }
   }
 </script>
 
-<section class="joy-faq-section {className}">
+<section bind:this={ref} class="joy-faq-section {className}" {...rest}>
   {#if title || subtitle}
     <div class="joy-faq-section__header">
       {#if title}<h2 class="joy-faq-section__title">{title}</h2>{/if}
@@ -48,8 +54,8 @@
   <div class="joy-faq-list">
     {#each items as item, idx}
       {@const isOpen = openIndexes.includes(idx)}
-      {@const answerId = `faq-answer-${idx}`}
-      {@const triggerId = `faq-trigger-${idx}`}
+      {@const answerId = `${uid}-answer-${idx}`}
+      {@const triggerId = `${uid}-trigger-${idx}`}
 
       <div class="joy-faq-item" class:joy-faq-item--open={isOpen}>
         <button
@@ -60,29 +66,19 @@
           class="joy-faq-item__trigger"
           onclick={() => toggleIndex(idx)}
         >
-          <span>{item.question}</span>
-          <svg
-            class="joy-faq-item__icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+          <span class="joy-faq-item__label">{item.question}</span>
+          <span class="joy-faq-item__icon" aria-hidden="true"><ChevronDown size="100%" /></span>
         </button>
-        {#if isOpen}
-          <div
-            id={answerId}
-            role="region"
-            aria-labelledby={triggerId}
-            class="joy-faq-item__content"
-          >
-            {item.answer}
-          </div>
-        {/if}
+        <!-- Always in the DOM so aria-controls resolves and the answer is part of the page; hidden while closed. -->
+        <div
+          id={answerId}
+          role="region"
+          aria-labelledby={triggerId}
+          class="joy-faq-item__content"
+          hidden={!isOpen}
+        >
+          {item.answer}
+        </div>
       </div>
     {/each}
   </div>

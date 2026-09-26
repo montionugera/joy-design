@@ -3,6 +3,7 @@ import React from 'react';
 export type BentoColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export interface BentoCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Column span out of 12 (1..12, default 4). Everything under 900px is full width. Spans below 3 suit decorative tiles only. */
   colSpan?: BentoColSpan;
   title?: string;
   description?: string;
@@ -19,10 +20,12 @@ export const BentoCard = React.forwardRef<HTMLDivElement, BentoCardProps>(({
   className = '',
   ...props
 }, ref) => {
+  // Only 1..12 have a rule; anything else falls back to 4 instead of emitting a NaN modifier.
+  const span = Number.isInteger(colSpan) && colSpan >= 1 && colSpan <= 12 ? colSpan : 4;
   return (
     <div
       ref={ref}
-      className={`joy-bento-card joy-bento-card--col-${colSpan} ${className}`}
+      className={`joy-bento-card joy-bento-card--col-${span} ${className}`}
       {...props}
     >
       <div>

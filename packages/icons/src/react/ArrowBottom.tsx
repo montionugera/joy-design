@@ -1,9 +1,9 @@
 import React from "react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: string | number;
+  size?: number | string;
   color?: string;
-  strokeWidth?: number;
+  strokeWidth?: number | string;
 }
 
 export const ArrowBottom: React.FC<IconProps> = ({
@@ -19,18 +19,14 @@ export const ArrowBottom: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
     <path
 		d="M6 9L12 15L18 9"
-		stroke=color
-		strokeWidth="1.5"
+		stroke={color}
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/>

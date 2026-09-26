@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { JoyChartCore, type SeriesConfig, type ChartPoint } from './chart-core.js';
+	import {
+		JoyChartCore,
+		describeSeriesChart,
+		summaryWindow,
+		type SeriesConfig,
+		type ChartPoint
+	} from './chart-core.js';
 
 	interface Props {
 		series: SeriesConfig[];
@@ -8,17 +14,22 @@
 		smooth?: boolean;
 		theme?: 'light' | 'dark';
 		class?: string;
+		style?: string;
+		ref?: HTMLDivElement | null;
+		[key: string]: any;
 	}
 
 	let {
 		series = [],
 		height = 360,
 		smooth = true,
-		theme = 'light',
-		class: className = ''
+		theme,
+		class: className = '',
+		style = '',
+		ref = $bindable(null),
+		...rest
 	}: Props = $props();
 
-	let container: HTMLDivElement;
 	let baseCanvas: HTMLCanvasElement;
 	let overlayCanvas: HTMLCanvasElement;
 	let chartInstance: JoyChartCore | null = null;
@@ -38,8 +49,8 @@
 			? new ResizeObserver(() => chartInstance?.resize())
 			: null;
 
-		if (container && ro) {
-			ro.observe(container);
+		if (ref && ro) {
+			ro.observe(ref);
 		}
 
 		const handleResize = () => chartInstance?.resize();
@@ -52,9 +63,19 @@
 		};
 	});
 
+	let chartLabel = $derived(describeSeriesChart('Line', series));
+
 	$effect(() => {
 		if (chartInstance && series) {
 			chartInstance.setSeries(series);
+		}
+	});
+
+	// Re-apply the theme override in place on later changes; onMount above
+	// only sets it once when the chart instance is created.
+	$effect(() => {
+		if (chartInstance) {
+			chartInstance.setTheme(theme);
 		}
 	});
 
@@ -80,14 +101,17 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<!-- The chart region is focusable on purpose: keyboard users pan/zoom it (see the aria-label). -->
 <div
-	bind:this={container}
+	bind:this={ref}
 	tabindex="0"
 	onkeydown={handleKeyDown}
 	class="joy-chart {className}"
-	style="height: {height}px;"
+	style="height: {height}px; {style}"
 	role="region"
 	aria-label="Interactive Line Chart. Use arrow keys to pan, plus and minus to zoom, 0 to reset."
+	{...rest}
 >
 	<div class="joy-chart__hud" aria-live="polite">
 		{#if hoveredPoint}
@@ -97,18 +121,37 @@
 			</div>
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">Value:</span>
-				<span class="joy-chart__hud-value" style="color: var(--gold-400, #c49a3a);">{hoveredPoint.y.toFixed(2)}</span>
+				<span class="joy-chart__hud-value joy-chart__hud-value--accent">{hoveredPoint.y.toFixed(2)}</span>
 			</div>
 		{:else}
 			<div class="joy-chart__hud-item">
 				<span class="joy-chart__hud-label">Interactive</span>
-				<span class="joy-chart__hud-value" style="color: var(--navy-500, #14253e);">Pan/Zoom Enabled</span>
+				<span class="joy-chart__hud-value">Pan/Zoom Enabled</span>
 			</div>
 		{/if}
 	</div>
 
-	<div class="joy-chart__canvas-container">
+	<div class="joy-chart__canvas-container" role="img" aria-label={chartLabel}>
 		<canvas bind:this={baseCanvas} class="joy-chart__canvas-base"></canvas>
 		<canvas bind:this={overlayCanvas} class="joy-chart__canvas-overlay"></canvas>
+	</div>
+
+	<div class="joy-chart__sr">
+		{#each series as s (s.id)}
+			{#if s.data.length > 0}
+				{@const win = summaryWindow(s.data)}
+				<table>
+					<caption>{s.name || s.id}: {win.note}</caption>
+					<thead>
+						<tr><th scope="col">Index</th><th scope="col">Value</th></tr>
+					</thead>
+					<tbody>
+						{#each win.rows as pt}
+							<tr><th scope="row">{pt.x}</th><td>{pt.y.toFixed(2)}</td></tr>
+						{/each}
+					</tbody>
+				</table>
+			{/if}
+		{/each}
 	</div>
 </div>

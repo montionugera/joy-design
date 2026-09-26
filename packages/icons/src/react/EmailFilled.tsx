@@ -1,9 +1,9 @@
 import React from "react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: string | number;
+  size?: number | string;
   color?: string;
-  strokeWidth?: number;
+  strokeWidth?: number | string;
 }
 
 export const EmailFilled: React.FC<IconProps> = ({
@@ -19,18 +19,14 @@ export const EmailFilled: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <path d="M4 7H20V17H4V7Z" fill=color /><path
+    <path d="M4 7H20V17H4V7Z" fill={color} /><path
 		d="M4 7L12 13L20 7"
-		stroke="var(--bg-canvas)"
-		strokeWidth="1.5"
+		stroke="var(--joy-surface-canvas)"
+		strokeWidth={strokeWidth}
 		strokeLinecap="round"
 		strokeLinejoin="round"
 	/>

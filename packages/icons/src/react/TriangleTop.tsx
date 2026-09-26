@@ -1,9 +1,9 @@
 import React from "react";
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: string | number;
+  size?: number | string;
   color?: string;
-  strokeWidth?: number;
+  strokeWidth?: number | string;
 }
 
 export const TriangleTop: React.FC<IconProps> = ({
@@ -19,15 +19,11 @@ export const TriangleTop: React.FC<IconProps> = ({
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     aria-hidden="true" focusable="false" style={{ display: "inline-block", verticalAlign: "middle", ...style }}
     {...props}
   >
-    <path d="M12 8L18 16H6L12 8Z" fill=color />
+    <path d="M12 8L18 16H6L12 8Z" fill={color} />
   </svg>
 );
 

@@ -418,5 +418,103 @@
     "claimed_at": "2026-09-21T01:33:08.417782+00:00",
     "shipped_at": "2026-09-21T01:37:56.859351+00:00",
     "promoted_at": "2026-09-21T01:38:49.249414+00:00"
+  },
+  {
+    "id": "F-036",
+    "title": "Wave 1: semantic token foundation \u2014 light/dark remaps, brand-tinted ramps, type/space/z/shadow scales, reduced motion, foreign-hex lint and epic-check gate",
+    "from_idea": "I-036",
+    "created_at": "2026-09-22T01:04:13.061067+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "epic": "E-001",
+    "claimed_at": "2026-09-22T01:04:13.715377+00:00",
+    "shipped_at": "2026-09-22T14:00:28.979707+00:00"
+  },
+  {
+    "id": "F-037",
+    "title": "Wave 2: hero-grade Button and form controls with full state coverage, Svelte + React parity",
+    "from_idea": "I-037",
+    "created_at": "2026-09-22T14:00:50.430424+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "epic": "E-001",
+    "claimed_at": "2026-09-22T14:00:57.065558+00:00",
+    "shipped_at": "2026-09-23T13:36:06.816721+00:00"
+  },
+  {
+    "id": "F-038",
+    "title": "Wave 3: display, feedback, navigation and overlay components \u2014 dark mode, mobile, z-index, states, parity",
+    "from_idea": "I-038",
+    "created_at": "2026-09-23T13:40:57.599596+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "epic": "E-001",
+    "claimed_at": "2026-09-23T13:41:01.441486+00:00",
+    "shipped_at": "2026-09-24T01:09:42.760841+00:00"
+  },
+  {
+    "id": "F-039",
+    "title": "Wave 4: landing suite \u2014 hero and CTA depth, mobile navigation, fluid headings, slop removal, dark treatment",
+    "from_idea": "I-039",
+    "created_at": "2026-09-24T01:09:49.060045+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "epic": "E-001",
+    "claimed_at": "2026-09-24T01:09:49.727434+00:00",
+    "shipped_at": "2026-09-24T13:03:27.477685+00:00"
+  },
+  {
+    "id": "F-040",
+    "title": "Wave 5: Storybook hub \u2014 mobile layout, dark mode, hero, token-only colors, visual contracts",
+    "from_idea": "I-040",
+    "created_at": "2026-09-24T13:03:35.359314+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "epic": "E-001",
+    "claimed_at": "2026-09-24T13:03:38.617449+00:00",
+    "shipped_at": "2026-09-25T17:24:10.734086+00:00",
+    "shipped_sha": "72cdd2db536e821f2d3051934457c6e69f04de6c"
+  },
+  {
+    "id": "F-041",
+    "title": "Wave 6: design rules, DESIGN.md and PRODUCT.md, README, AGENTS.md and enforcement gates",
+    "from_idea": "I-041",
+    "created_at": "2026-09-25T17:24:20.281783+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "epic": "E-001",
+    "claimed_at": "2026-09-25T17:24:20.978478+00:00",
+    "shipped_at": "2026-09-25T18:21:26.075001+00:00",
+    "shipped_sha": "9a556801a456202a28e0288218c97320bd7b1e94"
+  },
+  {
+    "id": "F-042",
+    "title": "epic-check installs deps in a fresh snapshot",
+    "from_idea": "I-042",
+    "created_at": "2026-09-25T18:22:39.311565+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "claimed_at": "2026-09-25T18:22:40.073980+00:00",
+    "shipped_at": "2026-09-25T18:41:56.135083+00:00",
+    "shipped_sha": "0ebd1ac5d1def766aa4d2354eee6b68921cc2b08"
+  },
+  {
+    "id": "F-043",
+    "title": "Brand asset kit: logo, hero banner, ribbon, social cards aligned with joymify-portal",
+    "from_idea": "I-043",
+    "created_at": "2026-09-25T18:41:56.219127+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.24",
+    "claimed_at": "2026-09-25T18:42:00.789535+00:00",
+    "shipped_at": "2026-09-26T02:55:13.673098+00:00",
+    "shipped_sha": "b08248db056285d625ccbc56aca53426178ce4f0"
   }
 ]
