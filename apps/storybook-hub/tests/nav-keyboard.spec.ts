@@ -81,4 +81,18 @@ test.describe("sidebar nav keyboard access", () => {
     }
     expect(navFocused).toBeGreaterThan(0);
   });
+
+  test("picking the already-open view still closes the drawer", async ({
+    page,
+  }, info) => {
+    test.skip(
+      info.project.name !== "mobile-chrome",
+      "drawer only exists on mobile",
+    );
+    await page.goto("/#tokens");
+    await page.locator(".mobile-menu-btn").click();
+    await expect(page.locator(".sidebar")).toHaveClass(/open/);
+    await page.locator('.nav-item[data-view="tokens"]').click();
+    await expect(page.locator(".sidebar")).not.toHaveClass(/open/);
+  });
 });

@@ -829,6 +829,7 @@ ${inlinedThemeCss}
       color: var(--joy-accent-text);
       box-shadow: var(--joy-elevation-1);
     }
+    .nav-item:focus-visible,
     .framework-btn:focus-visible,
     .mobile-menu-btn:focus-visible,
     .sidebar-close-btn:focus-visible {
@@ -5900,6 +5901,8 @@ export async function executeHedge(symbol: string, size: number) {
     // Synchronize view immediately on script load to eliminate theme/overview flash
     syncViewFromHash();
     window.addEventListener('hashchange', syncViewFromHash);
+    // Following a link to the current hash fires no hashchange, so close the drawer on every nav pick.
+    document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', () => toggleMobileMenu(false)));
 
     function setFramework(fw) {
       activeFramework = fw;
