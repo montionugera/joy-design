@@ -15,6 +15,7 @@
     "check": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@joymify/brand": "workspace:*",
     "@joymify/icons": "workspace:*",
     "@joymify/tokens": "workspace:*"
   },

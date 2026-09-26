@@ -81,7 +81,12 @@ export const COMPONENTS = [
   'SiteFooter',
   'LandingPage',
   // internal (not exported): the action button both landing twins render; no ref/rest by design
-  'LandingAction'
+  'LandingAction',
+  // F-043
+  'BrandMark',
+  'Wordmark',
+  'Ribbon',
+  'BrandBanner'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a

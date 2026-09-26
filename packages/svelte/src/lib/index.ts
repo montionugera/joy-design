@@ -103,3 +103,8 @@ export { default as CTASection } from './CTASection.svelte';
 export { default as FAQSection } from './FAQSection.svelte';
 export { default as SiteFooter } from './SiteFooter.svelte';
 export { default as LandingPage } from './LandingPage.svelte';
+// F-043: Brand Asset Kit
+export { default as BrandMark } from './BrandMark.svelte';
+export { default as Wordmark } from './Wordmark.svelte';
+export { default as Ribbon } from './Ribbon.svelte';
+export { default as BrandBanner } from './BrandBanner.svelte';

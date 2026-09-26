@@ -27,6 +27,8 @@ else
     "packages/icons/src"
     "apps/storybook-hub/build.js"
     "packages/tokens/build.js"
+    "packages/brand/src"
+    "packages/brand/build.js"
   )
 fi
 

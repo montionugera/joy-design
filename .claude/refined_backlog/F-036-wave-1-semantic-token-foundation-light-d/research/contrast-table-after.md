@@ -56,3 +56,11 @@
 | --joy-status-danger-solid-fg (#ffffff) on --joy-status-danger-solid-bg (#9f3331) | Dark | Danger Solid Button | 7.02:1 | ≥ 4.5:1 | PASS |
 | --joy-status-info-fg (#8fbceb) on --joy-status-info-bg (#0b2741) | Dark | Status Text / Surface | 7.65:1 | ≥ 4.5:1 | PASS |
 | --joy-status-info-fg (#8fbceb) on --joy-surface-canvas (#0d1624) | Dark | Status Text / Surface | 9.13:1 | ≥ 4.5:1 | PASS |
+| --joy-brand-mark-on-tile (#c49a3a) on --joy-brand-tile (#14253e) | Light | Brand mark / Tile | 5.89:1 | ≥ 3:1 | PASS |
+| --joy-brand-mark (#856515) on --joy-surface-canvas (#f8f3e8) | Light | Brand mark / Canvas | 4.90:1 | ≥ 3:1 | PASS |
+| --joy-brand-ink (#14253e) on --joy-surface-canvas (#f8f3e8) | Light | Brand ink / Canvas | 13.91:1 | ≥ 4.5:1 | PASS |
+| --joy-brand-ink-on-tile (#f8f3e8) on --joy-brand-tile (#14253e) | Light | Brand ink / Tile | 13.91:1 | ≥ 4.5:1 | PASS |
+| --joy-brand-mark-on-tile (#c49a3a) on --joy-brand-tile (#14253e) | Dark | Brand mark / Tile | 5.89:1 | ≥ 3:1 | PASS |
+| --joy-brand-mark (#dab362) on --joy-surface-canvas (#0d1624) | Dark | Brand mark / Canvas | 9.16:1 | ≥ 3:1 | PASS |
+| --joy-brand-ink (#f8f3e8) on --joy-surface-canvas (#0d1624) | Dark | Brand ink / Canvas | 16.40:1 | ≥ 4.5:1 | PASS |
+| --joy-brand-ink-on-tile (#f8f3e8) on --joy-brand-tile (#14253e) | Dark | Brand ink / Tile | 13.91:1 | ≥ 4.5:1 | PASS |

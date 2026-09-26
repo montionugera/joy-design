@@ -47,6 +47,12 @@ colors:
   status-info-fg: "#17446f"
   status-info-bg: "#e6f0f9"
   status-info-border: "#8fbceb"
+  brand-tile: "#14253e"
+  brand-mark: "#856515"
+  brand-mark-on-tile: "#c49a3a"
+  brand-mark-contrast: "#fdfaf3"
+  brand-ink: "#14253e"
+  brand-ink-on-tile: "#f8f3e8"
   surface-canvas-dark: "#0d1624"
   surface-card-dark: "#111b2b"
   surface-raised-dark: "#14253e"
@@ -88,6 +94,12 @@ colors:
   status-info-fg-dark: "#8fbceb"
   status-info-bg-dark: "#0b2741"
   status-info-border-dark: "#17446f"
+  brand-tile-dark: "#14253e"
+  brand-mark-dark: "#dab362"
+  brand-mark-on-tile-dark: "#c49a3a"
+  brand-mark-contrast-dark: "#fdfaf3"
+  brand-ink-dark: "#f8f3e8"
+  brand-ink-on-tile-dark: "#f8f3e8"
 typography:
   display:
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
@@ -293,6 +305,12 @@ The contract. Light and dark values for every role.
 | `--joy-elevation-accent-1` | `0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)` | `0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)` |
 | `--joy-elevation-accent-2` | `0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)` | `0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6)` |
 | `--joy-elevation-accent-inset` | `inset 0 2px 4px rgba(133, 101, 21, 0.35)` | `inset 0 2px 4px rgba(0, 0, 0, 0.45)` |
+| `--joy-brand-tile` | `#14253e` | `#14253e` |
+| `--joy-brand-mark` | `#856515` | `#dab362` |
+| `--joy-brand-mark-on-tile` | `#c49a3a` | `#c49a3a` |
+| `--joy-brand-mark-contrast` | `#fdfaf3` | `#fdfaf3` |
+| `--joy-brand-ink` | `#14253e` | `#f8f3e8` |
+| `--joy-brand-ink-on-tile` | `#f8f3e8` | `#f8f3e8` |
 
 ### Measured contrast
 
@@ -605,6 +623,25 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | SiteFooter | `.joy-site-footer` | - | - | hover, focus-visible |
 | LandingPage | `.joy-landing-page` | sm, md, lg | - | hover, focus-visible, active, disabled, loading |
 | LandingAction | `.joy-button` | sm, md, lg | block, danger, ghost, icon-only, link, outline, solid, wave | hover, focus-visible, active, disabled, loading |
+| BrandMark | `.joy-brand-mark` | - | - | - |
+| Wordmark | `.joy-wordmark` | - | - | - |
+| Ribbon | `.joy-ribbon` | - | corner, gold, inline, navy | - |
+| BrandBanner | `.joy-brand-banner` | - | center | hover, focus-visible, active, disabled |
+
+## Brand
+
+The mark is a gold diamond on a navy tile, not a square and not a circle: outline `M16 4 28 16 16 28 4 16Z`, inner fill `M16 9 23 16 16 23 9 16Z`, a centre dot, on a 32×32 tile with `rx=6`, defined once in `packages/brand/src/geometry.js`. The wordmark is "Joymify" in sentence case, set in the display font and converted to vector outlines (no live text, no font dependency at render time). The canonical mark : gap : glyph ratio is `48 : 16 : 40`. Components render the wordmark at padding 0, so the mark height equals the `height` prop and the glyph is drawn with `overflow: visible`, deliberately overflowing its box by about 8% of height on each edge. Parents must not clip the `Wordmark` with `overflow: hidden` unless they add matching padding back. Downloadable wordmark assets (`packages/brand/assets/`) bake in 16px padding at 80px height.
+
+Display font: `--joy-font-family-display` (`"Cormorant Garamond", "Noto Serif", Georgia, serif`). joy-design does not load the font; consumers do.
+
+Colour roles: `--joy-brand-tile`, `--joy-brand-mark`, `--joy-brand-mark-on-tile`, `--joy-brand-mark-contrast`, `--joy-brand-ink`, `--joy-brand-ink-on-tile` — light and dark values are in the [Semantic layer](#semantic-layer) table above.
+
+### Don'ts
+
+- Do not recolour the mark or wordmark outside the `--joy-brand-*` roles above.
+- Do not stretch or skew the mark or wordmark; scale it uniformly.
+- Do not substitute the square mark some products still ship; the diamond is canonical.
+- Gold is a signature, not a wash: never a large field, a page background or a card background. The two sanctioned small-area gold fills are the mark's inner diamond and the `Ribbon` `gold` tone.
 
 ## Do's and Don'ts
 

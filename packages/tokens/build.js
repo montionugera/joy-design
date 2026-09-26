@@ -2671,6 +2671,137 @@ h1, h2, h3, .joy-display {
   }
 }
 
+/* Brand mark + wordmark: inline SVG logos, coloured entirely through --joy-brand-* custom
+   properties (see packages/brand) so they track the active theme; these block classes exist so a
+   consumer can target sizing/spacing, not for any colour of their own. */
+.joy-brand-mark {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.joy-wordmark {
+  display: inline-block;
+  /* Fix round 3: the glyph outline's descender pokes past the viewBox at padding 0 by design (the
+     mark:gap:glyph ratio is canonical, the box is not padded to fit it) — the CSS property backs
+     up the svg element's own overflow="visible" attribute for browsers/contexts that prefer one
+     over the other. */
+  overflow: visible;
+}
+
+/* Ribbon: a small label badge. The "corner" variant is absolutely positioned and rotated 45deg,
+   so its parent must set position: relative; overflow: hidden for the band to clip cleanly. */
+.joy-ribbon {
+  display: inline-block;
+  box-sizing: border-box;
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.4;
+  white-space: nowrap;
+  padding: 4px 12px;
+}
+.joy-ribbon--inline {
+  display: inline-flex;
+  align-items: center;
+  padding-right: 20px;
+  /* An inward V (swallowtail notch), not an outward arrow point: the right edge cuts IN by 10px
+     at the vertical centre, it does not come to a point past the box. */
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%);
+}
+.joy-ribbon--corner {
+  position: absolute;
+  top: 16px;
+  right: -40px;
+  width: 160px;
+  text-align: center;
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+.joy-ribbon--gold {
+  background: var(--joy-accent-default);
+  color: var(--joy-text-on-accent);
+}
+.joy-ribbon--navy {
+  background: var(--joy-brand-tile);
+  color: var(--joy-brand-ink-on-tile);
+}
+
+/* Brand Banner: a tile-toned marketing band with a decorative diamond lattice behind the copy. */
+.joy-brand-banner {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--joy-brand-tile);
+  color: var(--joy-brand-ink-on-tile);
+  padding: 48px 32px;
+  border-radius: var(--joy-radius-overlay);
+}
+.joy-brand-banner--center {
+  text-align: center;
+}
+.joy-brand-banner--center .joy-brand-banner__content {
+  margin: 0 auto;
+}
+.joy-brand-banner--center .joy-brand-banner__ctas {
+  justify-content: center;
+}
+.joy-brand-banner__lattice {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.joy-brand-banner__content {
+  position: relative;
+  max-width: 640px;
+}
+.joy-brand-banner__eyebrow {
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  letter-spacing: normal;
+  margin: 0 0 8px 0;
+  opacity: 0.85;
+}
+.joy-brand-banner__title {
+  font-family: var(--joy-font-family-display);
+  font-weight: 500;
+  font-size: var(--joy-font-size-display-md);
+  color: var(--joy-brand-ink-on-tile);
+  margin: 0 0 12px 0;
+}
+.joy-brand-banner__lede {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  opacity: 0.92;
+}
+.joy-brand-banner__ctas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+/* Fix round (final review Important #1): the shared .joy-button--outline sets its own color
+   (--joy-text-primary), which wins over the banner's color: var(--joy-brand-ink-on-tile) on
+   .joy-brand-banner itself, so the secondary CTA rendered dark ink on the navy tile -- 1.11:1 for
+   the text and 1.91:1 for the border, both failing WCAG (4.5:1 text, 3:1 non-text). --joy-brand-tile
+   and --joy-brand-ink-on-tile are the same value in both themes, so one override covers light and
+   dark. Mirrors .joy-cta-section__container's outline override: transparent background always (the
+   hero's "raised surface" hover would be invisible in dark, where --joy-surface-raised equals the
+   tile colour), an inset ring on hover/active instead of a fill change. */
+.joy-brand-banner .joy-button--outline {
+  color: var(--joy-brand-ink-on-tile);
+  border-color: var(--joy-brand-ink-on-tile);
+}
+.joy-brand-banner .joy-button--outline:hover:not(:disabled),
+.joy-brand-banner .joy-button--outline:active:not(:disabled) {
+  background: transparent;
+}
+.joy-brand-banner .joy-button--outline:hover:not(:disabled):not(:focus-visible),
+.joy-brand-banner .joy-button--outline:active:not(:disabled):not(:focus-visible) {
+  box-shadow: inset 0 0 0 1px var(--joy-brand-ink-on-tile);
+}
+
 /* Pricing Matrix */
 .joy-pricing-matrix {
   display: flex;

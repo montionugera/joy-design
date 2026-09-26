@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { MARK, WORDMARK, heroLattice, wordmarkLayout, markScale } from "../../packages/brand/src/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "dist");
@@ -145,7 +146,76 @@ function renderFormsMatrix() {
   </div>`;
 }
 
+// Outline + filled-inner path pair for the diamond mark in a single `color`, shared by every mark
+// render site below (the standalone mark preview and the mark embedded in the wordmark) so the two
+// can't drift apart.
+function markOutlineAndInner(color) {
+  return `<path d="${MARK.outline}" fill="none" stroke="${color}" stroke-width="${MARK.outlineWidth}"/><path d="${MARK.inner}" fill="${color}"/>`;
+}
+
+// Brand mark: the single inline-<svg> builder for every mark rendered in the hub (the `.brand-logo`
+// header sites, the Brand nav icon, and the Brand view's size/tile grid). Mirrors BrandMark.svelte's
+// own tile/bare branches exactly (rect + outline + inner + contrast dot when tile, bare outline +
+// inner otherwise) so it can never drift from the real component, and geometry always comes from
+// @joymify/brand's MARK with var(--joy-brand-*) fills, never a resolved hex.
+// `decorative` drops the img role/label for sites where an adjacent visible label already names the
+// mark (the header logos sit next to "Joymify Design" text; the nav icon sits next to its own link
+// label) — without it, screen readers would announce "Joymify" twice.
+function brandMarkPreview(size, tile, decorative = false) {
+  const color = tile ? "var(--joy-brand-mark-on-tile)" : "var(--joy-brand-mark)";
+  let markup = "";
+  if (tile) markup += `<rect width="32" height="32" rx="${MARK.tileRx}" fill="var(--joy-brand-tile)"/>`;
+  markup += markOutlineAndInner(color);
+  if (tile) markup += `<circle cx="${MARK.dot.cx}" cy="${MARK.dot.cy}" r="${MARK.dot.r}" fill="var(--joy-brand-mark-contrast)"/>`;
+  const label = decorative ? 'aria-hidden="true"' : 'role="img" aria-label="Joymify"';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK.viewBox}" width="${size}" height="${size}" ${label} focusable="false" class="joy-brand-mark">${markup}</svg>`;
+}
+
+// Wordmark preview for the Brand view: mirrors Wordmark.svelte's SSR output (padding: 0, the mark
+// filling the full lockup height) so the hub demo can never drift from the real component.
+function brandWordmarkPreview(tone, height) {
+  const { width, markX, markY, markSize, glyphX, glyphY, glyphScale } = wordmarkLayout({ height, withMark: true, padding: 0 });
+  const isCream = tone === "cream";
+  const glyphColor = isCream ? "var(--joy-brand-ink-on-tile)" : "var(--joy-brand-ink)";
+  const markColor = isCream ? "var(--joy-brand-mark-on-tile)" : "var(--joy-brand-mark)";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="Joymify" class="joy-wordmark" overflow="visible"><title>Joymify</title><g transform="translate(${markX} ${markY}) scale(${markScale(markSize)})">${markOutlineAndInner(markColor)}</g><path d="${WORDMARK.d}" fill="${glyphColor}" transform="translate(${glyphX} ${glyphY}) scale(${glyphScale})"/></svg>`;
+}
+
+// Decorative diamond lattice for the BrandBanner demo: the same grid + right-edge fade as
+// BrandBanner.svelte's own <svg>, sourced from the shared heroLattice() helper so the two can
+// never drift apart.
+function brandBannerLatticeSvg() {
+  const lattice = heroLattice();
+  const diamonds = lattice.diamonds
+    .map(
+      (d) =>
+        `<g transform="translate(${d.x} ${d.y}) scale(${lattice.diamondScale})"><path d="${MARK.outline}" fill="none" stroke="var(--joy-brand-mark-on-tile)" stroke-width="0.5" stroke-opacity="${d.opacity}"/></g>`,
+    )
+    .join("");
+  return `<svg class="joy-brand-banner__lattice" viewBox="0 0 ${lattice.width} ${lattice.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${diamonds}</svg>`;
+}
+
+// Every generated file in @joymify/brand's assets/ folder (mark, wordmark, favicon, hero banner, OG
+// card variants): read once here so the Brand view's download links (below) and the dist copy step
+// at the end of this file always list the exact same files, with no separate hardcoded list to drift
+// out of sync with the folder. The <link rel="icon"> further below is unconditional, so a missing or
+// empty folder must fail the build loudly rather than silently ship a 404 favicon and downloads;
+// dotfiles (e.g. macOS .DS_Store) and any subfolder are skipped, only regular files are read. Sorted
+// into the kit's canonical mark -> favicon -> wordmark -> banner -> OG-card order, since readdirSync's
+// own order isn't guaranteed stable across filesystems.
+const brandAssetsSrc = path.join(__dirname, "../../packages/brand/assets");
+if (!fs.existsSync(brandAssetsSrc)) {
+  throw new Error(`Brand assets folder not found: ${brandAssetsSrc}. Run "pnpm --filter @joymify/brand build" first.`);
+}
+const brandAssetDisplayOrder = ["mark.svg", "mark-bare.svg", "favicon.svg", "favicon-32.png", "apple-touch-icon.png", "wordmark-cream.svg", "wordmark-deep.svg", "hero-banner.svg", "og-card.svg", "og-card.png"];
+const brandAssetFiles = fs
+  .readdirSync(brandAssetsSrc, { withFileTypes: true })
+  .filter((entry) => entry.isFile() && !entry.name.startsWith("."))
+  .map((entry) => entry.name)
+  .sort((a, b) => brandAssetDisplayOrder.indexOf(a) - brandAssetDisplayOrder.indexOf(b));
+
 const navIcons = {
+  brand: brandMarkPreview(16, false, true),
   overview: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
   tokens: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>`,
   propsSpec: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
@@ -550,6 +620,7 @@ const html = `<!DOCTYPE html>
     })();
   </script>
   <title>Joymify Design System & Component Portal</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <style id="joy-theme-inline">
 ${inlinedThemeCss}
   </style>
@@ -623,15 +694,9 @@ ${inlinedThemeCss}
     .brand-logo {
       width: 34px;
       height: 34px;
-      background: var(--joy-accent-default);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--joy-text-on-accent);
-      font-weight: 700;
-      font-size: var(--joy-font-size-lg);
-      box-shadow: var(--joy-elevation-1);
     }
     .brand-info h2 {
       margin: 0;
@@ -723,8 +788,6 @@ ${inlinedThemeCss}
     .brand-logo.brand-logo--compact {
       width: 28px;
       height: 28px;
-      font-size: var(--joy-font-size-sm);
-      box-shadow: none;
     }
     #btn-theme-toggle.hub-theme-toggle {
       flex-shrink: 0;
@@ -1557,7 +1620,7 @@ ${inlinedThemeCss}
   <!-- Sidebar -->
   <aside class="sidebar" id="hub-sidebar" aria-label="Component navigation">
     <div class="brand">
-      <div class="brand-logo">J</div>
+      <div class="brand-logo">${brandMarkPreview(20, true, true)}</div>
       <div class="brand-info">
         <h2>Joymify Design</h2>
         <span>v2.2 OpenDesign Integrated</span>
@@ -1582,7 +1645,7 @@ ${navigationHtml}
         <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Open navigation" aria-controls="hub-sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">J</span><span class="topbar-brand__name">Joymify Design</span></span>
+        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">${brandMarkPreview(16, true, true)}</span><span class="topbar-brand__name">Joymify Design</span></span>
       </div>
       <div class="topbar__end">
         <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-theme-toggle" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme">
@@ -1666,6 +1729,109 @@ ${navigationHtml}
           <div class="joy-alert__title">Complete Ant Design Parity Suite + OpenDesign Posture Engine</div>
           <div class="joy-alert__desc">
             Explore 18 standard & enterprise components including Modals, Drawers, Dropdown menus, Selects, and Live Trading Orderbooks with full GPU spring motion transitions and OpenDesign posture styling.
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Brand Assets (F-043) -->
+      <section id="view-brand" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Brand Assets</h2>
+        <p class="header-tagline">The Joymify diamond mark, wordmark and hero lattice: live renders sourced from @joymify/brand, plus the downloadable asset kit generated from the same geometry.</p>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Mark: sizes and surfaces</h4></div>
+          <div class="canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--joy-space-4);">
+            <div>
+              <p>On canvas</p>
+              <div style="display: flex; align-items: flex-end; flex-wrap: wrap; gap: var(--joy-space-3);">${[16, 32, 64, 128].map((s) => brandMarkPreview(s, false)).join("")}</div>
+            </div>
+            <div>
+              <p>On tile</p>
+              <div style="display: flex; align-items: flex-end; flex-wrap: wrap; gap: var(--joy-space-3);">${[16, 32, 64, 128].map((s) => brandMarkPreview(s, true)).join("")}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Wordmark</h4></div>
+          <div class="canvas" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--joy-space-4);">
+            <div>${brandWordmarkPreview("deep", 40)}</div>
+            <div style="background: var(--joy-brand-tile); padding: var(--joy-space-4); border-radius: var(--joy-radius-md);">${brandWordmarkPreview("cream", 40)}</div>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Clear space</h4></div>
+          <div class="canvas">
+            <p>Keep one diamond-width of space around the lockup; minimum 16px mark, 96px wordmark.</p>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Colour tokens</h4></div>
+          <div class="hub-scroll-x" tabindex="0" role="region" aria-label="Brand colour tokens (token table, scrolls sideways)">
+          <table class="tokens-table">
+            <thead>
+              <tr><th>CSS Custom Property</th><th>Preview</th><th>Resolved value</th></tr>
+            </thead>
+            <tbody>
+              ${["--joy-brand-tile", "--joy-brand-mark", "--joy-brand-mark-on-tile", "--joy-brand-mark-contrast", "--joy-brand-ink", "--joy-brand-ink-on-tile"]
+                .map(
+                  (token) =>
+                    `<tr><td><code>${token}</code></td><td><span class="color-swatch" style="background: var(${token});"></span></td><td><code class="token-value" data-token="${token}"></code></td></tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Ribbon</h4></div>
+          <div class="canvas" style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--joy-space-4);">
+            <span class="joy-ribbon joy-ribbon--inline joy-ribbon--gold">New</span>
+            <span class="joy-ribbon joy-ribbon--inline joy-ribbon--navy">Beta</span>
+            <div style="position: relative; overflow: hidden; width: 200px; height: 120px; border: 1px solid var(--joy-border-subtle); border-radius: var(--joy-radius-md);">
+              <span class="joy-ribbon joy-ribbon--corner joy-ribbon--gold">Sale</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Brand banner</h4></div>
+          <div class="canvas">
+            <section class="joy-brand-banner">
+              ${brandBannerLatticeSvg()}
+              <div class="joy-brand-banner__content">
+                <p class="joy-brand-banner__eyebrow">Joymify</p>
+                <h2 class="joy-brand-banner__title">Trade with clarity</h2>
+                <p class="joy-brand-banner__lede">A calmer way to see your portfolio.</p>
+                <div class="joy-brand-banner__ctas">
+                  <a class="joy-button joy-button--solid joy-button--md" href="#brand"><span class="joy-button__label">Get started</span></a>
+                  <a class="joy-button joy-button--outline joy-button--md" href="#brand"><span class="joy-button__label">Learn more</span></a>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Do and don't</h4></div>
+          <div class="canvas" style="display: flex; flex-direction: column; gap: var(--joy-space-3);">
+            ${hubAlert("success", "Do", "Keep the diamond mark's proportions and clear space intact; use the --joy-brand-* tokens for colour.")}
+            ${hubAlert("danger", "Don't", "Recolor the mark outside the --joy-brand-* tokens, stretch it off its aspect ratio, or crowd it inside the clear-space margin. Do not substitute the square mark some products still ship — the diamond is canonical. Gold is a signature, not a wash: never a large field, a page background or a card background.")}
+          </div>
+        </div>
+
+        <div class="playground-box">
+          <div class="playground-header"><h4>Download the asset kit</h4></div>
+          <div class="canvas" style="display: flex; flex-wrap: wrap; gap: var(--joy-space-2);">
+            ${brandAssetFiles
+              .map(
+                (file) =>
+                  `<a class="joy-button joy-button--outline joy-button--sm" download href="brand/${file}"><span class="joy-button__label">${file}</span></a>`,
+              )
+              .join("")}
           </div>
         </div>
       </section>
@@ -5595,9 +5761,12 @@ export async function executeHedge(symbol: string, size: number) {
     document.addEventListener('DOMContentLoaded', () => {
       syncThemeToggle(document.documentElement.getAttribute('data-theme'));
     });
-    // Any theme change (toggle, restore, tests, devtools) keeps the toggle's icon and labels truthful.
-    new MutationObserver(() => syncThemeToggle(document.documentElement.getAttribute('data-theme')))
-      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    // Any theme change (toggle, restore, tests, devtools) keeps the toggle's icon and labels truthful,
+    // and re-reads any resolved brand token values the Brand view is showing.
+    new MutationObserver(() => {
+      syncThemeToggle(document.documentElement.getAttribute('data-theme'));
+      paintBrandTokenValues();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     /** Enter activates a role="link" .hub-card the same as a click (native <a> behaviour). */
     function hubCardActivate(event) {
@@ -5703,6 +5872,20 @@ export async function executeHedge(symbol: string, size: number) {
       if (viewName === 'charts' || viewName === 'data-display-feedback') {
         requestAnimationFrame(redrawHubCharts);
       }
+
+      // The brand colour token table shows resolved values read at runtime, not hardcoded hex.
+      if (viewName === 'brand') {
+        paintBrandTokenValues();
+      }
+    }
+
+    /** Fills every .token-value[data-token] in the Brand view with that custom property's current
+        resolved value, so the table never hardcodes a hex the active theme might change. */
+    function paintBrandTokenValues() {
+      const root = getComputedStyle(document.documentElement);
+      document.querySelectorAll('.token-value[data-token]').forEach((el) => {
+        el.textContent = root.getPropertyValue(el.getAttribute('data-token')).trim();
+      });
     }
 
     function syncViewFromHash() {
@@ -7355,4 +7538,14 @@ const tokensSrc = path.join(__dirname, "../../packages/tokens/dist/theme.css");
 if (fs.existsSync(tokensSrc)) {
   fs.copyFileSync(tokensSrc, path.join(outDir, "theme.css"));
 }
+
+// Downloadable brand assets (F-043): copy the files listed in brandAssetFiles (read above) into the
+// dist output, plus a copy of favicon.svg at the site root for the <link rel="icon"> above.
+const brandOutDir = path.join(outDir, "brand");
+fs.mkdirSync(brandOutDir, { recursive: true });
+for (const file of brandAssetFiles) {
+  fs.copyFileSync(path.join(brandAssetsSrc, file), path.join(brandOutDir, file));
+}
+fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
+
 console.log("Built Storybook Hub static distribution in", outDir);

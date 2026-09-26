@@ -197,6 +197,24 @@ Read from the stylesheet (\`packages/tokens/dist/theme.css\`): for each componen
 ${table(['Component', 'Block', 'Sizes', 'Variants', 'States'], rows)}`;
 }
 
+function brand(m) {
+  const roles = Object.keys(m.semantic.light.brand).map((role) => code(`--joy-brand-${role}`));
+  return `## Brand
+
+The mark is a gold diamond on a navy tile, not a square and not a circle: outline \`M16 4 28 16 16 28 4 16Z\`, inner fill \`M16 9 23 16 16 23 9 16Z\`, a centre dot, on a 32×32 tile with \`rx=6\`, defined once in \`packages/brand/src/geometry.js\`. The wordmark is "Joymify" in sentence case, set in the display font and converted to vector outlines (no live text, no font dependency at render time). The canonical mark : gap : glyph ratio is \`48 : 16 : 40\`. Components render the wordmark at padding 0, so the mark height equals the \`height\` prop and the glyph is drawn with \`overflow: visible\`, deliberately overflowing its box by about 8% of height on each edge. Parents must not clip the \`Wordmark\` with \`overflow: hidden\` unless they add matching padding back. Downloadable wordmark assets (\`packages/brand/assets/\`) bake in 16px padding at 80px height.
+
+Display font: ${code('--joy-font-family-display')} (\`${get(m.fontFamily, 'display')}\`). joy-design does not load the font; consumers do.
+
+Colour roles: ${roles.join(', ')} — light and dark values are in the [Semantic layer](#semantic-layer) table above.
+
+### Don'ts
+
+- Do not recolour the mark or wordmark outside the \`--joy-brand-*\` roles above.
+- Do not stretch or skew the mark or wordmark; scale it uniformly.
+- Do not substitute the square mark some products still ship; the diamond is canonical.
+- Gold is a signature, not a wash: never a large field, a page background or a card background. The two sanctioned small-area gold fills are the mark's inner diamond and the \`Ribbon\` \`gold\` tone.`;
+}
+
 function dosAndDonts() {
   return `## Do's and Don'ts
 
@@ -223,7 +241,7 @@ function dosAndDonts() {
 }
 
 export function renderDesignMd(m) {
-  return `${[frontmatter(m), GENERATED_NOTE, '# Design System: Joymify', overview(m), colors(m), typography(m), elevation(m), components(m), dosAndDonts()].join('\n\n')}\n`;
+  return `${[frontmatter(m), GENERATED_NOTE, '# Design System: Joymify', overview(m), colors(m), typography(m), elevation(m), components(m), brand(m), dosAndDonts()].join('\n\n')}\n`;
 }
 
 const BADGE = { gated: 'parity-gated', both: 'both, not gated', svelte: 'Svelte only', react: 'React only' };

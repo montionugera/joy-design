@@ -151,10 +151,13 @@ test.describe("F-037 form control contracts", () => {
         return color;
       });
 
-      await expect(page.locator(".canvas").first()).toBeVisible();
+      // Scoped to the active view: ".canvas" is a generic wrapper class reused by many views (e.g.
+      // the F-043 Brand view), so an unscoped `.locator(".canvas").first()` would match whichever
+      // hidden view's canvas happens to come first in DOM order instead of this one's.
+      const canvas = page.locator("#view-button .canvas");
+      await expect(canvas.first()).toBeVisible();
       expect(
-        await page
-          .locator(".canvas")
+        await canvas
           .first()
           .evaluate((element) => getComputedStyle(element).backgroundImage),
       ).toContain(borderColor);
