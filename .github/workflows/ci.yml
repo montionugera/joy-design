@@ -83,6 +83,10 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm --filter storybook-hub exec playwright install --with-deps chromium
 
+      # scripts/lint-colors.sh and its self-test search with ripgrep, which the runner image lacks.
+      - name: Install ripgrep
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ripgrep
+
       - name: Type check (pnpm check)
         run: pnpm check
 
