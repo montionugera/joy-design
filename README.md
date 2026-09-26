@@ -47,6 +47,7 @@ Import the stylesheet once: `import '@joymify/tokens/theme.css'`. Light is the d
 
 | Step | Command | What it enforces |
 | --- | --- | --- |
+| 0 | `pnpm install --frozen-lockfile` | Workspace packages are linked, including any package a merge just added. |
 | 1 | emoji scan (inline Python) | No raw OS emoji in tracked files. |
 | 2 | `bash scripts/lint-colors.sh` | No hex, `rgb()`/`hsl()` or `var(--joy-*, fallback)` in any package source or the hub. Every hit fails. Narrow exceptions live in `scripts/lint-colors.allow`. |
 | 2a | `bash scripts/test-lint-colors.sh`, `bash scripts/test-epic-check.sh` | Self-tests: the gate scripts still catch what they claim to. |

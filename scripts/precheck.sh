@@ -5,6 +5,11 @@ export PLAYWRIGHT_PORT="${PLAYWRIGHT_PORT:-6116}"
 
 echo "==> Gate 1: Deterministic Precheck <=="
 
+echo "0. Linking workspace packages (pnpm install --frozen-lockfile)..."
+# A merge can add a workspace package (e.g. packages/brand); without a fresh
+# install its node_modules links are missing and its tests cannot resolve siblings.
+pnpm install --frozen-lockfile --prefer-offline >/dev/null
+
 echo "1. Validating Zero Emoji Policy in source files..."
 # Ensure no OS emoji in codebase via Python UTF-32 regex
 python3 -c "
