@@ -261,7 +261,7 @@ const navigationHtml = manifest.categories
     const items = cat.views
       .map((v) => {
         const iconSvg = navIcons[v.icon] || navIcons.overview;
-        return `      <a class="nav-item" onclick="switchView('${v.id}')">
+        return `      <a class="nav-item" href="#${v.id}" data-view="${v.id}">
         <span class="icon">${iconSvg}</span> ${v.label}
       </a>`;
       })
@@ -829,6 +829,7 @@ ${inlinedThemeCss}
       color: var(--joy-accent-text);
       box-shadow: var(--joy-elevation-1);
     }
+    .nav-item:focus-visible,
     .framework-btn:focus-visible,
     .mobile-menu-btn:focus-visible,
     .sidebar-close-btn:focus-visible {
@@ -5850,12 +5851,12 @@ export async function executeHedge(symbol: string, size: number) {
         target.classList.add('active');
       }
 
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(el => {
-        const oc = el.getAttribute('onclick');
-        return oc && (oc.includes("'" + viewName + "'") || oc.includes('"' + viewName + '"'));
+      document.querySelectorAll('.nav-item').forEach(i => {
+        const current = i.dataset.view === viewName;
+        i.classList.toggle('active', current);
+        if (current) i.setAttribute('aria-current', 'page');
+        else i.removeAttribute('aria-current');
       });
-      if (activeNav) activeNav.classList.add('active');
 
       const main = document.querySelector('.main');
       if (main) main.scrollTop = 0;
@@ -5900,6 +5901,8 @@ export async function executeHedge(symbol: string, size: number) {
     // Synchronize view immediately on script load to eliminate theme/overview flash
     syncViewFromHash();
     window.addEventListener('hashchange', syncViewFromHash);
+    // Following a link to the current hash fires no hashchange, so close the drawer on every nav pick.
+    document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', () => toggleMobileMenu(false)));
 
     function setFramework(fw) {
       activeFramework = fw;
