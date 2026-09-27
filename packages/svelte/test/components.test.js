@@ -63,7 +63,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(tbl.includes('<svg width="12" height="12"'), 'Table sort indicators must use vector SVG icons');
 
   const pagination = fs.readFileSync(path.resolve('./src/lib/Pagination.svelte'), 'utf8');
-  assert.ok(pagination.includes('role="navigation"'), 'Pagination must implement role=navigation');
+  assert.ok(/<nav\b/.test(pagination), 'Pagination must implement the navigation role (native <nav> landmark)');
   assert.ok(pagination.includes('joy-pagination'), 'Pagination must have joy-pagination class');
   assert.ok(pagination.includes('$derived'), 'Pagination must use Svelte 5 $derived()');
 
@@ -196,7 +196,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
 
   const anchor = fs.readFileSync(path.resolve('./src/lib/Anchor.svelte'), 'utf8');
   assert.ok(anchor.includes('joy-anchor'), 'Anchor must have joy-anchor class');
-  assert.ok(anchor.includes('role="navigation"'), 'Anchor must implement role=navigation');
+  assert.ok(/<nav\b/.test(anchor), 'Anchor must implement the navigation role (native <nav> landmark)');
 
   const message = fs.readFileSync(path.resolve('./src/lib/Message.svelte'), 'utf8');
   assert.ok(message.includes('joy-message'), 'Message must have joy-message class');

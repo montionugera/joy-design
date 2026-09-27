@@ -31,6 +31,8 @@
   }: Props = $props();
 
   let isOpen = $state(false);
+  const uid = $props.id();
+  const panelId = `${uid}-panel`;
   let activeCol = $state<0 | 1 | 2>(0);
 
   let anchorEl = $state<HTMLDivElement | null>(null);
@@ -139,6 +141,7 @@
     tabindex={disabled ? -1 : 0}
     role="combobox"
     aria-expanded={isOpen}
+    aria-controls={isOpen ? panelId : undefined}
     aria-haspopup="listbox"
     onclick={() => {
       if (!disabled) isOpen = !isOpen;
@@ -168,6 +171,7 @@
   {#if isOpen}
     <div
       bind:this={panelEl}
+      id={panelId}
       class="joy-time-picker__panel"
       role="listbox"
       tabindex="-1"

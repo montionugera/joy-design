@@ -15,7 +15,8 @@
     }
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "check": "svelte-check --tsconfig ./tsconfig.json --threshold error"
   },
   "peerDependencies": {
     "react": "^19.0.0",
@@ -28,5 +29,12 @@
     "svelte": {
       "optional": true
     }
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "react": "^19.3.0",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "typescript": "^5.9.3"
   }
 }

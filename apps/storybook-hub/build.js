@@ -261,7 +261,7 @@ const navigationHtml = manifest.categories
     const items = cat.views
       .map((v) => {
         const iconSvg = navIcons[v.icon] || navIcons.overview;
-        return `      <a class="nav-item" onclick="switchView('${v.id}')">
+        return `      <a class="nav-item" href="#${v.id}" data-view="${v.id}">
         <span class="icon">${iconSvg}</span> ${v.label}
       </a>`;
       })
@@ -829,6 +829,7 @@ ${inlinedThemeCss}
       color: var(--joy-accent-text);
       box-shadow: var(--joy-elevation-1);
     }
+    .nav-item:focus-visible,
     .framework-btn:focus-visible,
     .mobile-menu-btn:focus-visible,
     .sidebar-close-btn:focus-visible {
@@ -2291,7 +2292,7 @@ ${navigationHtml}
             <div class="joy-input-wrapper">
               <input class="joy-input" id="demo-input" placeholder="Type something here..." oninput="updateInputMirror(this.value)">
             </div>
-            <div style="font-size: 0.875rem; color: var(--joy-text-muted); margin-top: 8px;">
+            <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted); margin-top: 8px;">
               Live value: <strong id="input-mirror" style="color: var(--joy-accent-default);">(empty)</strong>
             </div>
           </div>
@@ -2517,7 +2518,7 @@ ${navigationHtml}
                 <option value="trailing">Trailing Dynamic Stop</option>
               </select>
             </div>
-            <div style="font-size: 0.875rem; color: var(--joy-text-muted); margin-top: 8px;">
+            <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted); margin-top: 8px;">
               Active Mode: <strong id="demo-select-feedback" style="color: var(--joy-accent-default);">Limit Order</strong>
             </div>
           </div>
@@ -2689,7 +2690,7 @@ ${navigationHtml}
           <div class="canvas" style="flex-direction: column; align-items: stretch; max-width: 680px; margin: 0 auto;">
             <div style="background: var(--joy-surface-card); border: 1px solid var(--joy-border-default); border-radius: 8px; padding: 16px; margin-bottom: 16px;" id="paged-content-box">
               <div style="font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 8px;" id="paged-range-text">Showing Orders 1 to 10 of 50</div>
-              <ul style="margin: 0; padding-left: 20px; color: var(--joy-text-muted); font-size: 0.875rem;" id="paged-records-list">
+              <ul style="margin: 0; padding-left: 20px; color: var(--joy-text-muted); font-size: var(--joy-font-size-sm);" id="paged-records-list">
                 <!-- Records list -->
               </ul>
             </div>
@@ -2745,16 +2746,16 @@ ${navigationHtml}
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                 <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--joy-accent-subtle); color: var(--joy-accent-default); display: flex; align-items: center; justify-content: center; font-weight: 700;">JOY</div>
                 <div>
-                  <h4 style="margin: 0; font-size: 1rem;">Joymify Quant Pool</h4>
-                  <span style="font-size: 0.75rem; color: var(--joy-text-muted);">Arbitrage High-Freq Vault</span>
+                  <h4 style="margin: 0; font-size: var(--joy-font-size-md);">Joymify Quant Pool</h4>
+                  <span style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted);">Arbitrage High-Freq Vault</span>
                 </div>
               </div>
-              <p style="margin: 0 0 12px; font-size: 0.875rem; color: var(--joy-text-secondary); line-height: 1.5;">
+              <p style="margin: 0 0 12px; font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary); line-height: 1.5;">
                 Delta-neutral funding rate harvester with sub-millisecond execution routing on Vultr Kubernetes.
               </p>
               <div class="hub-metric-row">
                 <span style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted);">Annualized APY</span>
-                <strong style="color: var(--joy-status-success-fg); font-size: 1.1rem; font-family: var(--joy-font-family-mono);">+28.4%</strong>
+                <strong style="color: var(--joy-status-success-fg); font-size: var(--joy-font-size-lg); font-family: var(--joy-font-family-mono);">+28.4%</strong>
               </div>
             </div>
           </div>
@@ -2784,7 +2785,7 @@ ${navigationHtml}
                   </svg>
                 </span>
               </div>
-              <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-top: 4px;">Selected Date: <strong id="single-date-feedback" style="color: var(--joy-accent-default);">2026-09-19</strong></div>
+              <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Selected Date: <strong id="single-date-feedback" style="color: var(--joy-accent-default);">2026-09-19</strong></div>
             </div>
 
             <div style="width: 100%;">
@@ -2804,7 +2805,7 @@ ${navigationHtml}
                   </span>
                 </div>
               </div>
-              <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: var(--joy-accent-default);">2026-01-01 to 2026-09-19</strong></div>
+              <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: var(--joy-accent-default);">2026-01-01 to 2026-09-19</strong></div>
             </div>
           </div>
         </div>
@@ -2933,7 +2934,7 @@ ${navigationHtml}
                       <polyline points="13 2 13 9 20 9"></polyline>
                     </svg>
                     <span style="font-weight: 500;">alpha_momentum_v3.json</span>
-                    <span style="color: var(--joy-text-muted); font-size: 0.75rem;">(42.8 KB)</span>
+                    <span style="color: var(--joy-text-muted); font-size: var(--joy-font-size-xs);">(42.8 KB)</span>
                   </div>
                   <button type="button" class="joy-upload-list__item-remove" onclick="document.getElementById('demo-file-1').remove(); showDemoToast('Removed alpha_momentum_v3.json', 'info');">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2989,7 +2990,7 @@ ${navigationHtml}
           </div>
           <div class="canvas" style="padding: 40px 32px; max-width: 540px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <label style="font-size: 0.875rem; font-weight: 600;">Max Execution Leverage</label>
+              <label style="font-size: var(--joy-font-size-sm); font-weight: 600;">Max Execution Leverage</label>
               <span class="joy-badge joy-badge--brand joy-badge--sm" id="demo-slider-badge">25x</span>
             </div>
             <div class="joy-slider" id="demo-slider-box">
@@ -2999,7 +3000,7 @@ ${navigationHtml}
                 <div class="joy-slider__tooltip" id="demo-slider-tooltip" style="display: none;">25x</div>
               </div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--joy-text-muted); margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 8px;">
               <span>1x (Spot)</span>
               <span>50x</span>
               <span>100x (Max)</span>
@@ -5185,7 +5186,7 @@ export async function executeHedge(symbol: string, size: number) {
                 <canvas id="candle-overlay-canvas" class="joy-chart__canvas-overlay"></canvas>
               </div>
             </div>
-            <div style="margin-top: 12px; font-size: 0.75rem; color: var(--joy-text-muted); display: flex; justify-content: space-between;">
+            <div style="margin-top: 12px; font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); display: flex; justify-content: space-between;">
               <span>Tip: Scroll mouse wheel on canvas to zoom; drag to pan across time horizons.</span>
               <span id="chart-points-count">Dataset: 500 OHLC Bars</span>
             </div>
@@ -5318,7 +5319,7 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="form-showcase-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 28px; width: 100%;">
               <!-- Vertical Form -->
               <div class="joy-form joy-form--vertical" style="background: var(--joy-surface-sunken); padding: 20px; border-radius: 8px; border: 1px solid var(--joy-border-subtle);">
-                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 14px; color: var(--joy-accent-default);">Vertical Layout with Validation Rules</div>
+                <div style="font-weight: 600; font-size: var(--joy-font-size-sm); margin-bottom: 14px; color: var(--joy-accent-default);">Vertical Layout with Validation Rules</div>
                 
                 <div class="joy-form-item">
                   <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Asset Symbol</label>
@@ -5356,7 +5357,7 @@ export async function executeHedge(symbol: string, size: number) {
 
               <!-- Horizontal Form -->
               <div class="joy-form joy-form--horizontal" style="background: var(--joy-surface-sunken); padding: 24px; border-radius: 8px; border: 1px solid var(--joy-border-subtle); --joy-form-label-width: 160px;">
-                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 18px; color: var(--joy-accent-default);">Horizontal Layout Alignment (Right-Aligned Baselines)</div>
+                <div style="font-weight: 600; font-size: var(--joy-font-size-sm); margin-bottom: 18px; color: var(--joy-accent-default);">Horizontal Layout Alignment (Right-Aligned Baselines)</div>
                 
                 <div class="joy-form-item joy-form-item--horizontal">
                   <label class="joy-form-item__label"><span class="joy-form-item__required">*</span>Account Name</label>
@@ -5407,7 +5408,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
             <div class="component-canvas" style="flex-direction: column; align-items: flex-start; gap: 16px;">
               <div>
-                <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Leverage Multiplier (1x - 100x):</div>
+                <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-bottom: 6px;">Leverage Multiplier (1x - 100x):</div>
                 <div class="joy-input-number" role="spinbutton" aria-valuenow="10" aria-valuemin="1" aria-valuemax="100" tabindex="0">
                   <input type="text" class="joy-input-number__input" id="demo-num-input" value="10" />
                   <div class="joy-input-number__handler-wrap">
@@ -5422,7 +5423,7 @@ export async function executeHedge(symbol: string, size: number) {
               </div>
 
               <div>
-                <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Precision Sizing (step 0.05):</div>
+                <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-bottom: 6px;">Precision Sizing (step 0.05):</div>
                 <div class="joy-input-number" role="spinbutton" aria-valuenow="1.25" tabindex="0">
                   <input type="text" class="joy-input-number__input" id="demo-num-step" value="1.25" />
                   <div class="joy-input-number__handler-wrap">
@@ -5448,7 +5449,7 @@ export async function executeHedge(symbol: string, size: number) {
             </div>
             <div class="component-canvas" style="flex-direction: column; align-items: flex-start; gap: 16px;">
               <div>
-                <div style="font-size: 0.75rem; color: var(--joy-text-muted); margin-bottom: 6px;">Execution Quality Rating:</div>
+                <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-bottom: 6px;">Execution Quality Rating:</div>
                 <div class="joy-rate" id="demo-rate" role="radiogroup" aria-label="Rating"></div>
                 <div id="rate-feedback" style="font-size: var(--joy-font-size-sm); font-weight: 500; color: var(--joy-accent-default); margin-top: 6px;">4.5 Stars</div>
               </div>
@@ -5607,7 +5608,7 @@ export async function executeHedge(symbol: string, size: number) {
 
               <!-- Center Interactive Feedback Grid -->
               <div style="display: flex; flex-direction: column; gap: 16px;">
-                <div style="font-weight: 600; font-size: 0.875rem;">Message & Notification Triggers:</div>
+                <div style="font-weight: 600; font-size: var(--joy-font-size-sm);">Message & Notification Triggers:</div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                   <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="triggerMessage('success', 'Order filled successfully at $64,250.00')">Message Success</button>
                   <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="triggerMessage('error', 'Execution rejected: Insufficient margin')">Message Error</button>
@@ -5615,13 +5616,13 @@ export async function executeHedge(symbol: string, size: number) {
                   <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="triggerNotification('info', 'Liquidation Warning', 'ETH-PERP margin ratio has dropped below 15%. Consider adding collateral.')">Notification Card</button>
                 </div>
 
-                <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Popconfirm Confirmation:</div>
+                <div style="margin-top: 12px; font-weight: 600; font-size: var(--joy-font-size-sm);">Popconfirm Confirmation:</div>
                 <div style="display: flex; gap: 16px; align-items: center;">
                   ${hubPopconfirm("demo-popconfirm-panel", "Revoke API Key", "Revoke DMA Master Key?")}
                   <span style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted);">Prevents accidental destructive operations</span>
                 </div>
 
-                <div style="margin-top: 12px; font-weight: 600; font-size: 0.875rem;">Spin Loading Indicators:</div>
+                <div style="margin-top: 12px; font-weight: 600; font-size: var(--joy-font-size-sm);">Spin Loading Indicators:</div>
                 <div style="display: flex; gap: 20px; align-items: center;">
                   <div class="joy-spin"><svg class="joy-spin__indicator" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></div>
                   <div class="joy-spin"><svg class="joy-spin__indicator" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg></div>
@@ -5631,7 +5632,7 @@ export async function executeHedge(symbol: string, size: number) {
 
                 <!-- Wrapped Container with Spin Mask -->
                 <div class="joy-spin__container" id="demo-spin-container" style="background: var(--joy-surface-raised); border: 1px solid var(--joy-border-subtle); border-radius: 8px; padding: 16px; margin-top: 8px;">
-                  <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 6px;">Live Book Depth Stream</div>
+                  <div style="font-weight: 600; font-size: var(--joy-font-size-sm); margin-bottom: 6px;">Live Book Depth Stream</div>
                   <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted);">Real-time aggregated L2 order depth feed from 6 venues.</div>
                   <div class="joy-spin__mask" id="demo-spin-mask" style="display: none;" role="status">
                     <div class="joy-spin" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
@@ -5850,12 +5851,12 @@ export async function executeHedge(symbol: string, size: number) {
         target.classList.add('active');
       }
 
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(el => {
-        const oc = el.getAttribute('onclick');
-        return oc && (oc.includes("'" + viewName + "'") || oc.includes('"' + viewName + '"'));
+      document.querySelectorAll('.nav-item').forEach(i => {
+        const current = i.dataset.view === viewName;
+        i.classList.toggle('active', current);
+        if (current) i.setAttribute('aria-current', 'page');
+        else i.removeAttribute('aria-current');
       });
-      if (activeNav) activeNav.classList.add('active');
 
       const main = document.querySelector('.main');
       if (main) main.scrollTop = 0;
@@ -5900,6 +5901,8 @@ export async function executeHedge(symbol: string, size: number) {
     // Synchronize view immediately on script load to eliminate theme/overview flash
     syncViewFromHash();
     window.addEventListener('hashchange', syncViewFromHash);
+    // Following a link to the current hash fires no hashchange, so close the drawer on every nav pick.
+    document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', () => toggleMobileMenu(false)));
 
     function setFramework(fw) {
       activeFramework = fw;

@@ -35,7 +35,7 @@
   }
 </script>
 
-<nav bind:this={ref} class="joy-anchor {className}" role="navigation" aria-label="Anchor Navigation" {...rest}>
+<nav bind:this={ref} class="joy-anchor {className}" aria-label="Anchor Navigation" {...rest}>
   <div class="joy-anchor__ink"></div>
   {#each items as item (item.key)}
     <a

@@ -151,7 +151,7 @@ export const Mentions = React.forwardRef<HTMLDivElement, MentionsProps>(
           onChange={handleInput}
           onKeyDown={handleKeyDown}
           aria-autocomplete="list"
-          aria-expanded={isOpen}
+          aria-haspopup="listbox"
           aria-controls={isOpen ? dropdownId : undefined}
         />
         {isOpen && filteredOptions.length > 0 && (
