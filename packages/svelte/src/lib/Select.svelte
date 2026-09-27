@@ -172,6 +172,8 @@
   {#if open}
     <ul bind:this={panelEl} id={listboxId} class="joy-select__listbox joy-overlay" role="listbox">
       {#each options as opt, i}
+        <!-- False positive: options are not focusable; the keyboard is handled by the trigger button (aria-activedescendant, Arrow/Enter/Space). -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
         <li
           id="{listboxId}-opt-{i}"
           role="option"

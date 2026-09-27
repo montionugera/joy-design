@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import MarkdownViewer from './MarkdownViewer.svelte';
   import {
     Edit,
@@ -40,12 +41,14 @@
     ...rest
   }: Props = $props();
 
-  let content = $state(value !== undefined ? value : defaultValue);
-  let currentMode = $state<'split' | 'edit' | 'preview'>(mode);
+  // `defaultValue` and `mode` only seed internal state (uncontrolled props); untrack makes
+  // the one-time read explicit.
+  let content = $state(untrack(() => (value !== undefined ? value : defaultValue)));
+  let currentMode = $state<'split' | 'edit' | 'preview'>(untrack(() => mode));
   let isFullscreen = $state(false);
 
-  let textareaEl: HTMLTextAreaElement;
-  let previewEl: HTMLDivElement;
+  let textareaEl = $state<HTMLTextAreaElement>();
+  let previewEl = $state<HTMLDivElement>();
   let isSyncing = false;
 
   $effect(() => {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ChevronDown, ChevronRight, Close, Check } from '@joymify/icons';
+	import { untrack } from 'svelte';
 	import { openOverlay } from './overlay-utils.js';
 
 	export interface TreeNode {
@@ -43,8 +44,11 @@
 	}: Props = $props();
 
 	let open = $state(false);
+	const uid = $props.id();
+	const panelId = `${uid}-panel`;
+	// `defaultValue`/`multiple` only seed the uncontrolled value; untrack makes the one-time read explicit.
 	let internalValue = $state<string | string[]>(
-		defaultValue !== undefined ? defaultValue : multiple ? [] : ''
+		untrack(() => (defaultValue !== undefined ? defaultValue : multiple ? [] : ''))
 	);
 	let selectedValue = $derived(value !== undefined ? value : internalValue);
 	let expandedKeys = $state<Set<string>>(new Set());
@@ -276,6 +280,7 @@
 		bind:this={controlEl}
 		role="combobox"
 		aria-expanded={open}
+		aria-controls={open ? panelId : undefined}
 		aria-haspopup="tree"
 		tabindex={disabled ? -1 : 0}
 		class="joy-treeselect__control"
@@ -330,6 +335,7 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
+			id={panelId}
 			role="tree"
 			aria-label="Tree selector options"
 			class="joy-treeselect__panel joy-overlay"
@@ -343,6 +349,8 @@
 					{@const sel = isSelected(node.value)}
 					{@const isFocused = focusedKey === node.key}
 
+					<!-- False positive: keyboard for tree items is handled by the tree panel (onkeydown={handleKeyDown}: Arrow/Enter/Space via roving focusedKey). -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<div
 						role="treeitem"
 						tabindex={isFocused ? 0 : -1}

@@ -24,12 +24,9 @@
 	}: Props = $props();
 
 	let openPreview = $state(false);
-	let currentSrc = $state(src);
+	// Writable $derived: follows `src`, and handleError may override it with the fallback.
+	let currentSrc = $derived(src);
 	let isHovered = $state(false);
-
-	$effect(() => {
-		currentSrc = src;
-	});
 
 	function handleError() {
 		if (fallback) {
@@ -42,6 +39,8 @@
 	);
 </script>
 
+<!-- False positive: the role is dynamic (button only when previewable), so the checker cannot see that tabindex=0 is only set when the role is interactive. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	bind:this={ref}
 	class="joy-image-wrapper {className}"

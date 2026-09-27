@@ -142,6 +142,7 @@
   <textarea
     bind:this={textareaEl}
     class="joy-textarea joy-mentions__textarea"
+    role="combobox"
     {rows}
     {placeholder}
     {disabled}
@@ -161,6 +162,8 @@
       role="listbox"
     >
       {#each filteredOptions as opt, i}
+        <!-- False positive: options are not focusable; the keyboard is handled by the textarea (handleKeyDown: Arrow/Enter/Tab). -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
         <li
           class="joy-mentions__item {i === activeIndex ? 'joy-mentions__item--active' : ''}"
           role="option"
