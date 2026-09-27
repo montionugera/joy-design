@@ -142,7 +142,6 @@
   <textarea
     bind:this={textareaEl}
     class="joy-textarea joy-mentions__textarea"
-    role="combobox"
     {rows}
     {placeholder}
     {disabled}
@@ -150,7 +149,7 @@
     oninput={handleInput}
     onkeydown={handleKeyDown}
     aria-autocomplete="list"
-    aria-expanded={isOpen}
+    aria-haspopup="listbox"
     aria-controls={isOpen && filteredOptions.length > 0 ? dropdownId : undefined}
   ></textarea>
 
