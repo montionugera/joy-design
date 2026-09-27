@@ -149,7 +149,7 @@
     oninput={handleInput}
     onkeydown={handleKeyDown}
     aria-autocomplete="list"
-    aria-expanded={isOpen}
+    aria-haspopup="listbox"
     aria-controls={isOpen && filteredOptions.length > 0 ? dropdownId : undefined}
   ></textarea>
 
@@ -161,6 +161,8 @@
       role="listbox"
     >
       {#each filteredOptions as opt, i}
+        <!-- False positive: options are not focusable; the keyboard is handled by the textarea (handleKeyDown: Arrow/Enter/Tab). -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
         <li
           class="joy-mentions__item {i === activeIndex ? 'joy-mentions__item--active' : ''}"
           role="option"

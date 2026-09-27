@@ -33,7 +33,8 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<!-- False positive: the role is dynamic (checkbox when checkable, else status), so the checker cannot see that tabindex=0 is only set when the role is interactive. -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_no_noninteractive_tabindex -->
 <span
 	bind:this={ref}
 	{...rest}

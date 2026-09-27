@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ChevronDown, ChevronRight, Close } from '@joymify/icons';
+	import { untrack } from 'svelte';
 	import { openOverlay } from './overlay-utils.js';
 
 	export interface CascaderOption {
@@ -43,7 +44,10 @@
 	}: Props = $props();
 
 	let open = $state(false);
-	let internalValue = $state<string[]>(defaultValue);
+	const uid = $props.id();
+	const panelId = `${uid}-panel`;
+	// `defaultValue` only seeds the uncontrolled value; untrack makes the one-time read explicit.
+	let internalValue = $state<string[]>(untrack(() => defaultValue));
 	let selectedValue = $derived(value !== undefined ? value : internalValue);
 	let activePath = $state<CascaderOption[]>([]);
 	let focusedCol = $state(0);
@@ -212,6 +216,7 @@
 		bind:this={controlEl}
 		role="combobox"
 		aria-expanded={open}
+		aria-controls={open ? panelId : undefined}
 		aria-haspopup="listbox"
 		tabindex={disabled ? -1 : 0}
 		class="joy-cascader__control"
@@ -244,6 +249,7 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
+			id={panelId}
 			role="listbox"
 			aria-label="Cascader options"
 			class="joy-cascader__panel joy-overlay"
@@ -258,6 +264,8 @@
 							{@const isFocused = focusedCol === colIdx && focusedVal === option.value}
 							{@const hasChildren = Boolean(option.children && option.children.length > 0)}
 
+							<!-- False positive: keyboard for menu items is handled by the panel (onkeydown={handleKeyDown}: Arrow/Enter/Space via roving focusedVal). -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
 							<li
 								role="menuitem"
 								tabindex={isFocused || isActive ? 0 : -1}

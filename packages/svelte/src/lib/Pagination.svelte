@@ -57,7 +57,7 @@
   }
 </script>
 
-<nav bind:this={ref} class="joy-pagination {className}" role="navigation" aria-label="Pagination" {...rest}>
+<nav bind:this={ref} class="joy-pagination {className}" aria-label="Pagination" {...rest}>
   <button
     type="button"
     class="joy-pagination__btn"
