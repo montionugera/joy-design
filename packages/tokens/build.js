@@ -554,7 +554,7 @@ select.joy-select:disabled,
   left: 2px;
   width: 20px;
   height: 20px;
-  background: var(--joy-surface-card);
+  background: var(--joy-surface-thumb);
   border-radius: 50%;
   box-shadow: var(--joy-elevation-1);
   transition: transform var(--joy-duration-fast) var(--joy-ease-out);
