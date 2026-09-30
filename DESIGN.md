@@ -13,6 +13,7 @@ colors:
   surface-disabled: "#efe9dc"
   surface-overlay: "#ffffff"
   surface-inverse: "#14253e"
+  surface-thumb: "#ffffff"
   text-primary: "#1f1c13"
   text-secondary: "#3c3a35"
   text-muted: "#686660"
@@ -60,10 +61,11 @@ colors:
   surface-disabled-dark: "#111b2b"
   surface-overlay-dark: "#111b2b"
   surface-inverse-dark: "#f8f3e8"
+  surface-thumb-dark: "#f8f3e8"
   text-primary-dark: "#f8f3e8"
   text-secondary-dark: "#bab7b0"
-  text-muted-dark: "#88867f"
-  text-disabled-dark: "#88867f"
+  text-muted-dark: "#a2b2cb"
+  text-disabled-dark: "#7487a5"
   text-inverse-dark: "#1f1c13"
   text-link-dark: "#dab362"
   text-on-accent-dark: "#0a121f"
@@ -75,25 +77,25 @@ colors:
   accent-default-dark: "#dab362"
   accent-hover-dark: "#e9cd94"
   accent-active-dark: "#c49a3a"
-  accent-subtle-dark: "#2a2211"
+  accent-subtle-dark: "#1e2129"
   accent-text-dark: "#dab362"
   accent-gradient-end-dark: "#c49a3a"
   accent-highlight-dark: "#e9cd94"
   status-success-fg-dark: "#93c794"
   status-success-bg-dark: "#0d2d0f"
-  status-success-border-dark: "#1a4f1f"
+  status-success-border-dark: "#478d4b"
   status-warning-fg-dark: "#dfae68"
   status-warning-bg-dark: "#3a1e00"
-  status-warning-border-dark: "#643600"
+  status-warning-border-dark: "#a96b00"
   status-danger-fg-dark: "#fb9890"
   status-danger-bg-dark: "#470d0e"
-  status-danger-border-dark: "#781b1c"
+  status-danger-border-dark: "#c74b47"
   status-danger-solid-bg-dark: "#9f3331"
   status-danger-solid-fg-dark: "#ffffff"
   status-danger-solid-border-dark: "#781b1c"
   status-info-fg-dark: "#8fbceb"
   status-info-bg-dark: "#0b2741"
-  status-info-border-dark: "#17446f"
+  status-info-border-dark: "#437eb9"
   brand-tile-dark: "#14253e"
   brand-mark-dark: "#dab362"
   brand-mark-on-tile-dark: "#c49a3a"
@@ -263,10 +265,11 @@ The contract. Light and dark values for every role.
 | `--joy-surface-disabled` | `#efe9dc` | `#111b2b` |
 | `--joy-surface-overlay` | `#ffffff` | `#111b2b` |
 | `--joy-surface-inverse` | `#14253e` | `#f8f3e8` |
+| `--joy-surface-thumb` | `#ffffff` | `#f8f3e8` |
 | `--joy-text-primary` | `#1f1c13` | `#f8f3e8` |
 | `--joy-text-secondary` | `#3c3a35` | `#bab7b0` |
-| `--joy-text-muted` | `#686660` | `#88867f` |
-| `--joy-text-disabled` | `#686660` | `#88867f` |
+| `--joy-text-muted` | `#686660` | `#a2b2cb` |
+| `--joy-text-disabled` | `#686660` | `#7487a5` |
 | `--joy-text-inverse` | `#ffffff` | `#1f1c13` |
 | `--joy-text-link` | `#856515` | `#dab362` |
 | `--joy-text-on-accent` | `#14253e` | `#0a121f` |
@@ -278,25 +281,25 @@ The contract. Light and dark values for every role.
 | `--joy-accent-default` | `#c49a3a` | `#dab362` |
 | `--joy-accent-hover` | `#a5802b` | `#e9cd94` |
 | `--joy-accent-active` | `#856515` | `#c49a3a` |
-| `--joy-accent-subtle` | `#fbf4e6` | `#2a2211` |
+| `--joy-accent-subtle` | `#fbf4e6` | `#1e2129` |
 | `--joy-accent-text` | `#856515` | `#dab362` |
 | `--joy-accent-gradient-end` | `#ad8a3b` | `#c49a3a` |
 | `--joy-accent-highlight` | `#e9cd94` | `#e9cd94` |
 | `--joy-status-success-fg` | `#1a4f1f` | `#93c794` |
 | `--joy-status-success-bg` | `#e7f2e7` | `#0d2d0f` |
-| `--joy-status-success-border` | `#93c794` | `#1a4f1f` |
+| `--joy-status-success-border` | `#93c794` | `#478d4b` |
 | `--joy-status-warning-fg` | `#643600` | `#dfae68` |
 | `--joy-status-warning-bg` | `#f7eddf` | `#3a1e00` |
-| `--joy-status-warning-border` | `#dfae68` | `#643600` |
+| `--joy-status-warning-border` | `#dfae68` | `#a96b00` |
 | `--joy-status-danger-fg` | `#9f3331` | `#fb9890` |
 | `--joy-status-danger-bg` | `#fee9e6` | `#470d0e` |
-| `--joy-status-danger-border` | `#fb9890` | `#781b1c` |
+| `--joy-status-danger-border` | `#fb9890` | `#c74b47` |
 | `--joy-status-danger-solid-bg` | `#9f3331` | `#9f3331` |
 | `--joy-status-danger-solid-fg` | `#ffffff` | `#ffffff` |
 | `--joy-status-danger-solid-border` | `#781b1c` | `#781b1c` |
 | `--joy-status-info-fg` | `#17446f` | `#8fbceb` |
 | `--joy-status-info-bg` | `#e6f0f9` | `#0b2741` |
-| `--joy-status-info-border` | `#8fbceb` | `#17446f` |
+| `--joy-status-info-border` | `#8fbceb` | `#437eb9` |
 | `--joy-focus-ring` | `2px solid #856515` | `2px solid #dab362` |
 | `--joy-elevation-0` | `none` | `none` |
 | `--joy-elevation-1` | `0 1px 3px rgba(20, 37, 62, 0.08), 0 1px 2px rgba(20, 37, 62, 0.04)` | `0 0 0 1px rgba(77, 96, 125, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4)` |
@@ -340,8 +343,8 @@ WCAG 2.2 relative-luminance ratios computed from the values above (`packages/tok
 | dark | `--joy-text-primary` | `--joy-surface-card` | 15.61 | 4.5:1 | pass |
 | dark | `--joy-text-secondary` | `--joy-surface-canvas` | 9.06 | 4.5:1 | pass |
 | dark | `--joy-text-secondary` | `--joy-surface-card` | 8.63 | 4.5:1 | pass |
-| dark | `--joy-text-muted` | `--joy-surface-canvas` | 4.98 | 4.5:1 | pass |
-| dark | `--joy-text-muted` | `--joy-surface-card` | 4.74 | 4.5:1 | pass |
+| dark | `--joy-text-muted` | `--joy-surface-canvas` | 8.44 | 4.5:1 | pass |
+| dark | `--joy-text-muted` | `--joy-surface-card` | 8.04 | 4.5:1 | pass |
 | dark | `--joy-text-link` | `--joy-surface-canvas` | 9.16 | 4.5:1 | pass |
 | dark | `--joy-text-link` | `--joy-surface-card` | 8.73 | 4.5:1 | pass |
 | dark | `--joy-text-primary` | `--joy-surface-raised` | 13.91 | 4.5:1 | pass |
@@ -353,7 +356,7 @@ WCAG 2.2 relative-luminance ratios computed from the values above (`packages/tok
 | dark | `--joy-status-warning-fg` | `--joy-status-warning-bg` | 7.61 | 4.5:1 | pass |
 | dark | `--joy-status-danger-fg` | `--joy-status-danger-bg` | 7.51 | 4.5:1 | pass |
 | dark | `--joy-status-info-fg` | `--joy-status-info-bg` | 7.65 | 4.5:1 | pass |
-| dark | `--joy-text-disabled` | `--joy-surface-canvas` | 4.98 | info | n/a |
+| dark | `--joy-text-disabled` | `--joy-surface-canvas` | 4.97 | info | n/a |
 
 ### Primitive ramps
 

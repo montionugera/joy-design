@@ -118,6 +118,7 @@ export interface JoyTokens {
   'surface-disabled': string;
   'surface-overlay': string;
   'surface-inverse': string;
+  'surface-thumb': string;
   'text-primary': string;
   'text-secondary': string;
   'text-muted': string;
