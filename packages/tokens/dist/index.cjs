@@ -119,6 +119,7 @@ exports.tokens = {
   "surface-disabled": "#efe9dc",
   "surface-overlay": "#ffffff",
   "surface-inverse": "#14253e",
+  "surface-thumb": "#ffffff",
   "text-primary": "#1f1c13",
   "text-secondary": "#3c3a35",
   "text-muted": "#686660",

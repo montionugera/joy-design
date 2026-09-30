@@ -178,7 +178,8 @@ export function generateAllTokens() {
       "sunken": { "value": "{color.cream.200}", "type": "color" },
       "disabled": { "value": "{color.cream.200}", "type": "color" },
       "overlay": { "value": "#ffffff", "type": "color" },
-      "inverse": { "value": "{color.navy.500}", "type": "color" }
+      "inverse": { "value": "{color.navy.500}", "type": "color" },
+      "thumb": { "value": "#ffffff", "type": "color" }
     },
     // Text
     "text": {
@@ -258,14 +259,15 @@ export function generateAllTokens() {
       "sunken": { "value": "{color.navy.950}", "type": "color" },
       "disabled": { "value": "{color.navy.800}", "type": "color" },
       "overlay": { "value": "{color.navy.800}", "type": "color" },
-      "inverse": { "value": "{color.cream.100}", "type": "color" }
+      "inverse": { "value": "{color.cream.100}", "type": "color" },
+      "thumb": { "value": "{color.cream.100}", "type": "color" }
     },
     // Text
     "text": {
       "primary": { "value": "{color.cream.100}", "type": "color" },
       "secondary": { "value": "{color.neutral.300}", "type": "color" },
-      "muted": { "value": "{color.neutral.400}", "type": "color" },
-      "disabled": { "value": "{color.neutral.400}", "type": "color" },
+      "muted": { "value": "{color.navy.200}", "type": "color" },
+      "disabled": { "value": "{color.navy.300}", "type": "color" },
       "inverse": { "value": "{color.ink.500}", "type": "color" },
       "link": { "value": "{color.gold.300}", "type": "color" },
       "on-accent": { "value": "{color.navy.950}", "type": "color" }
@@ -285,7 +287,7 @@ export function generateAllTokens() {
       "default": { "value": "{color.gold.300}", "type": "color" },
       "hover": { "value": "{color.gold.200}", "type": "color" },
       "active": { "value": "{color.gold.400}", "type": "color" },
-      "subtle": { "value": "#2a2211", "type": "color" },
+      "subtle": { "value": "#1e2129", "type": "color" },
       "text": { "value": "{color.gold.300}", "type": "color" },
       "gradient-end": { "value": "{color.gold.400}", "type": "color" },
       "highlight": { "value": "{color.gold.200}", "type": "color" }
@@ -295,19 +297,19 @@ export function generateAllTokens() {
     "status": {
       "success-fg": { "value": "{color.status.success.300}", "type": "color" },
       "success-bg": { "value": "#0d2d0f", "type": "color" },
-      "success-border": { "value": "{color.status.success.700}", "type": "color" },
+      "success-border": { "value": "{color.status.success.500}", "type": "color" },
       "warning-fg": { "value": "{color.status.warning.300}", "type": "color" },
       "warning-bg": { "value": "#3a1e00", "type": "color" },
-      "warning-border": { "value": "{color.status.warning.700}", "type": "color" },
+      "warning-border": { "value": "{color.status.warning.500}", "type": "color" },
       "danger-fg": { "value": "{color.status.danger.300}", "type": "color" },
       "danger-bg": { "value": "#470d0e", "type": "color" },
-      "danger-border": { "value": "{color.status.danger.700}", "type": "color" },
+      "danger-border": { "value": "{color.status.danger.500}", "type": "color" },
       "danger-solid-bg": { "value": "{color.status.danger.600}", "type": "color" },
       "danger-solid-fg": { "value": "#ffffff", "type": "color" },
       "danger-solid-border": { "value": "{color.status.danger.700}", "type": "color" },
       "info-fg": { "value": "{color.status.info.300}", "type": "color" },
       "info-bg": { "value": "#0b2741", "type": "color" },
-      "info-border": { "value": "{color.status.info.700}", "type": "color" }
+      "info-border": { "value": "{color.status.info.500}", "type": "color" }
     },
     // Focus ring
     "focus-ring": { "value": "2px solid #dab362", "type": "border" },
