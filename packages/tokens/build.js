@@ -2220,8 +2220,9 @@ h1, h2, h3, .joy-display {
   justify-content: center;
   font-family: var(--joy-font-family-sans);
   font-weight: 600;
-  color: var(--joy-text-secondary);
+  color: var(--joy-text-primary);
   background-color: var(--joy-surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--joy-border-default);
   user-select: none;
   overflow: visible;
 }
@@ -2246,6 +2247,36 @@ h1, h2, h3, .joy-display {
   height: 48px;
   font-size: 1.125rem;
 }
+.joy-avatar--neutral {
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-primary);
+  box-shadow: inset 0 0 0 1px var(--joy-border-default);
+}
+.joy-avatar--brand {
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+  box-shadow: inset 0 0 0 1px var(--joy-accent-default);
+}
+.joy-avatar--info {
+  background-color: var(--joy-status-info-bg);
+  color: var(--joy-status-info-fg);
+  box-shadow: inset 0 0 0 1px var(--joy-status-info-border);
+}
+.joy-avatar--success {
+  background-color: var(--joy-status-success-bg);
+  color: var(--joy-status-success-fg);
+  box-shadow: inset 0 0 0 1px var(--joy-status-success-border);
+}
+.joy-avatar--warning {
+  background-color: var(--joy-status-warning-bg);
+  color: var(--joy-status-warning-fg);
+  box-shadow: inset 0 0 0 1px var(--joy-status-warning-border);
+}
+.joy-avatar--danger {
+  background-color: var(--joy-status-danger-bg);
+  color: var(--joy-status-danger-fg);
+  box-shadow: inset 0 0 0 1px var(--joy-status-danger-border);
+}
 .joy-avatar__image {
   width: 100%;
   height: 100%;
@@ -2262,7 +2293,19 @@ h1, h2, h3, .joy-display {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 2px solid var(--joy-surface-canvas);
+  border: 2px solid var(--joy-surface-card);
+}
+.joy-avatar--sm .joy-avatar__badge {
+  width: 8px;
+  height: 8px;
+}
+.joy-avatar--md .joy-avatar__badge {
+  width: 10px;
+  height: 10px;
+}
+.joy-avatar--lg .joy-avatar__badge {
+  width: 12px;
+  height: 12px;
 }
 .joy-avatar__badge--online {
   background-color: var(--joy-status-success-fg);
@@ -2276,12 +2319,13 @@ h1, h2, h3, .joy-display {
 }
 .joy-avatar-group .joy-avatar {
   margin-right: -8px;
-  border: 2px solid var(--joy-surface-canvas);
+  border: 2px solid var(--joy-surface-card);
   box-shadow: var(--joy-elevation-1);
 }
 .joy-avatar-group__overflow {
-  background-color: var(--joy-surface-sunken);
-  color: var(--joy-text-secondary);
+  background-color: var(--joy-surface-raised);
+  color: var(--joy-text-primary);
+  box-shadow: inset 0 0 0 1px var(--joy-border-default);
 }
 .joy-avatar-group .joy-avatar:hover {
   z-index: 2;

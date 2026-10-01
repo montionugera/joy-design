@@ -2,12 +2,17 @@
 	import type { Snippet } from 'svelte';
 	import Avatar from './Avatar.svelte';
 
+	type Variant = 'default' | 'neutral' | 'brand' | 'info' | 'success' | 'warning' | 'danger';
+	type Shape = 'circle' | 'square';
+	type Size = 'sm' | 'md' | 'lg';
+
 	interface AvatarItem {
 		src?: string;
 		alt?: string;
 		name?: string;
-		shape?: 'circle' | 'square';
-		size?: 'sm' | 'md' | 'lg';
+		shape?: Shape;
+		size?: Size;
+		variant?: Variant;
 		color?: string;
 	}
 
