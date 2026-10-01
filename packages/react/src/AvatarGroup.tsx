@@ -4,7 +4,7 @@ import type { AvatarProps } from './Avatar.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
-export type AvatarGroupItem = Pick<AvatarProps, 'src' | 'alt' | 'name' | 'shape' | 'size' | 'color'>;
+export type AvatarGroupItem = Pick<AvatarProps, 'src' | 'alt' | 'name' | 'shape' | 'size' | 'variant' | 'color'>;
 
 export interface AvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Maximum avatars rendered before collapsing the rest into one "+N" overflow avatar. */

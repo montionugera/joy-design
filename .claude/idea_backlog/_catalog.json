@@ -310,5 +310,11 @@
     "title": "Dark mode contrast elevation and enterprise color calibration",
     "created_at": "2026-09-30T17:35:30.620568+00:00",
     "promoted_to": "F-047"
+  },
+  {
+    "id": "I-052",
+    "title": "Avatar contrast elevation and semantic role styling",
+    "created_at": "2026-10-01T15:52:08.596774+00:00",
+    "promoted_to": "F-048"
   }
 ]

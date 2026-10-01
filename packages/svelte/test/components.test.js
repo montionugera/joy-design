@@ -500,6 +500,7 @@ test('F-038 B-L1: Avatar/AvatarGroup/Badge/Tag/Divider use brand tokens, overflo
   assert.ok(group.includes('+{overflow}'), 'AvatarGroup must render a +N overflow avatar');
   assert.ok(group.includes('joy-avatar-group__overflow'), 'AvatarGroup overflow avatar must carry its class');
   assert.ok(read('Avatar').includes('onerror'), 'Avatar must fall back when the image fails to load');
+  assert.ok(read('Avatar').includes('joy-avatar--${variant}'), 'Avatar must support semantic variant classes');
   assert.ok(!read('Tag').includes('style="border: none'), 'Tag close button styling must live in CSS, not inline');
 });
 

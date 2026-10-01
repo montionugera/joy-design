@@ -2,6 +2,7 @@
 	type Shape = 'circle' | 'square';
 	type Size = 'sm' | 'md' | 'lg';
 	type Status = 'online' | 'offline' | 'none';
+	type Variant = 'default' | 'neutral' | 'brand' | 'info' | 'success' | 'warning' | 'danger';
 
 	interface Props {
 		src?: string;
@@ -10,6 +11,7 @@
 		shape?: Shape;
 		size?: Size;
 		status?: Status;
+		variant?: Variant;
 		color?: string;
 		class?: string;
 		ref?: HTMLDivElement | null;
@@ -22,6 +24,7 @@
 		shape = 'circle',
 		size = 'md',
 		status = 'none',
+		variant = 'default',
 		color,
 		class: className = '',
 		ref = $bindable(null),
@@ -38,11 +41,23 @@
 		}
 		return name.slice(0, 2).toUpperCase();
 	});
+
+	const classes = $derived(
+		[
+			'joy-avatar',
+			`joy-avatar--${shape}`,
+			`joy-avatar--${size}`,
+			variant !== 'default' ? `joy-avatar--${variant}` : null,
+			className || null
+		]
+			.filter(Boolean)
+			.join(' ')
+	);
 </script>
 
 <div
 	bind:this={ref}
-	class="joy-avatar joy-avatar--{shape} joy-avatar--{size} {className}"
+	class={classes}
 	style={color ? `background-color: ${color};` : undefined}
 	role="img"
 	aria-label={name || alt}

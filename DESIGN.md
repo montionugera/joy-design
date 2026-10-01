@@ -574,7 +574,7 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | MarkdownEditor | `.joy-markdown-editor` | - | fullscreen, readonly | hover, focus-visible, active, disabled, error |
 | Alert | `.joy-alert` | - | danger, info, success, warning | hover, focus-visible |
 | Anchor | `.joy-anchor` | - | - | hover, focus-visible, active |
-| Avatar | `.joy-avatar` | sm, md, lg | circle, square | hover |
+| Avatar | `.joy-avatar` | sm, md, lg | brand, circle, danger, info, neutral, square, success, warning | hover |
 | AvatarGroup | `.joy-avatar-group` | sm, md, lg | - | hover |
 | Badge | `.joy-badge` | sm, md | brand, danger, neutral, success, warning | - |
 | Breadcrumb | `.joy-breadcrumb` | - | - | hover, focus-visible |

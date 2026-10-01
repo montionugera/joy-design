@@ -2963,16 +2963,16 @@ ${navigationHtml}
               <div class="joy-avatar joy-avatar--circle joy-avatar--sm"><span class="joy-avatar__fallback">QA</span></div>
               <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">JD</span><span class="joy-avatar__badge joy-avatar__badge--online"></span></div>
               <div class="joy-avatar joy-avatar--circle joy-avatar--lg"><span class="joy-avatar__fallback">TC</span><span class="joy-avatar__badge joy-avatar__badge--offline"></span></div>
-              <div class="joy-avatar joy-avatar--square joy-avatar--lg" style="background-color: var(--joy-status-info-fg);"><span class="joy-avatar__fallback">VT</span></div>
+              <div class="joy-avatar joy-avatar--square joy-avatar--lg joy-avatar--info"><span class="joy-avatar__fallback">VT</span></div>
             </div>
 
             <div style="margin-top: 8px;">
               <h5 class="hub-demo-label">Avatar group, overlapping team stack</h5>
               <div class="joy-avatar-group">
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md"><span class="joy-avatar__fallback">AM</span></div>
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-success-fg);"><span class="joy-avatar__fallback">BL</span></div>
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-status-warning-fg);"><span class="joy-avatar__fallback">CR</span></div>
-                <div class="joy-avatar joy-avatar--circle joy-avatar--md" style="background-color: var(--joy-text-muted);"><span class="joy-avatar__fallback">+4</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar--brand"><span class="joy-avatar__fallback">AM</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar--success"><span class="joy-avatar__fallback">BL</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar--warning"><span class="joy-avatar__fallback">CR</span></div>
+                <div class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar-group__overflow" role="img" aria-label="4 more">+4</div>
               </div>
             </div>
           </div>

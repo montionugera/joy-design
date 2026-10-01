@@ -515,6 +515,8 @@ test('F-038 C-L1: display twins forward refs, spread rest props, and match Svelt
   assert.ok(!plain.includes('style='), plain);
   assert.ok(plain.includes('class="joy-avatar joy-avatar--circle joy-avatar--md"'), plain);
   assert.ok(html(React.createElement(Avatar, { name: 'A', color: 'tomato' })).includes('background-color:tomato'));
+  const infoAvatar = html(React.createElement(Avatar, { name: 'V T', variant: 'info' }));
+  assert.ok(infoAvatar.includes('class="joy-avatar joy-avatar--circle joy-avatar--md joy-avatar--info"'), infoAvatar);
 
   // Divider: vertical exposes aria-orientation (RXD-101); horizontal does not
   assert.ok(html(React.createElement(Divider, { type: 'vertical' })).includes('aria-orientation="vertical"'));
