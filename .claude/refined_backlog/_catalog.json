@@ -608,8 +608,9 @@
     "title": "fix-palette-presets-text-contrast-and-verification-matrix",
     "from_idea": "I-055",
     "created_at": "2026-10-02T23:42:22.032223+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-10-02T23:42:25.763363+00:00"
   }
 ]
