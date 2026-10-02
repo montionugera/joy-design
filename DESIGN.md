@@ -14,6 +14,14 @@ colors:
   surface-overlay: "#ffffff"
   surface-inverse: "#14253e"
   surface-thumb: "#ffffff"
+  surface-clay-bg: "#F0D8C9"
+  surface-clay-fg: "#8A4526"
+  surface-hard-bg: "#E2E8EF"
+  surface-hard-fg: "#14253e"
+  surface-grass-bg: "#E4EADA"
+  surface-grass-fg: "#4E5F36"
+  surface-indoor-bg: "#e3dccc"
+  surface-indoor-fg: "#566a87"
   text-primary: "#1f1c13"
   text-secondary: "#3c3a35"
   text-muted: "#686660"
@@ -54,6 +62,15 @@ colors:
   brand-mark-contrast: "#fdfaf3"
   brand-ink: "#14253e"
   brand-ink-on-tile: "#f8f3e8"
+  court-default: "#A85A34"
+  court-soft: "#F0D8C9"
+  court-line: "#14253e"
+  result-won: "#1a4f1f"
+  result-won-bg: "#e7f2e7"
+  result-lost: "#781b1c"
+  result-lost-bg: "#fee9e6"
+  result-retired: "#643600"
+  result-title: "#c49a3a"
   surface-canvas-dark: "#0d1624"
   surface-card-dark: "#111b2b"
   surface-raised-dark: "#14253e"
@@ -62,6 +79,14 @@ colors:
   surface-overlay-dark: "#111b2b"
   surface-inverse-dark: "#f8f3e8"
   surface-thumb-dark: "#f8f3e8"
+  surface-clay-bg-dark: "#63311B"
+  surface-clay-fg-dark: "#DFB093"
+  surface-hard-bg-dark: "#111b2b"
+  surface-hard-fg-dark: "#a2b2cb"
+  surface-grass-bg-dark: "#1a2c17"
+  surface-grass-fg-dark: "#8fb382"
+  surface-indoor-bg-dark: "#132033"
+  surface-indoor-fg-dark: "#a2b2cb"
   text-primary-dark: "#f8f3e8"
   text-secondary-dark: "#bab7b0"
   text-muted-dark: "#a2b2cb"
@@ -102,6 +127,15 @@ colors:
   brand-mark-contrast-dark: "#fdfaf3"
   brand-ink-dark: "#f8f3e8"
   brand-ink-on-tile-dark: "#f8f3e8"
+  court-default-dark: "#C97C52"
+  court-soft-dark: "#63311B"
+  court-line-dark: "#a2b2cb"
+  result-won-dark: "#93c794"
+  result-won-bg-dark: "#061b07"
+  result-lost-dark: "#fb9890"
+  result-lost-bg-dark: "#2d0606"
+  result-retired-dark: "#dfae68"
+  result-title-dark: "#e9cd94"
 typography:
   display:
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
@@ -266,6 +300,14 @@ The contract. Light and dark values for every role.
 | `--joy-surface-overlay` | `#ffffff` | `#111b2b` |
 | `--joy-surface-inverse` | `#14253e` | `#f8f3e8` |
 | `--joy-surface-thumb` | `#ffffff` | `#f8f3e8` |
+| `--joy-surface-clay-bg` | `#F0D8C9` | `#63311B` |
+| `--joy-surface-clay-fg` | `#8A4526` | `#DFB093` |
+| `--joy-surface-hard-bg` | `#E2E8EF` | `#111b2b` |
+| `--joy-surface-hard-fg` | `#14253e` | `#a2b2cb` |
+| `--joy-surface-grass-bg` | `#E4EADA` | `#1a2c17` |
+| `--joy-surface-grass-fg` | `#4E5F36` | `#8fb382` |
+| `--joy-surface-indoor-bg` | `#e3dccc` | `#132033` |
+| `--joy-surface-indoor-fg` | `#566a87` | `#a2b2cb` |
 | `--joy-text-primary` | `#1f1c13` | `#f8f3e8` |
 | `--joy-text-secondary` | `#3c3a35` | `#bab7b0` |
 | `--joy-text-muted` | `#686660` | `#a2b2cb` |
@@ -314,6 +356,15 @@ The contract. Light and dark values for every role.
 | `--joy-brand-mark-contrast` | `#fdfaf3` | `#fdfaf3` |
 | `--joy-brand-ink` | `#14253e` | `#f8f3e8` |
 | `--joy-brand-ink-on-tile` | `#f8f3e8` | `#f8f3e8` |
+| `--joy-court-default` | `#A85A34` | `#C97C52` |
+| `--joy-court-soft` | `#F0D8C9` | `#63311B` |
+| `--joy-court-line` | `#14253e` | `#a2b2cb` |
+| `--joy-result-won` | `#1a4f1f` | `#93c794` |
+| `--joy-result-won-bg` | `#e7f2e7` | `#061b07` |
+| `--joy-result-lost` | `#781b1c` | `#fb9890` |
+| `--joy-result-lost-bg` | `#fee9e6` | `#2d0606` |
+| `--joy-result-retired` | `#643600` | `#dfae68` |
+| `--joy-result-title` | `#c49a3a` | `#e9cd94` |
 
 ### Measured contrast
 
@@ -480,6 +531,18 @@ Inputs to the semantic layer. Components never reference these directly.
 | 700 | `--joy-color-status-info-700` | `#17446f` |
 | 900 | `--joy-color-status-info-900` | `#051729` |
 
+**clay**
+
+| Step | Token | Value |
+| --- | --- | --- |
+| 50 | `--joy-color-clay-50` | `#FBF0EA` |
+| 100 | `--joy-color-clay-100` | `#F0D8C9` |
+| 200 | `--joy-color-clay-200` | `#DFB093` |
+| 300 | `--joy-color-clay-300` | `#C97C52` |
+| 400 | `--joy-color-clay-400` | `#A85A34` |
+| 500 | `--joy-color-clay-500` | `#8A4526` |
+| 600 | `--joy-color-clay-600` | `#63311B` |
+
 ## Typography
 
 Sans: `Inter, -apple-system, BlinkMacSystemFont, sans-serif`. Mono (code, tabular data): `JetBrains Mono, Menlo, monospace`. A 1.2 modular scale from a 16px body.
@@ -599,7 +662,7 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Space | `.joy-space` | - | vertical | - |
 | Spin | `.joy-spin` | - | - | - |
 | Splitter | `.joy-splitter` | - | horizontal, vertical | hover, focus-visible, active |
-| StatCard | `.joy-stat-card` | - | - | - |
+| StatCard | `.joy-stat-card` | - | editorial | - |
 | Statistic | `.joy-statistic` | - | - | - |
 | Steps | `.joy-steps` | - | horizontal, vertical | focus-visible, error |
 | Table | `.joy-table` | - | compact, responsive-stack, scroll | hover, focus-visible |
@@ -630,6 +693,13 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Wordmark | `.joy-wordmark` | - | - | - |
 | Ribbon | `.joy-ribbon` | - | corner, gold, inline, navy | - |
 | BrandBanner | `.joy-brand-banner` | - | center | hover, focus-visible, active, disabled |
+| VoiceCard | `.joy-voice-card` | - | editorial, ground-deep, ground-flat, ground-paper, ground-sunken, performance | - |
+| PerformanceFigure | `.joy-performance-figure` | - | - | - |
+| PerformanceBars | `.joy-performance-bars` | - | - | - |
+| DenseRow | `.joy-dense-row` | - | - | - |
+| MonoChip | `.joy-mono-chip` | - | court, danger, default | active |
+| TrendLine | `.joy-trend-line` | - | - | - |
+| Emblem | `.joy-emblem` | - | - | - |
 
 ## Brand
 

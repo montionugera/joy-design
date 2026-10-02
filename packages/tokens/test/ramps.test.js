@@ -52,6 +52,17 @@ test('primitive ramps in tokens.json maintain exact anchors and strictly decreas
     prevCreamY = y;
   }
 
+  // Clay ramp (50-600)
+  let prevClayY = Infinity;
+  for (const [step, token] of Object.entries(tokens.color.clay)) {
+    const y = relativeLuminance(token.value);
+    assert.ok(
+      y < prevClayY,
+      `Clay step ${step} (${token.value}, Y=${y}) must have strictly lower luminance than previous (prev Y=${prevClayY})`
+    );
+    prevClayY = y;
+  }
+
   // Status ramps (100-900)
   for (const statusName of ['success', 'warning', 'danger', 'info']) {
     const ramp = tokens.color.status[statusName];

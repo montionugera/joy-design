@@ -2191,3 +2191,32 @@ test('F-038 C-L8: chart components carry no inline colour: HUD colours come from
   assert.ok(!candle.includes('joy-color-'), 'no foreign --joy-color-* tokens');
   for (const f of ['BarChart', 'LineChart']) assert.ok(readSrc(`../src/${f}.tsx`).includes('joy-chart__hud-value--accent'), `${f} hover value uses the accent class`);
 });
+
+test('bauhaus component twins exist and render proper CSS classes in React', () => {
+  const voiceCard = fs.readFileSync(path.resolve('./src/VoiceCard.tsx'), 'utf8');
+  assert.ok(voiceCard.includes('joy-voice-card'), 'VoiceCard must render joy-voice-card class');
+  assert.ok(voiceCard.includes('React.forwardRef'), 'VoiceCard must implement forwardRef');
+
+  const statCard = fs.readFileSync(path.resolve('./src/StatCard.tsx'), 'utf8');
+  assert.ok(statCard.includes('joy-stat-card'), 'StatCard must render joy-stat-card class');
+  assert.ok(statCard.includes('joy-stat-card--editorial'), 'StatCard must support editorial mode');
+
+  const perfFig = fs.readFileSync(path.resolve('./src/PerformanceFigure.tsx'), 'utf8');
+  assert.ok(perfFig.includes('joy-performance-figure'), 'PerformanceFigure must render joy-performance-figure class');
+
+  const perfBars = fs.readFileSync(path.resolve('./src/PerformanceBars.tsx'), 'utf8');
+  assert.ok(perfBars.includes('joy-performance-bars'), 'PerformanceBars must render joy-performance-bars class');
+
+  const denseRow = fs.readFileSync(path.resolve('./src/DenseRow.tsx'), 'utf8');
+  assert.ok(denseRow.includes('joy-dense-row'), 'DenseRow must render joy-dense-row class');
+
+  const monoChip = fs.readFileSync(path.resolve('./src/MonoChip.tsx'), 'utf8');
+  assert.ok(monoChip.includes('joy-mono-chip'), 'MonoChip must render joy-mono-chip class');
+
+  const trendLine = fs.readFileSync(path.resolve('./src/TrendLine.tsx'), 'utf8');
+  assert.ok(trendLine.includes('joy-trend-line'), 'TrendLine must render joy-trend-line class');
+
+  const emblem = fs.readFileSync(path.resolve('./src/Emblem.tsx'), 'utf8');
+  assert.ok(emblem.includes('joy-emblem'), 'Emblem must render joy-emblem class');
+});
+

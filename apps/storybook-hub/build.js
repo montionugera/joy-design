@@ -604,6 +604,168 @@ function renderNavigationView() {
       </section>`;
 }
 
+function renderBauhausView() {
+  return `<section id="view-bauhaus" class="view-panel">
+        <div style="display: flex; align-items: center; gap: var(--joy-space-2); margin-bottom: var(--joy-space-2);">
+          <span class="joy-badge joy-badge--brand joy-badge--md"><span class="joy-badge__dot"></span> Bauhaus & Joy-Coach</span>
+          <span class="joy-badge joy-badge--neutral joy-badge--md">Dual Registers</span>
+        </div>
+        <h2 style="margin: 0 0 8px 0;">Bauhaus Dessau & Sports Analytics</h2>
+        <p class="header-tagline">
+          Dual-voice design architecture ported from joy-coach: warm editorial storytelling with Cormorant Garamond display serif alongside high-density performance telemetry in JetBrains Mono.
+        </p>
+
+        <!-- Dual Registers Comparison -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: var(--joy-space-6); margin: var(--joy-space-6) 0;">
+          
+          <!-- Register 1: Editorial Voice -->
+          <div class="joy-voice-card joy-voice-card--editorial joy-voice-card--ground-paper">
+            <div class="joy-voice-card__eyebrow">CHAMPIONSHIP MATCH / ROLAND-GARROS</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--joy-space-4);">
+              <div>
+                <h3 style="margin: 0; font-family: var(--joy-font-display); font-size: 2rem; font-weight: 400; line-height: 1.1; color: var(--joy-text-primary);">Philippe-Chatrier Court</h3>
+                <p style="margin: 4px 0 0 0; font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary);">Final Set / Deciding Baseline Rally</p>
+              </div>
+              <svg class="joy-emblem" width="64" height="64" viewBox="0 0 100 100" role="img" aria-label="Roland Garros Emblem">
+                <defs>
+                  <path id="emblem-hub-circle" d="M 50, 50 m -36, 0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" />
+                </defs>
+                <circle class="joy-emblem__field" cx="50" cy="50" r="48" />
+                <circle class="joy-emblem__ring" cx="50" cy="50" r="44" stroke-width="1.5" />
+                <circle class="joy-emblem__disc" cx="50" cy="50" r="22" />
+                <text class="joy-emblem__text">
+                  <textPath href="#emblem-hub-circle" startOffset="50%" text-anchor="middle">ROLAND-GARROS 2026</textPath>
+                </text>
+                <text class="joy-emblem__text" x="50" y="54" text-anchor="middle" font-weight="700" font-size="12">RG</text>
+              </svg>
+            </div>
+
+            <div class="joy-stat-card joy-stat-card--editorial" style="margin-bottom: var(--joy-space-4);">
+              <div class="joy-stat-card__eyebrow">FIRST SERVE WIN %</div>
+              <div class="joy-stat-card__row">
+                <div class="joy-stat-card__figure">84.2</div>
+                <span class="joy-stat-card__unit">%</span>
+                <span class="joy-stat-card__qualifier">26/31</span>
+              </div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--positive">
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                <span class="joy-stat-card__sr">Increase: </span>
+                <span>+6.4% vs tour avg</span>
+              </div>
+              <div class="joy-stat-card__progress-wrap">
+                <div class="joy-stat-card__progress-bar" style="width: 84.2%;"></div>
+              </div>
+              <div class="joy-stat-card__note">Heavy topspin kicking out wide to opponent backhand wing.</div>
+            </div>
+
+            <div class="joy-voice-card__caption">
+              Editorial voice uses Cormorant Garamond display serif, generous air, and paper-ground warmth.
+            </div>
+          </div>
+
+          <!-- Register 2: Performance Voice -->
+          <div class="joy-voice-card joy-voice-card--performance joy-voice-card--ground-deep">
+            <div class="joy-voice-card__eyebrow">REAL-TIME TELEMETRY FEED</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--joy-space-4);">
+              <div class="joy-performance-figure">
+                <span class="joy-performance-figure__label">SERVE VELOCITY</span>
+                <div class="joy-performance-figure__val-row">
+                  <span class="joy-performance-figure__figure">214</span>
+                  <span class="joy-performance-figure__unit">KM/H</span>
+                  <span class="joy-performance-figure__tally">PEAK ACE</span>
+                </div>
+              </div>
+              <svg class="joy-trend-line" width="80" height="32" viewBox="0 0 80 32" role="img" aria-label="Velocity Trend">
+                <path class="joy-trend-line__path" d="M 0.0 24.0 L 11.4 20.0 L 22.9 22.0 L 34.3 12.0 L 45.7 15.0 L 57.1 8.0 L 68.6 6.0 L 80.0 2.0" stroke-width="2"></path>
+              </svg>
+            </div>
+
+            <div class="joy-performance-bars" style="margin-bottom: var(--joy-space-4);">
+              <div class="joy-performance-bars__label">LAST 8 SERVICE POINTS</div>
+              <div class="joy-performance-bars__track">
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--win" aria-label="win"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--win" aria-label="win"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--loss" aria-label="loss"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--win" aria-label="win"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--win" aria-label="win"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--loss" aria-label="loss"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--win" aria-label="win"></span>
+                <span class="joy-performance-bars__bar joy-performance-bars__bar--win" aria-label="win"></span>
+              </div>
+            </div>
+
+            <div style="background: var(--joy-surface-sunken); border-radius: var(--joy-radius-inner); margin-bottom: var(--joy-space-4); overflow: hidden;">
+              <div class="joy-dense-row">
+                <span class="joy-dense-row__label">Break Points Saved</span>
+                <div class="joy-dense-row__right">
+                  <span class="joy-dense-row__figure">5/6</span>
+                  <span class="joy-dense-row__delta joy-dense-row__delta--positive">+18%</span>
+                </div>
+              </div>
+              <div class="joy-dense-row">
+                <span class="joy-dense-row__label">Unforced Errors</span>
+                <div class="joy-dense-row__right">
+                  <span class="joy-dense-row__figure">12</span>
+                  <span class="joy-dense-row__delta joy-dense-row__delta--critical">-4</span>
+                </div>
+              </div>
+              <div class="joy-dense-row">
+                <span class="joy-dense-row__label">Net Clearance</span>
+                <div class="joy-dense-row__right">
+                  <span class="joy-dense-row__figure">0.82m</span>
+                  <span class="joy-dense-row__delta joy-dense-row__delta--neutral">avg</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: var(--joy-space-2); flex-wrap: wrap;">
+              <span class="joy-mono-chip joy-mono-chip--court">CLAY COURT</span>
+              <span class="joy-mono-chip joy-mono-chip--active">LIVE FEED</span>
+              <span class="joy-mono-chip joy-mono-chip--default">ID 8821</span>
+              <span class="joy-mono-chip joy-mono-chip--danger">MATCH PT</span>
+            </div>
+
+            <div class="joy-voice-card__caption">
+              Performance voice uses monospace tabular numbers, dense grid spacing, and high-contrast deep grounds.
+            </div>
+          </div>
+        </div>
+
+        <!-- Court Semantics Grid -->
+        <div class="component-card" style="margin-top: var(--joy-space-6);">
+          <div class="component-header">
+            <div>
+              <div class="component-title">Court Surface Semantics</div>
+              <div class="component-desc">Specialized surface tokens for tennis and analytics engines: clay, hard, grass, and indoor.</div>
+            </div>
+          </div>
+          <div class="component-canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--joy-space-4);">
+            <div style="background: var(--joy-surface-clay-bg); color: var(--joy-surface-clay-fg); padding: var(--joy-space-4); border: 1px solid var(--joy-court); border-radius: var(--joy-radius-card);">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8;">Clay Court</div>
+              <div style="font-size: var(--joy-font-size-lg); font-weight: 600; margin-top: var(--joy-space-1);">Roland-Garros</div>
+              <div style="font-size: var(--joy-font-size-xs); margin-top: var(--joy-space-2); opacity: 0.9;">--joy-surface-clay-bg</div>
+            </div>
+            <div style="background: var(--joy-surface-hard-bg); color: var(--joy-surface-hard-fg); padding: var(--joy-space-4); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-card);">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8;">Hard Court</div>
+              <div style="font-size: var(--joy-font-size-lg); font-weight: 600; margin-top: var(--joy-space-1);">US Open / AO</div>
+              <div style="font-size: var(--joy-font-size-xs); margin-top: var(--joy-space-2); opacity: 0.9;">--joy-surface-hard-bg</div>
+            </div>
+            <div style="background: var(--joy-surface-grass-bg); color: var(--joy-surface-grass-fg); padding: var(--joy-space-4); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-card);">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8;">Grass Court</div>
+              <div style="font-size: var(--joy-font-size-lg); font-weight: 600; margin-top: var(--joy-space-1);">Wimbledon</div>
+              <div style="font-size: var(--joy-font-size-xs); margin-top: var(--joy-space-2); opacity: 0.9;">--joy-surface-grass-bg</div>
+            </div>
+            <div style="background: var(--joy-surface-indoor-bg); color: var(--joy-surface-indoor-fg); padding: var(--joy-space-4); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-card);">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8;">Indoor Carpet</div>
+              <div style="font-size: var(--joy-font-size-lg); font-weight: 600; margin-top: var(--joy-space-1);">ATP Finals</div>
+              <div style="font-size: var(--joy-font-size-xs); margin-top: var(--joy-space-2); opacity: 0.9;">--joy-surface-indoor-bg</div>
+            </div>
+          </div>
+        </div>
+      </section>`;
+}
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -617,6 +779,9 @@ const html = `<!DOCTYPE html>
         theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', theme);
+      var palette = 'classic';
+      try { palette = localStorage.getItem('joy-palette') || 'classic'; } catch (e) {}
+      document.documentElement.setAttribute('data-palette', palette);
     })();
   </script>
   <title>Joymify Design System & Component Portal</title>
@@ -627,7 +792,7 @@ ${inlinedThemeCss}
   <link rel="stylesheet" href="/theme.css?v=2.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --sidebar-width: 280px;
@@ -797,6 +962,79 @@ ${inlinedThemeCss}
     .hub-theme-toggle__icon {
       display: inline-flex;
       align-items: center;
+    }
+    .hub-palette-picker {
+      position: relative;
+    }
+    #btn-palette-toggle.hub-palette-toggle {
+      flex-shrink: 0;
+      gap: var(--joy-space-2);
+      border: 1px solid var(--hub-chrome-border);
+    }
+    .hub-palette-swatch {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .swatch-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid var(--joy-border-subtle);
+      box-sizing: border-box;
+      display: inline-block;
+    }
+    #hub-palette-active-swatch .swatch-dot--1 { background: var(--joy-accent-default); }
+    #hub-palette-active-swatch .swatch-dot--2 { background: var(--joy-surface-raised); }
+    #hub-palette-active-swatch .swatch-dot--3 { background: var(--joy-border-focus); }
+    .hub-palette-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      width: 260px;
+      background: var(--joy-surface-card);
+      border: 1px solid var(--joy-border-default);
+      border-radius: var(--joy-radius-card);
+      box-shadow: var(--joy-elevation-3);
+      padding: var(--joy-space-1);
+      z-index: var(--joy-z-dropdown);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hub-palette-dropdown[hidden] {
+      display: none;
+    }
+    .hub-palette-item {
+      display: flex;
+      align-items: center;
+      gap: var(--joy-space-2);
+      padding: var(--joy-space-2) var(--joy-space-3);
+      border-radius: var(--joy-radius-inner);
+      cursor: pointer;
+      user-select: none;
+      transition: background-color var(--joy-duration-fast) var(--joy-ease-out);
+    }
+    .hub-palette-item:hover, .hub-palette-item.active {
+      background: var(--joy-surface-sunken);
+    }
+    .hub-palette-item:focus-visible {
+      outline: 2px solid var(--joy-border-focus);
+      outline-offset: -2px;
+    }
+    .hub-palette-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .hub-palette-name {
+      font-size: var(--joy-font-size-sm);
+      font-weight: 600;
+      color: var(--joy-text-primary);
+    }
+    .hub-palette-sub {
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-muted);
     }
     .framework-pill {
       display: inline-flex;
@@ -1552,7 +1790,8 @@ ${inlinedThemeCss}
       .topbar__end {
         gap: var(--joy-space-2);
       }
-      #btn-theme-toggle.hub-theme-toggle {
+      #btn-theme-toggle.hub-theme-toggle,
+      #btn-palette-toggle.hub-palette-toggle {
         min-height: 44px;
         min-width: 44px;
       }
@@ -1576,11 +1815,27 @@ ${inlinedThemeCss}
       }
     }
     @media (max-width: 480px) {
-      #theme-label {
+      .topbar {
+        padding: var(--joy-space-2) var(--joy-space-3);
+      }
+      .topbar__start,
+      .topbar__end {
+        gap: var(--joy-space-2);
+      }
+      #theme-label,
+      #hub-palette-label {
         display: none;
       }
-      #btn-theme-toggle.hub-theme-toggle {
-        padding: 0;
+      #btn-theme-toggle.hub-theme-toggle,
+      #btn-palette-toggle.hub-palette-toggle {
+        padding: 0 var(--joy-space-2);
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+    @media (max-width: 360px) {
+      .topbar-brand__name {
+        display: none;
       }
     }
     @media (max-width: 640px) {
@@ -1649,6 +1904,74 @@ ${navigationHtml}
         <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">${brandMarkPreview(16, true, true)}</span><span class="topbar-brand__name">Joymify Design</span></span>
       </div>
       <div class="topbar__end">
+        <div class="hub-palette-picker" id="hub-palette-picker">
+          <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-palette-toggle" id="btn-palette-toggle" onclick="togglePaletteMenu()" aria-haspopup="listbox" aria-expanded="false" aria-label="Select color palette preset">
+            <span class="hub-palette-swatch" id="hub-palette-active-swatch">
+              <span class="swatch-dot swatch-dot--1"></span>
+              <span class="swatch-dot swatch-dot--2"></span>
+              <span class="swatch-dot swatch-dot--3"></span>
+            </span>
+            <span id="hub-palette-label">Joy Classic</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="hub-palette-dropdown" id="hub-palette-dropdown" role="listbox" aria-label="Color palette presets" hidden>
+            <div class="hub-palette-item" role="option" data-palette="classic" onclick="setPalette('classic')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-color-navy-800);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-gold-500);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-cream-100);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Joy Classic</span>
+                <span class="hub-palette-sub">Oxford Navy & Ochre Gold</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="bauhaus-primary" onclick="setPalette('bauhaus-primary')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-color-navy-700);"></span>
+                <span class="swatch-dot" style="background: var(--joy-result-lost);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-gold-500);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Bauhaus Primary</span>
+                <span class="hub-palette-sub">Dessau Geometric Triad</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="clay-court" onclick="setPalette('clay-court')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-color-clay-500);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-clay-300);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-clay-50);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Clay Court</span>
+                <span class="hub-palette-sub">Roland-Garros Terracotta</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="nordic-slate" onclick="setPalette('nordic-slate')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-color-navy-600);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-status-info-fg);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-cream-50);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Nordic Slate</span>
+                <span class="hub-palette-sub">Minimalist Slate & Cerulean</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="verdant-lawn" onclick="setPalette('verdant-lawn')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-color-status-success-fg);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-gold-400);"></span>
+                <span class="swatch-dot" style="background: var(--joy-color-cream-50);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Verdant Lawn</span>
+                <span class="hub-palette-sub">Wimbledon Green & Champagne</span>
+              </div>
+            </div>
+          </div>
+        </div>
         <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-theme-toggle" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme">
           <span id="theme-icon" class="hub-theme-toggle__icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -5658,6 +5981,8 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
         </div>
       </section>
+      ${renderBauhausView()}
+    </div>
   </main>
 
   <!-- Interactive Demo Modal (body level so any view can open it) -->
@@ -5759,8 +6084,54 @@ export async function executeHedge(symbol: string, size: number) {
       redrawHubCharts();
     }
 
+    const PALETTES = {
+      'classic': 'Joy Classic',
+      'bauhaus-primary': 'Bauhaus Primary',
+      'clay-court': 'Clay Court',
+      'nordic-slate': 'Nordic Slate',
+      'verdant-lawn': 'Verdant Lawn'
+    };
+
+    function togglePaletteMenu() {
+      const dd = document.getElementById('hub-palette-dropdown');
+      const btn = document.getElementById('btn-palette-toggle');
+      if (!dd || !btn) return;
+      const isOpen = !dd.hasAttribute('hidden');
+      if (isOpen) {
+        dd.setAttribute('hidden', '');
+        btn.setAttribute('aria-expanded', 'false');
+      } else {
+        dd.removeAttribute('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function setPalette(palette) {
+      if (!PALETTES[palette]) palette = 'classic';
+      document.documentElement.setAttribute('data-palette', palette);
+      try { localStorage.setItem('joy-palette', palette); } catch (e) {}
+      syncPalette(palette);
+      const dd = document.getElementById('hub-palette-dropdown');
+      const btn = document.getElementById('btn-palette-toggle');
+      if (dd) dd.setAttribute('hidden', '');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+      redrawHubCharts();
+    }
+
+    function syncPalette(palette) {
+      if (!palette || !PALETTES[palette]) palette = 'classic';
+      const label = document.getElementById('hub-palette-label');
+      if (label) label.textContent = PALETTES[palette];
+      document.querySelectorAll('.hub-palette-item').forEach(el => {
+        const active = el.getAttribute('data-palette') === palette;
+        el.classList.toggle('active', active);
+        el.setAttribute('aria-selected', String(active));
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       syncThemeToggle(document.documentElement.getAttribute('data-theme'));
+      syncPalette(document.documentElement.getAttribute('data-palette') || 'classic');
     });
     // Any theme change (toggle, restore, tests, devtools) keeps the toggle's icon and labels truthful,
     // and re-reads any resolved brand token values the Brand view is showing.
@@ -5768,6 +6139,19 @@ export async function executeHedge(symbol: string, size: number) {
       syncThemeToggle(document.documentElement.getAttribute('data-theme'));
       paintBrandTokenValues();
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    new MutationObserver(() => {
+      syncPalette(document.documentElement.getAttribute('data-palette'));
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-palette'] });
+
+    document.addEventListener('click', (e) => {
+      const picker = document.getElementById('hub-palette-picker');
+      if (picker && !picker.contains(e.target)) {
+        const dd = document.getElementById('hub-palette-dropdown');
+        const btn = document.getElementById('btn-palette-toggle');
+        if (dd) dd.setAttribute('hidden', '');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    });
 
     /** Enter activates a role="link" .hub-card the same as a click (native <a> behaviour). */
     function hubCardActivate(event) {
