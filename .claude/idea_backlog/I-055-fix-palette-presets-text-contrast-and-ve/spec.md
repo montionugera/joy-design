@@ -1,10 +1,10 @@
 ---
-title: "list"
-id: I-054
+title: "fix-palette-presets-text-contrast-and-verification-matrix"
+id: I-055
 status: idea
 ---
 
-# list
+# fix-palette-presets-text-contrast-and-verification-matrix
 
 ## Problem
 
