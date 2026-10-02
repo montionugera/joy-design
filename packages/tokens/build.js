@@ -105,6 +105,10 @@ function extractTokens(rootTokens) {
           const varName = group === 'status' ? `status-${name}` : `${group}-${name}`;
           lightVars.push(`  --joy-${varName}: ${val};`);
           jsObj[varName] = val;
+          if (name === 'default') {
+            lightVars.push(`  --joy-${group}: ${val};`);
+            jsObj[group] = val;
+          }
         }
       }
     }
@@ -122,6 +126,9 @@ function extractTokens(rootTokens) {
           const val = resolveRef(token.value, rootTokens);
           const varName = group === 'status' ? `status-${name}` : `${group}-${name}`;
           darkVars.push(`  --joy-${varName}: ${val};`);
+          if (name === 'default') {
+            darkVars.push(`  --joy-${group}: ${val};`);
+          }
         }
       }
     }
@@ -5868,7 +5875,12 @@ const canonicalVars = [
   '  --gold-400: #c49a3a;',
   '  --cream-100: #f8f3e8;',
   '  --ink-500: #1f1c13;',
+  '  --joy-font-display: var(--joy-font-family-display);',
+  '  --joy-stat-numeric: lining-nums tabular-nums;',
 ].join('\n');
+
+jsObj['font-display'] = jsObj['font-family-display'] || '"Cormorant Garamond", "Noto Serif", Georgia, serif';
+jsObj['stat-numeric'] = 'lining-nums tabular-nums';
 
 const legacyAliasesMap = {
   'color-brand-primary': { target: 'accent-default', cssVal: 'var(--joy-accent-default)' },
@@ -5995,11 +6007,25 @@ const mediaCoarsePointer = `
 }
 `;
 
+let presetBlocks = '';
+if (tokens.preset) {
+  for (const [key, preset] of Object.entries(tokens.preset)) {
+    if (preset.light) {
+      const lightEntries = Object.entries(preset.light).map(([k, v]) => `  --joy-${k}: ${v};`).join('\n');
+      presetBlocks += `\n/* ── Palette Preset: ${preset.name} (Light) ── */\n[data-palette="${key}"], :root[data-palette="${key}"] {\n${lightEntries}\n}\n`;
+    }
+    if (preset.dark) {
+      const darkEntries = Object.entries(preset.dark).map(([k, v]) => `  --joy-${k}: ${v};`).join('\n');
+      presetBlocks += `\n/* ── Palette Preset: ${preset.name} (Dark) ── */\n[data-theme="dark"][data-palette="${key}"], [data-theme="dark"] [data-palette="${key}"] {\n${darkEntries}\n}\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"])[data-palette="${key}"] {\n${darkEntries}\n  }\n}\n`;
+    }
+  }
+}
+
 const rootBlock = `:root {\n${primitiveVars.join('\n')}\n${lightVars.join('\n')}\n${canonicalVars}\n${legacyAliases}\n}\n`;
 const darkBlock = `[data-theme="dark"] {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n}\n`;
 const mediaDarkBlock = `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n  }\n}\n`;
 
-const themeCss = `${rootBlock}\n${darkBlock}\n${mediaDarkBlock}\n${mediaReducedMotion}\n${mediaCoarsePointer}\n\n${componentStyles}`;
+const themeCss = `${rootBlock}\n${darkBlock}\n${mediaDarkBlock}\n${mediaReducedMotion}\n${mediaCoarsePointer}\n${presetBlocks}\n\n${componentStyles}`;
 // Atomic write: parallel test runners import this module (which regenerates dist at load),
 // so readers must never observe a truncated file. Write to a same-dir temp, then rename.
 function writeFileAtomic(target, data) {
