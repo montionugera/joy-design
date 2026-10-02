@@ -620,11 +620,11 @@ function renderBauhausView() {
           
           <!-- Register 1: Editorial Voice -->
           <div class="joy-voice-card joy-voice-card--editorial joy-voice-card--ground-paper">
-            <div class="joy-voice-card__eyebrow">CHAMPIONSHIP MATCH • ROLAND-GARROS</div>
+            <div class="joy-voice-card__eyebrow">CHAMPIONSHIP MATCH / ROLAND-GARROS</div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--joy-space-4);">
               <div>
                 <h3 style="margin: 0; font-family: var(--joy-font-display); font-size: 2rem; font-weight: 400; line-height: 1.1; color: var(--joy-text-primary);">Philippe-Chatrier Court</h3>
-                <p style="margin: 4px 0 0 0; font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary);">Final Set • Deciding Baseline Rally</p>
+                <p style="margin: 4px 0 0 0; font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary);">Final Set / Deciding Baseline Rally</p>
               </div>
               <svg class="joy-emblem" width="64" height="64" viewBox="0 0 100 100" role="img" aria-label="Roland Garros Emblem">
                 <defs>
@@ -634,7 +634,7 @@ function renderBauhausView() {
                 <circle class="joy-emblem__ring" cx="50" cy="50" r="44" stroke-width="1.5" />
                 <circle class="joy-emblem__disc" cx="50" cy="50" r="22" />
                 <text class="joy-emblem__text">
-                  <textPath href="#emblem-hub-circle" startOffset="50%" text-anchor="middle">ROLAND-GARROS • 2026</textPath>
+                  <textPath href="#emblem-hub-circle" startOffset="50%" text-anchor="middle">ROLAND-GARROS 2026</textPath>
                 </text>
                 <text class="joy-emblem__text" x="50" y="54" text-anchor="middle" font-weight="700" font-size="12">RG</text>
               </svg>
@@ -1815,13 +1815,27 @@ ${inlinedThemeCss}
       }
     }
     @media (max-width: 480px) {
+      .topbar {
+        padding: var(--joy-space-2) var(--joy-space-3);
+      }
+      .topbar__start,
+      .topbar__end {
+        gap: var(--joy-space-2);
+      }
       #theme-label,
       #hub-palette-label {
         display: none;
       }
       #btn-theme-toggle.hub-theme-toggle,
       #btn-palette-toggle.hub-palette-toggle {
-        padding: 0;
+        padding: 0 var(--joy-space-2);
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+    @media (max-width: 360px) {
+      .topbar-brand__name {
+        display: none;
       }
     }
     @media (max-width: 640px) {
