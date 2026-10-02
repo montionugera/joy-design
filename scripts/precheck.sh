@@ -20,7 +20,7 @@ for root, dirs, files in os.walk('.'):
     # test-results/, playwright-report/ and .turbo/ (binary cache archives) are gitignored build output, not codebase files.
     if any(x in root for x in ['node_modules', '.git', 'dist', '.claude', '.turbo', 'test-results', 'playwright-report']): continue
     for f in files:
-        if f in ['pnpm-lock.yaml', 'AGENTS.md']: continue
+        if f in ['pnpm-lock.yaml', 'AGENTS.md'] or (f.endswith('.html') and 'docs' in root): continue
         p = os.path.join(root, f)
         try:
             with open(p, 'r', encoding='utf-8', errors='ignore') as fh:

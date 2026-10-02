@@ -136,5 +136,25 @@ test('index.d.ts provides strongly typed tokens without loose index signature an
   assert.ok(dts.includes("@deprecated Use 'accent-default' instead"), 'legacy alias must have @deprecated JSDoc pointing to new token');
 });
 
+test('bauhaus joy-coach tokens and 5 palette presets exist in theme.css', () => {
+  const css = fs.readFileSync(path.resolve('./dist/theme.css'), 'utf8');
+
+  // Clay scale tokens
+  assert.ok(css.includes('--joy-color-clay-400: #A85A34;') || css.includes('--joy-color-clay-400: #a85a34;'), 'clay-400 primitive must exist');
+  assert.ok(css.includes('--joy-court:'), 'court semantic token must exist');
+  assert.ok(css.includes('--joy-surface-clay-bg:'), 'surface-clay-bg semantic token must exist');
+  assert.ok(css.includes('--joy-surface-grass-bg:'), 'surface-grass-bg semantic token must exist');
+  assert.ok(css.includes('--joy-result-won:'), 'result-won semantic token must exist');
+  assert.ok(css.includes('--joy-result-title:'), 'result-title semantic token must exist');
+  assert.ok(css.includes('--joy-font-display:'), 'font-display Cormorant serif token must exist');
+
+  // 5 Palette Presets in theme.css
+  assert.ok(css.includes('[data-palette="classic"]'), 'classic palette preset must exist');
+  assert.ok(css.includes('[data-palette="bauhaus-primary"]'), 'bauhaus-primary palette preset must exist');
+  assert.ok(css.includes('[data-palette="clay-court"]'), 'clay-court palette preset must exist');
+  assert.ok(css.includes('[data-palette="nordic-slate"]'), 'nordic-slate palette preset must exist');
+  assert.ok(css.includes('[data-palette="verdant-lawn"]'), 'verdant-lawn palette preset must exist');
+});
+
 
 

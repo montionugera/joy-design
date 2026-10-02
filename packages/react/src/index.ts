@@ -107,3 +107,11 @@ export { BrandMark, type BrandMarkProps } from './BrandMark.js';
 export { Wordmark, type WordmarkProps } from './Wordmark.js';
 export { Ribbon, type RibbonProps } from './Ribbon.js';
 export { BrandBanner, type BrandBannerProps } from './BrandBanner.js';
+// F-049: Bauhaus & Sports Analytics Component Suite
+export { VoiceCard, type VoiceCardProps, type Voice, type Ground } from './VoiceCard.js';
+export { PerformanceFigure, type PerformanceFigureProps } from './PerformanceFigure.js';
+export { PerformanceBars, type PerformanceBarsProps, type Outcome } from './PerformanceBars.js';
+export { DenseRow, type DenseRowProps, type DenseRowTone } from './DenseRow.js';
+export { MonoChip, type MonoChipProps, type MonoChipVariant } from './MonoChip.js';
+export { TrendLine, type TrendLineProps } from './TrendLine.js';
+export { Emblem, type EmblemProps } from './Emblem.js';

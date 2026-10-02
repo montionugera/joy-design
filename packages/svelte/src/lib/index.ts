@@ -108,3 +108,11 @@ export { default as BrandMark } from './BrandMark.svelte';
 export { default as Wordmark } from './Wordmark.svelte';
 export { default as Ribbon } from './Ribbon.svelte';
 export { default as BrandBanner } from './BrandBanner.svelte';
+// F-049: Bauhaus & Sports Analytics Component Suite
+export { default as VoiceCard } from './VoiceCard.svelte';
+export { default as PerformanceFigure } from './PerformanceFigure.svelte';
+export { default as PerformanceBars } from './PerformanceBars.svelte';
+export { default as DenseRow } from './DenseRow.svelte';
+export { default as MonoChip } from './MonoChip.svelte';
+export { default as TrendLine } from './TrendLine.svelte';
+export { default as Emblem } from './Emblem.svelte';

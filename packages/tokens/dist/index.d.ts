@@ -51,6 +51,13 @@ export interface JoyTokens {
   'color-neutral-800': string;
   'color-neutral-900': string;
   'color-neutral-950': string;
+  'color-clay-50': string;
+  'color-clay-100': string;
+  'color-clay-200': string;
+  'color-clay-300': string;
+  'color-clay-400': string;
+  'color-clay-500': string;
+  'color-clay-600': string;
   'z-base': string;
   'z-sticky': string;
   'z-backdrop': string;
@@ -119,6 +126,14 @@ export interface JoyTokens {
   'surface-overlay': string;
   'surface-inverse': string;
   'surface-thumb': string;
+  'surface-clay-bg': string;
+  'surface-clay-fg': string;
+  'surface-hard-bg': string;
+  'surface-hard-fg': string;
+  'surface-grass-bg': string;
+  'surface-grass-fg': string;
+  'surface-indoor-bg': string;
+  'surface-indoor-fg': string;
   'text-primary': string;
   'text-secondary': string;
   'text-muted': string;
@@ -132,6 +147,7 @@ export interface JoyTokens {
   'border-focus': string;
   'border-disabled': string;
   'accent-default': string;
+  'accent': string;
   'accent-hover': string;
   'accent-active': string;
   'accent-subtle': string;
@@ -167,6 +183,18 @@ export interface JoyTokens {
   'brand-mark-contrast': string;
   'brand-ink': string;
   'brand-ink-on-tile': string;
+  'court-default': string;
+  'court': string;
+  'court-soft': string;
+  'court-line': string;
+  'result-won': string;
+  'result-won-bg': string;
+  'result-lost': string;
+  'result-lost-bg': string;
+  'result-retired': string;
+  'result-title': string;
+  'font-display': string;
+  'stat-numeric': string;
   /**
    * @deprecated Use 'accent-default' instead
    */

@@ -105,6 +105,10 @@ function extractTokens(rootTokens) {
           const varName = group === 'status' ? `status-${name}` : `${group}-${name}`;
           lightVars.push(`  --joy-${varName}: ${val};`);
           jsObj[varName] = val;
+          if (name === 'default') {
+            lightVars.push(`  --joy-${group}: ${val};`);
+            jsObj[group] = val;
+          }
         }
       }
     }
@@ -122,6 +126,9 @@ function extractTokens(rootTokens) {
           const val = resolveRef(token.value, rootTokens);
           const varName = group === 'status' ? `status-${name}` : `${group}-${name}`;
           darkVars.push(`  --joy-${varName}: ${val};`);
+          if (name === 'default') {
+            darkVars.push(`  --joy-${group}: ${val};`);
+          }
         }
       }
     }
@@ -2023,6 +2030,313 @@ h1, h2, h3, .joy-display {
 .joy-stat-card__delta--neutral {
   color: var(--joy-text-muted);
 }
+.joy-stat-card--editorial {
+  font-family: var(--joy-font-family-sans);
+}
+.joy-stat-card--editorial .joy-stat-card__eyebrow {
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--joy-text-muted);
+}
+.joy-stat-card--editorial .joy-stat-card__row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--joy-space-1);
+  margin-top: var(--joy-space-2);
+}
+.joy-stat-card--editorial .joy-stat-card__figure {
+  font-family: var(--joy-font-display);
+  font-weight: 300;
+  font-size: 3rem;
+  line-height: 1;
+  font-variant-numeric: var(--joy-stat-numeric);
+  color: var(--joy-text-primary);
+}
+.joy-stat-card__unit {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-md);
+  font-weight: 500;
+  color: var(--joy-text-secondary);
+}
+.joy-stat-card__qualifier {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-muted);
+  margin-left: var(--joy-space-2);
+}
+.joy-stat-card__note {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  margin-top: var(--joy-space-3);
+  line-height: 1.4;
+}
+.joy-stat-card__progress-wrap {
+  width: 100%;
+  height: 4px;
+  background-color: var(--joy-surface-sunken);
+  border-radius: var(--joy-radius-pill);
+  overflow: hidden;
+  margin-top: var(--joy-space-3);
+}
+.joy-stat-card__progress-bar {
+  height: 100%;
+  background-color: var(--joy-accent-default);
+  transition: width var(--joy-duration-normal) var(--joy-ease-out);
+}
+
+/* Voice Card (Bauhaus Dual Registers) */
+.joy-voice-card {
+  position: relative;
+  box-sizing: border-box;
+  padding: var(--joy-space-4);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-voice-card--editorial {
+  font-family: var(--joy-font-family-sans);
+}
+.joy-voice-card--performance {
+  font-family: var(--joy-font-family-mono);
+  border-radius: var(--joy-radius-inner);
+}
+.joy-voice-card--ground-paper {
+  background-color: var(--joy-surface-card);
+  box-shadow: var(--joy-elevation-1);
+}
+.joy-voice-card--ground-deep {
+  background-color: var(--joy-color-navy-800);
+  color: var(--joy-color-cream-50);
+  border-color: var(--joy-border-subtle);
+  box-shadow: var(--joy-elevation-2);
+}
+.joy-voice-card--ground-deep .joy-voice-card__eyebrow {
+  color: var(--joy-accent-highlight);
+}
+.joy-voice-card--ground-deep .joy-voice-card__caption {
+  color: var(--joy-color-cream-200);
+}
+.joy-voice-card--ground-sunken {
+  background-color: var(--joy-surface-sunken);
+  box-shadow: none;
+}
+.joy-voice-card--ground-flat {
+  box-shadow: none;
+}
+.joy-voice-card__eyebrow {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--joy-text-muted);
+  margin-bottom: var(--joy-space-2);
+}
+.joy-voice-card__caption {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  margin-top: var(--joy-space-3);
+  line-height: 1.4;
+}
+
+/* Performance Figure */
+.joy-performance-figure {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--joy-space-1);
+}
+.joy-performance-figure__val-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--joy-space-1);
+}
+.joy-performance-figure__figure {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-2xl);
+  font-weight: 600;
+  font-variant-numeric: var(--joy-stat-numeric);
+  color: var(--joy-text-primary);
+  line-height: 1;
+}
+.joy-performance-figure__unit {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+}
+.joy-performance-figure__tally {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-muted);
+}
+.joy-performance-figure__label {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Performance Bars */
+.joy-performance-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--joy-space-2);
+}
+.joy-performance-bars__label {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-muted);
+  font-weight: 500;
+}
+.joy-performance-bars__track {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-1);
+}
+.joy-performance-bars__bar {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  display: inline-block;
+  box-sizing: border-box;
+}
+.joy-performance-bars__bar--win {
+  background-color: var(--joy-result-won);
+}
+.joy-performance-bars__bar--loss {
+  background-color: var(--joy-result-lost);
+}
+.joy-performance-bars__bar--neutral {
+  background-color: var(--joy-surface-sunken);
+  border: 1px solid var(--joy-border-subtle);
+}
+
+/* Dense Row */
+.joy-dense-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--joy-space-2) var(--joy-space-3);
+  border-bottom: 1px solid var(--joy-border-subtle);
+  font-size: var(--joy-font-size-sm);
+}
+.joy-dense-row:last-child {
+  border-bottom: none;
+}
+.joy-dense-row__label {
+  color: var(--joy-text-primary);
+  font-weight: 500;
+}
+.joy-dense-row__right {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-2);
+}
+.joy-dense-row__figure {
+  font-family: var(--joy-font-family-mono);
+  font-variant-numeric: var(--joy-stat-numeric);
+  font-weight: 600;
+  color: var(--joy-text-primary);
+}
+.joy-dense-row__delta {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-xs);
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.joy-dense-row__delta--positive {
+  background-color: var(--joy-status-success-bg);
+  color: var(--joy-status-success-fg);
+}
+.joy-dense-row__delta--critical {
+  background-color: var(--joy-status-danger-bg);
+  color: var(--joy-status-danger-fg);
+}
+.joy-dense-row__delta--info {
+  background-color: var(--joy-status-info-bg);
+  color: var(--joy-status-info-fg);
+}
+.joy-dense-row__delta--neutral {
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-muted);
+}
+
+/* Mono Chip */
+.joy-mono-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-xs);
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: var(--joy-radius-inner);
+  user-select: none;
+  line-height: 1.3;
+}
+.joy-mono-chip--default {
+  background-color: var(--joy-surface-sunken);
+  color: var(--joy-text-secondary);
+  border: 1px solid var(--joy-border-subtle);
+}
+.joy-mono-chip--active {
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+  border: 1px solid var(--joy-accent-default);
+}
+.joy-mono-chip--court {
+  background-color: var(--joy-surface-clay-bg);
+  color: var(--joy-surface-clay-fg);
+  border: 1px solid var(--joy-court);
+}
+.joy-mono-chip--danger {
+  background-color: var(--joy-status-danger-bg);
+  color: var(--joy-status-danger-fg);
+  border: 1px solid var(--joy-status-danger-border);
+}
+
+/* TrendLine */
+.joy-trend-line {
+  display: inline-block;
+  overflow: visible;
+}
+.joy-trend-line__path {
+  fill: none;
+  stroke: var(--joy-accent-default);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Emblem */
+.joy-emblem {
+  display: inline-block;
+  position: relative;
+  overflow: visible;
+}
+.joy-emblem__field {
+  fill: var(--joy-color-navy-600);
+}
+.joy-emblem__ring {
+  stroke: var(--joy-accent-default);
+  fill: none;
+}
+.joy-emblem__disc {
+  fill: var(--joy-court);
+}
+.joy-emblem__text {
+  fill: var(--joy-accent-default);
+  font-family: var(--joy-font-family-sans);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 
 /* Progress */
 .joy-progress {
@@ -5868,7 +6182,12 @@ const canonicalVars = [
   '  --gold-400: #c49a3a;',
   '  --cream-100: #f8f3e8;',
   '  --ink-500: #1f1c13;',
+  '  --joy-font-display: var(--joy-font-family-display);',
+  '  --joy-stat-numeric: lining-nums tabular-nums;',
 ].join('\n');
+
+jsObj['font-display'] = jsObj['font-family-display'] || '"Cormorant Garamond", "Noto Serif", Georgia, serif';
+jsObj['stat-numeric'] = 'lining-nums tabular-nums';
 
 const legacyAliasesMap = {
   'color-brand-primary': { target: 'accent-default', cssVal: 'var(--joy-accent-default)' },
@@ -5995,11 +6314,25 @@ const mediaCoarsePointer = `
 }
 `;
 
+let presetBlocks = '';
+if (tokens.preset) {
+  for (const [key, preset] of Object.entries(tokens.preset)) {
+    if (preset.light) {
+      const lightEntries = Object.entries(preset.light).map(([k, v]) => `  --joy-${k}: ${v};`).join('\n');
+      presetBlocks += `\n/* ── Palette Preset: ${preset.name} (Light) ── */\n[data-palette="${key}"], :root[data-palette="${key}"] {\n${lightEntries}\n}\n`;
+    }
+    if (preset.dark) {
+      const darkEntries = Object.entries(preset.dark).map(([k, v]) => `  --joy-${k}: ${v};`).join('\n');
+      presetBlocks += `\n/* ── Palette Preset: ${preset.name} (Dark) ── */\n[data-theme="dark"][data-palette="${key}"], [data-theme="dark"] [data-palette="${key}"] {\n${darkEntries}\n}\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"])[data-palette="${key}"] {\n${darkEntries}\n  }\n}\n`;
+    }
+  }
+}
+
 const rootBlock = `:root {\n${primitiveVars.join('\n')}\n${lightVars.join('\n')}\n${canonicalVars}\n${legacyAliases}\n}\n`;
 const darkBlock = `[data-theme="dark"] {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n}\n`;
 const mediaDarkBlock = `@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {\n${darkVars.join('\n')}\n${darkLegacyRemap}\n  }\n}\n`;
 
-const themeCss = `${rootBlock}\n${darkBlock}\n${mediaDarkBlock}\n${mediaReducedMotion}\n${mediaCoarsePointer}\n\n${componentStyles}`;
+const themeCss = `${rootBlock}\n${darkBlock}\n${mediaDarkBlock}\n${mediaReducedMotion}\n${mediaCoarsePointer}\n${presetBlocks}\n\n${componentStyles}`;
 // Atomic write: parallel test runners import this module (which regenerates dist at load),
 // so readers must never observe a truncated file. Write to a same-dir temp, then rename.
 function writeFileAtomic(target, data) {

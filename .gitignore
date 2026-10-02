@@ -11,3 +11,5 @@ dist/
 .turbo/
 test-results/
 playwright-report/
+docs/**/*.html
+.thinker.json
