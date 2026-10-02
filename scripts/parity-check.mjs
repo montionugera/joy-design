@@ -86,7 +86,15 @@ export const COMPONENTS = [
   'BrandMark',
   'Wordmark',
   'Ribbon',
-  'BrandBanner'
+  'BrandBanner',
+  // F-049
+  'VoiceCard',
+  'PerformanceFigure',
+  'PerformanceBars',
+  'DenseRow',
+  'MonoChip',
+  'TrendLine',
+  'Emblem'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a
@@ -127,7 +135,15 @@ export const REF_FORWARDING = [
   'TestimonialCard',
   'FAQSection',
   'SiteFooter',
-  'LandingPage'
+  'LandingPage',
+  // F-049
+  'VoiceCard',
+  'PerformanceFigure',
+  'PerformanceBars',
+  'DenseRow',
+  'MonoChip',
+  'TrendLine',
+  'Emblem'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
@@ -149,7 +165,15 @@ export const SVELTE_REF_REST = [
   'TestimonialCard',
   'FAQSection',
   'SiteFooter',
-  'LandingPage'
+  'LandingPage',
+  // F-049
+  'VoiceCard',
+  'PerformanceFigure',
+  'PerformanceBars',
+  'DenseRow',
+  'MonoChip',
+  'TrendLine',
+  'Emblem'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).
