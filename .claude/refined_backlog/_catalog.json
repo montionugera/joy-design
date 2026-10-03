@@ -602,5 +602,17 @@
     "shipped_at": "2026-10-02T13:02:17.228092+00:00",
     "shipped_sha": "bd1a2d7ec0881f9ac02b4991ac665603f744882c",
     "promoted_at": "2026-10-02T13:24:25.105948+00:00"
+  },
+  {
+    "id": "F-050",
+    "title": "fix-palette-presets-text-contrast-and-verification-matrix",
+    "from_idea": "I-055",
+    "created_at": "2026-10-02T23:42:22.032223+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "2.29",
+    "claimed_at": "2026-10-02T23:42:25.763363+00:00",
+    "shipped_at": "2026-10-03T00:04:55.044623+00:00",
+    "shipped_sha": "6640d8d15f9f98a6d61988295d0f0c3110aa8687"
   }
 ]

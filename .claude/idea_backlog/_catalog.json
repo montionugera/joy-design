@@ -322,5 +322,17 @@
     "title": "Color palette preset system with 5 presets and Bauhaus joy-coach full design system integration",
     "created_at": "2026-10-02T11:41:06.919843+00:00",
     "promoted_to": "F-049"
+  },
+  {
+    "id": "I-054",
+    "title": "list",
+    "created_at": "2026-10-02T23:41:51.997149+00:00",
+    "promoted_to": null
+  },
+  {
+    "id": "I-055",
+    "title": "fix-palette-presets-text-contrast-and-verification-matrix",
+    "created_at": "2026-10-02T23:42:00.518398+00:00",
+    "promoted_to": "F-050"
   }
 ]
