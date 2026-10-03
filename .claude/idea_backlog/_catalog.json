@@ -346,5 +346,11 @@
     "title": "F-052: Instrument Modernism \u2014 2026 Web/Mobile Responsiveness, Joy-Coach Suite, and Interactive Demos",
     "created_at": "2026-10-03T12:53:47.324408+00:00",
     "promoted_to": "F-052"
+  },
+  {
+    "id": "I-058",
+    "title": "Fix mobile responsive layout and simulator emulation in Storybook Hub",
+    "created_at": "2026-10-03T17:55:57.937736+00:00",
+    "promoted_to": "F-053"
   }
 ]
