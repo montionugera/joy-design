@@ -766,6 +766,394 @@ function renderBauhausView() {
       </section>`;
 }
 
+function renderCourtsideLoggerView() {
+  return `<section id="view-courtside-logger" class="view-panel">
+        <div style="display: flex; align-items: center; gap: var(--joy-space-2); margin-bottom: var(--joy-space-2);">
+          <span class="joy-badge joy-badge--brand joy-badge--md"><span class="joy-badge__dot"></span> Live Courtside Logger</span>
+          <span class="joy-badge joy-badge--neutral joy-badge--md">Bi-Manual & Thumb Ergonomics</span>
+        </div>
+        <h2 style="margin: 0 0 8px 0;">Courtside Live Match Logger</h2>
+        <p class="header-tagline">
+          Instrument-modernism courtside match analysis with sub-second thumb logging, interactive SVG court telemetry, and zero-jitter tabular scorekeeping.
+        </p>
+
+        <!-- Surface Switcher & Status Ribbon -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--joy-space-3); margin-bottom: var(--joy-space-4);">
+          <div style="display: flex; align-items: center; gap: var(--joy-space-2);">
+            <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="setDemoCourtSurface('clay')">Roland-Garros (Clay)</button>
+            <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="setDemoCourtSurface('grass')">Wimbledon (Grass)</button>
+            <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="setDemoCourtSurface('hard')">US Open (Hard)</button>
+            <button type="button" class="joy-button joy-button--outline joy-button--sm" onclick="setDemoCourtSurface('indoor')">Nitto ATP (Indoor)</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--joy-space-2);">
+            <span class="joy-badge joy-badge--sm joy-badge--brand">LIVE 01:42:18</span>
+            <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="clearCourtShots()">Reset Shots</button>
+          </div>
+        </div>
+
+        <!-- Logger Main Grid: Scoreboard + Court Radar -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: var(--joy-space-4); margin-bottom: var(--joy-space-6);">
+          <!-- Column 1: Scoreboard + Telemetry -->
+          <div style="display: flex; flex-direction: column; gap: var(--joy-space-4);">
+            <!-- MatchScoreboard -->
+            <div class="joy-match-scoreboard" id="demo-match-scoreboard">
+              <div class="joy-match-scoreboard__header">
+                <span class="joy-match-scoreboard__surface" id="demo-surface-label">Arthur Ashe Stadium — DecoTurf Hard</span>
+                <span class="joy-match-scoreboard__status">LIVE</span>
+              </div>
+              <table class="joy-match-scoreboard__table">
+                <thead>
+                  <tr>
+                    <th class="joy-match-scoreboard__cell" style="text-align: left;">Player</th>
+                    <th class="joy-match-scoreboard__cell">1</th>
+                    <th class="joy-match-scoreboard__cell">2</th>
+                    <th class="joy-match-scoreboard__cell">3</th>
+                    <th class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="joy-match-scoreboard__row">
+                    <td class="joy-match-scoreboard__player-cell">
+                      <span class="joy-match-scoreboard__serving" aria-label="Serving"></span>
+                      <span>C. Alcaraz</span>
+                      <span class="joy-match-scoreboard__seed">(1)</span>
+                    </td>
+                    <td class="joy-match-scoreboard__cell">6</td>
+                    <td class="joy-match-scoreboard__cell">4</td>
+                    <td class="joy-match-scoreboard__cell">5</td>
+                    <td class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">40</td>
+                  </tr>
+                  <tr class="joy-match-scoreboard__row">
+                    <td class="joy-match-scoreboard__player-cell">
+                      <span>J. Sinner</span>
+                      <span class="joy-match-scoreboard__seed">(2)</span>
+                    </td>
+                    <td class="joy-match-scoreboard__cell">4</td>
+                    <td class="joy-match-scoreboard__cell">6</td>
+                    <td class="joy-match-scoreboard__cell">4</td>
+                    <td class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">30</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="joy-match-scoreboard__footer">
+                <span>Men's Singles Championship Final</span>
+                <span>Elapsed: 2h 18m</span>
+              </div>
+            </div>
+
+            <!-- TelemetryStrip -->
+            <div class="joy-telemetry-strip">
+              <div class="joy-telemetry-strip__item">
+                <span class="joy-telemetry-strip__label">SERVE SPEED</span>
+                <span class="joy-telemetry-strip__metric">218 km/h</span>
+                <span class="joy-telemetry-strip__zone">1st Flat Ace</span>
+              </div>
+              <div class="joy-telemetry-strip__item">
+                <span class="joy-telemetry-strip__label">RALLY LENGTH</span>
+                <span class="joy-telemetry-strip__metric">14 shots</span>
+                <span class="joy-telemetry-strip__zone">Baseline Cross</span>
+              </div>
+              <div class="joy-telemetry-strip__item">
+                <span class="joy-telemetry-strip__label">RPM TOPSPIN</span>
+                <span class="joy-telemetry-strip__metric">3,420 rpm</span>
+                <span class="joy-telemetry-strip__zone">Heavy Kick</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: CourtRadar (Interactive SVG) -->
+          <div class="joy-court-radar joy-court-radar--surface-hard joy-court-radar--interactive" id="demo-court-radar">
+            <div class="joy-court-radar__header">
+              <h4 class="joy-court-radar__title">Ball Placement & Shot Heatmap</h4>
+              <span class="joy-court-radar__badge" id="demo-shot-count">4 Shots Placed</span>
+            </div>
+            <div class="joy-court-radar__court-wrap">
+              <svg id="demo-court-svg" class="joy-court-radar__svg" viewBox="0 0 360 480" role="button" aria-label="Interactive Tennis Court" tabindex="0" onclick="handleCourtClick(event)">
+                <rect x="0" y="0" width="360" height="480" rx="8" class="joy-court-radar__court-bg" />
+                <rect x="40" y="40" width="280" height="400" class="joy-court-radar__line" />
+                <line x1="75" y1="40" x2="75" y2="440" class="joy-court-radar__line" />
+                <line x1="285" y1="40" x2="285" y2="440" class="joy-court-radar__line" />
+                <line x1="75" y1="130" x2="285" y2="130" class="joy-court-radar__line" />
+                <line x1="75" y1="350" x2="285" y2="350" class="joy-court-radar__line" />
+                <line x1="180" y1="130" x2="180" y2="350" class="joy-court-radar__line" />
+                <line x1="180" y1="40" x2="180" y2="50" class="joy-court-radar__line" />
+                <line x1="180" y1="430" x2="180" y2="440" class="joy-court-radar__line" />
+                <line x1="30" y1="240" x2="330" y2="240" class="joy-court-radar__net" />
+                <g id="demo-trajectories-layer">
+                  <line x1="180" y1="430" x2="95" y2="145" class="joy-court-radar__trajectory" />
+                  <line x1="180" y1="50" x2="265" y2="335" class="joy-court-radar__trajectory" />
+                </g>
+                <g id="demo-shots-layer">
+                  <circle cx="95" cy="145" r="5" class="joy-court-radar__shot-point joy-court-radar__shot-point--in" />
+                  <circle cx="265" cy="335" r="5" class="joy-court-radar__shot-point joy-court-radar__shot-point--in" />
+                  <circle cx="290" cy="120" r="5" class="joy-court-radar__shot-point joy-court-radar__shot-point--out" />
+                  <circle cx="180" cy="235" r="5" class="joy-court-radar__shot-point joy-court-radar__shot-point--net" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- CommandIsland: Mobile/Desktop Thumb Dock -->
+        <div class="joy-command-island joy-command-island--bottom-fixed" style="margin-top: var(--joy-space-4);">
+          <div class="joy-command-island__inner" role="toolbar" aria-label="Courtside Logger Action Dock">
+            <button type="button" class="joy-command-island__item joy-command-island__item--active" data-action="in" onclick="setLoggerAction('in', this)">
+              <span>Winner / In</span>
+              <span class="joy-command-island__kbd">W</span>
+            </button>
+            <button type="button" class="joy-command-island__item" data-action="out" onclick="setLoggerAction('out', this)">
+              <span>Out / Error</span>
+              <span class="joy-command-island__kbd">O</span>
+            </button>
+            <button type="button" class="joy-command-island__item" data-action="net" onclick="setLoggerAction('net', this)">
+              <span>Net Cord</span>
+              <span class="joy-command-island__kbd">N</span>
+            </button>
+          </div>
+        </div>
+      </section>`;
+}
+
+function renderCoachDashboardView() {
+  return `<section id="view-coach-dashboard" class="view-panel">
+        <div style="display: flex; align-items: center; gap: var(--joy-space-2); margin-bottom: var(--joy-space-2);">
+          <span class="joy-badge joy-badge--brand joy-badge--md"><span class="joy-badge__dot"></span> Coach Performance Bento</span>
+          <span class="joy-badge joy-badge--neutral joy-badge--md">CSS Subgrid & Container Queries</span>
+        </div>
+        <h2 style="margin: 0 0 8px 0;">Athletic Performance & Kinematics Bento</h2>
+        <p class="header-tagline">
+          Multi-sensor telemetry, tactile chronometer timing, and stroke mechanics mapped onto responsive container grids.
+        </p>
+
+        <!-- Live Telemetry Strip Header -->
+        <div class="joy-telemetry-strip" style="margin-bottom: var(--joy-space-6);">
+          <div class="joy-telemetry-strip__item">
+            <span class="joy-telemetry-strip__label">HEART RATE</span>
+            <span class="joy-telemetry-strip__metric">178 bpm</span>
+            <span class="joy-telemetry-strip__zone">Zone 4 (Threshold)</span>
+          </div>
+          <div class="joy-telemetry-strip__item">
+            <span class="joy-telemetry-strip__label">ACTIVE DURATION</span>
+            <span class="joy-telemetry-strip__metric">01:24:50</span>
+            <span class="joy-telemetry-strip__zone">Set 3 In Progress</span>
+          </div>
+          <div class="joy-telemetry-strip__item">
+            <span class="joy-telemetry-strip__label">PEAK ACCELERATION</span>
+            <span class="joy-telemetry-strip__metric">4.8 g</span>
+            <span class="joy-telemetry-strip__zone">Forehand Turn</span>
+          </div>
+          <div class="joy-telemetry-strip__item">
+            <span class="joy-telemetry-strip__label">TOTAL ENERGY</span>
+            <span class="joy-telemetry-strip__metric">1,140 kcal</span>
+            <span class="joy-telemetry-strip__zone">High Expenditure</span>
+          </div>
+        </div>
+
+        <!-- Bento Grid Container -->
+        <div class="joy-bento-grid joy-bento-grid--cols-12" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--joy-space-4);">
+          <!-- Chronometer Dial Card (col-span-6) -->
+          <div class="joy-bento-card joy-bento-card--col-span-6" style="grid-column: span 6;">
+            <div class="joy-bento-card__header">
+              <h4 class="joy-bento-card__title">Split Lap Chronometer</h4>
+              <span class="joy-badge joy-badge--sm joy-badge--brand">Tactile Dial</span>
+            </div>
+            <div style="display: flex; justify-content: center; padding: var(--joy-space-2) 0;">
+              <div class="joy-chronometer-dial" id="demo-chrono">
+                <div class="joy-chronometer-dial__dial-wrap">
+                  <svg class="joy-chronometer-dial__svg" viewBox="0 0 220 220" role="img" aria-label="Stopwatch dial">
+                    <circle class="joy-chronometer-dial__track" cx="110" cy="110" r="96" />
+                    <circle id="demo-chrono-ring" class="joy-chronometer-dial__progress" cx="110" cy="110" r="96" stroke-dasharray="603.19" stroke-dashoffset="180.95" />
+                  </svg>
+                  <div class="joy-chronometer-dial__center">
+                    <span class="joy-chronometer-dial__time" id="demo-chrono-time">00:42.38</span>
+                    <span class="joy-chronometer-dial__label" id="demo-chrono-label">REST INTERVAL</span>
+                  </div>
+                </div>
+                <div class="joy-chronometer-dial__controls">
+                  <button type="button" class="joy-chronometer-dial__btn joy-chronometer-dial__btn--secondary" onclick="demoChronoLap()">Lap Split</button>
+                  <button type="button" class="joy-chronometer-dial__btn joy-chronometer-dial__btn--primary" id="demo-chrono-toggle" onclick="demoChronoToggle()">Stop</button>
+                </div>
+                <div class="joy-chronometer-dial__laps" id="demo-chrono-laps">
+                  <div class="joy-chronometer-dial__lap-item"><span>Lap 1</span><span>+00:18.20</span><span>00:18.20</span></div>
+                  <div class="joy-chronometer-dial__lap-item"><span>Lap 2</span><span>+00:24.18</span><span>00:42.38</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mini Court Radar (col-span-6) -->
+          <div class="joy-bento-card joy-bento-card--col-span-6" style="grid-column: span 6;">
+            <div class="joy-bento-card__header">
+              <h4 class="joy-bento-card__title">Shot Trajectory Vector</h4>
+              <span class="joy-badge joy-badge--sm joy-badge--neutral">High Accuracy</span>
+            </div>
+            <div class="joy-court-radar joy-court-radar--surface-clay" style="border: none; box-shadow: none; padding: 0;">
+              <div class="joy-court-radar__court-wrap" style="max-height: 320px;">
+                <svg class="joy-court-radar__svg" viewBox="0 0 360 480" role="img" aria-label="Clay Court Telemetry">
+                  <rect x="0" y="0" width="360" height="480" rx="8" class="joy-court-radar__court-bg" />
+                  <rect x="40" y="40" width="280" height="400" class="joy-court-radar__line" />
+                  <line x1="75" y1="40" x2="75" y2="440" class="joy-court-radar__line" />
+                  <line x1="285" y1="40" x2="285" y2="440" class="joy-court-radar__line" />
+                  <line x1="75" y1="130" x2="285" y2="130" class="joy-court-radar__line" />
+                  <line x1="75" y1="350" x2="285" y2="350" class="joy-court-radar__line" />
+                  <line x1="180" y1="130" x2="180" y2="350" class="joy-court-radar__line" />
+                  <line x1="180" y1="40" x2="180" y2="50" class="joy-court-radar__line" />
+                  <line x1="180" y1="430" x2="180" y2="440" class="joy-court-radar__line" />
+                  <line x1="30" y1="240" x2="330" y2="240" class="joy-court-radar__net" />
+                  <line x1="180" y1="430" x2="80" y2="140" class="joy-court-radar__trajectory" />
+                  <circle cx="80" cy="140" r="6" class="joy-court-radar__shot-point joy-court-radar__shot-point--in" />
+                  <circle cx="270" cy="340" r="5" class="joy-court-radar__shot-point joy-court-radar__shot-point--in" />
+                  <circle cx="180" cy="135" r="5" class="joy-court-radar__shot-point joy-court-radar__shot-point--in" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stat Metric 1 (col-span-4) -->
+          <div class="joy-bento-card joy-bento-card--col-span-4" style="grid-column: span 4;">
+            <div class="joy-stat-card joy-stat-card--editorial">
+              <div class="joy-stat-card__eyebrow">FIRST SERVE %</div>
+              <div class="joy-stat-card__row">
+                <div class="joy-stat-card__figure">74.5</div>
+                <span class="joy-stat-card__unit">%</span>
+              </div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--positive">
+                <span>+4.2% vs target</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stat Metric 2 (col-span-4) -->
+          <div class="joy-bento-card joy-bento-card--col-span-4" style="grid-column: span 4;">
+            <div class="joy-stat-card joy-stat-card--editorial">
+              <div class="joy-stat-card__eyebrow">BREAK POINTS CONVERTED</div>
+              <div class="joy-stat-card__row">
+                <div class="joy-stat-card__figure">5/7</div>
+                <span class="joy-stat-card__unit">PTS</span>
+              </div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--positive">
+                <span>71.4% efficiency</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stat Metric 3 (col-span-4) -->
+          <div class="joy-bento-card joy-bento-card--col-span-4" style="grid-column: span 4;">
+            <div class="joy-stat-card joy-stat-card--editorial">
+              <div class="joy-stat-card__eyebrow">NET POINTS WON</div>
+              <div class="joy-stat-card__row">
+                <div class="joy-stat-card__figure">18/22</div>
+                <span class="joy-stat-card__unit">PTS</span>
+              </div>
+              <div class="joy-stat-card__delta joy-stat-card__delta--positive">
+                <span>81.8% success</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>`;
+}
+
+function renderOutdoorGlareView() {
+  return `<section id="view-outdoor-glare" class="view-panel">
+        <div style="display: flex; align-items: center; gap: var(--joy-space-2); margin-bottom: var(--joy-space-2);">
+          <span class="joy-badge joy-badge--brand joy-badge--md"><span class="joy-badge__dot"></span> High-Noon Outdoor Mode</span>
+          <span class="joy-badge joy-badge--neutral joy-badge--md">50,000 Lux Contrast Rigor</span>
+        </div>
+        <h2 style="margin: 0 0 8px 0;">Outdoor Sunlight & Glare Simulator</h2>
+        <p class="header-tagline">
+          Under direct courtside sunlight, conventional SaaS cards with pastel borders and grey drop-shadows wash out completely. Joy-Design's High-Noon Outdoor mode activates AAA contrast pairs (≥7.0:1), 2px structural borders, and directional ambient bevels.
+        </p>
+
+        <!-- Interactive Mode Toggle -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--joy-space-4); margin: var(--joy-space-4) 0; padding: var(--joy-space-3); background: var(--joy-surface-raised); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-card);">
+          <div style="display: flex; flex-direction: column; gap: var(--joy-space-1);">
+            <span style="font-weight: var(--joy-font-weight-semibold); color: var(--joy-text-primary);">Courtside Sunlight Simulator Controls</span>
+            <span style="font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">Simulates high ambient illuminance and enforces [data-mode="outdoor"] token mapping.</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--joy-space-3);">
+            <button type="button" class="joy-button joy-button--outline joy-button--sm" id="btn-toggle-glare" onclick="toggleSimulatedGlare()">Toggle 50,000 Lux Glare Simulation</button>
+            <button type="button" class="joy-button joy-button--solid joy-button--sm" id="btn-toggle-outdoor-mode" onclick="toggleOutdoorMode()">Toggle High-Noon Outdoor Mode</button>
+          </div>
+        </div>
+
+        <!-- Comparison Rig -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: var(--joy-space-6); margin-top: var(--joy-space-4);">
+          <!-- Standard Card under sunlight -->
+          <div style="display: flex; flex-direction: column; gap: var(--joy-space-3);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: var(--joy-font-weight-semibold); font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary);">STANDARD SaaS POSTURE</span>
+              <span class="joy-badge joy-badge--sm joy-badge--neutral">AA 4.5:1</span>
+            </div>
+            <div class="joy-voice-card joy-voice-card--ground-paper">
+              <div class="joy-voice-card__eyebrow">COURTSIDE TELEMETRY</div>
+              <div class="joy-match-scoreboard" style="margin-bottom: var(--joy-space-4);">
+                <div class="joy-match-scoreboard__header">
+                  <span class="joy-match-scoreboard__surface">Standard Mode Contrast</span>
+                  <span class="joy-match-scoreboard__status">LIVE</span>
+                </div>
+                <table class="joy-match-scoreboard__table">
+                  <thead>
+                    <tr>
+                      <th class="joy-match-scoreboard__cell" style="text-align: left;">Player</th>
+                      <th class="joy-match-scoreboard__cell">1</th>
+                      <th class="joy-match-scoreboard__cell">2</th>
+                      <th class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">PTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="joy-match-scoreboard__row">
+                      <td class="joy-match-scoreboard__player-cell"><span>Player A</span></td>
+                      <td class="joy-match-scoreboard__cell">6</td>
+                      <td class="joy-match-scoreboard__cell">4</td>
+                      <td class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">40</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin: 0;">Standard 1px borders and subtle grey surfaces can lose edge definition when viewing tablets outdoors under midday sun.</p>
+            </div>
+          </div>
+
+          <!-- Outdoor Mode Rig -->
+          <div style="display: flex; flex-direction: column; gap: var(--joy-space-3);" data-mode="outdoor">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: var(--joy-font-weight-semibold); font-size: var(--joy-font-size-sm); color: var(--joy-accent-text);">INSTRUMENT MODERNISM (OUTDOOR MODE)</span>
+              <span class="joy-badge joy-badge--sm joy-badge--brand">AAA ≥7.0:1 Guaranteed</span>
+            </div>
+            <div class="joy-voice-card joy-voice-card--ground-paper" style="border: 2px solid var(--joy-border-strong); box-shadow: var(--joy-elevation-bevel), var(--joy-elevation-2);">
+              <div class="joy-voice-card__eyebrow" style="font-weight: var(--joy-font-weight-bold); color: var(--joy-accent-text);">COURTSIDE TELEMETRY (HIGH-NOON)</div>
+              <div class="joy-match-scoreboard" style="margin-bottom: var(--joy-space-4); border: 2px solid var(--joy-border-strong);">
+                <div class="joy-match-scoreboard__header">
+                  <span class="joy-match-scoreboard__surface">High-Noon Outdoor Rigor</span>
+                  <span class="joy-match-scoreboard__status" style="border-width: 2px;">LIVE</span>
+                </div>
+                <table class="joy-match-scoreboard__table">
+                  <thead>
+                    <tr>
+                      <th class="joy-match-scoreboard__cell" style="text-align: left;">Player</th>
+                      <th class="joy-match-scoreboard__cell">1</th>
+                      <th class="joy-match-scoreboard__cell">2</th>
+                      <th class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">PTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="joy-match-scoreboard__row">
+                      <td class="joy-match-scoreboard__player-cell"><span>Player A</span></td>
+                      <td class="joy-match-scoreboard__cell">6</td>
+                      <td class="joy-match-scoreboard__cell">4</td>
+                      <td class="joy-match-scoreboard__cell joy-match-scoreboard__cell--active">40</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style="font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary); margin: 0; font-weight: var(--joy-font-weight-medium);">High-Noon Outdoor mode tokens enforce 2px high-opacity borders, deep tabular numerals, and bevel elevation highlights visible even in intense sunlight.</p>
+            </div>
+          </div>
+        </div>
+      </section>`;
+}
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -813,6 +1201,9 @@ ${inlinedThemeCss}
       --hub-drawer-edge: 1px 0 0 var(--joy-border-strong);
       /* surface-inverse is cream in dark, so the scrim uses the darkest neutral to dim rather than wash out. */
       --hub-scrim: var(--joy-color-neutral-950);
+    }
+    .hub-glare-active {
+      filter: brightness(1.2) contrast(1.15);
     }
     * {
       box-sizing: border-box;
@@ -5982,6 +6373,9 @@ export async function executeHedge(symbol: string, size: number) {
         </div>
       </section>
       ${renderBauhausView()}
+      ${renderCourtsideLoggerView()}
+      ${renderCoachDashboardView()}
+      ${renderOutdoorGlareView()}
     </div>
   </main>
 
@@ -7912,6 +8306,116 @@ export async function executeHedge(symbol: string, size: number) {
       } else {
         btnSnippet.innerHTML = \`// React 19 Modern Example<br>import { Button } from '@joymify/react';<br><br>&lt;Button variant="solid" size="md" onClick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
       }
+    }
+
+    // F-052 Joy-Coach & Outdoor Mode Interactive Demo Scripts
+    let activeLoggerAction = 'in';
+    function setLoggerAction(action, btn) {
+      activeLoggerAction = action;
+      document.querySelectorAll('.joy-command-island__item').forEach(b => b.classList.remove('joy-command-island__item--active'));
+      if (btn) btn.classList.add('joy-command-island__item--active');
+    }
+
+    function setDemoCourtSurface(surface) {
+      const radar = document.getElementById('demo-court-radar');
+      if (!radar) return;
+      radar.className = 'joy-court-radar joy-court-radar--interactive joy-court-radar--surface-' + surface;
+      const label = document.getElementById('demo-surface-label');
+      if (label) {
+        if (surface === 'clay') label.textContent = 'Court Philippe-Chatrier — Roland-Garros Clay';
+        else if (surface === 'grass') label.textContent = 'Centre Court — Wimbledon Grass';
+        else if (surface === 'hard') label.textContent = 'Arthur Ashe Stadium — DecoTurf Hard';
+        else if (surface === 'indoor') label.textContent = 'Pala Alpitour — Nitto ATP Finals Carpet';
+      }
+    }
+
+    function handleCourtClick(e) {
+      const svg = document.getElementById('demo-court-svg');
+      const layer = document.getElementById('demo-shots-layer');
+      if (!svg || !layer) return;
+      const rect = svg.getBoundingClientRect();
+      const x = Math.max(0, Math.min(100, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
+      const y = Math.max(0, Math.min(100, Math.round(((e.clientY - rect.top) / rect.height) * 100)));
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', String((x / 100) * 360));
+      circle.setAttribute('cy', String((y / 100) * 480));
+      circle.setAttribute('r', '6');
+      circle.setAttribute('class', 'joy-court-radar__shot-point joy-court-radar__shot-point--' + activeLoggerAction);
+      layer.appendChild(circle);
+
+      const count = document.getElementById('demo-shot-count');
+      if (count) count.textContent = layer.children.length + ' Shots Placed';
+      showDemoToast('Logged ' + activeLoggerAction.toUpperCase() + ' at (' + x + '%, ' + y + '%)', 'info');
+    }
+
+    function clearCourtShots() {
+      const layer = document.getElementById('demo-shots-layer');
+      if (layer) layer.innerHTML = '';
+      const count = document.getElementById('demo-shot-count');
+      if (count) count.textContent = '0 Shots Placed';
+    }
+
+    // Chronometer demo logic
+    let chronoRunning = false;
+    let chronoSeconds = 42.38;
+    let chronoTimer = null;
+    let chronoLapCount = 2;
+
+    function demoChronoToggle() {
+      const btn = document.getElementById('demo-chrono-toggle');
+      if (!btn) return;
+      chronoRunning = !chronoRunning;
+      if (chronoRunning) {
+        btn.textContent = 'Stop';
+        btn.className = 'joy-chronometer-dial__btn joy-chronometer-dial__btn--primary';
+        chronoTimer = setInterval(() => {
+          chronoSeconds += 0.05;
+          const mins = Math.floor(chronoSeconds / 60);
+          const secs = (chronoSeconds % 60).toFixed(2);
+          const timeStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(5, '0');
+          const timeEl = document.getElementById('demo-chrono-time');
+          if (timeEl) timeEl.textContent = timeStr;
+          const ring = document.getElementById('demo-chrono-ring');
+          if (ring) {
+            const frac = (chronoSeconds % 60) / 60;
+            ring.style.strokeDashoffset = String(603.19 * (1 - frac));
+          }
+        }, 50);
+      } else {
+        btn.textContent = 'Start';
+        btn.className = 'joy-chronometer-dial__btn joy-chronometer-dial__btn--primary';
+        clearInterval(chronoTimer);
+      }
+    }
+
+    function demoChronoLap() {
+      const laps = document.getElementById('demo-chrono-laps');
+      const timeEl = document.getElementById('demo-chrono-time');
+      if (!laps || !timeEl) return;
+      chronoLapCount++;
+      const item = document.createElement('div');
+      item.className = 'joy-chronometer-dial__lap-item';
+      item.innerHTML = '<span>Lap ' + chronoLapCount + '</span><span>+00:15.00</span><span>' + timeEl.textContent + '</span>';
+      laps.prepend(item);
+    }
+
+    function toggleOutdoorMode() {
+      const isOutdoor = document.documentElement.getAttribute('data-mode') === 'outdoor';
+      if (isOutdoor) {
+        document.documentElement.removeAttribute('data-mode');
+        showDemoToast('Outdoor Mode: OFF', 'info');
+      } else {
+        document.documentElement.setAttribute('data-mode', 'outdoor');
+        showDemoToast('High-Noon Outdoor Mode: ACTIVE (AAA >= 7.0:1)', 'success');
+      }
+    }
+
+    function toggleSimulatedGlare() {
+      const main = document.querySelector('.main');
+      if (!main) return;
+      main.classList.toggle('hub-glare-active');
+      const active = main.classList.contains('hub-glare-active');
+      showDemoToast(active ? '50,000 Lux Glare Simulation ON' : 'Glare Simulation OFF', 'info');
     }
 
   </script>

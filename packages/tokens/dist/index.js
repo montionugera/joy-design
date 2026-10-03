@@ -179,6 +179,7 @@ export const tokens = {
   "elevation-accent-1": "0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)",
   "elevation-accent-2": "0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)",
   "elevation-accent-inset": "inset 0 2px 4px rgba(133, 101, 21, 0.35)",
+  "elevation-bevel": "inset 0 1px 0 0 rgba(255, 255, 255, 0.70)",
   "brand-tile": "#14253e",
   "brand-mark": "#856515",
   "brand-mark-on-tile": "#c49a3a",

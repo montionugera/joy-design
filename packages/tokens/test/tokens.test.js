@@ -148,12 +148,17 @@ test('bauhaus joy-coach tokens and 5 palette presets exist in theme.css', () => 
   assert.ok(css.includes('--joy-result-title:'), 'result-title semantic token must exist');
   assert.ok(css.includes('--joy-font-display:'), 'font-display Cormorant serif token must exist');
 
-  // 5 Palette Presets in theme.css
+  // 6 Palette Presets & Outdoor High-Noon Mode in theme.css
   assert.ok(css.includes('[data-palette="classic"]'), 'classic palette preset must exist');
   assert.ok(css.includes('[data-palette="bauhaus-primary"]'), 'bauhaus-primary palette preset must exist');
   assert.ok(css.includes('[data-palette="clay-court"]'), 'clay-court palette preset must exist');
   assert.ok(css.includes('[data-palette="nordic-slate"]'), 'nordic-slate palette preset must exist');
   assert.ok(css.includes('[data-palette="verdant-lawn"]'), 'verdant-lawn palette preset must exist');
+  assert.ok(css.includes('[data-palette="outdoor"]'), 'outdoor palette preset must exist');
+  assert.ok(css.includes('[data-mode="outdoor"]'), 'data-mode="outdoor" selector must exist');
+  assert.ok(css.includes('--joy-elevation-bevel:'), 'elevation-bevel token must exist');
+  assert.ok(css.includes('.joy-tabular-nums'), '.joy-tabular-nums utility must exist');
+  assert.ok(css.includes('.joy-bevel'), '.joy-bevel utility must exist');
 });
 
 

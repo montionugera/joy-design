@@ -2220,3 +2220,29 @@ test('bauhaus component twins exist and render proper CSS classes in React', () 
   assert.ok(emblem.includes('joy-emblem'), 'Emblem must render joy-emblem class');
 });
 
+test('Joy-Coach instrument modernism component twins exist and render proper CSS classes in React', () => {
+  const courtRadar = fs.readFileSync(path.resolve('./src/CourtRadar.tsx'), 'utf8');
+  assert.ok(courtRadar.includes('joy-court-radar'), 'CourtRadar must render joy-court-radar class');
+  assert.ok(courtRadar.includes('React.forwardRef'), 'CourtRadar must implement forwardRef');
+  assert.ok(courtRadar.includes('joy-court-radar--surface-'), 'CourtRadar must support court surfaces');
+
+  const matchScoreboard = fs.readFileSync(path.resolve('./src/MatchScoreboard.tsx'), 'utf8');
+  assert.ok(matchScoreboard.includes('joy-match-scoreboard'), 'MatchScoreboard must render joy-match-scoreboard class');
+  assert.ok(matchScoreboard.includes('React.forwardRef'), 'MatchScoreboard must implement forwardRef');
+  assert.ok(matchScoreboard.includes('joy-match-scoreboard__table'), 'MatchScoreboard must render tabular score table');
+
+  const chronometerDial = fs.readFileSync(path.resolve('./src/ChronometerDial.tsx'), 'utf8');
+  assert.ok(chronometerDial.includes('joy-chronometer-dial'), 'ChronometerDial must render joy-chronometer-dial class');
+  assert.ok(chronometerDial.includes('React.forwardRef'), 'ChronometerDial must implement forwardRef');
+  assert.ok(chronometerDial.includes('joy-chronometer-dial__time'), 'ChronometerDial must render dial time');
+
+  const telemetryStrip = fs.readFileSync(path.resolve('./src/TelemetryStrip.tsx'), 'utf8');
+  assert.ok(telemetryStrip.includes('joy-telemetry-strip'), 'TelemetryStrip must render joy-telemetry-strip class');
+  assert.ok(telemetryStrip.includes('React.forwardRef'), 'TelemetryStrip must implement forwardRef');
+
+  const commandIsland = fs.readFileSync(path.resolve('./src/CommandIsland.tsx'), 'utf8');
+  assert.ok(commandIsland.includes('joy-command-island'), 'CommandIsland must render joy-command-island class');
+  assert.ok(commandIsland.includes('React.forwardRef'), 'CommandIsland must implement forwardRef');
+  assert.ok(commandIsland.includes('joy-command-island__inner'), 'CommandIsland must render inner dock');
+});
+
