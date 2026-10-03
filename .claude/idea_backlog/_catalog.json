@@ -351,6 +351,6 @@
     "id": "I-058",
     "title": "Fix mobile responsive layout and simulator emulation in Storybook Hub",
     "created_at": "2026-10-03T17:55:57.937736+00:00",
-    "promoted_to": null
+    "promoted_to": "F-053"
   }
 ]
