@@ -3,7 +3,7 @@
 **Status:** Design specification for implementation  
 **Date:** 2026-10-03  
 **System:** Joymify Design System (`joy-design`)  
-**Decision owner:** Design systems architecture  
+**Decision owner:** Design systems architecture
 
 <div class="callout success">
 <strong>Decision.</strong> Keep five presets, but rebuild them as restrained product palettes with one unambiguous action accent, culturally specific material neutrals, perceptually measured OKLCH relationships, and WCAG 2.2 AA contrast in every theme. Bauhaus red becomes a supporting emblem—not the default button. Nordic loses generic sky-blue. Clay dark mode uses fired terracotta—not powder peach.
@@ -15,13 +15,13 @@ Joymify is a component system for dense finance tools, outdoor coaching products
 
 The five presets are not five unrelated skins. They share a stable semantic contract and differ through material character:
 
-| Preset | Physical scene | Primary action | Supporting identity | Failure it eliminates |
-|---|---|---|---|---|
-| Joy Classic | Oxford ledger, navy cloth, brass instrument, parchment | Ochre Gold | Oxford Navy | Gold treated as decoration or wash |
+| Preset         | Physical scene                                                | Primary action       | Supporting identity         | Failure it eliminates                       |
+| -------------- | ------------------------------------------------------------- | -------------------- | --------------------------- | ------------------------------------------- |
+| Joy Classic    | Oxford ledger, navy cloth, brass instrument, parchment        | Ochre Gold           | Oxford Navy                 | Gold treated as decoration or wash          |
 | Dessau Bauhaus | Painted steel, glass, charcoal type, architectural wayfinding | Architectural Cobalt | Crimson and Cadmium emblems | Red primary buttons reading as delete/error |
-| Clay Court | Sun-baked crushed brick, chalk line, shaded pine | Terracotta Clay | Court Pine | Powdery peach and cosmetic warmth |
-| Nordic Slate | Granite, fjord water, silvered metal, cold paper | Fjord Navy | Granite Slate | Stock SaaS sky-blue on Tailwind gray |
-| Verdant Lawn | Cut grass, racing green paint, ivory linen, trophy metal | British Racing Green | Champagne Gold | Generic emerald startup palette |
+| Clay Court     | Sun-baked crushed brick, chalk line, shaded pine              | Terracotta Clay      | Court Pine                  | Powdery peach and cosmetic warmth           |
+| Nordic Slate   | Granite, fjord water, silvered metal, cold paper              | Fjord Navy           | Granite Slate               | Stock SaaS sky-blue on Tailwind gray        |
+| Verdant Lawn   | Cut grass, racing green paint, ivory linen, trophy metal      | British Racing Green | Champagne Gold              | Generic emerald startup palette             |
 
 <div class="callout warn">
 <strong>Names are vernacular references, not trademark color claims.</strong> The exact hex values below are Joymify design decisions inspired by the cited material cultures. They are not asserted to be official Bauhaus, Roland-Garros, Wimbledon, Oxford, or Nordic institutional brand values.
@@ -112,85 +112,85 @@ Coordinates were computed from the exact sRGB hex values with `packages/tokens/s
 
 ### Joy Classic
 
-| Role | Light | Dark |
-|---|---|---|
-| surface-canvas | `#f8f3e8 — 0.9650 0.0155 86.4` | `#0d1624 — 0.1991 0.0314 259.0` |
-| surface-card | `#ffffff — 1.0000 0.0000 none` | `#111b2b — 0.2212 0.0348 259.5` |
-| text-primary | `#1f1c13 — 0.2268 0.0171 91.8` | `#f8f3e8 — 0.9650 0.0155 86.4` |
-| text-secondary | `#3c3a35 — 0.3487 0.0089 88.7` | `#bab7b0 — 0.7799 0.0104 87.5` |
-| text-muted | `#686660 — 0.5102 0.0096 91.6` | `#a2b2cb — 0.7594 0.0402 259.3` |
-| border-default | `#88867f — 0.6197 0.0106 93.6` | `#566a87 — 0.5195 0.0521 257.6` |
-| accent-default | `#c49a3a — 0.7079 0.1220 84.6` | `#dab362 — 0.7848 0.1096 84.1` |
+| Role           | Light                           | Dark                            |
+| -------------- | ------------------------------- | ------------------------------- |
+| surface-canvas | `#f8f3e8 — 0.9650 0.0155 86.4`  | `#0d1624 — 0.1991 0.0314 259.0` |
+| surface-card   | `#ffffff — 1.0000 0.0000 none`  | `#111b2b — 0.2212 0.0348 259.5` |
+| text-primary   | `#1f1c13 — 0.2268 0.0171 91.8`  | `#f8f3e8 — 0.9650 0.0155 86.4`  |
+| text-secondary | `#3c3a35 — 0.3487 0.0089 88.7`  | `#bab7b0 — 0.7799 0.0104 87.5`  |
+| text-muted     | `#686660 — 0.5102 0.0096 91.6`  | `#a2b2cb — 0.7594 0.0402 259.3` |
+| border-default | `#88867f — 0.6197 0.0106 93.6`  | `#566a87 — 0.5195 0.0521 257.6` |
+| accent-default | `#c49a3a — 0.7079 0.1220 84.6`  | `#dab362 — 0.7848 0.1096 84.1`  |
 | text-on-accent | `#14253e — 0.2636 0.0524 257.9` | `#0a121f — 0.1816 0.0296 259.8` |
 
 ### Dessau Bauhaus
 
-| Role | Light | Dark |
-|---|---|---|
+| Role           | Light                           | Dark                            |
+| -------------- | ------------------------------- | ------------------------------- |
 | surface-canvas | `#f8fafc — 0.9842 0.0034 247.9` | `#090d16 — 0.1596 0.0203 265.6` |
-| surface-card | `#ffffff — 1.0000 0.0000 none` | `#0f172a — 0.2077 0.0398 265.8` |
-| text-primary | `#0f172a — 0.2077 0.0398 265.8` | `#f8fafc — 0.9842 0.0034 247.9` |
+| surface-card   | `#ffffff — 1.0000 0.0000 none`  | `#0f172a — 0.2077 0.0398 265.8` |
+| text-primary   | `#0f172a — 0.2077 0.0398 265.8` | `#f8fafc — 0.9842 0.0034 247.9` |
 | text-secondary | `#334155 — 0.3717 0.0392 257.3` | `#cbd5e1 — 0.8690 0.0198 252.9` |
-| text-muted | `#64748b — 0.5544 0.0407 257.4` | `#94a3b8 — 0.7107 0.0351 256.8` |
+| text-muted     | `#64748b — 0.5544 0.0407 257.4` | `#94a3b8 — 0.7107 0.0351 256.8` |
 | border-default | `#7c8798 — 0.6202 0.0288 259.0` | `#64748b — 0.5544 0.0407 257.4` |
 | accent-default | `#1e40af — 0.4244 0.1809 265.6` | `#2563eb — 0.5461 0.2152 262.9` |
-| text-on-accent | `#ffffff — 1.0000 0.0000 none` | `#ffffff — 1.0000 0.0000 none` |
+| text-on-accent | `#ffffff — 1.0000 0.0000 none`  | `#ffffff — 1.0000 0.0000 none`  |
 
 ### Clay Court
 
-| Role | Light | Dark |
-|---|---|---|
+| Role           | Light                          | Dark                           |
+| -------------- | ------------------------------ | ------------------------------ |
 | surface-canvas | `#fbf0ea — 0.9621 0.0144 50.8` | `#17110e — 0.1841 0.0117 48.1` |
-| surface-card | `#fffaf7 — 0.9881 0.0067 53.4` | `#211713 — 0.2158 0.0180 42.8` |
-| text-primary | `#261c14 — 0.2360 0.0215 60.1` | `#fbf0ea — 0.9621 0.0144 50.8` |
+| surface-card   | `#fffaf7 — 0.9881 0.0067 53.4` | `#211713 — 0.2158 0.0180 42.8` |
+| text-primary   | `#261c14 — 0.2360 0.0215 60.1` | `#fbf0ea — 0.9621 0.0144 50.8` |
 | text-secondary | `#4a3e35 — 0.3736 0.0225 58.9` | `#d8c3b7 — 0.8314 0.0290 51.8` |
-| text-muted | `#73645b — 0.5148 0.0238 52.9` | `#b39a8c — 0.7046 0.0359 51.1` |
+| text-muted     | `#73645b — 0.5148 0.0238 52.9` | `#b39a8c — 0.7046 0.0359 51.1` |
 | border-default | `#9a7b6c — 0.6084 0.0447 47.2` | `#80604f — 0.5172 0.0493 49.2` |
 | accent-default | `#9c4221 — 0.4937 0.1289 39.6` | `#d97746 — 0.6700 0.1379 45.9` |
 | text-on-accent | `#ffffff — 1.0000 0.0000 none` | `#18110d — 0.1852 0.0142 51.3` |
 
 ### Nordic Slate
 
-| Role | Light | Dark |
-|---|---|---|
+| Role           | Light                           | Dark                            |
+| -------------- | ------------------------------- | ------------------------------- |
 | surface-canvas | `#f8fafc — 0.9842 0.0034 247.9` | `#0b111b — 0.1768 0.0229 260.4` |
-| surface-card | `#ffffff — 1.0000 0.0000 none` | `#111a27 — 0.2158 0.0290 257.5` |
-| text-primary | `#0f172a — 0.2077 0.0398 265.8` | `#f8fafc — 0.9842 0.0034 247.9` |
+| surface-card   | `#ffffff — 1.0000 0.0000 none`  | `#111a27 — 0.2158 0.0290 257.5` |
+| text-primary   | `#0f172a — 0.2077 0.0398 265.8` | `#f8fafc — 0.9842 0.0034 247.9` |
 | text-secondary | `#334155 — 0.3717 0.0392 257.3` | `#cbd5e1 — 0.8690 0.0198 252.9` |
-| text-muted | `#64748b — 0.5544 0.0407 257.4` | `#94a3b8 — 0.7107 0.0351 256.8` |
+| text-muted     | `#64748b — 0.5544 0.0407 257.4` | `#94a3b8 — 0.7107 0.0351 256.8` |
 | border-default | `#7b8796 — 0.6187 0.0267 254.0` | `#64748b — 0.5544 0.0407 257.4` |
 | accent-default | `#0369a1 — 0.5000 0.1193 242.7` | `#075985 — 0.4434 0.1000 240.8` |
-| text-on-accent | `#ffffff — 1.0000 0.0000 none` | `#ffffff — 1.0000 0.0000 none` |
+| text-on-accent | `#ffffff — 1.0000 0.0000 none`  | `#ffffff — 1.0000 0.0000 none`  |
 
 ### Verdant Lawn
 
-| Role | Light | Dark |
-|---|---|---|
+| Role           | Light                           | Dark                            |
+| -------------- | ------------------------------- | ------------------------------- |
 | surface-canvas | `#f4f6f0 — 0.9700 0.0082 121.6` | `#09150f — 0.1820 0.0214 161.6` |
-| surface-card | `#ffffff — 1.0000 0.0000 none` | `#0e2118 — 0.2281 0.0309 162.0` |
-| text-primary | `#0b1e14 — 0.2151 0.0322 159.1` | `#f4f6f0 — 0.9700 0.0082 121.6` |
+| surface-card   | `#ffffff — 1.0000 0.0000 none`  | `#0e2118 — 0.2281 0.0309 162.0` |
+| text-primary   | `#0b1e14 — 0.2151 0.0322 159.1` | `#f4f6f0 — 0.9700 0.0082 121.6` |
 | text-secondary | `#29483a — 0.3727 0.0445 163.8` | `#c7d8cb — 0.8657 0.0255 152.8` |
-| text-muted | `#526f5f — 0.5139 0.0423 160.3` | `#96ad9d — 0.7253 0.0343 155.1` |
+| text-muted     | `#526f5f — 0.5139 0.0423 160.3` | `#96ad9d — 0.7253 0.0343 155.1` |
 | border-default | `#788f7f — 0.6272 0.0355 154.9` | `#5d7866 — 0.5459 0.0420 155.6` |
 | accent-default | `#143d2b — 0.3252 0.0564 161.7` | `#22593d — 0.4187 0.0752 158.4` |
-| text-on-accent | `#ffffff — 1.0000 0.0000 none` | `#ffffff — 1.0000 0.0000 none` |
+| text-on-accent | `#ffffff — 1.0000 0.0000 none`  | `#ffffff — 1.0000 0.0000 none`  |
 
 ## WCAG 2.2 contrast verification
 
 Ratios were computed with the repository’s `contrastRatio()` implementation in `packages/tokens/scripts/color.mjs`. Text roles are gated at 4.5:1 against both canvas and card. `border-default` is treated as a meaningful UI boundary and gated at 3:1 against both surfaces. Ratios below are not rounded before pass/fail evaluation.
 
-| Preset | Theme | On accent | Primary canvas/card | Secondary canvas/card | Muted canvas/card | Border canvas/card |
-|---|---|---:|---:|---:|---:|---:|
-| Joy Classic | Light | 5.89 | 15.38 / 17.02 | 10.26 / 11.36 | 5.19 / 5.74 | 3.29 / 3.64 |
-| Joy Classic | Dark | 9.48 | 16.40 / 15.61 | 9.06 / 8.63 | 8.44 / 8.04 | 3.29 / 3.13 |
-| Dessau Bauhaus | Light | 8.72 | 17.06 / 17.85 | 9.90 / 10.35 | 4.55 / 4.76 | 3.47 / 3.64 |
-| Dessau Bauhaus | Dark | 5.17 | 18.57 / 17.06 | 13.09 / 12.02 | 7.58 / 6.96 | 4.08 / 3.75 |
-| Clay Court | Light | 6.53 | 14.90 / 16.10 | 9.23 / 9.98 | 5.06 / 5.47 | 3.46 / 3.74 |
-| Clay Court | Dark | 5.94 | 16.70 / 15.67 | 11.05 / 10.37 | 7.05 / 6.62 | 3.30 / 3.10 |
-| Nordic Slate | Light | 5.93 | 17.06 / 17.85 | 9.90 / 10.35 | 4.55 / 4.76 | 3.49 / 3.65 |
-| Nordic Slate | Dark | 7.56 | 18.08 / 16.71 | 12.74 / 11.78 | 7.38 / 6.82 | 3.97 / 3.67 |
-| Verdant Lawn | Light | 12.12 | 15.94 / 17.35 | 9.26 / 10.08 | 5.08 / 5.53 | 3.20 / 3.48 |
-| Verdant Lawn | Dark | 8.19 | 17.13 / 15.44 | 12.54 / 11.30 | 7.78 / 7.01 | 3.86 / 3.48 |
+| Preset         | Theme | On accent | Primary canvas/card | Secondary canvas/card | Muted canvas/card | Border canvas/card |
+| -------------- | ----- | --------: | ------------------: | --------------------: | ----------------: | -----------------: |
+| Joy Classic    | Light |      5.89 |       15.38 / 17.02 |         10.26 / 11.36 |       5.19 / 5.74 |        3.29 / 3.64 |
+| Joy Classic    | Dark  |      9.48 |       16.40 / 15.61 |           9.06 / 8.63 |       8.44 / 8.04 |        3.29 / 3.13 |
+| Dessau Bauhaus | Light |      8.72 |       17.06 / 17.85 |          9.90 / 10.35 |       4.55 / 4.76 |        3.47 / 3.64 |
+| Dessau Bauhaus | Dark  |      5.17 |       18.57 / 17.06 |         13.09 / 12.02 |       7.58 / 6.96 |        4.08 / 3.75 |
+| Clay Court     | Light |      6.53 |       14.90 / 16.10 |           9.23 / 9.98 |       5.06 / 5.47 |        3.46 / 3.74 |
+| Clay Court     | Dark  |      5.94 |       16.70 / 15.67 |         11.05 / 10.37 |       7.05 / 6.62 |        3.30 / 3.10 |
+| Nordic Slate   | Light |      5.93 |       17.06 / 17.85 |          9.90 / 10.35 |       4.55 / 4.76 |        3.49 / 3.65 |
+| Nordic Slate   | Dark  |      7.56 |       18.08 / 16.71 |         12.74 / 11.78 |       7.38 / 6.82 |        3.97 / 3.67 |
+| Verdant Lawn   | Light |     12.12 |       15.94 / 17.35 |          9.26 / 10.08 |       5.08 / 5.53 |        3.20 / 3.48 |
+| Verdant Lawn   | Dark  |      8.19 |       17.13 / 15.44 |         12.54 / 11.30 |       7.78 / 7.01 |        3.86 / 3.48 |
 
 <div class="callout info">
 <strong>Interaction-state gate.</strong> Implementation must also test `text-on-accent` against `accent-hover` and `accent-active`. The specified pairs all meet 4.5:1; this closes a gap in the current preset test, which checks only `accent-default`.
@@ -619,15 +619,15 @@ Extend `packages/tokens/test/contrast.test.js` so every preset and theme asserts
 
 ## Failure modes and rollback
 
-| Risk | Detection | Mitigation | Rollback |
-|---|---|---|---|
-| Consumer snapshots change unexpectedly | Package/Playwright diffs | Announce palette appearance change; preserve IDs and token names | Revert the palette commit and regenerate artifacts |
-| Supporting colors leak into action semantics | State specimen and token review | One-action-color rule; test computed CSS | Restore prior semantic mapping, not raw literals |
-| Near-threshold muted text regresses after adjustment | Raw-ratio unit gate | Keep minimum exact; prefer at least 0.05 headroom where character allows | Restore last passing value |
-| Focus ring passes one adjacency but fails another | Multi-surface focus test | Test ring against canvas, card, and control fill | Select a higher-luminance-delta focus token |
-| Dark palette becomes muddy | 375/1280 screenshots and design critique | Separate surfaces by OKLCH lightness; reserve chroma for action | Revert only the affected preset theme |
-| Generated artifacts drift from source | `gen-design-md --check`, build diff | Always generate from `ramps.mjs`; never hand-edit outputs | Regenerate from last known-good generator |
-| Palette flashes on reload | Playwright reload test and filmstrip | Apply stored `data-palette` in the pre-render bootstrap | Revert bootstrap change independently |
+| Risk                                                 | Detection                                | Mitigation                                                               | Rollback                                           |
+| ---------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------- |
+| Consumer snapshots change unexpectedly               | Package/Playwright diffs                 | Announce palette appearance change; preserve IDs and token names         | Revert the palette commit and regenerate artifacts |
+| Supporting colors leak into action semantics         | State specimen and token review          | One-action-color rule; test computed CSS                                 | Restore prior semantic mapping, not raw literals   |
+| Near-threshold muted text regresses after adjustment | Raw-ratio unit gate                      | Keep minimum exact; prefer at least 0.05 headroom where character allows | Restore last passing value                         |
+| Focus ring passes one adjacency but fails another    | Multi-surface focus test                 | Test ring against canvas, card, and control fill                         | Select a higher-luminance-delta focus token        |
+| Dark palette becomes muddy                           | 375/1280 screenshots and design critique | Separate surfaces by OKLCH lightness; reserve chroma for action          | Revert only the affected preset theme              |
+| Generated artifacts drift from source                | `gen-design-md --check`, build diff      | Always generate from `ramps.mjs`; never hand-edit outputs                | Regenerate from last known-good generator          |
+| Palette flashes on reload                            | Playwright reload test and filmstrip     | Apply stored `data-palette` in the pre-render bootstrap                  | Revert bootstrap change independently              |
 
 All implementation actions are R2 (locally reversible) until `psrw promote --babysit`, which uses the separately authorized release workflow. Protected files—`.release.json`, `working-feature.json`, `claims.json`, and Git internal state—must not be overwritten or deleted.
 
