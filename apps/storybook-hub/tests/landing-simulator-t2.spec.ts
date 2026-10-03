@@ -163,6 +163,63 @@ test.describe("simulator body (generated from the components)", () => {
       });
     }
   }
+
+  for (const theme of themes) {
+    test(`${theme}: Mobile frame emulation activates drawer menu, 1-col feature cards, and constrained table column`, async ({ page }) => {
+      await open(page, "landing-preview", 1280, theme);
+      const frameEl = page.locator("#simulator-viewport-frame");
+      const navEl = page.locator(`${SIM} .joy-landing-header__nav`);
+      const menuEl = page.locator(`${SIM} .joy-landing-header__menu`);
+
+      // Initial state: desktop layout
+      await expect(navEl).toBeVisible();
+      await expect(menuEl).toBeHidden();
+
+      // Click Mobile (375px)
+      await page.getByRole("button", { name: /^Mobile/ }).click();
+      await expect(frameEl).toHaveAttribute("data-viewport", "mobile");
+      await expect(navEl).toBeHidden();
+      await expect(menuEl).toBeVisible();
+
+      // Wait for frame transition to settle
+      await expect.poll(async () => {
+        return page.evaluate(() => {
+          const f = document.getElementById("simulator-viewport-frame");
+          return f ? f.getBoundingClientRect().width : 0;
+        });
+      }).toBeLessThanOrEqual(376);
+
+      // Feature cards should each be full width (> 280px) in a 1-column layout
+      const cardWidths = await page.evaluate((sim) => {
+        return Array.from(document.querySelectorAll<HTMLElement>(`${sim} #sim-features .joy-feature-card`)).map((c) => c.getBoundingClientRect().width);
+      }, SIM);
+      expect(cardWidths.length).toBeGreaterThan(0);
+      for (const w of cardWidths) {
+        expect(w, "feature card width in 375px mobile simulator frame").toBeGreaterThan(280);
+      }
+
+      // Pricing matrix table pinned first column should be capped to <= 115px
+      const firstColWidth = await page.evaluate((sim) => {
+        const th = document.querySelector<HTMLElement>(`${sim} #sim-matrix .joy-pricing-matrix__table th:first-child`);
+        return th ? th.getBoundingClientRect().width : 0;
+      }, SIM);
+      expect(firstColWidth, "table first column capped").toBeLessThanOrEqual(115);
+
+      // Click Desktop: restores desktop view
+      await page.getByRole("button", { name: /^Desktop/ }).click();
+      await expect(frameEl).not.toHaveAttribute("data-viewport", "mobile");
+      await expect(navEl).toBeVisible();
+      await expect(menuEl).toBeHidden();
+
+      // Wait for frame transition to expand back
+      await expect.poll(async () => {
+        return page.evaluate(() => {
+          const f = document.getElementById("simulator-viewport-frame");
+          return f ? f.getBoundingClientRect().width : 0;
+        });
+      }).toBeGreaterThan(376);
+    });
+  }
 });
 
 test.describe("frame width switcher", () => {
