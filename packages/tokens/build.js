@@ -6184,6 +6184,433 @@ a.joy-logo-cloud__item:focus-visible {
   margin-top: 32px;
 }
 
+/* ── Joy-Coach Athletic Telemetry & Instrument Modernism ── */
+
+/* 1. CourtRadar */
+.joy-court-radar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  box-shadow: var(--joy-elevation-bevel), var(--joy-elevation-1);
+  padding: var(--joy-space-4);
+  gap: var(--joy-space-3);
+  overflow: hidden;
+}
+.joy-court-radar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--joy-space-2);
+}
+.joy-court-radar__title {
+  margin: 0;
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-md);
+  font-weight: var(--joy-font-weight-semibold);
+  color: var(--joy-text-primary);
+  letter-spacing: -0.01em;
+}
+.joy-court-radar__badge {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-xs);
+  font-weight: var(--joy-font-weight-medium);
+  padding: var(--joy-space-1) var(--joy-space-2);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+  border: 1px solid var(--joy-border-subtle);
+}
+.joy-court-radar__court-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--joy-surface-sunken);
+  border-radius: var(--joy-radius-control);
+  padding: var(--joy-space-2);
+  overflow: hidden;
+}
+.joy-court-radar__svg {
+  width: 100%;
+  max-height: 480px;
+  display: block;
+  user-select: none;
+}
+.joy-court-radar--interactive .joy-court-radar__svg {
+  cursor: crosshair;
+}
+.joy-court-radar--surface-clay .joy-court-radar__court-bg {
+  fill: var(--joy-surface-clay-bg);
+}
+.joy-court-radar--surface-grass .joy-court-radar__court-bg {
+  fill: var(--joy-surface-grass-bg);
+}
+.joy-court-radar--surface-hard .joy-court-radar__court-bg {
+  fill: var(--joy-brand-navy);
+}
+.joy-court-radar--surface-indoor .joy-court-radar__court-bg {
+  fill: var(--joy-surface-sunken);
+}
+.joy-court-radar__line {
+  stroke: var(--joy-surface-canvas);
+  stroke-width: 2px;
+  fill: none;
+}
+.joy-court-radar__net {
+  stroke: var(--joy-border-strong);
+  stroke-width: 3px;
+  stroke-dasharray: 4 2;
+}
+.joy-court-radar__shot-point {
+  transition: transform var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-court-radar__shot-point--in {
+  fill: var(--joy-status-success-fg);
+}
+.joy-court-radar__shot-point--out {
+  fill: var(--joy-status-danger-fg);
+}
+.joy-court-radar__shot-point--net {
+  fill: var(--joy-status-warning-fg);
+}
+.joy-court-radar__trajectory {
+  stroke: var(--joy-accent-default);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0.75;
+}
+
+/* 2. MatchScoreboard */
+.joy-match-scoreboard {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  box-shadow: var(--joy-elevation-bevel), var(--joy-elevation-1);
+  padding: var(--joy-space-4);
+  gap: var(--joy-space-3);
+  font-family: var(--joy-font-family-sans);
+}
+.joy-match-scoreboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--joy-space-2);
+}
+.joy-match-scoreboard__surface {
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-secondary);
+  font-weight: var(--joy-font-weight-medium);
+  letter-spacing: 0.02em;
+}
+.joy-match-scoreboard__status {
+  font-size: var(--joy-font-size-xs);
+  font-weight: var(--joy-font-weight-semibold);
+  padding: var(--joy-space-0-5) var(--joy-space-2);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-status-danger-bg);
+  color: var(--joy-status-danger-fg);
+  border: 1px solid var(--joy-status-danger-border);
+}
+.joy-match-scoreboard__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 var(--joy-space-1);
+}
+.joy-match-scoreboard__row {
+  background-color: var(--joy-surface-raised);
+}
+.joy-match-scoreboard__player-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-2);
+  padding: var(--joy-space-2) var(--joy-space-3);
+  font-weight: var(--joy-font-weight-semibold);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-primary);
+}
+.joy-match-scoreboard__serving {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-accent-default);
+  box-shadow: 0 0 6px var(--joy-accent-default);
+}
+.joy-match-scoreboard__seed {
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-muted);
+  font-weight: var(--joy-font-weight-regular);
+}
+.joy-match-scoreboard__cell {
+  text-align: center;
+  padding: var(--joy-space-2) var(--joy-space-3);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-secondary);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+.joy-match-scoreboard__cell--active {
+  font-weight: var(--joy-font-weight-bold);
+  color: var(--joy-accent-text);
+  background-color: var(--joy-accent-subtle);
+  border-radius: var(--joy-radius-control);
+}
+.joy-match-scoreboard__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-muted);
+  border-top: 1px solid var(--joy-border-subtle);
+  padding-top: var(--joy-space-2);
+}
+
+/* 3. ChronometerDial */
+.joy-chronometer-dial {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  box-shadow: var(--joy-elevation-bevel), var(--joy-elevation-1);
+  padding: var(--joy-space-5);
+  gap: var(--joy-space-4);
+  font-family: var(--joy-font-family-sans);
+}
+.joy-chronometer-dial__dial-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joy-chronometer-dial__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.joy-chronometer-dial__track {
+  fill: none;
+  stroke: var(--joy-surface-sunken);
+  stroke-width: 8px;
+}
+.joy-chronometer-dial__progress {
+  fill: none;
+  stroke: var(--joy-accent-default);
+  stroke-width: 8px;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--joy-duration-fast) linear;
+}
+.joy-chronometer-dial__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.joy-chronometer-dial__time {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-2xl);
+  font-weight: var(--joy-font-weight-bold);
+  color: var(--joy-text-primary);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: -0.02em;
+}
+.joy-chronometer-dial__label {
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-secondary);
+  letter-spacing: 0.04em;
+  margin-top: var(--joy-space-1);
+}
+.joy-chronometer-dial__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-3);
+  width: 100%;
+  justify-content: center;
+}
+.joy-chronometer-dial__btn {
+  min-height: 56px;
+  min-width: 100px;
+  padding: 0 var(--joy-space-4);
+  font-size: var(--joy-font-size-sm);
+  font-weight: var(--joy-font-weight-semibold);
+  border-radius: var(--joy-radius-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform var(--joy-duration-fast) var(--joy-ease-out), background-color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-chronometer-dial__btn:active {
+  transform: scale(0.98);
+}
+.joy-chronometer-dial__btn--primary {
+  background-color: var(--joy-accent-default);
+  color: var(--joy-text-on-accent);
+  border: 1px solid var(--joy-accent-default);
+}
+.joy-chronometer-dial__btn--secondary {
+  background-color: var(--joy-surface-raised);
+  color: var(--joy-text-primary);
+  border: 1px solid var(--joy-border-default);
+}
+.joy-chronometer-dial__laps {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--joy-space-1);
+  max-height: 140px;
+  overflow-y: auto;
+  border-top: 1px solid var(--joy-border-subtle);
+  padding-top: var(--joy-space-2);
+}
+.joy-chronometer-dial__lap-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-secondary);
+  font-family: var(--joy-font-family-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+  padding: var(--joy-space-1) 0;
+}
+
+/* 4. TelemetryStrip */
+.joy-telemetry-strip {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--joy-space-4);
+  background-color: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-card);
+  box-shadow: var(--joy-elevation-bevel), var(--joy-elevation-1);
+  padding: var(--joy-space-3) var(--joy-space-4);
+  overflow-x: auto;
+}
+.joy-telemetry-strip__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--joy-space-1);
+}
+.joy-telemetry-strip__metric {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-lg);
+  font-weight: var(--joy-font-weight-bold);
+  color: var(--joy-text-primary);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+.joy-telemetry-strip__label {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-xs);
+  color: var(--joy-text-secondary);
+  font-weight: var(--joy-font-weight-medium);
+}
+.joy-telemetry-strip__zone {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--joy-space-1);
+  font-size: var(--joy-font-size-xs);
+  padding: var(--joy-space-0-5) var(--joy-space-2);
+  border-radius: var(--joy-radius-pill);
+  background-color: var(--joy-accent-subtle);
+  color: var(--joy-accent-text);
+  border: 1px solid var(--joy-border-subtle);
+}
+
+/* 5. CommandIsland */
+.joy-command-island {
+  box-sizing: border-box;
+  z-index: var(--joy-z-dropdown);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.joy-command-island--bottom-floating {
+  position: fixed;
+  bottom: calc(var(--joy-space-4) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: calc(100vw - var(--joy-space-8));
+}
+.joy-command-island--bottom-fixed {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+}
+.joy-command-island--top-header {
+  position: sticky;
+  top: var(--joy-space-2);
+}
+.joy-command-island__inner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--joy-space-2);
+  background-color: var(--joy-surface-card);
+  border: 1px solid var(--joy-border-strong);
+  border-radius: var(--joy-radius-pill);
+  box-shadow: var(--joy-elevation-bevel), var(--joy-elevation-2);
+  padding: var(--joy-space-2) var(--joy-space-3);
+}
+.joy-command-island__item {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--joy-space-2);
+  min-height: 44px;
+  padding: var(--joy-space-2) var(--joy-space-3);
+  border-radius: var(--joy-radius-pill);
+  color: var(--joy-text-secondary);
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-sm);
+  font-weight: var(--joy-font-weight-medium);
+  touch-action: manipulation;
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-command-island__item:hover {
+  background-color: var(--joy-surface-raised);
+  color: var(--joy-text-primary);
+}
+.joy-command-island__item--active {
+  background-color: var(--joy-accent-default);
+  color: var(--joy-text-on-accent);
+}
+.joy-command-island__kbd {
+  font-family: var(--joy-font-family-mono);
+  font-size: var(--joy-font-size-xs);
+  padding: var(--joy-space-0-5) var(--joy-space-1);
+  background-color: var(--joy-surface-sunken);
+  border: 1px solid var(--joy-border-subtle);
+  border-radius: var(--joy-radius-control);
+  color: var(--joy-text-muted);
+}
+
+
 `;
 
 const canonicalVars = [
