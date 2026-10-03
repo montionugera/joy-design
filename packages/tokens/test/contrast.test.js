@@ -162,3 +162,60 @@ test('WCAG 2.2 AA Contrast Gate for Semantic Tokens', () => {
 
   assert.strictEqual(failures.length, 0, `WCAG Contrast Gate failures:\n${failures.join('\n')}`);
 });
+
+test('WCAG 2.2 AA Contrast Gate across all 5 Palette Presets (Light & Dark)', () => {
+  const cssPath = path.resolve(__dirname, '../dist/theme.css');
+  const css = fs.readFileSync(cssPath, 'utf8');
+  const { light, dark } = parseCssTokens(css);
+
+  const presets = ['classic', 'bauhaus-primary', 'clay-court', 'nordic-slate', 'verdant-lawn'];
+  const failures = [];
+
+  const parseDecls = (body) => {
+    const res = {};
+    for (const line of body.split(';')) {
+      const m = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
+      if (m) res[m[1].trim()] = m[2].trim();
+    }
+    return res;
+  };
+
+  for (const key of presets) {
+    const lightBlockRegex = new RegExp(`\\[data-palette="${key}"\\],\\s*:root\\[data-palette="${key}"\\]\\s*\\{([^}]+)\\}`);
+    const darkBlockRegex = new RegExp(`\\[data-theme="dark"\\]\\[data-palette="${key}"\\],\\s*\\[data-theme="dark"\\]\\s*\\[data-palette="${key}"\\]\\s*\\{([^}]+)\\}`);
+
+    const mLight = lightBlockRegex.exec(css);
+    const mDark = darkBlockRegex.exec(css);
+
+    assert.ok(mLight, `Preset ${key} must have a light block in theme.css`);
+    assert.ok(mDark, `Preset ${key} must have a dark block in theme.css`);
+
+    const pLight = { ...light, ...parseDecls(mLight[1]) };
+    const pDark = { ...dark, ...parseDecls(mDark[1]) };
+
+    // 1. Text on Accent (Buttons, badges, active chips) >= 4.5:1
+    const lightBtnRatio = contrastRatio(pLight['--joy-text-on-accent'], pLight['--joy-accent-default']);
+    if (lightBtnRatio < 4.5) {
+      failures.push(`Preset ${key} (Light) text-on-accent (${pLight['--joy-text-on-accent']}) on accent-default (${pLight['--joy-accent-default']}) ratio ${lightBtnRatio.toFixed(2)}:1 < 4.5:1`);
+    }
+
+    const darkBtnRatio = contrastRatio(pDark['--joy-text-on-accent'], pDark['--joy-accent-default']);
+    if (darkBtnRatio < 4.5) {
+      failures.push(`Preset ${key} (Dark) text-on-accent (${pDark['--joy-text-on-accent']}) on accent-default (${pDark['--joy-accent-default']}) ratio ${darkBtnRatio.toFixed(2)}:1 < 4.5:1`);
+    }
+
+    // 2. Primary Text on Surface Canvas & Card >= 4.5:1
+    const lightCanvasRatio = contrastRatio(pLight['--joy-text-primary'], pLight['--joy-surface-canvas']);
+    if (lightCanvasRatio < 4.5) {
+      failures.push(`Preset ${key} (Light) text-primary on surface-canvas ratio ${lightCanvasRatio.toFixed(2)}:1 < 4.5:1`);
+    }
+
+    const darkCanvasRatio = contrastRatio(pDark['--joy-text-primary'], pDark['--joy-surface-canvas']);
+    if (darkCanvasRatio < 4.5) {
+      failures.push(`Preset ${key} (Dark) text-primary on surface-canvas ratio ${darkCanvasRatio.toFixed(2)}:1 < 4.5:1`);
+    }
+  }
+
+  assert.strictEqual(failures.length, 0, `Preset Contrast Gate failures:\n${failures.join('\n')}`);
+});
+
