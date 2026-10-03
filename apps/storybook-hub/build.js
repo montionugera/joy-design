@@ -2065,6 +2065,114 @@ ${inlinedThemeCss}
       color: var(--joy-text-secondary);
     }
 
+    /* ── Full Page Simulator Viewport Emulation ── */
+    /* When emulating mobile (375px) on desktop windows, media queries targeting window width
+       do not trigger. These scoped rules activate the authentic mobile layout inside the simulator frame. */
+    .simulator-frame[data-viewport="mobile"] .joy-landing-header {
+      padding: var(--joy-space-3) var(--joy-space-4);
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-landing-header__nav {
+      display: none !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-landing-header .joy-landing-header__menu {
+      display: inline-flex !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-landing-header__brand {
+      font-size: var(--joy-font-size-lg);
+      white-space: nowrap;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-hero {
+      padding: 48px 16px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-hero__title {
+      font-size: var(--joy-font-size-display-sm);
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-hero__ctas {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-hero__ctas .joy-button {
+      width: 100% !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-feature-grid--lead {
+      grid-template-columns: minmax(0, 1fr) !important;
+      gap: 16px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-feature-grid--lead > * {
+      grid-column: 1 / -1 !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-feature-grid--lead > :first-child .joy-feature-card__title {
+      font-size: var(--joy-font-size-xl) !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-feature-card {
+      padding: 20px 18px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-feature-card__title {
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-feature-card__desc {
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-pricing-matrix:not(.joy-pricing-matrix--table) {
+      gap: 16px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-pricing-matrix:not(.joy-pricing-matrix--table) > * {
+      flex-basis: 100% !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-pricing-card {
+      padding: 24px 18px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-pricing-matrix__table th:first-child {
+      max-inline-size: 110px !important;
+      font-size: var(--joy-font-size-xs);
+      padding: 8px 10px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-pricing-matrix__table th,
+    .simulator-frame[data-viewport="mobile"] .joy-pricing-matrix__table td {
+      padding: 8px 10px;
+      font-size: var(--joy-font-size-xs);
+      min-width: 72px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-cta-section {
+      padding: 32px 16px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-cta-section__container {
+      padding: 36px 18px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-cta-section__title {
+      font-size: var(--joy-font-size-xl);
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-cta-section__actions {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-cta-section__actions .joy-button {
+      width: 100% !important;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-site-footer {
+      padding: 40px 16px 24px 16px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-site-footer__inner {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 28px;
+    }
+    .simulator-frame[data-viewport="mobile"] .joy-site-footer__bottom {
+      flex-direction: column-reverse !important;
+      align-items: flex-start !important;
+      margin-top: 24px;
+    }
+
+    /* Tablet emulation overrides (768px) */
+    .simulator-frame[data-viewport="tablet"] .joy-feature-grid--lead {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+    .simulator-frame[data-viewport="tablet"] .joy-feature-grid--lead > * {
+      grid-column: 1 / -1 !important;
+    }
+
     /* Landing blocks view: layout for the demo wrappers only; the blocks themselves are styled by theme.css. */
     .view-panel > h2,
     .landing-demo-title {
@@ -5299,7 +5407,7 @@ export async function executeHedge(symbol: string, size: number) {
               </button>
             </div>
           </div>
-          <p class="simulator-note">The frame changes width only. Layout breakpoints follow the browser window, so resize the window to see the phone layout.</p>
+          <p class="simulator-note">The frame emulates responsive mobile and tablet layouts. You can also resize the browser window directly.</p>
         </div>
 
         <!-- Simulator Status Bar -->
@@ -8235,6 +8343,13 @@ export async function executeHedge(symbol: string, size: number) {
       const info = document.getElementById('simulator-viewport-info');
       if (frame) {
         frame.style.maxWidth = width;
+        if (width === '375px') {
+          frame.setAttribute('data-viewport', 'mobile');
+        } else if (width === '768px') {
+          frame.setAttribute('data-viewport', 'tablet');
+        } else {
+          frame.removeAttribute('data-viewport');
+        }
       }
       if (info) {
         info.textContent = width === '100%' ? 'Full width' : width === '768px' ? 'Tablet, 768px' : 'Mobile, 375px';
