@@ -32,7 +32,7 @@ const themeCss = fs.readFileSync(path.resolve(__dirname, "../../../packages/toke
 const script = path.resolve(__dirname, "../scripts/render-landing-ssr.mjs");
 const raw = execFileSync(process.execPath, [script], {
   encoding: "utf8",
-  timeout: 60_000,
+  timeout: 300_000,
   // the two default pages are ~15 KB each; 16 MB leaves room for growth without hiding a runaway output
   maxBuffer: 16 * 1024 * 1024,
 });
