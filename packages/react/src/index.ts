@@ -115,3 +115,9 @@ export { DenseRow, type DenseRowProps, type DenseRowTone } from './DenseRow.js';
 export { MonoChip, type MonoChipProps, type MonoChipVariant } from './MonoChip.js';
 export { TrendLine, type TrendLineProps } from './TrendLine.js';
 export { Emblem, type EmblemProps } from './Emblem.js';
+// F-052: Joy-Coach Athletic Telemetry & Instrument Modernism Suite
+export { CourtRadar, type CourtRadarProps, type CourtSurface, type ShotPoint, type Trajectory } from './CourtRadar.js';
+export { MatchScoreboard, type MatchScoreboardProps } from './MatchScoreboard.js';
+export { ChronometerDial, type ChronometerDialProps, type LapRecord } from './ChronometerDial.js';
+export { TelemetryStrip, type TelemetryStripProps, type TelemetryMetric } from './TelemetryStrip.js';
+export { CommandIsland, type CommandIslandProps, type CommandIslandPosition, type CommandIslandItem } from './CommandIsland.js';

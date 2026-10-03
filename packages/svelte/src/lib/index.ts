@@ -116,3 +116,9 @@ export { default as DenseRow } from './DenseRow.svelte';
 export { default as MonoChip } from './MonoChip.svelte';
 export { default as TrendLine } from './TrendLine.svelte';
 export { default as Emblem } from './Emblem.svelte';
+// F-052: Joy-Coach Athletic Telemetry & Instrument Modernism Suite
+export { default as CourtRadar } from './CourtRadar.svelte';
+export { default as MatchScoreboard } from './MatchScoreboard.svelte';
+export { default as ChronometerDial } from './ChronometerDial.svelte';
+export { default as TelemetryStrip } from './TelemetryStrip.svelte';
+export { default as CommandIsland } from './CommandIsland.svelte';
