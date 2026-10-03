@@ -1,4 +1,9 @@
 import { test, expect } from "@playwright/test";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)", () => {
   test.beforeEach(async ({ page }) => {
@@ -163,8 +168,10 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
   });
 
   test("captures visual verification screenshots across all 5 palettes in light and dark themes", async ({ page }, testInfo) => {
-    // Only capture in desktop-chrome project to avoid duplicate captures
-    if (testInfo.project.name !== "desktop-chrome") return;
+    test.skip(
+      !process.env.PALETTE_SCREENS || testInfo.project.name !== "desktop-chrome",
+      "set PALETTE_SCREENS=1 to capture screenshots"
+    );
 
     await page.goto("/#button");
     await expect(page.locator("#view-button")).toHaveClass(/active/);
@@ -173,7 +180,9 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
       content: "*, *::before, *::after { transition: none !important; animation: none !important; }"
     });
 
-    const outDir = "/Users/pasitnusso/.gemini/antigravity-cli/brain/1ad0770e-cf82-4de2-beff-bb22e70dfab3/screenshots";
+    const outDir = process.env.SCREENSHOT_DIR || path.resolve(__dirname, "../dist/screenshots");
+    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+
     const palettes = ["classic", "bauhaus-primary", "clay-court", "nordic-slate", "verdant-lawn"];
     const themes = ["light", "dark"];
 
@@ -186,7 +195,7 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
 
         const canvas = page.locator("#button-canvas");
         await canvas.screenshot({
-          path: `${outDir}/button-${palette}-${theme}.png`
+          path: path.join(outDir, `button-${palette}-${theme}.png`)
         });
       }
     }
