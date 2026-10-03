@@ -1073,3 +1073,29 @@ test('bauhaus component twins exist and render proper CSS classes in Svelte', ()
   assert.ok(emblem.includes('joy-emblem'), 'Emblem must render joy-emblem class');
 });
 
+test('Joy-Coach instrument modernism component twins exist and render proper CSS classes in Svelte', () => {
+  const courtRadar = fs.readFileSync(path.resolve('./src/lib/CourtRadar.svelte'), 'utf8');
+  assert.ok(courtRadar.includes('joy-court-radar'), 'CourtRadar must render joy-court-radar class');
+  assert.ok(courtRadar.includes('$props()'), 'CourtRadar must use Svelte 5 runes');
+  assert.ok(courtRadar.includes('joy-court-radar--surface-'), 'CourtRadar must support court surfaces');
+
+  const matchScoreboard = fs.readFileSync(path.resolve('./src/lib/MatchScoreboard.svelte'), 'utf8');
+  assert.ok(matchScoreboard.includes('joy-match-scoreboard'), 'MatchScoreboard must render joy-match-scoreboard class');
+  assert.ok(matchScoreboard.includes('$props()'), 'MatchScoreboard must use Svelte 5 runes');
+  assert.ok(matchScoreboard.includes('joy-match-scoreboard__table'), 'MatchScoreboard must render tabular score table');
+
+  const chronometerDial = fs.readFileSync(path.resolve('./src/lib/ChronometerDial.svelte'), 'utf8');
+  assert.ok(chronometerDial.includes('joy-chronometer-dial'), 'ChronometerDial must render joy-chronometer-dial class');
+  assert.ok(chronometerDial.includes('$props()'), 'ChronometerDial must use Svelte 5 runes');
+  assert.ok(chronometerDial.includes('joy-chronometer-dial__time'), 'ChronometerDial must render dial time');
+
+  const telemetryStrip = fs.readFileSync(path.resolve('./src/lib/TelemetryStrip.svelte'), 'utf8');
+  assert.ok(telemetryStrip.includes('joy-telemetry-strip'), 'TelemetryStrip must render joy-telemetry-strip class');
+  assert.ok(telemetryStrip.includes('$props()'), 'TelemetryStrip must use Svelte 5 runes');
+
+  const commandIsland = fs.readFileSync(path.resolve('./src/lib/CommandIsland.svelte'), 'utf8');
+  assert.ok(commandIsland.includes('joy-command-island'), 'CommandIsland must render joy-command-island class');
+  assert.ok(commandIsland.includes('$props()'), 'CommandIsland must use Svelte 5 runes');
+  assert.ok(commandIsland.includes('joy-command-island__inner'), 'CommandIsland must render inner dock');
+});
+

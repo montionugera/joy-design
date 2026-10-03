@@ -350,6 +350,7 @@ The contract. Light and dark values for every role.
 | `--joy-elevation-accent-1` | `0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)` | `0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)` |
 | `--joy-elevation-accent-2` | `0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)` | `0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6)` |
 | `--joy-elevation-accent-inset` | `inset 0 2px 4px rgba(133, 101, 21, 0.35)` | `inset 0 2px 4px rgba(0, 0, 0, 0.45)` |
+| `--joy-elevation-bevel` | `inset 0 1px 0 0 rgba(255, 255, 255, 0.70)` | `inset 0 1px 0 0 rgba(255, 255, 255, 0.08)` |
 | `--joy-brand-tile` | `#14253e` | `#14253e` |
 | `--joy-brand-mark` | `#856515` | `#dab362` |
 | `--joy-brand-mark-on-tile` | `#c49a3a` | `#c49a3a` |
@@ -590,6 +591,7 @@ Light theme lifts with soft navy-tinted shadows. Dark theme lifts with a hairlin
 | `--joy-elevation-accent-1` | `0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08)` | `0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4)` |
 | `--joy-elevation-accent-2` | `0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12)` | `0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6)` |
 | `--joy-elevation-accent-inset` | `inset 0 2px 4px rgba(133, 101, 21, 0.35)` | `inset 0 2px 4px rgba(0, 0, 0, 0.45)` |
+| `--joy-elevation-bevel` | `inset 0 1px 0 0 rgba(255, 255, 255, 0.70)` | `inset 0 1px 0 0 rgba(255, 255, 255, 0.08)` |
 
 ### Radius roles
 
@@ -700,6 +702,11 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | MonoChip | `.joy-mono-chip` | - | court, danger, default | active |
 | TrendLine | `.joy-trend-line` | - | - | - |
 | Emblem | `.joy-emblem` | - | - | - |
+| CourtRadar | `.joy-court-radar` | - | interactive, surface-clay, surface-grass, surface-hard, surface-indoor | - |
+| MatchScoreboard | `.joy-match-scoreboard` | - | - | active |
+| ChronometerDial | `.joy-chronometer-dial` | - | - | active |
+| TelemetryStrip | `.joy-telemetry-strip` | - | - | - |
+| CommandIsland | `.joy-command-island` | - | bottom-fixed, bottom-floating, top-header | hover, active |
 
 ## Brand
 
