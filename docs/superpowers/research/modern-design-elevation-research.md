@@ -49,15 +49,15 @@ Modern, high-craft software—typified by tools like **Linear, Raycast, Vercel, 
 ```mermaid
 flowchart TD
     subgraph Subject["Physical Context & Subject Matter"]
-        A["🎾 Joy-Coach: Outdoor Court, Sun Glare, High-Speed Telemetry, Sweaty Thumbs"]
-        B["📈 Quant-FE: Dense Financial Data, 12h Night Sessions, Zero Jiggle"]
+        A["Joy-Coach: Outdoor Court, Sun Glare, High-Speed Telemetry, Sweaty Thumbs"]
+        B["Quant-FE: Dense Financial Data, 12h Night Sessions, Zero Jiggle"]
     end
     subgraph Core["Instrument Modernism Philosophy"]
-        C["📐 Bauhaus Geometric Discipline (Dessau 1925)"]
-        D["⏱️ Tactile Instrument Ergonomics (Physical Wells & 1px Directional Bevels)"]
-        E["🔤 Tabular Figure Precision (font-variant-numeric: tabular-nums)"]
-        F["📱 Thumb-Zone Ergonomics (Bottom 35% Safe Reach)"]
-        G["🔄 Dual-Orientation Physics (Vertical Thumb vs. Horizontal Bi-Manual)"]
+        C["Bauhaus Geometric Discipline (Dessau 1925)"]
+        D["Tactile Instrument Ergonomics (Physical Wells & 1px Directional Bevels)"]
+        E["Tabular Figure Precision (font-variant-numeric: tabular-nums)"]
+        F["Thumb-Zone Ergonomics (Bottom 35% Safe Reach)"]
+        G["Dual-Orientation Physics (Vertical Thumb vs. Horizontal Bi-Manual)"]
     end
     subgraph Output["Elevated Design Surface"]
         H["Asymmetric Narrative Bento Grids (CSS Subgrid)"]
@@ -131,7 +131,7 @@ A premier design system in 2026 cannot treat mobile and tablet as afterthought C
 ┌──────────────────────────────────────┬───────────────────────────────────────┐
 │ LEFT THUMB & VISUAL ZONE (55% width) │ RIGHT THUMB ACTION DOCK (45% width)   │
 │                                      │                                       │
-│  🎾 CourtRadar (Horizontal Mode)     │  SET 3 · GAME 11 · DEUCE [40 - 40]    │
+│  CourtRadar (Horizontal Mode)          │  SET 3 · GAME 11 · DEUCE [40 - 40]    │
 │  - Full baseline-to-baseline view    │  ┌─────────────────┬────────────────┐ │
 │  - Ball impact heatmap overlay       │  │ [1st SERVE IN]  │ [FAULT]        │ │
 │  - Net clearance height arc          │  ├─────────────────┼────────────────┤ │
@@ -322,9 +322,9 @@ To demonstrate cross-device usability, responsiveness, and aesthetic elevation a
 ```mermaid
 flowchart TD
     subgraph Demos["Interactive Sample Page Demos (apps/storybook-hub)"]
-        D1["🎾 Demo 1: Courtside Match Logger<br/>• Mobile Portrait vs. Landscape Split<br/>• 56px Thumb Dock & Court Tapping"]
-        D2["📊 Demo 2: Athletic Performance Bento<br/>• CSS Subgrid & Container Queries<br/>• Fluid scaling: 375px to 1920px"]
-        D3["☀️ Demo 3: Outdoor Sunlight Glare Lab<br/>• 50,000 Lux Direct Sun Simulation<br/>• AAA 7:1+ Contrast & 2px Solid Borders"]
+        D1["Demo 1: Courtside Match Logger<br/>• Mobile Portrait vs. Landscape Split<br/>• 56px Thumb Dock & Court Tapping"]
+        D2["Demo 2: Athletic Performance Bento<br/>• CSS Subgrid & Container Queries<br/>• Fluid scaling: 375px to 1920px"]
+        D3["Demo 3: Outdoor Sunlight Glare Lab<br/>• 50,000 Lux Direct Sun Simulation<br/>• AAA 7:1+ Contrast & 2px Solid Borders"]
     end
     D1 --> Test["Cross-Device Playwright Visual Regression (375px & 1280px)"]
     D2 --> Test
@@ -363,15 +363,15 @@ To cement `joy-design` as the premier design system for `joy-coach`, four flagsh
 ```mermaid
 flowchart LR
     subgraph Athletic["Joy-Coach Athletic Performance Suite"]
-        A["🎾 CourtRadar"]
-        B["⏱️ ChronometerDial"]
-        C["📊 MatchScoreboard"]
-        D["💓 TelemetryStrip"]
+        A["CourtRadar"]
+        B["ChronometerDial"]
+        C["MatchScoreboard"]
+        D["TelemetryStrip"]
     end
     subgraph Ergonomic["Layout & Navigation Containers"]
-        E["📐 BentoGrid (Subgrid)"]
-        F["📱 CommandIsland (Thumb Dock)"]
-        G["📄 BottomSheet (Drawer)"]
+        E["BentoGrid (Subgrid)"]
+        F["CommandIsland (Thumb Dock)"]
+        G["BottomSheet (Drawer)"]
     end
     Athletic --> CoachApp["Joy-Coach Web & Mobile App"]
     Ergonomic --> CoachApp
@@ -419,7 +419,7 @@ flowchart LR
     *   `serveVelocity: { top: number, average: number, unit: 'km/h'|'mph' }`
     *   `rallyCount: { current: number, longest: number }`
 *   **Zero-Emoji Policy**:
-    *   Exclusively utilizes crisp SVG vector glyphs (`@joymify/icons`), strictly barring raw OS emojis (`❤️`, `🎾`, `⚡`).
+    *   Exclusively utilizes crisp SVG vector glyphs (`@joymify/icons`), strictly barring raw OS emojis (`[Heart]`, `[Court]`, `[Zap]`).
 
 ### 5. `BentoGrid` & `BentoCard` (CSS Subgrid Architecture)
 *   **Props**:
@@ -463,7 +463,7 @@ flowchart LR
 │ • Gradient text ("Supercharge Your Game")   │ • Solid architectural display & sentence-case│
 │ • Tracked all-caps eyebrows ("FEATURES")    │ • Functional hierarchy with micro-labels    │
 │ • Numbers jiggle horizontally on data tick  │ • Strict tabular-nums & zero-jitter channels│
-│ • Raw OS emojis (🎾, 🔴, ⏳, 🌙)             │ • Crisp scalable vector SVG icons           │
+│ • Raw OS emojis (Court, Red, Hourglass, Moon) │ • Crisp scalable vector SVG icons           │
 │ • Washes out under direct outdoor sunlight  │ • High-Noon Outdoor 7:1+ Mode (AAA contrast)│
 │ • Centered modal dialogs unclickable with 1 │ • Bottom Sheets & Floating Thumb Dock       │
 │   hand on modern mobile screens             │   (Safe Zone ergonomics)                    │
