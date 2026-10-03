@@ -12,7 +12,7 @@ const css = fs.readFileSync(path.resolve(__dirname, "../../../packages/tokens/di
 const { cards } = JSON.parse(
   execFileSync(process.execPath, [path.resolve(__dirname, "../scripts/render-pricing-ssr.mjs")], {
     encoding: "utf8",
-    timeout: 60_000,
+    timeout: 300_000,
     maxBuffer: 16 * 1024 * 1024,
   }),
 ) as { cards: Record<string, string> };

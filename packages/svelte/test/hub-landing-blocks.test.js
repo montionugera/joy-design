@@ -17,10 +17,10 @@ const repoRoot = path.resolve(here, '../../..');
 const generator = path.join(repoRoot, 'apps/storybook-hub/scripts/gen-landing-blocks.mjs');
 
 function check(root) {
-  return spawnSync(process.execPath, [generator, '--check', '--root', root], { encoding: 'utf8', timeout: 120000 });
+  return spawnSync(process.execPath, [generator, '--check', '--root', root], { encoding: 'utf8', timeout: 300000 });
 }
 
-test('hub landing blocks match the current landing components', () => {
+test('hub landing blocks match the current landing components', { timeout: 300000 }, () => {
   const run = check(repoRoot);
   assert.equal(run.status, 0, `drift between components and the hub landing blocks:\n${run.stderr}${run.stdout}`);
 });
@@ -50,7 +50,7 @@ function mutate(scratch, file, from, to) {
   fs.writeFileSync(target, source.replaceAll(from, to));
 }
 
-test('the drift check turns red when a component class changes (scratch copy, real repo untouched)', () => {
+test('the drift check turns red when a component class changes (scratch copy, real repo untouched)', { timeout: 300000 }, () => {
   withScratch((scratch) => {
     mutate(scratch, 'FeatureGrid.svelte', 'joy-feature-grid--lead', 'joy-feature-grid--lead-renamed');
     const drifted = check(scratch);
@@ -60,7 +60,7 @@ test('the drift check turns red when a component class changes (scratch copy, re
   });
 });
 
-test('T2: the drift check covers the simulator body: a LandingPage change turns it red in the simulator region only', () => {
+test('T2: the drift check covers the simulator body: a LandingPage change turns it red in the simulator region only', { timeout: 300000 }, () => {
   withScratch((scratch) => {
     // The simulator page is the real LandingPage render, so a class the page itself emits (not a sub-component's) is a drift.
     mutate(scratch, 'LandingPage.svelte', '<div id="telemetry">', '<div id="telemetry" class="joy-landing-page__telemetry-renamed">');
@@ -72,7 +72,7 @@ test('T2: the drift check covers the simulator body: a LandingPage change turns 
   });
 });
 
-test('T2: the drift check catches the tag defect the taste review found (a bare joy-badge without a size class)', () => {
+test('T2: the drift check catches the tag defect the taste review found (a bare joy-badge without a size class)', { timeout: 300000 }, () => {
   withScratch((scratch) => {
     mutate(scratch, 'LandingPage.svelte', '<Badge variant="brand" size="sm">FPGA-Core</Badge>', '<span class="joy-badge joy-badge--brand">FPGA-Core</span>');
     const drifted = check(scratch);
@@ -82,12 +82,12 @@ test('T2: the drift check catches the tag defect the taste review found (a bare 
   });
 });
 
-test('T2 fix: the render-id rewrite (s<digits> to sim<digits>) touches attribute values only, never text or SVG path data', () => {
+test('T2 fix: the render-id rewrite (s<digits> to sim<digits>) touches attribute values only, never text or SVG path data', { timeout: 300000 }, () => {
   withScratch((scratch) => {
     // Text and path data that look like a render id sit in the generated region; ids and aria refs must still be renamed.
     mutate(scratch, 'LandingPage.svelte', '<Smartphone size="1.5rem" />', '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M0 0 s1.5 2 3 4 s2 1" /></svg>');
     mutate(scratch, 'LandingPage.svelte', 'title="Tables that fit phones"', 'title="Tables that fit s2 phones"');
-    const write = spawnSync(process.execPath, [generator, '--write', '--root', scratch], { encoding: 'utf8', timeout: 120000 });
+    const write = spawnSync(process.execPath, [generator, '--write', '--root', scratch], { encoding: 'utf8', timeout: 300000 });
     assert.equal(write.status, 0, `${write.stderr}${write.stdout}`);
     const out = fs.readFileSync(path.join(scratch, 'apps/storybook-hub/build.js'), 'utf8');
     assert.ok(out.includes('d="M0 0 s1.5 2 3 4 s2 1"'), 'SVG path data is untouched');

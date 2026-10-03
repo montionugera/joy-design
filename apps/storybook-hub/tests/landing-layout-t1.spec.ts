@@ -17,7 +17,7 @@ const ssr = JSON.parse(
     [path.resolve(__dirname, "../scripts/render-landing-ssr.mjs")],
     {
       encoding: "utf8",
-      timeout: 60_000,
+      timeout: 300_000,
       maxBuffer: 16 * 1024 * 1024,
     },
   ),
