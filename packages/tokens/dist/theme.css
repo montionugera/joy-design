@@ -179,6 +179,7 @@
   --joy-elevation-accent-1: 0 1px 2px rgba(196, 154, 58, 0.28), 0 1px 3px rgba(20, 37, 62, 0.08);
   --joy-elevation-accent-2: 0 6px 16px -2px rgba(196, 154, 58, 0.42), 0 2px 6px -1px rgba(20, 37, 62, 0.12);
   --joy-elevation-accent-inset: inset 0 2px 4px rgba(133, 101, 21, 0.35);
+  --joy-elevation-bevel: inset 0 1px 0 0 rgba(255, 255, 255, 0.70);
   --joy-brand-tile: #14253e;
   --joy-brand-mark: #856515;
   --joy-brand-mark-on-tile: #c49a3a;
@@ -330,6 +331,7 @@
   --joy-elevation-accent-1: 0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
   --joy-elevation-accent-2: 0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6);
   --joy-elevation-accent-inset: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  --joy-elevation-bevel: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
   --joy-brand-tile: #14253e;
   --joy-brand-mark: #dab362;
   --joy-brand-mark-on-tile: #c49a3a;
@@ -417,6 +419,7 @@
   --joy-elevation-accent-1: 0 0 0 1px rgba(218, 179, 98, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
   --joy-elevation-accent-2: 0 0 0 1px rgba(218, 179, 98, 0.50), 0 6px 18px rgba(0, 0, 0, 0.6);
   --joy-elevation-accent-inset: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  --joy-elevation-bevel: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
   --joy-brand-tile: #14253e;
   --joy-brand-mark: #dab362;
   --joy-brand-mark-on-tile: #c49a3a;
@@ -895,6 +898,174 @@
   }
 }
 
+/* ── Palette Preset: High-Noon Outdoor (Light) ── */
+[data-palette="outdoor"], :root[data-palette="outdoor"] {
+  --joy-brand-navy: #0f172a;
+  --joy-brand-gold: #b45309;
+  --joy-brand-cream: #ffffff;
+  --joy-brand-ink: #000000;
+  --joy-accent-default: #0f172a;
+  --joy-accent-hover: #1e293b;
+  --joy-accent-active: #000000;
+  --joy-accent-subtle: #f1f5f9;
+  --joy-accent-text: #0f172a;
+  --joy-accent-gradient-end: #0f172a;
+  --joy-accent-highlight: #0f172a;
+  --joy-color-brand-primary: #0f172a;
+  --joy-surface-canvas: #ffffff;
+  --joy-surface-card: #ffffff;
+  --joy-surface-raised: #ffffff;
+  --joy-surface-sunken: #f1f5f9;
+  --joy-text-primary: #000000;
+  --joy-text-secondary: #0f172a;
+  --joy-text-muted: #334155;
+  --joy-text-on-accent: #ffffff;
+  --joy-border-subtle: #0f172a;
+  --joy-border-default: #0f172a;
+  --joy-border-strong: #000000;
+  --joy-border-focus: #000000;
+}
+
+/* ── High-Noon Outdoor Mode (Light) ── */
+[data-mode="outdoor"], :root[data-mode="outdoor"] {
+  --joy-brand-navy: #0f172a;
+  --joy-brand-gold: #b45309;
+  --joy-brand-cream: #ffffff;
+  --joy-brand-ink: #000000;
+  --joy-accent-default: #0f172a;
+  --joy-accent-hover: #1e293b;
+  --joy-accent-active: #000000;
+  --joy-accent-subtle: #f1f5f9;
+  --joy-accent-text: #0f172a;
+  --joy-accent-gradient-end: #0f172a;
+  --joy-accent-highlight: #0f172a;
+  --joy-color-brand-primary: #0f172a;
+  --joy-surface-canvas: #ffffff;
+  --joy-surface-card: #ffffff;
+  --joy-surface-raised: #ffffff;
+  --joy-surface-sunken: #f1f5f9;
+  --joy-text-primary: #000000;
+  --joy-text-secondary: #0f172a;
+  --joy-text-muted: #334155;
+  --joy-text-on-accent: #ffffff;
+  --joy-border-subtle: #0f172a;
+  --joy-border-default: #0f172a;
+  --joy-border-strong: #000000;
+  --joy-border-focus: #000000;
+}
+
+/* ── Palette Preset: High-Noon Outdoor (Dark) ── */
+[data-theme="dark"][data-palette="outdoor"], [data-theme="dark"] [data-palette="outdoor"] {
+  --joy-brand-navy: #000000;
+  --joy-brand-gold: #f59e0b;
+  --joy-brand-cream: #ffffff;
+  --joy-brand-ink: #000000;
+  --joy-accent-default: #ffffff;
+  --joy-accent-hover: #f8fafc;
+  --joy-accent-active: #e2e8f0;
+  --joy-accent-subtle: #1e293b;
+  --joy-accent-text: #ffffff;
+  --joy-accent-gradient-end: #ffffff;
+  --joy-accent-highlight: #ffffff;
+  --joy-color-brand-primary: #ffffff;
+  --joy-surface-canvas: #000000;
+  --joy-surface-card: #05080e;
+  --joy-surface-raised: #0f172a;
+  --joy-surface-sunken: #000000;
+  --joy-text-primary: #ffffff;
+  --joy-text-secondary: #f8fafc;
+  --joy-text-muted: #cbd5e1;
+  --joy-text-on-accent: #000000;
+  --joy-border-subtle: #ffffff;
+  --joy-border-default: #ffffff;
+  --joy-border-strong: #ffffff;
+  --joy-border-focus: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-palette="outdoor"] {
+  --joy-brand-navy: #000000;
+  --joy-brand-gold: #f59e0b;
+  --joy-brand-cream: #ffffff;
+  --joy-brand-ink: #000000;
+  --joy-accent-default: #ffffff;
+  --joy-accent-hover: #f8fafc;
+  --joy-accent-active: #e2e8f0;
+  --joy-accent-subtle: #1e293b;
+  --joy-accent-text: #ffffff;
+  --joy-accent-gradient-end: #ffffff;
+  --joy-accent-highlight: #ffffff;
+  --joy-color-brand-primary: #ffffff;
+  --joy-surface-canvas: #000000;
+  --joy-surface-card: #05080e;
+  --joy-surface-raised: #0f172a;
+  --joy-surface-sunken: #000000;
+  --joy-text-primary: #ffffff;
+  --joy-text-secondary: #f8fafc;
+  --joy-text-muted: #cbd5e1;
+  --joy-text-on-accent: #000000;
+  --joy-border-subtle: #ffffff;
+  --joy-border-default: #ffffff;
+  --joy-border-strong: #ffffff;
+  --joy-border-focus: #ffffff;
+  }
+}
+
+/* ── High-Noon Outdoor Mode (Dark) ── */
+[data-theme="dark"][data-mode="outdoor"], [data-theme="dark"] [data-mode="outdoor"] {
+  --joy-brand-navy: #000000;
+  --joy-brand-gold: #f59e0b;
+  --joy-brand-cream: #ffffff;
+  --joy-brand-ink: #000000;
+  --joy-accent-default: #ffffff;
+  --joy-accent-hover: #f8fafc;
+  --joy-accent-active: #e2e8f0;
+  --joy-accent-subtle: #1e293b;
+  --joy-accent-text: #ffffff;
+  --joy-accent-gradient-end: #ffffff;
+  --joy-accent-highlight: #ffffff;
+  --joy-color-brand-primary: #ffffff;
+  --joy-surface-canvas: #000000;
+  --joy-surface-card: #05080e;
+  --joy-surface-raised: #0f172a;
+  --joy-surface-sunken: #000000;
+  --joy-text-primary: #ffffff;
+  --joy-text-secondary: #f8fafc;
+  --joy-text-muted: #cbd5e1;
+  --joy-text-on-accent: #000000;
+  --joy-border-subtle: #ffffff;
+  --joy-border-default: #ffffff;
+  --joy-border-strong: #ffffff;
+  --joy-border-focus: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-mode="outdoor"] {
+  --joy-brand-navy: #000000;
+  --joy-brand-gold: #f59e0b;
+  --joy-brand-cream: #ffffff;
+  --joy-brand-ink: #000000;
+  --joy-accent-default: #ffffff;
+  --joy-accent-hover: #f8fafc;
+  --joy-accent-active: #e2e8f0;
+  --joy-accent-subtle: #1e293b;
+  --joy-accent-text: #ffffff;
+  --joy-accent-gradient-end: #ffffff;
+  --joy-accent-highlight: #ffffff;
+  --joy-color-brand-primary: #ffffff;
+  --joy-surface-canvas: #000000;
+  --joy-surface-card: #05080e;
+  --joy-surface-raised: #0f172a;
+  --joy-surface-sunken: #000000;
+  --joy-text-primary: #ffffff;
+  --joy-text-secondary: #f8fafc;
+  --joy-text-muted: #cbd5e1;
+  --joy-text-on-accent: #000000;
+  --joy-border-subtle: #ffffff;
+  --joy-border-default: #ffffff;
+  --joy-border-strong: #ffffff;
+  --joy-border-focus: #ffffff;
+  }
+}
+
 
 
 /* ── Joymify Component Base Styling & Motion Engine ── */
@@ -909,6 +1080,16 @@
 @keyframes joy-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* ── Instrument Modernism Utilities ── */
+.joy-tabular-nums {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: -0.01em;
+}
+.joy-bevel {
+  box-shadow: var(--joy-elevation-bevel);
 }
 
 .joy-button { appearance: none; -webkit-appearance: none; box-sizing: border-box; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--joy-space-2); font-family: var(--joy-font-family-sans); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; border: 1px solid transparent; border-radius: var(--joy-radius-control); cursor: pointer; user-select: none; -webkit-user-select: none; text-decoration: none; transition: transform var(--joy-duration-fast) var(--joy-ease-out), box-shadow var(--joy-duration-fast) var(--joy-ease-out), background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out); }

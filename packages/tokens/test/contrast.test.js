@@ -560,7 +560,7 @@ test("WCAG 2.2 AA Contrast Gate for Semantic Tokens", () => {
   );
 });
 
-test("WCAG 2.2 AA Contrast Gate across all 5 Palette Presets (Light & Dark) - 110 Pairs", () => {
+test("WCAG 2.2 AA Contrast Gate across all 6 Palette Presets (Light & Dark) - 132 Pairs", () => {
   const cssPath = path.resolve(__dirname, "../dist/theme.css");
   const css = fs.readFileSync(cssPath, "utf8");
   const { light, dark } = parseCssTokens(css);
@@ -571,6 +571,7 @@ test("WCAG 2.2 AA Contrast Gate across all 5 Palette Presets (Light & Dark) - 11
     "clay-court",
     "nordic-slate",
     "verdant-lawn",
+    "outdoor",
   ];
   const failures = [];
   let totalChecked = 0;
@@ -700,8 +701,8 @@ test("WCAG 2.2 AA Contrast Gate across all 5 Palette Presets (Light & Dark) - 11
 
   assert.strictEqual(
     totalChecked,
-    110,
-    `Expected 110 contrast pairs checked, got ${totalChecked}`,
+    132,
+    `Expected 132 contrast pairs checked, got ${totalChecked}`,
   );
   assert.strictEqual(
     failures.length,

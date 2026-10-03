@@ -155,6 +155,16 @@ const componentStyles = `
   to { transform: rotate(360deg); }
 }
 
+/* ── Instrument Modernism Utilities ── */
+.joy-tabular-nums {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: -0.01em;
+}
+.joy-bevel {
+  box-shadow: var(--joy-elevation-bevel);
+}
+
 .joy-button { appearance: none; -webkit-appearance: none; box-sizing: border-box; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--joy-space-2); font-family: var(--joy-font-family-sans); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; border: 1px solid transparent; border-radius: var(--joy-radius-control); cursor: pointer; user-select: none; -webkit-user-select: none; text-decoration: none; transition: transform var(--joy-duration-fast) var(--joy-ease-out), box-shadow var(--joy-duration-fast) var(--joy-ease-out), background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out); }
 .joy-button:focus:not(:focus-visible) { outline: none; }
 .joy-button:focus-visible,
@@ -6320,10 +6330,16 @@ if (tokens.preset) {
     if (preset.light) {
       const lightEntries = Object.entries(preset.light).map(([k, v]) => `  --joy-${k}: ${v};`).join('\n');
       presetBlocks += `\n/* ── Palette Preset: ${preset.name} (Light) ── */\n[data-palette="${key}"], :root[data-palette="${key}"] {\n${lightEntries}\n}\n`;
+      if (key === 'outdoor') {
+        presetBlocks += `\n/* ── High-Noon Outdoor Mode (Light) ── */\n[data-mode="outdoor"], :root[data-mode="outdoor"] {\n${lightEntries}\n}\n`;
+      }
     }
     if (preset.dark) {
       const darkEntries = Object.entries(preset.dark).map(([k, v]) => `  --joy-${k}: ${v};`).join('\n');
       presetBlocks += `\n/* ── Palette Preset: ${preset.name} (Dark) ── */\n[data-theme="dark"][data-palette="${key}"], [data-theme="dark"] [data-palette="${key}"] {\n${darkEntries}\n}\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"])[data-palette="${key}"] {\n${darkEntries}\n  }\n}\n`;
+      if (key === 'outdoor') {
+        presetBlocks += `\n/* ── High-Noon Outdoor Mode (Dark) ── */\n[data-theme="dark"][data-mode="outdoor"], [data-theme="dark"] [data-mode="outdoor"] {\n${darkEntries}\n}\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"])[data-mode="outdoor"] {\n${darkEntries}\n  }\n}\n`;
+      }
     }
   }
 }

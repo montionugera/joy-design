@@ -177,6 +177,7 @@ export interface JoyTokens {
   'elevation-accent-1': string;
   'elevation-accent-2': string;
   'elevation-accent-inset': string;
+  'elevation-bevel': string;
   'brand-tile': string;
   'brand-mark': string;
   'brand-mark-on-tile': string;
