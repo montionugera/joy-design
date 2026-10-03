@@ -10,7 +10,7 @@
 		kbd?: string;
 	}
 
-	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class'> {
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'onselect'> {
 		position?: CommandIslandPosition;
 		items: CommandIslandItem[];
 		onselect?: (id: string) => void;

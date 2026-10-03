@@ -11,7 +11,7 @@ export interface CommandIslandItem {
   kbd?: string;
 }
 
-export interface CommandIslandProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommandIslandProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   position?: CommandIslandPosition;
   items: CommandIslandItem[];
   onSelect?: (id: string) => void;
