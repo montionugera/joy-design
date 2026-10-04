@@ -39,17 +39,39 @@ A comprehensive design specification and ergonomic interface guideline for Smart
 
 ### Optical See-Through (OST) Rendering Rules
 
-1. **True Black is Transparent**:
-   - Backgrounds must never use opaque flat gray or white fills in native HUD mode.
-   - Use ultra-subtle translucent overlays (<code>rgba</code> or variable scrims) only to ensure minimum 4.5:1 text legibility against cluttered physical backgrounds (e.g. bright sidewalks, foliage, fluorescent lighting).
-2. **Luminescent Phosphor Color Roles**:
-   - **Primary Glyphs**: Crisp phosphor white (<code>var(--joy-text-primary)</code>) or electric gold (<code>var(--joy-accent-default)</code>).
-   - **Status Active / Listening**: High-visibility emerald (<code>var(--joy-status-success-fg)</code>).
-   - **Warning / Recording**: Luminescent amber / gold (<code>var(--joy-status-warning-fg)</code> or <code>var(--joy-accent-highlight)</code>).
-   - **Passive / Secondary**: Muted translucent phosphor (<code>var(--joy-text-secondary)</code>, <code>var(--joy-text-muted)</code>).
-3. **Zero OS Emoji Policy**:
-   - Monocular waveguides distort multi-color bitmap emojis. Raw OS emojis (such as OS speech, ear, checkmark, or colored dot glyphs) are strictly banned per <code>AGENTS.md</code>.
-   - All state badges, mode indicators, and checklist marks must use crisp, scalable vector SVGs from <code>@joymify/icons</code> (<code>Mic</code>, <code>Volume2</code>, <code>Eye</code>, <code>Check</code>, <code>CheckCircle</code>, <code>Sliders</code>).
+1. **Dark Background in All Cases (Additive Physics)**:
+   - In optical see-through smart glasses, photons are purely *additive*. True black (zero light emission) equals 100% transparent glass, allowing physical reality to pass through unobstructed.
+   - Light or white card surfaces **do not exist** in optical waveguides: projecting white pixels across the eyebox completely occludes real-world vision, destroys see-through safety, and causes catastrophic battery depletion.
+   - Therefore, the HUD visor **must maintain its optical dark background in all cases**, regardless of whether the host operating system or companion application is set to light or dark mode.
+
+2. **Monochrome Green Architecture (P43 Phosphor, ~530nm)**:
+   - Production monocular smart glasses (Vuzix, Even Realities, military aviation HUDs) use single-color green MicroLEDs.
+   - **Photopic Peak V(λ)**: Human eye sensitivity peaks at 555nm (green). A green MicroLED produces 4× to 5× higher perceived luminance per milliwatt than blue or red emitters, punching through blinding 10,000-lux ambient sunlight with 3,000+ nits while preserving all-day battery life.
+   - **Monochrome Luminance Ramping**:
+     - *High Luminance (100% Nits)*: `var(--joy-status-success-fg)` or `var(--joy-color-green-400)` for active text, selection arrows, and live meters.
+     - *Medium Luminance (60% Nits)*: `var(--joy-color-green-600)` for secondary labels and inactive telemetry.
+     - *Low Luminance (20% Nits / Scrim)*: Reticle outlines and subtle container dividers.
+     - *Zero Emission (0% Nits)*: Optical clear glass (background).
+
+3. **Single-Color Symbolic State & Selection Matrix**:
+   - Because single-color optics cannot use color hue (e.g. amber for warning, red for error, blue for info) to differentiate states, all interaction states must be communicated through **high-contrast geometric symbols, directional glyphs, and reverse-video typography**:
+
+| Meaning / State | Primary Symbol / Glyph | Secondary Feedback | Optical Rationale |
+| :--- | :--- | :--- | :--- |
+| **Active Cursor / Selection** | `▶` (U+25B6) or `►` (U+25BA) | Reverse-video filled row (green background with black text) | Highest possible foveal pop without hue variance |
+| **Checklist Pending** | `[ ]` or `□` (U+25A1) | Hollow geometric box | Distinct from filled active cursor |
+| **Checklist Completed** | `[x]` or SVG vector `Check` | Strikethrough text line | Rapid cognitive discrimination |
+| **Action: Delete / Reject** | `[×]` (U+00D7) | Brackets + multiplication cross | Unambiguous destructive signifier |
+| **Audio: AI Talking** | `▶ TALK` (Play glyph) | Animated phosphor audio waveform bars | Indicates live voice streaming |
+| **Audio: Listening** | `[~ LISTEN]` | Steady low-amplitude meter | Ambient standby indicator |
+| **Audio: Paused** | `⏸ PAUSE` (U+23F8) | Frozen double bar indicator | Clear halt signal |
+| **Audio: Recording Memo** | `● REC` (U+25CF) | Pulsing phosphor dot | Recording state feedback |
+| **Navigation: Scroll Up/Down**| `▲` (U+25B2) / `▼` (U+25BC) | Directional arrow glyphs | Direct mapping to swipe gestures |
+| **Navigation: Back / Return** | `◄ BACK` (U+25C4) | Leftward return arrow | Direct mapping to double-tap |
+
+4. **Zero OS Emoji Policy**:
+   - Monocular waveguides cannot render multi-color OS emoji bitmaps. Furthermore, operating systems render raw unicode emojis with uncontrollable colored bitmap fonts (e.g. bright blue/orange).
+   - Strict rule: All icons must use scalable single-color vector SVGs from `@joymify/icons` or approved geometric unicode symbols (`▶`, `▲`, `▼`, `◄`, `►`, `■`, `□`, `×`, `●`, `⏸`, `⏹`).
 
 ---
 
