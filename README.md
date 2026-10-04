@@ -500,6 +500,35 @@ The Storybook Hub provides 8 distinct Hero Section variants in `#landing-blocks`
    - **Scene 4 (Silicon Specs Bento)**: A18 Pro 3nm GPU specs, Grade 5 Titanium chassis, and all-day battery telemetry.
    - **Scene 5 (Studio Finish Customizer)**: 4 Titanium swatches, 4 storage tiers, live pricing calculator, and order CTA.
 
+
+### Smart Glasses Head-Up Display (Glasses HUD) & UI Guidelines (F-056)
+
+The Storybook Hub provides a monocular Optical See-Through (OST) Head-Up Display interface in `#glasses-hud`, accompanied by comprehensive architectural interaction guidelines (`docs/superpowers/specs/glasses-hud-design.md` and rendered `docs/superpowers/specs/glasses-hud-design.html`):
+
+1. **Optical Waveguide Physics & Additive Light Model**:
+   - Built for MicroLED diffraction grating waveguides (25° monocular FOV, 3,500 nits luminescent brightness).
+   - Zero-emission black: black pixels emit zero photons, rendering completely transparent optical glass.
+   - High daylight legibility with pure Joymify semantic tokens (`--joy-text-primary`, `--joy-accent-default`, `--joy-status-success-fg`).
+   - Ambient optic scene switcher (`Cyberpunk Night`, `Daylight Walk`, `Optical Bench`).
+
+2. **Audio-Visual Communication State Machine**:
+   - Deterministic 4-state machine: `Listening` (ambient active mic), `Watching` (CV glance), `AI Talking` (synthesized speech output), and `Recording` (hands-free memo).
+   - Instant Tap-to-Interrupt: tapping the temple touchpad during AI speech halts Claudia immediately and frees user attention without latency stalls.
+   - Streaming conversational transcript box displaying interactive turn-taking between `User` and `Claudia (Agent)`.
+
+3. **Dual-Panel 50% / 50% Monocular Visor**:
+   - **Left Panel (Communication Stream)**: Live state indicator pill, prompt simulator chips (`Prompt: Checklist`, `Prompt: Meeting`), and animated cursor speech feed.
+   - **Right Panel (Hierarchical Assist Navigation)**:
+     - *Control Center*: Top launcher for Conversation Control, Daily Todos, and Notifications.
+     - *Today Todos Checklist*: Interactive task list with gold selection cursor (`> [ ] Walk 3 Km`, `[x] Prepare Meeting note`).
+     - *Todo Detail Action Tray*: Action buttons (`[ Mark done ]`, `[ Mark not done ]`, `[ Delete ]`) with live counter badge sync.
+     - *Communication Control Guide*: Touch gesture syntax reference.
+
+4. **Temple Capacitive Touchpad Gesture Simulator**:
+   - Hardware controls: Tap (select / interrupt), Double Tap (back up hierarchy), Swipe Down / Up (cursor movement), Hold (voice recording).
+   - Live gesture event feed telemetry.
+   - Strict Zero OS Emoji policy with vector icons from `@joymify/icons` and 100% WCAG 2.2 AA token contrast.
+
 ### Contracts and screenshots
 
 `apps/storybook-hub/tests/contracts.spec.ts` covers the hub in these contracts. Most run on the `desktop-chrome` project and set their own viewports.
