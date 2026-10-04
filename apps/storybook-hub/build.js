@@ -1230,6 +1230,26 @@ ${inlinedThemeCss}
       overflow-wrap: break-word;
     }
 
+    /* Sleek custom scrollbars: thin, pill-shaped thumb, transparent track, theme-aware */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--joy-border-default) transparent;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--joy-border-default);
+      border-radius: var(--joy-radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--joy-border-strong);
+    }
+
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
@@ -1915,6 +1935,174 @@ ${inlinedThemeCss}
       .kinetic-canvas {
         display: none;
       }
+    }
+
+    /* ── Hero Options & 3D / Editorial Landing Variants ── */
+    .landing-hero-options-wrapper {
+      margin-bottom: var(--joy-space-6);
+    }
+    .landing-hero-options-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--joy-space-4);
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 0 4px;
+    }
+    .hero-option-panel {
+      transition: opacity var(--joy-duration-normal) var(--joy-ease-default);
+    }
+
+    /* 3D Volumetric Wave Mesh Hero (OpenAI Codex style) */
+    .mesh-3d-hero-container {
+      position: relative;
+      width: 100%;
+      min-height: 440px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--hub-chrome-border);
+      background: var(--joy-surface-card);
+      margin-bottom: var(--joy-space-6);
+    }
+    .mesh-3d-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+    .mesh-3d-hero-container > .joy-hero {
+      position: relative;
+      z-index: var(--joy-z-base);
+    }
+    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+      .mesh-3d-hero-container {
+        background-image:
+          radial-gradient(circle at 75% 25%, var(--joy-accent-subtle), transparent 65%),
+          radial-gradient(circle at 20% 80%, var(--joy-accent-subtle), transparent 60%);
+      }
+    }
+    @media (pointer: coarse) {
+      .mesh-3d-canvas {
+        display: none;
+      }
+    }
+
+    /* Editorial Luxury Cover Hero (Gucci style) */
+    .editorial-cover-container {
+      position: relative;
+      width: 100%;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--hub-chrome-border);
+      background: var(--joy-surface-sunken);
+      padding: 32px 28px;
+      margin-bottom: var(--joy-space-6);
+    }
+    .editorial-cover__backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 30%, var(--joy-accent-subtle), transparent 70%);
+      opacity: 0.6;
+    }
+    .editorial-cover__ambient-orb {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, var(--joy-accent-default), transparent 70%);
+      opacity: 0.14;
+      filter: blur(40px);
+    }
+    .editorial-cover__ambient-orb-2 {
+      position: absolute;
+      bottom: 10%;
+      right: 15%;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, var(--joy-border-strong), transparent 70%);
+      opacity: 0.12;
+      filter: blur(35px);
+    }
+    .editorial-cover__topbar {
+      position: relative;
+      z-index: var(--joy-z-base);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .editorial-cover__locale {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-muted);
+      letter-spacing: 0.15em;
+    }
+    .editorial-cover__brand {
+      font-size: var(--joy-font-size-md);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+    .editorial-cover__actions {
+      display: flex;
+      gap: 8px;
+    }
+    .editorial-cover__action-label {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+      letter-spacing: 0.15em;
+    }
+    .editorial-cover__centerpiece {
+      position: relative;
+      z-index: var(--joy-z-base);
+      text-align: center;
+      max-width: 640px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+    .editorial-cover__eyebrow {
+      font-size: var(--joy-font-size-sm);
+      font-weight: 500;
+      color: var(--joy-accent-text);
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .editorial-cover__title {
+      font-size: var(--joy-font-size-display-md);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      line-height: var(--joy-line-height-tight);
+      margin: 0 0 16px 0;
+      letter-spacing: -0.02em;
+    }
+    .editorial-cover__desc {
+      font-size: var(--joy-font-size-md);
+      color: var(--joy-text-secondary);
+      line-height: var(--joy-line-height-normal);
+      margin: 0 0 28px 0;
+    }
+    .editorial-cover__cta-wrap {
+      display: flex;
+      justify-content: center;
+    }
+    .editorial-cover__btn {
+      padding: 12px 28px;
+      border-radius: var(--joy-radius-full);
+      box-shadow: var(--joy-elevation-accent-1);
     }
 
     /* ── Responsive Mobile & Tablet Rules ── */
@@ -4007,22 +4195,89 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
         </div>
 
-        <div class="kinetic-canvas-container" id="kinetic-hero-container">
-          <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
-          <section class="joy-hero">
-            <div class="joy-hero__badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Interactive particle field
+        <div class="landing-hero-options-wrapper" id="landing-hero-options">
+          <div class="landing-hero-options-header">
+            <div>
+              <h3 style="margin: 0 0 4px 0; font-size: var(--joy-font-size-md); font-weight: 700; color: var(--joy-text-primary);">
+                Interactive Hero &amp; 3D Cover Variants
+              </h3>
+              <p style="margin: 0; font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">
+                Toggle between Google Antigravity-style floating particle physics, OpenAI Codex-style 3D wireframe mesh, and luxury editorial cover.
+              </p>
             </div>
-            <h1 class="joy-hero__title">
-              Fast, clear <span class="joy-hero__title-emphasis">order screens for busy desks</span>
-            </h1>
-            <p class="joy-hero__subtitle">
-              Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.
-            </p>
-            <div class="joy-hero__ctas">
-              <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Deploy solution</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read the guide</span>  </button>
+            <div class="hub-segmented-ctrl" role="tablist">
+              <button class="segment-btn active" id="btn-hero-opt-antigravity" onclick="switchHeroOption('antigravity')" role="tab" aria-selected="true">Antigravity Particles</button>
+              <button class="segment-btn" id="btn-hero-opt-mesh3d" onclick="switchHeroOption('mesh3d')" role="tab" aria-selected="false">3D Wave Mesh</button>
+              <button class="segment-btn" id="btn-hero-opt-editorial" onclick="switchHeroOption('editorial')" role="tab" aria-selected="false">Editorial Cover</button>
             </div>
-          </section>
+          </div>
+          <div class="kinetic-canvas-container hero-option-panel active" id="kinetic-hero-container">
+            <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
+            <section class="joy-hero">
+              <div class="joy-hero__badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Interactive Antigravity particle field
+              </div>
+              <h1 class="joy-hero__title">
+                Fast, clear <span class="joy-hero__title-emphasis">order screens for busy desks</span>
+              </h1>
+              <p class="joy-hero__subtitle">
+                Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.
+              </p>
+              <div class="joy-hero__ctas">
+                <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Deploy solution</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read the guide</span>  </button>
+              </div>
+            </section>
+          </div>
+          <div class="mesh-3d-hero-container hero-option-panel" id="mesh-hero-container" style="display: none;">
+            <canvas class="mesh-3d-canvas" id="mesh-3d-canvas" aria-hidden="true"></canvas>
+            <section class="joy-hero">
+              <div class="joy-hero__badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> 3D Volumetric Wave Mesh
+              </div>
+              <h1 class="joy-hero__title">
+                Build anything with <span class="joy-hero__title-emphasis">real-time speed</span>
+              </h1>
+              <p class="joy-hero__subtitle">
+                Move faster, go further, and bring your biggest ideas to life with dynamic spatial computing and responsive primitives.
+              </p>
+              <div class="joy-hero__ctas">
+                <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Download for macOS</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Try on web</span>  </button>
+              </div>
+            </section>
+          </div>
+          <div class="editorial-cover-container hero-option-panel" id="editorial-cover-container" style="display: none;">
+            <div class="editorial-cover__backdrop">
+              <div class="editorial-cover__ambient-orb">
+              </div>
+              <div class="editorial-cover__ambient-orb-2">
+              </div>
+            </div>
+            <div class="editorial-cover__topbar">
+              <span class="editorial-cover__locale">JOYMIFY STUDIO</span>
+              <div class="editorial-cover__brand">
+                J O Y M I F Y
+              </div>
+              <div class="editorial-cover__actions">
+                <span class="editorial-cover__action-label">MENU</span>
+              </div>
+            </div>
+            <div class="editorial-cover__centerpiece">
+              <div class="editorial-cover__eyebrow">
+                Autumn / Winter 2026 Collection
+              </div>
+              <h2 class="editorial-cover__title">
+                กระเป๋าถือสำหรับผู้หญิง
+              </h2>
+              <p class="editorial-cover__desc">
+                Architectural form meets tactile precision in obsidian leather and brushed gold hardware.
+              </p>
+              <div class="editorial-cover__cta-wrap">
+                <button type="button" class="joy-button joy-button--solid joy-button--md editorial-cover__btn" onclick="showDemoToast('Exploring the luxury collection', 'success')">
+                  <span class="joy-button__label">ค้นหาเพิ่มเติม</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="playground-box">
@@ -8129,14 +8384,20 @@ export async function executeHedge(symbol: string, size: number) {
 
       kineticParticles = [];
       for (let i = 0; i < KINETIC_PARTICLE_COUNT; i++) {
+        const isPill = i % 2 === 0;
         kineticParticles.push({
-          x: (Math.random() - 0.5) * 600,
-          y: (Math.random() - 0.5) * 350,
+          x: (Math.random() - 0.5) * 700,
+          y: (Math.random() - 0.5) * 400,
           z: Math.random() * 300 - 150,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: (Math.random() - 0.5) * 0.8,
-          vz: (Math.random() - 0.5) * 0.4,
-          baseRadius: 1.5 + Math.random() * 2,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: -0.2 - Math.random() * 0.45,
+          vz: (Math.random() - 0.5) * 0.3,
+          baseRadius: 1.8 + Math.random() * 2.2,
+          length: isPill ? 10 + Math.random() * 12 : 0,
+          thickness: isPill ? 3 + Math.random() * 1.5 : 0,
+          isPill,
+          angle: Math.random() * Math.PI * 2,
+          omega: (Math.random() - 0.5) * 0.02,
           tone: i % 3,
           phase: Math.random() * Math.PI * 2,
         });
@@ -8208,14 +8469,16 @@ export async function executeHedge(symbol: string, size: number) {
         const dx = cx + p.x * scale - clickX;
         const dy = cy + p.y * scale - clickY;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const force = Math.max(0, 180 - dist) / 180;
-        p.vx += (dx / dist) * force * 14;
-        p.vy += (dy / dist) * force * 14;
+        const force = Math.max(0, 200 - dist) / 200;
+        p.vx += (dx / dist) * force * 16;
+        p.vy += (dy / dist) * force * 16;
         p.vz += (Math.random() - 0.5) * force * 10;
+        p.omega += (Math.random() - 0.5) * force * 0.15;
       });
     }
 
     function stepKineticParticle(p, w, h) {
+      p.angle += p.omega;
       const rx = p.x * Math.cos(0.002) - p.z * Math.sin(0.002);
       p.z = p.z * Math.cos(0.002) + p.x * Math.sin(0.002);
       p.x = rx;
@@ -8224,23 +8487,25 @@ export async function executeHedge(symbol: string, size: number) {
         const mdx = w / 2 + p.x * scale - kineticMouse.x;
         const mdy = h / 2 + p.y * scale - kineticMouse.y;
         const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mdist < 140 && mdist > 0) {
-          const force = (140 - mdist) / 140;
-          p.vx += (mdx / mdist) * force * 1.5 + kineticMouse.vx * 0.05;
-          p.vy += (mdy / mdist) * force * 1.5 + kineticMouse.vy * 0.05;
+        if (mdist < 160 && mdist > 0) {
+          const force = (160 - mdist) / 160;
+          p.vx += (mdx / mdist) * force * 2.2 + kineticMouse.vx * 0.05;
+          p.vy += (mdy / mdist) * force * 2.2 + kineticMouse.vy * 0.05;
+          p.omega += (mdx / mdist) * force * 0.03;
         }
       }
-      p.vx *= 0.94;
-      p.vy *= 0.94;
-      p.vz *= 0.94;
-      p.x += p.vx + Math.sin(p.phase) * 0.2;
-      p.y += p.vy + Math.cos(p.phase) * 0.2;
+      p.vx *= 0.95;
+      p.vy *= 0.95;
+      p.vz *= 0.95;
+      p.omega *= 0.98;
+      p.x += p.vx + Math.sin(p.phase) * 0.25;
+      p.y += p.vy + Math.cos(p.phase) * 0.25;
       p.z += p.vz;
       p.phase += 0.02;
       const bx = w * 0.55;
       const by = h * 0.55;
-      if (p.x < -bx || p.x > bx) { p.x = Math.max(-bx, Math.min(bx, p.x)); p.vx *= -1; }
-      if (p.y < -by || p.y > by) { p.y = Math.max(-by, Math.min(by, p.y)); p.vy *= -1; }
+      if (p.x < -bx) { p.x = bx; } else if (p.x > bx) { p.x = -bx; }
+      if (p.y < -by) { p.y = by; p.vy = -0.2 - Math.random() * 0.45; }
       if (p.z < -160 || p.z > 160) { p.z = Math.max(-160, Math.min(160, p.z)); p.vz *= -1; }
     }
 
@@ -8256,32 +8521,41 @@ export async function executeHedge(symbol: string, size: number) {
       const projected = kineticParticles.map((p) => {
         if (advance) stepKineticParticle(p, w, h);
         const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
-        return { x: w / 2 + p.x * scale, y: h / 2 + p.y * scale, scale, radius: p.baseRadius * scale, tone: p.tone };
+        return {
+          x: w / 2 + p.x * scale,
+          y: h / 2 + p.y * scale,
+          scale,
+          radius: p.baseRadius * scale,
+          length: p.length * scale,
+          thickness: p.thickness * scale,
+          isPill: p.isPill,
+          angle: p.angle,
+          tone: p.tone
+        };
       });
 
-      const maxDist = 85;
-      kineticCtx.lineWidth = 0.75;
-      kineticCtx.strokeStyle = kineticPalette.muted;
-      for (let i = 0; i < projected.length; i++) {
-        const p1 = projected[i];
-        for (let j = i + 1; j < projected.length; j++) {
-          const p2 = projected[j];
-          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          if (dist >= maxDist) continue;
-          kineticCtx.globalAlpha = (1 - dist / maxDist) * Math.min(p1.scale, p2.scale) * 0.3;
-          kineticCtx.beginPath();
-          kineticCtx.moveTo(p1.x, p1.y);
-          kineticCtx.lineTo(p2.x, p2.y);
-          kineticCtx.stroke();
-        }
-      }
-
-      kineticCtx.globalAlpha = 0.85;
+      // Render floating Antigravity capsules and orbs (zero spiderweb connecting lines)
+      kineticCtx.globalAlpha = 0.88;
       for (const p of projected) {
         kineticCtx.fillStyle = kineticPalette.accents[p.tone];
-        kineticCtx.beginPath();
-        kineticCtx.arc(p.x, p.y, Math.max(1, p.radius), 0, Math.PI * 2);
-        kineticCtx.fill();
+        if (p.isPill && p.length > 2) {
+          kineticCtx.save();
+          kineticCtx.translate(p.x, p.y);
+          kineticCtx.rotate(p.angle);
+          kineticCtx.beginPath();
+          const rad = Math.max(1, p.thickness / 2);
+          if (kineticCtx.roundRect) {
+            kineticCtx.roundRect(-p.length / 2, -p.thickness / 2, p.length, p.thickness, rad);
+          } else {
+            kineticCtx.rect(-p.length / 2, -p.thickness / 2, p.length, p.thickness);
+          }
+          kineticCtx.fill();
+          kineticCtx.restore();
+        } else {
+          kineticCtx.beginPath();
+          kineticCtx.arc(p.x, p.y, Math.max(1, p.radius), 0, Math.PI * 2);
+          kineticCtx.fill();
+        }
       }
       kineticCtx.globalAlpha = 1;
       clearKineticTextArea();
@@ -8312,6 +8586,219 @@ export async function executeHedge(symbol: string, size: number) {
       kineticCtx.restore();
     }
 
+    /* ── Hero Options Switcher & 3D Wave Mesh Engine ── */
+    function switchHeroOption(opt) {
+      const panels = {
+        antigravity: document.getElementById('kinetic-hero-container'),
+        mesh3d: document.getElementById('mesh-hero-container'),
+        editorial: document.getElementById('editorial-cover-container'),
+      };
+      const btns = {
+        antigravity: document.getElementById('btn-hero-opt-antigravity'),
+        mesh3d: document.getElementById('btn-hero-opt-mesh3d'),
+        editorial: document.getElementById('btn-hero-opt-editorial'),
+      };
+      for (const [key, panel] of Object.entries(panels)) {
+        if (!panel) continue;
+        const active = key === opt;
+        panel.style.display = active ? (key === 'editorial' ? 'flex' : 'block') : 'none';
+        if (active) panel.classList.add('active');
+        else panel.classList.remove('active');
+      }
+      for (const [key, btn] of Object.entries(btns)) {
+        if (!btn) continue;
+        const active = key === opt;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      }
+      if (opt === 'antigravity') {
+        resizeKineticCanvas();
+        syncKinetic();
+      } else if (opt === 'mesh3d') {
+        resizeMesh3dCanvas();
+        syncMesh3d();
+      }
+    }
+    window.switchHeroOption = switchHeroOption;
+
+    let mesh3dCanvas, mesh3dCtx;
+    let mesh3dAnimId = null;
+    let mesh3dVisible = false;
+    let mesh3dTime = 0;
+    let mesh3dMouse = { x: 0, y: 0, targetPitch: 0.35, targetYaw: 0, pitch: 0.35, yaw: 0 };
+    const MESH_COLS = 26;
+    const MESH_ROWS = 16;
+    const MESH_SPACING = 36;
+
+    function initMesh3dCanvas() {
+      mesh3dCanvas = document.getElementById('mesh-3d-canvas');
+      const container = document.getElementById('mesh-hero-container');
+      if (!mesh3dCanvas || !container) return;
+      mesh3dCtx = mesh3dCanvas.getContext('2d');
+
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        const nx = (e.clientX - rect.left) / rect.width - 0.5;
+        const ny = (e.clientY - rect.top) / rect.height - 0.5;
+        mesh3dMouse.targetYaw = nx * 0.45;
+        mesh3dMouse.targetPitch = 0.35 + ny * 0.25;
+      });
+      container.addEventListener('mouseleave', () => {
+        mesh3dMouse.targetYaw = 0;
+        mesh3dMouse.targetPitch = 0.35;
+      });
+
+      new IntersectionObserver((entries) => {
+        mesh3dVisible = entries[entries.length - 1].isIntersecting;
+        if (mesh3dVisible) resizeMesh3dCanvas();
+        syncMesh3d();
+      }).observe(container);
+
+      window.addEventListener('resize', () => {
+        resizeMesh3dCanvas();
+        if (mesh3dAnimId === null && mesh3dVisible) drawMesh3dFrame();
+      });
+    }
+
+    function resizeMesh3dCanvas() {
+      if (!mesh3dCanvas) return;
+      const rect = mesh3dCanvas.parentElement ? mesh3dCanvas.parentElement.getBoundingClientRect() : null;
+      if (!rect || rect.width === 0) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      mesh3dCanvas.width = rect.width * dpr;
+      mesh3dCanvas.height = rect.height * dpr;
+      if (mesh3dCtx) mesh3dCtx.scale(dpr, dpr);
+    }
+
+    function syncMesh3d() {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!mesh3dVisible || document.hidden || reduce) {
+        if (mesh3dAnimId !== null) cancelAnimationFrame(mesh3dAnimId);
+        mesh3dAnimId = null;
+        if (mesh3dCanvas && mesh3dVisible && reduce) drawMesh3dFrame();
+        return;
+      }
+      if (mesh3dAnimId === null) mesh3dAnimId = requestAnimationFrame(mesh3dTick);
+    }
+
+    function mesh3dTick() {
+      mesh3dAnimId = null;
+      mesh3dTime += 0.02;
+      mesh3dMouse.pitch += (mesh3dMouse.targetPitch - mesh3dMouse.pitch) * 0.06;
+      mesh3dMouse.yaw += (mesh3dMouse.targetYaw - mesh3dMouse.yaw) * 0.06;
+      drawMesh3dFrame();
+      syncMesh3d();
+    }
+
+    function drawMesh3dFrame() {
+      if (!mesh3dCtx || !mesh3dCanvas) return;
+      const rect = mesh3dCanvas.parentElement.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      if (w === 0 || h === 0) return;
+      mesh3dCtx.clearRect(0, 0, w, h);
+
+      const cs = getComputedStyle(document.documentElement);
+      const accent = cs.getPropertyValue('--joy-accent-default').trim();
+      const border = cs.getPropertyValue('--joy-border-default').trim();
+      const fov = 320;
+      const cx = w / 2;
+      const cy = h / 2 + 50;
+
+      const cosP = Math.cos(mesh3dMouse.pitch);
+      const sinP = Math.sin(mesh3dMouse.pitch);
+      const cosY = Math.cos(mesh3dMouse.yaw);
+      const sinY = Math.sin(mesh3dMouse.yaw);
+
+      const grid = [];
+      const xOffset = ((MESH_COLS - 1) * MESH_SPACING) / 2;
+      const zOffset = ((MESH_ROWS - 1) * MESH_SPACING) / 2;
+
+      for (let r = 0; r < MESH_ROWS; r++) {
+        grid[r] = [];
+        for (let c = 0; c < MESH_COLS; c++) {
+          const wx = c * MESH_SPACING - xOffset;
+          const wz = r * MESH_SPACING - zOffset;
+          const dist = Math.hypot(wx, wz) * 0.015;
+          const wy = Math.sin(c * 0.35 + mesh3dTime * 1.5) * 14 + Math.cos(r * 0.4 + mesh3dTime) * 10 + Math.sin(dist * 5 - mesh3dTime * 2) * 8;
+
+          const rx = wx * cosY - wz * sinY;
+          const rz = wz * cosY + wx * sinY;
+          const ry = wy * cosP - rz * sinP;
+          const finalZ = rz * cosP + wy * sinP + 380;
+
+          if (finalZ <= 10) continue;
+          const scale = fov / finalZ;
+          const sx = cx + rx * scale;
+          const sy = cy + ry * scale;
+          const alpha = Math.max(0.08, Math.min(0.7, 1 - (finalZ - 200) / 450));
+          grid[r][c] = { sx, sy, alpha, finalZ };
+        }
+      }
+
+      mesh3dCtx.lineWidth = 1;
+      for (let r = 0; r < MESH_ROWS; r++) {
+        for (let c = 0; c < MESH_COLS - 1; c++) {
+          const p1 = grid[r][c];
+          const p2 = grid[r][c + 1];
+          if (!p1 || !p2) continue;
+          mesh3dCtx.strokeStyle = r % 3 === 0 ? accent : border;
+          mesh3dCtx.globalAlpha = Math.min(p1.alpha, p2.alpha) * 0.5;
+          mesh3dCtx.beginPath();
+          mesh3dCtx.moveTo(p1.sx, p1.sy);
+          mesh3dCtx.lineTo(p2.sx, p2.sy);
+          mesh3dCtx.stroke();
+        }
+      }
+      for (let c = 0; c < MESH_COLS; c++) {
+        for (let r = 0; r < MESH_ROWS - 1; r++) {
+          const p1 = grid[r][c];
+          const p2 = grid[r + 1][c];
+          if (!p1 || !p2) continue;
+          mesh3dCtx.strokeStyle = c % 4 === 0 ? accent : border;
+          mesh3dCtx.globalAlpha = Math.min(p1.alpha, p2.alpha) * 0.4;
+          mesh3dCtx.beginPath();
+          mesh3dCtx.moveTo(p1.sx, p1.sy);
+          mesh3dCtx.lineTo(p2.sx, p2.sy);
+          mesh3dCtx.stroke();
+        }
+      }
+
+      for (let r = 0; r < MESH_ROWS; r += 2) {
+        for (let c = 0; c < MESH_COLS; c += 3) {
+          const p = grid[r] && grid[r][c];
+          if (!p) continue;
+          mesh3dCtx.globalAlpha = p.alpha * 0.85;
+          mesh3dCtx.fillStyle = accent;
+          mesh3dCtx.beginPath();
+          mesh3dCtx.arc(p.sx, p.sy, 2, 0, Math.PI * 2);
+          mesh3dCtx.fill();
+        }
+      }
+
+      mesh3dCtx.globalAlpha = 1;
+
+      const hero = mesh3dCanvas.parentElement.querySelector('.joy-hero');
+      if (hero) {
+        const origin = mesh3dCanvas.getBoundingClientRect();
+        const rects = [];
+        hero.querySelectorAll('.joy-hero__title, .joy-hero__subtitle').forEach((el) => {
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          rects.push(...range.getClientRects());
+        });
+        hero.querySelectorAll('.joy-hero__badge, .joy-hero__ctas .joy-button').forEach((el) => rects.push(el.getBoundingClientRect()));
+        const pad = 12;
+        mesh3dCtx.save();
+        mesh3dCtx.globalCompositeOperation = 'destination-out';
+        mesh3dCtx.fillStyle = border;
+        for (const r of rects) {
+          mesh3dCtx.fillRect(r.left - origin.left - pad, r.top - origin.top - pad, r.width + pad * 2, r.height + pad * 2);
+        }
+        mesh3dCtx.restore();
+      }
+    }
+
     // Hero CTAs are SSR markup from the generator; their actions are wired here.
     document.addEventListener('click', (e) => {
       const btn = e.target.closest && e.target.closest('.joy-hero__ctas .joy-button');
@@ -8321,6 +8808,8 @@ export async function executeHedge(symbol: string, size: number) {
         switchView(primary ? 'button' : 'tokens');
       } else if (btn.closest('#kinetic-hero-container')) {
         showDemoToast(primary ? 'Deploying the pipeline' : 'Opening the API guide', primary ? 'success' : 'info');
+      } else if (btn.closest('#mesh-hero-container')) {
+        showDemoToast(primary ? 'Downloading desktop app' : 'Opening web workspace', primary ? 'success' : 'info');
       }
     });
 
@@ -8335,6 +8824,7 @@ export async function executeHedge(symbol: string, size: number) {
       renderTimePickerCols();
       renderTransferDemo();
       initKineticCanvas();
+      initMesh3dCanvas();
       syncViewFromHash();
     }, 100);
 
