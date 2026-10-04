@@ -1,13 +1,31 @@
 import { test, expect } from "@playwright/test";
 import path from "node:path";
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 
-const outDir = "/Users/pasitnusso/.gemini/antigravity-cli/brain/1ad0770e-cf82-4de2-beff-bb22e70dfab3/screenshots";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const outDir =
+  process.env.F054_SCREENS_DIR ||
+  path.resolve(__dirname, "../dist/screenshots");
+
+async function safeScreenshot(locator: any, filename: string) {
+  try {
+    if (fs.existsSync(outDir)) {
+      await locator.screenshot({ path: path.join(outDir, filename) });
+    }
+  } catch (err) {
+    console.warn(`Could not save screenshot ${filename}:`, err);
+  }
+}
 
 test.describe("Visual verification for F-054", () => {
   test.beforeAll(() => {
-    if (!fs.existsSync(outDir)) {
-      fs.mkdirSync(outDir, { recursive: true });
+    try {
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true });
+      }
+    } catch (err) {
+      console.warn("Could not create screenshots directory:", err);
     }
   });
 
@@ -30,7 +48,7 @@ test.describe("Visual verification for F-054", () => {
     expect(highlightColorDark).not.toBe("#b91c1c");
     expect(highlightColorDark).toBe("#60a5fa");
 
-    await liveTickBtn.screenshot({ path: path.join(outDir, "button-stream-live-tick-dark.png") });
+    await safeScreenshot(liveTickBtn, "button-stream-live-tick-dark.png");
 
     // Switch to light theme
     await page.evaluate(() => {
@@ -46,7 +64,7 @@ test.describe("Visual verification for F-054", () => {
     expect(highlightColorLight).not.toBe("#b91c1c");
     expect(highlightColorLight).toBe("#60a5fa");
 
-    await liveTickBtn.screenshot({ path: path.join(outDir, "button-stream-live-tick-light.png") });
+    await safeScreenshot(liveTickBtn, "button-stream-live-tick-light.png");
   });
 
   test("2. Sidebar nav has sleek themed scrollbar", async ({ page }, testInfo) => {
@@ -63,7 +81,7 @@ test.describe("Visual verification for F-054", () => {
     console.log("Nav scrollbarWidth:", scrollbarWidth);
     expect(scrollbarWidth).toBe("thin");
 
-    await nav.screenshot({ path: path.join(outDir, "sidebar-nav-scrollbar.png") });
+    await safeScreenshot(nav, "sidebar-nav-scrollbar.png");
   });
 
   test("3. Antigravity particles, 3D Wave Mesh, and Editorial Cover heroes with switcher", async ({ page }, testInfo) => {
@@ -80,7 +98,7 @@ test.describe("Visual verification for F-054", () => {
     const kineticContainer = page.locator("#kinetic-hero-container");
     await expect(kineticContainer).toBeVisible();
     await page.waitForTimeout(600);
-    await kineticContainer.screenshot({ path: path.join(outDir, "hero-antigravity-particles.png") });
+    await safeScreenshot(kineticContainer, "hero-antigravity-particles.png");
 
     // Option 2: 3D Wave Mesh
     const meshBtn = page.locator('#btn-hero-opt-mesh3d');
@@ -90,7 +108,7 @@ test.describe("Visual verification for F-054", () => {
     const meshCanvas = page.locator("#mesh-3d-canvas");
     await expect(meshCanvas).toBeVisible();
     await page.waitForTimeout(600);
-    await meshContainer.screenshot({ path: path.join(outDir, "hero-3d-wave-mesh.png") });
+    await safeScreenshot(meshContainer, "hero-3d-wave-mesh.png");
 
     // Option 3: Editorial Cover
     const coverBtn = page.locator('#btn-hero-opt-editorial');
@@ -98,6 +116,6 @@ test.describe("Visual verification for F-054", () => {
     const coverContainer = page.locator("#editorial-cover-container");
     await expect(coverContainer).toBeVisible();
     await page.waitForTimeout(600);
-    await coverContainer.screenshot({ path: path.join(outDir, "hero-editorial-cover.png") });
+    await safeScreenshot(coverContainer, "hero-editorial-cover.png");
   });
 });
