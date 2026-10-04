@@ -1993,51 +1993,45 @@ ${inlinedThemeCss}
       }
     }
 
-    /* Editorial Luxury Cover Hero (Gucci style) */
+    /* ── Hero Variants (8 Archetypes) & Apple Continuous Narrative Showcase ── */
+    .hub-segmented-ctrl--wrap {
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    /* 1. Centered Luxury Editorial Image Cover (Gucci / Bottega / Vogue Style) */
     .editorial-cover-container {
       position: relative;
       width: 100%;
-      min-height: 480px;
+      min-height: 560px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
       border-radius: var(--joy-radius-lg);
       overflow: hidden;
       border: 1px solid var(--hub-chrome-border);
       background: var(--joy-surface-sunken);
-      padding: 32px 28px;
+      padding: 64px 32px;
       margin-bottom: var(--joy-space-6);
     }
-    .editorial-cover__backdrop {
+    .editorial-cover__image-backdrop {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(circle at 50% 30%, var(--joy-accent-subtle), transparent 70%);
-      opacity: 0.6;
+      overflow: hidden;
     }
-    .editorial-cover__ambient-orb {
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, var(--joy-accent-default), transparent 70%);
-      opacity: 0.14;
-      filter: blur(40px);
-    }
-    .editorial-cover__ambient-orb-2 {
-      position: absolute;
-      bottom: 10%;
-      right: 15%;
-      width: 240px;
-      height: 240px;
-      background: radial-gradient(circle, var(--joy-border-strong), transparent 70%);
-      opacity: 0.12;
-      filter: blur(35px);
+    .editorial-cover__svg-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .editorial-cover__topbar {
-      position: relative;
+      position: absolute;
+      top: 24px;
+      left: 32px;
+      right: 32px;
       z-index: var(--joy-z-base);
       display: flex;
       justify-content: space-between;
@@ -2070,39 +2064,788 @@ ${inlinedThemeCss}
       position: relative;
       z-index: var(--joy-z-base);
       text-align: center;
-      max-width: 640px;
-      margin: 40px auto;
+      max-width: 680px;
+      margin: 0 auto;
       padding: 0 16px;
     }
     .editorial-cover__eyebrow {
       font-size: var(--joy-font-size-sm);
-      font-weight: 500;
+      font-weight: 600;
       color: var(--joy-accent-text);
-      letter-spacing: 0.08em;
-      margin-bottom: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
     }
     .editorial-cover__title {
-      font-size: var(--joy-font-size-display-md);
-      font-weight: 700;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
       color: var(--joy-text-primary);
       line-height: var(--joy-line-height-tight);
       margin: 0 0 16px 0;
       letter-spacing: -0.02em;
+      font-family: Georgia, serif;
     }
     .editorial-cover__desc {
-      font-size: var(--joy-font-size-md);
+      font-size: var(--joy-font-size-lg);
       color: var(--joy-text-secondary);
       line-height: var(--joy-line-height-normal);
-      margin: 0 0 28px 0;
+      margin: 0 0 32px 0;
     }
     .editorial-cover__cta-wrap {
       display: flex;
       justify-content: center;
     }
     .editorial-cover__btn {
-      padding: 12px 28px;
+      padding: 14px 36px;
       border-radius: var(--joy-radius-full);
       box-shadow: var(--joy-elevation-accent-1);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .editorial-cover__bottombar {
+      position: absolute;
+      bottom: 24px;
+      left: 32px;
+      right: 32px;
+      z-index: var(--joy-z-base);
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--joy-font-size-xs);
+      font-weight: 500;
+      color: var(--joy-text-muted);
+      letter-spacing: 0.15em;
+    }
+
+    /* 2. Apple Keynote Hardware Hero */
+    .keynote-hero-container {
+      position: relative;
+      width: 100%;
+      min-height: 520px;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--hub-chrome-border);
+      background: var(--joy-surface-sunken);
+      padding: 48px 32px 32px;
+      margin-bottom: var(--joy-space-6);
+    }
+    .keynote-hero__stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .keynote-hero__halo {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 480px;
+      height: 240px;
+      background: radial-gradient(ellipse, var(--joy-accent-highlight), transparent 70%);
+      opacity: 0.18;
+      filter: blur(48px);
+      pointer-events: none;
+    }
+    .keynote-hero__device-mockup {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .keynote-device-frame {
+      width: 320px;
+      height: 180px;
+      border-radius: 28px;
+      border: 3px solid var(--joy-border-strong);
+      background: var(--joy-surface-raised);
+      box-shadow: 0 20px 40px var(--joy-elevation-3), inset 0 1px 2px var(--joy-accent-highlight);
+      padding: 10px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .keynote-device-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      background: var(--joy-surface-canvas);
+      border: 1px solid var(--joy-border-subtle);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .keynote-screen-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, var(--joy-accent-subtle), transparent 70%);
+      opacity: 0.6;
+    }
+    .keynote-screen-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .keynote-screen-time {
+      font-size: var(--joy-font-size-xl);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+    }
+    .keynote-screen-chip {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-accent-text);
+      background: var(--joy-accent-subtle);
+      padding: 2px 8px;
+      border-radius: var(--joy-radius-sm);
+      border: 1px solid var(--joy-border-focus);
+    }
+
+    /* 3. SaaS Financial Cockpit Hero */
+    .cockpit-hero-container {
+      position: relative;
+      width: 100%;
+      min-height: 520px;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--hub-chrome-border);
+      background: var(--joy-surface-sunken);
+      padding: 40px 32px 32px;
+      margin-bottom: var(--joy-space-6);
+    }
+    .cockpit-hero__telemetry-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .cockpit-telemetry-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: monospace;
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-secondary);
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      padding: 4px 12px;
+      border-radius: var(--joy-radius-full);
+    }
+    .status-indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--joy-radius-full);
+      background: var(--joy-status-success-fg);
+      box-shadow: 0 0 6px var(--joy-status-success-border);
+    }
+    .cockpit-hero__sparkline-dock {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .cockpit-sparkline-canvas {
+      max-width: 100%;
+      height: 80px;
+      border-radius: var(--joy-radius-md);
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+    }
+
+    /* 4. Cyberpunk Kinetic HUD Hero */
+    .cyberpunk-hero-container {
+      position: relative;
+      width: 100%;
+      min-height: 500px;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--joy-border-strong);
+      background: var(--joy-surface-sunken);
+      padding: 48px 32px 36px;
+      margin-bottom: var(--joy-space-6);
+    }
+    .cyberpunk-hud-reticle {
+      position: absolute;
+      font-family: monospace;
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-accent-default);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .cyberpunk-hud-reticle--tl { top: 16px; left: 16px; }
+    .cyberpunk-hud-reticle--tr { top: 16px; right: 16px; }
+    .cyberpunk-hud-reticle--bl { bottom: 16px; left: 16px; }
+    .cyberpunk-hud-reticle--br { bottom: 16px; right: 16px; }
+    .cyberpunk-hud-status-strip {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      font-family: monospace;
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-accent-text);
+      margin-bottom: 20px;
+      letter-spacing: 0.1em;
+    }
+    .cyberpunk-scanline-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--joy-accent-default), transparent);
+      opacity: 0.4;
+      animation: scanlineMove 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes scanlineMove {
+      0% { top: 10%; }
+      100% { top: 90%; }
+    }
+
+    /* 5. Swiss Typographic Poster Hero */
+    .swiss-hero-container {
+      position: relative;
+      width: 100%;
+      min-height: 500px;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 2px solid var(--joy-text-primary);
+      background: var(--joy-surface-canvas);
+      padding: 36px 32px 28px;
+      margin-bottom: var(--joy-space-6);
+    }
+    .swiss-marquee-bar {
+      overflow: hidden;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--joy-text-primary);
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+    .swiss-marquee-content {
+      display: inline-block;
+      font-family: monospace;
+      font-size: var(--joy-font-size-xs);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      letter-spacing: 0.15em;
+      animation: swissMarquee 25s linear infinite;
+    }
+    @keyframes swissMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .swiss-grid-footer {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px solid var(--joy-text-primary);
+      display: flex;
+      justify-content: space-between;
+      font-family: monospace;
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-muted);
+    }
+
+    /* 6. Luminous Fluid Aura Hero */
+    .aura-hero-container {
+      position: relative;
+      width: 100%;
+      min-height: 500px;
+      border-radius: var(--joy-radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--hub-chrome-border);
+      background: var(--joy-surface-sunken);
+      padding: 48px 32px 36px;
+      margin-bottom: var(--joy-space-6);
+    }
+    .aura-hero__mesh-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .aura-orb {
+      position: absolute;
+      border-radius: var(--joy-radius-full);
+      filter: blur(55px);
+      opacity: 0.25;
+      animation: auraFloat 8s ease-in-out infinite alternate;
+    }
+    .aura-orb--1 {
+      top: 10%;
+      left: 25%;
+      width: 280px;
+      height: 280px;
+      background: var(--joy-accent-default);
+    }
+    .aura-orb--2 {
+      bottom: 15%;
+      right: 20%;
+      width: 240px;
+      height: 240px;
+      background: var(--joy-status-info-fg);
+      animation-delay: -3s;
+    }
+    .aura-orb--3 {
+      top: 40%;
+      left: 55%;
+      width: 200px;
+      height: 200px;
+      background: var(--joy-accent-highlight);
+      animation-delay: -5s;
+    }
+    @keyframes auraFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(25px, 20px) scale(1.1); }
+    }
+
+    /* ── Apple Continuous Narrative Scroll Landing View (#view-apple-landing) ── */
+    #view-apple-landing {
+      padding: 0;
+      max-width: 100%;
+    }
+    .apple-subnav {
+      position: sticky;
+      top: 56px;
+      z-index: 50;
+      background: var(--joy-surface-raised);
+      border-bottom: 1px solid var(--joy-border-subtle);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .apple-subnav__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .apple-subnav__title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .apple-subnav__title {
+      font-size: var(--joy-font-size-md);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      letter-spacing: -0.01em;
+    }
+    .apple-subnav__badge {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--joy-radius-full);
+      background: var(--joy-accent-subtle);
+      color: var(--joy-accent-text);
+      border: 1px solid var(--joy-border-focus);
+    }
+    .apple-subnav__actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .apple-subnav__link {
+      font-size: var(--joy-font-size-sm);
+      color: var(--joy-text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color var(--joy-duration-fast) var(--joy-ease-default);
+    }
+    .apple-subnav__link:hover {
+      color: var(--joy-text-primary);
+    }
+
+    .apple-landing-body {
+      width: 100%;
+    }
+    .apple-scene {
+      padding: 80px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .apple-eyebrow {
+      font-size: var(--joy-font-size-sm);
+      font-weight: 600;
+      color: var(--joy-accent-text);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+      text-align: center;
+    }
+    .apple-headline {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.08;
+      text-align: center;
+      margin: 0 0 16px 0;
+      color: var(--joy-text-primary);
+      letter-spacing: -0.03em;
+    }
+    .apple-tagline {
+      font-size: var(--joy-font-size-lg);
+      color: var(--joy-text-secondary);
+      max-width: 640px;
+      text-align: center;
+      margin: 0 0 32px 0;
+      line-height: var(--joy-line-height-normal);
+    }
+    .apple-intro__cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+
+    /* Scene 2: Interactive Posture & Fold Mechanics */
+    .apple-scene__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      width: 100%;
+    }
+    @media (max-width: 900px) {
+      .apple-scene__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .apple-posture__callout-card {
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      border-radius: var(--joy-radius-lg);
+      padding: 28px;
+      box-shadow: 0 10px 30px var(--joy-elevation-2);
+      margin-bottom: 24px;
+    }
+    .apple-posture__card-title {
+      font-size: var(--joy-font-size-md);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      margin: 0 0 8px 0;
+      line-height: var(--joy-line-height-tight);
+    }
+    .apple-posture__card-desc {
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-muted);
+      margin: 0 0 20px 0;
+    }
+    .apple-scrub-container {
+      position: relative;
+      margin: 16px 0;
+    }
+    .apple-scrub-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: var(--joy-radius-full);
+      background: var(--joy-border-subtle);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .apple-scrub-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--joy-radius-full);
+      background: var(--joy-accent-default);
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--joy-elevation-2);
+      border: 2px solid var(--joy-surface-canvas);
+    }
+    .apple-posture__status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .apple-posture__angle-label {
+      font-family: monospace;
+      font-size: var(--joy-font-size-sm);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+    }
+    .apple-posture__mode-badge {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-accent-text);
+      background: var(--joy-accent-subtle);
+      padding: 2px 10px;
+      border-radius: var(--joy-radius-full);
+      border: 1px solid var(--joy-border-focus);
+    }
+    .apple-posture__pills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .apple-posture-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      border-radius: var(--joy-radius-full);
+      padding: 8px 16px;
+      font-size: var(--joy-font-size-sm);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+      cursor: pointer;
+      transition: all var(--joy-duration-fast) var(--joy-ease-default);
+    }
+    .apple-posture-pill:hover {
+      border-color: var(--joy-accent-default);
+      color: var(--joy-text-primary);
+    }
+    .apple-posture-pill.active {
+      background: var(--joy-accent-default);
+      color: var(--joy-text-on-accent);
+      border-color: var(--joy-accent-default);
+    }
+    .apple-posture-pill .pill-plus {
+      font-weight: 700;
+    }
+
+    /* 3D Fold Device Stage */
+    .apple-posture__stage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 480px;
+    }
+    .apple-fold-stage {
+      perspective: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+    }
+    .apple-fold-device {
+      display: flex;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      box-shadow: 0 30px 60px var(--joy-elevation-3);
+      border-radius: 28px;
+    }
+    .apple-fold-wing {
+      width: 220px;
+      height: 380px;
+      background: var(--joy-surface-inverse);
+      border: 4px solid var(--joy-border-strong);
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 1px 3px var(--joy-accent-highlight);
+    }
+    .apple-fold-wing--left {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      border-right: 1px solid var(--joy-border-subtle);
+    }
+    .apple-fold-wing--right {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      border-left: 1px solid var(--joy-border-subtle);
+      transform-origin: left center;
+      transform: rotateY(-70deg);
+      transition: transform 0.1s ease-out;
+    }
+    .apple-fold-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--joy-surface-canvas);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .apple-fold-time {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--joy-text-primary);
+      line-height: 1;
+      margin-top: 20px;
+    }
+    .apple-fold-date {
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-muted);
+      margin-top: 4px;
+    }
+    .apple-fold-widget {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--joy-radius-full);
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--joy-text-primary);
+    }
+    .apple-fold-hinge {
+      width: 6px;
+      height: 380px;
+      background: var(--joy-border-strong);
+      z-index: 10;
+    }
+
+    /* Scene 3: Cinematic Screen Immersion */
+    .apple-cinema__screen-frame {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      margin: 40px auto 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .apple-cinema__ambient-glow {
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle at 50% 50%, var(--joy-accent-highlight), transparent 70%);
+      opacity: 0.25;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+    .apple-cinema__bezel {
+      width: 100%;
+      border-radius: 28px;
+      border: 4px solid var(--joy-border-strong);
+      background: var(--joy-surface-sunken);
+      padding: 12px;
+      box-shadow: 0 30px 60px var(--joy-elevation-3);
+      transition: max-width 0.4s var(--joy-ease-default);
+    }
+    .apple-cinema__display-canvas {
+      width: 100%;
+      aspect-ratio: 21 / 9;
+      border-radius: 18px;
+      background: var(--joy-surface-inverse);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: aspect-ratio 0.4s var(--joy-ease-default);
+    }
+    .apple-cinema__art-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--joy-color-navy-900), var(--joy-color-navy-700));
+      display: flex;
+      align-items: flex-end;
+      padding: 32px;
+    }
+    .apple-cinema__title-card {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+    }
+    .apple-cinema__movie-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--joy-color-cream-100);
+      letter-spacing: 0.35em;
+    }
+    .apple-cinema__service-logo {
+      font-size: var(--joy-font-size-md);
+      font-weight: 700;
+      color: var(--joy-color-cream-100);
+      opacity: 0.85;
+    }
+    .apple-cinema__controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 960px;
+      gap: 16px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    /* Scene 4 & 5: Specs & Finish Customizer */
+    .apple-specs-bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 1080px;
+      margin: 32px auto;
+    }
+    .apple-bento-tile {
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      border-radius: var(--joy-radius-lg);
+      padding: 28px;
+    }
+    .apple-bento-tile--col-6 { grid-column: span 6; }
+    .apple-bento-tile--col-12 { grid-column: span 12; }
+    @media (max-width: 768px) {
+      .apple-bento-tile--col-6 { grid-column: span 12; }
+    }
+    .apple-customizer-tray {
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      border-radius: var(--joy-radius-lg);
+      padding: 36px;
+      max-width: 760px;
+      width: 100%;
+      margin: 32px auto 0;
+      box-shadow: 0 20px 40px var(--joy-elevation-2);
+    }
+    .apple-finish-swatches {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin: 20px 0 28px;
+    }
+    .apple-swatch-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--joy-radius-full);
+      border: 3px solid var(--joy-surface-raised);
+      outline: 2px solid var(--joy-border-subtle);
+      cursor: pointer;
+      transition: all var(--joy-duration-fast) var(--joy-ease-default);
+    }
+    .apple-swatch-btn.active {
+      outline: 2px solid var(--joy-accent-default);
+      transform: scale(1.1);
+    }
+    .apple-storage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 600px) {
+      .apple-storage-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .apple-storage-btn {
+      padding: 16px 12px;
+      border-radius: var(--joy-radius-md);
+      border: 1px solid var(--joy-border-subtle);
+      background: var(--joy-surface-sunken);
+      color: var(--joy-text-primary);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+    }
+    .apple-storage-btn.active {
+      border-color: var(--joy-accent-default);
+      background: var(--joy-accent-subtle);
+      color: var(--joy-accent-text);
     }
 
     /* ── Responsive Mobile & Tablet Rules ── */
@@ -4199,16 +4942,21 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="landing-hero-options-header">
             <div>
               <h3 style="margin: 0 0 4px 0; font-size: var(--joy-font-size-md); font-weight: 700; color: var(--joy-text-primary);">
-                Interactive Hero &amp; 3D Cover Variants
+                Interactive Hero &amp; 3D Cover Variants (8 Archetypes)
               </h3>
               <p style="margin: 0; font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">
-                Toggle between Google Antigravity-style floating particle physics, OpenAI Codex-style 3D wireframe mesh, and luxury editorial cover.
+                Toggle between 8 production-grade hero section archetypes: Antigravity particles, 3D wave mesh, centered luxury editorial image cover, Apple keynote, SaaS financial cockpit, Cyberpunk HUD, Swiss typographic poster, and Luminous fluid aura.
               </p>
             </div>
-            <div class="hub-segmented-ctrl" role="tablist">
-              <button class="segment-btn active" id="btn-hero-opt-antigravity" onclick="switchHeroOption('antigravity')" role="tab" aria-selected="true">Antigravity Particles</button>
-              <button class="segment-btn" id="btn-hero-opt-mesh3d" onclick="switchHeroOption('mesh3d')" role="tab" aria-selected="false">3D Wave Mesh</button>
+            <div class="hub-segmented-ctrl hub-segmented-ctrl--wrap" role="tablist" aria-label="Hero section variant switcher">
+              <button class="segment-btn active" id="btn-hero-opt-antigravity" onclick="switchHeroOption('antigravity')" role="tab" aria-selected="true">Antigravity</button>
+              <button class="segment-btn" id="btn-hero-opt-mesh3d" onclick="switchHeroOption('mesh3d')" role="tab" aria-selected="false">3D Wave</button>
               <button class="segment-btn" id="btn-hero-opt-editorial" onclick="switchHeroOption('editorial')" role="tab" aria-selected="false">Editorial Cover</button>
+              <button class="segment-btn" id="btn-hero-opt-keynote" onclick="switchHeroOption('keynote')" role="tab" aria-selected="false">Apple Keynote</button>
+              <button class="segment-btn" id="btn-hero-opt-cockpit" onclick="switchHeroOption('cockpit')" role="tab" aria-selected="false">SaaS Cockpit</button>
+              <button class="segment-btn" id="btn-hero-opt-cyberpunk" onclick="switchHeroOption('cyberpunk')" role="tab" aria-selected="false">Cyberpunk HUD</button>
+              <button class="segment-btn" id="btn-hero-opt-swiss" onclick="switchHeroOption('swiss')" role="tab" aria-selected="false">Swiss Poster</button>
+              <button class="segment-btn" id="btn-hero-opt-aura" onclick="switchHeroOption('aura')" role="tab" aria-selected="false">Fluid Aura</button>
             </div>
           </div>
           <div class="kinetic-canvas-container hero-option-panel active" id="kinetic-hero-container">
@@ -4246,10 +4994,39 @@ export async function executeHedge(symbol: string, size: number) {
             </section>
           </div>
           <div class="editorial-cover-container hero-option-panel" id="editorial-cover-container" style="display: none;">
-            <div class="editorial-cover__backdrop">
-              <div class="editorial-cover__ambient-orb">
-              </div>
-              <div class="editorial-cover__ambient-orb-2">
+            <div class="editorial-cover__image-backdrop" aria-hidden="true">
+              <svg class="editorial-cover__svg-art" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="ed-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.95"/>
+                    <stop offset="50%" stop-color="var(--joy-surface-raised)" stop-opacity="0.85"/>
+                    <stop offset="100%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.98"/>
+                  </linearGradient>
+                  <radialGradient id="ed-gold-glow" cx="50%" cy="45%" r="50%">
+                    <stop offset="0%" stop-color="var(--joy-accent-default)" stop-opacity="0.22"/>
+                    <stop offset="50%" stop-color="var(--joy-accent-subtle)" stop-opacity="0.08"/>
+                    <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+                  </radialGradient>
+                  <linearGradient id="ed-gold-ribbon" x1="0%" y1="0%" x2="100%" y2="50%">
+                    <stop offset="0%" stop-color="var(--joy-accent-default)" stop-opacity="0.6"/>
+                    <stop offset="50%" stop-color="var(--joy-accent-highlight)" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="var(--joy-accent-hover)" stop-opacity="0.4"/>
+                  </linearGradient>
+                  <linearGradient id="ed-shadow-overlay" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.65"/>
+                    <stop offset="50%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.85"/>
+                  </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#ed-bg)"/>
+                <circle cx="600" cy="300" r="380" fill="url(#ed-gold-glow)"/>
+                <path d="M 200,550 C 350,220 520,120 700,160 C 880,200 980,380 1100,550" fill="none" stroke="url(#ed-gold-ribbon)" stroke-width="2" opacity="0.6"/>
+                <path d="M 150,580 C 320,180 560,80 780,130 C 1000,180 1060,420 1150,580" fill="none" stroke="var(--joy-border-default)" stroke-width="1" opacity="0.3" stroke-dasharray="4,6"/>
+                <path d="M 420,480 C 460,340 540,240 680,260 C 760,270 820,360 840,480 Z" fill="var(--joy-surface-inverse)" opacity="0.12"/>
+                <path d="M 440,460 C 480,350 550,270 660,285 C 730,295 780,370 800,460 Z" fill="none" stroke="var(--joy-accent-default)" stroke-width="1.5" opacity="0.45"/>
+                <rect width="100%" height="100%" fill="url(#ed-shadow-overlay)"/>
+              </svg>
+              <div class="editorial-cover__grain" aria-hidden="true">
               </div>
             </div>
             <div class="editorial-cover__topbar">
@@ -4258,7 +5035,7 @@ export async function executeHedge(symbol: string, size: number) {
                 J O Y M I F Y
               </div>
               <div class="editorial-cover__actions">
-                <span class="editorial-cover__action-label">MENU</span>
+                <span class="editorial-cover__action-label">ISSUE 04 // 2026</span>
               </div>
             </div>
             <div class="editorial-cover__centerpiece">
@@ -4277,6 +5054,161 @@ export async function executeHedge(symbol: string, size: number) {
                 </button>
               </div>
             </div>
+            <div class="editorial-cover__bottombar">
+              <span>PARIS • MILAN • TOKYO • BANGKOK</span>
+              <span>LIMITED EDITION 01/50</span>
+            </div>
+          </div>
+          <div class="keynote-hero-container hero-option-panel" id="keynote-hero-container" style="display: none;">
+            <div class="keynote-hero__stage">
+              <div class="keynote-hero__halo" aria-hidden="true">
+              </div>
+              <section class="joy-hero">
+                <div class="joy-hero__badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Titanium • M4 Max • Super Retina XDR
+                </div>
+                <h1 class="joy-hero__title">
+                  Pro beyond measure <span class="joy-hero__title-emphasis">in every dimension</span>
+                </h1>
+                <p class="joy-hero__subtitle">
+                  Precision-milled aerospace titanium housing unmatched silicon performance and all-day thermal stability.
+                </p>
+                <div class="joy-hero__ctas">
+                  <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Pre-order now</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Watch keynote</span>  </button>
+                </div>
+              </section>
+              <div class="keynote-hero__device-mockup" aria-hidden="true">
+                <div class="keynote-device-frame">
+                  <div class="keynote-device-screen">
+                    <div class="keynote-screen-glow">
+                    </div>
+                    <div class="keynote-screen-notch">
+                    </div>
+                    <div class="keynote-screen-content">
+                      <span class="keynote-screen-time">9:41</span>
+                      <span class="keynote-screen-chip">M4 Max</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cockpit-hero-container hero-option-panel" id="cockpit-hero-container" style="display: none;">
+            <div class="cockpit-hero__telemetry-bar">
+              <div class="cockpit-telemetry-pill">
+                <span class="status-indicator-dot"></span>
+                <span>Gateway: 0.42ms DPDK</span>
+              </div>
+              <div class="cockpit-telemetry-pill">
+                <span>Order Book: 1,420,890 evt/s</span>
+              </div>
+              <div class="cockpit-telemetry-pill">
+                <span>Settlement: 14 Chains Active</span>
+              </div>
+            </div>
+            <section class="joy-hero">
+              <div class="joy-hero__badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Live Tick Engine // 0.42ms DPDK
+              </div>
+              <h1 class="joy-hero__title">
+                Execution at the <span class="joy-hero__title-emphasis">speed of light</span>
+              </h1>
+              <p class="joy-hero__subtitle">
+                Direct market access with microsecond order routing, cross-margin risk telemetry, and unified multi-venue settlement.
+              </p>
+              <div class="joy-hero__ctas">
+                <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Launch terminal</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">API reference</span>  </button>
+              </div>
+            </section>
+            <div class="cockpit-hero__sparkline-dock">
+              <canvas class="cockpit-sparkline-canvas" id="cockpit-sparkline-canvas" width="600" height="80" aria-label="Real-time order latency telemetry"></canvas>
+            </div>
+          </div>
+          <div class="cyberpunk-hero-container hero-option-panel" id="cyberpunk-hero-container" style="display: none;">
+            <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--tl" aria-hidden="true">
+              [ + ]
+            </div>
+            <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--tr" aria-hidden="true">
+              [ + ]
+            </div>
+            <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--bl" aria-hidden="true">
+              [ + ]
+            </div>
+            <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--br" aria-hidden="true">
+              [ + ]
+            </div>
+            <div class="cyberpunk-hud-status-strip">
+              <span>SYS_CLK // 4.80GHz</span>
+              <span>BUFFER // LOCKED</span>
+              <span>NODE // US-EAST-01</span>
+            </div>
+            <section class="joy-hero">
+              <div class="joy-hero__badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> NEURAL_HUD // SEC_LVL: ALPHA
+              </div>
+              <h1 class="joy-hero__title">
+                Tactical telemetry <span class="joy-hero__title-emphasis">engineered for zero failure</span>
+              </h1>
+              <p class="joy-hero__subtitle">
+                Real-time neural interface protocols with sub-millisecond heartbeat monitoring and hardened cryptography.
+              </p>
+              <div class="joy-hero__ctas">
+                <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Initialize link</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Telemetry logs</span>  </button>
+              </div>
+            </section>
+            <div class="cyberpunk-scanline-laser" aria-hidden="true">
+            </div>
+          </div>
+          <div class="swiss-hero-container hero-option-panel" id="swiss-hero-container" style="display: none;">
+            <div class="swiss-marquee-bar" aria-hidden="true">
+              <div class="swiss-marquee-content">
+                <span>JOYMIFY DESIGN SYSTEM • MODERNIST CANON • SVELTE 5 &amp; REACT 19 • SEMANTIC TOKENS • WCAG 2.2 AA • ZERO DECORATIVE SLOP • PURE COMPONENT PARITY •</span>
+                <span>JOYMIFY DESIGN SYSTEM • MODERNIST CANON • SVELTE 5 &amp; REACT 19 • SEMANTIC TOKENS • WCAG 2.2 AA • ZERO DECORATIVE SLOP • PURE COMPONENT PARITY •</span>
+              </div>
+            </div>
+            <section class="joy-hero">
+              <div class="joy-hero__badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Modernist Grid // Zurich 1957
+              </div>
+              <h1 class="joy-hero__title">
+                Pure typographic <span class="joy-hero__title-emphasis">structure and form</span>
+              </h1>
+              <p class="joy-hero__subtitle">
+                Strict mathematical ratios, absolute semantic tokens, and uncompromising contrast across light and dark canvases.
+              </p>
+              <div class="joy-hero__ctas">
+                <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Inspect system</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">Read manifesto</span>  </button>
+              </div>
+            </section>
+            <div class="swiss-grid-footer">
+              <span>GRID: 12-COL MODULAR</span>
+              <span>SPEC: DIN 1451 / HELVETICA</span>
+              <span>CONTRAST: 7:1 AAA</span>
+            </div>
+          </div>
+          <div class="aura-hero-container hero-option-panel" id="aura-hero-container" style="display: none;">
+            <div class="aura-hero__mesh-bg" aria-hidden="true">
+              <div class="aura-orb aura-orb--1">
+              </div>
+              <div class="aura-orb aura-orb--2">
+              </div>
+              <div class="aura-orb aura-orb--3">
+              </div>
+            </div>
+            <section class="joy-hero">
+              <div class="joy-hero__badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Chromatic Ambient Mesh
+              </div>
+              <h1 class="joy-hero__title">
+                Crafted with soul <span class="joy-hero__title-emphasis">and luminous precision</span>
+              </h1>
+              <p class="joy-hero__subtitle">
+                Organic fluid gradient orbs designed to breathe life into modern product interfaces with smooth ambient physics.
+              </p>
+              <div class="joy-hero__ctas">
+                <button type="button" class="joy-button joy-button--solid joy-button--lg"> <span class="joy-button__label">Explore tokens</span>  </button> <button type="button" class="joy-button joy-button--outline joy-button--lg joy-hero__secondary-cta"> <span class="joy-button__label">View showcase</span>  </button>
+              </div>
+            </section>
           </div>
         </div>
 
@@ -6226,6 +7158,235 @@ export async function executeHedge(symbol: string, size: number) {
                 </div>
               </footer>
               <!-- landing-simulator-footer:generated:end -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Narrative Continuous Scroll (Apple Keynote) -->
+      <section id="view-apple-landing" class="view-panel">
+        <!-- Sticky Sub-Nav (Glassmorphic) -->
+        <div class="apple-subnav">
+          <div class="apple-subnav__inner">
+            <div class="apple-subnav__title-group">
+              <span class="apple-subnav__title">iPhone Duo</span>
+              <span class="apple-subnav__badge">Pro Foldable</span>
+            </div>
+            <div class="apple-subnav__actions">
+              <a href="#apple-scene-posture" class="apple-subnav__link" onclick="scrollToAppleScene('apple-scene-posture'); return false;">ดูข้อมูล</a>
+              <button type="button" class="joy-button joy-button--solid joy-button--sm apple-subnav__buy" onclick="scrollToAppleScene('apple-scene-customizer')">ดูราคา</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="apple-landing-body">
+          <!-- Scene 1: The Monumental Intro & Keynote Silhouette Reveal -->
+          <div class="apple-scene apple-scene--intro" id="apple-scene-intro">
+            <span class="apple-eyebrow">ความอเนกประสงค์</span>
+            <h1 class="apple-headline">iOS ที่พลิกโฉมมาใหม่<br>อะไรๆ ก็จัดท่าได้</h1>
+            <p class="apple-tagline">ดีไซน์แบบพับได้ที่เบาที่สุด พร้อมบานพับไทเทเนียมเจเนอเรชันใหม่และจอแสดงผลคู่ Super Retina XDR</p>
+            <div class="apple-intro__cta-group">
+              <button type="button" class="joy-button joy-button--solid joy-button--lg" onclick="scrollToAppleScene('apple-scene-customizer')">สั่งซื้อล่วงหน้า</button>
+              <button type="button" class="joy-button joy-button--outline joy-button--lg" onclick="showDemoToast('เปิดตัวภาพยนตร์แนะนำ iPhone Duo', 'info')">ชมภาพยนตร์เปิดตัว</button>
+            </div>
+            <div class="apple-intro__device-wrapper">
+              <div class="keynote-device-frame" style="width: 480px; height: 260px; max-width: 90vw;">
+                <div class="keynote-device-screen">
+                  <div class="keynote-screen-glow"></div>
+                  <div class="keynote-screen-content">
+                    <span class="apple-eyebrow" style="margin-bottom: 4px;">Joymify Studio Pro</span>
+                    <span style="font-size: var(--joy-font-size-2xl); font-weight: 800; color: var(--joy-text-primary);">A18 Pro Dual Silicon</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 2: Interactive Posture & Fold Mechanics (Matches User Image 3) -->
+          <div class="apple-scene apple-scene--posture" id="apple-scene-posture">
+            <div class="apple-scene__grid">
+              <!-- Left: Interactive controls & narrative callouts -->
+              <div class="apple-posture__controls">
+                <div class="apple-posture__callout-card">
+                  <h3 class="apple-posture__card-title">ดีไซน์แบบพับได้ พบกับประสบการณ์การดูที่ยอดเยี่ยมในดีไซน์แบบพอดีกระเป๋า</h3>
+                  <p class="apple-posture__card-desc">ลากที่ด้านล่างเพื่อเปิดและปิด</p>
+                  <!-- Interactive Drag/Scrub Slider (< >) -->
+                  <div class="apple-scrub-container">
+                    <input type="range" class="apple-scrub-slider" id="apple-posture-slider" min="0" max="180" value="110" oninput="updateDevicePosture(this.value)">
+                  </div>
+                  <div class="apple-posture__status-row">
+                    <span class="apple-posture__angle-label" id="apple-posture-angle-label">มุมพับ: 110°</span>
+                    <span class="apple-posture__mode-badge" id="apple-posture-mode-badge">โหมดแนวนอน (Laptop)</span>
+                  </div>
+                </div>
+
+                <!-- Posture Pills (Matches Image 3) -->
+                <div class="apple-posture__pills-list">
+                  <button type="button" class="apple-posture-pill active" id="pill-posture-horizontal" onclick="setDevicePosturePreset(110, 'horizontal', this)">
+                    <span class="pill-plus">+</span> แนวนอน
+                  </button>
+                  <button type="button" class="apple-posture-pill" id="pill-posture-vertical" onclick="setDevicePosturePreset(90, 'vertical', this)">
+                    <span class="pill-plus">+</span> แนวตั้ง
+                  </button>
+                  <button type="button" class="apple-posture-pill" id="pill-posture-folded" onclick="setDevicePosturePreset(0, 'folded', this)">
+                    <span class="pill-plus">+</span> พับปิด
+                  </button>
+                  <button type="button" class="apple-posture-pill" id="pill-posture-flat" onclick="setDevicePosturePreset(180, 'flat', this)">
+                    <span class="pill-plus">+</span> วางเปิด
+                  </button>
+                  <button type="button" class="apple-posture-pill" id="pill-posture-tent" onclick="setDevicePosturePreset(65, 'tent', this)">
+                    <span class="pill-plus">+</span> กางตั้ง
+                  </button>
+                  <button type="button" class="apple-posture-pill" id="pill-posture-durability" onclick="runDurabilityCycle()">
+                    <span class="pill-plus">+</span> ความทนทาน
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right: 3D Folding Hardware Render (Real-time 3D CSS transform) -->
+              <div class="apple-posture__stage">
+                <div class="apple-fold-stage" id="apple-fold-stage">
+                  <div class="apple-fold-device" id="apple-fold-device">
+                    <div class="apple-fold-wing apple-fold-wing--left">
+                      <div class="apple-fold-screen">
+                        <div class="apple-fold-screen__content">
+                          <div class="apple-fold-time">9:41</div>
+                          <div class="apple-fold-date">Wednesday, April 1</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="apple-fold-hinge" id="apple-fold-hinge"></div>
+                    <div class="apple-fold-wing apple-fold-wing--right" id="apple-fold-wing-right">
+                      <div class="apple-fold-screen">
+                        <div class="apple-fold-screen__content" style="align-items: flex-end;">
+                          <div class="apple-fold-widget">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 3: Cinematic Ultra-Wide Display Immersion (Matches User Image 4) -->
+          <div class="apple-scene apple-scene--cinema" id="apple-scene-cinema">
+            <span class="apple-eyebrow">จอแสดงผลระดับสตูดิโอ</span>
+            <h2 class="apple-headline">โรงภาพยนตร์ขนาดยักษ์<br>ที่พับเก็บได้ในมือคุณ</h2>
+            <p class="apple-tagline">ขยายหน้าจอสู่ 8.2 นิ้ว เต็มตาไร้รอยต่อ รองรับ Dolby Vision HDR และระบบเสียงรอบทิศทางตามตำแหน่งศีรษะ</p>
+
+            <div class="apple-cinema__screen-frame" id="apple-cinema-frame">
+              <div class="apple-cinema__ambient-glow" id="apple-cinema-glow"></div>
+              <div class="apple-cinema__bezel">
+                <div class="apple-cinema__display-canvas" id="apple-cinema-canvas">
+                  <div class="apple-cinema__art-bg">
+                    <div class="apple-cinema__title-card">
+                      <span class="apple-cinema__movie-title">S I L O</span>
+                      <span class="apple-cinema__service-logo">Apple TV+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="apple-cinema__controls-bar">
+              <div class="segmented-control">
+                <button type="button" class="segment-btn active" onclick="switchCinemaAspect('21-9', this)">21:9 Widescreen</button>
+                <button type="button" class="segment-btn" onclick="switchCinemaAspect('16-9', this)">16:9 Cinema</button>
+                <button type="button" class="segment-btn" onclick="switchCinemaAspect('4-3', this)">4:3 Full Display</button>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <span class="joy-badge joy-badge--brand joy-badge--sm">Spatial Audio</span>
+                <span class="joy-badge joy-badge--warning joy-badge--sm">Peak 2,000 Nits</span>
+                <span class="joy-badge joy-badge--success joy-badge--sm">120Hz ProMotion</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 4: Bionic Silicon & Thermal Specs Bento -->
+          <div class="apple-scene apple-scene--specs" id="apple-scene-specs">
+            <span class="apple-eyebrow">สถาปัตยกรรมชิป</span>
+            <h2 class="apple-headline">พลังประมวลผลที่ฉีกทุกกฎ</h2>
+            <p class="apple-tagline">สถาปัตยกรรม A18 Pro พร้อม Neural Engine 16 คอร์และห้องระบายความร้อนไอน้ำแกรไฟต์</p>
+
+            <div class="apple-specs-bento">
+              <div class="apple-bento-tile apple-bento-tile--col-6">
+                <span class="apple-eyebrow">3 นาโนเมตร เจเนอเรชันที่ 2</span>
+                <h3 style="font-size: var(--joy-font-size-xl); font-weight: 700; margin: 0 0 12px 0;">GPU ระดับโปร 6 คอร์</h3>
+                <p style="color: var(--joy-text-secondary); margin: 0 0 16px 0;">ฮาร์ดแวร์เร่งความเร็ว Ray Tracing ที่เร็วขึ้นสูงสุด 2 เท่า สำหรับเกมระดับคอนโซล</p>
+                <div style="display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--success joy-badge--sm">+35% GPU Speed</span>
+                  <span class="joy-badge joy-badge--brand joy-badge--sm">Hardware Ray Tracing</span>
+                </div>
+              </div>
+              <div class="apple-bento-tile apple-bento-tile--col-6">
+                <span class="apple-eyebrow">โครงสร้างอากาศยาน</span>
+                <h3 style="font-size: var(--joy-font-size-xl); font-weight: 700; margin: 0 0 12px 0;">ไทเทเนียมเกรด 5 แกร่งพิเศษ</h3>
+                <p style="color: var(--joy-text-secondary); margin: 0 0 16px 0;">การผสมผสานระหว่างไทเทเนียมและโครงอะลูมิเนียมรีไซเคิล 100% เชื่อมด้วยเทคโนโลยี Diffusion Bonding</p>
+                <div style="display: flex; gap: 8px;">
+                  <span class="joy-badge joy-badge--warning joy-badge--sm">Armor Hinge</span>
+                  <span class="joy-badge joy-badge--neutral joy-badge--sm">IP68 Water Resistant</span>
+                </div>
+              </div>
+              <div class="apple-bento-tile apple-bento-tile--col-12">
+                <span class="apple-eyebrow">ประสิทธิภาพพลังงาน</span>
+                <h3 style="font-size: var(--joy-font-size-xl); font-weight: 700; margin: 0 0 12px 0;">แบตเตอรี่ใช้งานได้ตลอดวัน นานขึ้น 4 ชั่วโมง</h3>
+                <p style="color: var(--joy-text-secondary); margin: 0;">ระบบจัดการพลังงานขั้นสูงขับเคลื่อนหน้าจอคู่ได้อย่างมีประสิทธิภาพสูงสุด</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 5: Studio Finish Customizer & Configuration Tray -->
+          <div class="apple-scene apple-scene--customizer" id="apple-scene-customizer">
+            <span class="apple-eyebrow">เลือกสีและปรับแต่ง</span>
+            <h2 class="apple-headline">สร้าง iPhone Duo ในสไตล์ของคุณ</h2>
+            <p class="apple-tagline">มีให้เลือก 4 สีไทเทเนียมธรรมชาติ พร้อมความจุสูงสุด 2TB</p>
+
+            <div class="apple-customizer-tray">
+              <div style="text-align: center; margin-bottom: 8px;">
+                <span style="font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary);">สีที่เลือก: </span>
+                <strong id="apple-finish-name" style="color: var(--joy-text-primary);">Natural Titanium</strong>
+              </div>
+              <div class="apple-finish-swatches">
+                <button type="button" class="apple-swatch-btn active" style="background: var(--joy-border-default);" onclick="setDeviceFinish('Natural Titanium', 'var(--joy-border-default)', this)" aria-label="Natural Titanium"></button>
+                <button type="button" class="apple-swatch-btn" style="background: var(--joy-accent-default);" onclick="setDeviceFinish('Desert Titanium', 'var(--joy-accent-default)', this)" aria-label="Desert Titanium"></button>
+                <button type="button" class="apple-swatch-btn" style="background: var(--joy-color-navy-800);" onclick="setDeviceFinish('Obsidian Navy', 'var(--joy-color-navy-800)', this)" aria-label="Obsidian Navy"></button>
+                <button type="button" class="apple-swatch-btn" style="background: var(--joy-color-cream-100);" onclick="setDeviceFinish('Liquid Silver', 'var(--joy-color-cream-100)', this)" aria-label="Liquid Silver"></button>
+              </div>
+
+              <div style="text-align: center; margin-bottom: 12px; font-weight: 600; color: var(--joy-text-primary);">
+                เลือกความจุ
+              </div>
+              <div class="apple-storage-grid">
+                <button type="button" class="apple-storage-btn active" onclick="selectStorageTier('256GB', '43,900', this)">
+                  <div>256GB</div>
+                  <small style="opacity: 0.8;">฿43,900</small>
+                </button>
+                <button type="button" class="apple-storage-btn" onclick="selectStorageTier('512GB', '49,900', this)">
+                  <div>512GB</div>
+                  <small style="opacity: 0.8;">฿49,900</small>
+                </button>
+                <button type="button" class="apple-storage-btn" onclick="selectStorageTier('1TB', '57,900', this)">
+                  <div>1TB</div>
+                  <small style="opacity: 0.8;">฿57,900</small>
+                </button>
+                <button type="button" class="apple-storage-btn" onclick="selectStorageTier('2TB', '65,900', this)">
+                  <div>2TB</div>
+                  <small style="opacity: 0.8;">฿65,900</small>
+                </button>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--joy-border-subtle);">
+                <div>
+                  <span style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); display: block;">ราคารวมเริ่มต้น</span>
+                  <span id="apple-customizer-price" style="font-size: 1.8rem; font-weight: 800; color: var(--joy-text-primary);">฿43,900</span>
+                </div>
+                <button type="button" class="joy-button joy-button--solid joy-button--lg" onclick="showDemoToast('บันทึกการสั่งซื้อ iPhone Duo เข้าสู่ตะกร้าเรียบร้อย', 'success')">
+                  สั่งซื้อเลย
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -8586,17 +9747,27 @@ export async function executeHedge(symbol: string, size: number) {
       kineticCtx.restore();
     }
 
-    /* ── Hero Options Switcher & 3D Wave Mesh Engine ── */
+    /* ── Hero Options Switcher (8 Archetypes) & Interactive Engines ── */
     function switchHeroOption(opt) {
       const panels = {
         antigravity: document.getElementById('kinetic-hero-container'),
         mesh3d: document.getElementById('mesh-hero-container'),
         editorial: document.getElementById('editorial-cover-container'),
+        keynote: document.getElementById('keynote-hero-container'),
+        cockpit: document.getElementById('cockpit-hero-container'),
+        cyberpunk: document.getElementById('cyberpunk-hero-container'),
+        swiss: document.getElementById('swiss-hero-container'),
+        aura: document.getElementById('aura-hero-container'),
       };
       const btns = {
         antigravity: document.getElementById('btn-hero-opt-antigravity'),
         mesh3d: document.getElementById('btn-hero-opt-mesh3d'),
         editorial: document.getElementById('btn-hero-opt-editorial'),
+        keynote: document.getElementById('btn-hero-opt-keynote'),
+        cockpit: document.getElementById('btn-hero-opt-cockpit'),
+        cyberpunk: document.getElementById('btn-hero-opt-cyberpunk'),
+        swiss: document.getElementById('btn-hero-opt-swiss'),
+        aura: document.getElementById('btn-hero-opt-aura'),
       };
       for (const [key, panel] of Object.entries(panels)) {
         if (!panel) continue;
@@ -8617,9 +9788,51 @@ export async function executeHedge(symbol: string, size: number) {
       } else if (opt === 'mesh3d') {
         resizeMesh3dCanvas();
         syncMesh3d();
+      } else if (opt === 'cockpit') {
+        initCockpitSparkline();
       }
     }
     window.switchHeroOption = switchHeroOption;
+
+    /* Cockpit Hero Live Telemetry Sparkline */
+    let cockpitCanvas, cockpitCtx;
+    let cockpitPoints = [42, 45, 41, 48, 39, 44, 46, 43, 40, 42, 47, 41, 43, 40, 38, 41, 44, 42];
+    function initCockpitSparkline() {
+      cockpitCanvas = document.getElementById('cockpit-sparkline-canvas');
+      if (!cockpitCanvas) return;
+      cockpitCtx = cockpitCanvas.getContext('2d');
+      drawCockpitSparkline();
+    }
+    function drawCockpitSparkline() {
+      if (!cockpitCtx || !cockpitCanvas) return;
+      const w = cockpitCanvas.width;
+      const h = cockpitCanvas.height;
+      cockpitCtx.clearRect(0, 0, w, h);
+      
+      const cs = getComputedStyle(document.documentElement);
+      const accent = cs.getPropertyValue('--joy-accent-default').trim();
+      const border = cs.getPropertyValue('--joy-border-subtle').trim();
+      
+      // Draw grid line
+      cockpitCtx.strokeStyle = border;
+      cockpitCtx.lineWidth = 1;
+      cockpitCtx.beginPath();
+      cockpitCtx.moveTo(0, h / 2);
+      cockpitCtx.lineTo(w, h / 2);
+      cockpitCtx.stroke();
+      
+      // Draw sparkline curve
+      cockpitCtx.strokeStyle = accent;
+      cockpitCtx.lineWidth = 2;
+      cockpitCtx.beginPath();
+      const step = w / (cockpitPoints.length - 1);
+      cockpitPoints.forEach((pt, idx) => {
+        const y = h - ((pt - 30) / 30) * h;
+        if (idx === 0) cockpitCtx.moveTo(0, y);
+        else cockpitCtx.lineTo(idx * step, y);
+      });
+      cockpitCtx.stroke();
+    }
 
     let mesh3dCanvas, mesh3dCtx;
     let mesh3dAnimId = null;
@@ -8810,8 +10023,108 @@ export async function executeHedge(symbol: string, size: number) {
         showDemoToast(primary ? 'Deploying the pipeline' : 'Opening the API guide', primary ? 'success' : 'info');
       } else if (btn.closest('#mesh-hero-container')) {
         showDemoToast(primary ? 'Downloading desktop app' : 'Opening web workspace', primary ? 'success' : 'info');
+      } else if (btn.closest('#keynote-hero-container')) {
+        showDemoToast(primary ? 'Configuring your iPhone Duo' : 'Streaming Apple Keynote replay', primary ? 'success' : 'info');
+      } else if (btn.closest('#cockpit-hero-container')) {
+        showDemoToast(primary ? 'Launching Institutional Terminal' : 'Opening WebSocket API docs', primary ? 'success' : 'info');
+      } else if (btn.closest('#cyberpunk-hero-container')) {
+        showDemoToast(primary ? 'Neural link synchronized' : 'Telemetry logs decrypted', primary ? 'success' : 'info');
+      } else if (btn.closest('#swiss-hero-container')) {
+        showDemoToast(primary ? 'Modernist design tokens active' : 'Reading 1957 Zurich Manifesto', primary ? 'success' : 'info');
+      } else if (btn.closest('#aura-hero-container')) {
+        showDemoToast(primary ? 'Chromatic mesh tokens loaded' : 'Viewing fluid palette showcase', primary ? 'success' : 'info');
       }
     });
+
+    /* ── Apple Continuous Narrative Landing Page Engine ── */
+    function updateDevicePosture(val) {
+      const angle = parseInt(val, 10);
+      const rightWing = document.getElementById('apple-fold-wing-right');
+      const angleLabel = document.getElementById('apple-posture-angle-label');
+      const modeBadge = document.getElementById('apple-posture-mode-badge');
+      if (rightWing) {
+        // Map 0 (folded) to -180deg, 180 (flat) to 0deg
+        const rotY = -(180 - angle);
+        rightWing.style.transform = 'rotateY(' + rotY + 'deg)';
+      }
+      if (angleLabel) angleLabel.textContent = 'มุมพับ: ' + angle + '°';
+      if (modeBadge) {
+        if (angle <= 25) modeBadge.textContent = 'โหมดพับปิด (Compact Pocket)';
+        else if (angle <= 75) modeBadge.textContent = 'โหมดกางตั้ง (Tent Stand)';
+        else if (angle <= 100) modeBadge.textContent = 'โหมดแนวตั้ง (Book Reading)';
+        else if (angle <= 135) modeBadge.textContent = 'โหมดแนวนอน (Laptop Mode)';
+        else modeBadge.textContent = 'โหมดวางเปิด (Flat Canvas)';
+      }
+    }
+    window.updateDevicePosture = updateDevicePosture;
+
+    function setDevicePosturePreset(angle, mode, btn) {
+      const slider = document.getElementById('apple-posture-slider');
+      if (slider) slider.value = angle;
+      updateDevicePosture(angle);
+      document.querySelectorAll('.apple-posture-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+    window.setDevicePosturePreset = setDevicePosturePreset;
+
+    function runDurabilityCycle() {
+      showDemoToast('กำลังทดสอบความทนทานบานพับ Armor Hinge...', 'info');
+      const slider = document.getElementById('apple-posture-slider');
+      let step = 0;
+      const sequence = [180, 140, 90, 45, 0, 45, 90, 110];
+      const timer = setInterval(() => {
+        if (step >= sequence.length) {
+          clearInterval(timer);
+          showDemoToast('การทดสอบความทนทานบานพับ Armor Hinge 500,000 ครั้ง สำเร็จ', 'success');
+          return;
+        }
+        const ang = sequence[step++];
+        if (slider) slider.value = ang;
+        updateDevicePosture(ang);
+      }, 120);
+    }
+    window.runDurabilityCycle = runDurabilityCycle;
+
+    function switchCinemaAspect(aspect, btn) {
+      const canvas = document.getElementById('apple-cinema-canvas');
+      if (canvas) {
+        if (aspect === '21-9') canvas.style.aspectRatio = '21 / 9';
+        else if (aspect === '16-9') canvas.style.aspectRatio = '16 / 9';
+        else if (aspect === '4-3') canvas.style.aspectRatio = '4 / 3';
+      }
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    }
+    window.switchCinemaAspect = switchCinemaAspect;
+
+    function setDeviceFinish(finishName, colorVar, btn) {
+      const nameEl = document.getElementById('apple-finish-name');
+      if (nameEl) nameEl.textContent = finishName;
+      document.querySelectorAll('.apple-swatch-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      
+      const leftWing = document.querySelector('.apple-fold-wing--left');
+      const rightWing = document.querySelector('.apple-fold-wing--right');
+      if (leftWing) leftWing.style.borderColor = colorVar;
+      if (rightWing) rightWing.style.borderColor = colorVar;
+    }
+    window.setDeviceFinish = setDeviceFinish;
+
+    function selectStorageTier(tier, price, btn) {
+      const priceEl = document.getElementById('apple-customizer-price');
+      if (priceEl) priceEl.textContent = '฿' + price;
+      document.querySelectorAll('.apple-storage-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+    window.selectStorageTier = selectStorageTier;
+
+    function scrollToAppleScene(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+    window.scrollToAppleScene = scrollToAppleScene;
 
     // Initial render
     setTimeout(() => {
