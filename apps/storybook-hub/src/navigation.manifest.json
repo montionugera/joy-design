@@ -74,6 +74,7 @@
       "views": [
         { "id": "landing-blocks", "label": "Bento & Landing Suite", "icon": "landing" },
         { "id": "landing-preview", "label": "Full page simulator", "icon": "landing" },
+        { "id": "apple-landing", "label": "Narrative Continuous Scroll (Apple Keynote)", "icon": "landing" },
         { "id": "charts", "label": "High-Perf Financial Charts", "icon": "charts" },
         { "id": "bauhaus", "label": "Bauhaus & Sports Analytics", "icon": "metric" },
         { "id": "courtside-logger", "label": "Courtside Live Match Logger", "icon": "metric" },
