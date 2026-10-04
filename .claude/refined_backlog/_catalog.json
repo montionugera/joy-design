@@ -667,5 +667,14 @@
     "shipped_at": "2026-10-04T01:20:57.183735+00:00",
     "shipped_sha": "14195182433341930f9d164a5256a4096fccfb12",
     "promoted_at": "2026-10-04T01:51:29.062987+00:00"
+  },
+  {
+    "id": "F-055",
+    "title": "8 Hero Section variants with centered image cover editorial, and Apple-style continuous narrative scroll landing page with 5 interactive scenes",
+    "from_idea": "I-060",
+    "created_at": "2026-10-04T05:11:42.226329+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
