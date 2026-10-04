@@ -501,31 +501,40 @@ The Storybook Hub provides 8 distinct Hero Section variants in `#landing-blocks`
    - **Scene 5 (Studio Finish Customizer)**: 4 Titanium swatches, 4 storage tiers, live pricing calculator, and order CTA.
 
 
-### Smart Glasses Head-Up Display (Glasses HUD) & UI Guidelines (F-056)
+### Smart Glasses Head-Up Display (Glasses HUD) & UI Guidelines (F-056 / F-057)
 
 The Storybook Hub provides a monocular Optical See-Through (OST) Head-Up Display interface in `#glasses-hud`, accompanied by comprehensive architectural interaction guidelines (`docs/superpowers/specs/glasses-hud-design.md` and rendered `docs/superpowers/specs/glasses-hud-design.html`):
 
 1. **Optical Waveguide Physics & Additive Light Model**:
    - Built for MicroLED diffraction grating waveguides (25° monocular FOV, 3,500 nits luminescent brightness).
-   - Zero-emission black: black pixels emit zero photons, rendering completely transparent optical glass.
-   - High daylight legibility with pure Joymify semantic tokens (`--joy-text-primary`, `--joy-accent-default`, `--joy-status-success-fg`).
-   - Ambient optic scene switcher (`Cyberpunk Night`, `Daylight Walk`, `Optical Bench`).
+   - **All-Case Optical Dark Background**: In optical waveguides, true zero-emission black is 100% transparent glass, allowing physical reality to pass through unobstructed. Light or white card surfaces do not exist in optical waveguides; the HUD visor frame maintains its true optical dark background (`var(--joy-color-navy-950)`) across all themes and ambient scenes.
+   - **P43 Phosphor Green (530nm Mono)**: Human eye photopic sensitivity $V(\lambda)$ peaks at 555nm (green). A single-color P43 green emitter produces 4× to 5× higher perceived luminance per milliwatt than blue or red, punching through direct 10,000-lux ambient sunlight with 3,500+ nits while preserving all-day battery life.
+   - **Optical Phosphor Emitter Switcher**: Toggle between `P43 Phosphor Green (530nm Mono)` [default], `P20 Amber Phosphor (585nm)`, and `Polychrome Dual-RGB`.
+   - **Ambient Optic Scene Switcher**: `Cyberpunk Night`, `Daylight Walk`, `Optical Bench`.
 
-2. **Audio-Visual Communication State Machine**:
+2. **Single-Color Symbolic State & Selection Matrix**:
+   - Because single-color optics cannot rely on color hue variance, all interactive states and hierarchical navigation use high-contrast geometric symbols and typographic fills:
+     - **Active Selection**: `▶` cursor arrow with military HUD reverse-video highlight (solid phosphor green rectangular bar with dark black text).
+     - **Checklist States**: `[x]` for completed tasks (with strikethrough text) vs `[ ]` for pending tasks.
+     - **Destructive Actions**: `[×] [ Delete ]` cross notation.
+     - **Audio States**: `▶ TALKING` (with animated green phosphor meter bars), `[~ LISTEN]` (listening standby), `〇 WATCH` (glance mode), `● REC` (voice recording).
+     - **Directional Navigation**: `▲ Swipe (Prev)`, `▼ Swipe (Next)`, `◄ Double Tap (Back)`.
+
+3. **Audio-Visual Communication State Machine**:
    - Deterministic 4-state machine: `Listening` (ambient active mic), `Watching` (CV glance), `AI Talking` (synthesized speech output), and `Recording` (hands-free memo).
    - Instant Tap-to-Interrupt: tapping the temple touchpad during AI speech halts Claudia immediately and frees user attention without latency stalls.
    - Streaming conversational transcript box displaying interactive turn-taking between `User` and `Claudia (Agent)`.
 
-3. **Dual-Panel 50% / 50% Monocular Visor**:
+4. **Dual-Panel 50% / 50% Monocular Visor**:
    - **Left Panel (Communication Stream)**: Live state indicator pill, prompt simulator chips (`Prompt: Checklist`, `Prompt: Meeting`), and animated cursor speech feed.
    - **Right Panel (Hierarchical Assist Navigation)**:
-     - *Control Center*: Top launcher for Conversation Control, Daily Todos, and Notifications.
-     - *Today Todos Checklist*: Interactive task list with gold selection cursor (`> [ ] Walk 3 Km`, `[x] Prepare Meeting note`).
-     - *Todo Detail Action Tray*: Action buttons (`[ Mark done ]`, `[ Mark not done ]`, `[ Delete ]`) with live counter badge sync.
+     - *Control Center*: Top launcher for Conversation Control, Daily Todos (`[ 1 / 3 ]`), and Notifications (`[ 2 ] 10m ago`).
+     - *Today Todos Checklist*: Interactive task list with reverse-video selection (`▶ [ ] Walk 3 Km`, `[x] Prepare Meeting note`).
+     - *Todo Detail Action Tray*: Action buttons (`[x] [ Mark done ]`, `[ ] [ Mark not done ]`, `[×] [ Delete ]`) with live counter badge sync.
      - *Communication Control Guide*: Touch gesture syntax reference.
 
-4. **Temple Capacitive Touchpad Gesture Simulator**:
-   - Hardware controls: Tap (select / interrupt), Double Tap (back up hierarchy), Swipe Down / Up (cursor movement), Hold (voice recording).
+5. **Temple Capacitive Touchpad Gesture Simulator**:
+   - Hardware controls: Tap (`▶ Select / ⏸ Interrupt`), Double Tap (`◄ Back`), Swipe Down / Up (`▼ / ▲ Cursor`), Hold (`● Record Memo`).
    - Live gesture event feed telemetry.
    - Strict Zero OS Emoji policy with vector icons from `@joymify/icons` and 100% WCAG 2.2 AA token contrast.
 

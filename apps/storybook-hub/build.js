@@ -2880,35 +2880,39 @@ ${inlinedThemeCss}
       margin-right: 8px;
     }
 
-    /* Optical Visor Outer Frame */
+    /* Optical Visor Outer Frame — Always Optical Dark in All Cases */
     .hud-visor-frame {
       position: relative;
       width: 100%;
       min-height: 600px;
       border-radius: var(--joy-radius-lg);
-      border: 2px solid var(--joy-border-strong);
+      border: 2px solid var(--joy-color-navy-800);
       overflow: hidden;
-      background: var(--joy-surface-sunken);
+      background-color: var(--joy-color-navy-950) !important;
       box-shadow: 0 24px 60px var(--joy-elevation-3);
       display: flex;
       flex-direction: column;
       margin-bottom: 32px;
       transition: background 0.3s var(--joy-ease-default);
+      color: var(--joy-status-success-fg);
     }
     .hud-visor-frame[data-scene="cyberpunk"] {
-      background: radial-gradient(circle at 80% 20%, var(--joy-surface-raised) 0%, var(--joy-surface-sunken) 70%);
+      background-color: var(--joy-color-navy-950) !important;
+      background-image: radial-gradient(circle at 80% 20%, var(--joy-color-navy-900) 0%, var(--joy-color-navy-950) 70%) !important;
     }
     .hud-visor-frame[data-scene="daylight"] {
-      background: radial-gradient(circle at 50% 50%, var(--joy-surface-card) 0%, var(--joy-surface-canvas) 100%);
+      background-color: var(--joy-color-navy-950) !important;
+      background-image: radial-gradient(circle at 50% 50%, var(--joy-color-navy-900) 0%, var(--joy-color-navy-950) 100%) !important;
     }
     .hud-visor-frame[data-scene="optical"] {
-      background: var(--joy-surface-inverse);
+      background-color: var(--joy-color-navy-950) !important;
+      background-image: none !important;
     }
     .hud-reticle-overlay {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      border: 1px dashed var(--joy-border-subtle);
+      border: 1px dashed var(--joy-color-navy-800);
       margin: 12px;
       border-radius: var(--joy-radius-md);
       opacity: 0.35;
@@ -2917,7 +2921,7 @@ ${inlinedThemeCss}
       position: absolute;
       width: 16px;
       height: 16px;
-      border-color: var(--joy-accent-default);
+      border-color: var(--joy-status-success-fg);
       border-style: solid;
       border-width: 0;
     }
@@ -2934,24 +2938,26 @@ ${inlinedThemeCss}
       justify-content: space-between;
       align-items: center;
       padding: 16px 24px;
-      border-bottom: 1px solid var(--joy-border-subtle);
-      background: var(--joy-surface-raised);
+      border-bottom: 1px solid var(--joy-color-navy-800);
+      background: var(--joy-color-navy-900);
       font-size: var(--joy-font-size-xs);
       font-family: monospace;
+      color: var(--joy-status-success-fg);
     }
     .hud-telemetry-brand {
       display: flex;
       align-items: center;
       gap: 8px;
       font-weight: 700;
-      color: var(--joy-accent-default);
+      color: var(--joy-status-success-fg);
       letter-spacing: 0.05em;
     }
     .hud-telemetry-metrics {
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--joy-text-secondary);
+      color: var(--joy-status-success-fg);
+      opacity: 0.9;
     }
     .hud-live-meter {
       display: inline-flex;
@@ -2961,7 +2967,7 @@ ${inlinedThemeCss}
     }
     .hud-meter-bar {
       width: 3px;
-      background: var(--joy-accent-default);
+      background: var(--joy-status-success-fg);
       border-radius: 1px;
       animation: hudMeterPulse 0.8s ease-in-out infinite alternate;
     }
@@ -3014,7 +3020,7 @@ ${inlinedThemeCss}
       .hud-left-panel {
         padding: 16px;
         border-right: none !important;
-        border-bottom: 1px solid var(--joy-border-subtle);
+        border-bottom: 1px solid var(--joy-color-navy-800);
       }
       .hud-right-panel {
         padding: 16px;
@@ -3042,7 +3048,7 @@ ${inlinedThemeCss}
     /* Left Panel: Communication Stream */
     .hud-left-panel {
       padding: 24px;
-      border-right: 1px solid var(--joy-border-subtle);
+      border-right: 1px solid var(--joy-color-navy-800);
       display: flex;
       flex-direction: column;
     }
@@ -3060,13 +3066,15 @@ ${inlinedThemeCss}
       gap: 8px;
       padding: 6px 14px;
       border-radius: var(--joy-radius-pill);
-      background: var(--joy-surface-raised);
-      border: 1px solid var(--joy-border-default);
+      background: var(--joy-color-navy-900);
+      border: 1px solid var(--joy-status-success-border);
+      color: var(--joy-status-success-fg);
       font-size: var(--joy-font-size-xs);
       font-weight: 600;
       letter-spacing: 0.02em;
       white-space: nowrap;
       flex-shrink: 0;
+      font-family: monospace;
     }
     .hud-status-indicator {
       display: inline-block;
@@ -3077,16 +3085,16 @@ ${inlinedThemeCss}
       box-shadow: 0 0 8px var(--joy-status-success-fg);
     }
     .hud-com-pill[data-state="watching"] .hud-status-indicator {
-      background: var(--joy-accent-highlight);
-      box-shadow: 0 0 8px var(--joy-accent-highlight);
+      background: var(--joy-status-success-fg);
+      box-shadow: 0 0 8px var(--joy-status-success-fg);
     }
     .hud-com-pill[data-state="talking"] .hud-status-indicator {
-      background: var(--joy-accent-default);
-      box-shadow: 0 0 8px var(--joy-accent-default);
+      background: var(--joy-status-success-fg);
+      box-shadow: 0 0 8px var(--joy-status-success-fg);
     }
     .hud-com-pill[data-state="recording"] .hud-status-indicator {
-      background: var(--joy-status-warning-fg);
-      box-shadow: 0 0 8px var(--joy-status-warning-fg);
+      background: var(--joy-status-success-fg);
+      box-shadow: 0 0 8px var(--joy-status-success-fg);
       animation: recordingBlink 0.6s infinite alternate;
     }
     @keyframes recordingBlink {
@@ -3096,8 +3104,8 @@ ${inlinedThemeCss}
 
     .hud-transcript-box {
       flex: 1;
-      background: var(--joy-surface-raised);
-      border: 1px solid var(--joy-border-subtle);
+      background: var(--joy-color-navy-900);
+      border: 1px solid var(--joy-color-navy-800);
       border-radius: var(--joy-radius-md);
       padding: 20px;
       display: flex;
@@ -3117,29 +3125,31 @@ ${inlinedThemeCss}
     .hud-msg-speaker {
       font-size: var(--joy-font-size-xs);
       font-weight: 700;
-      color: var(--joy-text-muted);
+      color: var(--joy-status-success-fg);
+      opacity: 0.75;
       margin-bottom: 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      font-family: monospace;
     }
     .hud-msg-text {
       font-size: var(--joy-font-size-sm);
       line-height: 1.5;
-      color: var(--joy-text-primary);
+      color: var(--joy-status-success-fg);
+      font-family: monospace;
     }
     .hud-msg-text--user {
-      color: var(--joy-text-secondary);
+      opacity: 0.85;
     }
     .hud-msg-text--agent {
-      color: var(--joy-text-primary);
-      font-weight: 500;
+      font-weight: 600;
     }
     .hud-typing-cursor {
       display: inline-block;
       width: 6px;
       height: 14px;
-      background: var(--joy-accent-default);
+      background: var(--joy-status-success-fg);
       margin-left: 4px;
       vertical-align: middle;
       animation: cursorBlink 0.8s infinite;
@@ -3161,20 +3171,21 @@ ${inlinedThemeCss}
       align-items: center;
       margin-bottom: 18px;
       padding-bottom: 12px;
-      border-bottom: 1px solid var(--joy-border-subtle);
+      border-bottom: 1px solid var(--joy-color-navy-800);
     }
     .hud-assist-title {
       font-size: var(--joy-font-size-sm);
       font-weight: 700;
-      color: var(--joy-text-primary);
+      color: var(--joy-status-success-fg);
       letter-spacing: 0.02em;
+      font-family: monospace;
     }
     .hud-assist-guide-badge {
       font-size: var(--joy-font-size-xs);
       font-family: monospace;
-      color: var(--joy-accent-default);
-      background: var(--joy-surface-raised);
-      border: 1px solid var(--joy-border-subtle);
+      color: var(--joy-status-success-fg);
+      background: var(--joy-color-navy-900);
+      border: 1px solid var(--joy-color-navy-800);
       padding: 4px 10px;
       border-radius: var(--joy-radius-pill);
     }
@@ -3192,39 +3203,181 @@ ${inlinedThemeCss}
       gap: 12px;
       padding: 12px 16px;
       border-radius: var(--joy-radius-md);
-      background: var(--joy-surface-raised);
-      border: 1px solid var(--joy-border-subtle);
+      background: var(--joy-color-navy-900);
+      border: 1px solid var(--joy-color-navy-800);
       font-size: var(--joy-font-size-sm);
-      color: var(--joy-text-primary);
+      color: var(--joy-status-success-fg);
+      font-family: monospace;
       cursor: pointer;
       transition: all var(--joy-duration-fast) var(--joy-ease-default);
     }
-    .hud-list-item:hover,
-    .hud-list-item.selected {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-accent-default);
+    .hud-list-item:hover {
+      border-color: var(--joy-status-success-border);
     }
     .hud-cursor-arrow {
       font-family: monospace;
       font-weight: 800;
-      color: var(--joy-accent-default);
+      color: var(--joy-status-success-fg);
       width: 14px;
       display: inline-block;
     }
     .hud-checkbox-box {
-      width: 18px;
-      height: 18px;
-      border-radius: var(--joy-radius-control);
-      border: 1.5px solid var(--joy-border-default);
+      width: 24px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: var(--joy-status-success-fg);
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: -0.05em;
+    }
+
+    /* REVERSE-VIDEO Selection Highlight & Optical Phosphor Tokens */
+    .hud-visor-frame[data-phosphor="green"] {
+      --hud-phosphor-color: var(--joy-status-success-fg);
+      color: var(--hud-phosphor-color);
+      border-color: var(--joy-color-navy-800);
+    }
+    :root:not([data-theme="dark"]) .hud-visor-frame[data-phosphor="green"] {
+      --hud-phosphor-color: var(--joy-status-success-border);
+    }
+    .hud-visor-frame[data-phosphor="green"] .hud-telemetry-brand,
+    .hud-visor-frame[data-phosphor="green"] .hud-telemetry-metrics,
+    .hud-visor-frame[data-phosphor="green"] .hud-reticle-corner,
+    .hud-visor-frame[data-phosphor="green"] .hud-com-pill,
+    .hud-visor-frame[data-phosphor="green"] .hud-msg-speaker,
+    .hud-visor-frame[data-phosphor="green"] .hud-msg-text,
+    .hud-visor-frame[data-phosphor="green"] .hud-assist-title,
+    .hud-visor-frame[data-phosphor="green"] .hud-assist-guide-badge,
+    .hud-visor-frame[data-phosphor="green"] .hud-list-item,
+    .hud-visor-frame[data-phosphor="green"] .hud-cursor-arrow,
+    .hud-visor-frame[data-phosphor="green"] .hud-checkbox-box,
+    .hud-visor-frame[data-phosphor="green"] .hud-touch-btn,
+    .hud-visor-frame[data-phosphor="green"] .hud-event-feed,
+    .hud-visor-frame[data-phosphor="green"] #hud-detail-title,
+    .hud-visor-frame[data-phosphor="green"] #hud-guide-cycle {
+      color: var(--hud-phosphor-color) !important;
+      border-color: var(--hud-phosphor-color) !important;
+    }
+    .hud-visor-frame[data-phosphor="green"] .hud-meter-bar,
+    .hud-visor-frame[data-phosphor="green"] .hud-typing-cursor,
+    .hud-visor-frame[data-phosphor="green"] .hud-status-indicator {
+      background: var(--hud-phosphor-color) !important;
+      box-shadow: 0 0 8px var(--hud-phosphor-color);
+    }
+    .hud-visor-frame[data-phosphor="green"] .hud-list-item.selected {
+      background: var(--hud-phosphor-color) !important;
+      color: var(--joy-color-navy-950) !important;
+      border-color: var(--hud-phosphor-color) !important;
+      font-weight: 700;
+    }
+    .hud-visor-frame[data-phosphor="green"] .hud-list-item.selected * {
+      color: var(--joy-color-navy-950) !important;
+      border-color: var(--joy-color-navy-950) !important;
+    }
+    .hud-visor-frame .joy-button--subtle {
+      background: var(--joy-color-navy-950) !important;
+      border: 1px solid var(--joy-color-navy-800) !important;
+      color: var(--hud-phosphor-color, var(--joy-status-success-fg)) !important;
+    }
+    .hud-visor-frame .joy-button--subtle:hover {
+      border-color: var(--hud-phosphor-color, var(--joy-status-success-fg)) !important;
+    }
+
+    /* Amber Phosphor Mode (P20 Phosphor, 585nm Gold) */
+    .hud-visor-frame[data-phosphor="amber"] {
+      border-color: var(--joy-accent-default);
+      color: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="amber"] .hud-reticle-corner {
+      border-color: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="amber"] .hud-telemetry-brand,
+    .hud-visor-frame[data-phosphor="amber"] .hud-telemetry-metrics,
+    .hud-visor-frame[data-phosphor="amber"] .hud-com-pill,
+    .hud-visor-frame[data-phosphor="amber"] .hud-assist-title,
+    .hud-visor-frame[data-phosphor="amber"] .hud-assist-guide-badge,
+    .hud-visor-frame[data-phosphor="amber"] .hud-msg-speaker,
+    .hud-visor-frame[data-phosphor="amber"] .hud-msg-text,
+    .hud-visor-frame[data-phosphor="amber"] .hud-list-item,
+    .hud-visor-frame[data-phosphor="amber"] .hud-cursor-arrow,
+    .hud-visor-frame[data-phosphor="amber"] .hud-checkbox-box,
+    .hud-visor-frame[data-phosphor="amber"] .hud-touch-btn,
+    .hud-visor-frame[data-phosphor="amber"] .hud-event-feed {
+      color: var(--joy-accent-default);
+      border-color: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="amber"] .hud-meter-bar,
+    .hud-visor-frame[data-phosphor="amber"] .hud-typing-cursor,
+    .hud-visor-frame[data-phosphor="amber"] .hud-status-indicator {
+      background: var(--joy-accent-default);
+      box-shadow: 0 0 8px var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="amber"] .hud-list-item.selected {
+      background: var(--joy-accent-default) !important;
+      color: var(--joy-color-navy-950) !important;
+      border-color: var(--joy-accent-default) !important;
+      font-weight: 700;
+    }
+    .hud-visor-frame[data-phosphor="amber"] .hud-list-item.selected * {
+      color: var(--joy-color-navy-950) !important;
+      border-color: var(--joy-color-navy-950) !important;
+    }
+
+    /* Polychrome Dual-RGB Mode */
+    .hud-visor-frame[data-phosphor="dual"] {
+      border-color: var(--joy-border-strong);
       color: var(--joy-text-primary);
     }
-    .hud-checkbox-box.checked {
-      background: var(--joy-accent-default);
+    .hud-visor-frame[data-phosphor="dual"] .hud-reticle-corner {
       border-color: var(--joy-accent-default);
-      color: var(--joy-text-inverse);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-telemetry-brand {
+      color: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-telemetry-metrics {
+      color: var(--joy-text-secondary);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-meter-bar {
+      background: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-com-pill {
+      color: var(--joy-text-primary);
+      border-color: var(--joy-border-default);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-msg-speaker {
+      color: var(--joy-text-muted);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-msg-text--user {
+      color: var(--joy-text-secondary);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-msg-text--agent {
+      color: var(--joy-text-primary);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-assist-title {
+      color: var(--joy-text-primary);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-assist-guide-badge {
+      color: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-list-item {
+      color: var(--joy-text-primary);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-list-item.selected {
+      background: var(--joy-color-navy-800) !important;
+      border-color: var(--joy-accent-default) !important;
+      color: var(--joy-text-primary) !important;
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-cursor-arrow {
+      color: var(--joy-accent-default);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-touch-btn {
+      color: var(--joy-text-primary);
+    }
+    .hud-visor-frame[data-phosphor="dual"] .hud-event-feed {
+      color: var(--joy-accent-default);
     }
 
     /* Temple Touchpad Controller Bar */
@@ -3232,8 +3385,8 @@ ${inlinedThemeCss}
       position: relative;
       z-index: 10;
       padding: 16px 24px;
-      border-top: 1px solid var(--joy-border-subtle);
-      background: var(--joy-surface-raised);
+      border-top: 1px solid var(--joy-color-navy-800);
+      background: var(--joy-color-navy-900);
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -3251,17 +3404,17 @@ ${inlinedThemeCss}
       gap: 6px;
       padding: 8px 14px;
       border-radius: var(--joy-radius-md);
-      background: var(--joy-surface-sunken);
-      border: 1px solid var(--joy-border-default);
-      color: var(--joy-text-primary);
+      background: var(--joy-color-navy-950);
+      border: 1px solid var(--joy-color-navy-800);
+      color: var(--joy-status-success-fg);
       font-size: var(--joy-font-size-xs);
       font-weight: 600;
+      font-family: monospace;
       cursor: pointer;
       transition: all var(--joy-duration-fast) var(--joy-ease-default);
     }
     .hud-touch-btn:hover {
-      background: var(--joy-surface-card);
-      border-color: var(--joy-accent-default);
+      border-color: var(--joy-status-success-fg);
     }
     .hud-touch-btn:active {
       transform: scale(0.96);
@@ -3269,11 +3422,11 @@ ${inlinedThemeCss}
     .hud-event-feed {
       font-family: monospace;
       font-size: var(--joy-font-size-xs);
-      color: var(--joy-accent-default);
-      background: var(--joy-surface-sunken);
+      color: var(--joy-status-success-fg);
+      background: var(--joy-color-navy-950);
       padding: 6px 12px;
       border-radius: var(--joy-radius-pill);
-      border: 1px solid var(--joy-border-subtle);
+      border: 1px solid var(--joy-color-navy-800);
       max-width: 480px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -7824,16 +7977,26 @@ export async function executeHedge(symbol: string, size: number) {
         </div>
       </section>
 
-      <!-- View: Glasses HUD (Optical AR) (F-056) -->
+      <!-- View: Glasses HUD (Optical AR) (F-056 / F-057) -->
       <section id="view-glasses-hud" class="view-panel">
         <div class="hud-hero-header">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span class="joy-badge joy-badge--success joy-badge--sm">P43 PHOSPHOR GREEN (530nm)</span>
             <span class="joy-badge joy-badge--brand joy-badge--sm">OPTICAL OST HUD</span>
             <span class="joy-badge joy-badge--neutral joy-badge--sm">WAVEGUIDE AR</span>
           </div>
           <h2 style="margin: 0 0 8px 0;">Smart Glasses Head-Up Display (Glasses HUD)</h2>
-          <p class="header-tagline">Dual-panel monocular optical see-through interface with conversational speech streaming, hierarchical assist navigation, and temple touchpad gesture control.</p>
+          <p class="header-tagline">Dual-panel monocular optical see-through interface with conversational speech streaming, single-color symbolic selection, and temple touchpad gesture control.</p>
           
+          <div class="hud-ambient-switcher" style="margin-bottom: 12px;">
+            <span class="hud-ambient-label">Optical Emitter Phosphor:</span>
+            <div class="segmented-control" role="group" aria-label="Select optical phosphor emitter mode">
+              <button type="button" class="segment-btn active" id="btn-phosphor-green" onclick="switchHudPhosphor('green', this)">P43 Phosphor Green (530nm Mono)</button>
+              <button type="button" class="segment-btn" id="btn-phosphor-amber" onclick="switchHudPhosphor('amber', this)">P20 Amber Phosphor (585nm)</button>
+              <button type="button" class="segment-btn" id="btn-phosphor-dual" onclick="switchHudPhosphor('dual', this)">Polychrome Dual-RGB</button>
+            </div>
+          </div>
+
           <div class="hud-ambient-switcher">
             <span class="hud-ambient-label">Ambient Optic Scene:</span>
             <div class="segmented-control" role="group" aria-label="Select ambient environment">
@@ -7845,7 +8008,7 @@ export async function executeHedge(symbol: string, size: number) {
         </div>
 
         <!-- The Glasses HUD Eyebox Visor Viewport -->
-        <div class="hud-visor-frame" id="hud-visor-frame" data-scene="cyberpunk" tabindex="0" role="region" aria-label="Smart Glasses Head Up Display Simulator">
+        <div class="hud-visor-frame" id="hud-visor-frame" data-scene="cyberpunk" data-phosphor="green" tabindex="0" role="region" aria-label="Smart Glasses Head Up Display Simulator">
           <div class="hud-reticle-overlay" aria-hidden="true"></div>
           <div class="hud-reticle-corner hud-reticle-tl" aria-hidden="true"></div>
           <div class="hud-reticle-corner hud-reticle-tr" aria-hidden="true"></div>
@@ -7856,10 +8019,11 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="hud-telemetry-bar">
             <div class="hud-telemetry-brand">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              <span>JOYMIFY AR // GLASSES HUD v2.5</span>
+              <span>JOYMIFY AR // GLASSES HUD v2.6</span>
             </div>
             <div class="hud-telemetry-metrics">
               <span>FOV: 25° MONO</span>
+              <span>P43: 530nm</span>
               <span>LUM: 3,500 NITS</span>
               <span>BAT: 84%</span>
               <div style="display: flex; align-items: center; gap: 4px;">
@@ -7883,7 +8047,7 @@ export async function executeHedge(symbol: string, size: number) {
                   <span class="hud-status-indicator" id="hud-status-dot"></span>
                   <span id="hud-mode-label">Voice</span>
                   <span style="opacity: 0.5;">/</span>
-                  <span id="hud-state-label">AI Talking</span>
+                  <span id="hud-state-label">▶ TALKING (AI Talking)</span>
                 </div>
                 <div style="display: flex; gap: 6px;">
                   <button type="button" class="joy-button joy-button--subtle joy-button--xs" onclick="simulateSpeechInput('Morning, show me the checklist')">Prompt: Checklist</button>
@@ -7916,27 +8080,27 @@ export async function executeHedge(symbol: string, size: number) {
             <div class="hud-right-panel">
               <div class="hud-assist-header">
                 <div class="hud-assist-title" id="hud-assist-title">Today Todos</div>
-                <div class="hud-assist-guide-badge" id="hud-assist-guide">double tap : to Control Center</div>
+                <div class="hud-assist-guide-badge" id="hud-assist-guide">◄ double tap : to Control Center</div>
               </div>
 
               <!-- View 1: Control Center (Root Launcher) -->
               <div class="hud-assist-view" id="hud-view-control-center" style="display: none;">
                 <div class="hud-list-item selected" data-index="0" onclick="selectHudControlItem(0)">
-                  <span class="hud-cursor-arrow">&gt;</span>
+                  <span class="hud-cursor-arrow">▶</span>
                   <span>Conversation Control</span>
                 </div>
                 <div class="hud-list-item" data-index="1" onclick="selectHudControlItem(1)">
                   <span class="hud-cursor-arrow">&nbsp;</span>
                   <span style="display: flex; justify-content: space-between; width: 100%;">
                     <span>Daily Todos</span>
-                    <span class="joy-badge joy-badge--neutral joy-badge--xs" id="hud-todos-badge">1 / 3</span>
+                    <span class="joy-badge joy-badge--neutral joy-badge--xs" id="hud-todos-badge">[ 1 / 3 ]</span>
                   </span>
                 </div>
                 <div class="hud-list-item" data-index="2" onclick="selectHudControlItem(2)">
                   <span class="hud-cursor-arrow">&nbsp;</span>
                   <span style="display: flex; justify-content: space-between; width: 100%;">
                     <span>Notifications</span>
-                    <span class="joy-badge joy-badge--brand joy-badge--xs">(2) 10m ago</span>
+                    <span class="joy-badge joy-badge--brand joy-badge--xs">[ 2 ] 10m ago</span>
                   </span>
                 </div>
                 <div class="hud-list-item" data-index="3" onclick="selectHudControlItem(3)">
@@ -7948,61 +8112,59 @@ export async function executeHedge(symbol: string, size: number) {
               <!-- View 2: Today Todos (Checklist) -->
               <div class="hud-assist-view" id="hud-view-todos" style="display: flex;">
                 <div class="hud-list-item selected" data-index="0" onclick="selectHudTodoItem(0)">
-                  <span class="hud-cursor-arrow">&gt;</span>
-                  <div class="hud-checkbox-box" id="todo-box-0"></div>
+                  <span class="hud-cursor-arrow">▶</span>
+                  <div class="hud-checkbox-box" id="todo-box-0">[ ]</div>
                   <span>Walk 3 Km</span>
                 </div>
                 <div class="hud-list-item" data-index="1" onclick="selectHudTodoItem(1)">
                   <span class="hud-cursor-arrow">&nbsp;</span>
-                  <div class="hud-checkbox-box checked" id="todo-box-1">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  </div>
-                  <span>Prepare Meeting note</span>
+                  <div class="hud-checkbox-box checked" id="todo-box-1">[x]</div>
+                  <span style="text-decoration: line-through;">Prepare Meeting note</span>
                 </div>
                 <div class="hud-list-item" data-index="2" onclick="selectHudTodoItem(2)">
                   <span class="hud-cursor-arrow">&nbsp;</span>
-                  <div class="hud-checkbox-box" id="todo-box-2"></div>
+                  <div class="hud-checkbox-box" id="todo-box-2">[ ]</div>
                   <span>Meeting with John</span>
                 </div>
               </div>
 
               <!-- View 3: Todo Detail Action Tray -->
               <div class="hud-assist-view" id="hud-view-todo-detail" style="display: none;">
-                <div style="font-weight: 700; font-size: var(--joy-font-size-sm); margin-bottom: 8px; color: var(--joy-accent-default);" id="hud-detail-title">Walk 3 Km</div>
+                <div style="font-weight: 700; font-size: var(--joy-font-size-sm); margin-bottom: 8px; color: var(--joy-status-success-fg);" id="hud-detail-title">Walk 3 Km</div>
                 <div class="hud-list-item selected" data-action="mark_done" onclick="executeHudAction('mark_done')">
-                  <span class="hud-cursor-arrow">&gt;</span>
-                  <span>[ Mark done ]</span>
+                  <span class="hud-cursor-arrow">▶</span>
+                  <span>[x] [ Mark done ]</span>
                 </div>
                 <div class="hud-list-item" data-action="mark_undone" onclick="executeHudAction('mark_undone')">
                   <span class="hud-cursor-arrow">&nbsp;</span>
-                  <span>[ Mark not done ]</span>
+                  <span>[ ] [ Mark not done ]</span>
                 </div>
                 <div class="hud-list-item" data-action="delete" onclick="executeHudAction('delete')">
                   <span class="hud-cursor-arrow">&nbsp;</span>
-                  <span>[ Delete ]</span>
+                  <span>[×] [ Delete ]</span>
                 </div>
               </div>
 
               <!-- View 4: Communication State Control Guide -->
               <div class="hud-assist-view" id="hud-view-com-guide" style="display: none;">
-                <div style="font-size: var(--joy-font-size-xs); font-family: monospace; color: var(--joy-text-muted); margin-bottom: 8px;">
-                  Mode: <span id="hud-guide-cycle" style="color: var(--joy-accent-default); font-weight: 700;">[ listen &harr; pause &harr; watch ]</span>
+                <div style="font-size: var(--joy-font-size-xs); font-family: monospace; color: var(--joy-status-success-fg); margin-bottom: 8px; opacity: 0.85;">
+                  Mode: <span id="hud-guide-cycle" style="color: var(--joy-status-success-fg); font-weight: 700;">[ listen ◄► pause ◄► watch ]</span>
                 </div>
                 <div class="hud-list-item" style="cursor: default;">
                   <span style="font-size: var(--joy-font-size-xs); line-height: 1.5;">
-                    <strong>tap : to Interrupt</strong><br>
-                    State machine: interrupt &bull; record &bull; resume AI talking
+                    <strong>▶ tap : to Interrupt</strong><br>
+                    State machine: interrupt • record • resume AI talking
                   </span>
                 </div>
                 <div class="hud-list-item" style="cursor: default;">
                   <span style="font-size: var(--joy-font-size-xs); line-height: 1.5;">
-                    <strong>swipe : to switch mode</strong><br>
+                    <strong>▲▼ swipe : to switch mode</strong><br>
                     Cycle between listening, watching, and paused glance
                   </span>
                 </div>
                 <div class="hud-list-item" style="cursor: default;">
                   <span style="font-size: var(--joy-font-size-xs); line-height: 1.5;">
-                    <strong>double tap : to back</strong><br>
+                    <strong>◄ double tap : to back</strong><br>
                     Return to root Control Center
                   </span>
                 </div>
@@ -8013,22 +8175,22 @@ export async function executeHedge(symbol: string, size: number) {
           <!-- Bottom Temple Touchpad Simulator Bar -->
           <div class="hud-temple-controller">
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%;">
-              <span style="font-size: var(--joy-font-size-xs); font-weight: 700; color: var(--joy-text-muted);">TEMPLE TOUCHPAD:</span>
+              <span style="font-size: var(--joy-font-size-xs); font-weight: 700; color: var(--joy-status-success-fg); opacity: 0.75;">TEMPLE TOUCHPAD:</span>
               <div class="hud-temple-touchbar">
                 <button type="button" class="hud-touch-btn" id="btn-touch-tap" onclick="triggerHudGesture('tap')">
-                  <span>Tap (Select / Interrupt)</span>
+                  <span>▶ Tap (Select / ⏸ Interrupt)</span>
                 </button>
                 <button type="button" class="hud-touch-btn" id="btn-touch-double" onclick="triggerHudGesture('double_tap')">
-                  <span>Double Tap (Back)</span>
+                  <span>◄ Double Tap (Back)</span>
                 </button>
                 <button type="button" class="hud-touch-btn" id="btn-touch-swipe-down" onclick="triggerHudGesture('swipe_down')">
-                  <span>Swipe &darr; (Next)</span>
+                  <span>▼ Swipe (Next)</span>
                 </button>
                 <button type="button" class="hud-touch-btn" id="btn-touch-swipe-up" onclick="triggerHudGesture('swipe_up')">
-                  <span>Swipe &uarr; (Prev)</span>
+                  <span>▲ Swipe (Prev)</span>
                 </button>
                 <button type="button" class="hud-touch-btn" id="btn-touch-hold" onclick="triggerHudGesture('hold')">
-                  <span>Hold (Record)</span>
+                  <span>● Hold (Record Memo)</span>
                 </button>
               </div>
             </div>
@@ -8042,27 +8204,27 @@ export async function executeHedge(symbol: string, size: number) {
           <div class="apple-specs-bento">
             <div class="apple-bento-tile apple-bento-tile--col-6">
               <span class="apple-eyebrow">Optical Waveguide Physics</span>
-              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Additive Light & Transparent Black</h4>
-              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">MicroLED waveguides emit photons onto transparent glass; true black (zero-emission black) emits no light and renders completely transparent. Never render opaque white or light grey card surfaces in native HUD mode.</p>
-              <span class="joy-badge joy-badge--brand joy-badge--sm">Additive RGB</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">All-Case Dark Background & Additive Light</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">MicroLED waveguides emit photons onto transparent optical glass. Photons are purely additive; 0-emission true black equals 100% transparent reality. Opaque white cards do not exist in optical waveguides and would cause total vision occlusion and rapid battery drainage.</p>
+              <span class="joy-badge joy-badge--brand joy-badge--sm">Additive MicroLED</span>
             </div>
             <div class="apple-bento-tile apple-bento-tile--col-6">
-              <span class="apple-eyebrow">Audio-Visual State Control</span>
-              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Deterministic 4-State Machine</h4>
-              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Coordinates active <code>Listening</code>, ambient <code>Watching</code>, synthesized <code>AI Talking</code>, and memo <code>Recording</code>. Single Tap instantly forces speech interruption, freeing user attention.</p>
-              <span class="joy-badge joy-badge--success joy-badge--sm">Zero Stalls</span>
+              <span class="apple-eyebrow">Monochrome Green MicroLED</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">P43 Phosphor (530nm) & Photopic Peak V(λ)</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Human eye photopic sensitivity peaks at 555nm (green). A single-wavelength P43 green emitter produces 4× to 5× higher perceived luminance per milliwatt than blue or red, achieving 3,500+ nits to punch through direct outdoor sunlight all day.</p>
+              <span class="joy-badge joy-badge--success joy-badge--sm">Photopic V(λ) 555nm</span>
             </div>
             <div class="apple-bento-tile apple-bento-tile--col-6">
-              <span class="apple-eyebrow">Touch Gesture Syntax</span>
-              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Temple Capacitive Input</h4>
-              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Intuitive blind ergonomics: Tap executes or interrupts; Double Tap always navigates back to parent/Control Center; Swipes move cursors; Long Press triggers instant hands-free recording.</p>
-              <span class="joy-badge joy-badge--warning joy-badge--sm">Capacitive Temple</span>
+              <span class="apple-eyebrow">Symbolic State Matrix</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Single-Color Geometric Symbols & Reverse-Video</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Without color hue variance, all state distinctions use high-contrast geometric symbols: <code>▶</code> cursor with solid reverse-video rectangular fill (green background with black text), <code>[x]</code> completed, <code>[ ]</code> pending, <code>[×]</code> delete, and directional cues <code>▲ / ▼ / ◄</code>.</p>
+              <span class="joy-badge joy-badge--warning joy-badge--sm">Reverse-Video Selection</span>
             </div>
             <div class="apple-bento-tile apple-bento-tile--col-6">
-              <span class="apple-eyebrow">Zero Emoji & Pure Tokens</span>
+              <span class="apple-eyebrow">Zero Emoji Policy</span>
               <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Enterprise Optical Contract</h4>
-              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Strict prohibition of OS emojis; all status indicators use crisp vector SVGs from <code>@joymify/icons</code>. Color assignments map exclusively to Joymify semantic tokens.</p>
-              <span class="joy-badge joy-badge--neutral joy-badge--sm">WCAG 2.2 AA Contrast</span>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">OS emojis render unpredictable multi-color bitmaps that ruin optical waveguides. All symbols use standard non-emoji geometric unicode (U+25B6, U+00D7, U+25C4) or scalable vector SVGs from <code>@joymify/icons</code>.</p>
+              <span class="joy-badge joy-badge--neutral joy-badge--sm">Zero OS Emojis</span>
             </div>
           </div>
         </div>
@@ -10802,7 +10964,8 @@ export async function executeHedge(symbol: string, size: number) {
     }
     window.scrollToAppleScene = scrollToAppleScene;
 
-    /* ── Smart Glasses Head-Up Display (Glasses HUD) Engine (F-056) ── */
+    /* ── Smart Glasses Head-Up Display (Glasses HUD) Engine (F-056 / F-057) ── */
+    let hudPhosphor = 'green'; // 'green' | 'amber' | 'dual'
     let hudState = 'talking'; // 'listening' | 'watching' | 'talking' | 'recording'
     let hudMode = 'Voice'; // 'Voice' | 'Watch' | 'Pause'
     let hudActiveView = 'todos'; // 'todos' | 'control_center' | 'todo_detail' | 'com_guide'
@@ -10820,6 +10983,18 @@ export async function executeHedge(symbol: string, size: number) {
       const feed = document.getElementById('hud-event-feed');
       if (feed) feed.textContent = msg;
     }
+
+    function switchHudPhosphor(mode, btn) {
+      hudPhosphor = mode;
+      const frame = document.getElementById('hud-visor-frame');
+      if (frame) frame.setAttribute('data-phosphor', mode);
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      logHudEvent('[EMITTER] Optical phosphor set to: ' + mode.toUpperCase());
+    }
+    window.switchHudPhosphor = switchHudPhosphor;
 
     function switchHudAmbientScene(scene, btn) {
       const frame = document.getElementById('hud-visor-frame');
@@ -10844,14 +11019,12 @@ export async function executeHedge(symbol: string, size: number) {
 
         const arrow = document.createElement('span');
         arrow.className = 'hud-cursor-arrow';
-        arrow.innerHTML = (idx === hudSelectedTodo ? '&gt;' : '&nbsp;');
+        arrow.textContent = (idx === hudSelectedTodo ? '▶' : ' ');
 
         const box = document.createElement('div');
         box.id = 'todo-box-' + idx;
         box.className = 'hud-checkbox-box' + (item.done ? ' checked' : '');
-        if (item.done) {
-          box.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-        }
+        box.textContent = (item.done ? '[x]' : '[ ]');
 
         const label = document.createElement('span');
         label.textContent = item.text;
@@ -10866,7 +11039,7 @@ export async function executeHedge(symbol: string, size: number) {
       const badge = document.getElementById('hud-todos-badge');
       if (badge) {
         const doneCount = hudTodos.filter(t => t.done).length;
-        badge.textContent = doneCount + ' / ' + hudTodos.length;
+        badge.textContent = '[ ' + doneCount + ' / ' + hudTodos.length + ' ]';
       }
     }
 
@@ -10878,10 +11051,10 @@ export async function executeHedge(symbol: string, size: number) {
         const arrow = el.querySelector('.hud-cursor-arrow');
         if (idx === hudSelectedControl) {
           el.classList.add('selected');
-          if (arrow) arrow.innerHTML = '&gt;';
+          if (arrow) arrow.textContent = '▶';
         } else {
           el.classList.remove('selected');
-          if (arrow) arrow.innerHTML = '&nbsp;';
+          if (arrow) arrow.textContent = ' ';
         }
       });
     }
@@ -10898,10 +11071,10 @@ export async function executeHedge(symbol: string, size: number) {
         const arrow = el.querySelector('.hud-cursor-arrow');
         if (idx === hudSelectedAction) {
           el.classList.add('selected');
-          if (arrow) arrow.innerHTML = '&gt;';
+          if (arrow) arrow.textContent = '▶';
         } else {
           el.classList.remove('selected');
-          if (arrow) arrow.innerHTML = '&nbsp;';
+          if (arrow) arrow.textContent = ' ';
         }
       });
     }
@@ -10916,10 +11089,10 @@ export async function executeHedge(symbol: string, size: number) {
       if (pill) pill.setAttribute('data-state', hudState);
       if (modeLabel) modeLabel.textContent = hudMode;
       if (stateLabel) {
-        if (hudState === 'talking') stateLabel.textContent = 'AI Talking';
-        else if (hudState === 'listening') stateLabel.textContent = 'Listening';
-        else if (hudState === 'watching') stateLabel.textContent = 'Watching';
-        else if (hudState === 'recording') stateLabel.textContent = 'Recording';
+        if (hudState === 'talking') stateLabel.textContent = '▶ TALKING (AI Talking)';
+        else if (hudState === 'listening') stateLabel.textContent = '[~ LISTEN] (Listening)';
+        else if (hudState === 'watching') stateLabel.textContent = '〇 WATCH (Watching)';
+        else if (hudState === 'recording') stateLabel.textContent = '● REC (Recording)';
       }
 
       // Hide all assist views, then show active
@@ -10936,20 +11109,20 @@ export async function executeHedge(symbol: string, size: number) {
       if (titleEl && guideEl) {
         if (hudActiveView === 'todos') {
           titleEl.textContent = 'Today Todos';
-          guideEl.textContent = 'double tap : to Control Center';
+          guideEl.textContent = '◄ double tap : to Control Center';
           renderHudTodosView();
         } else if (hudActiveView === 'control_center') {
           titleEl.textContent = 'Control Center';
-          guideEl.textContent = 'tap: select · swipe: navigate';
+          guideEl.textContent = '▶ tap : select · ▲▼ swipe : move';
           renderHudControlCenterView();
         } else if (hudActiveView === 'todo_detail') {
           const curItem = hudTodos[hudSelectedTodo];
           titleEl.textContent = 'Today Todos > ' + (curItem ? curItem.text : 'Item');
-          guideEl.textContent = 'double tap : to back';
+          guideEl.textContent = '◄ double tap : to back';
           renderHudTodoDetailView();
         } else if (hudActiveView === 'com_guide') {
           titleEl.textContent = 'Communication Control';
-          guideEl.textContent = 'double tap : to back';
+          guideEl.textContent = '◄ double tap : to back';
         }
       }
     }
@@ -11001,16 +11174,16 @@ export async function executeHedge(symbol: string, size: number) {
       if (!curItem) return;
       if (action === 'mark_done') {
         curItem.done = true;
-        logHudEvent('[ACTION] Marked done: ' + curItem.text);
+        logHudEvent('[ACTION] [x] Marked done: ' + curItem.text);
         showDemoToast('Completed: ' + curItem.text, 'success');
       } else if (action === 'mark_undone') {
         curItem.done = false;
-        logHudEvent('[ACTION] Marked undone: ' + curItem.text);
+        logHudEvent('[ACTION] [ ] Marked undone: ' + curItem.text);
         showDemoToast('Marked uncompleted: ' + curItem.text, 'info');
       } else if (action === 'delete') {
         hudTodos.splice(hudSelectedTodo, 1);
         hudSelectedTodo = Math.max(0, hudSelectedTodo - 1);
-        logHudEvent('[ACTION] Deleted task');
+        logHudEvent('[ACTION] [×] Deleted task');
         showDemoToast('Task deleted from checklist', 'warn');
       }
       hudActiveView = 'todos';
@@ -11068,13 +11241,13 @@ export async function executeHedge(symbol: string, size: number) {
       } else if (gesture === 'double_tap') {
         if (hudActiveView === 'todo_detail') {
           hudActiveView = 'todos';
-          logHudEvent('[NAV] Double Tap -> Returned to Today Todos checklist');
+          logHudEvent('[NAV] ◄ Double Tap -> Returned to Today Todos checklist');
         } else if (hudActiveView === 'todos' || hudActiveView === 'com_guide') {
           hudActiveView = 'control_center';
-          logHudEvent('[NAV] Double Tap -> Returned to Control Center');
+          logHudEvent('[NAV] ◄ Double Tap -> Returned to Control Center');
         } else if (hudActiveView === 'control_center') {
           hudActiveView = 'todos';
-          logHudEvent('[NAV] Double Tap -> Switched to Todos view');
+          logHudEvent('[NAV] ◄ Double Tap -> Switched to Todos view');
         }
       } else if (gesture === 'swipe_down') {
         if (hudActiveView === 'todos') {
@@ -11087,7 +11260,7 @@ export async function executeHedge(symbol: string, size: number) {
           hudSelectedAction = (hudSelectedAction + 1) % 3;
           renderHudTodoDetailView();
         }
-        logHudEvent('[GESTURE] Swiped Down -> cursor advanced');
+        logHudEvent('[GESTURE] ▼ Swiped Down -> cursor advanced');
       } else if (gesture === 'swipe_up') {
         if (hudActiveView === 'todos') {
           hudSelectedTodo = (hudSelectedTodo - 1 + hudTodos.length) % Math.max(1, hudTodos.length);
@@ -11099,10 +11272,10 @@ export async function executeHedge(symbol: string, size: number) {
           hudSelectedAction = (hudSelectedAction - 1 + 3) % 3;
           renderHudTodoDetailView();
         }
-        logHudEvent('[GESTURE] Swiped Up -> cursor reversed');
+        logHudEvent('[GESTURE] ▲ Swiped Up -> cursor reversed');
       } else if (gesture === 'hold') {
         hudState = 'recording';
-        logHudEvent('[RECORD] Long press triggered -> Recording voice memo');
+        logHudEvent('[RECORD] ● Long press triggered -> Recording voice memo');
         showDemoToast('Recording voice memo (00:03)...', 'warn');
         setTimeout(() => {
           if (hudState === 'recording') {

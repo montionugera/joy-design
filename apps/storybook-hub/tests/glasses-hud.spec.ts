@@ -25,7 +25,7 @@ async function safeScreenshot(locator: any, filename: string) {
   }
 }
 
-test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () => {
+test.describe("F-056 / F-057: Smart Glasses HUD (Optical AR) & Interaction Engine", () => {
   test.beforeAll(() => {
     try {
       if (!fs.existsSync(outDir)) {
@@ -39,7 +39,7 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
     }
   });
 
-  test("1. Glasses HUD section loads, renders dual-panel visor and telemetry", async ({ page }, testInfo) => {
+  test("1. Glasses HUD section loads, renders dual-panel visor, P43 green phosphor and telemetry", async ({ page }, testInfo) => {
     if (testInfo.project.name === "mobile-chrome") {
       test.skip();
     }
@@ -52,10 +52,12 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
 
     const visor = page.locator(".hud-visor-frame");
     await expect(visor).toBeVisible();
+    await expect(visor).toHaveAttribute("data-phosphor", "green");
 
     const telemetry = page.locator(".hud-telemetry-bar");
     await expect(telemetry).toBeVisible();
     await expect(telemetry).toContainText("JOYMIFY AR // GLASSES HUD");
+    await expect(telemetry).toContainText("P43: 530nm");
     await expect(telemetry).toContainText("BAT: 84%");
 
     // Left Panel & Right Panel exist
@@ -118,7 +120,7 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
     await expect(eventFeed).toContainText("Speech interrupted by Tap");
   });
 
-  test("3. Right Panel view navigation, detail action tray, and todo completion", async ({ page }, testInfo) => {
+  test("3. Right Panel view navigation, detail action tray, and symbolic todo completion", async ({ page }, testInfo) => {
     if (testInfo.project.name === "mobile-chrome") {
       test.skip();
     }
@@ -129,12 +131,16 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
     const titleEl = page.locator("#hud-assist-title");
     await expect(titleEl).toContainText("Today Todos");
 
-    // Verify checklist items are rendered
+    // Verify checklist items are rendered with symbols
     const todosView = page.locator("#hud-view-todos");
     await expect(todosView).toBeVisible();
     await expect(todosView).toContainText("Walk 3 Km");
     await expect(todosView).toContainText("Prepare Meeting note");
     await expect(todosView).toContainText("Meeting with John");
+
+    // Cursor on selected item should be ▶
+    const selectedCursor = page.locator("#hud-view-todos .hud-list-item.selected .hud-cursor-arrow");
+    await expect(selectedCursor).toContainText("▶");
 
     // Click item "Walk 3 Km" to enter Todo Detail Action Tray
     const walkItem = page.locator("#hud-view-todos .hud-list-item:has-text('Walk 3 Km')");
@@ -157,10 +163,11 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
     await markDoneAction.click();
     await page.waitForTimeout(150);
 
-    // Should return to todos list and Walk 3 Km checkbox should have checked class
+    // Should return to todos list and Walk 3 Km checkbox should have checked class and [x]
     await expect(todosView).toBeVisible();
     const todoBox0 = page.locator("#todo-box-0");
     await expect(todoBox0).toHaveClass(/checked/);
+    await expect(todoBox0).toContainText("[x]");
 
     // Double Tap gesture navigates back to Control Center
     const doubleTapBtn = page.locator("#btn-touch-double");
@@ -173,7 +180,7 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
     await expect(todosBadge).toContainText("2 / 3");
   });
 
-  test("4. Optical ambient scene switcher and light/dark theme contrast", async ({ page }, testInfo) => {
+  test("4. Optical ambient scene switcher, phosphor emitter switching, and all-case dark background", async ({ page }, testInfo) => {
     if (testInfo.project.name === "mobile-chrome") {
       test.skip();
     }
@@ -182,6 +189,19 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
     await page.waitForTimeout(300);
 
     const visor = page.locator(".hud-visor-frame");
+
+    // Test Phosphor Switcher: switch to Amber then back to Green
+    const amberBtn = page.locator("#btn-phosphor-amber");
+    await expect(amberBtn).toBeVisible();
+    await amberBtn.click();
+    await page.waitForTimeout(150);
+    await expect(visor).toHaveAttribute("data-phosphor", "amber");
+
+    const greenBtn = page.locator("#btn-phosphor-green");
+    await expect(greenBtn).toBeVisible();
+    await greenBtn.click();
+    await page.waitForTimeout(150);
+    await expect(visor).toHaveAttribute("data-phosphor", "green");
 
     // Switch to Daylight Walk
     const daylightBtn = page.locator("#btn-scene-daylight");
@@ -195,6 +215,10 @@ test.describe("F-056: Smart Glasses HUD (Optical AR) & Interaction Engine", () =
       document.documentElement.setAttribute("data-theme", "light");
     });
     await page.waitForTimeout(200);
+
+    // Verify background remains deep optical dark even in light theme
+    const bgColor = await visor.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(bgColor).toMatch(/rgb\(10,\s*18,\s*31\)/);
 
     await safeScreenshot(visor, "hud-view-daylight-light-1280.png");
 
