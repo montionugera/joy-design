@@ -272,16 +272,69 @@ ${group('Both as links', frame(heroLink))}
 // the CTAs through a delegated listener, so this markup stays SSR output). Placed after the hero states box so the
 // states specs keep indexing the first three .joy-hero renders as default, loading and disabled.
 const kineticHero = await R('HeroSection', {
-  badgeText: 'Interactive particle field',
+  badgeText: 'Interactive Antigravity particle field',
   title: 'Fast, clear',
   titleEmphasis: 'order screens for busy desks',
   subtitle: 'Order routing, dark-mode telemetry and steady UI parts built for dense, accessible screens.',
   primaryCtaText: 'Deploy solution',
   secondaryCtaText: 'Read the guide',
 });
-sections.push(`<div class="kinetic-canvas-container" id="kinetic-hero-container">
-  <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
-  ${kineticHero}
+
+const meshHero = await R('HeroSection', {
+  badgeText: '3D Volumetric Wave Mesh',
+  title: 'Build anything with',
+  titleEmphasis: 'real-time speed',
+  subtitle: 'Move faster, go further, and bring your biggest ideas to life with dynamic spatial computing and responsive primitives.',
+  primaryCtaText: 'Download for macOS',
+  secondaryCtaText: 'Try on web',
+});
+
+sections.push(`<div class="landing-hero-options-wrapper" id="landing-hero-options">
+  <div class="landing-hero-options-header">
+    <div>
+      <h3 style="margin: 0 0 4px 0; font-size: var(--joy-font-size-md); font-weight: 700; color: var(--joy-text-primary);">Interactive Hero &amp; 3D Cover Variants</h3>
+      <p style="margin: 0; font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">Toggle between Google Antigravity-style floating particle physics, OpenAI Codex-style 3D wireframe mesh, and luxury editorial cover.</p>
+    </div>
+    <div class="hub-segmented-ctrl" role="tablist">
+      <button class="segment-btn active" id="btn-hero-opt-antigravity" onclick="switchHeroOption('antigravity')" role="tab" aria-selected="true">Antigravity Particles</button>
+      <button class="segment-btn" id="btn-hero-opt-mesh3d" onclick="switchHeroOption('mesh3d')" role="tab" aria-selected="false">3D Wave Mesh</button>
+      <button class="segment-btn" id="btn-hero-opt-editorial" onclick="switchHeroOption('editorial')" role="tab" aria-selected="false">Editorial Cover</button>
+    </div>
+  </div>
+
+  <div class="kinetic-canvas-container hero-option-panel active" id="kinetic-hero-container">
+    <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
+    ${kineticHero}
+  </div>
+
+  <div class="mesh-3d-hero-container hero-option-panel" id="mesh-hero-container" style="display: none;">
+    <canvas class="mesh-3d-canvas" id="mesh-3d-canvas" aria-hidden="true"></canvas>
+    ${meshHero}
+  </div>
+
+  <div class="editorial-cover-container hero-option-panel" id="editorial-cover-container" style="display: none;">
+    <div class="editorial-cover__backdrop">
+      <div class="editorial-cover__ambient-orb"></div>
+      <div class="editorial-cover__ambient-orb-2"></div>
+    </div>
+    <div class="editorial-cover__topbar">
+      <span class="editorial-cover__locale">JOYMIFY STUDIO</span>
+      <div class="editorial-cover__brand">J O Y M I F Y</div>
+      <div class="editorial-cover__actions">
+        <span class="editorial-cover__action-label">MENU</span>
+      </div>
+    </div>
+    <div class="editorial-cover__centerpiece">
+      <div class="editorial-cover__eyebrow">Autumn / Winter 2026 Collection</div>
+      <h2 class="editorial-cover__title">กระเป๋าถือสำหรับผู้หญิง</h2>
+      <p class="editorial-cover__desc">Architectural form meets tactile precision in obsidian leather and brushed gold hardware.</p>
+      <div class="editorial-cover__cta-wrap">
+        <button type="button" class="joy-button joy-button--solid joy-button--md editorial-cover__btn" onclick="showDemoToast('Exploring the luxury collection', 'success')">
+          <span class="joy-button__label">ค้นหาเพิ่มเติม</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>`);
 
 const leadHtml = [];
