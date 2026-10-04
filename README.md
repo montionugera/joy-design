@@ -477,6 +477,29 @@ The menu button, drawer close, theme toggle (on phones) and the drawer's framewo
 - Frames only run while an `IntersectionObserver` sees the hero and the tab is visible, capped at 60fps. The field never paints under the hero text or CTAs.
 - One component fix landed with this wave: `.joy-radio-group` gained `flex-wrap: wrap`, because a horizontal group of long options ran off a 375px screen.
 
+### Hero Section variants & Apple Narrative Landing Page (F-055)
+
+The Storybook Hub provides 8 distinct Hero Section variants in `#landing-blocks` switchable via `.hub-segmented-ctrl--wrap`, plus a full-page Apple Keynote Continuous Narrative Scroll showcase in `#apple-landing`:
+
+1. **8 Hero Section Variants (`#landing-blocks`)**:
+   - `antigravity`: Kinetic particle physics field with interactive mouse repulsion and token-derived palette.
+   - `mesh3d`: Real-time 3D wave wireframe mesh on 2D canvas with mouse pitch/yaw tilt and perspective projection.
+   - `editorial`: Centered luxury fashion/editorial cover with embedded architectural SVG artwork backdrop, centered masthead, eyebrow, title, description, and gold pill CTA.
+   - `keynote`: Apple Keynote hardware showcase with dual CTAs and device silhouette.
+   - `cockpit`: SaaS financial trading terminal with real-time sparkline and live tick metrics.
+   - `cyberpunk`: Tactical HUD terminal with monospaced brackets and telemetry scanline.
+   - `swiss`: Modernist Zurich 1957 typography canon with top ticker marquee and technical specs.
+   - `aura`: Chromatic ambient mesh with smooth fluid gradient orbs.
+
+2. **Apple Keynote Continuous Narrative Landing Page (`#apple-landing`)**:
+   - Continuous scroll presentation inspired by iPhone Duo foldable / MacBook Pro keynotes.
+   - **Sticky Sub-Navigation**: Persistent model title (`iPhone Duo`), `Pro Foldable` badge, quick jump links, and price CTA.
+   - **Scene 1 (Monumental Intro)**: Large keynote typography, dual CTAs, and hardware silhouette showcase.
+   - **Scene 2 (Posture & Fold Mechanics)**: Continuous scrub slider controlling 0°–180° CSS 3D folding angles, alongside 6 posture pills (`แนวนอน`, `แนวตั้ง`, `พับปิด`, `วางเปิด`, `กางตั้ง`, `ความทนทาน`).
+   - **Scene 3 (Cinematic Immersion)**: Edge-to-edge widescreen cinema frame with aspect ratio switcher (`21:9`, `16:9`, `4:3`).
+   - **Scene 4 (Silicon Specs Bento)**: A18 Pro 3nm GPU specs, Grade 5 Titanium chassis, and all-day battery telemetry.
+   - **Scene 5 (Studio Finish Customizer)**: 4 Titanium swatches, 4 storage tiers, live pricing calculator, and order CTA.
+
 ### Contracts and screenshots
 
 `apps/storybook-hub/tests/contracts.spec.ts` covers the hub in these contracts. Most run on the `desktop-chrome` project and set their own viewports.

@@ -289,16 +289,66 @@ const meshHero = await R('HeroSection', {
   secondaryCtaText: 'Try on web',
 });
 
+const keynoteHero = await R('HeroSection', {
+  badgeText: 'Titanium • M4 Max • Super Retina XDR',
+  title: 'Pro beyond measure',
+  titleEmphasis: 'in every dimension',
+  subtitle: 'Precision-milled aerospace titanium housing unmatched silicon performance and all-day thermal stability.',
+  primaryCtaText: 'Pre-order now',
+  secondaryCtaText: 'Watch keynote',
+});
+
+const cockpitHero = await R('HeroSection', {
+  badgeText: 'Live Tick Engine // 0.42ms DPDK',
+  title: 'Execution at the',
+  titleEmphasis: 'speed of light',
+  subtitle: 'Direct market access with microsecond order routing, cross-margin risk telemetry, and unified multi-venue settlement.',
+  primaryCtaText: 'Launch terminal',
+  secondaryCtaText: 'API reference',
+});
+
+const cyberpunkHero = await R('HeroSection', {
+  badgeText: 'NEURAL_HUD // SEC_LVL: ALPHA',
+  title: 'Tactical telemetry',
+  titleEmphasis: 'engineered for zero failure',
+  subtitle: 'Real-time neural interface protocols with sub-millisecond heartbeat monitoring and hardened cryptography.',
+  primaryCtaText: 'Initialize link',
+  secondaryCtaText: 'Telemetry logs',
+});
+
+const swissHero = await R('HeroSection', {
+  badgeText: 'Modernist Grid // Zurich 1957',
+  title: 'Pure typographic',
+  titleEmphasis: 'structure and form',
+  subtitle: 'Strict mathematical ratios, absolute semantic tokens, and uncompromising contrast across light and dark canvases.',
+  primaryCtaText: 'Inspect system',
+  secondaryCtaText: 'Read manifesto',
+});
+
+const auraHero = await R('HeroSection', {
+  badgeText: 'Chromatic Ambient Mesh',
+  title: 'Crafted with soul',
+  titleEmphasis: 'and luminous precision',
+  subtitle: 'Organic fluid gradient orbs designed to breathe life into modern product interfaces with smooth ambient physics.',
+  primaryCtaText: 'Explore tokens',
+  secondaryCtaText: 'View showcase',
+});
+
 sections.push(`<div class="landing-hero-options-wrapper" id="landing-hero-options">
   <div class="landing-hero-options-header">
     <div>
-      <h3 style="margin: 0 0 4px 0; font-size: var(--joy-font-size-md); font-weight: 700; color: var(--joy-text-primary);">Interactive Hero &amp; 3D Cover Variants</h3>
-      <p style="margin: 0; font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">Toggle between Google Antigravity-style floating particle physics, OpenAI Codex-style 3D wireframe mesh, and luxury editorial cover.</p>
+      <h3 style="margin: 0 0 4px 0; font-size: var(--joy-font-size-md); font-weight: 700; color: var(--joy-text-primary);">Interactive Hero &amp; 3D Cover Variants (8 Archetypes)</h3>
+      <p style="margin: 0; font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">Toggle between 8 production-grade hero section archetypes: Antigravity particles, 3D wave mesh, centered luxury editorial image cover, Apple keynote, SaaS financial cockpit, Cyberpunk HUD, Swiss typographic poster, and Luminous fluid aura.</p>
     </div>
-    <div class="hub-segmented-ctrl" role="tablist">
-      <button class="segment-btn active" id="btn-hero-opt-antigravity" onclick="switchHeroOption('antigravity')" role="tab" aria-selected="true">Antigravity Particles</button>
-      <button class="segment-btn" id="btn-hero-opt-mesh3d" onclick="switchHeroOption('mesh3d')" role="tab" aria-selected="false">3D Wave Mesh</button>
+    <div class="hub-segmented-ctrl hub-segmented-ctrl--wrap" role="tablist" aria-label="Hero section variant switcher">
+      <button class="segment-btn active" id="btn-hero-opt-antigravity" onclick="switchHeroOption('antigravity')" role="tab" aria-selected="true">Antigravity</button>
+      <button class="segment-btn" id="btn-hero-opt-mesh3d" onclick="switchHeroOption('mesh3d')" role="tab" aria-selected="false">3D Wave</button>
       <button class="segment-btn" id="btn-hero-opt-editorial" onclick="switchHeroOption('editorial')" role="tab" aria-selected="false">Editorial Cover</button>
+      <button class="segment-btn" id="btn-hero-opt-keynote" onclick="switchHeroOption('keynote')" role="tab" aria-selected="false">Apple Keynote</button>
+      <button class="segment-btn" id="btn-hero-opt-cockpit" onclick="switchHeroOption('cockpit')" role="tab" aria-selected="false">SaaS Cockpit</button>
+      <button class="segment-btn" id="btn-hero-opt-cyberpunk" onclick="switchHeroOption('cyberpunk')" role="tab" aria-selected="false">Cyberpunk HUD</button>
+      <button class="segment-btn" id="btn-hero-opt-swiss" onclick="switchHeroOption('swiss')" role="tab" aria-selected="false">Swiss Poster</button>
+      <button class="segment-btn" id="btn-hero-opt-aura" onclick="switchHeroOption('aura')" role="tab" aria-selected="false">Fluid Aura</button>
     </div>
   </div>
 
@@ -313,15 +363,45 @@ sections.push(`<div class="landing-hero-options-wrapper" id="landing-hero-option
   </div>
 
   <div class="editorial-cover-container hero-option-panel" id="editorial-cover-container" style="display: none;">
-    <div class="editorial-cover__backdrop">
-      <div class="editorial-cover__ambient-orb"></div>
-      <div class="editorial-cover__ambient-orb-2"></div>
+    <div class="editorial-cover__image-backdrop" aria-hidden="true">
+      <svg class="editorial-cover__svg-art" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ed-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.95"/>
+            <stop offset="50%" stop-color="var(--joy-surface-raised)" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.98"/>
+          </linearGradient>
+          <radialGradient id="ed-gold-glow" cx="50%" cy="45%" r="50%">
+            <stop offset="0%" stop-color="var(--joy-accent-default)" stop-opacity="0.22"/>
+            <stop offset="50%" stop-color="var(--joy-accent-subtle)" stop-opacity="0.08"/>
+            <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="ed-gold-ribbon" x1="0%" y1="0%" x2="100%" y2="50%">
+            <stop offset="0%" stop-color="var(--joy-accent-default)" stop-opacity="0.6"/>
+            <stop offset="50%" stop-color="var(--joy-accent-highlight)" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="var(--joy-accent-hover)" stop-opacity="0.4"/>
+          </linearGradient>
+          <linearGradient id="ed-shadow-overlay" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.65"/>
+            <stop offset="50%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="var(--joy-surface-sunken)" stop-opacity="0.85"/>
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#ed-bg)"/>
+        <circle cx="600" cy="300" r="380" fill="url(#ed-gold-glow)"/>
+        <path d="M 200,550 C 350,220 520,120 700,160 C 880,200 980,380 1100,550" fill="none" stroke="url(#ed-gold-ribbon)" stroke-width="2" opacity="0.6"/>
+        <path d="M 150,580 C 320,180 560,80 780,130 C 1000,180 1060,420 1150,580" fill="none" stroke="var(--joy-border-default)" stroke-width="1" opacity="0.3" stroke-dasharray="4,6"/>
+        <path d="M 420,480 C 460,340 540,240 680,260 C 760,270 820,360 840,480 Z" fill="var(--joy-surface-inverse)" opacity="0.12"/>
+        <path d="M 440,460 C 480,350 550,270 660,285 C 730,295 780,370 800,460 Z" fill="none" stroke="var(--joy-accent-default)" stroke-width="1.5" opacity="0.45"/>
+        <rect width="100%" height="100%" fill="url(#ed-shadow-overlay)"/>
+      </svg>
+      <div class="editorial-cover__grain" aria-hidden="true"></div>
     </div>
     <div class="editorial-cover__topbar">
       <span class="editorial-cover__locale">JOYMIFY STUDIO</span>
       <div class="editorial-cover__brand">J O Y M I F Y</div>
       <div class="editorial-cover__actions">
-        <span class="editorial-cover__action-label">MENU</span>
+        <span class="editorial-cover__action-label">ISSUE 04 // 2026</span>
       </div>
     </div>
     <div class="editorial-cover__centerpiece">
@@ -334,6 +414,86 @@ sections.push(`<div class="landing-hero-options-wrapper" id="landing-hero-option
         </button>
       </div>
     </div>
+    <div class="editorial-cover__bottombar">
+      <span>PARIS • MILAN • TOKYO • BANGKOK</span>
+      <span>LIMITED EDITION 01/50</span>
+    </div>
+  </div>
+
+  <div class="keynote-hero-container hero-option-panel" id="keynote-hero-container" style="display: none;">
+    <div class="keynote-hero__stage">
+      <div class="keynote-hero__halo" aria-hidden="true"></div>
+      ${keynoteHero}
+      <div class="keynote-hero__device-mockup" aria-hidden="true">
+        <div class="keynote-device-frame">
+          <div class="keynote-device-screen">
+            <div class="keynote-screen-glow"></div>
+            <div class="keynote-screen-notch"></div>
+            <div class="keynote-screen-content">
+              <span class="keynote-screen-time">9:41</span>
+              <span class="keynote-screen-chip">M4 Max</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cockpit-hero-container hero-option-panel" id="cockpit-hero-container" style="display: none;">
+    <div class="cockpit-hero__telemetry-bar">
+      <div class="cockpit-telemetry-pill">
+        <span class="status-indicator-dot"></span>
+        <span>Gateway: 0.42ms DPDK</span>
+      </div>
+      <div class="cockpit-telemetry-pill">
+        <span>Order Book: 1,420,890 evt/s</span>
+      </div>
+      <div class="cockpit-telemetry-pill">
+        <span>Settlement: 14 Chains Active</span>
+      </div>
+    </div>
+    ${cockpitHero}
+    <div class="cockpit-hero__sparkline-dock">
+      <canvas class="cockpit-sparkline-canvas" id="cockpit-sparkline-canvas" width="600" height="80" aria-label="Real-time order latency telemetry"></canvas>
+    </div>
+  </div>
+
+  <div class="cyberpunk-hero-container hero-option-panel" id="cyberpunk-hero-container" style="display: none;">
+    <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--tl" aria-hidden="true">[ + ]</div>
+    <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--tr" aria-hidden="true">[ + ]</div>
+    <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--bl" aria-hidden="true">[ + ]</div>
+    <div class="cyberpunk-hud-reticle cyberpunk-hud-reticle--br" aria-hidden="true">[ + ]</div>
+    <div class="cyberpunk-hud-status-strip">
+      <span>SYS_CLK // 4.80GHz</span>
+      <span>BUFFER // LOCKED</span>
+      <span>NODE // US-EAST-01</span>
+    </div>
+    ${cyberpunkHero}
+    <div class="cyberpunk-scanline-laser" aria-hidden="true"></div>
+  </div>
+
+  <div class="swiss-hero-container hero-option-panel" id="swiss-hero-container" style="display: none;">
+    <div class="swiss-marquee-bar" aria-hidden="true">
+      <div class="swiss-marquee-content">
+        <span>JOYMIFY DESIGN SYSTEM • MODERNIST CANON • SVELTE 5 &amp; REACT 19 • SEMANTIC TOKENS • WCAG 2.2 AA • ZERO DECORATIVE SLOP • PURE COMPONENT PARITY •</span>
+        <span>JOYMIFY DESIGN SYSTEM • MODERNIST CANON • SVELTE 5 &amp; REACT 19 • SEMANTIC TOKENS • WCAG 2.2 AA • ZERO DECORATIVE SLOP • PURE COMPONENT PARITY •</span>
+      </div>
+    </div>
+    ${swissHero}
+    <div class="swiss-grid-footer">
+      <span>GRID: 12-COL MODULAR</span>
+      <span>SPEC: DIN 1451 / HELVETICA</span>
+      <span>CONTRAST: 7:1 AAA</span>
+    </div>
+  </div>
+
+  <div class="aura-hero-container hero-option-panel" id="aura-hero-container" style="display: none;">
+    <div class="aura-hero__mesh-bg" aria-hidden="true">
+      <div class="aura-orb aura-orb--1"></div>
+      <div class="aura-orb aura-orb--2"></div>
+      <div class="aura-orb aura-orb--3"></div>
+    </div>
+    ${auraHero}
   </div>
 </div>`);
 
