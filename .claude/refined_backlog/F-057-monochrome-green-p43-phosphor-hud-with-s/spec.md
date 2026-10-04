@@ -33,8 +33,8 @@ Smart glasses hardware in production (such as Vuzix, Even Realities G1, military
 
 ## Acceptance criteria
 
-- [ ] Visor viewport in `#view-glasses-hud` maintains dark optical see-through background in all cases (both light and dark theme).
-- [ ] Monochrome Green P43 Phosphor mode is available and fully functional in `#view-glasses-hud`.
-- [ ] All interactive selection and state feedback use high-contrast geometric symbols (`▶`, `[x]`, `[ ]`, `×`, `⏸`, `●`, `▲`, `▼`, `◄`, `►`) and reverse-video typographic highlights.
-- [ ] Zero OS emoji violations in codebase: all symbols are standard valid typographic characters or SVGs from `@joymify/icons`.
-- [ ] Playwright tests and Gate 1 precheck pass 100%.
+- [x] Visor viewport in `#view-glasses-hud` maintains dark optical see-through background in all cases (both light and dark theme).
+- [x] Monochrome Green P43 Phosphor mode is available and fully functional in `#view-glasses-hud`.
+- [x] All interactive selection and state feedback use high-contrast geometric symbols (`▶`, `[x]`, `[ ]`, `×`, `⏸`, `●`, `▲`, `▼`, `◄`, `►`) and reverse-video typographic highlights.
+- [x] Zero OS emoji violations in codebase: all symbols are standard valid typographic characters or SVGs from `@joymify/icons`.
+- [x] Playwright tests and Gate 1 precheck pass 100%.
