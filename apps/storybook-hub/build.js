@@ -253,6 +253,7 @@ const navIcons = {
   primitives: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
   forms: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
   navigation: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>`,
+  monitor: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
 };
 
 // Generate navigation HTML dynamically from manifest
@@ -2846,6 +2847,437 @@ ${inlinedThemeCss}
       border-color: var(--joy-accent-default);
       background: var(--joy-accent-subtle);
       color: var(--joy-accent-text);
+    }
+
+    /* ── Smart Glasses Head-Up Display (HUD) (#view-glasses-hud) ── */
+    #view-glasses-hud {
+      padding: 0;
+      max-width: 100%;
+    }
+    .hud-hero-header {
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--joy-border-subtle);
+      margin-bottom: 32px;
+    }
+    .hud-ambient-switcher {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 16px;
+      max-width: 100%;
+    }
+    .hud-ambient-switcher .segmented-control {
+      max-width: 100%;
+      flex-wrap: wrap;
+    }
+    .hud-ambient-label {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 8px;
+    }
+
+    /* Optical Visor Outer Frame */
+    .hud-visor-frame {
+      position: relative;
+      width: 100%;
+      min-height: 600px;
+      border-radius: var(--joy-radius-lg);
+      border: 2px solid var(--joy-border-strong);
+      overflow: hidden;
+      background: var(--joy-surface-sunken);
+      box-shadow: 0 24px 60px var(--joy-elevation-3);
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 32px;
+      transition: background 0.3s var(--joy-ease-default);
+    }
+    .hud-visor-frame[data-scene="cyberpunk"] {
+      background: radial-gradient(circle at 80% 20%, var(--joy-surface-raised) 0%, var(--joy-surface-sunken) 70%);
+    }
+    .hud-visor-frame[data-scene="daylight"] {
+      background: radial-gradient(circle at 50% 50%, var(--joy-surface-card) 0%, var(--joy-surface-canvas) 100%);
+    }
+    .hud-visor-frame[data-scene="optical"] {
+      background: var(--joy-surface-inverse);
+    }
+    .hud-reticle-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 1px dashed var(--joy-border-subtle);
+      margin: 12px;
+      border-radius: var(--joy-radius-md);
+      opacity: 0.35;
+    }
+    .hud-reticle-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: var(--joy-accent-default);
+      border-style: solid;
+      border-width: 0;
+    }
+    .hud-reticle-tl { top: 12px; left: 12px; border-top-width: 2px; border-left-width: 2px; }
+    .hud-reticle-tr { top: 12px; right: 12px; border-top-width: 2px; border-right-width: 2px; }
+    .hud-reticle-bl { bottom: 12px; left: 12px; border-bottom-width: 2px; border-left-width: 2px; }
+    .hud-reticle-br { bottom: 12px; right: 12px; border-bottom-width: 2px; border-right-width: 2px; }
+
+    /* HUD Top Telemetry Bar */
+    .hud-telemetry-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--joy-border-subtle);
+      background: var(--joy-surface-raised);
+      font-size: var(--joy-font-size-xs);
+      font-family: monospace;
+    }
+    .hud-telemetry-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--joy-accent-default);
+      letter-spacing: 0.05em;
+    }
+    .hud-telemetry-metrics {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--joy-text-secondary);
+    }
+    .hud-live-meter {
+      display: inline-flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 12px;
+    }
+    .hud-meter-bar {
+      width: 3px;
+      background: var(--joy-accent-default);
+      border-radius: 1px;
+      animation: hudMeterPulse 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes hudMeterPulse {
+      0% { height: 3px; opacity: 0.4; }
+      100% { height: 12px; opacity: 1; }
+    }
+
+    /* HUD Split Monocular Display (50% / 50%) */
+    .hud-display-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      gap: 0;
+      min-height: 440px;
+    }
+    @media (max-width: 768px) {
+      .hud-ambient-switcher {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hud-ambient-switcher .segmented-control {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .hud-ambient-switcher .segment-btn {
+        flex: 1 1 auto;
+        min-width: 80px;
+        padding: 6px 8px;
+        font-size: var(--joy-font-size-xs);
+        text-align: center;
+      }
+      .hud-telemetry-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px 16px;
+      }
+      .hud-telemetry-metrics {
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        font-size: 11px;
+      }
+      .hud-display-grid {
+        grid-template-columns: 1fr;
+      }
+      .hud-left-panel {
+        padding: 16px;
+        border-right: none !important;
+        border-bottom: 1px solid var(--joy-border-subtle);
+      }
+      .hud-right-panel {
+        padding: 16px;
+      }
+      .hud-temple-controller {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 16px;
+      }
+      .hud-event-feed {
+        max-width: 100% !important;
+        width: 100%;
+        text-align: center;
+      }
+      .hud-assist-guide-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+      .hud-assist-header {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+    }
+
+    /* Left Panel: Communication Stream */
+    .hud-left-panel {
+      padding: 24px;
+      border-right: 1px solid var(--joy-border-subtle);
+      display: flex;
+      flex-direction: column;
+    }
+    .hud-com-pill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .hud-com-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--joy-radius-pill);
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-default);
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .hud-status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--joy-status-success-fg);
+      box-shadow: 0 0 8px var(--joy-status-success-fg);
+    }
+    .hud-com-pill[data-state="watching"] .hud-status-indicator {
+      background: var(--joy-accent-highlight);
+      box-shadow: 0 0 8px var(--joy-accent-highlight);
+    }
+    .hud-com-pill[data-state="talking"] .hud-status-indicator {
+      background: var(--joy-accent-default);
+      box-shadow: 0 0 8px var(--joy-accent-default);
+    }
+    .hud-com-pill[data-state="recording"] .hud-status-indicator {
+      background: var(--joy-status-warning-fg);
+      box-shadow: 0 0 8px var(--joy-status-warning-fg);
+      animation: recordingBlink 0.6s infinite alternate;
+    }
+    @keyframes recordingBlink {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+
+    .hud-transcript-box {
+      flex: 1;
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      border-radius: var(--joy-radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 16px;
+      overflow-y: auto;
+      max-height: 340px;
+    }
+    .hud-msg-turn {
+      animation: hudMsgFade 0.3s ease-out;
+    }
+    @keyframes hudMsgFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hud-msg-speaker {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 700;
+      color: var(--joy-text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hud-msg-text {
+      font-size: var(--joy-font-size-sm);
+      line-height: 1.5;
+      color: var(--joy-text-primary);
+    }
+    .hud-msg-text--user {
+      color: var(--joy-text-secondary);
+    }
+    .hud-msg-text--agent {
+      color: var(--joy-text-primary);
+      font-weight: 500;
+    }
+    .hud-typing-cursor {
+      display: inline-block;
+      width: 6px;
+      height: 14px;
+      background: var(--joy-accent-default);
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: cursorBlink 0.8s infinite;
+    }
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Right Panel: Assist & Hierarchical Control */
+    .hud-right-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .hud-assist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--joy-border-subtle);
+    }
+    .hud-assist-title {
+      font-size: var(--joy-font-size-sm);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      letter-spacing: 0.02em;
+    }
+    .hud-assist-guide-badge {
+      font-size: var(--joy-font-size-xs);
+      font-family: monospace;
+      color: var(--joy-accent-default);
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      padding: 4px 10px;
+      border-radius: var(--joy-radius-pill);
+    }
+    .hud-assist-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* HUD List Item Row */
+    .hud-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--joy-radius-md);
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--joy-border-subtle);
+      font-size: var(--joy-font-size-sm);
+      color: var(--joy-text-primary);
+      cursor: pointer;
+      transition: all var(--joy-duration-fast) var(--joy-ease-default);
+    }
+    .hud-list-item:hover,
+    .hud-list-item.selected {
+      background: var(--joy-surface-card);
+      border-color: var(--joy-accent-default);
+    }
+    .hud-cursor-arrow {
+      font-family: monospace;
+      font-weight: 800;
+      color: var(--joy-accent-default);
+      width: 14px;
+      display: inline-block;
+    }
+    .hud-checkbox-box {
+      width: 18px;
+      height: 18px;
+      border-radius: var(--joy-radius-control);
+      border: 1.5px solid var(--joy-border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--joy-text-primary);
+    }
+    .hud-checkbox-box.checked {
+      background: var(--joy-accent-default);
+      border-color: var(--joy-accent-default);
+      color: var(--joy-text-inverse);
+    }
+
+    /* Temple Touchpad Controller Bar */
+    .hud-temple-controller {
+      position: relative;
+      z-index: 10;
+      padding: 16px 24px;
+      border-top: 1px solid var(--joy-border-subtle);
+      background: var(--joy-surface-raised);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .hud-temple-touchbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .hud-touch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--joy-radius-md);
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-default);
+      color: var(--joy-text-primary);
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--joy-duration-fast) var(--joy-ease-default);
+    }
+    .hud-touch-btn:hover {
+      background: var(--joy-surface-card);
+      border-color: var(--joy-accent-default);
+    }
+    .hud-touch-btn:active {
+      transform: scale(0.96);
+    }
+    .hud-event-feed {
+      font-family: monospace;
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-accent-default);
+      background: var(--joy-surface-sunken);
+      padding: 6px 12px;
+      border-radius: var(--joy-radius-pill);
+      border: 1px solid var(--joy-border-subtle);
+      max-width: 480px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     /* ── Responsive Mobile & Tablet Rules ── */
@@ -7392,6 +7824,250 @@ export async function executeHedge(symbol: string, size: number) {
         </div>
       </section>
 
+      <!-- View: Glasses HUD (Optical AR) (F-056) -->
+      <section id="view-glasses-hud" class="view-panel">
+        <div class="hud-hero-header">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span class="joy-badge joy-badge--brand joy-badge--sm">OPTICAL OST HUD</span>
+            <span class="joy-badge joy-badge--neutral joy-badge--sm">WAVEGUIDE AR</span>
+          </div>
+          <h2 style="margin: 0 0 8px 0;">Smart Glasses Head-Up Display (Glasses HUD)</h2>
+          <p class="header-tagline">Dual-panel monocular optical see-through interface with conversational speech streaming, hierarchical assist navigation, and temple touchpad gesture control.</p>
+          
+          <div class="hud-ambient-switcher">
+            <span class="hud-ambient-label">Ambient Optic Scene:</span>
+            <div class="segmented-control" role="group" aria-label="Select ambient environment">
+              <button type="button" class="segment-btn active" id="btn-scene-cyberpunk" onclick="switchHudAmbientScene('cyberpunk', this)">Cyberpunk Night</button>
+              <button type="button" class="segment-btn" id="btn-scene-daylight" onclick="switchHudAmbientScene('daylight', this)">Daylight Walk</button>
+              <button type="button" class="segment-btn" id="btn-scene-optical" onclick="switchHudAmbientScene('optical', this)">Optical Bench</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Glasses HUD Eyebox Visor Viewport -->
+        <div class="hud-visor-frame" id="hud-visor-frame" data-scene="cyberpunk" tabindex="0" role="region" aria-label="Smart Glasses Head Up Display Simulator">
+          <div class="hud-reticle-overlay" aria-hidden="true"></div>
+          <div class="hud-reticle-corner hud-reticle-tl" aria-hidden="true"></div>
+          <div class="hud-reticle-corner hud-reticle-tr" aria-hidden="true"></div>
+          <div class="hud-reticle-corner hud-reticle-bl" aria-hidden="true"></div>
+          <div class="hud-reticle-corner hud-reticle-br" aria-hidden="true"></div>
+
+          <!-- Top Telemetry & Health Bar -->
+          <div class="hud-telemetry-bar">
+            <div class="hud-telemetry-brand">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <span>JOYMIFY AR // GLASSES HUD v2.5</span>
+            </div>
+            <div class="hud-telemetry-metrics">
+              <span>FOV: 25° MONO</span>
+              <span>LUM: 3,500 NITS</span>
+              <span>BAT: 84%</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span>MIC:</span>
+                <div class="hud-live-meter" id="hud-audio-meter">
+                  <div class="hud-meter-bar" style="animation-delay: 0.1s;"></div>
+                  <div class="hud-meter-bar" style="animation-delay: 0.3s;"></div>
+                  <div class="hud-meter-bar" style="animation-delay: 0.2s;"></div>
+                  <div class="hud-meter-bar" style="animation-delay: 0.4s;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Dual-Panel Split Monocular Area (50% Left / 50% Right) -->
+          <div class="hud-display-grid">
+            <!-- Left Panel: Communication Mode & Conversation Stream -->
+            <div class="hud-left-panel">
+              <div class="hud-com-pill-row">
+                <div class="hud-com-pill" id="hud-com-pill" data-state="talking">
+                  <span class="hud-status-indicator" id="hud-status-dot"></span>
+                  <span id="hud-mode-label">Voice</span>
+                  <span style="opacity: 0.5;">/</span>
+                  <span id="hud-state-label">AI Talking</span>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" class="joy-button joy-button--subtle joy-button--xs" onclick="simulateSpeechInput('Morning, show me the checklist')">Prompt: Checklist</button>
+                  <button type="button" class="joy-button joy-button--subtle joy-button--xs" onclick="simulateSpeechInput('What is my next meeting?')">Prompt: Meeting</button>
+                </div>
+              </div>
+
+              <!-- Conversation Transcript Box -->
+              <div class="hud-transcript-box" id="hud-transcript-box" aria-live="polite">
+                <div class="hud-msg-turn">
+                  <div class="hud-msg-speaker">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>User</span>
+                  </div>
+                  <div class="hud-msg-text hud-msg-text--user" id="hud-user-speech">Hi, Show Me the today Todos</div>
+                </div>
+                <div class="hud-msg-turn">
+                  <div class="hud-msg-speaker">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                    <span>Claudia (Agent)</span>
+                  </div>
+                  <div class="hud-msg-text hud-msg-text--agent" id="hud-agent-speech">
+                    Morning, here Todos:<br>1. Walk 3 Km<br>2. Prepare Meeting note<br>3. Meeting with John<span class="hud-typing-cursor" id="hud-cursor"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Panel: Navigation Locator & Hierarchical Assist Views -->
+            <div class="hud-right-panel">
+              <div class="hud-assist-header">
+                <div class="hud-assist-title" id="hud-assist-title">Today Todos</div>
+                <div class="hud-assist-guide-badge" id="hud-assist-guide">double tap : to Control Center</div>
+              </div>
+
+              <!-- View 1: Control Center (Root Launcher) -->
+              <div class="hud-assist-view" id="hud-view-control-center" style="display: none;">
+                <div class="hud-list-item selected" data-index="0" onclick="selectHudControlItem(0)">
+                  <span class="hud-cursor-arrow">&gt;</span>
+                  <span>Conversation Control</span>
+                </div>
+                <div class="hud-list-item" data-index="1" onclick="selectHudControlItem(1)">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <span style="display: flex; justify-content: space-between; width: 100%;">
+                    <span>Daily Todos</span>
+                    <span class="joy-badge joy-badge--neutral joy-badge--xs" id="hud-todos-badge">1 / 3</span>
+                  </span>
+                </div>
+                <div class="hud-list-item" data-index="2" onclick="selectHudControlItem(2)">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <span style="display: flex; justify-content: space-between; width: 100%;">
+                    <span>Notifications</span>
+                    <span class="joy-badge joy-badge--brand joy-badge--xs">(2) 10m ago</span>
+                  </span>
+                </div>
+                <div class="hud-list-item" data-index="3" onclick="selectHudControlItem(3)">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <span>Optical Ambient Display</span>
+                </div>
+              </div>
+
+              <!-- View 2: Today Todos (Checklist) -->
+              <div class="hud-assist-view" id="hud-view-todos" style="display: flex;">
+                <div class="hud-list-item selected" data-index="0" onclick="selectHudTodoItem(0)">
+                  <span class="hud-cursor-arrow">&gt;</span>
+                  <div class="hud-checkbox-box" id="todo-box-0"></div>
+                  <span>Walk 3 Km</span>
+                </div>
+                <div class="hud-list-item" data-index="1" onclick="selectHudTodoItem(1)">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <div class="hud-checkbox-box checked" id="todo-box-1">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <span>Prepare Meeting note</span>
+                </div>
+                <div class="hud-list-item" data-index="2" onclick="selectHudTodoItem(2)">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <div class="hud-checkbox-box" id="todo-box-2"></div>
+                  <span>Meeting with John</span>
+                </div>
+              </div>
+
+              <!-- View 3: Todo Detail Action Tray -->
+              <div class="hud-assist-view" id="hud-view-todo-detail" style="display: none;">
+                <div style="font-weight: 700; font-size: var(--joy-font-size-sm); margin-bottom: 8px; color: var(--joy-accent-default);" id="hud-detail-title">Walk 3 Km</div>
+                <div class="hud-list-item selected" data-action="mark_done" onclick="executeHudAction('mark_done')">
+                  <span class="hud-cursor-arrow">&gt;</span>
+                  <span>[ Mark done ]</span>
+                </div>
+                <div class="hud-list-item" data-action="mark_undone" onclick="executeHudAction('mark_undone')">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <span>[ Mark not done ]</span>
+                </div>
+                <div class="hud-list-item" data-action="delete" onclick="executeHudAction('delete')">
+                  <span class="hud-cursor-arrow">&nbsp;</span>
+                  <span>[ Delete ]</span>
+                </div>
+              </div>
+
+              <!-- View 4: Communication State Control Guide -->
+              <div class="hud-assist-view" id="hud-view-com-guide" style="display: none;">
+                <div style="font-size: var(--joy-font-size-xs); font-family: monospace; color: var(--joy-text-muted); margin-bottom: 8px;">
+                  Mode: <span id="hud-guide-cycle" style="color: var(--joy-accent-default); font-weight: 700;">[ listen &harr; pause &harr; watch ]</span>
+                </div>
+                <div class="hud-list-item" style="cursor: default;">
+                  <span style="font-size: var(--joy-font-size-xs); line-height: 1.5;">
+                    <strong>tap : to Interrupt</strong><br>
+                    State machine: interrupt &bull; record &bull; resume AI talking
+                  </span>
+                </div>
+                <div class="hud-list-item" style="cursor: default;">
+                  <span style="font-size: var(--joy-font-size-xs); line-height: 1.5;">
+                    <strong>swipe : to switch mode</strong><br>
+                    Cycle between listening, watching, and paused glance
+                  </span>
+                </div>
+                <div class="hud-list-item" style="cursor: default;">
+                  <span style="font-size: var(--joy-font-size-xs); line-height: 1.5;">
+                    <strong>double tap : to back</strong><br>
+                    Return to root Control Center
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Temple Touchpad Simulator Bar -->
+          <div class="hud-temple-controller">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%;">
+              <span style="font-size: var(--joy-font-size-xs); font-weight: 700; color: var(--joy-text-muted);">TEMPLE TOUCHPAD:</span>
+              <div class="hud-temple-touchbar">
+                <button type="button" class="hud-touch-btn" id="btn-touch-tap" onclick="triggerHudGesture('tap')">
+                  <span>Tap (Select / Interrupt)</span>
+                </button>
+                <button type="button" class="hud-touch-btn" id="btn-touch-double" onclick="triggerHudGesture('double_tap')">
+                  <span>Double Tap (Back)</span>
+                </button>
+                <button type="button" class="hud-touch-btn" id="btn-touch-swipe-down" onclick="triggerHudGesture('swipe_down')">
+                  <span>Swipe &darr; (Next)</span>
+                </button>
+                <button type="button" class="hud-touch-btn" id="btn-touch-swipe-up" onclick="triggerHudGesture('swipe_up')">
+                  <span>Swipe &uarr; (Prev)</span>
+                </button>
+                <button type="button" class="hud-touch-btn" id="btn-touch-hold" onclick="triggerHudGesture('hold')">
+                  <span>Hold (Record)</span>
+                </button>
+              </div>
+            </div>
+            <div class="hud-event-feed" id="hud-event-feed">[READY] Awaiting temple gesture or voice prompt...</div>
+          </div>
+        </div>
+
+        <!-- Design Guidelines Bento Matrix -->
+        <div style="margin-top: 40px;">
+          <h3 style="margin: 0 0 16px 0;">Glasses HUD UI & Interaction Guidelines</h3>
+          <div class="apple-specs-bento">
+            <div class="apple-bento-tile apple-bento-tile--col-6">
+              <span class="apple-eyebrow">Optical Waveguide Physics</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Additive Light & Transparent Black</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">MicroLED waveguides emit photons onto transparent glass; true black (zero-emission black) emits no light and renders completely transparent. Never render opaque white or light grey card surfaces in native HUD mode.</p>
+              <span class="joy-badge joy-badge--brand joy-badge--sm">Additive RGB</span>
+            </div>
+            <div class="apple-bento-tile apple-bento-tile--col-6">
+              <span class="apple-eyebrow">Audio-Visual State Control</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Deterministic 4-State Machine</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Coordinates active <code>Listening</code>, ambient <code>Watching</code>, synthesized <code>AI Talking</code>, and memo <code>Recording</code>. Single Tap instantly forces speech interruption, freeing user attention.</p>
+              <span class="joy-badge joy-badge--success joy-badge--sm">Zero Stalls</span>
+            </div>
+            <div class="apple-bento-tile apple-bento-tile--col-6">
+              <span class="apple-eyebrow">Touch Gesture Syntax</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Temple Capacitive Input</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Intuitive blind ergonomics: Tap executes or interrupts; Double Tap always navigates back to parent/Control Center; Swipes move cursors; Long Press triggers instant hands-free recording.</p>
+              <span class="joy-badge joy-badge--warning joy-badge--sm">Capacitive Temple</span>
+            </div>
+            <div class="apple-bento-tile apple-bento-tile--col-6">
+              <span class="apple-eyebrow">Zero Emoji & Pure Tokens</span>
+              <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Enterprise Optical Contract</h4>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">Strict prohibition of OS emojis; all status indicators use crisp vector SVGs from <code>@joymify/icons</code>. Color assignments map exclusively to Joymify semantic tokens.</p>
+              <span class="joy-badge joy-badge--neutral joy-badge--sm">WCAG 2.2 AA Contrast</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- View: Navigation & Workflow (Wave 3 aspect view) -->
       ${renderNavigationView()}
 
@@ -10125,6 +10801,356 @@ export async function executeHedge(symbol: string, size: number) {
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
     window.scrollToAppleScene = scrollToAppleScene;
+
+    /* ── Smart Glasses Head-Up Display (Glasses HUD) Engine (F-056) ── */
+    let hudState = 'talking'; // 'listening' | 'watching' | 'talking' | 'recording'
+    let hudMode = 'Voice'; // 'Voice' | 'Watch' | 'Pause'
+    let hudActiveView = 'todos'; // 'todos' | 'control_center' | 'todo_detail' | 'com_guide'
+    let hudSelectedTodo = 0;
+    let hudSelectedControl = 0;
+    let hudSelectedAction = 0;
+    let hudSpeechTimer = null;
+    let hudTodos = [
+      { id: 0, text: 'Walk 3 Km', done: false },
+      { id: 1, text: 'Prepare Meeting note', done: true },
+      { id: 2, text: 'Meeting with John', done: false }
+    ];
+
+    function logHudEvent(msg) {
+      const feed = document.getElementById('hud-event-feed');
+      if (feed) feed.textContent = msg;
+    }
+
+    function switchHudAmbientScene(scene, btn) {
+      const frame = document.getElementById('hud-visor-frame');
+      if (frame) frame.setAttribute('data-scene', scene);
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      logHudEvent('[OPTICS] Ambient background set to: ' + scene);
+    }
+    window.switchHudAmbientScene = switchHudAmbientScene;
+
+    function renderHudTodosView() {
+      const container = document.getElementById('hud-view-todos');
+      if (!container) return;
+      container.innerHTML = '';
+      hudTodos.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'hud-list-item' + (idx === hudSelectedTodo ? ' selected' : '');
+        row.setAttribute('data-index', idx);
+        row.onclick = () => selectHudTodoItem(idx);
+
+        const arrow = document.createElement('span');
+        arrow.className = 'hud-cursor-arrow';
+        arrow.innerHTML = (idx === hudSelectedTodo ? '&gt;' : '&nbsp;');
+
+        const box = document.createElement('div');
+        box.id = 'todo-box-' + idx;
+        box.className = 'hud-checkbox-box' + (item.done ? ' checked' : '');
+        if (item.done) {
+          box.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        }
+
+        const label = document.createElement('span');
+        label.textContent = item.text;
+        if (item.done) label.style.textDecoration = 'line-through';
+
+        row.appendChild(arrow);
+        row.appendChild(box);
+        row.appendChild(label);
+        container.appendChild(row);
+      });
+
+      const badge = document.getElementById('hud-todos-badge');
+      if (badge) {
+        const doneCount = hudTodos.filter(t => t.done).length;
+        badge.textContent = doneCount + ' / ' + hudTodos.length;
+      }
+    }
+
+    function renderHudControlCenterView() {
+      const container = document.getElementById('hud-view-control-center');
+      if (!container) return;
+      const items = container.querySelectorAll('.hud-list-item');
+      items.forEach((el, idx) => {
+        const arrow = el.querySelector('.hud-cursor-arrow');
+        if (idx === hudSelectedControl) {
+          el.classList.add('selected');
+          if (arrow) arrow.innerHTML = '&gt;';
+        } else {
+          el.classList.remove('selected');
+          if (arrow) arrow.innerHTML = '&nbsp;';
+        }
+      });
+    }
+
+    function renderHudTodoDetailView() {
+      const container = document.getElementById('hud-view-todo-detail');
+      const titleEl = document.getElementById('hud-detail-title');
+      if (!container || !titleEl) return;
+      const curItem = hudTodos[hudSelectedTodo];
+      if (curItem) titleEl.textContent = curItem.text;
+
+      const items = container.querySelectorAll('.hud-list-item');
+      items.forEach((el, idx) => {
+        const arrow = el.querySelector('.hud-cursor-arrow');
+        if (idx === hudSelectedAction) {
+          el.classList.add('selected');
+          if (arrow) arrow.innerHTML = '&gt;';
+        } else {
+          el.classList.remove('selected');
+          if (arrow) arrow.innerHTML = '&nbsp;';
+        }
+      });
+    }
+
+    function updateHudStateUI() {
+      const pill = document.getElementById('hud-com-pill');
+      const modeLabel = document.getElementById('hud-mode-label');
+      const stateLabel = document.getElementById('hud-state-label');
+      const titleEl = document.getElementById('hud-assist-title');
+      const guideEl = document.getElementById('hud-assist-guide');
+
+      if (pill) pill.setAttribute('data-state', hudState);
+      if (modeLabel) modeLabel.textContent = hudMode;
+      if (stateLabel) {
+        if (hudState === 'talking') stateLabel.textContent = 'AI Talking';
+        else if (hudState === 'listening') stateLabel.textContent = 'Listening';
+        else if (hudState === 'watching') stateLabel.textContent = 'Watching';
+        else if (hudState === 'recording') stateLabel.textContent = 'Recording';
+      }
+
+      // Hide all assist views, then show active
+      const vCc = document.getElementById('hud-view-control-center');
+      const vTodos = document.getElementById('hud-view-todos');
+      const vDetail = document.getElementById('hud-view-todo-detail');
+      const vGuide = document.getElementById('hud-view-com-guide');
+
+      if (vCc) vCc.style.display = (hudActiveView === 'control_center' ? 'flex' : 'none');
+      if (vTodos) vTodos.style.display = (hudActiveView === 'todos' ? 'flex' : 'none');
+      if (vDetail) vDetail.style.display = (hudActiveView === 'todo_detail' ? 'flex' : 'none');
+      if (vGuide) vGuide.style.display = (hudActiveView === 'com_guide' ? 'flex' : 'none');
+
+      if (titleEl && guideEl) {
+        if (hudActiveView === 'todos') {
+          titleEl.textContent = 'Today Todos';
+          guideEl.textContent = 'double tap : to Control Center';
+          renderHudTodosView();
+        } else if (hudActiveView === 'control_center') {
+          titleEl.textContent = 'Control Center';
+          guideEl.textContent = 'tap: select · swipe: navigate';
+          renderHudControlCenterView();
+        } else if (hudActiveView === 'todo_detail') {
+          const curItem = hudTodos[hudSelectedTodo];
+          titleEl.textContent = 'Today Todos > ' + (curItem ? curItem.text : 'Item');
+          guideEl.textContent = 'double tap : to back';
+          renderHudTodoDetailView();
+        } else if (hudActiveView === 'com_guide') {
+          titleEl.textContent = 'Communication Control';
+          guideEl.textContent = 'double tap : to back';
+        }
+      }
+    }
+    window.updateHudStateUI = updateHudStateUI;
+
+    function selectHudTodoItem(idx) {
+      hudSelectedTodo = idx;
+      if (hudState === 'talking') {
+        if (hudSpeechTimer) clearInterval(hudSpeechTimer);
+        hudSpeechTimer = null;
+        hudState = 'listening';
+      }
+      hudActiveView = 'todo_detail';
+      hudSelectedAction = 0;
+      logHudEvent('[NAV] Opened detail tray for: ' + (hudTodos[hudSelectedTodo] ? hudTodos[hudSelectedTodo].text : 'Item'));
+      updateHudStateUI();
+    }
+    window.selectHudTodoItem = selectHudTodoItem;
+
+    function selectHudControlItem(idx) {
+      hudSelectedControl = idx;
+      if (hudState === 'talking') {
+        if (hudSpeechTimer) clearInterval(hudSpeechTimer);
+        hudSpeechTimer = null;
+        hudState = 'listening';
+      }
+      if (idx === 0) {
+        hudActiveView = 'com_guide';
+        logHudEvent('[NAV] Opened Communication Control guide');
+      } else if (idx === 1) {
+        hudActiveView = 'todos';
+        logHudEvent('[NAV] Opened Daily Todos checklist');
+      } else if (idx === 2) {
+        showDemoToast('2 Notifications: Battery 84%, Workout synced', 'info');
+        logHudEvent('[ALERT] Inspected recent notifications');
+      } else if (idx === 3) {
+        const scenes = ['cyberpunk', 'daylight', 'optical'];
+        const curFrame = document.getElementById('hud-visor-frame');
+        const cur = curFrame ? curFrame.getAttribute('data-scene') : 'cyberpunk';
+        const nextIdx = (scenes.indexOf(cur) + 1) % scenes.length;
+        switchHudAmbientScene(scenes[nextIdx]);
+      }
+      updateHudStateUI();
+    }
+    window.selectHudControlItem = selectHudControlItem;
+
+    function executeHudAction(action) {
+      const curItem = hudTodos[hudSelectedTodo];
+      if (!curItem) return;
+      if (action === 'mark_done') {
+        curItem.done = true;
+        logHudEvent('[ACTION] Marked done: ' + curItem.text);
+        showDemoToast('Completed: ' + curItem.text, 'success');
+      } else if (action === 'mark_undone') {
+        curItem.done = false;
+        logHudEvent('[ACTION] Marked undone: ' + curItem.text);
+        showDemoToast('Marked uncompleted: ' + curItem.text, 'info');
+      } else if (action === 'delete') {
+        hudTodos.splice(hudSelectedTodo, 1);
+        hudSelectedTodo = Math.max(0, hudSelectedTodo - 1);
+        logHudEvent('[ACTION] Deleted task');
+        showDemoToast('Task deleted from checklist', 'warn');
+      }
+      hudActiveView = 'todos';
+      updateHudStateUI();
+    }
+    window.executeHudAction = executeHudAction;
+
+    function triggerHudGesture(gesture) {
+      if (gesture === 'tap') {
+        if (hudState === 'talking') {
+          if (hudSpeechTimer) clearInterval(hudSpeechTimer);
+          hudSpeechTimer = null;
+          hudState = 'listening';
+          logHudEvent('[INTERRUPT] Speech interrupted by Tap -> Listening mode active');
+          showDemoToast('Interrupted speech. Claudia listening...', 'info');
+          updateHudStateUI();
+          return;
+        }
+
+        if (hudActiveView === 'todos') {
+          if (hudTodos.length > 0) {
+            hudActiveView = 'todo_detail';
+            hudSelectedAction = 0;
+            logHudEvent('[NAV] Opened detail tray for: ' + hudTodos[hudSelectedTodo].text);
+          }
+        } else if (hudActiveView === 'control_center') {
+          if (hudSelectedControl === 0) {
+            hudActiveView = 'com_guide';
+            logHudEvent('[NAV] Opened Communication Control guide');
+          } else if (hudSelectedControl === 1) {
+            hudActiveView = 'todos';
+            logHudEvent('[NAV] Opened Daily Todos checklist');
+          } else if (hudSelectedControl === 2) {
+            showDemoToast('2 Notifications: Battery 84%, Workout synced', 'info');
+            logHudEvent('[ALERT] Inspected recent notifications');
+          } else if (hudSelectedControl === 3) {
+            const scenes = ['cyberpunk', 'daylight', 'optical'];
+            const curFrame = document.getElementById('hud-visor-frame');
+            const cur = curFrame ? curFrame.getAttribute('data-scene') : 'cyberpunk';
+            const nextIdx = (scenes.indexOf(cur) + 1) % scenes.length;
+            switchHudAmbientScene(scenes[nextIdx]);
+          }
+        } else if (hudActiveView === 'todo_detail') {
+          const actions = ['mark_done', 'mark_undone', 'delete'];
+          executeHudAction(actions[hudSelectedAction]);
+          return;
+        } else if (hudActiveView === 'com_guide') {
+          const modes = ['Voice', 'Watch', 'Pause'];
+          const nxt = (modes.indexOf(hudMode) + 1) % modes.length;
+          hudMode = modes[nxt];
+          const cycleEl = document.getElementById('hud-guide-cycle');
+          if (cycleEl) cycleEl.textContent = '[ ' + hudMode.toLowerCase() + ' active ]';
+          logHudEvent('[MODE] Cycled communication mode to: ' + hudMode);
+        }
+      } else if (gesture === 'double_tap') {
+        if (hudActiveView === 'todo_detail') {
+          hudActiveView = 'todos';
+          logHudEvent('[NAV] Double Tap -> Returned to Today Todos checklist');
+        } else if (hudActiveView === 'todos' || hudActiveView === 'com_guide') {
+          hudActiveView = 'control_center';
+          logHudEvent('[NAV] Double Tap -> Returned to Control Center');
+        } else if (hudActiveView === 'control_center') {
+          hudActiveView = 'todos';
+          logHudEvent('[NAV] Double Tap -> Switched to Todos view');
+        }
+      } else if (gesture === 'swipe_down') {
+        if (hudActiveView === 'todos') {
+          hudSelectedTodo = (hudSelectedTodo + 1) % Math.max(1, hudTodos.length);
+          renderHudTodosView();
+        } else if (hudActiveView === 'control_center') {
+          hudSelectedControl = (hudSelectedControl + 1) % 4;
+          renderHudControlCenterView();
+        } else if (hudActiveView === 'todo_detail') {
+          hudSelectedAction = (hudSelectedAction + 1) % 3;
+          renderHudTodoDetailView();
+        }
+        logHudEvent('[GESTURE] Swiped Down -> cursor advanced');
+      } else if (gesture === 'swipe_up') {
+        if (hudActiveView === 'todos') {
+          hudSelectedTodo = (hudSelectedTodo - 1 + hudTodos.length) % Math.max(1, hudTodos.length);
+          renderHudTodosView();
+        } else if (hudActiveView === 'control_center') {
+          hudSelectedControl = (hudSelectedControl - 1 + 4) % 4;
+          renderHudControlCenterView();
+        } else if (hudActiveView === 'todo_detail') {
+          hudSelectedAction = (hudSelectedAction - 1 + 3) % 3;
+          renderHudTodoDetailView();
+        }
+        logHudEvent('[GESTURE] Swiped Up -> cursor reversed');
+      } else if (gesture === 'hold') {
+        hudState = 'recording';
+        logHudEvent('[RECORD] Long press triggered -> Recording voice memo');
+        showDemoToast('Recording voice memo (00:03)...', 'warn');
+        setTimeout(() => {
+          if (hudState === 'recording') {
+            hudState = 'listening';
+            logHudEvent('[RECORD] Memo recorded. Processing task...');
+            showDemoToast('Memo recorded successfully', 'success');
+            updateHudStateUI();
+          }
+        }, 3000);
+      }
+      updateHudStateUI();
+    }
+    window.triggerHudGesture = triggerHudGesture;
+
+    function simulateSpeechInput(userText) {
+      const userEl = document.getElementById('hud-user-speech');
+      const agentEl = document.getElementById('hud-agent-speech');
+      if (userEl) userEl.textContent = userText;
+
+      hudState = 'talking';
+      updateHudStateUI();
+      logHudEvent('[VOICE] User: "' + userText + '"');
+
+      let reply = 'Morning, here Todos:<br>1. Walk 3 Km<br>2. Prepare Meeting note<br>3. Meeting with John';
+      if (userText.indexOf('meeting') !== -1) {
+        reply = 'Next meeting with John is scheduled at 2:00 PM in Conference Room B.';
+      }
+
+      if (agentEl) {
+        agentEl.innerHTML = '<span class="hud-typing-cursor"></span>';
+        let charIndex = 0;
+        if (hudSpeechTimer) clearInterval(hudSpeechTimer);
+        hudSpeechTimer = setInterval(() => {
+          charIndex += 4;
+          if (charIndex >= reply.length) {
+            clearInterval(hudSpeechTimer);
+            hudSpeechTimer = null;
+            agentEl.innerHTML = reply;
+            hudState = 'listening';
+            updateHudStateUI();
+            logHudEvent('[SPEECH] Claudia finished vocalizing. Listening active.');
+            return;
+          }
+          agentEl.innerHTML = reply.substring(0, charIndex) + '<span class="hud-typing-cursor"></span>';
+        }, 50);
+      }
+    }
+    window.simulateSpeechInput = simulateSpeechInput;
 
     // Initial render
     setTimeout(() => {
