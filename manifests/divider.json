@@ -1,0 +1,26 @@
+{
+  "component": "Divider",
+  "targets": {
+    "react": "JoyDivider",
+    "svelte": "Divider",
+    "flutter": "JoyDivider"
+  },
+  "props": {
+    "direction": {
+      "type": "enum",
+      "values": ["horizontal", "vertical"],
+      "default": "horizontal"
+    },
+    "dashed": { "type": "boolean", "default": false },
+    "thickness": { "type": "number", "default": 1.0 },
+    "indent": { "type": "number", "default": 0.0 },
+    "endIndent": { "type": "number", "default": 0.0 }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}
