@@ -627,7 +627,7 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Checkbox | `.joy-checkbox` | - | - | hover, focus-visible, disabled, selected |
 | Switch | `.joy-switch` | sm | - | focus-visible, disabled, selected |
 | RadioGroup | `.joy-radio-group` | - | success, vertical | hover, focus-visible, disabled, error, selected |
-| Slider | `.joy-slider` | - | - | focus-visible, active, disabled |
+| Slider | `.joy-slider` | - | - | hover, focus-visible, active, disabled |
 | Rate | `.joy-rate` | - | readonly | hover, focus-visible, disabled |
 | Segmented | `.joy-segmented` | sm | - | hover, focus-visible, active, disabled |
 | Form | `.joy-form` | - | horizontal, label-left, no-colon | - |

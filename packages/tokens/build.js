@@ -172,8 +172,30 @@ const componentStyles = `
   to { background-position: 24px 0; }
 }
 @keyframes joy-modal-pop {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes joy-tooltip-zoom {
+  from { opacity: 0; transform: translateX(-50%) translateY(-2px) scale(0.92); }
+  to { opacity: 1; transform: translateX(-50%) translateY(-6px) scale(1); }
+}
+@keyframes joy-notification-slide-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes joy-segmented-thumb {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+@keyframes joy-step-pulse {
+  0% { box-shadow: 0 0 0 0 var(--joy-accent-subtle); }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes joy-star-hover {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+  100% { transform: scale(1.15); }
 }
 @keyframes joy-spin {
   from { transform: rotate(0deg); }
@@ -1375,6 +1397,7 @@ select.joy-select:disabled,
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
+  transform-origin: center bottom;
   background: var(--joy-surface-inverse);
   color: var(--joy-text-inverse);
   padding: 6px 10px;
@@ -1385,7 +1408,7 @@ select.joy-select:disabled,
   pointer-events: none;
   z-index: var(--joy-z-tooltip);
   box-shadow: var(--joy-elevation-2);
-  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+  animation: joy-tooltip-zoom var(--joy-duration-fast) var(--joy-ease-out-quint);
 }
 @media (prefers-reduced-motion: reduce) {
   .joy-tooltip {
@@ -3140,9 +3163,14 @@ h1, h2, h3, .joy-display {
   outline: var(--joy-focus-ring);
   outline-offset: 2px;
 }
+.joy-slider__handle:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 0 0 4px var(--joy-accent-subtle);
+}
 .joy-slider__handle:active {
   cursor: grabbing;
-  box-shadow: var(--joy-elevation-2);
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 0 0 5px var(--joy-accent-subtle);
 }
 .joy-slider--disabled {
   opacity: 0.5;
@@ -3862,6 +3890,12 @@ h1, h2, h3, .joy-display {
   color: var(--joy-surface-card);
   border-color: var(--joy-accent-text);
   box-shadow: 0 0 0 4px var(--joy-accent-subtle);
+  animation: joy-step-pulse 2s infinite var(--joy-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-steps__item--process .joy-steps__icon {
+    animation: none;
+  }
 }
 .joy-steps__item--finish .joy-steps__icon {
   background-color: var(--joy-status-success-bg);
@@ -4398,6 +4432,12 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-primary);
   font-weight: 600;
   box-shadow: var(--joy-elevation-1);
+  animation: joy-segmented-thumb var(--joy-duration-fast) var(--joy-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-segmented__item--active {
+    animation: none;
+  }
 }
 .joy-segmented__item:focus:not(:focus-visible) {
   outline: none;
@@ -4412,6 +4452,11 @@ h1, h2, h3, .joy-display {
 }
 .joy-segmented--sm .joy-segmented__item {
   min-height: var(--joy-control-height-sm);
+}
+@media (pointer: coarse) {
+  .joy-segmented__item {
+    min-height: 44px;
+  }
 }
 
 /* ── Ant Design Form & Advanced Data Entry Suite ── */
@@ -4546,6 +4591,17 @@ h1, h2, h3, .joy-display {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-input-number:hover .joy-input-number__handler-wrap,
+.joy-input-number:focus-within .joy-input-number__handler-wrap {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .joy-input-number__handler-wrap {
+    opacity: 1;
+  }
 }
 .joy-input-number__handler-up,
 .joy-input-number__handler-down {
@@ -4629,7 +4685,14 @@ h1, h2, h3, .joy-display {
   color: var(--joy-accent-default);
 }
 .joy-rate__star:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  animation: joy-star-hover var(--joy-duration-fast) var(--joy-ease-out) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-rate__star:hover {
+    animation: none;
+    transform: none;
+  }
 }
 .joy-rate__star:focus:not(:focus-visible) {
   outline: none;
@@ -5039,6 +5102,12 @@ h1, h2, h3, .joy-display {
   border-radius: var(--joy-radius-card);
   box-shadow: var(--joy-elevation-3);
   border: 1px solid var(--joy-border-subtle);
+  animation: joy-notification-slide-in var(--joy-duration-normal) var(--joy-ease-out-quint);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-notification__notice {
+    animation: none;
+  }
 }
 .joy-notification__title {
   font-size: 0.9375rem;
@@ -5133,6 +5202,7 @@ h1, h2, h3, .joy-display {
   box-shadow: var(--joy-elevation-2);
   border: 1px solid var(--joy-border-subtle);
   z-index: var(--joy-z-popover);
+  animation: joy-popover-enter var(--joy-duration-fast) var(--joy-ease-out);
 }
 /* Fallback for panels that openOverlay has not taken over: float above the trigger as before. */
 .joy-popconfirm__panel:not(.joy-overlay) {
@@ -5140,6 +5210,16 @@ h1, h2, h3, .joy-display {
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
+}
+.joy-popconfirm__panel:not(.joy-overlay)::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--joy-surface-card) transparent transparent transparent;
 }
 /* The sheet keeps the overlay primitive's shape: .joy-popconfirm__panel is declared after .joy-overlay--sheet and
    would otherwise flatten the top radius, drop to elevation-2 and lose the safe-area inset. */

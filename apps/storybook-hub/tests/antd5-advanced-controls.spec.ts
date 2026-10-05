@@ -96,6 +96,102 @@ test.describe('Ant Design 5 Benchmark Suite: Cascader & TreeSelect Advanced Cont
     await expect(treeselect.locator('.joy-treeselect__tag')).toHaveCount(0);
   });
 
+  test('Wave 3 Floating Overlays: Modal dialog & Popconfirm nested confirmation', async ({ page }) => {
+    await page.goto('/#modal');
+    await page.waitForSelector('#view-modal', { state: 'visible' });
+
+    // Open Modal
+    const openBtn = page.locator('#view-modal button', { hasText: 'Open Confirm Modal' });
+    await openBtn.click();
+
+    const modal = page.locator('#demo-modal-container .joy-modal');
+    await expect(modal).toBeVisible();
+
+    // Trigger Popconfirm nested inside modal
+    const popconfirmTrigger = modal.locator('button', { hasText: 'Review sub-accounts first' });
+    await expect(popconfirmTrigger).toBeVisible();
+    await popconfirmTrigger.click();
+
+    const popconfirmPanel = page.locator('#hub-popconfirm-modal');
+    await expect(popconfirmPanel).toBeVisible();
+    await expect(popconfirmPanel).toHaveClass(/joy-popconfirm__panel/);
+
+    // Cancel Popconfirm
+    const cancelPopBtn = popconfirmPanel.locator('button', { hasText: 'Cancel' });
+    await cancelPopBtn.click();
+    await expect(popconfirmPanel).not.toBeVisible();
+
+    // Close Modal
+    const closeModalBtn = modal.locator('.joy-modal__close');
+    await closeModalBtn.click();
+    await expect(modal).not.toBeVisible();
+  });
+
+  test('Wave 3 Floating Overlays: Tooltip keyboard focus and ARIA attributes', async ({ page }) => {
+    await page.goto('/#tooltip');
+    await page.waitForSelector('#view-tooltip', { state: 'visible' });
+
+    const badge = page.locator('#view-tooltip .joy-badge', { hasText: 'Focus me (keyboard)' });
+    await expect(badge).toBeVisible();
+    await badge.focus();
+
+    const tooltip = page.locator('#demo-tip-b');
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveAttribute('role', 'tooltip');
+  });
+
+  test('Wave 4 Navigation: Tabs active indicator and Segmented control toggle', async ({ page }) => {
+    await page.goto('/#tabs');
+    await page.waitForSelector('#view-tabs', { state: 'visible' });
+
+    const tabsBox = page.locator('#view-tabs .joy-tabs');
+    await expect(tabsBox).toBeVisible();
+    const firstTab = tabsBox.locator('.joy-tab-btn', { hasText: 'Live Orders' });
+    await expect(firstTab).toHaveClass(/joy-tab-btn--active/);
+
+    const secondTab = tabsBox.locator('.joy-tab-btn', { hasText: 'Historical Fills' });
+    await secondTab.click();
+    await expect(secondTab).toHaveClass(/joy-tab-btn--active/);
+    await expect(firstTab).not.toHaveClass(/joy-tab-btn--active/);
+
+    // Segmented control in primitives
+    await page.goto('/#primitives');
+    await page.waitForSelector('#view-primitives', { state: 'visible' });
+
+    const segmented = page.locator('#demo-segmented');
+    await expect(segmented).toBeVisible();
+    const oneDayBtn = segmented.locator('.joy-segmented__item', { hasText: '1D' });
+    await oneDayBtn.click();
+    await expect(oneDayBtn).toHaveClass(/joy-segmented__item--active/);
+  });
+
+  test('Wave 5 Form Controls: InputNumber steppers, Rate stars, and Slider attributes', async ({ page }) => {
+    await page.goto('/#forms');
+    await page.waitForSelector('#view-forms', { state: 'visible' });
+
+    // InputNumber stepper
+    const numInput = page.locator('#demo-num-input');
+    await expect(numInput).toHaveValue('10');
+    const inputNumberBox = page.locator('.joy-input-number', { has: numInput });
+    const upBtn = inputNumberBox.locator('.joy-input-number__handler-up');
+    await upBtn.click();
+    await expect(numInput).toHaveValue('11');
+
+    // Rate scale
+    const rate = page.locator('#demo-rate');
+    await expect(rate).toBeVisible();
+    await expect(rate).toHaveAttribute('role', 'radiogroup');
+
+    // Slider
+    await page.goto('/#slider');
+    await page.waitForSelector('#view-slider', { state: 'visible' });
+
+    const sliderHandle = page.locator('#demo-slider-handle');
+    await expect(sliderHandle).toBeVisible();
+    await expect(sliderHandle).toHaveAttribute('role', 'slider');
+    await expect(sliderHandle).toHaveAttribute('aria-valuenow', '25');
+  });
+
   test('Responsive and theme visual check: 1280px light, 1280px dark, 375px mobile', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop-chrome', 'Screenshots generated in desktop-chrome project');
 
