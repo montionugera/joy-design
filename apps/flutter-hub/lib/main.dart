@@ -92,6 +92,12 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                     _buildLayoutSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
                     _buildDisplaySection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildFeedbackSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildOverlaysSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildNotificationsSection(tokens),
                   ],
                 ),
               ),
@@ -836,6 +842,283 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFeedbackSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Feedback Components (JoyAlert, JoyProgress, JoySpin, JoySkeleton)',
+      subtitle:
+          'Semantic status banners with zero side-stripes, linear and circular progress indicators, spinning indicators, and loading skeleton placeholders.',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const JoyText.h6('Status Alerts (JoyAlert Variants)'),
+          const SizedBox(height: JoySpacing.s8),
+          const JoyAlert.info(
+            title: Text('Information Notice'),
+            description: Text('System updates scheduled for Sunday at 02:00 UTC.'),
+            closable: true,
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          const JoyAlert.success(
+            title: Text('Operation Succeeded'),
+            description: Text('All data packages synchronized with zero errors.'),
+            closable: true,
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          const JoyAlert.warning(
+            title: Text('Storage Space Low'),
+            description: Text('Workspace storage usage is at 88% capacity.'),
+            closable: true,
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          const JoyAlert.danger(
+            title: Text('Connection Terminated'),
+            description: Text('TLS certificate validation failed for endpoint.'),
+            closable: true,
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Progress Indicators (JoyProgress Bar & Circle)'),
+          const SizedBox(height: JoySpacing.s12),
+          const JoyProgress.line(
+            percent: 68.0,
+            status: JoyProgressStatus.active,
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              JoyProgress.circle(
+                percent: 75.0,
+                status: JoyProgressStatus.normal,
+                size: 96.0,
+              ),
+              JoyProgress.circle(
+                percent: 100.0,
+                status: JoyProgressStatus.success,
+                size: 96.0,
+              ),
+              JoyProgress.circle(
+                percent: 45.0,
+                status: JoyProgressStatus.error,
+                size: 96.0,
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Loading Spinner (JoySpin)'),
+          const SizedBox(height: JoySpacing.s12),
+          JoySpin(
+            spinning: true,
+            tip: 'Loading design tokens...',
+            child: Container(
+              height: 80.0,
+              decoration: BoxDecoration(
+                color: tokens.surface.sunken,
+                borderRadius: BorderRadius.circular(JoyRadius.control),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'Container Content being loaded',
+                style: TextStyle(color: tokens.text.muted),
+              ),
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Placeholders (JoySkeleton Line, Avatar & Button)'),
+          const SizedBox(height: JoySpacing.s12),
+          const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              JoySkeleton.avatar(size: 48.0),
+              SizedBox(width: JoySpacing.s16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    JoySkeleton.line(lines: 3),
+                    SizedBox(height: JoySpacing.s12),
+                    JoySkeleton.button(width: 96.0, height: 36.0),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverlaysSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Overlays & Dialogs (JoyModal, JoyDrawer, JoyPopconfirm, JoyTooltip)',
+      subtitle:
+          'Modal dialogs with 60% navy900 scrim, responsive sliding off-canvas drawers, popconfirm popovers, and interactive tooltips.',
+      content: Builder(
+        builder: (context) {
+          return Wrap(
+            spacing: JoySpacing.s16,
+            runSpacing: JoySpacing.s16,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              JoyButton(
+                key: const Key('open-modal-showcase-btn'),
+                variant: JoyButtonVariant.solid,
+                onPressed: () {
+                  JoyModal.show<void>(
+                    context: context,
+                    title: const Text('Confirm Cluster Restart'),
+                    content: const Text(
+                      'Are you sure you want to execute a rolling restart on 3 worker nodes? This operation will preserve running workloads.',
+                    ),
+                    footer: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        JoyButton(
+                          variant: JoyButtonVariant.ghost,
+                          onPressed: () =>
+                              Navigator.of(context, rootNavigator: true).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        const SizedBox(width: JoySpacing.s8),
+                        JoyButton(
+                          variant: JoyButtonVariant.solid,
+                          onPressed: () =>
+                              Navigator.of(context, rootNavigator: true).pop(),
+                          child: const Text('Confirm Restart'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Open Modal Dialog'),
+              ),
+              JoyButton(
+                key: const Key('open-drawer-showcase-btn'),
+                variant: JoyButtonVariant.outline,
+                onPressed: () {
+                  JoyDrawer.show<void>(
+                    context: context,
+                    title: const Text('Workspace Settings'),
+                    placement: JoyDrawerPlacement.right,
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Configure design system variables, token overlays, and regional locale options.',
+                          style: TextStyle(color: tokens.text.secondary),
+                        ),
+                        const SizedBox(height: JoySpacing.s16),
+                        const JoySkeleton.line(lines: 4),
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Open Right Drawer'),
+              ),
+              JoyPopconfirm.text(
+                title: 'Delete this API key permanently?',
+                confirmText: 'Delete',
+                cancelText: 'Keep',
+                onConfirm: () {
+                  JoyMessage.show(
+                    context,
+                    content: 'API key successfully revoked',
+                    type: JoyMessageType.success,
+                  );
+                },
+                child: const JoyButton(
+                  variant: JoyButtonVariant.danger,
+                  child: Text('Delete Key Popconfirm'),
+                ),
+              ),
+              JoyTooltip.text(
+                title: 'WCAG 2.2 AA compliant contrast ratio: 7.2:1',
+                child: const JoyButton(
+                  variant: JoyButtonVariant.ghost,
+                  child: Text('Hover or Tap for Tooltip'),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildNotificationsSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Floating Notifications & Toasts (JoyNotification & JoyMessage)',
+      subtitle:
+          'Asynchronous status notifications at top-right/top-center and lightweight top-center pill toasts with smooth enter/exit animations.',
+      content: Builder(
+        builder: (context) {
+          return Wrap(
+            spacing: JoySpacing.s16,
+            runSpacing: JoySpacing.s16,
+            children: [
+              JoyButton(
+                key: const Key('trigger-notification-info-btn'),
+                variant: JoyButtonVariant.outline,
+                onPressed: () {
+                  JoyNotification.show(
+                    context,
+                    title: const Text('System Deployment Ready'),
+                    description: const Text(
+                      'All 14 microservices have passed automated Gate 1 prechecks.',
+                    ),
+                    type: JoyNotificationType.info,
+                  );
+                },
+                child: const Text('Show Info Notification'),
+              ),
+              JoyButton(
+                key: const Key('trigger-notification-success-btn'),
+                variant: JoyButtonVariant.outline,
+                onPressed: () {
+                  JoyNotification.show(
+                    context,
+                    title: const Text('Invoice Paid'),
+                    description: const Text(
+                      'Payment received for invoice #2026-09. Receipt sent to billing contact.',
+                    ),
+                    type: JoyNotificationType.success,
+                  );
+                },
+                child: const Text('Show Success Notification'),
+              ),
+              JoyButton(
+                key: const Key('trigger-message-success-btn'),
+                variant: JoyButtonVariant.solid,
+                onPressed: () {
+                  JoyMessage.show(
+                    context,
+                    content: 'Workspace configuration saved successfully',
+                    type: JoyMessageType.success,
+                  );
+                },
+                child: const Text('Trigger Success Toast'),
+              ),
+              JoyButton(
+                key: const Key('trigger-message-warning-btn'),
+                variant: JoyButtonVariant.ghost,
+                onPressed: () {
+                  JoyMessage.show(
+                    context,
+                    content: 'Network latency exceeds 250ms threshold',
+                    type: JoyMessageType.warning,
+                  );
+                },
+                child: const Text('Trigger Warning Toast'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
