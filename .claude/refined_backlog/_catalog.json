@@ -706,5 +706,15 @@
     "shipped_at": "2026-10-04T12:30:17.083561+00:00",
     "shipped_sha": "5e5e779ac51697cdbabde95719b974d8a00b31a6",
     "promoted_at": "2026-10-04T12:48:56.733660+00:00"
+  },
+  {
+    "id": "F-058",
+    "title": "Slice 0: Foundation & Walking Skeleton",
+    "from_idea": "I-063",
+    "created_at": "2026-10-05T11:01:26.235629+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null,
+    "epic": "E-002"
   }
 ]
