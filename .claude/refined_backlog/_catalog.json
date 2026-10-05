@@ -725,9 +725,10 @@
     "title": "Slice 1: Core Primitives, Layout & Visual Tokens",
     "from_idea": "I-064",
     "created_at": "2026-10-05T11:55:30.067089+00:00",
-    "claimed_by": null,
-    "status": "open",
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
     "release_version": null,
-    "epic": "E-002"
+    "epic": "E-002",
+    "claimed_at": "2026-10-05T11:55:34.950827+00:00"
   }
 ]
