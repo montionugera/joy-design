@@ -59,7 +59,17 @@ echo "2f. Checking DESIGN.md and README generated regions are up to date (script
 node scripts/gen-design-md.mjs --check
 
 echo "2g. Checking Flutter analyze and tests..."
-(cd packages/flutter && flutter analyze --fatal-infos && flutter test)
+if command -v flutter >/dev/null 2>&1; then
+  (cd packages/flutter && flutter pub get && flutter analyze --fatal-infos && flutter test)
+  (cd apps/flutter-hub && flutter pub get && flutter analyze --fatal-infos && flutter build web)
+else
+  if [ -n "$CI" ]; then
+    echo "::error::Flutter SDK is required for Gate 1 verification but not found in PATH."
+    exit 1
+  else
+    echo "   [warn] Flutter SDK not found in PATH; skipping Flutter gate on local machine."
+  fi
+fi
 
 echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js
