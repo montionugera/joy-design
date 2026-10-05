@@ -1,0 +1,44 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoySwitch",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "switch_toggle",
+      "description": "Default switch triggers change event on tap and satisfies touch target",
+      "props": {
+        "value": false,
+        "size": "md"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "switch_disabled",
+      "description": "Disabled switch suppresses change event on tap",
+      "props": {
+        "value": false,
+        "disabled": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    },
+    {
+      "id": "switch_loading",
+      "description": "Loading switch suppresses change event on tap",
+      "props": {
+        "value": true,
+        "loading": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    }
+  ]
+}
