@@ -1,0 +1,43 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoySteps",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "steps_horizontal_navigation",
+      "description": "Horizontal steps trigger change event when step clicked",
+      "props": {
+        "current": 0,
+        "direction": "horizontal"
+      },
+      "actions": [{ "type": "tap_step" }],
+      "expect": {
+        "events": { "change": 1 }
+      }
+    },
+    {
+      "id": "steps_vertical_orientation",
+      "description": "Vertical steps layout renders workflow sequence",
+      "props": {
+        "current": 1,
+        "direction": "vertical"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "steps_disabled_step",
+      "description": "Disabled step item suppresses change event on tap",
+      "props": {
+        "current": 0,
+        "direction": "horizontal"
+      },
+      "actions": [{ "type": "tap_disabled_step" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    }
+  ]
+}

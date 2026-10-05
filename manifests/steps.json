@@ -1,0 +1,36 @@
+{
+  "component": "Steps",
+  "targets": {
+    "react": "JoySteps",
+    "svelte": "Steps",
+    "flutter": "JoySteps"
+  },
+  "sizes": ["sm", "md"],
+  "variants": ["horizontal", "vertical"],
+  "props": {
+    "current": { "type": "number", "default": 0 },
+    "items": { "type": "array" },
+    "direction": {
+      "type": "enum",
+      "values": ["horizontal", "vertical"],
+      "default": "horizontal"
+    },
+    "status": {
+      "type": "enum",
+      "values": ["wait", "process", "finish", "error"],
+      "default": "process"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md"],
+      "default": "md"
+    }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChange"
+    }
+  }
+}

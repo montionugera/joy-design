@@ -1,0 +1,23 @@
+{
+  "component": "Pagination",
+  "targets": {
+    "react": "JoyPagination",
+    "svelte": "Pagination",
+    "flutter": "JoyPagination"
+  },
+  "props": {
+    "current": { "type": "number", "default": 1 },
+    "total": { "type": "number", "default": 0 },
+    "pageSize": { "type": "number", "default": 10 },
+    "showSizeChanger": { "type": "boolean", "default": false },
+    "simple": { "type": "boolean", "default": false },
+    "disabled": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChange"
+    }
+  }
+}
