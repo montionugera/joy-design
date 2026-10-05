@@ -738,9 +738,10 @@
     "title": "Slice 2: Form & Input Controls",
     "from_idea": "I-065",
     "created_at": "2026-10-05T12:33:44.823551+00:00",
-    "claimed_by": null,
-    "status": "open",
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
     "release_version": null,
-    "epic": "E-002"
+    "epic": "E-002",
+    "claimed_at": "2026-10-05T12:33:54.461411+00:00"
   }
 ]
