@@ -26,6 +26,13 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
   double _sliderValue = 65.0;
   double _rateValue = 4.5;
   String _segmentedValue = 'monthly';
+  String _activeLineTabKey = 'overview';
+  String _activeCardTabKey = 'metrics';
+  int _paginationCurrent = 3;
+  int _paginationCompact = 2;
+  String _breadcrumbNavigated = 'Workspace';
+  int _stepsHorizontalCurrent = 1;
+  int _stepsVerticalCurrent = 2;
 
   @override
   void initState() {
@@ -98,6 +105,8 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                     _buildOverlaysSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
                     _buildNotificationsSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildNavigationAndWorkflowSection(tokens),
                   ],
                 ),
               ),
@@ -1119,6 +1128,333 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNavigationAndWorkflowSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Navigation & Workflow Primitives (JoyTabs, JoyPagination, JoyBreadcrumb, JoySteps, JoyTimeline)',
+      subtitle:
+          'Comprehensive navigation hierarchy, windowed pagination, multi-step workflows, and chronological event timelines.',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 1. JoyTabs
+          Text(
+            'JoyTabs (Line and Card Modes)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          Text(
+            'Line mode with animated sliding indicator:',
+            style: TextStyle(fontSize: 12.0, color: tokens.text.secondary),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          JoyTabs(
+            key: const Key('joy-tabs-line-showcase'),
+            activeKey: _activeLineTabKey,
+            type: JoyTabsType.line,
+            onChange: (key) => setState(() => _activeLineTabKey = key),
+            items: [
+              JoyTabItem.text(
+                key: 'overview',
+                label: 'Overview',
+                icon: JoyIcon(JoyIcons.info, size: JoyIconSize.sm),
+                content: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: JoySpacing.s16),
+                  child: Text(
+                    'System Overview: All operational nodes running with optimal throughput.',
+                    style: TextStyle(color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              JoyTabItem.text(
+                key: 'analytics',
+                label: 'Analytics',
+                icon: JoyIcon(JoyIcons.search, size: JoyIconSize.sm),
+                content: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: JoySpacing.s16),
+                  child: Text(
+                    'Realtime Analytics: 99.98% SLA across all monitored endpoints.',
+                    style: TextStyle(color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              JoyTabItem.text(
+                key: 'audit',
+                label: 'Security & Audit',
+                icon: JoyIcon(JoyIcons.alertCircle, size: JoyIconSize.sm),
+                content: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: JoySpacing.s16),
+                  child: Text(
+                    'Audit Ledger: Zero unauthorized credential attempts in the last 24h.',
+                    style: TextStyle(color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              const JoyTabItem(
+                key: 'disabled_tab',
+                label: 'Legacy Archive',
+                disabled: true,
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s20),
+          Text(
+            'Card mode with structured tabs:',
+            style: TextStyle(fontSize: 12.0, color: tokens.text.secondary),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          JoyTabs(
+            key: const Key('joy-tabs-card-showcase'),
+            activeKey: _activeCardTabKey,
+            type: JoyTabsType.card,
+            onChange: (key) => setState(() => _activeCardTabKey = key),
+            items: [
+              JoyTabItem.text(
+                key: 'metrics',
+                label: 'Cluster Metrics',
+                content: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: JoySpacing.s16),
+                  child: Text(
+                    'Cluster utilization is healthy at 42% CPU and 58% Memory.',
+                    style: TextStyle(color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              JoyTabItem.text(
+                key: 'deployments',
+                label: 'Active Deployments',
+                content: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: JoySpacing.s16),
+                  child: Text(
+                    'Three blue/green rollouts currently staging in us-east-1.',
+                    style: TextStyle(color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              JoyTabItem.text(
+                key: 'configs',
+                label: 'Environment Configs',
+                content: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: JoySpacing.s16),
+                  child: Text(
+                    'Tokens and secret references synchronized with vault.',
+                    style: TextStyle(color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 2. JoyPagination
+          Text(
+            'JoyPagination (Windowed & Compact Modes)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Text(
+            'Standard windowed pagination with chevrons and hit targets (Page $_paginationCurrent of 15):',
+            style: TextStyle(fontSize: 12.0, color: tokens.text.secondary),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          JoyPagination(
+            key: const Key('joy-pagination-standard'),
+            current: _paginationCurrent,
+            total: 150,
+            pageSize: 10,
+            onChange: (p) => setState(() => _paginationCurrent = p),
+          ),
+          const SizedBox(height: JoySpacing.s16),
+          Text(
+            'Compact pagination mode (Page $_paginationCompact of 8):',
+            style: TextStyle(fontSize: 12.0, color: tokens.text.secondary),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          JoyPagination(
+            key: const Key('joy-pagination-compact'),
+            current: _paginationCompact,
+            total: 80,
+            pageSize: 10,
+            simple: true,
+            onChange: (p) => setState(() => _paginationCompact = p),
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 3. JoyBreadcrumb
+          Text(
+            'JoyBreadcrumb (Navigation Trails & Click Handlers)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Text(
+            'Current Location: $_breadcrumbNavigated',
+            style: TextStyle(fontSize: 12.0, color: tokens.accent.base, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          JoyBreadcrumb(
+            key: const Key('joy-breadcrumb-standard'),
+            items: [
+              JoyBreadcrumbItem.text(
+                'Dashboard',
+                icon: JoyIcon(JoyIcons.user, size: JoyIconSize.sm),
+                onClick: () => setState(() => _breadcrumbNavigated = 'Dashboard'),
+              ),
+              JoyBreadcrumbItem.text(
+                'Workspaces',
+                onClick: () => setState(() => _breadcrumbNavigated = 'Workspaces'),
+              ),
+              JoyBreadcrumbItem.text(
+                'Joymify Design System',
+                onClick: () => setState(() => _breadcrumbNavigated = 'Joymify Design System'),
+              ),
+              JoyBreadcrumbItem.text(
+                'Slice 4 Navigation',
+              ),
+            ],
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 4. JoySteps
+          Text(
+            'JoySteps (Horizontal & Vertical Workflow Progress)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Text(
+            'Horizontal step workflow with interactive progress (Current: Step ${_stepsHorizontalCurrent + 1}):',
+            style: TextStyle(fontSize: 12.0, color: tokens.text.secondary),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoySteps(
+            key: const Key('joy-steps-horizontal'),
+            current: _stepsHorizontalCurrent,
+            direction: Axis.horizontal,
+            onChange: (step) => setState(() => _stepsHorizontalCurrent = step),
+            items: [
+              JoyStepItem.text(
+                title: 'Contract Definition',
+                description: 'JSON Schema v2 verification',
+              ),
+              JoyStepItem.text(
+                title: 'Implementation',
+                description: 'Component architecture',
+              ),
+              JoyStepItem.text(
+                title: 'Verification',
+                description: 'Zero emoji and color literal checks',
+              ),
+              JoyStepItem.text(
+                title: 'Promotion',
+                description: 'Release rollout to cluster',
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s20),
+          Text(
+            'Vertical step workflow with error status:',
+            style: TextStyle(fontSize: 12.0, color: tokens.text.secondary),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoySteps(
+            key: const Key('joy-steps-vertical'),
+            current: _stepsVerticalCurrent,
+            direction: Axis.vertical,
+            onChange: (step) => setState(() => _stepsVerticalCurrent = step),
+            items: [
+              JoyStepItem.text(
+                title: 'Repository Worktree Check',
+                description: 'Cloned into isolated branch',
+                status: JoyStepStatus.finish,
+              ),
+              JoyStepItem.text(
+                title: 'Unit Test Execution',
+                description: '314 tests running in parallel',
+                status: JoyStepStatus.finish,
+              ),
+              JoyStepItem.text(
+                title: 'Color Literal Scan',
+                description: 'Active scanner validation',
+                status: JoyStepStatus.process,
+              ),
+              JoyStepItem.text(
+                title: 'Automated Deployment',
+                description: 'Pending stage validation',
+                status: JoyStepStatus.wait,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 5. JoyTimeline
+          Text(
+            'JoyTimeline (Chronological Status Events)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoyTimeline(
+            key: const Key('joy-timeline-showcase'),
+            items: [
+              JoyTimelineItem.text(
+                title: 'Production Rollout Finalized',
+                content: 'Version 2.0.0 promoted to all edge regions with zero downtime.',
+                timestamp: '14:20 UTC',
+                status: JoyTimelineStatus.success,
+              ),
+              JoyTimelineItem.text(
+                title: 'Automated Contract Verification',
+                content: 'All 12 contract scenarios across Tabs, Pagination, Breadcrumb, and Steps passed.',
+                timestamp: '14:15 UTC',
+                status: JoyTimelineStatus.accent,
+              ),
+              JoyTimelineItem.text(
+                title: 'Resource Allocation Warning',
+                content: 'Memory usage in staging cluster reached 78% of soft limit.',
+                timestamp: '14:02 UTC',
+                status: JoyTimelineStatus.warning,
+              ),
+              JoyTimelineItem.text(
+                title: 'Security Scan Anomaly',
+                content: 'Dependency vulnerability flagged and patched in automated build pipeline.',
+                timestamp: '13:45 UTC',
+                status: JoyTimelineStatus.danger,
+              ),
+              JoyTimelineItem.text(
+                title: 'Snapshot Backup Created',
+                content: 'System state archived to cold storage.',
+                timestamp: '13:30 UTC',
+                status: JoyTimelineStatus.info,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -32,4 +32,10 @@ export 'src/components/overlay/joy_modal.dart';
 export 'src/components/overlay/joy_drawer.dart';
 export 'src/components/overlay/joy_popconfirm.dart';
 export 'src/components/overlay/joy_tooltip.dart';
+export 'src/components/navigation/joy_tabs.dart';
+export 'src/components/navigation/joy_pagination.dart';
+export 'src/components/navigation/joy_breadcrumb.dart';
+export 'src/components/navigation/joy_steps.dart';
+export 'src/components/navigation/joy_timeline.dart';
+
 

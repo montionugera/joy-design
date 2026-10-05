@@ -1,0 +1,12 @@
+{
+  "component": "Breadcrumb",
+  "targets": {
+    "react": "JoyBreadcrumb",
+    "svelte": "Breadcrumb",
+    "flutter": "JoyBreadcrumb"
+  },
+  "props": {
+    "items": { "type": "array" },
+    "separator": { "type": "string", "default": "/" }
+  }
+}

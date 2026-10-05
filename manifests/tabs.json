@@ -1,0 +1,31 @@
+{
+  "component": "Tabs",
+  "targets": {
+    "react": "JoyTabs",
+    "svelte": "Tabs",
+    "flutter": "JoyTabs"
+  },
+  "sizes": ["sm", "md", "lg"],
+  "variants": ["line", "card"],
+  "props": {
+    "items": { "type": "array" },
+    "activeKey": { "type": "string" },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md"
+    },
+    "type": {
+      "type": "enum",
+      "values": ["line", "card"],
+      "default": "line"
+    }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChange"
+    }
+  }
+}

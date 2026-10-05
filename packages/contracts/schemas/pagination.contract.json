@@ -1,0 +1,49 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyPagination",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "pagination_page_select",
+      "description": "Tapping page number updates page and triggers change event",
+      "props": {
+        "current": 1,
+        "total": 50,
+        "pageSize": 10
+      },
+      "actions": [{ "type": "tap_page_2" }],
+      "expect": {
+        "events": { "change": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "pagination_next",
+      "description": "Tapping next chevron triggers change event with incremented page",
+      "props": {
+        "current": 1,
+        "total": 50,
+        "pageSize": 10
+      },
+      "actions": [{ "type": "tap_next" }],
+      "expect": {
+        "events": { "change": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "pagination_disabled",
+      "description": "Disabled pagination suppresses change events on click",
+      "props": {
+        "current": 1,
+        "total": 50,
+        "pageSize": 10,
+        "disabled": true
+      },
+      "actions": [{ "type": "tap_next" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    }
+  ]
+}

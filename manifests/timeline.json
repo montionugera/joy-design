@@ -1,0 +1,18 @@
+{
+  "component": "Timeline",
+  "targets": {
+    "react": "JoyTimeline",
+    "svelte": "Timeline",
+    "flutter": "JoyTimeline"
+  },
+  "variants": ["left", "right", "alternate"],
+  "props": {
+    "items": { "type": "array" },
+    "mode": {
+      "type": "enum",
+      "values": ["left", "right", "alternate"],
+      "default": "left"
+    },
+    "reverse": { "type": "boolean", "default": false }
+  }
+}

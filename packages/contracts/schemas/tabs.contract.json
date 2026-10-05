@@ -1,0 +1,44 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyTabs",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "tabs_select",
+      "description": "Tabs switch active tab on tap and trigger change event",
+      "props": {
+        "activeKey": "tab1",
+        "type": "line"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "tabs_card_type",
+      "description": "Card type tabs render with card container styling",
+      "props": {
+        "activeKey": "tab1",
+        "type": "card"
+      },
+      "actions": [],
+      "expect": {
+        "events": {},
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "tabs_disabled_tab",
+      "description": "Disabled tab suppresses change event on tap",
+      "props": {
+        "activeKey": "tab1"
+      },
+      "actions": [{ "type": "tap_disabled" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyBreadcrumb",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "breadcrumb_render",
+      "description": "Breadcrumb renders items trail with separator",
+      "props": {
+        "separator": "/"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "breadcrumb_interactive_click",
+      "description": "Clicking non-leaf interactive breadcrumb item triggers click event",
+      "props": {
+        "separator": "/"
+      },
+      "actions": [{ "type": "tap_item" }],
+      "expect": {
+        "events": { "click": 1 }
+      }
+    },
+    {
+      "id": "breadcrumb_leaf_non_clickable",
+      "description": "Clicking terminal leaf item does not trigger click event",
+      "props": {
+        "separator": "/"
+      },
+      "actions": [{ "type": "tap_leaf" }],
+      "expect": {
+        "events": { "click": 0 }
+      }
+    }
+  ]
+}
