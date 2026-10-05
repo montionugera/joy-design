@@ -1,0 +1,19 @@
+{
+  "component": "Skeleton",
+  "targets": {
+    "react": "JoySkeleton",
+    "svelte": "Skeleton",
+    "flutter": "JoySkeleton"
+  },
+  "variants": ["text", "rect", "circle"],
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["text", "rect", "circle"],
+      "default": "text"
+    },
+    "width": { "type": "number" },
+    "height": { "type": "number" },
+    "lines": { "type": "number", "default": 1 }
+  }
+}

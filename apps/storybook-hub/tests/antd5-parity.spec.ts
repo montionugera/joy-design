@@ -179,6 +179,83 @@ test.describe('Ant Design 5 Quality Bar & Custom DatePicker Suite', () => {
     await expect(page.locator('#demo-range-end')).toHaveValue('');
   });
 
+  test('constrained date picker respects min/max, blackout dates, and disabled weekends', async ({ page }) => {
+    const trigger = page.locator('#demo-constrained-date-picker-wrap');
+    const popover = page.locator('#demo-constrained-calendar-popover');
+
+    await trigger.click();
+    await expect(popover).toBeVisible();
+
+    // Check min boundary: 2026-09-04 is before min (09-05) -> disabled
+    const cellBeforeMin = popover.locator('.joy-calendar__cell[data-date="2026-09-04"]');
+    await expect(cellBeforeMin).toHaveClass(/joy-calendar__cell--disabled/);
+    await expect(cellBeforeMin).toHaveAttribute('aria-disabled', 'true');
+
+    // Check max boundary: 2026-09-26 is after max (09-25) -> disabled
+    const cellAfterMax = popover.locator('.joy-calendar__cell[data-date="2026-09-26"]');
+    await expect(cellAfterMax).toHaveClass(/joy-calendar__cell--disabled/);
+    await expect(cellAfterMax).toHaveAttribute('aria-disabled', 'true');
+
+    // Check blackout date: 2026-09-11 is a holiday blackout -> disabled
+    const blackout1 = popover.locator('.joy-calendar__cell[data-date="2026-09-11"]');
+    await expect(blackout1).toHaveClass(/joy-calendar__cell--disabled/);
+    await expect(blackout1).toHaveAttribute('aria-disabled', 'true');
+
+    // Check weekend: 2026-09-13 is Sunday -> disabled
+    const sunday = popover.locator('.joy-calendar__cell[data-date="2026-09-13"]');
+    await expect(sunday).toHaveClass(/joy-calendar__cell--disabled/);
+    await expect(sunday).toHaveAttribute('aria-disabled', 'true');
+
+    // Attempting to click disabled cell does not update input
+    await blackout1.click({ force: true });
+    await expect(page.locator('#demo-constrained-date')).toHaveValue('2026-09-15');
+
+    // Valid business weekday in range: 2026-09-16 (Wednesday) -> enabled & selectable
+    const validDay = popover.locator('.joy-calendar__cell[data-date="2026-09-16"]');
+    await expect(validDay).not.toHaveClass(/joy-calendar__cell--disabled/);
+    await validDay.click();
+
+    await expect(popover).not.toBeVisible();
+    await expect(page.locator('#demo-constrained-date')).toHaveValue('2026-09-16');
+    await expect(page.locator('#constrained-date-feedback')).toHaveText('2026-09-16');
+  });
+
+  test('blackout range picker blocks cross-blackout selection spans', async ({ page }) => {
+    const trigger = page.locator('#demo-blackout-range-picker-wrap');
+    const popover = page.locator('#demo-blackout-range-calendar-popover');
+
+    await trigger.click();
+    await expect(popover).toBeVisible();
+
+    // Blackout window is 2026-01-12 to 2026-01-16
+    const blackoutDay = popover.locator('.joy-calendar__cell[data-date="2026-01-14"]');
+    await expect(blackoutDay).toHaveClass(/joy-calendar__cell--disabled/);
+    await expect(blackoutDay).toHaveAttribute('aria-disabled', 'true');
+
+    // Select start date before blackout window: 2026-01-05
+    const startDay = popover.locator('.joy-calendar__cell[data-date="2026-01-05"]');
+    await startDay.click();
+
+    // Since forbidCrossBlackout is true, any day on or after the blackout window cannot be chosen as end date
+    const dayAfterBlackout = popover.locator('.joy-calendar__cell[data-date="2026-01-20"]');
+    await expect(dayAfterBlackout).toHaveClass(/joy-calendar__cell--disabled/);
+    await expect(dayAfterBlackout).toHaveAttribute('aria-disabled', 'true');
+
+    // Clicking day after blackout should NOT commit
+    await dayAfterBlackout.click({ force: true });
+    await expect(popover).toBeVisible();
+
+    // Valid end date before blackout window: 2026-01-08
+    const validEnd = popover.locator('.joy-calendar__cell[data-date="2026-01-08"]');
+    await expect(validEnd).not.toHaveClass(/joy-calendar__cell--disabled/);
+    await validEnd.click();
+
+    await expect(popover).not.toBeVisible();
+    await expect(page.locator('#demo-blackout-start')).toHaveValue('2026-01-05');
+    await expect(page.locator('#demo-blackout-end')).toHaveValue('2026-01-08');
+    await expect(page.locator('#blackout-range-feedback')).toHaveText('2026-01-05 to 2026-01-08');
+  });
+
   test('visual evidence: captures dark and light mode high-resolution screenshots of custom pickers', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop-chrome', 'Screenshots generated in desktop-chrome project');
 

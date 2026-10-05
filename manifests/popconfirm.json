@@ -1,0 +1,32 @@
+{
+  "component": "Popconfirm",
+  "targets": {
+    "react": "JoyPopconfirm",
+    "svelte": "Popconfirm",
+    "flutter": "JoyPopconfirm"
+  },
+  "props": {
+    "title": { "type": "string", "default": "Are you sure?" },
+    "okText": { "type": "string", "default": "Confirm" },
+    "cancelText": { "type": "string", "default": "Cancel" }
+  },
+  "events": {
+    "confirm": {
+      "react": "onConfirm",
+      "svelte": "onconfirm",
+      "flutter": "onConfirm"
+    },
+    "cancel": {
+      "react": "onCancel",
+      "svelte": "oncancel",
+      "flutter": "onCancel"
+    }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}

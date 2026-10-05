@@ -1,0 +1,30 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyTooltip",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "tooltip_mount_default",
+      "description": "Tooltip wraps child element with accessibility attributes",
+      "props": {
+        "title": "Helpful tooltip"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "tooltip_tap_pin",
+      "description": "Tooltip pins on tap and satisfies touch target bounds",
+      "props": {
+        "title": "Pinned description"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": {},
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    }
+  ]
+}

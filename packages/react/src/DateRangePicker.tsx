@@ -10,7 +10,11 @@ import {
   isSameDay,
   isBetweenDays,
   getStandardPresets,
-  type DateRangePreset
+  type DateRangePreset,
+  checkDateDisabled,
+  rangeContainsDisabledDate,
+  type DisabledDateFn,
+  type DateRangeTuple
 } from './calendar-utils.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
@@ -35,6 +39,10 @@ export interface DateRangePickerProps
   endPlaceholder?: string;
   allowClear?: boolean;
   presets?: DateRangePreset[];
+  disabledDate?: (current: Date, info?: { from?: Date }) => boolean;
+  blackoutDates?: string[];
+  blackoutRanges?: Array<[string, string]>;
+  forbidCrossBlackout?: boolean;
   className?: string;
   onChange?: (value: DateRangeValue) => void;
 }
@@ -55,6 +63,10 @@ export const DateRangePicker = React.forwardRef<HTMLDivElement, DateRangePickerP
       endPlaceholder = 'End date',
       allowClear = true,
       presets = getStandardPresets(),
+      disabledDate,
+      blackoutDates,
+      blackoutRanges,
+      forbidCrossBlackout = false,
       className = '',
       style,
       onChange,
@@ -92,12 +104,35 @@ export const DateRangePicker = React.forwardRef<HTMLDivElement, DateRangePickerP
       setHoverDate(null);
     });
 
-    const minDate = min ? parseDate(min) : null;
-    const maxDate = max ? parseDate(max) : null;
+    const isSingleDateDisabled = (d: Date, fromDate?: Date) => {
+      return checkDateDisabled(d, {
+        min,
+        max,
+        disabledDate,
+        blackoutDates,
+        blackoutRanges,
+        from: fromDate
+      });
+    };
 
     const isDateDisabled = (d: Date) => {
-      if (minDate && d < minDate) return true;
-      if (maxDate && d > maxDate) return true;
+      const isPickingEnd = currentValue?.start && !currentValue?.end && startDate;
+      if (isSingleDateDisabled(d, isPickingEnd ? startDate : undefined)) {
+        return true;
+      }
+      if (forbidCrossBlackout && isPickingEnd) {
+        if (
+          rangeContainsDisabledDate(startDate, d, {
+            min,
+            max,
+            disabledDate,
+            blackoutDates,
+            blackoutRanges
+          })
+        ) {
+          return true;
+        }
+      }
       return false;
     };
 
@@ -121,6 +156,19 @@ export const DateRangePicker = React.forwardRef<HTMLDivElement, DateRangePickerP
         setActiveInput('end');
       } else {
         // Complete range
+        if (
+          forbidCrossBlackout &&
+          startDate &&
+          rangeContainsDisabledDate(startDate, d, {
+            min,
+            max,
+            disabledDate,
+            blackoutDates,
+            blackoutRanges
+          })
+        ) {
+          return;
+        }
         commit({ start: currentValue.start, end: dateStr });
         setIsOpen(false);
         setHoverDate(null);
@@ -136,6 +184,24 @@ export const DateRangePicker = React.forwardRef<HTMLDivElement, DateRangePickerP
     };
 
     const handlePreset = (preset: DateRangePreset) => {
+      const pStart = parseDate(preset.value[0]);
+      const pEnd = parseDate(preset.value[1]);
+      if (pStart && isSingleDateDisabled(pStart)) return;
+      if (pEnd && isSingleDateDisabled(pEnd)) return;
+      if (
+        forbidCrossBlackout &&
+        pStart &&
+        pEnd &&
+        rangeContainsDisabledDate(pStart, pEnd, {
+          min,
+          max,
+          disabledDate,
+          blackoutDates,
+          blackoutRanges
+        })
+      ) {
+        return;
+      }
       commit({ start: preset.value[0], end: preset.value[1] });
       setIsOpen(false);
       setHoverDate(null);
@@ -344,7 +410,7 @@ export const DateRangePicker = React.forwardRef<HTMLDivElement, DateRangePickerP
                           disabledDay && 'joy-calendar__cell--disabled'
                         )}
                         onMouseEnter={() => {
-                          if (currentValue.start && !currentValue.end) {
+                          if (currentValue.start && !currentValue.end && !disabledDay) {
                             setHoverDate(day.date);
                           }
                         }}
@@ -420,7 +486,7 @@ export const DateRangePicker = React.forwardRef<HTMLDivElement, DateRangePickerP
                           disabledDay && 'joy-calendar__cell--disabled'
                         )}
                         onMouseEnter={() => {
-                          if (currentValue.start && !currentValue.end) {
+                          if (currentValue.start && !currentValue.end && !disabledDay) {
                             setHoverDate(day.date);
                           }
                         }}

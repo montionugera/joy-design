@@ -1,0 +1,34 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyDrawer",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "drawer_right_placement",
+      "description": "Drawer slides in from right with header and close action",
+      "props": {
+        "title": "Side Panel",
+        "placement": "right",
+        "closable": true
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "drawer_close_action",
+      "description": "Drawer triggers close event on close button tap",
+      "props": {
+        "title": "Side Panel",
+        "placement": "left",
+        "closable": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "close": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    }
+  ]
+}

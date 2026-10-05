@@ -184,3 +184,81 @@ export function getStandardPresets(baseDate = new Date()): DateRangePreset[] {
     { label: 'Year to Date', value: [formatDate(ytd), todayStr] }
   ];
 }
+
+export function isSameOrBeforeDay(d1: Date, d2: Date): boolean {
+  return isSameDay(d1, d2) || isBeforeDay(d1, d2);
+}
+
+export function isSameOrAfterDay(d1: Date, d2: Date): boolean {
+  return isSameDay(d1, d2) || isAfterDay(d1, d2);
+}
+
+export function isDateWithinRange(d: Date, start: Date, end: Date): boolean {
+  const [s, e] = isBeforeDay(start, end) ? [start, end] : [end, start];
+  return isSameOrAfterDay(d, s) && isSameOrBeforeDay(d, e);
+}
+
+export type DisabledDateFn = (current: Date, info?: { from?: Date }) => boolean;
+export type DateRangeTuple = [string, string];
+
+export interface DisabledDateOptions {
+  min?: string;
+  max?: string;
+  disabledDate?: (current: Date, info?: { from?: Date }) => boolean;
+  blackoutDates?: string[];
+  blackoutRanges?: Array<[string, string]>;
+  from?: Date;
+}
+
+export function checkDateDisabled(d: Date, options?: DisabledDateOptions): boolean {
+  if (!options) return false;
+
+  if (options.min) {
+    const minD = parseDate(options.min);
+    if (minD && isBeforeDay(d, minD)) return true;
+  }
+
+  if (options.max) {
+    const maxD = parseDate(options.max);
+    if (maxD && isAfterDay(d, maxD)) return true;
+  }
+
+  if (options.blackoutDates && options.blackoutDates.length > 0) {
+    const dStr = formatDate(d);
+    if (options.blackoutDates.includes(dStr)) return true;
+  }
+
+  if (options.blackoutRanges && options.blackoutRanges.length > 0) {
+    for (const [rStart, rEnd] of options.blackoutRanges) {
+      const s = parseDate(rStart);
+      const e = parseDate(rEnd);
+      if (s && e && isDateWithinRange(d, s, e)) {
+        return true;
+      }
+    }
+  }
+
+  if (options.disabledDate) {
+    if (options.disabledDate(d, { from: options.from })) return true;
+  }
+
+  return false;
+}
+
+export function rangeContainsDisabledDate(
+  start: Date,
+  end: Date,
+  options?: DisabledDateOptions
+): boolean {
+  if (!options) return false;
+  const [s, e] = isBeforeDay(start, end) ? [start, end] : [end, start];
+  const cur = new Date(s.getFullYear(), s.getMonth(), s.getDate() + 1);
+  const endLimit = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+  while (cur.getTime() < endLimit.getTime()) {
+    if (checkDateDisabled(cur, options)) {
+      return true;
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return false;
+}

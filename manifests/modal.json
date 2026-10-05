@@ -1,0 +1,32 @@
+{
+  "component": "Modal",
+  "targets": {
+    "react": "JoyModal",
+    "svelte": "Modal",
+    "flutter": "JoyModal"
+  },
+  "props": {
+    "open": { "type": "boolean", "default": false },
+    "title": { "type": "string" },
+    "closable": { "type": "boolean", "default": true }
+  },
+  "events": {
+    "close": {
+      "react": "onClose",
+      "svelte": "onclose",
+      "flutter": "onClose"
+    }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "content"
+    },
+    "footer": {
+      "react": "footer",
+      "svelte": "footer",
+      "flutter": "footer"
+    }
+  }
+}

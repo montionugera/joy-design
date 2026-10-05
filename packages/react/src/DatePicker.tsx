@@ -7,7 +7,10 @@ import {
   formatDate,
   getMonthMatrix,
   parseDate,
-  isSameDay
+  isSameDay,
+  checkDateDisabled,
+  type DisabledDateFn,
+  type DateRangeTuple
 } from './calendar-utils.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
@@ -24,6 +27,9 @@ export interface DatePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
   id?: string;
   className?: string;
   allowClear?: boolean;
+  disabledDate?: (current: Date) => boolean;
+  blackoutDates?: string[];
+  blackoutRanges?: Array<[string, string]>;
   onChange?: (date: string) => void;
 }
 
@@ -42,6 +48,9 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       className = '',
       style,
       allowClear = true,
+      disabledDate,
+      blackoutDates,
+      blackoutRanges,
       onChange,
       ...rest
     },
@@ -72,13 +81,14 @@ export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       setIsOpen(false);
     });
 
-    const minDate = min ? parseDate(min) : null;
-    const maxDate = max ? parseDate(max) : null;
-
     const isDateDisabled = (d: Date) => {
-      if (minDate && d < minDate) return true;
-      if (maxDate && d > maxDate) return true;
-      return false;
+      return checkDateDisabled(d, {
+        min,
+        max,
+        disabledDate,
+        blackoutDates,
+        blackoutRanges
+      });
     };
 
     const handleSelect = (dateStr: string, d: Date) => {

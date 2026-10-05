@@ -5448,7 +5448,32 @@ ${navigationHtml}
             </div>
 
             <div style="width: 100%;">
-              <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Financial Date Range Picker (Backtest Window)</label>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;">
+                <label style="font-size: var(--joy-font-size-sm); font-weight: 600; color: var(--joy-text-muted); overflow-wrap: anywhere;">Constrained Picker (Min/Max, Blackout, Weekends)</label>
+                <span class="joy-tag joy-tag--subtle joy-tag--warning" style="font-size: 11px;">Restricted</span>
+              </div>
+              <div class="joy-date-picker" id="demo-constrained-date-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
+                <input type="text" readonly class="joy-date-picker__input" id="demo-constrained-date" value="2026-09-15" placeholder="Select weekday in range">
+                <div class="joy-date-picker__actions">
+                  <button type="button" class="joy-date-picker__clear" id="demo-constrained-date-clear" aria-label="Clear date">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                  <span class="joy-date-picker__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </span>
+                </div>
+                <div id="demo-constrained-calendar-popover" class="joy-calendar-overlay" role="dialog" aria-label="Choose date" style="display: none; top: calc(100% + 4px); left: 0;"></div>
+              </div>
+              <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Valid Date: <strong id="constrained-date-feedback" style="color: var(--joy-accent-default);">2026-09-15</strong></div>
+            </div>
+
+            <div style="width: 100%;">
+              <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted); overflow-wrap: anywhere;">Financial Date Range Picker (Backtest Window)</label>
               <div class="joy-date-range-picker joy-date-range-picker--unified" id="demo-range-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
                 <input type="text" readonly class="joy-date-range-picker__input" id="demo-range-start" value="2026-01-01" placeholder="Start date">
                 <span class="joy-date-range-picker__sep joy-date-range-picker__separator" aria-hidden="true">
@@ -5466,6 +5491,30 @@ ${navigationHtml}
                 <div id="demo-range-calendar-popover" class="joy-calendar-overlay joy-calendar-overlay--dual" role="dialog" aria-label="Choose date range" style="display: none; top: calc(100% + 4px); left: 0;"></div>
               </div>
               <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: var(--joy-accent-default);">2026-01-01 to 2026-09-19</strong></div>
+            </div>
+
+            <div style="width: 100%;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;">
+                <label style="font-size: var(--joy-font-size-sm); font-weight: 600; color: var(--joy-text-muted); overflow-wrap: anywhere;">Trading Blackout Range (No Cross-Spans)</label>
+                <span class="joy-tag joy-tag--subtle joy-tag--danger" style="font-size: 11px;">Cross-Blackout Blocked</span>
+              </div>
+              <div class="joy-date-range-picker joy-date-range-picker--unified" id="demo-blackout-range-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
+                <input type="text" readonly class="joy-date-range-picker__input" id="demo-blackout-start" value="2026-01-05" placeholder="Start date">
+                <span class="joy-date-range-picker__sep joy-date-range-picker__separator" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+                <input type="text" readonly class="joy-date-range-picker__input" id="demo-blackout-end" value="2026-01-09" placeholder="End date">
+                <div class="joy-date-range-picker__actions">
+                  <button type="button" class="joy-date-range-picker__clear" id="demo-blackout-clear" aria-label="Clear range">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                  <span class="joy-date-range-picker__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </span>
+                </div>
+                <div id="demo-blackout-range-calendar-popover" class="joy-calendar-overlay joy-calendar-overlay--dual" role="dialog" aria-label="Choose date range" style="display: none; top: calc(100% + 4px); left: 0;"></div>
+              </div>
+              <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Booking Window: <strong id="blackout-range-feedback" style="color: var(--joy-accent-default);">2026-01-05 to 2026-01-09</strong></div>
             </div>
           </div>
         </div>
@@ -9887,233 +9936,58 @@ export async function executeHedge(symbol: string, size: number) {
         return cells;
       }
 
-      // Single Picker Setup
-      const singleWrap = document.getElementById('demo-date-picker-wrap');
-      const singleInput = document.getElementById('demo-single-date');
-      const singleClear = document.getElementById('demo-single-date-clear');
-      const singlePopover = document.getElementById('demo-single-calendar-popover');
-      let singleYear = 2026;
-      let singleMonth = 8; // September (0-indexed: 8)
-
-      function renderSingle() {
-        if (!singlePopover) return;
-        const curVal = singleInput ? singleInput.value : '';
-        const matrix = getMatrix(singleYear, singleMonth);
-
-        let html = '<div class="joy-calendar__pane">' +
-          '<div class="joy-calendar__header">' +
-            '<div style="display: flex; gap: 2px;">' +
-              '<button type="button" class="joy-calendar__nav-btn" id="single-prev-year" title="Previous Year">' +
-                '<span style="display: inline-flex; letter-spacing: -6px;">' +
-                  '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
-                  '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
-                '</span>' +
-              '</button>' +
-              '<button type="button" class="joy-calendar__nav-btn" id="single-prev-month" title="Previous Month">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
-              '</button>' +
-            '</div>' +
-            '<div class="joy-calendar__title">' +
-              '<span>' + monthNames[singleMonth] + '</span>' +
-              '<span>' + singleYear + '</span>' +
-            '</div>' +
-            '<div style="display: flex; gap: 2px;">' +
-              '<button type="button" class="joy-calendar__nav-btn" id="single-next-month" title="Next Month">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
-              '</button>' +
-              '<button type="button" class="joy-calendar__nav-btn" id="single-next-year" title="Next Year">' +
-                '<span style="display: inline-flex; letter-spacing: -6px;">' +
-                  '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
-                  '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
-                '</span>' +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="joy-calendar__grid" role="grid">' +
-            weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
-            matrix.map(c => {
-              const sel = c.dateString === curVal;
-              const cls = [
-                'joy-calendar__cell',
-                !c.isCurrentMonth ? 'joy-calendar__cell--muted' : '',
-                c.isToday ? 'joy-calendar__cell--today' : '',
-                sel ? 'joy-calendar__cell--selected' : ''
-              ].filter(Boolean).join(' ');
-              return '<button type="button" class="' + cls + '" data-date="' + c.dateString + '">' + c.dayNumber + '</button>';
-            }).join('') +
-          '</div>' +
-          '<div class="joy-calendar__footer">' +
-            '<button type="button" class="joy-calendar__action-btn" id="single-today-btn">Today</button>' +
-          '</div>' +
-        '</div>';
-        singlePopover.innerHTML = html;
-
-        singlePopover.querySelector('#single-prev-year').onclick = (e) => { e.stopPropagation(); singleYear--; renderSingle(); };
-        singlePopover.querySelector('#single-next-year').onclick = (e) => { e.stopPropagation(); singleYear++; renderSingle(); };
-        singlePopover.querySelector('#single-prev-month').onclick = (e) => {
-          e.stopPropagation();
-          singleMonth--;
-          if (singleMonth < 0) { singleMonth = 11; singleYear--; }
-          renderSingle();
-        };
-        singlePopover.querySelector('#single-next-month').onclick = (e) => {
-          e.stopPropagation();
-          singleMonth++;
-          if (singleMonth > 11) { singleMonth = 0; singleYear++; }
-          renderSingle();
-        };
-        singlePopover.querySelector('#single-today-btn').onclick = (e) => {
-          e.stopPropagation();
-          const today = fmt(new Date());
-          singleInput.value = today;
-          handleDateChange(today);
-          closeSingle();
-        };
-        singlePopover.querySelectorAll('.joy-calendar__cell').forEach(btn => {
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            const d = btn.getAttribute('data-date');
-            singleInput.value = d;
-            handleDateChange(d);
-            closeSingle();
-          };
-        });
+      const allPickers = [];
+      function closeAllPickers() {
+        allPickers.forEach(p => p.close());
       }
 
-      function openSingle() {
-        if (!singlePopover) return;
-        closeRange();
-        const p = parse(singleInput.value);
-        if (p) { singleYear = p.getFullYear(); singleMonth = p.getMonth(); }
-        renderSingle();
-        singlePopover.style.display = 'block';
-        singleWrap.classList.add('joy-date-picker--open');
-        singleWrap.setAttribute('aria-expanded', 'true');
-      }
+      // Single Picker Factory
+      function createSinglePicker(wrapId, inputId, clearId, popoverId, feedbackId, opts = {}) {
+        const wrap = document.getElementById(wrapId);
+        const input = document.getElementById(inputId);
+        const clear = document.getElementById(clearId);
+        const popover = document.getElementById(popoverId);
+        const feedback = document.getElementById(feedbackId);
+        if (!wrap || !popover || !input) return null;
 
-      function closeSingle() {
-        if (!singlePopover) return;
-        singlePopover.style.display = 'none';
-        singleWrap.classList.remove('joy-date-picker--open');
-        singleWrap.setAttribute('aria-expanded', 'false');
-      }
+        let year = 2026;
+        let month = 8; // September
 
-      if (singleWrap) {
-        singleWrap.onclick = (e) => {
-          if (e.target.closest('#demo-single-date-clear')) return;
-          if (e.target.closest('.joy-calendar-overlay')) return;
-          if (singlePopover.style.display === 'block') closeSingle();
-          else openSingle();
-        };
-        singleWrap.onkeydown = (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            if (singlePopover.style.display === 'block') closeSingle();
-            else openSingle();
-          } else if (e.key === 'Escape') {
-            closeSingle();
-          }
-        };
-      }
-      if (singleClear) {
-        singleClear.onclick = (e) => {
-          e.stopPropagation();
-          singleInput.value = '';
-          handleDateChange('');
-        };
-      }
-
-      // Range Picker Setup
-      const rangeWrap = document.getElementById('demo-range-picker-wrap');
-      const startInput = document.getElementById('demo-range-start');
-      const endInput = document.getElementById('demo-range-end');
-      const rangeClear = document.getElementById('demo-range-clear');
-      const rangePopover = document.getElementById('demo-range-calendar-popover');
-      let rangeLeftYear = 2026;
-      let rangeLeftMonth = 0; // January
-      let rangePickingStart = null;
-      let rangeHoverDate = null;
-
-      function renderRange() {
-        if (!rangePopover) return;
-        const curStart = rangePickingStart || (startInput ? startInput.value : '');
-        const curEnd = rangePickingStart ? '' : (endInput ? endInput.value : '');
-        const sDate = parse(curStart);
-        const eDate = parse(curEnd);
-        const hDate = rangeHoverDate;
-
-        const leftMatrix = getMatrix(rangeLeftYear, rangeLeftMonth);
-        const rightMonth = rangeLeftMonth === 11 ? 0 : rangeLeftMonth + 1;
-        const rightYear = rangeLeftMonth === 11 ? rangeLeftYear + 1 : rangeLeftYear;
-        const rightMatrix = getMatrix(rightYear, rightMonth);
-
-        function cellClass(c) {
-          const d = c.date;
-          const isStart = sDate && c.dateString === curStart;
-          const isEnd = eDate && c.dateString === curEnd;
-          let inRange = false;
-          if (sDate && eDate) {
-            inRange = d > sDate && d < eDate;
-          } else if (sDate && !eDate && hDate) {
-            inRange = (d > sDate && d < hDate) || (d > hDate && d < sDate);
-          }
-          const isHoverEnd = sDate && !eDate && hDate && c.dateString === fmt(hDate) && hDate > sDate;
-
-          return [
-            'joy-calendar__cell',
-            !c.isCurrentMonth ? 'joy-calendar__cell--muted' : '',
-            c.isToday ? 'joy-calendar__cell--today' : '',
-            isStart ? 'joy-calendar__cell--selected joy-calendar__cell--range-start' : '',
-            isEnd || isHoverEnd ? 'joy-calendar__cell--selected joy-calendar__cell--range-end' : '',
-            inRange && !isStart && !isEnd ? 'joy-calendar__cell--in-range' : ''
-          ].filter(Boolean).join(' ');
+        function isCellDisabled(d, dateStr) {
+          if (opts.min && d < parse(opts.min)) return true;
+          if (opts.max && d > parse(opts.max)) return true;
+          if (opts.blackoutDates && opts.blackoutDates.includes(dateStr)) return true;
+          if (opts.disabledDate && opts.disabledDate(d)) return true;
+          return false;
         }
 
-        const presets = [
-          { label: 'Today', val: () => { const t = fmt(new Date()); return [t, t]; } },
-          { label: 'Last 7 Days', val: () => { const t = new Date(); const d = new Date(); d.setDate(d.getDate() - 6); return [fmt(d), fmt(t)]; } },
-          { label: 'Last 30 Days', val: () => { const t = new Date(); const d = new Date(); d.setDate(d.getDate() - 29); return [fmt(d), fmt(t)]; } },
-          { label: 'Month to Date', val: () => { const t = new Date(); const m = new Date(t.getFullYear(), t.getMonth(), 1); return [fmt(m), fmt(t)]; } },
-          { label: 'Year to Date', val: () => { const t = new Date(); const y = new Date(t.getFullYear(), 0, 1); return [fmt(y), fmt(t)]; } }
-        ];
+        function render() {
+          const curVal = input.value;
+          const matrix = getMatrix(year, month);
+          const isDemoSingle = popoverId === 'demo-single-calendar-popover';
 
-        let html = '<div class="joy-calendar__body">' +
-          '<div class="joy-calendar__pane">' +
+          let html = '<div class="joy-calendar__pane">' +
             '<div class="joy-calendar__header">' +
               '<div style="display: flex; gap: 2px;">' +
-                '<button type="button" class="joy-calendar__nav-btn" id="range-prev-year" title="Previous Year">' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-prev-year"' : '') + ' data-act="prev-yr" title="Previous Year">' +
                   '<span style="display: inline-flex; letter-spacing: -6px;">' +
                     '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
                     '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
                   '</span>' +
                 '</button>' +
-                '<button type="button" class="joy-calendar__nav-btn" id="range-prev-month" title="Previous Month">' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-prev-month"' : '') + ' data-act="prev-mo" title="Previous Month">' +
                   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
                 '</button>' +
               '</div>' +
               '<div class="joy-calendar__title">' +
-                '<span>' + monthNames[rangeLeftMonth] + '</span>' +
-                '<span>' + rangeLeftYear + '</span>' +
-              '</div>' +
-              '<div style="width: 24px;"></div>' +
-            '</div>' +
-            '<div class="joy-calendar__grid" role="grid">' +
-              weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
-              leftMatrix.map(c => '<button type="button" class="' + cellClass(c) + '" data-date="' + c.dateString + '">' + c.dayNumber + '</button>').join('') +
-            '</div>' +
-          '</div>' +
-          '<div class="joy-calendar__pane">' +
-            '<div class="joy-calendar__header">' +
-              '<div style="width: 24px;"></div>' +
-              '<div class="joy-calendar__title">' +
-                '<span>' + monthNames[rightMonth] + '</span>' +
-                '<span>' + rightYear + '</span>' +
+                '<span>' + monthNames[month] + '</span>' +
+                '<span>' + year + '</span>' +
               '</div>' +
               '<div style="display: flex; gap: 2px;">' +
-                '<button type="button" class="joy-calendar__nav-btn" id="range-next-month" title="Next Month">' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-next-month"' : '') + ' data-act="next-mo" title="Next Month">' +
                   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
                 '</button>' +
-                '<button type="button" class="joy-calendar__nav-btn" id="range-next-year" title="Next Year">' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-next-year"' : '') + ' data-act="next-yr" title="Next Year">' +
                   '<span style="display: inline-flex; letter-spacing: -6px;">' +
                     '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
                     '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
@@ -10123,158 +9997,429 @@ export async function executeHedge(symbol: string, size: number) {
             '</div>' +
             '<div class="joy-calendar__grid" role="grid">' +
               weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
-              rightMatrix.map(c => '<button type="button" class="' + cellClass(c) + '" data-date="' + c.dateString + '">' + c.dayNumber + '</button>').join('') +
+              matrix.map(c => {
+                const sel = c.dateString === curVal;
+                const dis = isCellDisabled(c.date, c.dateString);
+                const cls = [
+                  'joy-calendar__cell',
+                  !c.isCurrentMonth ? 'joy-calendar__cell--muted' : '',
+                  c.isToday ? 'joy-calendar__cell--today' : '',
+                  sel ? 'joy-calendar__cell--selected' : '',
+                  dis ? 'joy-calendar__cell--disabled' : ''
+                ].filter(Boolean).join(' ');
+                return '<button type="button" class="' + cls + '" data-date="' + c.dateString + '"' + (dis ? ' disabled aria-disabled="true"' : '') + '>' + c.dayNumber + '</button>';
+              }).join('') +
             '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="joy-calendar__footer">' +
-          '<div class="joy-calendar__presets">' +
-            presets.map((p, idx) => '<button type="button" class="joy-calendar__preset-btn" data-preset="' + idx + '">' + p.label + '</button>').join('') +
-          '</div>' +
-        '</div>';
-        rangePopover.innerHTML = html;
+            '<div class="joy-calendar__footer">' +
+              '<button type="button" class="joy-calendar__action-btn"' + (isDemoSingle ? ' id="single-today-btn"' : '') + ' data-act="today">Today</button>' +
+            '</div>' +
+          '</div>';
+          popover.innerHTML = html;
 
-        rangePopover.querySelector('#range-prev-year').onclick = (e) => { e.stopPropagation(); rangeLeftYear--; renderRange(); };
-        rangePopover.querySelector('#range-next-year').onclick = (e) => { e.stopPropagation(); rangeLeftYear++; renderRange(); };
-        rangePopover.querySelector('#range-prev-month').onclick = (e) => {
-          e.stopPropagation();
-          rangeLeftMonth--;
-          if (rangeLeftMonth < 0) { rangeLeftMonth = 11; rangeLeftYear--; }
-          renderRange();
-        };
-        rangePopover.querySelector('#range-next-month').onclick = (e) => {
-          e.stopPropagation();
-          rangeLeftMonth++;
-          if (rangeLeftMonth > 11) { rangeLeftMonth = 0; rangeLeftYear++; }
-          renderRange();
-        };
-
-        rangePopover.querySelectorAll('.joy-calendar__preset-btn').forEach(btn => {
-          btn.onclick = (e) => {
+          popover.querySelector('[data-act="prev-yr"]').onclick = (e) => { e.stopPropagation(); year--; render(); };
+          popover.querySelector('[data-act="next-yr"]').onclick = (e) => { e.stopPropagation(); year++; render(); };
+          popover.querySelector('[data-act="prev-mo"]').onclick = (e) => {
             e.stopPropagation();
-            const idx = parseInt(btn.getAttribute('data-preset'), 10);
-            const res = presets[idx].val();
-            startInput.value = res[0];
-            endInput.value = res[1];
-            handleRangeChange();
-            closeRange();
+            month--;
+            if (month < 0) { month = 11; year--; }
+            render();
           };
-        });
-
-        function updateHoverCells() {
-          rangePopover.querySelectorAll('.joy-calendar__cell').forEach(cBtn => {
-            const dateStr = cBtn.getAttribute('data-date');
-            const d = parse(dateStr);
-            let inRange = false;
-            let isHoverEnd = false;
-            if (rangePickingStart && rangeHoverDate && d) {
-              const sDate = parse(rangePickingStart);
-              if (sDate) {
-                inRange = (d > sDate && d < rangeHoverDate) || (d > rangeHoverDate && d < sDate);
-                isHoverEnd = dateStr === fmt(rangeHoverDate) && rangeHoverDate.getTime() !== sDate.getTime();
-              }
-            }
-            cBtn.classList.toggle('joy-calendar__cell--in-range', inRange);
-            cBtn.classList.toggle('joy-calendar__cell--range-end', isHoverEnd);
+          popover.querySelector('[data-act="next-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            month++;
+            if (month > 11) { month = 0; year++; }
+            render();
+          };
+          popover.querySelector('[data-act="today"]').onclick = (e) => {
+            e.stopPropagation();
+            const today = new Date();
+            const todayStr = fmt(today);
+            if (isCellDisabled(today, todayStr)) return;
+            input.value = todayStr;
+            if (feedback) feedback.innerText = todayStr;
+            showDemoToast('Date set to: ' + todayStr, 'info');
+            close();
+          };
+          popover.querySelectorAll('.joy-calendar__cell:not(.joy-calendar__cell--disabled)').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const dStr = btn.getAttribute('data-date');
+              input.value = dStr;
+              if (feedback) feedback.innerText = dStr;
+              showDemoToast('Date set to: ' + dStr, 'info');
+              close();
+            };
           });
         }
 
-        rangePopover.querySelectorAll('.joy-calendar__cell').forEach(btn => {
-          btn.onmouseenter = () => {
-            if (rangePickingStart) {
-              rangeHoverDate = parse(btn.getAttribute('data-date'));
-              updateHoverCells();
-            }
-          };
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            const clicked = btn.getAttribute('data-date');
-            if (!rangePickingStart) {
-              rangePickingStart = clicked;
-              rangeHoverDate = null;
-              rangePopover.querySelectorAll('.joy-calendar__cell').forEach(cBtn => {
-                const isStart = cBtn.getAttribute('data-date') === clicked;
-                cBtn.classList.toggle('joy-calendar__cell--selected', isStart);
-                cBtn.classList.toggle('joy-calendar__cell--range-start', isStart);
-                cBtn.classList.remove('joy-calendar__cell--range-end', 'joy-calendar__cell--in-range');
-              });
-            } else {
-              let s = rangePickingStart;
-              let end = clicked;
-              if (s > end) { const tmp = s; s = end; end = tmp; }
-              startInput.value = s;
-              endInput.value = end;
-              handleRangeChange();
-              closeRange();
-            }
-          };
-        });
-      }
+        function open() {
+          closeAllPickers();
+          const p = parse(input.value);
+          if (p) { year = p.getFullYear(); month = p.getMonth(); }
+          render();
+          popover.style.display = 'block';
+          wrap.classList.add('joy-date-picker--open');
+          wrap.setAttribute('aria-expanded', 'true');
+        }
 
-      function openRange() {
-        if (!rangePopover) return;
-        closeSingle();
-        rangePickingStart = null;
-        rangeHoverDate = null;
-        const p = parse(startInput.value);
-        if (p) { rangeLeftYear = p.getFullYear(); rangeLeftMonth = p.getMonth(); }
-        renderRange();
-        rangePopover.style.display = 'block';
-        rangeWrap.classList.add('joy-date-range-picker--open');
-        rangeWrap.setAttribute('aria-expanded', 'true');
-      }
+        function close() {
+          popover.style.display = 'none';
+          wrap.classList.remove('joy-date-picker--open');
+          wrap.setAttribute('aria-expanded', 'false');
+        }
 
-      function closeRange() {
-        if (!rangePopover) return;
-        rangePickingStart = null;
-        rangeHoverDate = null;
-        rangePopover.style.display = 'none';
-        rangeWrap.classList.remove('joy-date-range-picker--open');
-        rangeWrap.setAttribute('aria-expanded', 'false');
-      }
-
-      if (rangeWrap) {
-        rangeWrap.onclick = (e) => {
-          if (e.target.closest('#demo-range-clear')) return;
+        wrap.onclick = (e) => {
+          if (e.target.closest('#' + clearId)) return;
           if (e.target.closest('.joy-calendar-overlay')) return;
-          if (rangePopover.style.display === 'block') closeRange();
-          else openRange();
+          if (popover.style.display === 'block') close();
+          else open();
         };
-        rangeWrap.onkeydown = (e) => {
+        wrap.onkeydown = (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            if (rangePopover.style.display === 'block') closeRange();
-            else openRange();
+            if (popover.style.display === 'block') close();
+            else open();
           } else if (e.key === 'Escape') {
-            closeRange();
+            close();
           }
         };
-      }
-      if (rangeClear) {
-        rangeClear.onclick = (e) => {
-          e.stopPropagation();
-          startInput.value = '';
-          endInput.value = '';
-          handleRangeChange();
-        };
+        if (clear) {
+          clear.onclick = (e) => {
+            e.stopPropagation();
+            input.value = '';
+            if (feedback) feedback.innerText = '...';
+            showDemoToast('Date cleared', 'info');
+          };
+        }
+
+        const instance = { close, popover, wrap };
+        allPickers.push(instance);
+        return instance;
       }
 
+      // Range Picker Factory
+      function createRangePicker(wrapId, startId, endId, clearId, popoverId, feedbackId, opts = {}) {
+        const wrap = document.getElementById(wrapId);
+        const startInput = document.getElementById(startId);
+        const endInput = document.getElementById(endId);
+        const clear = document.getElementById(clearId);
+        const popover = document.getElementById(popoverId);
+        const feedback = document.getElementById(feedbackId);
+        if (!wrap || !popover || !startInput || !endInput) return null;
+
+        let leftYear = 2026;
+        let leftMonth = 0; // January
+        let pickingStart = null;
+        let hoverDate = null;
+
+        function isDateInRangeBlackout(d) {
+          if (!opts.blackoutRanges) return false;
+          for (const [rStart, rEnd] of opts.blackoutRanges) {
+            const s = parse(rStart);
+            const e = parse(rEnd);
+            if (s && e && d >= s && d <= e) return true;
+          }
+          return false;
+        }
+
+        function isSingleDisabled(d, dateStr) {
+          if (opts.min && d < parse(opts.min)) return true;
+          if (opts.max && d > parse(opts.max)) return true;
+          if (opts.blackoutDates && opts.blackoutDates.includes(dateStr)) return true;
+          if (isDateInRangeBlackout(d)) return true;
+          if (opts.disabledDate && opts.disabledDate(d)) return true;
+          return false;
+        }
+
+        function isCrossBlackoutInvalid(targetDate) {
+          if (!opts.forbidCrossBlackout || !pickingStart) return false;
+          const s = parse(pickingStart);
+          if (!s) return false;
+          const [d1, d2] = s < targetDate ? [s, targetDate] : [targetDate, s];
+          const cur = new Date(d1);
+          cur.setDate(cur.getDate() + 1);
+          while (cur < d2) {
+            if (isSingleDisabled(cur, fmt(cur))) return true;
+            cur.setDate(cur.getDate() + 1);
+          }
+          return false;
+        }
+
+        function isRangeCellDisabled(d, dateStr) {
+          if (isSingleDisabled(d, dateStr)) return true;
+          if (pickingStart && isCrossBlackoutInvalid(d)) return true;
+          return false;
+        }
+
+        function render() {
+          const curStart = pickingStart || startInput.value;
+          const curEnd = pickingStart ? '' : endInput.value;
+          const sDate = parse(curStart);
+          const eDate = parse(curEnd);
+          const hDate = hoverDate;
+
+          const leftMatrix = getMatrix(leftYear, leftMonth);
+          const rightMonth = leftMonth === 11 ? 0 : leftMonth + 1;
+          const rightYear = leftMonth === 11 ? leftYear + 1 : leftYear;
+          const rightMatrix = getMatrix(rightYear, rightMonth);
+          const isDemoRange = popoverId === 'demo-range-calendar-popover';
+
+          function cellClass(c) {
+            const d = c.date;
+            const isStart = sDate && c.dateString === curStart;
+            const isEnd = eDate && c.dateString === curEnd;
+            let inRange = false;
+            if (sDate && eDate) {
+              inRange = d > sDate && d < eDate;
+            } else if (sDate && !eDate && hDate) {
+              inRange = (d > sDate && d < hDate) || (d > hDate && d < sDate);
+            }
+            const isHoverEnd = sDate && !eDate && hDate && c.dateString === fmt(hDate) && hDate > sDate;
+            const dis = isRangeCellDisabled(c.date, c.dateString);
+
+            return [
+              'joy-calendar__cell',
+              !c.isCurrentMonth ? 'joy-calendar__cell--muted' : '',
+              c.isToday ? 'joy-calendar__cell--today' : '',
+              isStart ? 'joy-calendar__cell--selected joy-calendar__cell--range-start' : '',
+              isEnd || isHoverEnd ? 'joy-calendar__cell--selected joy-calendar__cell--range-end' : '',
+              inRange && !isStart && !isEnd ? 'joy-calendar__cell--in-range' : '',
+              dis ? 'joy-calendar__cell--disabled' : ''
+            ].filter(Boolean).join(' ');
+          }
+
+          const presets = [
+            { label: 'Today', val: () => { const t = fmt(new Date()); return [t, t]; } },
+            { label: 'Last 7 Days', val: () => { const t = new Date(); const d = new Date(); d.setDate(d.getDate() - 6); return [fmt(d), fmt(t)]; } },
+            { label: 'Last 30 Days', val: () => { const t = new Date(); const d = new Date(); d.setDate(d.getDate() - 29); return [fmt(d), fmt(t)]; } },
+            { label: 'Month to Date', val: () => { const t = new Date(); const m = new Date(t.getFullYear(), t.getMonth(), 1); return [fmt(m), fmt(t)]; } },
+            { label: 'Year to Date', val: () => { const t = new Date(); const y = new Date(t.getFullYear(), 0, 1); return [fmt(y), fmt(t)]; } }
+          ];
+
+          let html = '<div class="joy-calendar__body">' +
+            '<div class="joy-calendar__pane">' +
+              '<div class="joy-calendar__header">' +
+                '<div style="display: flex; gap: 2px;">' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-prev-year"' : '') + ' data-act="prev-yr" title="Previous Year">' +
+                    '<span style="display: inline-flex; letter-spacing: -6px;">' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                    '</span>' +
+                  '</button>' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-prev-month"' : '') + ' data-act="prev-mo" title="Previous Month">' +
+                    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                  '</button>' +
+                '</div>' +
+                '<div class="joy-calendar__title">' +
+                  '<span>' + monthNames[leftMonth] + '</span>' +
+                  '<span>' + leftYear + '</span>' +
+                '</div>' +
+                '<div style="width: 24px;"></div>' +
+              '</div>' +
+              '<div class="joy-calendar__grid" role="grid">' +
+                weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
+                leftMatrix.map(c => {
+                  const dis = isRangeCellDisabled(c.date, c.dateString);
+                  return '<button type="button" class="' + cellClass(c) + '" data-date="' + c.dateString + '"' + (dis ? ' disabled aria-disabled="true"' : '') + '>' + c.dayNumber + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+            '<div class="joy-calendar__pane">' +
+              '<div class="joy-calendar__header">' +
+                '<div style="width: 24px;"></div>' +
+                '<div class="joy-calendar__title">' +
+                  '<span>' + monthNames[rightMonth] + '</span>' +
+                  '<span>' + rightYear + '</span>' +
+                '</div>' +
+                '<div style="display: flex; gap: 2px;">' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-next-month"' : '') + ' data-act="next-mo" title="Next Month">' +
+                    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                  '</button>' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-next-year"' : '') + ' data-act="next-yr" title="Next Year">' +
+                    '<span style="display: inline-flex; letter-spacing: -6px;">' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                    '</span>' +
+                  '</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="joy-calendar__grid" role="grid">' +
+                weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
+                rightMatrix.map(c => {
+                  const dis = isRangeCellDisabled(c.date, c.dateString);
+                  return '<button type="button" class="' + cellClass(c) + '" data-date="' + c.dateString + '"' + (dis ? ' disabled aria-disabled="true"' : '') + '>' + c.dayNumber + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="joy-calendar__footer">' +
+            '<div class="joy-calendar__presets">' +
+              presets.map((p, idx) => '<button type="button" class="joy-calendar__preset-btn" data-preset="' + idx + '">' + p.label + '</button>').join('') +
+            '</div>' +
+          '</div>';
+          popover.innerHTML = html;
+
+          popover.querySelector('[data-act="prev-yr"]').onclick = (e) => { e.stopPropagation(); leftYear--; render(); };
+          popover.querySelector('[data-act="next-yr"]').onclick = (e) => { e.stopPropagation(); leftYear++; render(); };
+          popover.querySelector('[data-act="prev-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            leftMonth--;
+            if (leftMonth < 0) { leftMonth = 11; leftYear--; }
+            render();
+          };
+          popover.querySelector('[data-act="next-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            leftMonth++;
+            if (leftMonth > 11) { leftMonth = 0; leftYear++; }
+            render();
+          };
+
+          popover.querySelectorAll('.joy-calendar__preset-btn').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const idx = parseInt(btn.getAttribute('data-preset'), 10);
+              const res = presets[idx].val();
+              const pStart = parse(res[0]);
+              const pEnd = parse(res[1]);
+              if (pStart && isSingleDisabled(pStart, res[0])) return;
+              if (pEnd && isSingleDisabled(pEnd, res[1])) return;
+              startInput.value = res[0];
+              endInput.value = res[1];
+              if (feedback) feedback.innerText = res[0] + ' to ' + res[1];
+              showDemoToast('Interval set: ' + res[0] + ' to ' + res[1], 'info');
+              close();
+            };
+          });
+
+          function updateHoverCells() {
+            popover.querySelectorAll('.joy-calendar__cell').forEach(cBtn => {
+              const dateStr = cBtn.getAttribute('data-date');
+              const d = parse(dateStr);
+              let inRange = false;
+              let isHoverEnd = false;
+              if (pickingStart && hoverDate && d) {
+                const sDate = parse(pickingStart);
+                if (sDate) {
+                  inRange = (d > sDate && d < hoverDate) || (d > hoverDate && d < sDate);
+                  isHoverEnd = dateStr === fmt(hoverDate) && hoverDate.getTime() !== sDate.getTime();
+                }
+              }
+              cBtn.classList.toggle('joy-calendar__cell--in-range', inRange);
+              cBtn.classList.toggle('joy-calendar__cell--range-end', isHoverEnd);
+            });
+          }
+
+          popover.querySelectorAll('.joy-calendar__cell:not(.joy-calendar__cell--disabled)').forEach(btn => {
+            btn.onmouseenter = () => {
+              if (pickingStart) {
+                hoverDate = parse(btn.getAttribute('data-date'));
+                updateHoverCells();
+              }
+            };
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const clicked = btn.getAttribute('data-date');
+              if (!pickingStart) {
+                pickingStart = clicked;
+                hoverDate = null;
+                render();
+              } else {
+                let s = pickingStart;
+                let end = clicked;
+                if (s > end) { const tmp = s; s = end; end = tmp; }
+                startInput.value = s;
+                endInput.value = end;
+                if (feedback) feedback.innerText = s + ' to ' + end;
+                showDemoToast('Interval set: ' + s + ' to ' + end, 'info');
+                close();
+              }
+            };
+          });
+        }
+
+        function open() {
+          closeAllPickers();
+          pickingStart = null;
+          hoverDate = null;
+          const p = parse(startInput.value);
+          if (p) { leftYear = p.getFullYear(); leftMonth = p.getMonth(); }
+          render();
+          popover.style.display = 'block';
+          wrap.classList.add('joy-date-range-picker--open');
+          wrap.setAttribute('aria-expanded', 'true');
+        }
+
+        function close() {
+          pickingStart = null;
+          hoverDate = null;
+          popover.style.display = 'none';
+          wrap.classList.remove('joy-date-range-picker--open');
+          wrap.setAttribute('aria-expanded', 'false');
+        }
+
+        wrap.onclick = (e) => {
+          if (e.target.closest('#' + clearId)) return;
+          if (e.target.closest('.joy-calendar-overlay')) return;
+          if (popover.style.display === 'block') close();
+          else open();
+        };
+        wrap.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (popover.style.display === 'block') close();
+            else open();
+          } else if (e.key === 'Escape') {
+            close();
+          }
+        };
+        if (clear) {
+          clear.onclick = (e) => {
+            e.stopPropagation();
+            startInput.value = '';
+            endInput.value = '';
+            if (feedback) feedback.innerText = '... to ...';
+            showDemoToast('Interval cleared', 'info');
+          };
+        }
+
+        const instance = { close, popover, wrap };
+        allPickers.push(instance);
+        return instance;
+      }
+
+      // Initialize all 4 pickers
+      // 1. Standard Single Picker
+      createSinglePicker('demo-date-picker-wrap', 'demo-single-date', 'demo-single-date-clear', 'demo-single-calendar-popover', 'single-date-feedback');
+
+      // 2. Constrained Single Picker (Min: 2026-09-05, Max: 2026-09-25, Blackout: 09-11 & 09-18, No Weekends)
+      createSinglePicker('demo-constrained-date-picker-wrap', 'demo-constrained-date', 'demo-constrained-date-clear', 'demo-constrained-calendar-popover', 'constrained-date-feedback', {
+        min: '2026-09-05',
+        max: '2026-09-25',
+        blackoutDates: ['2026-09-11', '2026-09-18'],
+        disabledDate: (d) => d.getDay() === 0 || d.getDay() === 6
+      });
+
+      // 3. Financial Range Picker
+      createRangePicker('demo-range-picker-wrap', 'demo-range-start', 'demo-range-end', 'demo-range-clear', 'demo-range-calendar-popover', 'range-date-feedback');
+
+      // 4. Blackout-Restricted Range Picker (Blackout: 2026-01-12 to 2026-01-16, Forbid cross-blackout)
+      createRangePicker('demo-blackout-range-picker-wrap', 'demo-blackout-start', 'demo-blackout-end', 'demo-blackout-clear', 'demo-blackout-range-calendar-popover', 'blackout-range-feedback', {
+        blackoutRanges: [['2026-01-12', '2026-01-16']],
+        forbidCrossBlackout: true
+      });
+
       document.addEventListener('click', (e) => {
-        if (singlePopover && singlePopover.style.display === 'block') {
-          if (!singleWrap.contains(e.target) && !singlePopover.contains(e.target)) {
-            closeSingle();
+        allPickers.forEach(p => {
+          if (p.popover && p.popover.style.display === 'block') {
+            if (!p.wrap.contains(e.target) && !p.popover.contains(e.target)) {
+              p.close();
+            }
           }
-        }
-        if (rangePopover && rangePopover.style.display === 'block') {
-          if (!rangeWrap.contains(e.target) && !rangePopover.contains(e.target)) {
-            closeRange();
-          }
-        }
+        });
       });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-          closeSingle();
-          closeRange();
+          closeAllPickers();
         }
       });
     }

@@ -1,0 +1,32 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyModal",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "modal_default_render",
+      "description": "Modal dialog renders title and content with close action",
+      "props": {
+        "title": "Confirm Action",
+        "closable": true
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "modal_close_action",
+      "description": "Modal triggers close event on close button tap",
+      "props": {
+        "title": "Modal Flow",
+        "closable": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "close": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    }
+  ]
+}
