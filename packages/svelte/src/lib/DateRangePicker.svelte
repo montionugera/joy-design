@@ -16,7 +16,11 @@
     isSameDay,
     isBetweenDays,
     getStandardPresets,
-    type DateRangePreset
+    type DateRangePreset,
+    checkDateDisabled,
+    rangeContainsDisabledDate,
+    type DisabledDateFn,
+    type DateRangeTuple
   } from './calendar-utils.js';
 
   interface Props {
@@ -33,6 +37,10 @@
     endPlaceholder?: string;
     allowClear?: boolean;
     presets?: DateRangePreset[];
+    disabledDate?: (current: Date, info?: { from?: Date }) => boolean;
+    blackoutDates?: string[];
+    blackoutRanges?: Array<[string, string]>;
+    forbidCrossBlackout?: boolean;
     onchange?: (v: DateRangeValue) => void;
     class?: string;
     style?: string;
@@ -54,6 +62,10 @@
     endPlaceholder = 'End date',
     allowClear = true,
     presets = getStandardPresets(),
+    disabledDate,
+    blackoutDates,
+    blackoutRanges,
+    forbidCrossBlackout = false,
     onchange,
     class: className = '',
     style = '',
@@ -92,12 +104,35 @@
     return () => h.dispose();
   });
 
-  const minDate = $derived(min ? parseDate(min) : null);
-  const maxDate = $derived(max ? parseDate(max) : null);
+  function isSingleDateDisabled(d: Date, fromDate?: Date) {
+    return checkDateDisabled(d, {
+      min,
+      max,
+      disabledDate,
+      blackoutDates,
+      blackoutRanges,
+      from: fromDate
+    });
+  }
 
   function isDateDisabled(d: Date) {
-    if (minDate && d < minDate) return true;
-    if (maxDate && d > maxDate) return true;
+    const isPickingEnd = value?.start && !value?.end && startDate;
+    if (isSingleDateDisabled(d, isPickingEnd ? startDate : undefined)) {
+      return true;
+    }
+    if (forbidCrossBlackout && isPickingEnd) {
+      if (
+        rangeContainsDisabledDate(startDate, d, {
+          min,
+          max,
+          disabledDate,
+          blackoutDates,
+          blackoutRanges
+        })
+      ) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -117,6 +152,19 @@
       commit({ start: dateStr, end: '' });
       activeInput = 'end';
     } else {
+      if (
+        forbidCrossBlackout &&
+        startDate &&
+        rangeContainsDisabledDate(startDate, d, {
+          min,
+          max,
+          disabledDate,
+          blackoutDates,
+          blackoutRanges
+        })
+      ) {
+        return;
+      }
       commit({ start: value.start, end: dateStr });
       isOpen = false;
       hoverDate = null;
@@ -131,6 +179,24 @@
   }
 
   function handlePreset(p: DateRangePreset) {
+    const pStart = parseDate(p.value[0]);
+    const pEnd = parseDate(p.value[1]);
+    if (pStart && isSingleDateDisabled(pStart)) return;
+    if (pEnd && isSingleDateDisabled(pEnd)) return;
+    if (
+      forbidCrossBlackout &&
+      pStart &&
+      pEnd &&
+      rangeContainsDisabledDate(pStart, pEnd, {
+        min,
+        max,
+        disabledDate,
+        blackoutDates,
+        blackoutRanges
+      })
+    ) {
+      return;
+    }
     commit({ start: p.value[0], end: p.value[1] });
     isOpen = false;
     hoverDate = null;
@@ -314,7 +380,7 @@
                 disabled={disabledDay}
                 class="joy-calendar__cell {!day.isCurrentMonth ? 'joy-calendar__cell--muted' : ''} {day.isToday ? 'joy-calendar__cell--today' : ''} {isStart ? 'joy-calendar__cell--selected joy-calendar__cell--range-start' : ''} {isEnd ? 'joy-calendar__cell--selected joy-calendar__cell--range-end' : ''} {inRange && !isStart && !isEnd ? 'joy-calendar__cell--in-range' : ''} {disabledDay ? 'joy-calendar__cell--disabled' : ''}"
                 onmouseenter={() => {
-                  if (value.start && !value.end) {
+                  if (value.start && !value.end && !disabledDay) {
                     hoverDate = day.date;
                   }
                 }}
@@ -379,7 +445,7 @@
                 disabled={disabledDay}
                 class="joy-calendar__cell {!day.isCurrentMonth ? 'joy-calendar__cell--muted' : ''} {day.isToday ? 'joy-calendar__cell--today' : ''} {isStart ? 'joy-calendar__cell--selected joy-calendar__cell--range-start' : ''} {isEnd ? 'joy-calendar__cell--selected joy-calendar__cell--range-end' : ''} {inRange && !isStart && !isEnd ? 'joy-calendar__cell--in-range' : ''} {disabledDay ? 'joy-calendar__cell--disabled' : ''}"
                 onmouseenter={() => {
-                  if (value.start && !value.end) {
+                  if (value.start && !value.end && !disabledDay) {
                     hoverDate = day.date;
                   }
                 }}

@@ -7,7 +7,10 @@
     formatDate,
     getMonthMatrix,
     parseDate,
-    isSameDay
+    isSameDay,
+    checkDateDisabled,
+    type DisabledDateFn,
+    type DateRangeTuple
   } from './calendar-utils.js';
 
   interface Props {
@@ -21,6 +24,9 @@
     size?: 'sm' | 'md' | 'lg';
     id?: string;
     allowClear?: boolean;
+    disabledDate?: (current: Date) => boolean;
+    blackoutDates?: string[];
+    blackoutRanges?: Array<[string, string]>;
     onchange?: (e: any) => void;
     class?: string;
     style?: string;
@@ -39,6 +45,9 @@
     size = 'md',
     id,
     allowClear = true,
+    disabledDate,
+    blackoutDates,
+    blackoutRanges,
     onchange,
     class: className = '',
     style = '',
@@ -72,13 +81,14 @@
     return () => h.dispose();
   });
 
-  const minDate = $derived(min ? parseDate(min) : null);
-  const maxDate = $derived(max ? parseDate(max) : null);
-
   function isDateDisabled(d: Date) {
-    if (minDate && d < minDate) return true;
-    if (maxDate && d > maxDate) return true;
-    return false;
+    return checkDateDisabled(d, {
+      min,
+      max,
+      disabledDate,
+      blackoutDates,
+      blackoutRanges
+    });
   }
 
   function handleSelect(dateStr: string, d: Date) {
