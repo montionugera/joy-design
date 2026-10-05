@@ -1,0 +1,26 @@
+{
+  "component": "Notification",
+  "targets": {
+    "react": "JoyNotification",
+    "svelte": "Notification",
+    "flutter": "JoyNotification"
+  },
+  "variants": ["info", "success", "warning", "error"],
+  "props": {
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "type": {
+      "type": "enum",
+      "values": ["info", "success", "warning", "error"],
+      "default": "info"
+    },
+    "duration": { "type": "number", "default": 4500 }
+  },
+  "events": {
+    "close": {
+      "react": "onClose",
+      "svelte": "onclose",
+      "flutter": "onClose"
+    }
+  }
+}

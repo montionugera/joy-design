@@ -1,0 +1,25 @@
+{
+  "component": "Spin",
+  "targets": {
+    "react": "JoySpin",
+    "svelte": "Spin",
+    "flutter": "JoySpin"
+  },
+  "sizes": ["sm", "md", "lg"],
+  "props": {
+    "spinning": { "type": "boolean", "default": true },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md"
+    },
+    "tip": { "type": "string" }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}

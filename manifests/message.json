@@ -1,0 +1,25 @@
+{
+  "component": "Message",
+  "targets": {
+    "react": "JoyMessage",
+    "svelte": "Message",
+    "flutter": "JoyMessage"
+  },
+  "variants": ["info", "success", "warning", "error"],
+  "props": {
+    "content": { "type": "string" },
+    "type": {
+      "type": "enum",
+      "values": ["info", "success", "warning", "error"],
+      "default": "info"
+    },
+    "duration": { "type": "number", "default": 3000 }
+  },
+  "events": {
+    "close": {
+      "react": "onClose",
+      "svelte": "onclose",
+      "flutter": "onClose"
+    }
+  }
+}

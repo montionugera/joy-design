@@ -1,0 +1,45 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyAlert",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "alert_default_info",
+      "description": "Default alert renders info variant with status icon",
+      "props": {
+        "variant": "info",
+        "title": "Info Notice"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "alert_closable_dismiss",
+      "description": "Closable alert triggers close event on dismiss button tap",
+      "props": {
+        "variant": "warning",
+        "title": "Warning Notice",
+        "closable": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "close": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "alert_danger_variant",
+      "description": "Danger alert variant renders danger status styling",
+      "props": {
+        "variant": "danger",
+        "title": "Critical Failure"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    }
+  ]
+}
