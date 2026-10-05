@@ -7,33 +7,33 @@ from_idea: I-071
 
 # Ant Design 5 elevation for Cascader, TreeSelect, floating overlays, navigation, and form controls
 
-## Problem
+## Goal
 
-Joy Design components lacked the visual micro-interactions, responsive spring easing, and polished overlay mechanics benchmarked against enterprise design systems like Ant Design 5:
-- Cascader lacked smooth column slide-in transitions with `--joy-ease-out-quint`.
-- TreeSelect lacked live keyboard/input search filtering with auto-expanding ancestor branches and async node loading spinners.
-- Overlays (Tooltip, Popconfirm, Modal, Notification) lacked unified transform-origin zooming, directional arrow pointers, and reduced-motion compliant entrances.
-- Navigation (Segmented, Steps) lacked smooth thumb transitions while maintaining 44px coarse pointer touch targets, and active step pulsing rings.
-- Form controls (InputNumber, Rate, Slider) lacked hover/focus-within handler reveals, smooth star hover physics, and handle scale with subtle glow halos.
+Elevate Joy Design components across Waves 2 through 5 to Ant Design 5 benchmark standards, including responsive spring transitions, live search filtering with auto-expansion, unified popover zoom origins, directional pointer arrows, mobile touch target preservation (>= 44px), and micro-interaction states across light and dark themes.
 
-## Why now
+## Architecture
 
-To achieve complete parity and benchmark superiority against Ant Design 5.14+ across all component families while strictly upholding Joymify's design contracts (token exclusivity, zero raw emojis, dark/light contrast, and touch target sizing).
-
-## Sketch
-
-Implement across Waves 2 through 5:
-- **Wave 2**: Elevate Cascader with column animations; TreeSelect with live search, node expand, and spinner.
-- **Wave 3**: Elevate Tooltip with zoom transform-origins, Popconfirm panel entrance and directional pointer arrow, Notification slide-in, and Modal zoom.
-- **Wave 4**: Elevate Segmented with smooth thumb entrance without compromising 44px mobile touch targets, and Steps with active pulse ring.
-- **Wave 5**: Elevate InputNumber handler reveal, Rate star hover bounce, and Slider handle scale and glow.
-- Comprehensive Playwright tests verifying both desktop and mobile behaviors across light and dark themes.
+- **Wave 2 (Hierarchical Selection)**:
+  - Cascader: CSS slide-in cascade animations powered by `--joy-ease-out-quint` and `--joy-duration-fast`.
+  - TreeSelect: Live input search with auto-expanded branch hierarchies and async loading spinners.
+- **Wave 3 (Overlays & Feedback)**:
+  - Tooltip: Scale-in `@keyframes joy-tooltip-zoom` with dynamic transform-origin matching placement.
+  - Popconfirm: Smooth entrance panel and directional pseudo-element pointer arrow (`:not(.joy-overlay)::after`).
+  - Modal: Responsive zoom-in (`@keyframes joy-modal-pop`) with `scale(0.88)` start.
+  - Notification: Reduced-motion compliant entrance slides (`@keyframes joy-notification-slide-in`).
+- **Wave 4 (Navigation)**:
+  - Segmented: Smooth opacity entrance transition for the active thumb pill, preserving mobile 44px touch targets.
+  - Steps: Process step pulsing indicator ring (`@keyframes joy-step-pulse`).
+- **Wave 5 (Form Controls)**:
+  - InputNumber: Stepper handlers hover/focus-within reveal (`opacity: 0` to `1`).
+  - Rate: Star hover bounce physics (`@keyframes joy-star-hover`).
+  - Slider: Thumb handle scale (`scale(1.15)`) with accent focus halo glow.
 
 ## Acceptance criteria
 
-- [ ] Cascader supports animated column slide-in and TreeSelect supports live search filtering with auto-expansion.
-- [ ] Tooltip and Popconfirm support scale-in zoom animations and directional arrow pointers.
-- [ ] Segmented and Steps support fluid micro-interactions with mobile touch targets >= 44px on coarse pointers.
-- [ ] InputNumber, Rate, and Slider support hover reveals, star bounce, and handle focus glow.
-- [ ] All components use semantic tokens only (0 color literals).
-- [ ] Gate 1 Precheck passes with 0 test failures.
+- [x] Cascader supports animated column slide-in and TreeSelect supports live search filtering with auto-expansion.
+- [x] Tooltip and Popconfirm support scale-in zoom animations and directional arrow pointers.
+- [x] Segmented and Steps support fluid micro-interactions with mobile touch targets >= 44px on coarse pointers.
+- [x] InputNumber, Rate, and Slider support hover reveals, star bounce, and handle focus glow.
+- [x] All components use semantic tokens only (0 color literals).
+- [x] Gate 1 Precheck passes with 0 test failures.
