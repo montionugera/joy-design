@@ -233,6 +233,16 @@ Cross-framework fidelity is proven through a single declarative contract archite
 3. **Playwright Browser Contracts (Storybook Web & Flutter Web)**:
    Playwright executes contracts against the Web Storybook Hub (`apps/storybook-hub`) and the Flutter Web Showcase (`apps/flutter-hub`). Flutter Web exposes state and component harnesses to Playwright via the `JoyHubBridge` (`window.__joyHub`), validating cross-platform visual and behavioral parity under identical scenarios.
 
+### Tri-Framework Storybook Hub (`design.joymify.com`)
+
+The primary design workshop at `design.joymify.com` provides a **3-way framework switcher**:
+```text
+[ Svelte 5 | React 19 | Flutter 3.32 ]
+```
+- **Live Twin Toggling**: Hot-swap between Svelte 5 and React 19 component instances in-place with zero page reload.
+- **Flutter 3.32 Workshop**: Switch to Flutter to instantly view Dart widget code snippets (`JoyButton`, `JoyInput`, `JoyTable`), copy vector icon constants (`JoyIcons.<name>`), and explore the live Flutter Web CanvasKit app (`#flutter` view or `/flutter/index.html`).
+- **Synchronized Bridge**: Toggling between Light and Dark mode or selecting a brand palette preset (`Joy Classic`, `Ocean Blue`, etc.) propagates in real-time across both HTML DOM components and the embedded Flutter canvas via `JoyHubBridge`.
+
 ### Quickstart for Mobile Applications (`joymify_flutter`)
 
 For mobile products such as `joy-coach-fe` and `quant-fe`:
