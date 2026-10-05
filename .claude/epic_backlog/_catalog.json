@@ -14,10 +14,11 @@
     "id": "E-002",
     "title": "Flutter Component Parity & Mobile Ecosystem",
     "created_at": "2026-10-05T11:00:07.380824+00:00",
-    "status": "open",
+    "status": "verifying",
     "release_version": null,
     "verified_sha": null,
     "verified_at": null,
-    "split_approved_by": null
+    "split_approved_by": null,
+    "verifying_sha": "ad18a11d06a99a57eca4c540e373f72300e175b6"
   }
 ]
