@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7304,3 +7305,9 @@ export default tokens;
 writeFileAtomic(path.join(outDir, 'index.d.ts'), dtsContent);
 
 console.log("Tokens compiled successfully to", outDir);
+
+// Generate Dart tokens if generator exists
+const dartGenScript = path.join(__dirname, 'scripts/gen-dart-tokens.mjs');
+if (fs.existsSync(dartGenScript)) {
+  execSync(`node "${dartGenScript}"`, { stdio: 'inherit' });
+}

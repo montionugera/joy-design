@@ -113,7 +113,8 @@ rm "$wave4_dir/packages/svelte/src/lib/LandingAction.svelte"
 wave6_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir"' EXIT
 mkdir -p "$wave6_dir/packages/svelte/src" "$wave6_dir/packages/react/src" "$wave6_dir/packages/icons/src" \
-  "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens" "$wave6_dir/packages/brand/src"
+  "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens" "$wave6_dir/packages/brand/src" \
+  "$wave6_dir/packages/flutter/lib"
 cp "$clean_file" "$wave6_dir/packages/svelte/src/Clean.svelte"
 cp "$clean_file" "$wave6_dir/packages/react/src/Clean.tsx"
 cp "$clean_file" "$wave6_dir/packages/icons/src/Clean.svelte"
@@ -121,6 +122,7 @@ cp "$clean_file" "$wave6_dir/apps/storybook-hub/build.js"
 printf '%s\n' 'const componentStyles = `' '.x { color: var(--joy-text-primary); }' '`;' > "$wave6_dir/packages/tokens/build.js"
 cp "$clean_file" "$wave6_dir/packages/brand/src/Clean.js"
 cp "$clean_file" "$wave6_dir/packages/brand/build.js"
+printf '%s\n' 'class CleanWidget {}' > "$wave6_dir/packages/flutter/lib/clean.dart"
 (cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1 || {
   echo "expected default mode to pass on a clean copy of every default target" >&2
   exit 1
@@ -128,6 +130,62 @@ cp "$clean_file" "$wave6_dir/packages/brand/build.js"
 cp "$literal_file" "$wave6_dir/packages/icons/src/Bad.svelte"
 if (cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1; then
   echo "expected default mode to scan packages/icons/src and reject a literal there" >&2
+  exit 1
+fi
+
+# Dart Color Linter tests
+dart_fixture_dir=$(mktemp -d)
+trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir" "$dart_fixture_dir"' EXIT
+
+dart_clean_file="$dart_fixture_dir/clean.dart"
+dart_literal_file="$dart_fixture_dir/bad_color.dart"
+dart_named_color_file="$dart_fixture_dir/bad_named_color.dart"
+dart_cupertino_color_file="$dart_fixture_dir/bad_cupertino.dart"
+dart_opacity_file="$dart_fixture_dir/bad_opacity.dart"
+dart_generated_file="$dart_fixture_dir/joy_tokens.g.dart"
+
+printf '%s\n' 'class MyWidget { final color = JoyThemeTokens.light.accent.base; }' > "$dart_clean_file"
+printf '%s\n' 'class MyWidget { final color = Color(0xFF112233); }' > "$dart_literal_file"
+printf '%s\n' 'class MyWidget { final color = Colors.red; }' > "$dart_named_color_file"
+printf '%s\n' 'class MyWidget { final color = CupertinoColors.activeBlue; }' > "$dart_cupertino_color_file"
+printf '%s\n' 'class MyWidget { final color = c.withOpacity(0.5); }' > "$dart_opacity_file"
+printf '%s\n' 'abstract final class JoyColorRamps { static const Color navy500 = Color(0xFF14253E); }' > "$dart_generated_file"
+
+"$repo_root/scripts/lint-colors.sh" --strict "$dart_clean_file" >/dev/null
+"$repo_root/scripts/lint-colors.sh" --strict "$dart_generated_file" >/dev/null
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$dart_literal_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Dart Color(0x...) literal" >&2
+  exit 1
+fi
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$dart_named_color_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Dart Colors.* literal" >&2
+  exit 1
+fi
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$dart_cupertino_color_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Dart CupertinoColors.* literal" >&2
+  exit 1
+fi
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$dart_opacity_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Dart .withOpacity( literal" >&2
+  exit 1
+fi
+
+# Test scanning directory with Flutter library
+mkdir -p "$dart_fixture_dir/packages/flutter/lib/src"
+cp "$dart_clean_file" "$dart_fixture_dir/packages/flutter/lib/clean.dart"
+cp "$dart_generated_file" "$dart_fixture_dir/packages/flutter/lib/src/tokens.g.dart"
+(cd "$dart_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/flutter/lib) >/dev/null 2>&1 || {
+  echo "expected packages/flutter/lib scan to pass on clean dart files and generated .g.dart files" >&2
+  exit 1
+}
+
+cp "$dart_literal_file" "$dart_fixture_dir/packages/flutter/lib/bad.dart"
+if (cd "$dart_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/flutter/lib) >/dev/null 2>&1; then
+  echo "expected packages/flutter/lib scan to reject a Dart file with Color(0x...)" >&2
   exit 1
 fi
 
