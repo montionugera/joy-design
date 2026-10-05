@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Joymify Component Contract Schema v2",
+  "type": "object",
+  "required": ["component", "version", "scenarios"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "component": { "type": "string" },
+    "version": { "type": "string" },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "props", "actions", "expect"],
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "props": { "type": "object" },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": { "type": "string" }
+              }
+            }
+          },
+          "expect": {
+            "type": "object",
+            "properties": {
+              "events": { "type": "object" },
+              "minTouchTarget": {
+                "type": "object",
+                "properties": {
+                  "width": { "type": "number" },
+                  "height": { "type": "number" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
