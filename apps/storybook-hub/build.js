@@ -5420,11 +5420,11 @@ ${navigationHtml}
         <h2 style="margin: 0 0 8px 0;">Date & Range Picker</h2>
         <p class="header-tagline">AntDesign-grade enterprise date pickers with calendar popover triggers, two-way binding, error states, and dark mode support.</p>
 
-        <div class="playground-box">
+        <div class="playground-box" style="overflow: visible;">
           <div class="playground-header">
             <h4>Single Date & Date Range Selectors</h4>
           </div>
-          <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto; position: relative;">
+          <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto; position: relative; padding-bottom: 360px;">
             <div style="width: 100%;">
               <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Standard Date Picker</label>
               <div class="joy-date-picker" id="demo-date-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
