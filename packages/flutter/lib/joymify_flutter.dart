@@ -26,7 +26,10 @@ export 'src/components/feedback/joy_alert.dart';
 export 'src/components/feedback/joy_progress.dart';
 export 'src/components/feedback/joy_spin.dart';
 export 'src/components/feedback/joy_skeleton.dart';
+export 'src/components/feedback/joy_notification.dart';
+export 'src/components/feedback/joy_message.dart';
 export 'src/components/overlay/joy_modal.dart';
 export 'src/components/overlay/joy_drawer.dart';
 export 'src/components/overlay/joy_popconfirm.dart';
 export 'src/components/overlay/joy_tooltip.dart';
+
