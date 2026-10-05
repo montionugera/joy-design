@@ -18,6 +18,14 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
   String _currentTheme = 'light';
   bool _checkableTagValue = true;
   bool _dismissedTag = false;
+  String _inputText = 'Search design system...';
+  double _inputNumber = 42.0;
+  bool? _checkboxValue = true;
+  String _radioValue = 'pro';
+  bool _switchValue = true;
+  double _sliderValue = 65.0;
+  double _rateValue = 4.5;
+  String _segmentedValue = 'monthly';
 
   @override
   void initState() {
@@ -68,6 +76,12 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                     _buildHeader(tokens),
                     const SizedBox(height: JoySpacing.s32),
                     _buildInteractiveCounterSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildInputsSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildChoiceSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildTogglesAndSlidersSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
                     _buildButtonsSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
@@ -512,6 +526,314 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                 size: JoyAvatarSize.md,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputsSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Form Inputs & Stepper',
+      subtitle:
+          'JoyInput text control with prefix/suffix addons, status variants, clear button, and JoyInputNumber numeric stepper',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const JoyText.h6('Text Input with Prefix & Clear Button'),
+          const SizedBox(height: JoySpacing.s8),
+          JoyInput(
+            initialValue: _inputText,
+            placeholder: 'Type to search...',
+            prefix: JoyIcon(JoyIcons.search, size: JoyIconSize.sm, color: tokens.text.secondary),
+            clearable: true,
+            onChanged: (val) {
+              setState(() {
+                _inputText = val;
+              });
+            },
+          ),
+          const SizedBox(height: JoySpacing.s16),
+          const JoyText.h6('Status Variants (Error & Warning)'),
+          const SizedBox(height: JoySpacing.s8),
+          Row(
+            children: [
+              Expanded(
+                child: JoyInput(
+                  initialValue: 'invalid.email@',
+                  status: JoyInputStatus.error,
+                  placeholder: 'Error input',
+                  prefix: JoyIcon(JoyIcons.alertTriangle, size: JoyIconSize.sm, color: tokens.status.danger.fg),
+                ),
+              ),
+              const SizedBox(width: JoySpacing.s16),
+              Expanded(
+                child: JoyInput(
+                  initialValue: 'weak-password',
+                  status: JoyInputStatus.warning,
+                  placeholder: 'Warning input',
+                  prefix: JoyIcon(JoyIcons.info, size: JoyIconSize.sm, color: tokens.status.warning.fg),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s16),
+          const JoyText.h6('Numeric Stepper (JoyInputNumber)'),
+          const SizedBox(height: JoySpacing.s8),
+          Row(
+            children: [
+              SizedBox(
+                width: 200.0,
+                child: JoyInputNumber(
+                  value: _inputNumber,
+                  min: 0,
+                  max: 100,
+                  step: 1,
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        _inputNumber = val.toDouble();
+                      });
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: JoySpacing.s16),
+              JoyText.body(
+                'Current Value: ${_inputNumber.toStringAsFixed(0)}',
+                color: JoyTextColor.secondary,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChoiceSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Choice Controls',
+      subtitle:
+          'JoyCheckbox tri-state selection and JoyRadioGroup single-choice options in horizontal and vertical directions',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const JoyText.h6('Checkbox States (Checked, Unchecked, Indeterminate, Disabled)'),
+          const SizedBox(height: JoySpacing.s8),
+          Wrap(
+            spacing: JoySpacing.s24,
+            runSpacing: JoySpacing.s12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              JoyCheckbox(
+                value: _checkboxValue,
+                labelText: 'Interactive (${_checkboxValue == null ? "Indeterminate" : (_checkboxValue! ? "Checked" : "Unchecked")})',
+                onChanged: (val) {
+                  setState(() {
+                    _checkboxValue = val;
+                  });
+                },
+              ),
+              const JoyCheckbox(
+                value: true,
+                labelText: 'Checked',
+                onChanged: null,
+              ),
+              const JoyCheckbox(
+                value: null,
+                labelText: 'Indeterminate',
+                onChanged: null,
+              ),
+              const JoyCheckbox(
+                value: false,
+                disabled: true,
+                labelText: 'Disabled',
+                onChanged: null,
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Radio Group — Horizontal Direction'),
+          const SizedBox(height: JoySpacing.s8),
+          JoyRadioGroup<String>(
+            value: _radioValue,
+            direction: Axis.horizontal,
+            gap: JoySpacing.s16,
+            options: const [
+              JoyRadioOption(value: 'starter', label: 'Starter'),
+              JoyRadioOption(value: 'pro', label: 'Professional'),
+              JoyRadioOption(value: 'enterprise', label: 'Enterprise'),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() {
+                  _radioValue = val;
+                });
+              }
+            },
+          ),
+          const SizedBox(height: JoySpacing.s16),
+          const JoyText.h6('Radio Group — Vertical Direction'),
+          const SizedBox(height: JoySpacing.s8),
+          JoyRadioGroup<String>(
+            value: _radioValue,
+            direction: Axis.vertical,
+            gap: JoySpacing.s8,
+            options: const [
+              JoyRadioOption(value: 'starter', label: 'Standard Delivery (3-5 business days)'),
+              JoyRadioOption(value: 'pro', label: 'Express Courier (Next day delivery)'),
+              JoyRadioOption(value: 'enterprise', label: 'Same-day Priority Courier (Disabled)', disabled: true),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() {
+                  _radioValue = val;
+                });
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTogglesAndSlidersSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Toggles & Sliders',
+      subtitle:
+          'JoySwitch interactive & loading switches, JoySlider precision control, JoyRate vector ratings, and JoySegmented sliding pill tabs',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const JoyText.h6('Switches (Interactive, Small, Loading, Disabled)'),
+          const SizedBox(height: JoySpacing.s8),
+          Wrap(
+            spacing: JoySpacing.s24,
+            runSpacing: JoySpacing.s12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              JoySwitch(
+                value: _switchValue,
+                labelText: _switchValue ? 'Realtime sync: ON' : 'Realtime sync: OFF',
+                onChanged: (val) {
+                  setState(() {
+                    _switchValue = val;
+                  });
+                },
+              ),
+              JoySwitch(
+                value: _switchValue,
+                size: JoySwitchSize.sm,
+                labelText: 'Small switch',
+                onChanged: (val) {
+                  setState(() {
+                    _switchValue = val;
+                  });
+                },
+              ),
+              const JoySwitch(
+                value: true,
+                loading: true,
+                labelText: 'Loading state',
+                onChanged: null,
+              ),
+              const JoySwitch(
+                value: false,
+                disabled: true,
+                labelText: 'Disabled switch',
+                onChanged: null,
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Slider (JoySlider with 44px Coarse Touch Area)'),
+          const SizedBox(height: JoySpacing.s8),
+          Row(
+            children: [
+              Expanded(
+                child: JoySlider(
+                  value: _sliderValue,
+                  min: 0.0,
+                  max: 100.0,
+                  step: 1.0,
+                  onChanged: (val) {
+                    setState(() {
+                      _sliderValue = val;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: JoySpacing.s16),
+              SizedBox(
+                width: 80.0,
+                child: JoyText.code(
+                  '${_sliderValue.toStringAsFixed(0)}%',
+                  weight: FontWeight.w600,
+                  color: JoyTextColor.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Star Rating (JoyRate Vector SVGs with Half-Stars)'),
+          const SizedBox(height: JoySpacing.s8),
+          Row(
+            children: [
+              JoyRate(
+                value: _rateValue,
+                allowHalf: true,
+                count: 5,
+                onChanged: (val) {
+                  setState(() {
+                    _rateValue = val;
+                  });
+                },
+              ),
+              const SizedBox(width: JoySpacing.s16),
+              JoyText.body(
+                '$_rateValue / 5.0 rating',
+                weight: FontWeight.w600,
+                color: JoyTextColor.secondary,
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Segmented Controls (JoySegmented Sliding Pills)'),
+          const SizedBox(height: JoySpacing.s8),
+          JoySegmented<String>(
+            value: _segmentedValue,
+            size: JoySegmentedSize.md,
+            options: const [
+              JoySegmentedOption(value: 'daily', labelText: 'Daily'),
+              JoySegmentedOption(value: 'weekly', labelText: 'Weekly'),
+              JoySegmentedOption(value: 'monthly', labelText: 'Monthly'),
+              JoySegmentedOption(value: 'annual', labelText: 'Annual'),
+            ],
+            onChanged: (val) {
+              setState(() {
+                _segmentedValue = val;
+              });
+            },
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoySegmented<String>(
+            value: _segmentedValue,
+            block: true,
+            size: JoySegmentedSize.sm,
+            options: const [
+              JoySegmentedOption(value: 'daily', labelText: 'Day'),
+              JoySegmentedOption(value: 'weekly', labelText: 'Week'),
+              JoySegmentedOption(value: 'monthly', labelText: 'Month'),
+              JoySegmentedOption(value: 'annual', labelText: 'Year'),
+            ],
+            onChanged: (val) {
+              setState(() {
+                _segmentedValue = val;
+              });
+            },
           ),
         ],
       ),
