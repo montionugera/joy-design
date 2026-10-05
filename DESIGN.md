@@ -222,7 +222,7 @@ components:
 
 Joymify is a component library for task-focused apps (register: **product**); the landing suite (`HeroSection`, `CTASection`, `PricingCard`, `LandingPage` and friends) is designed in the **brand** register. Personality: **composed, exact, warm**. Dense where data demands it, calm everywhere else. Gold is a signature, not a wash. Product context lives in `PRODUCT.md`.
 
-**Token contract.** Components read the semantic layer (`--joy-surface-*`, `--joy-text-*`, `--joy-border-*`, `--joy-accent-*`, `--joy-status-*`, `--joy-focus-ring`, `--joy-elevation-*`). Primitive ramps (`--joy-color-*`) only feed that layer. Colour literals live only in `packages/tokens/src/tokens.json`.
+**Token contract.** Components read the semantic layer (`--joy-surface-*`, `--joy-text-*`, `--joy-border-*`, `--joy-accent-*`, `--joy-status-*`, `--joy-focus-ring`, `--joy-elevation-*`). Primitive ramps (`--joy-color-*`) only feed that layer. Colour literals live only in `packages/tokens/src/tokens.json`. Status colours (`--joy-status-*`: green, amber, red, blue) are strictly reserved for semantic state and feedback, keeping them distinct from brand accents and general theme surfaces.
 
 **Theme switching.** `data-theme="dark"` or `data-theme="light"` on `<html>` wins. Without it, `prefers-color-scheme` picks the theme. Both themes are designed: dark is not inverted light.
 
@@ -287,6 +287,8 @@ Transitions use these durations with `--joy-ease-out`. Animate `transform`, `opa
 ## Colors
 
 Four brand anchors: navy `#14253e` (primary surface anchor), gold `#c49a3a` (the single accent), cream `#f8f3e8` (warm canvas), ink `#1f1c13` (primary text). Neutrals are tinted toward the brand, not slate.
+
+Semantic status colors (`success` green, `warning` amber, `danger` red, `info` blue) are preserved exclusively for feedback, state communication, and validation. They must never serve as decorative styling, general section backgrounds, or primary brand accents.
 
 ### Semantic layer
 
@@ -625,7 +627,7 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Checkbox | `.joy-checkbox` | - | - | hover, focus-visible, disabled, selected |
 | Switch | `.joy-switch` | sm | - | focus-visible, disabled, selected |
 | RadioGroup | `.joy-radio-group` | - | success, vertical | hover, focus-visible, disabled, error, selected |
-| Slider | `.joy-slider` | - | - | focus-visible, active, disabled |
+| Slider | `.joy-slider` | - | - | hover, focus-visible, active, disabled |
 | Rate | `.joy-rate` | - | readonly | hover, focus-visible, disabled |
 | Segmented | `.joy-segmented` | sm | - | hover, focus-visible, active, disabled |
 | Form | `.joy-form` | - | horizontal, label-left, no-colon | - |
@@ -735,6 +737,7 @@ Colour roles: `--joy-brand-tile`, `--joy-brand-mark`, `--joy-brand-mark-on-tile`
 - Keep Svelte and React twins identical in props, classes and rendering.
 - Spend boldness once per surface (the hero CTA, the hub canvas); everything else recedes.
 - Carry status with icon plus text, never colour alone.
+- Strictly reserve semantic status colors: red for danger/error, amber for warning, green for success, blue for info.
 
 ### Don't:
 
@@ -747,3 +750,4 @@ Colour roles: `--joy-brand-tile`, `--joy-brand-mark`, `--joy-brand-mark-on-tile`
 - An arrow glyph appended to link text, `#111` standing in for black, middle-dot meta strings.
 - Raw OS emoji anywhere; use the SVG icons in `@joymify/icons`.
 - A flat single-colour hero button with a colour-only hover, a spinner-only loading state, or 32px controls on a phone.
+- Use semantic status colors (green, amber, red) for arbitrary decorative styling, general section backgrounds, or brand theme accents.

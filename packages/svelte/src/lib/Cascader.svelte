@@ -9,6 +9,7 @@
 		disabled?: boolean;
 		children?: CascaderOption[];
 		isLeaf?: boolean;
+		loading?: boolean;
 	}
 
 	interface Props {
@@ -19,6 +20,7 @@
 		allowClear?: boolean;
 		disabled?: boolean;
 		changeOnSelect?: boolean;
+		expandTrigger?: 'click' | 'hover';
 		class?: string;
 		style?: string;
 		ref?: HTMLDivElement | null;
@@ -35,6 +37,7 @@
 		allowClear = true,
 		disabled = false,
 		changeOnSelect = false,
+		expandTrigger = 'click',
 		class: className = '',
 		style = '',
 		ref = $bindable(null),
@@ -271,12 +274,23 @@
 								tabindex={isFocused || isActive ? 0 : -1}
 								aria-expanded={hasChildren ? isActive : undefined}
 								aria-disabled={option.disabled ? true : undefined}
-								class="joy-cascader__item {isActive || isFocused ? 'joy-cascader__item--active' : ''}"
+								class="joy-cascader__item {isActive || isFocused ? 'joy-cascader__item--active' : ''} {option.disabled ? 'joy-cascader__item--disabled' : ''}"
 								onclick={() => handleSelectOption(option, colIdx)}
+								onmouseenter={() => {
+									if (expandTrigger === 'hover' && hasChildren && !option.disabled) {
+										handleSelectOption(option, colIdx);
+									}
+								}}
 							>
 								<span>{option.label}</span>
-								{#if hasChildren}
-									<span class="joy-cascader__item-arrow">
+								{#if option.loading}
+									<span class="joy-cascader__item-loading" aria-hidden="true">
+										<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+										</svg>
+									</span>
+								{:else if hasChildren}
+									<span class="joy-cascader__item-arrow" aria-hidden="true">
 										<ChevronRight />
 									</span>
 								{/if}

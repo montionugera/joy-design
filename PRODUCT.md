@@ -40,6 +40,7 @@ The interface should feel like a well-made instrument, dense where the data dema
 3. **Every state, every size, every framework.** An interactive component is styled for each state it can reach: default, hover, focus-visible, active, disabled, and loading, error or selected where they apply. It ships at every size it offers, with a Svelte and a React twin held together by `scripts/parity-check.mjs`. The per-component states and sizes are in the `DESIGN.md` state matrix.
 4. **The phone is the first viewport.** Design at 375px with 44px touch targets, 16px gutters and no horizontal scroll. Select-family overlays become bottom sheets on small screens.
 5. **Spend boldness once.** Each surface gets one signature moment, such as the hero CTA or the kinetic hub canvas. Everything else recedes.
+6. **Strict semantic color reservation.** Green (success), amber/yellow (warning), red (danger/error), and blue (info) are strictly preserved for status, validation, and feedback. Theme expressions and decorative surfaces rely on neutrals (navy, cream, ink, warm greys) and theme accents (`--joy-accent-*`), never semantic status colors.
 
 ## Accessibility & Inclusion
 

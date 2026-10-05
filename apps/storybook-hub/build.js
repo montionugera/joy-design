@@ -49,6 +49,8 @@ const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 const chevronRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 const chevronDown = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 const closeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>`;
+const checkIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+const miniSpinner = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
 const star = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 8.9 8.3 12 2"/></svg>`;
 const spinner = `<span class="joy-button__spinner" aria-hidden="true"><svg class="joy-button__spinner-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg></span>`;
 
@@ -138,8 +140,8 @@ function renderFormsMatrix() {
     <section><h3>Date and time</h3><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-23"><span class="joy-date-picker__icon" aria-hidden="true">${chevronDown}</span></div><div class="joy-date-range-picker"><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-23"></div><span class="joy-date-range-picker__sep">to</span><div class="joy-date-picker joy-date-picker--md"><input class="joy-date-picker__input" type="date" value="2026-09-30"></div></div>${sheetDemo(`<div class="joy-time-picker"><div class="joy-input-wrapper"><input class="joy-input" readonly value="09:30"><span class="joy-input-wrapper__suffix">${chevronDown}</span></div><div class="joy-time-picker__panel joy-overlay" role="listbox"><div class="joy-time-picker__column"><button type="button" class="joy-time-picker__cell joy-time-picker__cell--selected" aria-selected="true">09</button><button type="button" class="joy-time-picker__cell" aria-selected="false">10</button></div><div class="joy-time-picker__column"><button type="button" class="joy-time-picker__cell joy-time-picker__cell--selected" aria-selected="true">30</button><button type="button" class="joy-time-picker__cell" aria-selected="false">45</button></div></div></div>`)}</section>
     <section><h3>Mentions</h3>${sheetDemo(`<div class="joy-mentions"><textarea class="joy-textarea joy-mentions__textarea" aria-autocomplete="list" aria-expanded="true" aria-controls="mentions-list">@mi</textarea><ul class="joy-mentions__dropdown joy-overlay" id="mentions-list" role="listbox"><li class="joy-mentions__item joy-mentions__item--active" role="option" aria-selected="true"><span class="joy-mentions__item-label">Mina Lee</span></li><li class="joy-mentions__item" role="option" aria-selected="false"><span class="joy-mentions__item-label">Milo Chen</span></li></ul></div>`)}</section>
     <section><h3>Upload</h3><div class="joy-upload"><input type="file" hidden><div class="joy-upload-dragger" role="button" tabindex="0"><span class="joy-upload-dragger__icon">${chevronDown}</span><p class="joy-upload-dragger__text">Drop a file here</p><p class="joy-upload-dragger__hint">or browse your device</p></div><ul class="joy-upload-list"><li class="joy-upload-list__item"><span class="joy-upload-list__item-icon">${chevronRight}</span><span class="joy-upload-list__item-info">portfolio.csv</span><button type="button" class="joy-upload-list__item-remove" aria-label="Remove portfolio.csv">${closeIcon}</button></li></ul></div></section>
-    <section><h3>TreeSelect</h3>${sheetDemo(`<div class="joy-treeselect joy-treeselect--open"><div class="joy-treeselect__control" role="combobox" aria-expanded="true" aria-haspopup="tree" tabindex="0"><span class="joy-treeselect__tags"><span class="joy-treeselect__tag">Research<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove Research">${closeIcon}</button></span></span><span class="joy-treeselect__arrow">${chevronDown}</span></div><div class="joy-treeselect__panel joy-overlay joy-overlay--sheet" role="tree"><div class="joy-treeselect__node joy-treeselect__node--selected" role="treeitem" aria-expanded="true" aria-selected="true"><button type="button" class="joy-treeselect__node-toggle">${chevronDown}</button><span class="joy-treeselect__node-label">Research</span></div></div></div>`, true)}</section>
-    <section><h3>Cascader</h3>${sheetDemo(`<div class="joy-cascader joy-cascader--open"><div class="joy-cascader__control" role="combobox" aria-expanded="true" tabindex="0"><span class="joy-cascader__value">Markets / Futures</span><span class="joy-cascader__arrow">${chevronDown}</span></div><div class="joy-cascader__panel joy-overlay joy-overlay--sheet"><div class="joy-cascader__columns"><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" aria-expanded="true">Markets<span class="joy-cascader__item-arrow">${chevronRight}</span></li></ul><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item" role="menuitem" tabindex="-1">Futures</li></ul></div></div></div>`, true)}</section>
+    <section><h3>TreeSelect</h3>${sheetDemo(`<div class="joy-treeselect joy-treeselect--open"><div class="joy-treeselect__control" role="combobox" aria-expanded="true" aria-haspopup="tree" tabindex="0"><span class="joy-treeselect__tags"><span class="joy-treeselect__tag">Research<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove Research">${closeIcon}</button></span></span><button type="button" class="joy-treeselect__clear" aria-label="Clear selection">${closeIcon}</button><span class="joy-treeselect__arrow">${chevronDown}</span></div><div class="joy-treeselect__panel joy-overlay joy-overlay--sheet" role="tree"><div class="joy-treeselect__search-wrapper"><input type="search" class="joy-treeselect__search" placeholder="Search tree..." aria-label="Filter tree"></div><div class="joy-treeselect__node joy-treeselect__node--selected" role="treeitem" aria-expanded="true" aria-selected="true"><button type="button" class="joy-treeselect__node-toggle joy-treeselect__node-toggle--expanded" aria-label="Toggle node">${chevronRight}</button><span class="joy-treeselect__node-checkbox">${checkIcon}</span><span class="joy-treeselect__node-label">Research</span></div><div class="joy-treeselect__node" role="treeitem"><span class="joy-treeselect__indent-spacer"></span><span class="joy-treeselect__node-toggle"></span><span class="joy-treeselect__node-loading">${miniSpinner}</span><span class="joy-treeselect__node-label">Deep Learning</span></div></div></div>`, true)}</section>
+    <section><h3>Cascader</h3>${sheetDemo(`<div class="joy-cascader joy-cascader--open"><div class="joy-cascader__control" role="combobox" aria-expanded="true" tabindex="0"><span class="joy-cascader__value">Markets / Futures</span><button type="button" class="joy-cascader__clear" aria-label="Clear selection">${closeIcon}</button><span class="joy-cascader__arrow">${chevronDown}</span></div><div class="joy-cascader__panel joy-overlay joy-overlay--sheet"><div class="joy-cascader__columns"><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" aria-expanded="true">Markets<span class="joy-cascader__item-arrow">${chevronRight}</span></li><li class="joy-cascader__item" role="menuitem" tabindex="-1">Equities<span class="joy-cascader__item-arrow">${chevronRight}</span></li></ul><ul class="joy-cascader__column" role="menu"><li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="-1">Futures</li><li class="joy-cascader__item" role="menuitem" tabindex="-1"><span class="joy-cascader__item-loading">${miniSpinner}</span> Options</li></ul></div></div></div>`, true)}</section>
     <section><h3>Transfer</h3><div class="joy-transfer"><div class="joy-transfer__list"><div class="joy-transfer__header">${checkbox("Source")}<span class="joy-transfer__header-title">Available</span><span class="joy-transfer__header-count">1 item</span></div><div class="joy-transfer__body"><div class="joy-transfer__item joy-transfer__item--selected">${checkbox("Balanced")}</div></div></div><div class="joy-transfer__operations"><button type="button" class="joy-button joy-button--solid joy-button--sm joy-button--icon-only" aria-label="Move right">${chevronRight}</button><button type="button" class="joy-button joy-button--solid joy-button--sm joy-button--icon-only" aria-label="Move left">${chevronRight}</button></div><div class="joy-transfer__list"><div class="joy-transfer__header"><span class="joy-transfer__header-title">Selected</span><span class="joy-transfer__header-count">0 items</span></div><div class="joy-transfer__empty">No selected items</div></div></div></section>
     <section><h3>MarkdownEditor</h3><div class="joy-markdown-editor"><div class="joy-markdown-editor__toolbar" role="toolbar"><button type="button" class="joy-markdown-editor__tool" aria-label="Bold" aria-pressed="true">B</button><button type="button" class="joy-markdown-editor__tool" aria-label="Preview" aria-pressed="false">${chevronRight}</button></div><div class="joy-markdown-editor__panes joy-markdown-editor__panes--split"><textarea class="joy-textarea joy-markdown-editor__textarea"># Review</textarea><div class="joy-markdown-editor__preview"><h4>Review</h4><p>Semantic token coverage.</p></div></div></div></section>
     <script>document.querySelectorAll('[data-indeterminate="true"]').forEach((input) => { input.indeterminate = true; });</script>
@@ -598,6 +600,115 @@ const hubSelectSearchable = (wrapperId, listboxId) => {
         ${renderedOptions}
       </ul>
       <div class="joy-select__empty" style="display: none; padding: 12px; text-align: center; color: var(--joy-text-secondary); font-size: var(--joy-font-size-sm);">No matching pairs</div>
+    </div>
+  </div>`;
+};
+
+const hubCascaderInteractive = (id = "demo-cascader") => {
+  return `<div class="joy-cascader" id="${id}" style="position: relative; width: 100%;">
+    <div class="joy-cascader__control" role="combobox" aria-expanded="false" tabindex="0" onclick="toggleHubCascader('${id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHubCascader('${id}');}">
+      <span class="joy-cascader__value" id="${id}-val">Markets / Perpetual Futures / BTC-USDT</span>
+      <button type="button" class="joy-cascader__clear" aria-label="Clear selection" onclick="clearHubCascader(event, '${id}')">${closeIcon}</button>
+      <span class="joy-cascader__arrow">${chevronDown}</span>
+    </div>
+    <div class="joy-cascader__panel joy-overlay" id="${id}-panel" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: var(--joy-z-dropdown);">
+      <div class="joy-cascader__columns" id="${id}-cols">
+        <ul class="joy-cascader__column" role="menu">
+          <li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" onmouseenter="hoverHubCascaderCol('${id}', 0, 'markets')" onclick="hoverHubCascaderCol('${id}', 0, 'markets')">
+            Markets
+            <span class="joy-cascader__item-arrow">${chevronRight}</span>
+          </li>
+          <li class="joy-cascader__item" role="menuitem" tabindex="-1" onmouseenter="hoverHubCascaderCol('${id}', 0, 'options')" onclick="hoverHubCascaderCol('${id}', 0, 'options')">
+            Options Surface
+            <span class="joy-cascader__item-arrow">${chevronRight}</span>
+          </li>
+          <li class="joy-cascader__item" role="menuitem" tabindex="-1" onmouseenter="hoverHubCascaderCol('${id}', 0, 'yield')" onclick="hoverHubCascaderCol('${id}', 0, 'yield')">
+            Yield Vaults
+            <span class="joy-cascader__item-arrow">${chevronRight}</span>
+          </li>
+        </ul>
+        <ul class="joy-cascader__column" role="menu" id="${id}-col-1">
+          <li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" onmouseenter="hoverHubCascaderCol('${id}', 1, 'perp')" onclick="hoverHubCascaderCol('${id}', 1, 'perp')">
+            Perpetual Futures
+            <span class="joy-cascader__item-arrow">${chevronRight}</span>
+          </li>
+          <li class="joy-cascader__item" role="menuitem" tabindex="-1" onmouseenter="hoverHubCascaderCol('${id}', 1, 'spot')" onclick="hoverHubCascaderCol('${id}', 1, 'spot')">
+            Spot Liquidity
+            <span class="joy-cascader__item-arrow">${chevronRight}</span>
+          </li>
+          <li class="joy-cascader__item" role="menuitem" tabindex="-1">
+            <span class="joy-cascader__item-loading" aria-hidden="true">${miniSpinner}</span>
+            Loading Index...
+          </li>
+        </ul>
+        <ul class="joy-cascader__column" role="menu" id="${id}-col-2">
+          <li class="joy-cascader__item joy-cascader__item--active" role="menuitem" tabindex="0" onclick="selectHubCascaderLeaf('${id}', 'Markets / Perpetual Futures / BTC-USDT')">
+            BTC-USDT
+          </li>
+          <li class="joy-cascader__item" role="menuitem" tabindex="-1" onclick="selectHubCascaderLeaf('${id}', 'Markets / Perpetual Futures / ETH-USDT')">
+            ETH-USDT
+          </li>
+          <li class="joy-cascader__item" role="menuitem" tabindex="-1" onclick="selectHubCascaderLeaf('${id}', 'Markets / Perpetual Futures / SOL-USDT')">
+            SOL-USDT
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>`;
+};
+
+const hubTreeSelectInteractive = (id = "demo-treeselect") => {
+  return `<div class="joy-treeselect" id="${id}" style="position: relative; width: 100%;">
+    <div class="joy-treeselect__control" role="combobox" aria-expanded="false" tabindex="0" onclick="toggleHubTreeSelect('${id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHubTreeSelect('${id}');}">
+      <span class="joy-treeselect__tags" id="${id}-tags">
+        <span class="joy-treeselect__tag" data-val="research">Research<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove Research" onclick="removeHubTreeTag(event, '${id}', 'research')">${closeIcon}</button></span>
+        <span class="joy-treeselect__tag" data-val="quant">Quant Core<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove Quant Core" onclick="removeHubTreeTag(event, '${id}', 'quant')">${closeIcon}</button></span>
+      </span>
+      <button type="button" class="joy-treeselect__clear" aria-label="Clear selection" onclick="clearHubTreeSelect(event, '${id}')">${closeIcon}</button>
+      <span class="joy-treeselect__arrow">${chevronDown}</span>
+    </div>
+    <div class="joy-treeselect__panel joy-overlay" id="${id}-panel" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: var(--joy-z-dropdown); max-height: 280px; overflow-y: auto;">
+      <div class="joy-treeselect__search-wrapper" style="position: sticky; top: 0; background: var(--joy-surface-card); z-index: 1;">
+        <input type="search" class="joy-treeselect__search" id="${id}-search" placeholder="Search tree nodes..." aria-label="Search tree nodes" oninput="filterHubTreeSelect(this, '${id}')" onclick="event.stopPropagation()">
+      </div>
+      <div class="joy-treeselect__tree-body" id="${id}-nodes">
+        <div class="joy-treeselect__node joy-treeselect__node--selected" data-key="research" data-title="Research Division" onclick="toggleHubTreeNodeSelection(event, '${id}', 'research', 'Research Division')">
+          <button type="button" class="joy-treeselect__node-toggle joy-treeselect__node-toggle--expanded" aria-label="Toggle node" onclick="toggleHubTreeNodeCollapse(event, this)">${chevronRight}</button>
+          <span class="joy-treeselect__node-checkbox">${checkIcon}</span>
+          <span class="joy-treeselect__node-label">Research Division</span>
+        </div>
+        <div class="joy-treeselect__node joy-treeselect__node--selected" data-key="quant" data-parent="research" data-title="Quant Core" onclick="toggleHubTreeNodeSelection(event, '${id}', 'quant', 'Quant Core')">
+          <span class="joy-treeselect__indent-spacer"></span>
+          <button type="button" class="joy-treeselect__node-toggle" aria-label="Toggle node" onclick="toggleHubTreeNodeCollapse(event, this)">${chevronRight}</button>
+          <span class="joy-treeselect__node-checkbox">${checkIcon}</span>
+          <span class="joy-treeselect__node-label">Quant Core</span>
+        </div>
+        <div class="joy-treeselect__node" data-key="signals" data-parent="quant" data-title="Alpha Signals" onclick="toggleHubTreeNodeSelection(event, '${id}', 'signals', 'Alpha Signals')">
+          <span class="joy-treeselect__indent-spacer"></span>
+          <span class="joy-treeselect__indent-spacer"></span>
+          <span class="joy-treeselect__node-toggle"></span>
+          <span class="joy-treeselect__node-checkbox"></span>
+          <span class="joy-treeselect__node-label">Alpha Signals</span>
+        </div>
+        <div class="joy-treeselect__node" data-key="ml-loading" data-parent="research" data-title="Neural Models">
+          <span class="joy-treeselect__indent-spacer"></span>
+          <span class="joy-treeselect__node-toggle"></span>
+          <span class="joy-treeselect__node-loading">${miniSpinner}</span>
+          <span class="joy-treeselect__node-label">Neural Models (Async Syncing)</span>
+        </div>
+        <div class="joy-treeselect__node" data-key="infra" data-title="Trading Infrastructure" onclick="toggleHubTreeNodeSelection(event, '${id}', 'infra', 'Trading Infrastructure')">
+          <button type="button" class="joy-treeselect__node-toggle joy-treeselect__node-toggle--expanded" aria-label="Toggle node" onclick="toggleHubTreeNodeCollapse(event, this)">${chevronRight}</button>
+          <span class="joy-treeselect__node-checkbox"></span>
+          <span class="joy-treeselect__node-label">Trading Infrastructure</span>
+        </div>
+        <div class="joy-treeselect__node" data-key="fix" data-parent="infra" data-title="FIX Gateway" onclick="toggleHubTreeNodeSelection(event, '${id}', 'fix', 'FIX Gateway')">
+          <span class="joy-treeselect__indent-spacer"></span>
+          <span class="joy-treeselect__node-toggle"></span>
+          <span class="joy-treeselect__node-checkbox"></span>
+          <span class="joy-treeselect__node-label">FIX Gateway</span>
+        </div>
+        <div class="joy-treeselect__empty" id="${id}-empty" style="display: none; padding: 12px; text-align: center; color: var(--joy-text-muted); font-size: var(--joy-font-size-sm);">No matching nodes</div>
+      </div>
     </div>
   </div>`;
 };
@@ -5217,6 +5328,23 @@ ${navigationHtml}
             <div style="width: 100%;">
               <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 6px;">AUTO SMART SEARCH SELECT (&ge; 6 OPTIONS)</div>
               ${hubSelectSearchable("demo-instrument-select-wrap", "demo-instrument-listbox")}
+            </div>
+          </div>
+        </div>
+
+        <div class="playground-box" style="margin-top: 24px; overflow: visible;">
+          <div class="playground-header">
+            <h4>Advanced Hierarchical Selects: Cascader &amp; TreeSelect (Ant Design 5 Benchmark)</h4>
+          </div>
+          <div class="canvas" style="min-height: 580px; padding-bottom: 240px; flex-direction: column; max-width: 540px; margin: 0 auto; gap: 32px; overflow: visible;">
+            <div style="width: 100%;">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 6px;">CASCADER: MULTI-COLUMN HIERARCHICAL NAVIGATION (HOVER REVEAL &amp; ASYNC LOADING)</div>
+              ${hubCascaderInteractive("demo-cascader")}
+            </div>
+
+            <div style="width: 100%;">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 6px;">TREESELECT: HIERARCHICAL SEARCH &amp; MULTI-CHECKBOX SELECTION (AUTO-EXPAND BRANCHES)</div>
+              ${hubTreeSelectInteractive("demo-treeselect")}
             </div>
           </div>
         </div>
@@ -10741,6 +10869,180 @@ export async function executeHedge(symbol: string, size: number) {
       if (empty) empty.style.display = (q && visible === 0) ? 'block' : 'none';
     }
 
+    function toggleHubCascader(id) {
+      const root = document.getElementById(id);
+      if (!root) return;
+      const panel = document.getElementById(id + '-panel');
+      const ctrl = root.querySelector('.joy-cascader__control');
+      if (!panel || !ctrl) return;
+      const isOpen = panel.style.display !== 'none';
+      if (isOpen) {
+        panel.style.display = 'none';
+        root.classList.remove('joy-cascader--open');
+        ctrl.setAttribute('aria-expanded', 'false');
+      } else {
+        panel.style.display = 'block';
+        root.classList.add('joy-cascader--open');
+        ctrl.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function hoverHubCascaderCol(id, colIdx, key) {
+      const root = document.getElementById(id);
+      if (!root) return;
+      const cols = root.querySelectorAll('.joy-cascader__column');
+      if (colIdx >= cols.length) return;
+      const items = cols[colIdx].querySelectorAll('.joy-cascader__item');
+      items.forEach(it => it.classList.remove('joy-cascader__item--active'));
+      const target = event.currentTarget || event.target.closest('.joy-cascader__item');
+      if (target) target.classList.add('joy-cascader__item--active');
+    }
+
+    function selectHubCascaderLeaf(id, fullPath) {
+      const valEl = document.getElementById(id + '-val');
+      if (valEl) valEl.textContent = fullPath;
+      const root = document.getElementById(id);
+      const panel = document.getElementById(id + '-panel');
+      const ctrl = root ? root.querySelector('.joy-cascader__control') : null;
+      if (panel) panel.style.display = 'none';
+      if (root) root.classList.remove('joy-cascader--open');
+      if (ctrl) ctrl.setAttribute('aria-expanded', 'false');
+      showDemoToast('Cascader selected: ' + fullPath, 'info');
+    }
+
+    function clearHubCascader(e, id) {
+      e.stopPropagation();
+      const valEl = document.getElementById(id + '-val');
+      if (valEl) valEl.textContent = 'Select market path...';
+      showDemoToast('Cascader cleared', 'info');
+    }
+
+    function toggleHubTreeSelect(id) {
+      const root = document.getElementById(id);
+      if (!root) return;
+      const panel = document.getElementById(id + '-panel');
+      const ctrl = root.querySelector('.joy-treeselect__control');
+      if (!panel || !ctrl) return;
+      const isOpen = panel.style.display !== 'none';
+      if (isOpen) {
+        panel.style.display = 'none';
+        root.classList.remove('joy-treeselect--open');
+        ctrl.setAttribute('aria-expanded', 'false');
+      } else {
+        panel.style.display = 'block';
+        root.classList.add('joy-treeselect--open');
+        ctrl.setAttribute('aria-expanded', 'true');
+        const searchInput = document.getElementById(id + '-search');
+        if (searchInput) setTimeout(() => searchInput.focus(), 50);
+      }
+    }
+
+    function filterHubTreeSelect(input, id) {
+      const q = (input.value || '').trim().toLowerCase();
+      const root = document.getElementById(id);
+      if (!root) return;
+      const nodes = root.querySelectorAll('.joy-treeselect__node');
+      const empty = document.getElementById(id + '-empty');
+      let visible = 0;
+      nodes.forEach(node => {
+        const title = (node.getAttribute('data-title') || '').toLowerCase();
+        const match = !q || title.includes(q);
+        if (match) {
+          node.style.display = '';
+          visible++;
+          const parentKey = node.getAttribute('data-parent');
+          if (parentKey && q) {
+            const parentNode = root.querySelector('.joy-treeselect__node[data-key="' + parentKey + '"]');
+            if (parentNode) {
+              parentNode.style.display = '';
+              const toggleBtn = parentNode.querySelector('.joy-treeselect__node-toggle');
+              if (toggleBtn) toggleBtn.classList.add('joy-treeselect__node-toggle--expanded');
+            }
+          }
+        } else {
+          const key = node.getAttribute('data-key');
+          const hasMatchingChild = q && Array.from(nodes).some(n => n.getAttribute('data-parent') === key && (n.getAttribute('data-title') || '').toLowerCase().includes(q));
+          if (hasMatchingChild) {
+            node.style.display = '';
+            visible++;
+            const toggleBtn = node.querySelector('.joy-treeselect__node-toggle');
+            if (toggleBtn) toggleBtn.classList.add('joy-treeselect__node-toggle--expanded');
+          } else {
+            node.style.display = q ? 'none' : '';
+          }
+        }
+      });
+      if (empty) empty.style.display = (q && visible === 0) ? 'block' : 'none';
+    }
+
+    function toggleHubTreeNodeCollapse(e, btn) {
+      e.stopPropagation();
+      btn.classList.toggle('joy-treeselect__node-toggle--expanded');
+      const parentNode = btn.closest('.joy-treeselect__node');
+      if (!parentNode) return;
+      const key = parentNode.getAttribute('data-key');
+      const isExpanded = btn.classList.contains('joy-treeselect__node-toggle--expanded');
+      const treeBody = parentNode.closest('.joy-treeselect__tree-body');
+      if (treeBody && key) {
+        treeBody.querySelectorAll('.joy-treeselect__node[data-parent="' + key + '"]').forEach(child => {
+          child.style.display = isExpanded ? '' : 'none';
+        });
+      }
+    }
+
+    function toggleHubTreeNodeSelection(e, id, key, label) {
+      if (e.target.closest('.joy-treeselect__node-toggle')) return;
+      const nodeEl = e.currentTarget || e.target.closest('.joy-treeselect__node');
+      if (!nodeEl) return;
+      const isSelected = nodeEl.classList.toggle('joy-treeselect__node--selected');
+      const checkbox = nodeEl.querySelector('.joy-treeselect__node-checkbox');
+      if (checkbox) {
+        checkbox.innerHTML = isSelected ? ${JSON.stringify(checkIcon)} : '';
+      }
+      const tagsContainer = document.getElementById(id + '-tags');
+      if (tagsContainer) {
+        let existingTag = tagsContainer.querySelector('.joy-treeselect__tag[data-val="' + key + '"]');
+        if (isSelected && !existingTag) {
+          const newTag = document.createElement('span');
+          newTag.className = 'joy-treeselect__tag';
+          newTag.setAttribute('data-val', key);
+          newTag.innerHTML = label + '<button type="button" class="joy-treeselect__tag-remove" aria-label="Remove ' + label + '" onclick="removeHubTreeTag(event, \\'' + id + '\\', \\'' + key + '\\')">' + ${JSON.stringify(closeIcon)} + '</button>';
+          tagsContainer.appendChild(newTag);
+        } else if (!isSelected && existingTag) {
+          existingTag.remove();
+        }
+      }
+      showDemoToast((isSelected ? 'Selected ' : 'Deselected ') + label, 'info');
+    }
+
+    function removeHubTreeTag(e, id, key) {
+      e.stopPropagation();
+      const root = document.getElementById(id);
+      if (!root) return;
+      const tag = root.querySelector('.joy-treeselect__tag[data-val="' + key + '"]');
+      if (tag) tag.remove();
+      const node = root.querySelector('.joy-treeselect__node[data-key="' + key + '"]');
+      if (node) {
+        node.classList.remove('joy-treeselect__node--selected');
+        const cb = node.querySelector('.joy-treeselect__node-checkbox');
+        if (cb) cb.innerHTML = '';
+      }
+    }
+
+    function clearHubTreeSelect(e, id) {
+      e.stopPropagation();
+      const root = document.getElementById(id);
+      if (!root) return;
+      const tagsContainer = document.getElementById(id + '-tags');
+      if (tagsContainer) tagsContainer.innerHTML = '';
+      root.querySelectorAll('.joy-treeselect__node--selected').forEach(node => {
+        node.classList.remove('joy-treeselect__node--selected');
+        const cb = node.querySelector('.joy-treeselect__node-checkbox');
+        if (cb) cb.innerHTML = '';
+      });
+      showDemoToast('TreeSelect cleared', 'info');
+    }
+
     document.addEventListener('pointerdown', function (e) {
       document.querySelectorAll('[data-hub-panel]:not([hidden])').forEach(function (p) {
         const root = p.closest('.joy-popconfirm, .joy-dropdown-wrapper');
@@ -10752,6 +11054,24 @@ export async function executeHedge(symbol: string, size: number) {
           if (lb) lb.style.display = 'none';
           const b = sw.querySelector('.joy-select');
           if (b) b.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.querySelectorAll('.joy-cascader').forEach(function (c) {
+        if (!c.contains(e.target)) {
+          const p = c.querySelector('.joy-cascader__panel');
+          if (p) p.style.display = 'none';
+          c.classList.remove('joy-cascader--open');
+          const ctrl = c.querySelector('.joy-cascader__control');
+          if (ctrl) ctrl.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.querySelectorAll('.joy-treeselect').forEach(function (ts) {
+        if (!ts.contains(e.target)) {
+          const p = ts.querySelector('.joy-treeselect__panel');
+          if (p) p.style.display = 'none';
+          ts.classList.remove('joy-treeselect--open');
+          const ctrl = ts.querySelector('.joy-treeselect__control');
+          if (ctrl) ctrl.setAttribute('aria-expanded', 'false');
         }
       });
     });

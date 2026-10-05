@@ -11,6 +11,7 @@ export interface TreeNode {
   disabled?: boolean;
   children?: TreeNode[];
   icon?: React.ReactNode;
+  loading?: boolean;
 }
 
 export interface TreeSelectProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -22,6 +23,8 @@ export interface TreeSelectProps extends React.HTMLAttributes<HTMLDivElement> {
   allowClear?: boolean;
   disabled?: boolean;
   treeDefaultExpandAll?: boolean;
+  searchable?: boolean | 'auto';
+  searchPlaceholder?: string;
   onChange?: (value: any, node?: any) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -60,6 +63,8 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
       allowClear = true,
       disabled = false,
       treeDefaultExpandAll = true,
+      searchable = 'auto',
+      searchPlaceholder = 'Search tree...',
       onChange,
       className = '',
       style,
@@ -68,6 +73,7 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
     ref
   ) => {
     const [open, setOpen] = React.useState(false);
+    const [searchQuery, setSearchQuery] = React.useState('');
     const [internalValue, setInternalValue] = React.useState<string | string[]>(() => {
       if (defaultValue !== undefined) return defaultValue;
       return multiple ? [] : '';
@@ -93,7 +99,55 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
     const controlRef = React.useRef<HTMLDivElement | null>(null);
     const panelRef = React.useRef<HTMLDivElement | null>(null);
 
-    useOverlay(open, controlRef, panelRef, () => setOpen(false));
+    useOverlay(open, controlRef, panelRef, () => {
+      setOpen(false);
+      setSearchQuery('');
+    });
+
+    const isSearchable = searchable === true || (searchable === 'auto' && treeData.length >= 6);
+
+    const filterTree = (nodes: TreeNode[], q: string): TreeNode[] => {
+      if (!q.trim()) return nodes;
+      const term = q.trim().toLowerCase();
+      const res: TreeNode[] = [];
+      for (const n of nodes) {
+        const titleMatches = (n.title || '').toLowerCase().includes(term);
+        const filteredKids = n.children ? filterTree(n.children, q) : [];
+        if (titleMatches || filteredKids.length > 0) {
+          res.push({
+            ...n,
+            children: filteredKids.length > 0 ? filteredKids : n.children
+          });
+        }
+      }
+      return res;
+    };
+
+    const displayTreeData = React.useMemo(() => {
+      return filterTree(treeData, searchQuery);
+    }, [treeData, searchQuery]);
+
+    React.useEffect(() => {
+      if (searchQuery.trim()) {
+        const matchingKeys = new Set<string>();
+        const collect = (nodes: TreeNode[]) => {
+          for (const n of nodes) {
+            if (n.children && n.children.length > 0) {
+              const term = searchQuery.trim().toLowerCase();
+              const hasMatch = n.children.some((c) => (c.title || '').toLowerCase().includes(term));
+              if (hasMatch) matchingKeys.add(n.key);
+              collect(n.children);
+            }
+          }
+        };
+        collect(treeData);
+        setExpandedKeys((prev) => {
+          const next = new Set(prev);
+          matchingKeys.forEach((k) => next.add(k));
+          return next;
+        });
+      }
+    }, [searchQuery, treeData]);
 
     const selectedValue = controlledValue !== undefined ? controlledValue : internalValue;
 
@@ -108,8 +162,8 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
     );
 
     const visibleNodes = React.useMemo(
-      () => getVisibleNodes(treeData, expandedKeys),
-      [treeData, expandedKeys]
+      () => getVisibleNodes(displayTreeData, expandedKeys),
+      [displayTreeData, expandedKeys]
     );
 
     React.useEffect(() => {
@@ -266,26 +320,33 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
                 selected && 'joy-treeselect__node--selected',
                 node.disabled && 'joy-treeselect__node--disabled'
               )}
-              style={level > 0 ? { paddingLeft: 8 + level * 16 } : undefined}
               onClick={() => handleSelectNode(node)}
             >
+              {Array.from({ length: level }).map((_, li) => (
+                <span key={li} className="joy-treeselect__indent-spacer" aria-hidden="true" />
+              ))}
               {hasChildren ? (
                 <button
                   type="button"
-                  className="joy-treeselect__node-toggle"
+                  className={cx(
+                    'joy-treeselect__node-toggle',
+                    isExpanded && 'joy-treeselect__node-toggle--expanded'
+                  )}
                   aria-label={isExpanded ? 'Collapse node' : 'Expand node'}
                   onClick={(e) => toggleExpand(e, node.key)}
                 >
-                  <ChevronRight
-                    width={12}
-                    height={12}
-                    style={{
-                      transform: isExpanded ? 'rotate(90deg)' : 'none'
-                    }}
-                  />
+                  <ChevronRight width={12} height={12} />
                 </button>
               ) : (
-                <span style={{ width: 24, display: 'inline-block', flexShrink: 0 }} />
+                <span className="joy-treeselect__node-toggle" aria-hidden="true" />
+              )}
+
+              {node.loading && (
+                <span className="joy-treeselect__node-loading" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                </span>
               )}
 
               {multiple && (
@@ -375,11 +436,23 @@ export const TreeSelect = React.forwardRef<HTMLDivElement, TreeSelectProps>(
             className="joy-treeselect__panel joy-overlay"
             tabIndex={-1}
           >
-            {treeData.length > 0 ? (
-              renderTreeNodes(treeData)
+            {isSearchable && (
+              <div className="joy-treeselect__search-wrapper" role="presentation">
+                <input
+                  type="search"
+                  className="joy-treeselect__search"
+                  placeholder={searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label={searchPlaceholder}
+                />
+              </div>
+            )}
+            {displayTreeData.length > 0 ? (
+              renderTreeNodes(displayTreeData)
             ) : (
-              <div style={{ padding: 12, textAlign: 'center' }}>
-                No options available
+              <div className="joy-treeselect__empty" role="presentation">
+                {searchQuery.trim() ? 'No options found' : 'No options available'}
               </div>
             )}
           </div>
