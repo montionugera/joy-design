@@ -1,0 +1,22 @@
+{
+  "component": "Rate",
+  "targets": {
+    "react": "JoyRate",
+    "svelte": "Rate",
+    "flutter": "JoyRate"
+  },
+  "props": {
+    "value": { "type": "number", "default": 0 },
+    "count": { "type": "number", "default": 5 },
+    "allowHalf": { "type": "boolean", "default": false },
+    "disabled": { "type": "boolean", "default": false },
+    "readonly": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "component": "Switch",
+  "targets": {
+    "react": "JoySwitch",
+    "svelte": "Switch",
+    "flutter": "JoySwitch"
+  },
+  "sizes": ["sm", "md"],
+  "props": {
+    "checked": { "type": "boolean", "default": false },
+    "disabled": { "type": "boolean", "default": false },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md"],
+      "default": "md"
+    },
+    "label": { "type": "string" }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}

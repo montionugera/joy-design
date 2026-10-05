@@ -1,0 +1,33 @@
+{
+  "component": "Badge",
+  "targets": {
+    "react": "JoyBadge",
+    "svelte": "Badge",
+    "flutter": "JoyBadge"
+  },
+  "variants": ["defaultStatus", "success", "warning", "danger", "info"],
+  "sizes": ["sm", "md"],
+  "props": {
+    "status": {
+      "type": "enum",
+      "values": ["defaultStatus", "success", "warning", "danger", "info"],
+      "default": "defaultStatus"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md"],
+      "default": "md"
+    },
+    "count": { "type": "number" },
+    "overflowCount": { "type": "number", "default": 99 },
+    "dot": { "type": "boolean", "default": false },
+    "showZero": { "type": "boolean", "default": false }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}
