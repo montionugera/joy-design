@@ -712,9 +712,10 @@
     "title": "Slice 0: Foundation & Walking Skeleton",
     "from_idea": "I-063",
     "created_at": "2026-10-05T11:01:26.235629+00:00",
-    "claimed_by": null,
-    "status": "open",
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
     "release_version": null,
-    "epic": "E-002"
+    "epic": "E-002",
+    "claimed_at": "2026-10-05T11:01:29.694595+00:00"
   }
 ]
