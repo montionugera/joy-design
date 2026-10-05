@@ -33,6 +33,13 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
   String _breadcrumbNavigated = 'Workspace';
   int _stepsHorizontalCurrent = 1;
   int _stepsVerticalCurrent = 2;
+  Set<Object> _selectedPositions = {'1', '2'};
+  String? _positionsSortKey = 'symbol';
+  JoySortDirection _positionsSortDirection = JoySortDirection.asc;
+  JoyTableVariant _positionsTableVariant = JoyTableVariant.auto;
+  JoyCandleData? _hoveredCandle;
+  JoyPointData? _hoveredPoint;
+  JoyBarData? _hoveredBar;
 
   @override
   void initState() {
@@ -107,6 +114,10 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                     _buildNotificationsSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
                     _buildNavigationAndWorkflowSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildTableAndMetricsSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildFinancialChartsSection(tokens),
                   ],
                 ),
               ),
@@ -1094,7 +1105,7 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                     context,
                     title: const Text('Invoice Paid'),
                     description: const Text(
-                      'Payment received for invoice #2026-09. Receipt sent to billing contact.',
+                      'Payment received for invoice INV-2026-09. Receipt sent to billing contact.',
                     ),
                     type: JoyNotificationType.success,
                   );
@@ -1459,6 +1470,557 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
     );
   }
 
+  Widget _buildTableAndMetricsSection(JoyThemeTokens tokens) {
+    final sortedPositions = List<_HubPositionRecord>.from(_hubPositions);
+    if (_positionsSortKey != null && _positionsSortDirection != JoySortDirection.none) {
+      sortedPositions.sort((a, b) {
+        int cmp = 0;
+        switch (_positionsSortKey) {
+          case 'symbol':
+            cmp = a.symbol.compareTo(b.symbol);
+          case 'size':
+            cmp = a.size.compareTo(b.size);
+          case 'entryPrice':
+            cmp = a.entryPrice.compareTo(b.entryPrice);
+          case 'markPrice':
+            cmp = a.markPrice.compareTo(b.markPrice);
+          case 'pnl':
+            cmp = a.pnl.compareTo(b.pnl);
+          case 'pnlPercent':
+            cmp = a.pnlPercent.compareTo(b.pnlPercent);
+          default:
+            cmp = 0;
+        }
+        return _positionsSortDirection == JoySortDirection.asc ? cmp : -cmp;
+      });
+    }
+
+    final columns = [
+      JoyTableColumn<_HubPositionRecord>(
+        key: 'symbol',
+        title: 'Contract',
+        sortable: true,
+        render: (context, record, index) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              record.symbol,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: tokens.text.primary,
+              ),
+            ),
+            Text(
+              record.assetName,
+              style: TextStyle(
+                fontSize: 11.0,
+                color: tokens.text.secondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+      JoyTableColumn<_HubPositionRecord>(
+        key: 'side',
+        title: 'Side',
+        render: (context, record, index) {
+          final isLong = record.side == 'LONG';
+          return Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: JoySpacing.s8,
+              vertical: JoySpacing.s2,
+            ),
+            decoration: BoxDecoration(
+              color: isLong ? tokens.status.successBg : tokens.status.dangerBg,
+              borderRadius: BorderRadius.circular(JoyRadius.control),
+            ),
+            child: Text(
+              record.side,
+              style: TextStyle(
+                fontSize: 11.0,
+                fontWeight: FontWeight.w600,
+                color: isLong ? tokens.status.successFg : tokens.status.dangerFg,
+              ),
+            ),
+          );
+        },
+      ),
+      JoyTableColumn<_HubPositionRecord>(
+        key: 'size',
+        title: 'Size',
+        sortable: true,
+        align: TextAlign.right,
+        render: (context, record, index) => Text(
+          record.size.toStringAsFixed(record.size >= 10 ? 0 : 2),
+          style: TextStyle(color: tokens.text.primary),
+        ),
+      ),
+      JoyTableColumn<_HubPositionRecord>(
+        key: 'entryPrice',
+        title: 'Entry Price',
+        sortable: true,
+        align: TextAlign.right,
+        render: (context, record, index) => Text(
+          '\$${record.entryPrice.toStringAsFixed(2)}',
+          style: TextStyle(color: tokens.text.secondary),
+        ),
+      ),
+      JoyTableColumn<_HubPositionRecord>(
+        key: 'markPrice',
+        title: 'Mark Price',
+        sortable: true,
+        align: TextAlign.right,
+        render: (context, record, index) => Text(
+          '\$${record.markPrice.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: tokens.text.primary,
+          ),
+        ),
+      ),
+      JoyTableColumn<_HubPositionRecord>(
+        key: 'pnl',
+        title: 'Unrealized PnL',
+        sortable: true,
+        align: TextAlign.right,
+        render: (context, record, index) {
+          final isPositive = record.pnl >= 0;
+          final prefix = isPositive ? '+\$' : '-\$';
+          final absVal = record.pnl.abs().toStringAsFixed(2);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$prefix$absVal',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: isPositive ? tokens.status.successFg : tokens.status.dangerFg,
+                ),
+              ),
+              Text(
+                '${isPositive ? '+' : ''}${record.pnlPercent.toStringAsFixed(2)}%',
+                style: TextStyle(
+                  fontSize: 11.0,
+                  color: isPositive ? tokens.status.successFg : tokens.status.dangerFg,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    ];
+
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'High-Density Table & Financial Metrics',
+      subtitle: 'Adaptive responsive data tables, KPI metric tiles, and financial stat cards',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. KPI Metric Tiles
+          Text(
+            'JoyMetricTile (KPI Metrics with Positive, Negative, and Neutral Deltas)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          Wrap(
+            spacing: JoySpacing.s16,
+            runSpacing: JoySpacing.s16,
+            children: [
+              SizedBox(
+                width: 260.0,
+                child: JoyMetricTile(
+                  title: 'Total Portfolio Equity',
+                  value: '\$1,482,900',
+                  delta: 8.4,
+                  deltaPeriod: 'vs yesterday',
+                  trend: JoyMetricTrend.up,
+                  onTap: () {},
+                ),
+              ),
+              SizedBox(
+                width: 260.0,
+                child: JoyMetricTile(
+                  title: 'Maximum Drawdown',
+                  value: '-\$42,150',
+                  delta: -3.2,
+                  deltaPeriod: 'vs 30d peak',
+                  trend: JoyMetricTrend.down,
+                  onTap: () {},
+                ),
+              ),
+              SizedBox(
+                width: 260.0,
+                child: JoyMetricTile(
+                  title: 'Allocated Collateral',
+                  value: '\$250,000',
+                  delta: 0.0,
+                  deltaPeriod: 'target neutral',
+                  trend: JoyMetricTrend.neutral,
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: JoySpacing.s24),
+
+          // 2. JoyStatCard KPI Cards
+          Text(
+            'JoyStatCard (Enterprise Financial Cards with Eyebrow and Strategy Footers)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          Wrap(
+            spacing: JoySpacing.s16,
+            runSpacing: JoySpacing.s16,
+            children: [
+              SizedBox(
+                width: 260.0,
+                child: JoyStatCard(
+                  eyebrow: 'ALPHA STRATEGY',
+                  title: 'Net Realized Return',
+                  value: '+\$94,800',
+                  delta: 8.4,
+                  deltaPeriod: 'YTD Alpha',
+                  trend: JoyMetricTrend.up,
+                  footer: Text(
+                    'Outperforming benchmark by +4.2%',
+                    style: TextStyle(fontSize: 11.0, color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 260.0,
+                child: JoyStatCard(
+                  eyebrow: 'RISK EXPOSURE',
+                  title: 'Overnight VAR (99%)',
+                  value: '-\$12,400',
+                  delta: -3.2,
+                  deltaPeriod: 'risk factor',
+                  trend: JoyMetricTrend.down,
+                  footer: Text(
+                    'Well inside 5% capital risk ceiling',
+                    style: TextStyle(fontSize: 11.0, color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 260.0,
+                child: JoyStatCard(
+                  eyebrow: 'TREASURY REBALANCE',
+                  title: 'Target Cash Reserve',
+                  value: '\$500,000',
+                  delta: 0.0,
+                  deltaPeriod: 'balanced pool',
+                  trend: JoyMetricTrend.neutral,
+                  footer: Text(
+                    'Fully collateralized across vaults',
+                    style: TextStyle(fontSize: 11.0, color: tokens.text.secondary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 3. Interactive JoyTable
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Financial Positions & Orders (High-Density Adaptive Table)',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                  color: tokens.text.primary,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Layout View: ',
+                    style: TextStyle(
+                      fontSize: 12.0,
+                      color: tokens.text.secondary,
+                    ),
+                  ),
+                  const SizedBox(width: JoySpacing.s8),
+                  JoySegmented<String>(
+                    value: _positionsTableVariant == JoyTableVariant.auto
+                        ? 'auto'
+                        : _positionsTableVariant == JoyTableVariant.table
+                            ? 'table'
+                            : 'stack',
+                    size: JoySegmentedSize.sm,
+                    options: const [
+                      JoySegmentedOption(value: 'auto', labelText: 'Adaptive'),
+                      JoySegmentedOption(value: 'table', labelText: 'Table'),
+                      JoySegmentedOption(value: 'stack', labelText: 'Mobile Cards'),
+                    ],
+                    onChanged: (val) {
+                      setState(() {
+                        if (val == 'auto') _positionsTableVariant = JoyTableVariant.auto;
+                        if (val == 'table') _positionsTableVariant = JoyTableVariant.table;
+                        if (val == 'stack') _positionsTableVariant = JoyTableVariant.stack;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoyTable<_HubPositionRecord>(
+            columns: columns,
+            dataSource: sortedPositions,
+            rowKey: (r) => r.id,
+            striped: true,
+            bordered: true,
+            variant: _positionsTableVariant,
+            sortColumnKey: _positionsSortKey,
+            sortDirection: _positionsSortDirection,
+            selectedRowKeys: _selectedPositions,
+            onSelectionChanged: (selected) {
+              setState(() {
+                _selectedPositions = selected;
+              });
+            },
+            onSort: (colKey, dir) {
+              setState(() {
+                _positionsSortKey = colKey;
+                _positionsSortDirection = dir;
+              });
+            },
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Text(
+            'Selected positions: ${_selectedPositions.length} of ${_hubPositions.length} rows | Sorted by: ${_positionsSortKey ?? "none"} (${_positionsSortDirection.name})',
+            style: TextStyle(
+              fontSize: 12.0,
+              color: tokens.text.secondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialChartsSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Financial & Trading Charts',
+      subtitle: 'Interactive Canvas OHLC candlesticks, timeseries curves with area fills, and volume bars',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Candlestick Chart
+          Text(
+            'JoyCandlestickChart (Live OHLC with Canvas HUD Banner & Magnetic Crosshair)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: JoySpacing.s16,
+              vertical: JoySpacing.s12,
+            ),
+            decoration: BoxDecoration(
+              color: tokens.surface.sunken,
+              borderRadius: BorderRadius.circular(JoyRadius.control),
+              border: Border.all(color: tokens.border.subtle),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'HUD TELEMETRY: ',
+                      style: TextStyle(
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                        color: tokens.accent.base,
+                      ),
+                    ),
+                    Text(
+                      _hoveredCandle != null
+                          ? '${formatCandleTime(_hoveredCandle!.time)} | O: \$${_hoveredCandle!.open.toStringAsFixed(2)}  H: \$${_hoveredCandle!.high.toStringAsFixed(2)}  L: \$${_hoveredCandle!.low.toStringAsFixed(2)}  C: \$${_hoveredCandle!.close.toStringAsFixed(2)}  Vol: ${_hoveredCandle!.volume}'
+                          : 'Hover over candlestick bars to inspect OHLC tick telemetry',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w500,
+                        color: tokens.text.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                if (_hoveredCandle != null)
+                  Text(
+                    _hoveredCandle!.isBull ? '+BULL' : '-BEAR',
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      fontWeight: FontWeight.w700,
+                      color: _hoveredCandle!.isBull
+                          ? tokens.status.successFg
+                          : tokens.status.dangerFg,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoyCandlestickChart(
+            data: _hubCandleData,
+            height: 360.0,
+            showGrid: true,
+            showCrosshair: true,
+            onHover: (candle) {
+              setState(() {
+                _hoveredCandle = candle;
+              });
+            },
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 2. Line Chart
+          Text(
+            'JoyLineChart (Smooth Timeseries Curve with Gradient Area Fill & Hover Crosshair)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: JoySpacing.s16,
+              vertical: JoySpacing.s12,
+            ),
+            decoration: BoxDecoration(
+              color: tokens.surface.sunken,
+              borderRadius: BorderRadius.circular(JoyRadius.control),
+              border: Border.all(color: tokens.border.subtle),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'LINE TELEMETRY: ',
+                  style: TextStyle(
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: tokens.accent.base,
+                  ),
+                ),
+                Text(
+                  _hoveredPoint != null
+                      ? 'Point ${_hoveredPoint!.x.toInt() + 1} (${_hoveredPoint!.label ?? ""}) | Price: \$${_hoveredPoint!.y.toStringAsFixed(2)}'
+                      : 'Hover over curve to activate magnetic tooltip crosshair',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w500,
+                    color: tokens.text.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoyLineChart(
+            data: _hubLinePoints,
+            height: 320.0,
+            showGrid: true,
+            showArea: true,
+            onHover: (point) {
+              setState(() {
+                _hoveredPoint = point;
+              });
+            },
+          ),
+
+          const SizedBox(height: JoySpacing.s32),
+
+          // 3. Bar Chart
+          Text(
+            'JoyBarChart (Asset Category Volumes with Rounded Bar Tops & Category Labels)',
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+              color: tokens.text.primary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s8),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: JoySpacing.s16,
+              vertical: JoySpacing.s12,
+            ),
+            decoration: BoxDecoration(
+              color: tokens.surface.sunken,
+              borderRadius: BorderRadius.circular(JoyRadius.control),
+              border: Border.all(color: tokens.border.subtle),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'VOLUME TELEMETRY: ',
+                  style: TextStyle(
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: tokens.accent.base,
+                  ),
+                ),
+                Text(
+                  _hoveredBar != null
+                      ? '${_hoveredBar!.category}: ${_hoveredBar!.label ?? _hoveredBar!.value.toStringAsFixed(1)}'
+                      : 'Hover over bars to inspect category trade volume',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w500,
+                    color: tokens.text.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s12),
+          JoyBarChart(
+            data: _hubBarData,
+            height: 280.0,
+            showGrid: true,
+            onHover: (bar) {
+              setState(() {
+                _hoveredBar = bar;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionCard({
     required JoyThemeTokens tokens,
     required String title,
@@ -1498,3 +2060,190 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
     );
   }
 }
+
+class _HubPositionRecord {
+  final String id;
+  final String symbol;
+  final String assetName;
+  final String side;
+  final double size;
+  final double entryPrice;
+  final double markPrice;
+  final double pnl;
+  final double pnlPercent;
+
+  const _HubPositionRecord({
+    required this.id,
+    required this.symbol,
+    required this.assetName,
+    required this.side,
+    required this.size,
+    required this.entryPrice,
+    required this.markPrice,
+    required this.pnl,
+    required this.pnlPercent,
+  });
+}
+
+final _hubPositions = [
+  const _HubPositionRecord(
+    id: '1',
+    symbol: 'AAPL',
+    assetName: 'Apple Inc.',
+    side: 'LONG',
+    size: 250,
+    entryPrice: 172.50,
+    markPrice: 184.20,
+    pnl: 2925.00,
+    pnlPercent: 6.78,
+  ),
+  const _HubPositionRecord(
+    id: '2',
+    symbol: 'NVDA',
+    assetName: 'NVIDIA Corp.',
+    side: 'LONG',
+    size: 120,
+    entryPrice: 420.00,
+    markPrice: 485.40,
+    pnl: 7848.00,
+    pnlPercent: 15.57,
+  ),
+  const _HubPositionRecord(
+    id: '3',
+    symbol: 'TSLA',
+    assetName: 'Tesla Inc.',
+    side: 'SHORT',
+    size: 180,
+    entryPrice: 245.00,
+    markPrice: 252.80,
+    pnl: -1404.00,
+    pnlPercent: -3.18,
+  ),
+  const _HubPositionRecord(
+    id: '4',
+    symbol: 'BTC/USD',
+    assetName: 'Bitcoin Index',
+    side: 'LONG',
+    size: 2.5,
+    entryPrice: 62400.00,
+    markPrice: 65120.00,
+    pnl: 6800.00,
+    pnlPercent: 4.36,
+  ),
+  const _HubPositionRecord(
+    id: '5',
+    symbol: 'ETH/USD',
+    assetName: 'Ethereum Index',
+    side: 'SHORT',
+    size: 35.0,
+    entryPrice: 3450.00,
+    markPrice: 3410.00,
+    pnl: 1400.00,
+    pnlPercent: 1.16,
+  ),
+];
+
+final _hubCandleData = [
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 9, 30),
+    open: 178.20,
+    high: 180.50,
+    low: 177.80,
+    close: 179.90,
+    volume: 142000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 10, 0),
+    open: 179.90,
+    high: 182.10,
+    low: 179.40,
+    close: 181.60,
+    volume: 185000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 10, 30),
+    open: 181.60,
+    high: 182.40,
+    low: 180.10,
+    close: 180.80,
+    volume: 98000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 11, 0),
+    open: 180.80,
+    high: 183.50,
+    low: 180.50,
+    close: 183.20,
+    volume: 210000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 11, 30),
+    open: 183.20,
+    high: 184.00,
+    low: 182.20,
+    close: 183.80,
+    volume: 130000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 12, 0),
+    open: 183.80,
+    high: 184.50,
+    low: 182.90,
+    close: 184.10,
+    volume: 115000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 12, 30),
+    open: 184.10,
+    high: 185.20,
+    low: 183.60,
+    close: 184.90,
+    volume: 160000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 13, 0),
+    open: 184.90,
+    high: 186.10,
+    low: 184.30,
+    close: 185.80,
+    volume: 245000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 13, 30),
+    open: 185.80,
+    high: 186.40,
+    low: 184.80,
+    close: 185.20,
+    volume: 175000,
+  ),
+  JoyCandleData(
+    time: DateTime.utc(2026, 10, 5, 14, 0),
+    open: 185.20,
+    high: 187.00,
+    low: 185.00,
+    close: 186.75,
+    volume: 310000,
+  ),
+];
+
+const _hubLinePoints = [
+  JoyPointData(x: 0, y: 175.20, label: '09:30'),
+  JoyPointData(x: 1, y: 177.80, label: '10:00'),
+  JoyPointData(x: 2, y: 176.90, label: '10:30'),
+  JoyPointData(x: 3, y: 180.40, label: '11:00'),
+  JoyPointData(x: 4, y: 182.10, label: '11:30'),
+  JoyPointData(x: 5, y: 181.50, label: '12:00'),
+  JoyPointData(x: 6, y: 184.20, label: '12:30'),
+  JoyPointData(x: 7, y: 183.90, label: '13:00'),
+  JoyPointData(x: 8, y: 186.30, label: '13:30'),
+  JoyPointData(x: 9, y: 188.50, label: '14:00'),
+];
+
+const _hubBarData = [
+  JoyBarData(category: 'Equities', value: 1420.0, label: '\$1.42M'),
+  JoyBarData(category: 'Crypto', value: 890.0, label: '\$890K'),
+  JoyBarData(category: 'Forex', value: 650.0, label: '\$650K'),
+  JoyBarData(category: 'Commodities', value: 480.0, label: '\$480K'),
+  JoyBarData(category: 'Options', value: 1120.0, label: '\$1.12M'),
+  JoyBarData(category: 'Bonds', value: 310.0, label: '\$310K'),
+];

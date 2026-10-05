@@ -1,0 +1,33 @@
+{
+  "component": "Table",
+  "targets": {
+    "react": "JoyTable",
+    "svelte": "Table",
+    "flutter": "JoyTable"
+  },
+  "variants": ["auto", "table", "stack"],
+  "props": {
+    "columns": { "type": "array" },
+    "dataSource": { "type": "array" },
+    "striped": { "type": "boolean", "default": false },
+    "bordered": { "type": "boolean", "default": false },
+    "loading": { "type": "boolean", "default": false },
+    "variant": {
+      "type": "enum",
+      "values": ["auto", "table", "stack"],
+      "default": "auto"
+    }
+  },
+  "events": {
+    "sort": {
+      "react": "onSort",
+      "svelte": "onsort",
+      "flutter": "onSort"
+    },
+    "selectionChange": {
+      "react": "onSelectionChanged",
+      "svelte": "onselectionchanged",
+      "flutter": "onSelectionChanged"
+    }
+  }
+}

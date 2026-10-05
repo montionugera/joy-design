@@ -1,0 +1,30 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyBarChart",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "bar_chart_render",
+      "description": "Renders category bars with rounded tops, grid lines, and category labels",
+      "props": {
+        "height": 320.0,
+        "showGrid": true
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "bar_chart_hover",
+      "description": "Hovering over bar column triggers onHover callback and highlights bar",
+      "props": {
+        "height": 320.0
+      },
+      "actions": [{ "type": "hover" }],
+      "expect": {
+        "events": { "hover": 1 }
+      }
+    }
+  ]
+}
