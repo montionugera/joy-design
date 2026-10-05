@@ -22,7 +22,7 @@ void main() {
     'packages/contracts/schemas/line-chart.contract.json',
   );
 
-  final sampleData = [
+  const sampleData = [
     JoyPointData(x: 0, y: 100.0, label: '09:00'),
     JoyPointData(x: 1, y: 125.0, label: '10:00'),
     JoyPointData(x: 2, y: 110.0, label: '11:00'),
