@@ -11,3 +11,6 @@ export 'src/components/layout/joy_flex.dart';
 export 'src/components/layout/joy_space.dart';
 export 'src/components/layout/joy_grid.dart';
 export 'src/components/layout/joy_divider.dart';
+export 'src/components/display/joy_badge.dart';
+export 'src/components/display/joy_tag.dart';
+export 'src/components/display/joy_avatar.dart';
