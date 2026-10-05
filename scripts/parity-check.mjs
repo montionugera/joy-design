@@ -687,37 +687,53 @@ export function checkManifests(rootDir = process.cwd(), options = {}) {
 
       // Check React target file exists
       if (options.triplet || options.side === 'react') {
-        const reactFile = path.resolve(rootDir, `packages/react/src/${comp}.tsx`);
-        if (!fs.existsSync(reactFile)) {
+        if (targets.react === false || targets.react === 'none') {
           checks.push({
             component: comp,
-            check: `React component file exists (${comp}.tsx)`,
-            status: 'FAIL'
-          });
-        } else {
-          checks.push({
-            component: comp,
-            check: `React component (${comp}.tsx)`,
+            check: 'React component (skipped: not targeted)',
             status: 'PASS'
           });
+        } else {
+          const reactFile = path.resolve(rootDir, `packages/react/src/${comp}.tsx`);
+          if (!fs.existsSync(reactFile)) {
+            checks.push({
+              component: comp,
+              check: `React component file exists (${comp}.tsx)`,
+              status: 'FAIL'
+            });
+          } else {
+            checks.push({
+              component: comp,
+              check: `React component (${comp}.tsx)`,
+              status: 'PASS'
+            });
+          }
         }
       }
 
       // Check Svelte target file exists
       if (options.triplet || options.side === 'svelte') {
-        const svelteFile = path.resolve(rootDir, `packages/svelte/src/lib/${comp}.svelte`);
-        if (!fs.existsSync(svelteFile)) {
+        if (targets.svelte === false || targets.svelte === 'none') {
           checks.push({
             component: comp,
-            check: `Svelte component file exists (${comp}.svelte)`,
-            status: 'FAIL'
-          });
-        } else {
-          checks.push({
-            component: comp,
-            check: `Svelte component (${comp}.svelte)`,
+            check: 'Svelte component (skipped: not targeted)',
             status: 'PASS'
           });
+        } else {
+          const svelteFile = path.resolve(rootDir, `packages/svelte/src/lib/${comp}.svelte`);
+          if (!fs.existsSync(svelteFile)) {
+            checks.push({
+              component: comp,
+              check: `Svelte component file exists (${comp}.svelte)`,
+              status: 'FAIL'
+            });
+          } else {
+            checks.push({
+              component: comp,
+              check: `Svelte component (${comp}.svelte)`,
+              status: 'PASS'
+            });
+          }
         }
       }
     } catch (e) {

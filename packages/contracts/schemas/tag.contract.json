@@ -1,0 +1,33 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyTag",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "tag_close_activation",
+      "description": "Closable tag triggers close event on tapping close icon with 44px hit bounds",
+      "props": {
+        "text": "Closable Tag",
+        "closable": true
+      },
+      "actions": [{ "type": "tap_close" }],
+      "expect": {
+        "events": { "close": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "tag_checkable_toggle",
+      "description": "Checkable tag triggers change event on tap",
+      "props": {
+        "text": "Filter Tag",
+        "checkable": true,
+        "checked": false
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 1 }
+      }
+    }
+  ]
+}

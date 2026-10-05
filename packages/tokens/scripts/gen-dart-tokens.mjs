@@ -541,6 +541,8 @@ class JoyTextTokens {
     required this.onAccent,
   });
 
+  Color get tertiary => muted;
+
   JoyTextTokens copyWith({
     Color? primary,
     Color? secondary,

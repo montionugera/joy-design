@@ -1,0 +1,43 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyBadge",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "badge_count_default",
+      "description": "Default count badge displays count correctly",
+      "props": {
+        "count": 5,
+        "overflowCount": 99
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "badge_count_overflow",
+      "description": "Count badge displays overflow indicator when exceeding threshold",
+      "props": {
+        "count": 105,
+        "overflowCount": 99
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "badge_dot_indicator",
+      "description": "Dot badge displays status indicator",
+      "props": {
+        "dot": true,
+        "status": "success"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    }
+  ]
+}
