@@ -189,6 +189,146 @@ A component or screen is done when all of these are true:
 
 <!-- END GENERATED:component-inventory -->
 
+## Framework Parity & Component Coverage
+
+Joymify Design System provides full **Triplet Parity** across three first-class frameworks:
+- **React 19** (`@joymify/react`): Production TSX twins with ref forwarding, standard camelCase event handlers, and full token fidelity.
+- **Svelte 5** (`@joymify/svelte`): Idiomatic Svelte 5 Runes components (`$state`, `$derived`, `$props`, `ref = $bindable(null)`).
+- **Flutter 3.32+ / Dart 3.8.1** (`joymify_flutter`): Production mobile and desktop widgets, pure style resolvers, and semantic token theme extensions.
+
+### Triplet Parity Standards
+
+Every cross-framework component satisfies the core contract:
+1. **Semantic Token Contract**: 100% powered by `--joy-*` semantic tokens (`JoyThemeTokens` in Flutter). Zero hardcoded color literals in component source code.
+2. **State & Geometry Invariance**: Identical state matrices (default, hover, focus-visible, active, disabled, error, loading) and guaranteed minimum 44px touch targets on coarse pointers.
+3. **Accessibility**: Accessible ARIA semantic equivalents (`Semantics` in Flutter, roles/attributes in Web), keyboard operability, and focus outlines.
+
+### "One Contract, Three Runners" Testing Architecture
+
+Cross-framework fidelity is proven through a single declarative contract architecture evaluated across three independent test runners:
+
+```
+                      +---------------------------------------+
+                      |   Declarative Behavioral Contract     |
+                      | (packages/contracts/schemas/*.json)   |
+                      +-------------------+-------------------+
+                                          |
+        +---------------------------------+---------------------------------+
+        |                                 |                                 |
+        v                                 v                                 v
++-----------------------+     +-----------------------+     +-----------------------+
+|  Storybook Web E2E    |     | Native Flutter Runner |     |   Flutter Web E2E     |
+|   (Playwright Web)    |     |  (testWidgets/Engine) |     |  (Playwright Bridge)  |
+|                       |     |                       |     |                       |
+| Evaluates React 19 &  |     | Evaluates native      |     | Evaluates Flutter Web |
+| Svelte 5 twins in     |     | Dart widget semantics |     | canvas via            |
+| browser DOM & CSS     |     | and hit targets       |     | window.__joyHub       |
++-----------------------+     +-----------------------+     +-----------------------+
+```
+
+1. **Declarative Behavioral Contracts (`packages/contracts/schemas/*.contract.json`)**:
+   Machine-readable behavioral specifications defining component props, states, interaction sequences, ARIA roles, and accessibility bounds.
+2. **Native Flutter Widget Runner (`packages/flutter/test/contracts/`)**:
+   Runs native `testWidgets` in the Flutter test engine to verify geometry, tap target dimensions (>=44px), semantic nodes, and pure style resolution against each contract schema.
+3. **Playwright Browser Contracts (Storybook Web & Flutter Web)**:
+   Playwright executes contracts against the Web Storybook Hub (`apps/storybook-hub`) and the Flutter Web Showcase (`apps/flutter-hub`). Flutter Web exposes state and component harnesses to Playwright via the `JoyHubBridge` (`window.__joyHub`), validating cross-platform visual and behavioral parity under identical scenarios.
+
+### Quickstart for Mobile Applications (`joymify_flutter`)
+
+For mobile products such as `joy-coach-fe` and `quant-fe`:
+
+#### 1. Add Dependency
+
+In your application's `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  joymify_flutter:
+    path: ../joy-design/packages/flutter
+```
+
+#### 2. Configure Theme
+
+Wrap your `MaterialApp` with Joymify theme configurations:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:joymify_flutter/joymify_flutter.dart';
+
+void main() {
+  runApp(const JoymifyMobileApp());
+}
+
+class JoymifyMobileApp extends StatelessWidget {
+  const JoymifyMobileApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Joymify Mobile',
+      theme: JoyTheme.lightTheme(),
+      darkTheme: JoyTheme.darkTheme(),
+      themeMode: ThemeMode.system,
+      home: const HomeScreen(),
+    );
+  }
+}
+```
+
+#### 3. Use Components and Semantic Tokens
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:joymify_flutter/joymify_flutter.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.joyTheme;
+
+    return Scaffold(
+      backgroundColor: tokens.surfaceCanvas,
+      appBar: AppBar(
+        title: JoyText('Trading Telemetry', variant: JoyTextVariant.h2),
+        backgroundColor: tokens.surfaceCard,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(tokens.space4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            JoyMetricTile(
+              label: 'Portfolio Value',
+              value: '$1,248,500.00',
+              trend: JoyTrend.up,
+              delta: '+12.4%',
+            ),
+            SizedBox(height: tokens.space4),
+            JoyButton(
+              text: 'Execute Order',
+              variant: JoyButtonVariant.solid,
+              size: JoyButtonSize.lg,
+              onPressed: () {
+                JoyNotification.show(
+                  context,
+                  title: 'Order Submitted',
+                  description: 'Limit order executed successfully.',
+                  type: JoyNotificationType.success,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
 ## Form Controls (Wave 2)
 
 Wave 2 delivers production-grade, hero-tier Button and form control primitives with full cross-framework parity across `@joymify/svelte` (Svelte 5 Runes) and `@joymify/react` (React 19). All styling is powered strictly by semantic design tokens defined in `packages/tokens`.
