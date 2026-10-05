@@ -751,9 +751,10 @@
     "title": "Slice 3: Feedback, Overlays & Dialogs",
     "from_idea": "I-066",
     "created_at": "2026-10-05T13:24:42.703602+00:00",
-    "claimed_by": null,
-    "status": "open",
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
     "release_version": null,
-    "epic": "E-002"
+    "epic": "E-002",
+    "claimed_at": "2026-10-05T13:24:46.659390+00:00"
   }
 ]
