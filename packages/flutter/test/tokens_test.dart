@@ -48,6 +48,7 @@ void main() {
     expect(light.accent.base, isNotNull);
     expect(light.border.base, isNotNull);
     expect(light.accent.primary, equals(light.accent.base));
+    expect(light.text.tertiary, equals(light.text.muted));
   });
 
   test('JoyTheme.themeData produces valid ThemeData with extension', () {
