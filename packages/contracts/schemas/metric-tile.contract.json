@@ -1,0 +1,48 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyMetricTile",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "metric_tile_render",
+      "description": "Metric tile renders headline value, title, and delta trend pill",
+      "props": {
+        "title": "Total Revenue",
+        "value": "$1,245,800",
+        "trend": "up",
+        "delta": 8.4
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "metric_tile_tap",
+      "description": "Tapping interactive metric tile triggers tap event",
+      "props": {
+        "title": "Active Users",
+        "value": "42,150",
+        "trend": "neutral"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "tap": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "metric_tile_loading",
+      "description": "Loading state renders skeleton placeholder blocks without throwing",
+      "props": {
+        "title": "Loading Metric",
+        "value": "...",
+        "loading": true
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    }
+  ]
+}

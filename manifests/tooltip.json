@@ -1,0 +1,18 @@
+{
+  "component": "Tooltip",
+  "targets": {
+    "react": "JoyTooltip",
+    "svelte": "Tooltip",
+    "flutter": "JoyTooltip"
+  },
+  "props": {
+    "title": { "type": "string" }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}

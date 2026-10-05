@@ -1,0 +1,11 @@
+{
+  "name": "Joymify Flutter Hub",
+  "short_name": "JoyHub",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "description": "Joymify Design System Flutter Web Hub & Playwright Bridge",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}

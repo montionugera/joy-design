@@ -77,6 +77,13 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          channel: 'stable'
+          cache: true
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

@@ -1,0 +1,19 @@
+{
+  "component": "Progress",
+  "targets": {
+    "react": "JoyProgress",
+    "svelte": "Progress",
+    "flutter": "JoyProgress"
+  },
+  "variants": ["normal", "active", "success", "exception"],
+  "props": {
+    "percent": { "type": "number", "default": 0 },
+    "status": {
+      "type": "enum",
+      "values": ["normal", "active", "success", "exception"],
+      "default": "normal"
+    },
+    "showInfo": { "type": "boolean", "default": true },
+    "strokeWidth": { "type": "number", "default": 8 }
+  }
+}

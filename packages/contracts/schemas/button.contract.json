@@ -1,0 +1,35 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyButton",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "activation_default",
+      "description": "Default button triggers activate event on tap",
+      "props": { "variant": "solid", "size": "md" },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "activate": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "disabled_suppression",
+      "description": "Disabled button suppresses activate event on tap",
+      "props": { "variant": "solid", "size": "md", "disabled": true },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "activate": 0 }
+      }
+    },
+    {
+      "id": "loading_suppression",
+      "description": "Loading button suppresses activate event on tap",
+      "props": { "variant": "solid", "size": "md", "loading": true },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "activate": 0 }
+      }
+    }
+  ]
+}

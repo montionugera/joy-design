@@ -1,0 +1,43 @@
+{
+  "component": "Text",
+  "targets": {
+    "react": false,
+    "svelte": false,
+    "flutter": "JoyText"
+  },
+  "variants": [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "body",
+    "bodyLarge",
+    "caption",
+    "code"
+  ],
+  "props": {
+    "text": { "type": "string" },
+    "variant": {
+      "type": "enum",
+      "values": ["h1", "h2", "h3", "h4", "h5", "h6", "body", "bodyLarge", "caption", "code"],
+      "default": "body"
+    },
+    "color": {
+      "type": "enum",
+      "values": ["primary", "secondary", "tertiary", "inverse", "success", "warning", "danger", "accent"],
+      "default": "primary"
+    },
+    "weight": {
+      "type": "enum",
+      "values": ["w400", "w500", "w600", "w700"]
+    },
+    "align": {
+      "type": "enum",
+      "values": ["left", "right", "center", "justify"]
+    },
+    "maxLines": { "type": "number" },
+    "selectable": { "type": "boolean", "default": false }
+  }
+}

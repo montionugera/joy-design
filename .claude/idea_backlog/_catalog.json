@@ -376,5 +376,54 @@
     "title": "Monochrome Green P43 Phosphor HUD with Symbolic State Matrix",
     "created_at": "2026-10-04T12:07:05.580436+00:00",
     "promoted_to": "F-057"
+  },
+  {
+    "id": "I-063",
+    "title": "Slice 0: Foundation & Walking Skeleton",
+    "created_at": "2026-10-05T11:01:00.411467+00:00",
+    "promoted_to": "F-058",
+    "epic": "E-002"
+  },
+  {
+    "id": "I-064",
+    "title": "Slice 1: Core Primitives, Layout & Visual Tokens",
+    "created_at": "2026-10-05T11:01:00.414614+00:00",
+    "promoted_to": "F-059",
+    "epic": "E-002"
+  },
+  {
+    "id": "I-065",
+    "title": "Slice 2: Form & Input Controls",
+    "created_at": "2026-10-05T11:01:00.416781+00:00",
+    "promoted_to": "F-060",
+    "epic": "E-002"
+  },
+  {
+    "id": "I-066",
+    "title": "Slice 3: Feedback, Overlays & Dialogs",
+    "created_at": "2026-10-05T11:01:00.419162+00:00",
+    "promoted_to": "F-061",
+    "epic": "E-002"
+  },
+  {
+    "id": "I-067",
+    "title": "Slice 4: Navigation, Tabs & Workflow",
+    "created_at": "2026-10-05T11:01:00.420277+00:00",
+    "promoted_to": "F-062",
+    "epic": "E-002"
+  },
+  {
+    "id": "I-068",
+    "title": "Slice 5: Financial Charts & Data Display",
+    "created_at": "2026-10-05T11:01:00.422090+00:00",
+    "promoted_to": "F-063",
+    "epic": "E-002"
+  },
+  {
+    "id": "I-069",
+    "title": "Slice 6: Full Parity Verification, Hub Integration & Enterprise Hardening",
+    "created_at": "2026-10-05T11:01:00.423024+00:00",
+    "promoted_to": "F-064",
+    "epic": "E-002"
   }
 ]

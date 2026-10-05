@@ -18,7 +18,7 @@ pattern = re.compile(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0
 violations = []
 for root, dirs, files in os.walk('.'):
     # test-results/, playwright-report/ and .turbo/ (binary cache archives) are gitignored build output, not codebase files.
-    if any(x in root for x in ['node_modules', '.git', 'dist', '.claude', '.turbo', 'test-results', 'playwright-report']): continue
+    if any(x in root for x in ['node_modules', '.git', 'dist', '.claude', '.turbo', 'test-results', 'playwright-report', '.adal', '.gemini', '.cursor', '.kiro', '.windsurf', '.dart_tool', 'build', '.flutter-plugins']): continue
     for f in files:
         if f in ['pnpm-lock.yaml', 'AGENTS.md'] or (f.endswith('.html') and 'docs' in root): continue
         p = os.path.join(root, f)
@@ -57,6 +57,19 @@ node --test 'scripts/test/*.test.mjs'
 
 echo "2f. Checking DESIGN.md and README generated regions are up to date (scripts/gen-design-md.mjs --check)..."
 node scripts/gen-design-md.mjs --check
+
+echo "2g. Checking Flutter analyze and tests..."
+if command -v flutter >/dev/null 2>&1; then
+  (cd packages/flutter && flutter pub get && flutter analyze --fatal-infos && flutter test)
+  (cd apps/flutter-hub && flutter pub get && flutter analyze --fatal-infos && flutter build web)
+else
+  if [ -n "$CI" ]; then
+    echo "::error::Flutter SDK is required for Gate 1 verification but not found in PATH."
+    exit 1
+  else
+    echo "   [warn] Flutter SDK not found in PATH; skipping Flutter gate on local machine."
+  fi
+fi
 
 echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js

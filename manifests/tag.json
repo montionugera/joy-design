@@ -1,0 +1,38 @@
+{
+  "component": "Tag",
+  "targets": {
+    "react": "JoyTag",
+    "svelte": "Tag",
+    "flutter": "JoyTag"
+  },
+  "variants": ["defaultStatus", "accent", "success", "warning", "danger", "info"],
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["defaultStatus", "accent", "success", "warning", "danger", "info"],
+      "default": "defaultStatus"
+    },
+    "closable": { "type": "boolean", "default": false },
+    "checkable": { "type": "boolean", "default": false },
+    "checked": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "close": {
+      "react": "onClose",
+      "svelte": "onclose",
+      "flutter": "onClose"
+    },
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}

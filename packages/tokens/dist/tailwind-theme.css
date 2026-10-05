@@ -167,6 +167,8 @@
   --ease-joy-out: cubic-bezier(0.0, 0.0, 0.2, 1);
   --ease-joy-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
   --ease-joy-emphasized: cubic-bezier(0.2, 0.0, 0, 1);
+  --ease-joy-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-joy-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);
   --animate-joy-fast: 150ms;
   --animate-joy-normal: 250ms;
   --animate-joy-slow: 400ms;

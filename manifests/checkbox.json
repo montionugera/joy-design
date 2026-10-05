@@ -1,0 +1,21 @@
+{
+  "component": "Checkbox",
+  "targets": {
+    "react": "JoyCheckbox",
+    "svelte": "Checkbox",
+    "flutter": "JoyCheckbox"
+  },
+  "props": {
+    "checked": { "type": "boolean", "default": false },
+    "indeterminate": { "type": "boolean", "default": false },
+    "disabled": { "type": "boolean", "default": false },
+    "label": { "type": "string" }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}

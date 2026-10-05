@@ -354,6 +354,15 @@ sections.push(`<div class="landing-hero-options-wrapper" id="landing-hero-option
 
   <div class="kinetic-canvas-container hero-option-panel active" id="kinetic-hero-container">
     <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
+    <div class="kinetic-subvariants-bar" id="kinetic-subvariants-bar" role="tablist" aria-label="Particle animation presets">
+      <span class="kinetic-subvariants-label">Physics Archetype:</span>
+      <button type="button" class="kinetic-sub-btn active" id="btn-sub-gold" onclick="switchKineticSubvariant('gold')" role="tab" aria-selected="true">Obsidian &amp; 24K Gold</button>
+      <button type="button" class="kinetic-sub-btn" id="btn-sub-cosmos" onclick="switchKineticSubvariant('cosmos')" role="tab" aria-selected="false">Cosmos Aurora</button>
+      <button type="button" class="kinetic-sub-btn" id="btn-sub-titanium" onclick="switchKineticSubvariant('titanium')" role="tab" aria-selected="false">Titanium Prism</button>
+      <button type="button" class="kinetic-sub-btn" id="btn-sub-cyberpunk" onclick="switchKineticSubvariant('cyberpunk')" role="tab" aria-selected="false">Cyberpunk HUD</button>
+      <button type="button" class="kinetic-sub-btn" id="btn-sub-plasma" onclick="switchKineticSubvariant('plasma')" role="tab" aria-selected="false">Solar Plasma</button>
+      <button type="button" class="kinetic-sub-btn" id="btn-sub-swiss" onclick="switchKineticSubvariant('swiss')" role="tab" aria-selected="false">Swiss Halftone</button>
+    </div>
     ${kineticHero}
   </div>
 

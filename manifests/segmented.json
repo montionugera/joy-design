@@ -1,0 +1,25 @@
+{
+  "component": "Segmented",
+  "targets": {
+    "react": "JoySegmented",
+    "svelte": "Segmented",
+    "flutter": "JoySegmented"
+  },
+  "sizes": ["sm", "md", "lg"],
+  "props": {
+    "value": { "type": "string" },
+    "disabled": { "type": "boolean", "default": false },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md"
+    }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}

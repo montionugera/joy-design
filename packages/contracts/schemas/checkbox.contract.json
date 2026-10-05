@@ -1,0 +1,33 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyCheckbox",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "checkbox_toggle",
+      "description": "Default checkbox triggers change event on tap and satisfies touch target",
+      "props": {
+        "value": false,
+        "label": "Remember me"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "checkbox_disabled",
+      "description": "Disabled checkbox suppresses change event on tap",
+      "props": {
+        "value": false,
+        "disabled": true,
+        "label": "Disabled checkbox"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    }
+  ]
+}

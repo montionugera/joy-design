@@ -1,0 +1,32 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoySegmented",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "segmented_select",
+      "description": "Default segmented control triggers change event on option tap and satisfies touch target",
+      "props": {
+        "value": "opt1",
+        "size": "md"
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 1 },
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "segmented_disabled",
+      "description": "Disabled segmented control suppresses change event on tap",
+      "props": {
+        "value": "opt1",
+        "disabled": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    }
+  ]
+}

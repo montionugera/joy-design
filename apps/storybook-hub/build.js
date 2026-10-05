@@ -262,12 +262,12 @@ const navigationHtml = manifest.categories
     const items = cat.views
       .map((v) => {
         const iconSvg = navIcons[v.icon] || navIcons.overview;
-        return `      <a class="nav-item" href="#${v.id}" data-view="${v.id}">
-        <span class="icon">${iconSvg}</span> ${v.label}
+        return `      <a class="nav-item" href="#${v.id}" data-view="${v.id}" data-label="${v.label}">
+        <span class="icon">${iconSvg}</span> <span class="nav-item-text">${v.label}</span>
       </a>`;
       })
       .join("\n");
-    return `      <div class="nav-section">${cat.label}</div>\n${items}`;
+    return `      <div class="nav-section" data-section="${cat.label}">${cat.label}</div>\n${items}`;
   })
   .join("\n\n");
 
@@ -539,6 +539,67 @@ const hubTimelineItem = (status, title, desc, time) =>
 const hubDropdown = (id) => {
   const item = (key, label, cls = "") => `<button type="button" role="menuitem" class="joy-dropdown__item${cls}" onclick="selectHubDropdownItem(this, '${key}')">${label}</button>`;
   return `<div class="joy-dropdown-wrapper"><div class="joy-dropdown-trigger" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-controls="${id}" onclick="toggleHubDropdown(this)" onkeydown="if(event.key==='Enter'||event.key===' '||event.key==='ArrowDown'){event.preventDefault();toggleHubDropdown(this)}"><span class="joy-button joy-button--outline joy-button--md">Strategy options ${iconSvg("ChevronDown", "12")}</span></div><div id="${id}" class="joy-dropdown" role="menu" tabindex="-1" aria-orientation="vertical" data-hub-panel hidden>${item("dup", "Duplicate strategy")}${item("csv", "Export CSV")}${item("arch", "Archive strategy", " joy-dropdown__item--danger")}<button type="button" role="menuitem" class="joy-dropdown__item" disabled>Locked action</button></div></div>`;
+};
+
+const hubDropdownSearchable = (id) => {
+  const item = (key, label, cls = "") => `<button type="button" role="menuitem" class="joy-dropdown__item${cls}" onclick="selectHubDropdownItem(this, '${key}')">${label}</button>`;
+  const items = [
+    item("twap", "TWAP Strategy (Time-Weighted)"),
+    item("vwap", "VWAP Strategy (Volume-Weighted)"),
+    item("pov", "POV Percentage of Volume"),
+    item("iceberg", "Iceberg Hidden Reserve"),
+    item("sniper", "Sniper Immediate Execution"),
+    item("grid", "Grid Trading Quantitative"),
+    item("dca", "Dollar Cost Averaging"),
+    item("arbitrage", "Cross-Exchange Arbitrage"),
+  ].join("");
+
+  return `<div class="joy-dropdown-wrapper">
+    <div class="joy-dropdown-trigger" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-controls="${id}" onclick="toggleHubDropdown(this)" onkeydown="if(event.key==='Enter'||event.key===' '||event.key==='ArrowDown'){event.preventDefault();toggleHubDropdown(this)}">
+      <span class="joy-button joy-button--outline joy-button--md">Algorithmic Strategies (8 options) ${iconSvg("ChevronDown", "12")}</span>
+    </div>
+    <div id="${id}" class="joy-dropdown" role="menu" tabindex="-1" aria-orientation="vertical" data-hub-panel hidden>
+      <div class="joy-dropdown__search-wrapper">
+        <input type="search" class="joy-dropdown__search" placeholder="Search strategies..." aria-label="Search actions" oninput="filterHubDropdown(this, '${id}')" onclick="event.stopPropagation()">
+      </div>
+      <div class="joy-dropdown__items" style="max-height: 200px; overflow-y: auto;">
+        ${items}
+      </div>
+      <div class="joy-dropdown__empty" style="display: none; padding: 12px; text-align: center; color: var(--joy-text-secondary); font-size: var(--joy-font-size-sm);">No matching strategies</div>
+    </div>
+  </div>`;
+};
+
+const hubSelectSearchable = (wrapperId, listboxId) => {
+  const options = [
+    { value: "btc", label: "BTC / USDT (Bitcoin Perp)" },
+    { value: "eth", label: "ETH / USDT (Ethereum Perp)" },
+    { value: "sol", label: "SOL / USDT (Solana Perp)" },
+    { value: "bnb", label: "BNB / USDT (Binance Coin)" },
+    { value: "xrp", label: "XRP / USDT (Ripple Perp)" },
+    { value: "ada", label: "ADA / USDT (Cardano Perp)" },
+    { value: "avax", label: "AVAX / USDT (Avalanche Perp)" },
+    { value: "link", label: "LINK / USDT (Chainlink Perp)" },
+  ];
+  const renderedOptions = options
+    .map((o, idx) => `<li class="joy-select__option${idx === 0 ? " joy-select__option--active" : ""}" role="option" aria-selected="${idx === 0}" onclick="selectHubOption(this, '${wrapperId}', '${o.label}')">${o.label}</li>`)
+    .join("");
+
+  return `<div class="joy-select-wrapper joy-select-wrapper--md" id="${wrapperId}" style="position: relative;">
+    <button type="button" class="joy-select" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="${listboxId}" onclick="toggleHubSelect(this)">
+      <span class="joy-select__value">${options[0].label}</span>
+      <span class="joy-select__arrow">${chevronDown}</span>
+    </button>
+    <div class="joy-select__listbox joy-overlay" id="${listboxId}" role="listbox" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: var(--joy-z-dropdown); background: var(--joy-surface-raised); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-md); box-shadow: var(--joy-elevation-3); overflow: hidden;">
+      <div class="joy-select__search-wrapper" style="padding: 8px; border-bottom: 1px solid var(--joy-border-subtle); background: var(--joy-surface-sunken);">
+        <input type="search" class="joy-select__search" placeholder="Search trading pairs..." aria-label="Filter options" oninput="filterHubSelect(this, '${listboxId}')" onclick="event.stopPropagation()" style="width: 100%; box-sizing: border-box; padding: 6px 10px; font-size: var(--joy-font-size-sm); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-sm); background: var(--joy-surface-card); color: var(--joy-text-primary);">
+      </div>
+      <ul style="max-height: 200px; overflow-y: auto; margin: 0; padding: 4px 0; list-style: none;">
+        ${renderedOptions}
+      </ul>
+      <div class="joy-select__empty" style="display: none; padding: 12px; text-align: center; color: var(--joy-text-secondary); font-size: var(--joy-font-size-sm);">No matching pairs</div>
+    </div>
+  </div>`;
 };
 
 const hubPopconfirm = (id, triggerLabel, title = "Revoke this key?", variant = "danger") =>
@@ -1287,17 +1348,147 @@ ${inlinedThemeCss}
       color: var(--joy-accent-text);
       font-weight: 600;
     }
+    .sidebar-search {
+      padding: 12px 12px 6px;
+      flex-shrink: 0;
+    }
+    .sidebar-search__inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-default);
+      border-radius: var(--joy-radius-md);
+      transition: border-color var(--joy-duration-fast), box-shadow var(--joy-duration-fast);
+    }
+    .sidebar-search__inner:focus-within {
+      border-color: var(--joy-focus-ring);
+      box-shadow: 0 0 0 2px var(--joy-focus-ring);
+    }
+    .sidebar-search__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 10px;
+      color: var(--joy-text-secondary);
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    .sidebar-search__input {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      height: 36px;
+      padding: 0 8px;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: var(--joy-font-size-sm);
+      font-family: inherit;
+      color: var(--joy-text-primary);
+    }
+    .sidebar-search__input::placeholder {
+      color: var(--joy-text-secondary);
+      opacity: 0.85;
+    }
+    .sidebar-search__input::-webkit-search-decoration,
+    .sidebar-search__input::-webkit-search-cancel-button,
+    .sidebar-search__input::-webkit-search-results-button,
+    .sidebar-search__input::-webkit-search-results-decoration {
+      display: none;
+    }
+    .sidebar-search__clear {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--joy-text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      margin-right: 6px;
+      border-radius: var(--joy-radius-sm);
+      transition: color var(--joy-duration-fast), background-color var(--joy-duration-fast);
+    }
+    .sidebar-search__clear:hover {
+      color: var(--joy-text-primary);
+      background: var(--joy-surface-sunken);
+    }
+    .sidebar-search__kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      margin-right: 8px;
+      font-size: var(--joy-font-size-xs);
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+      background: var(--joy-surface-card);
+      border: 1px solid var(--joy-border-default);
+      border-radius: var(--joy-radius-sm);
+      pointer-events: none;
+      line-height: 1;
+      user-select: none;
+      flex-shrink: 0;
+    }
     .nav {
       flex: 1;
       overflow-y: auto;
-      padding: 16px 12px;
+      padding: 10px 12px 16px;
     }
     .nav-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: var(--joy-font-size-xs);
       font-weight: 600;
       color: var(--joy-text-secondary);
       padding: 10px 12px 6px;
       margin-top: 8px;
+    }
+    .nav-section-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: var(--joy-radius-pill);
+      background: var(--joy-surface-sunken);
+      color: var(--joy-text-secondary);
+      border: 1px solid var(--joy-border-subtle);
+      line-height: 1.2;
+    }
+    .nav-match-highlight {
+      background: var(--joy-accent-subtle);
+      color: var(--joy-accent-text);
+      border-radius: var(--joy-radius-sm);
+      padding: 0 2px;
+      font-weight: 600;
+    }
+    .sidebar-search__empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--joy-text-secondary);
+    }
+    .sidebar-search__empty-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+      opacity: 0.6;
+      color: var(--joy-text-secondary);
+    }
+    .sidebar-search__empty-title {
+      font-size: var(--joy-font-size-sm);
+      font-weight: 600;
+      color: var(--joy-text-primary);
+      margin-bottom: 4px;
+    }
+    .sidebar-search__empty-desc {
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-secondary);
+      line-height: 1.4;
     }
     .nav-item {
       display: flex;
@@ -1911,6 +2102,31 @@ ${inlinedThemeCss}
       border: 1px solid var(--hub-chrome-border);
       background: var(--joy-surface-card);
       margin-bottom: var(--joy-space-6);
+      transition: border-color var(--joy-duration-normal) var(--joy-ease-default), box-shadow var(--joy-duration-normal) var(--joy-ease-default);
+    }
+    .kinetic-canvas-container[data-archetype="gold"] {
+      border-color: var(--joy-border-subtle);
+      box-shadow: 0 0 32px -8px var(--joy-accent-subtle);
+    }
+    .kinetic-canvas-container[data-archetype="cosmos"] {
+      border-color: var(--joy-border-focus);
+      box-shadow: 0 0 32px -8px var(--joy-border-focus);
+    }
+    .kinetic-canvas-container[data-archetype="titanium"] {
+      border-color: var(--joy-border-default);
+      box-shadow: 0 0 24px -8px var(--joy-border-subtle);
+    }
+    .kinetic-canvas-container[data-archetype="cyberpunk"] {
+      border-color: var(--joy-border-subtle);
+      box-shadow: 0 0 32px -8px var(--joy-border-focus);
+    }
+    .kinetic-canvas-container[data-archetype="plasma"] {
+      border-color: var(--joy-border-subtle);
+      box-shadow: 0 0 32px -8px var(--joy-accent-subtle);
+    }
+    .kinetic-canvas-container[data-archetype="swiss"] {
+      border-color: var(--joy-border-default);
+      box-shadow: var(--joy-elevation-low);
     }
     .kinetic-canvas {
       position: absolute;
@@ -1923,6 +2139,55 @@ ${inlinedThemeCss}
     .kinetic-canvas-container > .joy-hero {
       position: relative;
       z-index: var(--joy-z-base);
+    }
+    .kinetic-subvariants-bar {
+      position: absolute;
+      top: var(--joy-space-3);
+      left: 0;
+      right: 0;
+      z-index: var(--joy-z-sticky);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--joy-space-xs);
+      flex-wrap: wrap;
+      padding: 0 var(--joy-space-4);
+      pointer-events: auto;
+    }
+    .kinetic-subvariants-label {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+      margin-right: 4px;
+      letter-spacing: 0.02em;
+    }
+    .kinetic-sub-btn {
+      position: relative;
+      z-index: var(--joy-z-sticky);
+      padding: 4px 12px;
+      font-size: var(--joy-font-size-xs);
+      font-family: inherit;
+      font-weight: 500;
+      border-radius: var(--joy-radius-full);
+      border: 1px solid var(--joy-border-subtle);
+      background: var(--joy-surface-raised);
+      color: var(--joy-text-secondary);
+      cursor: pointer;
+      user-select: none;
+      pointer-events: auto;
+      transition: all var(--joy-duration-fast) var(--joy-ease-default);
+    }
+    .kinetic-sub-btn:hover:not(.active) {
+      background: var(--joy-surface-sunken);
+      color: var(--joy-text-primary);
+      border-color: var(--joy-border-default);
+    }
+    .kinetic-sub-btn.active {
+      background: var(--joy-accent-default);
+      color: var(--joy-text-on-accent);
+      border-color: var(--joy-accent-default);
+      font-weight: 600;
+      box-shadow: var(--joy-elevation-low);
     }
     /* No animation: a still wash in the accent hue stands in for the moving field. */
     @media (pointer: coarse), (prefers-reduced-motion: reduce) {
@@ -3904,8 +4169,43 @@ ${inlinedThemeCss}
       <button type="button" class="framework-btn active" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
       <button type="button" class="framework-btn" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
     </div>
+    <div class="sidebar-search" role="search">
+      <div class="sidebar-search__inner">
+        <span class="sidebar-search__icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <input
+          type="search"
+          class="sidebar-search__input"
+          id="sidebar-search-input"
+          placeholder="Search components..."
+          aria-label="Search components and views"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button
+          type="button"
+          class="sidebar-search__clear"
+          id="sidebar-search-clear"
+          aria-label="Clear search"
+          tabindex="-1"
+          style="display: none;"
+          onclick="clearSidebarSearch()"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+        <kbd class="sidebar-search__kbd" id="sidebar-search-kbd" aria-hidden="true"><abbr title="Command" style="text-decoration: none;">⌘</abbr>K</kbd>
+      </div>
+    </div>
     <nav class="nav">
 ${navigationHtml}
+      <div class="sidebar-search__empty" id="sidebar-search-empty" style="display: none;">
+        <div class="sidebar-search__empty-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <div class="sidebar-search__empty-title">No matching components</div>
+        <div class="sidebar-search__empty-desc">Try another keyword or press <kbd style="padding: 1px 4px; font-size: 11px; background: var(--joy-surface-sunken); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-sm);">Esc</kbd> to clear.</div>
+      </div>
     </nav>
   </aside>
 
@@ -4795,8 +5095,15 @@ ${navigationHtml}
           <div class="playground-header">
             <h4>Interactive Dropdown</h4>
           </div>
-          <div class="canvas" style="min-height: 220px;">
-            ${hubDropdown("demo-dropdown-menu")}
+          <div class="canvas" style="min-height: 360px; gap: 32px; flex-wrap: wrap; justify-content: center; align-items: start;">
+            <div>
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 8px;">STANDARD MENU (&lt; 6 ACTIONS)</div>
+              ${hubDropdown("demo-dropdown-menu")}
+            </div>
+            <div>
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 8px;">AUTO SMART SEARCH MENU (&ge; 6 ACTIONS)</div>
+              ${hubDropdownSearchable("demo-dropdown-searchable")}
+            </div>
           </div>
           <div class="hub-demo-footer">
             Selected action: <strong id="dropdown-selection-text" style="color: var(--joy-accent-default);">None</strong>
@@ -4841,23 +5148,31 @@ ${navigationHtml}
       <!-- View: Select -->
       <section id="view-select" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Select Dropdown Component</h2>
-        <p class="header-tagline">Accessible single-selection dropdown with custom styled caret and native keyboard accessibility.</p>
+        <p class="header-tagline">Accessible single-selection dropdown with custom styled caret, keyboard accessibility, and auto smart search.</p>
 
         <div class="playground-box">
           <div class="playground-header">
-            <h4>Order Execution Routing</h4>
+            <h4>Order Execution Routing &amp; Instrument Picker</h4>
           </div>
-          <div class="canvas" style="flex-direction: column; max-width: 420px; margin: 0 auto;">
-            <div class="joy-select-wrapper">
-              <select class="joy-select" id="demo-order-select" onchange="handleSelectOrderType(this.value)">
-                <option value="limit">Limit Order (Default)</option>
-                <option value="market">Market Execution (Aggressive)</option>
-                <option value="stop_loss">Stop Loss Market</option>
-                <option value="trailing">Trailing Dynamic Stop</option>
-              </select>
+          <div class="canvas" style="min-height: 380px; flex-direction: column; max-width: 480px; margin: 0 auto; gap: 24px;">
+            <div style="width: 100%;">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 6px;">STANDARD SELECT (&lt; 6 OPTIONS)</div>
+              <div class="joy-select-wrapper">
+                <select class="joy-select" id="demo-order-select" onchange="handleSelectOrderType(this.value)">
+                  <option value="limit">Limit Order (Default)</option>
+                  <option value="market">Market Execution (Aggressive)</option>
+                  <option value="stop_loss">Stop Loss Market</option>
+                  <option value="trailing">Trailing Dynamic Stop</option>
+                </select>
+              </div>
+              <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted); margin-top: 8px;">
+                Active Mode: <strong id="demo-select-feedback" style="color: var(--joy-accent-default);">Limit Order</strong>
+              </div>
             </div>
-            <div style="font-size: var(--joy-font-size-sm); color: var(--joy-text-muted); margin-top: 8px;">
-              Active Mode: <strong id="demo-select-feedback" style="color: var(--joy-accent-default);">Limit Order</strong>
+
+            <div style="width: 100%;">
+              <div style="font-size: var(--joy-font-size-xs); font-weight: 600; color: var(--joy-text-secondary); margin-bottom: 6px;">AUTO SMART SEARCH SELECT (&ge; 6 OPTIONS)</div>
+              ${hubSelectSearchable("demo-instrument-select-wrap", "demo-instrument-listbox")}
             </div>
           </div>
         </div>
@@ -5105,45 +5420,101 @@ ${navigationHtml}
         <h2 style="margin: 0 0 8px 0;">Date & Range Picker</h2>
         <p class="header-tagline">AntDesign-grade enterprise date pickers with calendar popover triggers, two-way binding, error states, and dark mode support.</p>
 
-        <div class="playground-box">
+        <div class="playground-box" style="overflow: visible;">
           <div class="playground-header">
             <h4>Single Date & Date Range Selectors</h4>
           </div>
-          <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto;">
+          <div class="canvas" style="flex-direction: column; gap: 24px; align-items: flex-start; max-width: 600px; margin: 0 auto; position: relative; padding-bottom: 360px;">
             <div style="width: 100%;">
               <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Standard Date Picker</label>
-              <div class="joy-date-picker" id="demo-date-picker-wrap">
-                <input type="date" class="joy-date-picker__input" id="demo-single-date" value="2026-09-19" onchange="handleDateChange(this.value)">
-                <span class="joy-date-picker__icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                </span>
+              <div class="joy-date-picker" id="demo-date-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
+                <input type="text" readonly class="joy-date-picker__input" id="demo-single-date" value="2026-09-19" placeholder="Select date">
+                <div class="joy-date-picker__actions">
+                  <button type="button" class="joy-date-picker__clear" id="demo-single-date-clear" aria-label="Clear date">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                  <span class="joy-date-picker__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </span>
+                </div>
+                <div id="demo-single-calendar-popover" class="joy-calendar-overlay" role="dialog" aria-label="Choose date" style="display: none; top: calc(100% + 4px); left: 0;"></div>
               </div>
               <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Selected Date: <strong id="single-date-feedback" style="color: var(--joy-accent-default);">2026-09-19</strong></div>
             </div>
 
             <div style="width: 100%;">
-              <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted);">Financial Date Range Picker (Backtest Window)</label>
-              <div class="joy-date-range-picker">
-                <div class="joy-date-picker">
-                  <input type="date" class="joy-date-picker__input" id="demo-range-start" value="2026-01-01" onchange="handleRangeChange()">
-                  <span class="joy-date-picker__icon">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;">
+                <label style="font-size: var(--joy-font-size-sm); font-weight: 600; color: var(--joy-text-muted); overflow-wrap: anywhere;">Constrained Picker (Min/Max, Blackout, Weekends)</label>
+                <span class="joy-tag joy-tag--subtle joy-tag--warning" style="font-size: 11px;">Restricted</span>
+              </div>
+              <div class="joy-date-picker" id="demo-constrained-date-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
+                <input type="text" readonly class="joy-date-picker__input" id="demo-constrained-date" value="2026-09-15" placeholder="Select weekday in range">
+                <div class="joy-date-picker__actions">
+                  <button type="button" class="joy-date-picker__clear" id="demo-constrained-date-clear" aria-label="Clear date">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                  <span class="joy-date-picker__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </span>
+                </div>
+                <div id="demo-constrained-calendar-popover" class="joy-calendar-overlay" role="dialog" aria-label="Choose date" style="display: none; top: calc(100% + 4px); left: 0;"></div>
+              </div>
+              <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Valid Date: <strong id="constrained-date-feedback" style="color: var(--joy-accent-default);">2026-09-15</strong></div>
+            </div>
+
+            <div style="width: 100%;">
+              <label style="display: block; font-size: var(--joy-font-size-sm); font-weight: 600; margin-bottom: 6px; color: var(--joy-text-muted); overflow-wrap: anywhere;">Financial Date Range Picker (Backtest Window)</label>
+              <div class="joy-date-range-picker joy-date-range-picker--unified" id="demo-range-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
+                <input type="text" readonly class="joy-date-range-picker__input" id="demo-range-start" value="2026-01-01" placeholder="Start date">
+                <span class="joy-date-range-picker__sep joy-date-range-picker__separator" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+                <input type="text" readonly class="joy-date-range-picker__input" id="demo-range-end" value="2026-09-19" placeholder="End date">
+                <div class="joy-date-range-picker__actions">
+                  <button type="button" class="joy-date-range-picker__clear" id="demo-range-clear" aria-label="Clear range">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                  <span class="joy-date-range-picker__icon" aria-hidden="true">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                   </span>
                 </div>
-                <span class="joy-date-range-picker__sep" aria-hidden="true">to</span>
-                <div class="joy-date-picker">
-                  <input type="date" class="joy-date-picker__input" id="demo-range-end" value="2026-09-19" onchange="handleRangeChange()">
-                  <span class="joy-date-picker__icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                  </span>
-                </div>
+                <div id="demo-range-calendar-popover" class="joy-calendar-overlay joy-calendar-overlay--dual" role="dialog" aria-label="Choose date range" style="display: none; top: calc(100% + 4px); left: 0;"></div>
               </div>
               <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Active Interval: <strong id="range-date-feedback" style="color: var(--joy-accent-default);">2026-01-01 to 2026-09-19</strong></div>
+            </div>
+
+            <div style="width: 100%;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;">
+                <label style="font-size: var(--joy-font-size-sm); font-weight: 600; color: var(--joy-text-muted); overflow-wrap: anywhere;">Trading Blackout Range (No Cross-Spans)</label>
+                <span class="joy-tag joy-tag--subtle joy-tag--danger" style="font-size: 11px;">Cross-Blackout Blocked</span>
+              </div>
+              <div class="joy-date-range-picker joy-date-range-picker--unified" id="demo-blackout-range-picker-wrap" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="dialog" style="cursor: pointer; position: relative;">
+                <input type="text" readonly class="joy-date-range-picker__input" id="demo-blackout-start" value="2026-01-05" placeholder="Start date">
+                <span class="joy-date-range-picker__sep joy-date-range-picker__separator" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+                <input type="text" readonly class="joy-date-range-picker__input" id="demo-blackout-end" value="2026-01-09" placeholder="End date">
+                <div class="joy-date-range-picker__actions">
+                  <button type="button" class="joy-date-range-picker__clear" id="demo-blackout-clear" aria-label="Clear range">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                  <span class="joy-date-range-picker__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </span>
+                </div>
+                <div id="demo-blackout-range-calendar-popover" class="joy-calendar-overlay joy-calendar-overlay--dual" role="dialog" aria-label="Choose date range" style="display: none; top: calc(100% + 4px); left: 0;"></div>
+              </div>
+              <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-muted); margin-top: 4px;">Booking Window: <strong id="blackout-range-feedback" style="color: var(--joy-accent-default);">2026-01-05 to 2026-01-09</strong></div>
             </div>
           </div>
         </div>
@@ -5546,6 +5917,15 @@ export async function executeHedge(symbol: string, size: number) {
           </div>
           <div class="kinetic-canvas-container hero-option-panel active" id="kinetic-hero-container">
             <canvas class="kinetic-canvas" id="kinetic-particle-canvas" aria-hidden="true"></canvas>
+            <div class="kinetic-subvariants-bar" id="kinetic-subvariants-bar" role="tablist" aria-label="Particle animation presets">
+              <span class="kinetic-subvariants-label">Physics Archetype:</span>
+              <button type="button" class="kinetic-sub-btn active" id="btn-sub-gold" onclick="switchKineticSubvariant('gold')" role="tab" aria-selected="true">Obsidian &amp; 24K Gold</button>
+              <button type="button" class="kinetic-sub-btn" id="btn-sub-cosmos" onclick="switchKineticSubvariant('cosmos')" role="tab" aria-selected="false">Cosmos Aurora</button>
+              <button type="button" class="kinetic-sub-btn" id="btn-sub-titanium" onclick="switchKineticSubvariant('titanium')" role="tab" aria-selected="false">Titanium Prism</button>
+              <button type="button" class="kinetic-sub-btn" id="btn-sub-cyberpunk" onclick="switchKineticSubvariant('cyberpunk')" role="tab" aria-selected="false">Cyberpunk HUD</button>
+              <button type="button" class="kinetic-sub-btn" id="btn-sub-plasma" onclick="switchKineticSubvariant('plasma')" role="tab" aria-selected="false">Solar Plasma</button>
+              <button type="button" class="kinetic-sub-btn" id="btn-sub-swiss" onclick="switchKineticSubvariant('swiss')" role="tab" aria-selected="false">Swiss Halftone</button>
+            </div>
             <section class="joy-hero">
               <div class="joy-hero__badge">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Interactive Antigravity particle field
@@ -8888,6 +9268,8 @@ export async function executeHedge(symbol: string, size: number) {
     document.addEventListener('DOMContentLoaded', () => {
       syncThemeToggle(document.documentElement.getAttribute('data-theme'));
       syncPalette(document.documentElement.getAttribute('data-palette') || 'classic');
+      initSidebarSearch();
+      initAntd5DatePickers();
     });
     // Any theme change (toggle, restore, tests, devtools) keeps the toggle's icon and labels truthful,
     // and re-reads any resolved brand token values the Brand view is showing.
@@ -8977,6 +9359,151 @@ export async function executeHedge(symbol: string, size: number) {
       if (!e.matches) toggleMobileMenu(false);
     });
 
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    function clearSidebarSearch() {
+      const input = document.getElementById('sidebar-search-input');
+      if (input) {
+        input.value = '';
+        filterSidebar('');
+        input.focus();
+      }
+    }
+
+    function filterSidebar(query) {
+      query = (query || '').trim().toLowerCase();
+      const clearBtn = document.getElementById('sidebar-search-clear');
+      const kbd = document.getElementById('sidebar-search-kbd');
+      const emptyState = document.getElementById('sidebar-search-empty');
+      const nav = document.querySelector('.nav');
+      if (!nav) return;
+
+      if (clearBtn) clearBtn.style.display = query ? 'flex' : 'none';
+      if (kbd) kbd.style.display = query ? 'none' : 'inline-flex';
+
+      const sections = nav.querySelectorAll('.nav-section');
+      let totalVisible = 0;
+
+      sections.forEach(function (section) {
+        const catName = section.getAttribute('data-section') || section.textContent.trim();
+        let sibling = section.nextElementSibling;
+        const items = [];
+        while (sibling && sibling.classList.contains('nav-item')) {
+          items.push(sibling);
+          sibling = sibling.nextElementSibling;
+        }
+
+        let sectionMatches = 0;
+        items.forEach(function (item) {
+          const label = item.getAttribute('data-label') || item.textContent.trim();
+          const view = item.getAttribute('data-view') || '';
+          const labelEl = item.querySelector('.nav-item-text') || item;
+
+          if (!query) {
+            item.style.display = '';
+            if (item.querySelector('.nav-item-text')) {
+              labelEl.textContent = label;
+            }
+            sectionMatches++;
+            totalVisible++;
+          } else {
+            const matchIndex = label.toLowerCase().indexOf(query);
+            const viewMatches = view.toLowerCase().includes(query);
+            if (matchIndex !== -1 || viewMatches) {
+              item.style.display = '';
+              sectionMatches++;
+              totalVisible++;
+              if (item.querySelector('.nav-item-text')) {
+                if (matchIndex !== -1) {
+                  const before = label.slice(0, matchIndex);
+                  const matched = label.slice(matchIndex, matchIndex + query.length);
+                  const after = label.slice(matchIndex + query.length);
+                  labelEl.innerHTML = escapeHtml(before) + '<mark class="nav-match-highlight">' + escapeHtml(matched) + '</mark>' + escapeHtml(after);
+                } else {
+                  labelEl.textContent = label;
+                }
+              }
+            } else {
+              item.style.display = 'none';
+              if (item.querySelector('.nav-item-text')) {
+                labelEl.textContent = label;
+              }
+            }
+          }
+        });
+
+        if (!query) {
+          section.style.display = '';
+          section.textContent = catName;
+        } else {
+          if (sectionMatches > 0) {
+            section.style.display = '';
+            section.innerHTML = escapeHtml(catName) + ' <span class="nav-section-count">' + sectionMatches + '</span>';
+          } else {
+            section.style.display = 'none';
+          }
+        }
+      });
+
+      if (emptyState) {
+        emptyState.style.display = (query && totalVisible === 0) ? 'block' : 'none';
+      }
+    }
+
+    function initSidebarSearch() {
+      const input = document.getElementById('sidebar-search-input');
+      if (!input) return;
+
+      input.addEventListener('input', function (e) {
+        filterSidebar(e.target.value);
+      });
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          if (input.value) {
+            e.preventDefault();
+            clearSidebarSearch();
+          } else {
+            toggleMobileMenu(false);
+            input.blur();
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const firstVisible = Array.from(document.querySelectorAll('.sidebar .nav-item'))
+            .find(function (el) { return el.style.display !== 'none' && !el.hidden; });
+          if (firstVisible) firstVisible.focus();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const firstVisible = Array.from(document.querySelectorAll('.sidebar .nav-item'))
+            .find(function (el) { return el.style.display !== 'none' && !el.hidden; });
+          if (firstVisible) firstVisible.click();
+        }
+      });
+
+      // Global keyboard shortcuts: Cmd+K / Ctrl+K, or /
+      document.addEventListener('keydown', function (e) {
+        const isCmdK = (e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K');
+        const isSlash = e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey;
+
+        if (isCmdK || isSlash) {
+          const active = document.activeElement;
+          const isInput = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable);
+          if (isSlash && isInput) return;
+
+          e.preventDefault();
+          if (drawerMedia.matches) {
+            toggleMobileMenu(true);
+          }
+          input.focus();
+          input.select();
+        }
+      });
+    }
+
     function switchView(viewName, updateHash = true) {
       if (updateHash && window.location.hash !== '#' + viewName) {
         if (window.history && window.history.pushState) {
@@ -9019,6 +9546,7 @@ export async function executeHedge(symbol: string, size: number) {
         paintBrandTokenValues();
       }
     }
+    window.switchView = switchView;
 
     /** Fills every .token-value[data-token] in the Brand view with that custom property's current
         resolved value, so the table never hardcodes a hex the active theme might change. */
@@ -9364,8 +9892,536 @@ export async function executeHedge(symbol: string, size: number) {
     function handleRangeChange() {
       const start = document.getElementById('demo-range-start').value;
       const end = document.getElementById('demo-range-end').value;
-      document.getElementById('range-date-feedback').innerText = start + ' to ' + end;
+      const fb = document.getElementById('range-date-feedback');
+      if (fb) fb.innerText = (start || '...') + ' to ' + (end || '...');
       showDemoToast('Backtest window set: ' + start + ' to ' + end, 'info');
+    }
+
+    function initAntd5DatePickers() {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+      function pad(n) { return n < 10 ? '0' + n : String(n); }
+      function fmt(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+      function parse(s) {
+        if (!s) return null;
+        const p = s.split('-');
+        if (p.length !== 3) return null;
+        return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+      }
+
+      function getMatrix(year, month) {
+        const todayStr = fmt(new Date());
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrev = new Date(year, month, 0).getDate();
+        const cells = [];
+        for (let i = firstDay - 1; i >= 0; i--) {
+          const d = daysInPrev - i;
+          const dt = new Date(year, month - 1, d);
+          const s = fmt(dt);
+          cells.push({ date: dt, dateString: s, dayNumber: d, isCurrentMonth: false, isToday: s === todayStr });
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dt = new Date(year, month, d);
+          const s = fmt(dt);
+          cells.push({ date: dt, dateString: s, dayNumber: d, isCurrentMonth: true, isToday: s === todayStr });
+        }
+        const remaining = 42 - cells.length;
+        for (let d = 1; d <= remaining; d++) {
+          const dt = new Date(year, month + 1, d);
+          const s = fmt(dt);
+          cells.push({ date: dt, dateString: s, dayNumber: d, isCurrentMonth: false, isToday: s === todayStr });
+        }
+        return cells;
+      }
+
+      const allPickers = [];
+      function closeAllPickers() {
+        allPickers.forEach(p => p.close());
+      }
+
+      // Single Picker Factory
+      function createSinglePicker(wrapId, inputId, clearId, popoverId, feedbackId, opts = {}) {
+        const wrap = document.getElementById(wrapId);
+        const input = document.getElementById(inputId);
+        const clear = document.getElementById(clearId);
+        const popover = document.getElementById(popoverId);
+        const feedback = document.getElementById(feedbackId);
+        if (!wrap || !popover || !input) return null;
+
+        let year = 2026;
+        let month = 8; // September
+
+        function isCellDisabled(d, dateStr) {
+          if (opts.min && d < parse(opts.min)) return true;
+          if (opts.max && d > parse(opts.max)) return true;
+          if (opts.blackoutDates && opts.blackoutDates.includes(dateStr)) return true;
+          if (opts.disabledDate && opts.disabledDate(d)) return true;
+          return false;
+        }
+
+        function render() {
+          const curVal = input.value;
+          const matrix = getMatrix(year, month);
+          const isDemoSingle = popoverId === 'demo-single-calendar-popover';
+
+          let html = '<div class="joy-calendar__pane">' +
+            '<div class="joy-calendar__header">' +
+              '<div style="display: flex; gap: 2px;">' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-prev-year"' : '') + ' data-act="prev-yr" title="Previous Year">' +
+                  '<span style="display: inline-flex; letter-spacing: -6px;">' +
+                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                  '</span>' +
+                '</button>' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-prev-month"' : '') + ' data-act="prev-mo" title="Previous Month">' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                '</button>' +
+              '</div>' +
+              '<div class="joy-calendar__title">' +
+                '<span>' + monthNames[month] + '</span>' +
+                '<span>' + year + '</span>' +
+              '</div>' +
+              '<div style="display: flex; gap: 2px;">' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-next-month"' : '') + ' data-act="next-mo" title="Next Month">' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                '</button>' +
+                '<button type="button" class="joy-calendar__nav-btn"' + (isDemoSingle ? ' id="single-next-year"' : '') + ' data-act="next-yr" title="Next Year">' +
+                  '<span style="display: inline-flex; letter-spacing: -6px;">' +
+                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                  '</span>' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="joy-calendar__grid" role="grid">' +
+              weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
+              matrix.map(c => {
+                const sel = c.dateString === curVal;
+                const dis = isCellDisabled(c.date, c.dateString);
+                const cls = [
+                  'joy-calendar__cell',
+                  !c.isCurrentMonth ? 'joy-calendar__cell--muted' : '',
+                  c.isToday ? 'joy-calendar__cell--today' : '',
+                  sel ? 'joy-calendar__cell--selected' : '',
+                  dis ? 'joy-calendar__cell--disabled' : ''
+                ].filter(Boolean).join(' ');
+                return '<button type="button" class="' + cls + '" data-date="' + c.dateString + '"' + (dis ? ' disabled aria-disabled="true"' : '') + '>' + c.dayNumber + '</button>';
+              }).join('') +
+            '</div>' +
+            '<div class="joy-calendar__footer">' +
+              '<button type="button" class="joy-calendar__action-btn"' + (isDemoSingle ? ' id="single-today-btn"' : '') + ' data-act="today">Today</button>' +
+            '</div>' +
+          '</div>';
+          popover.innerHTML = html;
+
+          popover.querySelector('[data-act="prev-yr"]').onclick = (e) => { e.stopPropagation(); year--; render(); };
+          popover.querySelector('[data-act="next-yr"]').onclick = (e) => { e.stopPropagation(); year++; render(); };
+          popover.querySelector('[data-act="prev-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            month--;
+            if (month < 0) { month = 11; year--; }
+            render();
+          };
+          popover.querySelector('[data-act="next-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            month++;
+            if (month > 11) { month = 0; year++; }
+            render();
+          };
+          popover.querySelector('[data-act="today"]').onclick = (e) => {
+            e.stopPropagation();
+            const today = new Date();
+            const todayStr = fmt(today);
+            if (isCellDisabled(today, todayStr)) return;
+            input.value = todayStr;
+            if (feedback) feedback.innerText = todayStr;
+            showDemoToast('Date set to: ' + todayStr, 'info');
+            close();
+          };
+          popover.querySelectorAll('.joy-calendar__cell:not(.joy-calendar__cell--disabled)').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const dStr = btn.getAttribute('data-date');
+              input.value = dStr;
+              if (feedback) feedback.innerText = dStr;
+              showDemoToast('Date set to: ' + dStr, 'info');
+              close();
+            };
+          });
+        }
+
+        function open() {
+          closeAllPickers();
+          const p = parse(input.value);
+          if (p) { year = p.getFullYear(); month = p.getMonth(); }
+          render();
+          popover.style.display = 'block';
+          wrap.classList.add('joy-date-picker--open');
+          wrap.setAttribute('aria-expanded', 'true');
+        }
+
+        function close() {
+          popover.style.display = 'none';
+          wrap.classList.remove('joy-date-picker--open');
+          wrap.setAttribute('aria-expanded', 'false');
+        }
+
+        wrap.onclick = (e) => {
+          if (e.target.closest('#' + clearId)) return;
+          if (e.target.closest('.joy-calendar-overlay')) return;
+          if (popover.style.display === 'block') close();
+          else open();
+        };
+        wrap.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (popover.style.display === 'block') close();
+            else open();
+          } else if (e.key === 'Escape') {
+            close();
+          }
+        };
+        if (clear) {
+          clear.onclick = (e) => {
+            e.stopPropagation();
+            input.value = '';
+            if (feedback) feedback.innerText = '...';
+            showDemoToast('Date cleared', 'info');
+          };
+        }
+
+        const instance = { close, popover, wrap };
+        allPickers.push(instance);
+        return instance;
+      }
+
+      // Range Picker Factory
+      function createRangePicker(wrapId, startId, endId, clearId, popoverId, feedbackId, opts = {}) {
+        const wrap = document.getElementById(wrapId);
+        const startInput = document.getElementById(startId);
+        const endInput = document.getElementById(endId);
+        const clear = document.getElementById(clearId);
+        const popover = document.getElementById(popoverId);
+        const feedback = document.getElementById(feedbackId);
+        if (!wrap || !popover || !startInput || !endInput) return null;
+
+        let leftYear = 2026;
+        let leftMonth = 0; // January
+        let pickingStart = null;
+        let hoverDate = null;
+
+        function isDateInRangeBlackout(d) {
+          if (!opts.blackoutRanges) return false;
+          for (const [rStart, rEnd] of opts.blackoutRanges) {
+            const s = parse(rStart);
+            const e = parse(rEnd);
+            if (s && e && d >= s && d <= e) return true;
+          }
+          return false;
+        }
+
+        function isSingleDisabled(d, dateStr) {
+          if (opts.min && d < parse(opts.min)) return true;
+          if (opts.max && d > parse(opts.max)) return true;
+          if (opts.blackoutDates && opts.blackoutDates.includes(dateStr)) return true;
+          if (isDateInRangeBlackout(d)) return true;
+          if (opts.disabledDate && opts.disabledDate(d)) return true;
+          return false;
+        }
+
+        function isCrossBlackoutInvalid(targetDate) {
+          if (!opts.forbidCrossBlackout || !pickingStart) return false;
+          const s = parse(pickingStart);
+          if (!s) return false;
+          const [d1, d2] = s < targetDate ? [s, targetDate] : [targetDate, s];
+          const cur = new Date(d1);
+          cur.setDate(cur.getDate() + 1);
+          while (cur < d2) {
+            if (isSingleDisabled(cur, fmt(cur))) return true;
+            cur.setDate(cur.getDate() + 1);
+          }
+          return false;
+        }
+
+        function isRangeCellDisabled(d, dateStr) {
+          if (isSingleDisabled(d, dateStr)) return true;
+          if (pickingStart && isCrossBlackoutInvalid(d)) return true;
+          return false;
+        }
+
+        function render() {
+          const curStart = pickingStart || startInput.value;
+          const curEnd = pickingStart ? '' : endInput.value;
+          const sDate = parse(curStart);
+          const eDate = parse(curEnd);
+          const hDate = hoverDate;
+
+          const leftMatrix = getMatrix(leftYear, leftMonth);
+          const rightMonth = leftMonth === 11 ? 0 : leftMonth + 1;
+          const rightYear = leftMonth === 11 ? leftYear + 1 : leftYear;
+          const rightMatrix = getMatrix(rightYear, rightMonth);
+          const isDemoRange = popoverId === 'demo-range-calendar-popover';
+
+          function cellClass(c) {
+            const d = c.date;
+            const isStart = sDate && c.dateString === curStart;
+            const isEnd = eDate && c.dateString === curEnd;
+            let inRange = false;
+            if (sDate && eDate) {
+              inRange = d > sDate && d < eDate;
+            } else if (sDate && !eDate && hDate) {
+              inRange = (d > sDate && d < hDate) || (d > hDate && d < sDate);
+            }
+            const isHoverEnd = sDate && !eDate && hDate && c.dateString === fmt(hDate) && hDate > sDate;
+            const dis = isRangeCellDisabled(c.date, c.dateString);
+
+            return [
+              'joy-calendar__cell',
+              !c.isCurrentMonth ? 'joy-calendar__cell--muted' : '',
+              c.isToday ? 'joy-calendar__cell--today' : '',
+              isStart ? 'joy-calendar__cell--selected joy-calendar__cell--range-start' : '',
+              isEnd || isHoverEnd ? 'joy-calendar__cell--selected joy-calendar__cell--range-end' : '',
+              inRange && !isStart && !isEnd ? 'joy-calendar__cell--in-range' : '',
+              dis ? 'joy-calendar__cell--disabled' : ''
+            ].filter(Boolean).join(' ');
+          }
+
+          const presets = [
+            { label: 'Today', val: () => { const t = fmt(new Date()); return [t, t]; } },
+            { label: 'Last 7 Days', val: () => { const t = new Date(); const d = new Date(); d.setDate(d.getDate() - 6); return [fmt(d), fmt(t)]; } },
+            { label: 'Last 30 Days', val: () => { const t = new Date(); const d = new Date(); d.setDate(d.getDate() - 29); return [fmt(d), fmt(t)]; } },
+            { label: 'Month to Date', val: () => { const t = new Date(); const m = new Date(t.getFullYear(), t.getMonth(), 1); return [fmt(m), fmt(t)]; } },
+            { label: 'Year to Date', val: () => { const t = new Date(); const y = new Date(t.getFullYear(), 0, 1); return [fmt(y), fmt(t)]; } }
+          ];
+
+          let html = '<div class="joy-calendar__body">' +
+            '<div class="joy-calendar__pane">' +
+              '<div class="joy-calendar__header">' +
+                '<div style="display: flex; gap: 2px;">' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-prev-year"' : '') + ' data-act="prev-yr" title="Previous Year">' +
+                    '<span style="display: inline-flex; letter-spacing: -6px;">' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                    '</span>' +
+                  '</button>' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-prev-month"' : '') + ' data-act="prev-mo" title="Previous Month">' +
+                    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+                  '</button>' +
+                '</div>' +
+                '<div class="joy-calendar__title">' +
+                  '<span>' + monthNames[leftMonth] + '</span>' +
+                  '<span>' + leftYear + '</span>' +
+                '</div>' +
+                '<div style="width: 24px;"></div>' +
+              '</div>' +
+              '<div class="joy-calendar__grid" role="grid">' +
+                weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
+                leftMatrix.map(c => {
+                  const dis = isRangeCellDisabled(c.date, c.dateString);
+                  return '<button type="button" class="' + cellClass(c) + '" data-date="' + c.dateString + '"' + (dis ? ' disabled aria-disabled="true"' : '') + '>' + c.dayNumber + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+            '<div class="joy-calendar__pane">' +
+              '<div class="joy-calendar__header">' +
+                '<div style="width: 24px;"></div>' +
+                '<div class="joy-calendar__title">' +
+                  '<span>' + monthNames[rightMonth] + '</span>' +
+                  '<span>' + rightYear + '</span>' +
+                '</div>' +
+                '<div style="display: flex; gap: 2px;">' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-next-month"' : '') + ' data-act="next-mo" title="Next Month">' +
+                    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                  '</button>' +
+                  '<button type="button" class="joy-calendar__nav-btn"' + (isDemoRange ? ' id="range-next-year"' : '') + ' data-act="next-yr" title="Next Year">' +
+                    '<span style="display: inline-flex; letter-spacing: -6px;">' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+                    '</span>' +
+                  '</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="joy-calendar__grid" role="grid">' +
+                weekdays.map(w => '<div class="joy-calendar__weekday">' + w + '</div>').join('') +
+                rightMatrix.map(c => {
+                  const dis = isRangeCellDisabled(c.date, c.dateString);
+                  return '<button type="button" class="' + cellClass(c) + '" data-date="' + c.dateString + '"' + (dis ? ' disabled aria-disabled="true"' : '') + '>' + c.dayNumber + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="joy-calendar__footer">' +
+            '<div class="joy-calendar__presets">' +
+              presets.map((p, idx) => '<button type="button" class="joy-calendar__preset-btn" data-preset="' + idx + '">' + p.label + '</button>').join('') +
+            '</div>' +
+          '</div>';
+          popover.innerHTML = html;
+
+          popover.querySelector('[data-act="prev-yr"]').onclick = (e) => { e.stopPropagation(); leftYear--; render(); };
+          popover.querySelector('[data-act="next-yr"]').onclick = (e) => { e.stopPropagation(); leftYear++; render(); };
+          popover.querySelector('[data-act="prev-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            leftMonth--;
+            if (leftMonth < 0) { leftMonth = 11; leftYear--; }
+            render();
+          };
+          popover.querySelector('[data-act="next-mo"]').onclick = (e) => {
+            e.stopPropagation();
+            leftMonth++;
+            if (leftMonth > 11) { leftMonth = 0; leftYear++; }
+            render();
+          };
+
+          popover.querySelectorAll('.joy-calendar__preset-btn').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const idx = parseInt(btn.getAttribute('data-preset'), 10);
+              const res = presets[idx].val();
+              const pStart = parse(res[0]);
+              const pEnd = parse(res[1]);
+              if (pStart && isSingleDisabled(pStart, res[0])) return;
+              if (pEnd && isSingleDisabled(pEnd, res[1])) return;
+              startInput.value = res[0];
+              endInput.value = res[1];
+              if (feedback) feedback.innerText = res[0] + ' to ' + res[1];
+              showDemoToast('Interval set: ' + res[0] + ' to ' + res[1], 'info');
+              close();
+            };
+          });
+
+          function updateHoverCells() {
+            popover.querySelectorAll('.joy-calendar__cell').forEach(cBtn => {
+              const dateStr = cBtn.getAttribute('data-date');
+              const d = parse(dateStr);
+              let inRange = false;
+              let isHoverEnd = false;
+              if (pickingStart && hoverDate && d) {
+                const sDate = parse(pickingStart);
+                if (sDate) {
+                  inRange = (d > sDate && d < hoverDate) || (d > hoverDate && d < sDate);
+                  isHoverEnd = dateStr === fmt(hoverDate) && hoverDate.getTime() !== sDate.getTime();
+                }
+              }
+              cBtn.classList.toggle('joy-calendar__cell--in-range', inRange);
+              cBtn.classList.toggle('joy-calendar__cell--range-end', isHoverEnd);
+            });
+          }
+
+          popover.querySelectorAll('.joy-calendar__cell:not(.joy-calendar__cell--disabled)').forEach(btn => {
+            btn.onmouseenter = () => {
+              if (pickingStart) {
+                hoverDate = parse(btn.getAttribute('data-date'));
+                updateHoverCells();
+              }
+            };
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const clicked = btn.getAttribute('data-date');
+              if (!pickingStart) {
+                pickingStart = clicked;
+                hoverDate = null;
+                render();
+              } else {
+                let s = pickingStart;
+                let end = clicked;
+                if (s > end) { const tmp = s; s = end; end = tmp; }
+                startInput.value = s;
+                endInput.value = end;
+                if (feedback) feedback.innerText = s + ' to ' + end;
+                showDemoToast('Interval set: ' + s + ' to ' + end, 'info');
+                close();
+              }
+            };
+          });
+        }
+
+        function open() {
+          closeAllPickers();
+          pickingStart = null;
+          hoverDate = null;
+          const p = parse(startInput.value);
+          if (p) { leftYear = p.getFullYear(); leftMonth = p.getMonth(); }
+          render();
+          popover.style.display = 'block';
+          wrap.classList.add('joy-date-range-picker--open');
+          wrap.setAttribute('aria-expanded', 'true');
+        }
+
+        function close() {
+          pickingStart = null;
+          hoverDate = null;
+          popover.style.display = 'none';
+          wrap.classList.remove('joy-date-range-picker--open');
+          wrap.setAttribute('aria-expanded', 'false');
+        }
+
+        wrap.onclick = (e) => {
+          if (e.target.closest('#' + clearId)) return;
+          if (e.target.closest('.joy-calendar-overlay')) return;
+          if (popover.style.display === 'block') close();
+          else open();
+        };
+        wrap.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (popover.style.display === 'block') close();
+            else open();
+          } else if (e.key === 'Escape') {
+            close();
+          }
+        };
+        if (clear) {
+          clear.onclick = (e) => {
+            e.stopPropagation();
+            startInput.value = '';
+            endInput.value = '';
+            if (feedback) feedback.innerText = '... to ...';
+            showDemoToast('Interval cleared', 'info');
+          };
+        }
+
+        const instance = { close, popover, wrap };
+        allPickers.push(instance);
+        return instance;
+      }
+
+      // Initialize all 4 pickers
+      // 1. Standard Single Picker
+      createSinglePicker('demo-date-picker-wrap', 'demo-single-date', 'demo-single-date-clear', 'demo-single-calendar-popover', 'single-date-feedback');
+
+      // 2. Constrained Single Picker (Min: 2026-09-05, Max: 2026-09-25, Blackout: 09-11 & 09-18, No Weekends)
+      createSinglePicker('demo-constrained-date-picker-wrap', 'demo-constrained-date', 'demo-constrained-date-clear', 'demo-constrained-calendar-popover', 'constrained-date-feedback', {
+        min: '2026-09-05',
+        max: '2026-09-25',
+        blackoutDates: ['2026-09-11', '2026-09-18'],
+        disabledDate: (d) => d.getDay() === 0 || d.getDay() === 6
+      });
+
+      // 3. Financial Range Picker
+      createRangePicker('demo-range-picker-wrap', 'demo-range-start', 'demo-range-end', 'demo-range-clear', 'demo-range-calendar-popover', 'range-date-feedback');
+
+      // 4. Blackout-Restricted Range Picker (Blackout: 2026-01-12 to 2026-01-16, Forbid cross-blackout)
+      createRangePicker('demo-blackout-range-picker-wrap', 'demo-blackout-start', 'demo-blackout-end', 'demo-blackout-clear', 'demo-blackout-range-calendar-popover', 'blackout-range-feedback', {
+        blackoutRanges: [['2026-01-12', '2026-01-16']],
+        forbidCrossBlackout: true
+      });
+
+      document.addEventListener('click', (e) => {
+        allPickers.forEach(p => {
+          if (p.popover && p.popover.style.display === 'block') {
+            if (!p.wrap.contains(e.target) && !p.popover.contains(e.target)) {
+              p.close();
+            }
+          }
+        });
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeAllPickers();
+        }
+      });
     }
 
     function copyIconName(name) {
@@ -9531,10 +10587,87 @@ export async function executeHedge(symbol: string, size: number) {
       showDemoToast('Dropdown action: ' + key, 'info');
     }
 
+    function filterHubDropdown(input, id) {
+      const dropdown = document.getElementById(id);
+      if (!dropdown) return;
+      const q = (input.value || '').trim().toLowerCase();
+      const items = dropdown.querySelectorAll('.joy-dropdown__item');
+      const empty = dropdown.querySelector('.joy-dropdown__empty');
+      let visible = 0;
+      items.forEach(el => {
+        const text = el.textContent.toLowerCase();
+        const match = !q || text.includes(q);
+        el.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      if (empty) empty.style.display = (q && visible === 0) ? 'block' : 'none';
+    }
+
+    function toggleHubSelect(btn) {
+      const wrapper = btn.closest('.joy-select-wrapper');
+      if (!wrapper) return;
+      const listbox = wrapper.querySelector('.joy-select__listbox');
+      if (!listbox) return;
+      const isOpen = listbox.style.display !== 'none';
+      if (isOpen) {
+        listbox.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+      } else {
+        listbox.style.display = 'block';
+        btn.setAttribute('aria-expanded', 'true');
+        const searchInput = listbox.querySelector('.joy-select__search');
+        if (searchInput) {
+          setTimeout(() => searchInput.focus(), 50);
+        }
+      }
+    }
+
+    function selectHubOption(opt, wrapperId, valueText) {
+      const wrapper = document.getElementById(wrapperId);
+      if (!wrapper) return;
+      const valEl = wrapper.querySelector('.joy-select__value');
+      if (valEl) valEl.textContent = valueText;
+      wrapper.querySelectorAll('.joy-select__option').forEach(o => {
+        o.classList.remove('joy-select__option--active');
+        o.setAttribute('aria-selected', 'false');
+      });
+      opt.classList.add('joy-select__option--active');
+      opt.setAttribute('aria-selected', 'true');
+      const listbox = wrapper.querySelector('.joy-select__listbox');
+      if (listbox) listbox.style.display = 'none';
+      const btn = wrapper.querySelector('.joy-select');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+      showDemoToast('Selected instrument: ' + valueText, 'info');
+    }
+
+    function filterHubSelect(input, listboxId) {
+      const listbox = document.getElementById(listboxId);
+      if (!listbox) return;
+      const q = (input.value || '').trim().toLowerCase();
+      const options = listbox.querySelectorAll('.joy-select__option');
+      const empty = listbox.querySelector('.joy-select__empty');
+      let visible = 0;
+      options.forEach(el => {
+        const text = el.textContent.toLowerCase();
+        const match = !q || text.includes(q);
+        el.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      if (empty) empty.style.display = (q && visible === 0) ? 'block' : 'none';
+    }
+
     document.addEventListener('pointerdown', function (e) {
       document.querySelectorAll('[data-hub-panel]:not([hidden])').forEach(function (p) {
         const root = p.closest('.joy-popconfirm, .joy-dropdown-wrapper');
         if (!root || !root.contains(e.target)) hubClosePanel(p);
+      });
+      document.querySelectorAll('.joy-select-wrapper').forEach(function (sw) {
+        if (!sw.contains(e.target)) {
+          const lb = sw.querySelector('.joy-select__listbox');
+          if (lb) lb.style.display = 'none';
+          const b = sw.querySelector('.joy-select');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        }
       });
     });
     window.addEventListener('resize', function () { hubClosePanels(); });
@@ -10319,9 +11452,8 @@ export async function executeHedge(symbol: string, size: number) {
 
     // ── Kinetic particle hero ──
     // A decorative canvas behind the HeroSection in #view-landing-blocks. Its colours come from the theme tokens
-    // (hubKineticPalette, re-read whenever data-theme changes). Under reduced motion it draws one still frame; on a
-    // coarse pointer it draws nothing (the stylesheet shows a still gradient instead). Frames are scheduled with
-    // requestAnimationFrame only while the hero is on screen and the tab is visible, capped at 60fps.
+    // (hubKineticPalette, re-read whenever data-theme changes). Features 6 distinct physics archetypes with
+    // polymorphic geometry (pills, 4-point sparkle stars, diamond shards, data streams, convection embers, halftones).
     let kineticCanvas, kineticCtx;
     let kineticParticles = [];
     let kineticAnimId = null;
@@ -10329,11 +11461,18 @@ export async function executeHedge(symbol: string, size: number) {
     let kineticLastFrame = 0;
     let kineticPalette = null;
     let kineticMouse = { x: -1000, y: -1000, vx: 0, vy: 0, lastX: -1000, lastY: -1000, isOver: false };
-    const KINETIC_PARTICLE_COUNT = 90;
+    let kineticSubvariant = 'gold';
     const KINETIC_FRAME_MS = 1000 / 60 - 1;
     const KINETIC_FOV = 300;
     const kineticReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     const kineticCoarse = window.matchMedia('(pointer: coarse)');
+    let kineticCamX = 0;
+    let kineticCamY = 0;
+    let kineticRipples = [];
+    let kineticComets = [];
+    let kineticLastCometTime = 0;
+
+    let kineticSubPalette = null;
 
     function hubKineticPalette() {
       const cs = getComputedStyle(document.documentElement);
@@ -10344,6 +11483,69 @@ export async function executeHedge(symbol: string, size: number) {
       };
     }
     window.hubKineticPalette = hubKineticPalette;
+
+    function hubSubvariantPalette() {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (name) => cs.getPropertyValue(name).trim();
+      return {
+        accentDefault: v('--joy-accent-default'),
+        accentHover: v('--joy-accent-hover'),
+        accentActive: v('--joy-accent-active'),
+        accentHighlight: v('--joy-accent-highlight') || v('--joy-accent-hover'),
+        accentSubtle: v('--joy-accent-subtle'),
+        info: v('--joy-status-info-fg'),
+        infoBorder: v('--joy-status-info-border'),
+        success: v('--joy-status-success-fg'),
+        warning: v('--joy-status-warning-fg'),
+        danger: v('--joy-status-danger-fg'),
+        textPrimary: v('--joy-text-primary'),
+        textSecondary: v('--joy-text-secondary'),
+        textMuted: v('--joy-text-muted'),
+        borderDefault: v('--joy-border-default'),
+        borderSubtle: v('--joy-border-subtle'),
+        borderFocus: v('--joy-border-focus'),
+        surfaceRaised: v('--joy-surface-raised'),
+        surfaceCard: v('--joy-surface-card'),
+      };
+    }
+    window.kineticSubvariant = kineticSubvariant;
+
+    function switchKineticSubvariant(sub) {
+      kineticSubvariant = sub;
+      window.kineticSubvariant = sub;
+      const subBtns = document.querySelectorAll('.kinetic-sub-btn');
+      subBtns.forEach((btn) => {
+        const active = btn.id === 'btn-sub-' + sub;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      const container = document.getElementById('kinetic-hero-container');
+      if (container) {
+        container.setAttribute('data-archetype', sub);
+      }
+      const badge = document.querySelector('#kinetic-hero-container .joy-hero__badge');
+      const names = {
+        gold: 'Obsidian & 24K Gold',
+        cosmos: 'Cosmos Aurora',
+        titanium: 'Titanium Prism',
+        cyberpunk: 'Cyberpunk HUD',
+        plasma: 'Solar Plasma',
+        swiss: 'Swiss Halftone'
+      };
+      if (badge && names[sub]) {
+        const svg = badge.querySelector('svg');
+        const svgHtml = svg ? svg.outerHTML + ' ' : '';
+        badge.innerHTML = svgHtml + 'Particle Archetype: ' + names[sub];
+      }
+      initKineticParticles();
+      if (!kineticShouldAnimate()) {
+        drawKineticFrame(false);
+      }
+      if (typeof showDemoToast === 'function' && names[sub]) {
+        showDemoToast('Switched particle preset: ' + names[sub], 'info');
+      }
+    }
+    window.switchKineticSubvariant = switchKineticSubvariant;
 
     function kineticShouldAnimate() {
       return !!kineticCanvas && kineticVisible && !document.hidden && !kineticReduce.matches && !kineticCoarse.matches;
@@ -10364,7 +11566,6 @@ export async function executeHedge(symbol: string, size: number) {
       kineticAnimId = requestAnimationFrame(kineticTick);
     }
 
-    /** Starts, stops or repaints the field to match visibility, motion preference and pointer type. */
     function syncKinetic() {
       if (kineticShouldAnimate()) {
         if (kineticAnimId === null) kineticAnimId = requestAnimationFrame(kineticTick);
@@ -10374,33 +11575,186 @@ export async function executeHedge(symbol: string, size: number) {
       if (kineticCanvas && kineticVisible && kineticReduce.matches && !kineticCoarse.matches) drawKineticFrame(false);
     }
 
+    function initKineticParticles() {
+      kineticParticles = [];
+      const count = kineticSubvariant === 'cosmos' ? 190 : 170;
+      // Peripheral anchor coordinates for soft photographic bokeh floaters (never behind center copy)
+      const bokehAnchors = [
+        { x: -500, y: -170 },
+        { x: 500, y: -170 },
+        { x: -500, y: 170 },
+        { x: 500, y: 170 },
+        { x: -560, y: 0 },
+        { x: 560, y: 0 }
+      ];
+
+      for (let i = 0; i < count; i++) {
+        let p = {
+          x: (Math.random() - 0.5) * 760,
+          y: (Math.random() - 0.5) * 440,
+          z: Math.random() * 320 - 160,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: -0.15 - Math.random() * 0.35,
+          vz: (Math.random() - 0.5) * 0.25,
+          baseRadius: 1.2 + Math.random() * 1.6,
+          length: 0,
+          thickness: 0,
+          isPill: false,
+          shape: 'dust',
+          angle: Math.random() * Math.PI * 2,
+          omega: (Math.random() - 0.5) * 0.02,
+          tone: i % 3,
+          phase: Math.random() * Math.PI * 2,
+          alpha: 0.85,
+          fadeAlpha: 1.0,
+          rotX: Math.random() * Math.PI * 2,
+          rotY: Math.random() * Math.PI * 2,
+          rotZ: Math.random() * Math.PI * 2,
+          vRotX: (Math.random() - 0.5) * 0.025,
+          vRotY: (Math.random() - 0.5) * 0.025,
+          vRotZ: (Math.random() - 0.5) * 0.025,
+          originX: (Math.random() - 0.5) * 700,
+          originY: (Math.random() - 0.5) * 380,
+          freqA: 1 + (i % 3),
+          freqB: 1 + ((i + 1) % 3),
+          lensScale: 1,
+          isSurging: false,
+          surgeTimer: 0,
+        };
+
+        if (i < 6) {
+          // Tier 3: Optical Camera Bokeh Floaters (ultra-soft peripheral ambient light anchors)
+          p.shape = 'bokeh';
+          p.baseRadius = 40 + Math.random() * 35;
+          p.alpha = 0.035 + Math.random() * 0.025;
+          p.z = 120 + Math.random() * 40;
+          const anchor = bokehAnchors[i % bokehAnchors.length];
+          p.x = anchor.x + (Math.random() - 0.5) * 50;
+          p.y = anchor.y + (Math.random() - 0.5) * 30;
+          p.originX = anchor.x;
+          p.originY = anchor.y;
+          p.vx = (Math.random() - 0.5) * 0.08;
+          p.vy = (Math.random() - 0.5) * 0.08;
+        } else {
+          // Initial spawn clearance: never start particles directly inside the text exclusion zone
+          const qx = Math.max(0, Math.abs(p.x) - 170) / 180;
+          const qy = Math.abs(p.y) / 165;
+          const d = Math.sqrt(qx * qx + qy * qy);
+          if (d < 1.15) {
+            if (Math.random() < 0.5) {
+              p.x = (p.x >= 0 ? 1 : -1) * (260 + Math.random() * 180);
+            } else {
+              p.y = (p.y >= 0 ? 1 : -1) * (150 + Math.random() * 90);
+            }
+          }
+
+          if (i < 48) {
+            // Tier 2: Interactive Focal Entities & Velocity Light Streaks
+            if (kineticSubvariant === 'gold') {
+              if (i % 3 === 0) {
+                p.shape = 'star';
+                p.baseRadius = 3.5 + Math.random() * 3.5;
+                p.vy = -0.15 - Math.random() * 0.25;
+              } else if (i % 3 === 1) {
+                p.shape = 'pill';
+                p.length = 8 + Math.random() * 12;
+                p.thickness = 1.2 + Math.random() * 0.6;
+                p.isPill = true;
+                p.vy = -0.25 - Math.random() * 0.35;
+              } else {
+                p.shape = 'orb';
+                p.baseRadius = 1.8 + Math.random() * 2.0;
+                p.vy = -0.18 - Math.random() * 0.3;
+              }
+            } else if (kineticSubvariant === 'cosmos') {
+              if (i % 3 === 0) {
+                p.shape = 'diamond';
+                p.length = 6 + Math.random() * 8;
+                p.thickness = 2.2 + Math.random() * 1.4;
+              } else if (i % 3 === 1) {
+                p.shape = 'ring';
+                p.baseRadius = 6 + Math.random() * 6;
+              } else {
+                p.shape = 'orb';
+                p.baseRadius = 1.6 + Math.random() * 1.8;
+              }
+            } else if (kineticSubvariant === 'titanium') {
+              if (i % 3 === 0) {
+                p.shape = 'flare';
+                p.length = 14 + Math.random() * 12;
+                p.thickness = 1.0;
+              } else if (i % 3 === 1) {
+                p.shape = 'shard';
+                p.length = 8 + Math.random() * 10;
+                p.thickness = 2.2 + Math.random() * 1.8;
+              } else {
+                p.shape = 'orb';
+                p.baseRadius = 1.6 + Math.random() * 2.0;
+              }
+            } else if (kineticSubvariant === 'cyberpunk') {
+              if (i % 3 === 0) {
+                p.shape = 'cross';
+                p.baseRadius = 3.5 + Math.random() * 1.5;
+              } else if (i % 3 === 1) {
+                p.shape = 'stream';
+                p.length = 10 + Math.random() * 14;
+                p.thickness = 1.4;
+                p.vy = 1.6 + Math.random() * 1.2;
+              } else {
+                p.shape = 'pixel';
+                p.length = 3;
+                p.thickness = 3;
+                p.vy = 0.8 + Math.random() * 1.0;
+              }
+            } else if (kineticSubvariant === 'plasma') {
+              if (i % 3 === 0) {
+                p.shape = 'spark';
+                p.baseRadius = 2.0 + Math.random() * 2.0;
+                p.vy = -0.35 - Math.random() * 0.5;
+              } else if (i % 3 === 1) {
+                p.shape = 'ember';
+                p.baseRadius = 2.2 + Math.random() * 2.4;
+                p.vy = -0.25 - Math.random() * 0.4;
+              } else {
+                p.shape = 'pill';
+                p.length = 7 + Math.random() * 9;
+                p.thickness = 1.2 + Math.random() * 0.6;
+                p.isPill = true;
+                p.vy = -0.3 - Math.random() * 0.4;
+              }
+            } else if (kineticSubvariant === 'swiss') {
+              if (i % 3 === 0) {
+                p.shape = 'cross';
+                p.baseRadius = 4.5;
+              } else if (i % 3 === 1) {
+                p.shape = 'ring';
+                p.baseRadius = 7 + Math.random() * 6;
+              } else {
+                p.shape = 'halftone';
+                p.baseRadius = 2.2 + Math.random() * 2.4;
+              }
+            }
+          } else {
+            // Tier 1: Atmospheric Micro-Stardust (rich, living celestial field)
+            p.shape = 'dust';
+            p.baseRadius = 0.6 + Math.random() * 0.85;
+            p.alpha = 0.35 + Math.random() * 0.45;
+            p.isPill = false;
+          }
+        }
+        kineticParticles.push(p);
+      }
+    }
+
     function initKineticCanvas() {
       kineticCanvas = document.getElementById('kinetic-particle-canvas');
       const container = document.getElementById('kinetic-hero-container');
       if (!kineticCanvas || !container) return;
       kineticCtx = kineticCanvas.getContext('2d');
       kineticPalette = hubKineticPalette();
-
-      kineticParticles = [];
-      for (let i = 0; i < KINETIC_PARTICLE_COUNT; i++) {
-        const isPill = i % 2 === 0;
-        kineticParticles.push({
-          x: (Math.random() - 0.5) * 700,
-          y: (Math.random() - 0.5) * 400,
-          z: Math.random() * 300 - 150,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: -0.2 - Math.random() * 0.45,
-          vz: (Math.random() - 0.5) * 0.3,
-          baseRadius: 1.8 + Math.random() * 2.2,
-          length: isPill ? 10 + Math.random() * 12 : 0,
-          thickness: isPill ? 3 + Math.random() * 1.5 : 0,
-          isPill,
-          angle: Math.random() * Math.PI * 2,
-          omega: (Math.random() - 0.5) * 0.02,
-          tone: i % 3,
-          phase: Math.random() * Math.PI * 2,
-        });
-      }
+      kineticSubPalette = hubSubvariantPalette();
+      container.setAttribute('data-archetype', kineticSubvariant);
+      initKineticParticles();
 
       container.addEventListener('mousemove', (e) => {
         const rect = container.getBoundingClientRect();
@@ -10426,12 +11780,11 @@ export async function executeHedge(symbol: string, size: number) {
         if (kineticVisible) resizeKineticCanvas();
         syncKinetic();
       }).observe(container);
-      // Theme switches (toggle, OS scheme, tests) all land on data-theme.
       new MutationObserver(() => {
         kineticPalette = hubKineticPalette();
+        kineticSubPalette = hubSubvariantPalette();
         if (kineticAnimId === null) syncKinetic();
       }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-      // Web fonts can land after the still frame: repaint so the text cut-outs match the final line boxes.
       if (document.fonts) document.fonts.ready.then(() => {
         if (kineticAnimId === null) syncKinetic();
       });
@@ -10449,7 +11802,6 @@ export async function executeHedge(symbol: string, size: number) {
       const rect = kineticCanvas.parentElement ? kineticCanvas.parentElement.getBoundingClientRect() : null;
       if (!rect || rect.width === 0) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      // Assigning width/height resets the context transform, so the scale is applied exactly once per resize.
       kineticCanvas.width = rect.width * dpr;
       kineticCanvas.height = rect.height * dpr;
       if (kineticCtx) kineticCtx.scale(dpr, dpr);
@@ -10463,6 +11815,25 @@ export async function executeHedge(symbol: string, size: number) {
       const clickY = e && e.clientY ? e.clientY - rect.top : rect.height / 2;
       const cx = rect.width / 2;
       const cy = rect.height / 2;
+
+      const pal = kineticSubPalette || kineticPalette;
+      let waveColor = pal.accentHighlight || pal.accentDefault || (pal.accents && pal.accents[0]);
+      if (kineticSubvariant === 'cosmos') waveColor = pal.info || waveColor;
+      else if (kineticSubvariant === 'titanium') waveColor = pal.textPrimary || waveColor;
+      else if (kineticSubvariant === 'cyberpunk') waveColor = pal.success || waveColor;
+      else if (kineticSubvariant === 'plasma') waveColor = pal.accentHighlight || waveColor;
+      else if (kineticSubvariant === 'swiss') waveColor = pal.accentDefault || waveColor;
+
+      kineticRipples.push({
+        x: clickX,
+        y: clickY,
+        r: 6,
+        maxR: Math.min(rect.width * 0.45, 280),
+        speed: 8.5,
+        color: waveColor,
+        alpha: 0.55
+      });
+
       kineticParticles.forEach((p) => {
         const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
         const dx = cx + p.x * scale - clickX;
@@ -10476,36 +11847,556 @@ export async function executeHedge(symbol: string, size: number) {
       });
     }
 
+    /* ── Distinct Physics Engines per Sub-Variant ── */
     function stepKineticParticle(p, w, h) {
-      p.angle += p.omega;
-      const rx = p.x * Math.cos(0.002) - p.z * Math.sin(0.002);
-      p.z = p.z * Math.cos(0.002) + p.x * Math.sin(0.002);
-      p.x = rx;
-      if (kineticMouse.isOver) {
-        const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
-        const mdx = w / 2 + p.x * scale - kineticMouse.x;
-        const mdy = h / 2 + p.y * scale - kineticMouse.y;
-        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mdist < 160 && mdist > 0) {
-          const force = (160 - mdist) / 160;
-          p.vx += (mdx / mdist) * force * 2.2 + kineticMouse.vx * 0.05;
-          p.vy += (mdy / mdist) * force * 2.2 + kineticMouse.vy * 0.05;
-          p.omega += (mdx / mdist) * force * 0.03;
+      if (p.shape === 'bokeh') {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (Math.abs(p.x - p.originX) > 40) p.vx = -p.vx;
+        if (Math.abs(p.y - p.originY) > 25) p.vy = -p.vy;
+      } else {
+        const bx = w * 0.55;
+        const by = h * 0.55;
+
+      if (kineticSubvariant === 'gold') {
+        // Obsidian & 24K Gold: Laminar buoyancy + wave sway + capsule orientation
+        p.angle += p.omega;
+        const rx = p.x * Math.cos(0.002) - p.z * Math.sin(0.002);
+        p.z = p.z * Math.cos(0.002) + p.x * Math.sin(0.002);
+        p.x = rx;
+        if (kineticMouse.isOver) {
+          const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+          const mdx = w / 2 + p.x * scale - kineticMouse.x;
+          const mdy = h / 2 + p.y * scale - kineticMouse.y;
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mdist < 160 && mdist > 0) {
+            const force = (160 - mdist) / 160;
+            p.vx += (mdx / mdist) * force * 2.2 + kineticMouse.vx * 0.05;
+            p.vy += (mdy / mdist) * force * 2.2 + kineticMouse.vy * 0.05;
+            p.omega += (mdx / mdist) * force * 0.03;
+          }
+        }
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+        p.vz *= 0.95;
+        p.omega *= 0.98;
+        p.x += p.vx + Math.sin(p.phase) * 0.28;
+        p.y += p.vy - 0.25;
+        p.z += p.vz;
+        p.phase += 0.02;
+
+        if (p.shape === 'pill') {
+          p.angle = Math.atan2(p.vy - 0.25, p.vx + Math.sin(p.phase) * 0.28) + Math.PI / 2;
+        }
+
+        if (p.x < -bx) { p.x = bx; } else if (p.x > bx) { p.x = -bx; }
+        if (p.y < -by) { p.y = by; p.vy = -0.2 - Math.random() * 0.45; }
+        if (p.z < -160 || p.z > 160) { p.z = Math.max(-160, Math.min(160, p.z)); p.vz *= -1; }
+
+      } else if (kineticSubvariant === 'cosmos') {
+        // Cosmos Aurora: Orbital gravitational vortex + cursor slingshot lens
+        const centerDist = Math.sqrt(p.x * p.x + p.y * p.y) || 1;
+        p.vx += (-p.y / centerDist) * 0.16 - (p.x / centerDist) * 0.02;
+        p.vy += (p.x / centerDist) * 0.16 - (p.y / centerDist) * 0.02;
+
+        if (kineticMouse.isOver) {
+          const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+          const mdx = kineticMouse.x - (w / 2 + p.x * scale);
+          const mdy = kineticMouse.y - (h / 2 + p.y * scale);
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy) || 1;
+          if (mdist < 220) {
+            const gForce = (220 - mdist) / 220;
+            p.vx += (mdx / mdist) * gForce * 1.5 + (-mdy / mdist) * gForce * 1.8;
+            p.vy += (mdy / mdist) * gForce * 1.5 + (mdx / mdist) * gForce * 1.8;
+          }
+        }
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+        p.vz *= 0.96;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.z += p.vz + Math.sin(p.phase) * 0.2;
+        p.phase += 0.025;
+        p.angle += 0.015;
+
+        if (p.x < -bx) { p.x = bx; } else if (p.x > bx) { p.x = -bx; }
+        if (p.y < -by) { p.y = by; } else if (p.y > by) { p.y = -by; }
+        if (p.z < -160 || p.z > 160) { p.z = Math.max(-160, Math.min(160, p.z)); p.vz *= -1; }
+
+      } else if (kineticSubvariant === 'titanium') {
+        // Titanium Prism: 3D tumbling across Euler angles + microgravity fluid damping
+        p.rotX += p.vRotX;
+        p.rotY += p.vRotY;
+        p.rotZ += p.vRotZ;
+        p.angle = p.rotZ;
+
+        if (kineticMouse.isOver) {
+          const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+          const mdx = w / 2 + p.x * scale - kineticMouse.x;
+          const mdy = h / 2 + p.y * scale - kineticMouse.y;
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mdist < 180 && mdist > 0) {
+            const force = (180 - mdist) / 180;
+            p.vx += (mdx / mdist) * force * 1.6;
+            p.vy += (mdy / mdist) * force * 1.6;
+            p.vRotX += (Math.random() - 0.5) * force * 0.05;
+            p.vRotY += (Math.random() - 0.5) * force * 0.05;
+          }
+        }
+        p.vx *= 0.92;
+        p.vy *= 0.92;
+        p.vz *= 0.92;
+        p.vRotX *= 0.97;
+        p.vRotY *= 0.97;
+        p.x += p.vx + Math.sin(p.phase * 0.5) * 0.15;
+        p.y += p.vy + Math.cos(p.phase * 0.7) * 0.15;
+        p.z += p.vz;
+        p.phase += 0.015;
+
+        if (p.x < -bx) { p.x = bx; } else if (p.x > bx) { p.x = -bx; }
+        if (p.y < -by) { p.y = by; } else if (p.y > by) { p.y = -by; }
+        if (p.z < -160 || p.z > 160) { p.z = Math.max(-160, Math.min(160, p.z)); p.vz *= -1; }
+
+      } else if (kineticSubvariant === 'cyberpunk') {
+        // Cyberpunk HUD: 8px quantized channels, stream drops, periodic packet surges
+        if (p.surgeTimer > 0) {
+          p.surgeTimer--;
+          if (p.surgeTimer === 0) p.isSurging = false;
+        } else if (Math.random() < 0.005) {
+          p.isSurging = true;
+          p.surgeTimer = 14;
+        }
+
+        const dropSpeed = (p.isSurging ? 5.2 : 1.2) * (p.shape === 'stream' ? 1.6 : 0.9);
+        p.y += dropSpeed;
+
+        if (kineticMouse.isOver) {
+          const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+          const mdx = w / 2 + p.x * scale - kineticMouse.x;
+          const mdy = h / 2 + p.y * scale - kineticMouse.y;
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mdist < 140 && mdist > 0) {
+            p.x += (mdx > 0 ? 8 : -8);
+          }
+        }
+        p.x = Math.round(p.x / 8) * 8;
+
+        if (p.y > by) {
+          p.y = -by;
+          p.x = (Math.random() - 0.5) * w;
+        }
+
+      } else if (kineticSubvariant === 'plasma') {
+        // Solar Plasma: Thermal buoyancy (hot/large particles rise faster) + curl eddies
+        const thermalLift = 0.35 + (p.baseRadius / 3.0) * 0.45;
+        p.vy -= 0.04 * thermalLift;
+        p.vx += Math.cos(p.y * 0.015 + p.phase) * 0.35;
+
+        if (kineticMouse.isOver) {
+          const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+          const mdx = w / 2 + p.x * scale - kineticMouse.x;
+          const mdy = h / 2 + p.y * scale - kineticMouse.y;
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mdist < 170 && mdist > 0) {
+            const force = (170 - mdist) / 170;
+            p.vx += (mdx / mdist) * force * 2.8 + kineticMouse.vx * 0.12;
+            p.vy += (mdy / mdist) * force * 2.8 + kineticMouse.vy * 0.12;
+          }
+        }
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.phase += 0.03;
+
+        if (p.x < -bx) { p.x = bx; } else if (p.x > bx) { p.x = -bx; }
+        if (p.y < -by) {
+          p.y = by;
+          p.vy = -0.4 - Math.random() * 0.5;
+        }
+
+      } else if (kineticSubvariant === 'swiss') {
+        // Swiss Halftone: Lissajous harmonic curves + proximity lens zoom
+        p.phase += 0.012;
+        p.x = p.originX + Math.sin(p.phase * p.freqA) * 35;
+        p.y = p.originY + Math.cos(p.phase * p.freqB) * 25;
+
+        if (kineticMouse.isOver) {
+          const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+          const mdx = w / 2 + p.x * scale - kineticMouse.x;
+          const mdy = h / 2 + p.y * scale - kineticMouse.y;
+          const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mdist < 140) {
+            const factor = (140 - mdist) / 140;
+            p.lensScale = 1 + factor * 0.85;
+          } else {
+            p.lensScale = 1;
+          }
+        } else {
+          p.lensScale = 1;
         }
       }
-      p.vx *= 0.95;
-      p.vy *= 0.95;
-      p.vz *= 0.95;
-      p.omega *= 0.98;
-      p.x += p.vx + Math.sin(p.phase) * 0.25;
-      p.y += p.vy + Math.cos(p.phase) * 0.25;
-      p.z += p.vz;
-      p.phase += 0.02;
-      const bx = w * 0.55;
-      const by = h * 0.55;
-      if (p.x < -bx) { p.x = bx; } else if (p.x > bx) { p.x = -bx; }
-      if (p.y < -by) { p.y = by; p.vy = -0.2 - Math.random() * 0.45; }
-      if (p.z < -160 || p.z > 160) { p.z = Math.max(-160, Math.min(160, p.z)); p.vz *= -1; }
+      }
+
+      // Continuous organic avoidance zone around hero headline & CTA area
+      const hScale = KINETIC_FOV / (KINETIC_FOV + p.z);
+      const hx = p.x * hScale;
+      const hy = p.y * hScale;
+      const qx = Math.max(0, Math.abs(hx) - 170) / 180;
+      const qy = Math.abs(hy) / 165;
+      const textDist = Math.sqrt(qx * qx + qy * qy);
+
+      // Smooth alpha dissolution: particle dissolves completely before reaching text edge
+      const isBokeh = p.shape === 'bokeh';
+      const clearThresh = isBokeh ? 1.6 : 1.35;
+      const zeroThresh = isBokeh ? 1.25 : 0.96;
+      if (textDist < clearThresh) {
+        const t = Math.max(0, (textDist - zeroThresh) / (clearThresh - zeroThresh));
+        p.fadeAlpha = t * t * (3 - 2 * t);
+      } else {
+        p.fadeAlpha = 1.0;
+      }
+
+      // Aerodynamic vector repulsion gently steers particles around the text capsule
+      if (!isBokeh && textDist < 1.4 && textDist > 0.01) {
+        const repel = (1.4 - textDist) * 0.42;
+        const nx = hx !== 0 ? (hx > 0 ? 1 : -1) : (Math.random() - 0.5);
+        const ny = hy !== 0 ? (hy > 0 ? 1 : -1) : -1;
+        p.vx += nx * repel * 1.4;
+        p.vy += ny * repel * 1.4;
+      }
+
+      if (p.shape === 'dust') {
+        p.alpha = 0.28 + 0.52 * Math.abs(Math.sin(p.phase));
+      }
+    }
+
+    /* ── Polymorphic Geometry Renderers with Additive Bloom & Luminous Gradients ── */
+    function drawSparkle(ctx, x, y, radius, angle, color, alpha) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(1, radius));
+      grad.addColorStop(0, color);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(1, radius), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(-radius * 2.5, 0);
+      ctx.lineTo(radius * 2.5, 0);
+      ctx.moveTo(0, -radius * 2.5);
+      ctx.lineTo(0, radius * 2.5);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawShard(ctx, x, y, length, thickness, angle, color, alpha) {
+      if (length <= 0 || thickness <= 0) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createLinearGradient(0, -length / 2, 0, length / 2);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.5, color);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, -length / 2);
+      ctx.lineTo(thickness / 2, 0);
+      ctx.lineTo(0, length / 2);
+      ctx.lineTo(-thickness / 2, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawRing(ctx, x, y, radius, color, alpha) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.7;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(1, radius), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCross(ctx, x, y, radius, color, alpha) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.moveTo(x - radius, y);
+      ctx.lineTo(x + radius, y);
+      ctx.moveTo(x, y - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPixel(ctx, x, y, len, thick, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.fillRect(x - len / 2, y - thick / 2, len, thick);
+      ctx.restore();
+    }
+
+    function drawStream(ctx, x, y, thick, len, color, alpha) {
+      if (len <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createLinearGradient(0, y - len, 0, y);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(1, color);
+      ctx.fillStyle = grad;
+      ctx.fillRect(x - thick / 2, y - len, thick, len);
+      ctx.restore();
+    }
+
+    function drawCapsule(ctx, x, y, length, thickness, angle, color, alpha) {
+      if (length <= 0 || thickness <= 0) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createLinearGradient(-length / 2, 0, length / 2, 0);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.25, color);
+      grad.addColorStop(0.75, color);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      const rad = Math.max(0.5, thickness / 2);
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(-length / 2, -thickness / 2, length, thickness, rad);
+      } else {
+        ctx.rect(-length / 2, -thickness / 2, length, thickness);
+      }
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBokeh(ctx, x, y, radius, color, alpha) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0.01, Math.min(0.08, alpha));
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      grad.addColorStop(0, color);
+      grad.addColorStop(0.35, color);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawOrb(ctx, x, y, radius, color, alpha, glow = true) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (glow && radius >= 1.5) {
+        ctx.save();
+        ctx.globalAlpha = alpha * 0.45;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.2);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(0.65, radius), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawDust(ctx, x, y, radius, color, alpha) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(0.6, radius), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function getParticleColor(p) {
+      if (!kineticPalette) return 'transparent';
+      const pal = kineticSubPalette || kineticPalette;
+      if (kineticSubvariant === 'gold') {
+        if (p.shape === 'star') return pal.accentHighlight || pal.accents[1];
+        if (p.shape === 'bokeh') return pal.accentDefault || pal.accents[0];
+        if (p.shape === 'dust') return p.tone === 0 ? (pal.accentHighlight || pal.accents[1]) : (pal.accentDefault || pal.accents[0]);
+        if (p.tone === 1) return pal.accentHover || pal.accents[1];
+        if (p.tone === 2) return pal.accentActive || pal.accents[2];
+        return pal.accentDefault || pal.accents[0];
+      } else if (kineticSubvariant === 'cosmos') {
+        if (p.shape === 'ring') return pal.borderFocus || pal.accents[0];
+        if (p.shape === 'diamond') return pal.info || pal.accents[1];
+        if (p.shape === 'bokeh') return pal.info || pal.accents[1];
+        if (p.shape === 'dust') return p.tone === 0 ? (pal.info || pal.accents[1]) : (pal.borderFocus || pal.accents[0]);
+        if (p.tone === 1) return pal.borderFocus || pal.accents[0];
+        return pal.textPrimary || pal.muted;
+      } else if (kineticSubvariant === 'titanium') {
+        if (p.shape === 'flare') return pal.textPrimary || pal.muted;
+        if (p.shape === 'shard') return (p.tone === 0 ? (pal.borderDefault || pal.muted) : (pal.info || pal.accents[1]));
+        if (p.shape === 'bokeh') return pal.borderDefault || pal.muted;
+        if (p.shape === 'dust') return p.tone === 0 ? (pal.borderFocus || pal.muted) : (pal.textPrimary || pal.muted);
+        return pal.textPrimary || pal.muted;
+      } else if (kineticSubvariant === 'cyberpunk') {
+        if (p.shape === 'cross') return pal.warning || pal.accents[0];
+        if (p.shape === 'stream') return pal.success || pal.accents[1];
+        if (p.shape === 'dust') return p.tone === 0 ? (pal.success || pal.accents[1]) : (pal.warning || pal.accents[0]);
+        if (p.isSurging) return pal.warning || pal.accents[0];
+        return pal.success || pal.accents[1];
+      } else if (kineticSubvariant === 'plasma') {
+        if (p.shape === 'spark') return pal.accentHighlight || pal.accents[1];
+        if (p.shape === 'ember') return (p.tone === 0 ? (pal.accentDefault || pal.accents[0]) : (pal.warning || pal.accents[0]));
+        if (p.shape === 'bokeh') return pal.accentDefault || pal.accents[0];
+        if (p.shape === 'dust') return p.tone === 0 ? (pal.accentHighlight || pal.accents[1]) : (pal.warning || pal.accents[0]);
+        return pal.accentDefault || pal.accents[0];
+      } else if (kineticSubvariant === 'swiss') {
+        if (p.shape === 'cross') return pal.accentDefault || pal.accents[0];
+        if (p.shape === 'ring') return pal.textMuted || pal.muted;
+        if (p.shape === 'dust') return pal.textMuted || pal.muted;
+        return (p.tone === 0 ? (pal.accentDefault || pal.accents[0]) : (pal.textPrimary || pal.muted));
+      }
+      return kineticPalette.accents[p.tone % kineticPalette.accents.length];
+    }
+
+    /* ── Expanding Wavefront Ripples, Periodic Comets & Cursor Spotlight ── */
+    function stepAndDrawRipples(ctx, advance) {
+      if (kineticRipples.length === 0) return;
+      for (let i = kineticRipples.length - 1; i >= 0; i--) {
+        const rip = kineticRipples[i];
+        if (advance) {
+          rip.r += rip.speed;
+          rip.alpha *= 0.94;
+        }
+        if (rip.r >= rip.maxR || rip.alpha <= 0.01) {
+          kineticRipples.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = rip.alpha;
+        ctx.strokeStyle = rip.color;
+        ctx.lineWidth = Math.max(0.5, 2.5 * (1 - rip.r / rip.maxR));
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function stepAndDrawComets(ctx, w, h, advance) {
+      const now = performance.now();
+      if (advance && kineticComets.length === 0 && now - kineticLastCometTime > 7500) {
+        if (Math.random() < 0.04) {
+          kineticLastCometTime = now;
+          const startX = Math.random() < 0.5 ? -40 : w + 40;
+          const targetX = startX < 0 ? w * (0.6 + Math.random() * 0.3) : w * (0.1 + Math.random() * 0.3);
+          const startY = Math.random() * (h * 0.35);
+          const angle = Math.atan2((h * 0.6 + Math.random() * h * 0.3) - startY, targetX - startX);
+          const speed = 14 + Math.random() * 8;
+          kineticComets.push({
+            x: startX,
+            y: startY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            len: 45 + Math.random() * 40,
+            life: 1.0,
+            decay: 0.016 + Math.random() * 0.008,
+          });
+        }
+      }
+
+      if (kineticComets.length === 0) return;
+      const pal = kineticSubPalette || kineticPalette;
+      let cometColor = pal.accentHighlight || pal.accentDefault || (pal.accents && pal.accents[0]);
+      if (kineticSubvariant === 'cosmos') cometColor = pal.info || cometColor;
+      else if (kineticSubvariant === 'titanium') cometColor = pal.textPrimary || cometColor;
+      else if (kineticSubvariant === 'cyberpunk') cometColor = pal.warning || cometColor;
+      else if (kineticSubvariant === 'plasma') cometColor = pal.accentHighlight || cometColor;
+
+      for (let i = kineticComets.length - 1; i >= 0; i--) {
+        const c = kineticComets[i];
+        if (advance) {
+          c.x += c.vx;
+          c.y += c.vy;
+          c.life -= c.decay;
+        }
+        if (c.life <= 0 || c.x < -100 || c.x > w + 100 || c.y > h + 100) {
+          kineticComets.splice(i, 1);
+          continue;
+        }
+        const grad = ctx.createLinearGradient(c.x, c.y, c.x - c.vx * 3.5, c.y - c.vy * 3.5);
+        grad.addColorStop(0, cometColor);
+        grad.addColorStop(1, 'transparent');
+        ctx.save();
+        ctx.globalAlpha = c.life * 0.75;
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo(c.x - c.vx * 3.5, c.y - c.vy * 3.5);
+        ctx.stroke();
+        ctx.fillStyle = cometColor;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 2.0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawCursorSpotlight(ctx, w, h, isDark) {
+      if (!isDark || !kineticMouse.isOver || kineticMouse.x < 0 || kineticMouse.y < 0) return;
+      const mx = kineticMouse.x - w / 2;
+      const my = kineticMouse.y - h / 2;
+      const mqx = Math.max(0, Math.abs(mx) - 170) / 180;
+      const mqy = Math.abs(my) / 165;
+      const mTextDist = Math.sqrt(mqx * mqx + mqy * mqy);
+      let spotAlpha = 0.045;
+      if (mTextDist < 1.45) {
+        const t = Math.max(0, (mTextDist - 0.95) / 0.5);
+        spotAlpha *= t * t * (3 - 2 * t);
+      }
+      if (spotAlpha <= 0.001) return;
+
+      const pal = kineticSubPalette || kineticPalette;
+      let spotColor = pal.accentHighlight || pal.accentDefault || (pal.accents && pal.accents[0]);
+      if (kineticSubvariant === 'cosmos') spotColor = pal.info || spotColor;
+      else if (kineticSubvariant === 'titanium') spotColor = pal.borderFocus || spotColor;
+      else if (kineticSubvariant === 'cyberpunk') spotColor = pal.success || spotColor;
+      else if (kineticSubvariant === 'plasma') spotColor = pal.accentHighlight || spotColor;
+      else if (kineticSubvariant === 'swiss') spotColor = pal.accentDefault || spotColor;
+
+      ctx.save();
+      const grad = ctx.createRadialGradient(kineticMouse.x, kineticMouse.y, 0, kineticMouse.x, kineticMouse.y, 190);
+      grad.addColorStop(0, spotColor);
+      grad.addColorStop(0.4, spotColor);
+      grad.addColorStop(1, 'transparent');
+      ctx.globalAlpha = spotAlpha;
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(kineticMouse.x, kineticMouse.y, 190, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
     }
 
     /** Paints the field; advance=true moves the particles one step first (false = repaint the current still frame). */
@@ -10517,52 +12408,98 @@ export async function executeHedge(symbol: string, size: number) {
       const h = rect.height;
       kineticCtx.clearRect(0, 0, w, h);
 
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+        (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      kineticCtx.globalCompositeOperation = isDark ? 'screen' : 'source-over';
+
+      // 3D camera parallax tilt towards cursor
+      const targetCamX = (kineticMouse.isOver ? (kineticMouse.x - w / 2) : 0) * 0.08;
+      const targetCamY = (kineticMouse.isOver ? (kineticMouse.y - h / 2) : 0) * 0.08;
+      if (advance) {
+        kineticCamX += (targetCamX - kineticCamX) * 0.06;
+        kineticCamY += (targetCamY - kineticCamY) * 0.06;
+      }
+
       const projected = kineticParticles.map((p) => {
         if (advance) stepKineticParticle(p, w, h);
         const scale = KINETIC_FOV / (KINETIC_FOV + p.z);
+        const parallaxFactor = (180 - p.z) / 360;
+        const px = p.x - kineticCamX * parallaxFactor;
+        const py = p.y - kineticCamY * parallaxFactor;
+        const screenX = w / 2 + px * scale;
+        const screenY = h / 2 + py * scale;
+
+        let spotFactor = 1.0;
+        if (kineticMouse.isOver && kineticMouse.x >= 0) {
+          const mDist = Math.hypot(screenX - kineticMouse.x, screenY - kineticMouse.y);
+          if (mDist < 190) {
+            spotFactor = 1.0 + (1 - mDist / 190) * 0.35;
+          }
+        }
+
         return {
-          x: w / 2 + p.x * scale,
-          y: h / 2 + p.y * scale,
+          x: screenX,
+          y: screenY,
           scale,
-          radius: p.baseRadius * scale,
-          length: p.length * scale,
+          radius: p.baseRadius * scale * (spotFactor > 1.0 ? 1.15 : 1.0),
+          length: p.length * scale * (spotFactor > 1.0 ? 1.15 : 1.0),
           thickness: p.thickness * scale,
           isPill: p.isPill,
+          shape: p.shape,
           angle: p.angle,
-          tone: p.tone
+          tone: p.tone,
+          alpha: p.alpha,
+          fadeAlpha: p.fadeAlpha,
+          lensScale: p.lensScale,
+          isSurging: p.isSurging,
+          spotFactor,
         };
       });
 
-      // Render floating Antigravity capsules and orbs (zero spiderweb connecting lines)
-      kineticCtx.globalAlpha = 0.88;
+      drawCursorSpotlight(kineticCtx, w, h, isDark);
+
       for (const p of projected) {
-        kineticCtx.fillStyle = kineticPalette.accents[p.tone];
-        if (p.isPill && p.length > 2) {
-          kineticCtx.save();
-          kineticCtx.translate(p.x, p.y);
-          kineticCtx.rotate(p.angle);
-          kineticCtx.beginPath();
-          const rad = Math.max(1, p.thickness / 2);
-          if (kineticCtx.roundRect) {
-            kineticCtx.roundRect(-p.length / 2, -p.thickness / 2, p.length, p.thickness, rad);
-          } else {
-            kineticCtx.rect(-p.length / 2, -p.thickness / 2, p.length, p.thickness);
-          }
-          kineticCtx.fill();
-          kineticCtx.restore();
+        const baseAlpha = p.alpha != null ? p.alpha : 0.88;
+        const fade = p.fadeAlpha != null ? p.fadeAlpha : 1.0;
+        const alpha = Math.min(1.0, baseAlpha * fade * p.spotFactor);
+        if (alpha <= 0.008) continue;
+        const color = getParticleColor(p);
+
+        if (p.shape === 'bokeh') {
+          drawBokeh(kineticCtx, p.x, p.y, p.radius, color, alpha);
+        } else if (p.shape === 'star') {
+          drawSparkle(kineticCtx, p.x, p.y, p.radius, p.angle, color, alpha);
+        } else if (p.shape === 'diamond' || p.shape === 'shard') {
+          drawShard(kineticCtx, p.x, p.y, p.length, p.thickness, p.angle, color, alpha);
+        } else if (p.shape === 'ring') {
+          drawRing(kineticCtx, p.x, p.y, p.radius, color, alpha);
+        } else if (p.shape === 'cross') {
+          drawCross(kineticCtx, p.x, p.y, p.radius, color, alpha);
+        } else if (p.shape === 'pixel') {
+          drawPixel(kineticCtx, p.x, p.y, p.length, p.thickness, color, alpha);
+        } else if (p.shape === 'stream') {
+          drawStream(kineticCtx, p.x, p.y, p.thickness, p.length, color, alpha);
+        } else if (p.shape === 'pill' || (p.isPill && p.length > 2)) {
+          drawCapsule(kineticCtx, p.x, p.y, p.length, p.thickness, p.angle, color, alpha);
+        } else if (p.shape === 'halftone') {
+          drawOrb(kineticCtx, p.x, p.y, p.radius * (p.lensScale || 1), color, alpha, false);
+        } else if (p.shape === 'dust') {
+          drawDust(kineticCtx, p.x, p.y, p.radius, color, alpha);
         } else {
-          kineticCtx.beginPath();
-          kineticCtx.arc(p.x, p.y, Math.max(1, p.radius), 0, Math.PI * 2);
-          kineticCtx.fill();
+          drawOrb(kineticCtx, p.x, p.y, Math.max(1, p.radius), color, alpha, true);
         }
       }
-      kineticCtx.globalAlpha = 1;
+
+      stepAndDrawComets(kineticCtx, w, h, advance);
+      stepAndDrawRipples(kineticCtx, advance);
+      kineticCtx.globalCompositeOperation = 'source-over';
       clearKineticTextArea();
     }
 
     /**
-     * Keeps the hero copy on the plain card surface: every text line box and CTA of the HeroSection, padded, is cut out
-     * of the painted field, so particles never lower the text contrast. Line boxes are read live (fonts load late).
+     * Keeps the hero copy on the plain card surface: every text line box and CTA of the HeroSection is cut out
+     * of the painted field with zero extra padding, so particles never lower the text contrast while leaving
+     * zero visible rectangular boundaries on the open canvas.
      */
     function clearKineticTextArea() {
       const hero = kineticCanvas.parentElement.querySelector('.joy-hero');
@@ -10575,7 +12512,11 @@ export async function executeHedge(symbol: string, size: number) {
         rects.push(...range.getClientRects());
       });
       hero.querySelectorAll('.joy-hero__badge, .joy-hero__ctas .joy-button').forEach((el) => rects.push(el.getBoundingClientRect()));
-      const pad = 10;
+      const subBar = kineticCanvas.parentElement.querySelector('.kinetic-subvariants-bar');
+      if (subBar) {
+        subBar.querySelectorAll('.kinetic-sub-btn').forEach((btn) => rects.push(btn.getBoundingClientRect()));
+      }
+      const pad = 1;
       kineticCtx.save();
       kineticCtx.globalCompositeOperation = 'destination-out';
       kineticCtx.fillStyle = kineticPalette.muted;
@@ -10628,6 +12569,19 @@ export async function executeHedge(symbol: string, size: number) {
         syncMesh3d();
       } else if (opt === 'cockpit') {
         initCockpitSparkline();
+      }
+      const heroNames = {
+        antigravity: 'Antigravity Particles',
+        mesh3d: '3D Wave Mesh',
+        editorial: 'Editorial Cover',
+        keynote: 'Apple Keynote',
+        cockpit: 'SaaS Cockpit',
+        cyberpunk: 'Cyberpunk HUD',
+        swiss: 'Swiss Poster',
+        aura: 'Fluid Aura'
+      };
+      if (typeof showDemoToast === 'function' && heroNames[opt]) {
+        showDemoToast('Hero archetype: ' + heroNames[opt], 'info');
       }
     }
     window.switchHeroOption = switchHeroOption;

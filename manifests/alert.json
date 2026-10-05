@@ -1,0 +1,33 @@
+{
+  "component": "Alert",
+  "targets": {
+    "react": "JoyAlert",
+    "svelte": "Alert",
+    "flutter": "JoyAlert"
+  },
+  "variants": ["info", "success", "warning", "danger"],
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["info", "success", "warning", "danger"],
+      "default": "info"
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "closable": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "close": {
+      "react": "onClose",
+      "svelte": "onclose",
+      "flutter": "onClose"
+    }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    }
+  }
+}

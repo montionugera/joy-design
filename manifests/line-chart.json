@@ -1,0 +1,21 @@
+{
+  "component": "LineChart",
+  "targets": {
+    "react": "JoyLineChart",
+    "svelte": "LineChart",
+    "flutter": "JoyLineChart"
+  },
+  "props": {
+    "data": { "type": "array" },
+    "height": { "type": "number", "default": 320 },
+    "showGrid": { "type": "boolean", "default": true },
+    "showArea": { "type": "boolean", "default": true }
+  },
+  "events": {
+    "hover": {
+      "react": "onHover",
+      "svelte": "onhover",
+      "flutter": "onHover"
+    }
+  }
+}

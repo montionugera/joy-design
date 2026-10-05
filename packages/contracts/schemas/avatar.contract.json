@@ -1,0 +1,33 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyAvatar",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "avatar_initials_render",
+      "description": "Avatar derives initials from full name",
+      "props": {
+        "name": "Joy Design",
+        "size": "md",
+        "shape": "circle"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "avatar_explicit_initials",
+      "description": "Avatar displays explicit initials override",
+      "props": {
+        "initials": "JD",
+        "size": "lg",
+        "shape": "square"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    }
+  ]
+}

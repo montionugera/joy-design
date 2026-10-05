@@ -1,0 +1,40 @@
+{
+  "component": "Avatar",
+  "targets": {
+    "react": "JoyAvatar",
+    "svelte": "Avatar",
+    "flutter": "JoyAvatar"
+  },
+  "variants": [
+    "defaultVariant",
+    "neutral",
+    "accent",
+    "info",
+    "success",
+    "warning",
+    "danger"
+  ],
+  "sizes": ["sm", "md", "lg"],
+  "shapes": ["circle", "square"],
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["defaultVariant", "neutral", "accent", "info", "success", "warning", "danger"],
+      "default": "defaultVariant"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md"
+    },
+    "shape": {
+      "type": "enum",
+      "values": ["circle", "square"],
+      "default": "circle"
+    },
+    "imageUrl": { "type": "string" },
+    "name": { "type": "string" },
+    "initials": { "type": "string" },
+    "ringWidth": { "type": "number", "default": 0.0 }
+  }
+}
