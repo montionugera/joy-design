@@ -810,8 +810,9 @@
     "title": "Integrate Flutter into Storybook Hub with 3-way framework toggle, synchronized bridge, and Dart snippets",
     "from_idea": "I-070",
     "created_at": "2026-10-05T16:33:49.562374+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-10-05T16:33:56.397146+00:00"
   }
 ]
