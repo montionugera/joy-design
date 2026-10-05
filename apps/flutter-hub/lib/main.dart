@@ -16,6 +16,8 @@ class JoyFlutterHubApp extends StatefulWidget {
 
 class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
   String _currentTheme = 'light';
+  bool _checkableTagValue = true;
+  bool _dismissedTag = false;
 
   @override
   void initState() {
@@ -67,11 +69,15 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
                     const SizedBox(height: JoySpacing.s32),
                     _buildInteractiveCounterSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
-                    _buildVariantsSection(tokens),
+                    _buildButtonsSection(tokens),
                     const SizedBox(height: JoySpacing.s32),
-                    _buildSizesSection(tokens),
+                    _buildTypographySection(tokens),
                     const SizedBox(height: JoySpacing.s32),
-                    _buildStatesSection(tokens),
+                    _buildIconsSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildLayoutSection(tokens),
+                    const SizedBox(height: JoySpacing.s32),
+                    _buildDisplaySection(tokens),
                   ],
                 ),
               ),
@@ -185,93 +191,327 @@ class _JoyFlutterHubAppState extends State<JoyFlutterHubApp> {
     );
   }
 
-  Widget _buildVariantsSection(JoyThemeTokens tokens) {
+  Widget _buildButtonsSection(JoyThemeTokens tokens) {
     return _buildSectionCard(
       tokens: tokens,
-      title: 'Button Variants',
-      subtitle: 'All 5 styling variants across the design system token ramp',
-      content: Wrap(
-        spacing: JoySpacing.s12,
-        runSpacing: JoySpacing.s12,
+      title: 'Button Variants & Sizes',
+      subtitle: 'All 5 variants and 3 sizes enforcing 44px hit bounds',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          JoyButton(
-            variant: JoyButtonVariant.solid,
-            onPressed: () {},
-            child: const Text('Solid'),
-          ),
-          JoyButton(
-            variant: JoyButtonVariant.outline,
-            onPressed: () {},
-            child: const Text('Outline'),
-          ),
-          JoyButton(
-            variant: JoyButtonVariant.ghost,
-            onPressed: () {},
-            child: const Text('Ghost'),
-          ),
-          JoyButton(
-            variant: JoyButtonVariant.danger,
-            onPressed: () {},
-            child: const Text('Danger'),
-          ),
-          JoyButton(
-            variant: JoyButtonVariant.link,
-            onPressed: () {},
-            child: const Text('Link'),
+          Wrap(
+            spacing: JoySpacing.s12,
+            runSpacing: JoySpacing.s12,
+            children: [
+              JoyButton(
+                variant: JoyButtonVariant.solid,
+                onPressed: () {},
+                child: const Text('Solid'),
+              ),
+              JoyButton(
+                variant: JoyButtonVariant.outline,
+                onPressed: () {},
+                child: const Text('Outline'),
+              ),
+              JoyButton(
+                variant: JoyButtonVariant.ghost,
+                onPressed: () {},
+                child: const Text('Ghost'),
+              ),
+              JoyButton(
+                variant: JoyButtonVariant.danger,
+                onPressed: () {},
+                child: const Text('Danger'),
+              ),
+              JoyButton(
+                variant: JoyButtonVariant.link,
+                onPressed: () {},
+                child: const Text('Link'),
+              ),
+              JoyButton(
+                disabled: true,
+                onPressed: () {},
+                child: const Text('Disabled'),
+              ),
+              JoyButton(
+                loading: true,
+                onPressed: () {},
+                child: const Text('Loading'),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSizesSection(JoyThemeTokens tokens) {
+  Widget _buildTypographySection(JoyThemeTokens tokens) {
     return _buildSectionCard(
       tokens: tokens,
-      title: 'Button Sizes',
-      subtitle: 'All sizes enforce minimum 44px coarse hit targets',
+      title: 'Typography: JoyText Scales & Colors',
+      subtitle: 'Pure semantic typography resolving tokens across Light and Dark themes',
+      content: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          JoyText.h1('Heading 1 (32px Bold)'),
+          SizedBox(height: JoySpacing.s8),
+          JoyText.h2('Heading 2 (24px SemiBold)'),
+          SizedBox(height: JoySpacing.s8),
+          JoyText.h3('Heading 3 (20px SemiBold)'),
+          SizedBox(height: JoySpacing.s8),
+          JoyText.bodyLarge(
+            'Body Large: High-contrast primary reading typography engineered for mobile readability.',
+          ),
+          SizedBox(height: JoySpacing.s8),
+          JoyText.body(
+            'Body: Standard paragraph scale mapped to design system typography scale.',
+            color: JoyTextColor.secondary,
+          ),
+          SizedBox(height: JoySpacing.s8),
+          JoyText.caption(
+            'Caption: Supporting annotations, timestamps, and secondary metadata.',
+            color: JoyTextColor.tertiary,
+          ),
+          SizedBox(height: JoySpacing.s8),
+          JoyText.code(
+            'const tokens = context.joyTheme; // Monospace code variant',
+            color: JoyTextColor.accent,
+          ),
+          SizedBox(height: JoySpacing.s16),
+          Wrap(
+            spacing: JoySpacing.s12,
+            runSpacing: JoySpacing.s8,
+            children: [
+              JoyText('Primary', color: JoyTextColor.primary),
+              JoyText('Secondary', color: JoyTextColor.secondary),
+              JoyText('Tertiary', color: JoyTextColor.tertiary),
+              JoyText('Accent', color: JoyTextColor.accent),
+              JoyText('Success', color: JoyTextColor.success),
+              JoyText('Warning', color: JoyTextColor.warning),
+              JoyText('Danger', color: JoyTextColor.danger),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconsSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Vector Icons: JoyIcon & JoyIcons',
+      subtitle: 'Crisp vector SVGs adhering strictly to Zero Emoji policy',
       content: Wrap(
-        spacing: JoySpacing.s12,
-        runSpacing: JoySpacing.s12,
+        spacing: JoySpacing.s16,
+        runSpacing: JoySpacing.s16,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          JoyButton(
-            size: JoyButtonSize.sm,
-            onPressed: () {},
-            child: const Text('Small (sm)'),
+          JoyIcon(JoyIcons.search, size: JoyIconSize.lg, color: tokens.text.primary),
+          JoyIcon(JoyIcons.check, size: JoyIconSize.lg, color: tokens.status.success.fg),
+          JoyIcon(JoyIcons.close, size: JoyIconSize.lg, color: tokens.status.danger.fg),
+          JoyIcon(JoyIcons.alertTriangle, size: JoyIconSize.lg, color: tokens.status.warning.fg),
+          JoyIcon(JoyIcons.star, size: JoyIconSize.lg, color: tokens.accent.base),
+          JoyIcon(JoyIcons.user, size: JoyIconSize.lg, color: tokens.text.primary),
+          JoyIcon(JoyIcons.edit, size: JoyIconSize.lg, color: tokens.text.secondary),
+          JoyIcon(JoyIcons.trash, size: JoyIconSize.lg, color: tokens.status.danger.fg),
+          JoyIcon(JoyIcons.info, size: JoyIconSize.lg, color: tokens.status.info.fg),
+          JoyIcon(JoyIcons.plus, size: JoyIconSize.md, color: tokens.text.primary),
+          JoyIcon(JoyIcons.minus, size: JoyIconSize.md, color: tokens.text.primary),
+          JoyIcon(JoyIcons.chevronRight, size: JoyIconSize.sm, color: tokens.text.secondary),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLayoutSection(JoyThemeTokens tokens) {
+    return _buildSectionCard(
+      tokens: tokens,
+      title: 'Layout Primitives: Box, Flex, Space, Grid, Divider',
+      subtitle: 'Responsive container and structural building blocks',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          JoyBox(
+            padding: const EdgeInsets.all(JoySpacing.s16),
+            backgroundColor: tokens.surface.sunken,
+            borderRadius: BorderRadius.circular(JoyRadius.control),
+            borderColor: tokens.border.subtle,
+            child: Row(
+              children: [
+                JoyIcon(JoyIcons.info, color: tokens.status.info.fg),
+                const SizedBox(width: JoySpacing.s12),
+                const Expanded(
+                  child: JoyText.body(
+                    'JoyBox layout container with tokenized background and border.',
+                  ),
+                ),
+              ],
+            ),
           ),
-          JoyButton(
-            size: JoyButtonSize.md,
-            onPressed: () {},
-            child: const Text('Medium (md)'),
+          const SizedBox(height: JoySpacing.s16),
+          const JoyDivider(dashed: false),
+          const SizedBox(height: JoySpacing.s16),
+          JoySpace(
+            direction: Axis.horizontal,
+            size: JoySpacing.s8,
+            children: [
+              JoyBox(
+                padding: const EdgeInsets.all(JoySpacing.s8),
+                backgroundColor: tokens.surface.card,
+                borderColor: tokens.border.base,
+                child: const JoyText.caption('Item 1'),
+              ),
+              JoyBox(
+                padding: const EdgeInsets.all(JoySpacing.s8),
+                backgroundColor: tokens.surface.card,
+                borderColor: tokens.border.base,
+                child: const JoyText.caption('Item 2'),
+              ),
+              JoyBox(
+                padding: const EdgeInsets.all(JoySpacing.s8),
+                backgroundColor: tokens.surface.card,
+                borderColor: tokens.border.base,
+                child: const JoyText.caption('Item 3'),
+              ),
+            ],
           ),
-          JoyButton(
-            size: JoyButtonSize.lg,
-            onPressed: () {},
-            child: const Text('Large (lg)'),
+          const SizedBox(height: JoySpacing.s16),
+          const JoyDivider(
+            dashed: true,
+            child: JoyText.caption(
+              'Dashed Divider',
+              color: JoyTextColor.tertiary,
+            ),
+          ),
+          const SizedBox(height: JoySpacing.s16),
+          JoyGrid(
+            columns: 3,
+            gutter: JoySpacing.s8,
+            children: [
+              JoyBox(
+                padding: const EdgeInsets.all(JoySpacing.s12),
+                backgroundColor: tokens.surface.raised,
+                child: const Center(child: JoyText.caption('Col 1')),
+              ),
+              JoyBox(
+                padding: const EdgeInsets.all(JoySpacing.s12),
+                backgroundColor: tokens.surface.raised,
+                child: const Center(child: JoyText.caption('Col 2')),
+              ),
+              JoyBox(
+                padding: const EdgeInsets.all(JoySpacing.s12),
+                backgroundColor: tokens.surface.raised,
+                child: const Center(child: JoyText.caption('Col 3')),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatesSection(JoyThemeTokens tokens) {
+  Widget _buildDisplaySection(JoyThemeTokens tokens) {
     return _buildSectionCard(
       tokens: tokens,
-      title: 'Button States',
-      subtitle: 'Interactive suppression for disabled and loading states',
-      content: Wrap(
-        spacing: JoySpacing.s12,
-        runSpacing: JoySpacing.s12,
+      title: 'Visual Display: Badge, Tag, Avatar',
+      subtitle: 'Component triplet parity with 44px coarse hit targets',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          JoyButton(
-            disabled: true,
-            onPressed: () {},
-            child: const Text('Disabled'),
+          const JoyText.h6('Badges'),
+          const SizedBox(height: JoySpacing.s8),
+          Wrap(
+            spacing: JoySpacing.s16,
+            runSpacing: JoySpacing.s12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const JoyBadge(count: 5),
+              const JoyBadge(count: 120, overflowCount: 99),
+              const JoyBadge.dot(status: JoyBadgeStatus.success),
+              const JoyBadge.dot(status: JoyBadgeStatus.danger),
+              JoyBadge.count(
+                count: 3,
+                child: Container(
+                  padding: const EdgeInsets.all(JoySpacing.s8),
+                  decoration: BoxDecoration(
+                    color: tokens.surface.sunken,
+                    borderRadius: BorderRadius.circular(JoyRadius.control),
+                  ),
+                  child: JoyIcon(JoyIcons.user, size: JoyIconSize.md),
+                ),
+              ),
+              const JoyBadge(status: JoyBadgeStatus.success, text: 'ACTIVE'),
+              const JoyBadge(status: JoyBadgeStatus.warning, text: 'PENDING'),
+              const JoyBadge(status: JoyBadgeStatus.danger, text: 'HIGH'),
+            ],
           ),
-          JoyButton(
-            loading: true,
-            onPressed: () {},
-            child: const Text('Loading'),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Tags'),
+          const SizedBox(height: JoySpacing.s8),
+          Wrap(
+            spacing: JoySpacing.s12,
+            runSpacing: JoySpacing.s12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const JoyTag(text: 'Default Tag'),
+              const JoyTag(variant: JoyTagVariant.accent, text: 'Accent Tag'),
+              const JoyTag(variant: JoyTagVariant.success, text: 'Success'),
+              const JoyTag(variant: JoyTagVariant.warning, text: 'Warning'),
+              const JoyTag(variant: JoyTagVariant.danger, text: 'Danger'),
+              const JoyTag(variant: JoyTagVariant.info, text: 'Info'),
+              if (!_dismissedTag)
+                JoyTag.closable(
+                  text: 'Dismissible',
+                  onClose: () {
+                    setState(() {
+                      _dismissedTag = true;
+                    });
+                  },
+                ),
+              JoyTag.checkable(
+                text: 'Selectable',
+                checked: _checkableTagValue,
+                onChanged: (val) {
+                  setState(() {
+                    _checkableTagValue = val;
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: JoySpacing.s24),
+          const JoyText.h6('Avatars'),
+          const SizedBox(height: JoySpacing.s8),
+          const Wrap(
+            spacing: JoySpacing.s16,
+            runSpacing: JoySpacing.s12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              JoyAvatar(
+                name: 'Joy Design',
+                size: JoyAvatarSize.sm,
+              ),
+              JoyAvatar(
+                name: 'Alex Turner',
+                size: JoyAvatarSize.md,
+              ),
+              JoyAvatar(
+                name: 'Morgan Stanley',
+                size: JoyAvatarSize.lg,
+              ),
+              JoyAvatar.square(
+                name: 'Square Avatar',
+                size: JoyAvatarSize.md,
+              ),
+              JoyAvatar(
+                initials: 'VIP',
+                ringWidth: 3.0,
+                size: JoyAvatarSize.md,
+              ),
+              JoyAvatar(
+                size: JoyAvatarSize.md,
+              ),
+            ],
           ),
         ],
       ),
