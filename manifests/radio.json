@@ -1,0 +1,24 @@
+{
+  "component": "RadioGroup",
+  "targets": {
+    "react": "RadioGroup",
+    "svelte": "RadioGroup",
+    "flutter": "JoyRadioGroup"
+  },
+  "props": {
+    "value": { "type": "string" },
+    "direction": {
+      "type": "enum",
+      "values": ["horizontal", "vertical"],
+      "default": "horizontal"
+    },
+    "disabled": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}

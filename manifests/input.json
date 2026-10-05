@@ -1,0 +1,34 @@
+{
+  "component": "Input",
+  "targets": {
+    "react": "JoyInput",
+    "svelte": "Input",
+    "flutter": "JoyInput"
+  },
+  "sizes": ["sm", "md", "lg"],
+  "statuses": ["defaultStatus", "error", "warning"],
+  "props": {
+    "value": { "type": "string" },
+    "placeholder": { "type": "string" },
+    "disabled": { "type": "boolean", "default": false },
+    "readonly": { "type": "boolean", "default": false },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md"
+    },
+    "status": {
+      "type": "enum",
+      "values": ["defaultStatus", "error", "warning"],
+      "default": "defaultStatus"
+    },
+    "allowClear": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}

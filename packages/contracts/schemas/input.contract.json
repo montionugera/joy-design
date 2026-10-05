@@ -1,0 +1,44 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyInput",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "input_default",
+      "description": "Default input mounts and satisfies minimum touch target",
+      "props": {
+        "placeholder": "Enter text...",
+        "size": "lg"
+      },
+      "actions": [],
+      "expect": {
+        "events": {},
+        "minTouchTarget": { "width": 44.0, "height": 44.0 }
+      }
+    },
+    {
+      "id": "input_disabled",
+      "description": "Disabled input suppresses typing change events",
+      "props": {
+        "placeholder": "Disabled",
+        "disabled": true
+      },
+      "actions": [{ "type": "tap" }],
+      "expect": {
+        "events": { "change": 0 }
+      }
+    },
+    {
+      "id": "input_status_error",
+      "description": "Input displays error status variant",
+      "props": {
+        "status": "error",
+        "placeholder": "Error field"
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    }
+  ]
+}

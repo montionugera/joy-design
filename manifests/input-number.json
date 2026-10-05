@@ -1,0 +1,36 @@
+{
+  "component": "InputNumber",
+  "targets": {
+    "react": "JoyInputNumber",
+    "svelte": "InputNumber",
+    "flutter": "JoyInputNumber"
+  },
+  "sizes": ["sm", "md", "lg"],
+  "statuses": ["defaultStatus", "error", "warning"],
+  "props": {
+    "value": { "type": "number" },
+    "min": { "type": "number" },
+    "max": { "type": "number" },
+    "step": { "type": "number", "default": 1 },
+    "precision": { "type": "number" },
+    "disabled": { "type": "boolean", "default": false },
+    "readonly": { "type": "boolean", "default": false },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md"
+    },
+    "status": {
+      "type": "enum",
+      "values": ["defaultStatus", "error", "warning"],
+      "default": "defaultStatus"
+    }
+  },
+  "events": {
+    "change": {
+      "react": "onChange",
+      "svelte": "onchange",
+      "flutter": "onChanged"
+    }
+  }
+}
