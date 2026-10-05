@@ -1,0 +1,41 @@
+{
+  "component": "Button",
+  "targets": {
+    "react": "JoyButton",
+    "svelte": "Button",
+    "flutter": "JoyButton"
+  },
+  "variants": ["solid", "outline", "ghost", "danger", "link"],
+  "sizes": ["sm", "md", "lg"],
+  "props": {
+    "variant": { "type": "enum", "values": ["solid", "outline", "ghost", "danger", "link"], "default": "solid" },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md" },
+    "loading": { "type": "boolean", "default": false },
+    "disabled": { "type": "boolean", "default": false },
+    "block": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "activate": {
+      "react": "onClick",
+      "svelte": "onclick",
+      "flutter": "onPressed"
+    }
+  },
+  "slots": {
+    "content": {
+      "react": "children",
+      "svelte": "children",
+      "flutter": "child"
+    },
+    "iconStart": {
+      "react": "iconStart",
+      "svelte": "iconStart",
+      "flutter": "iconStart"
+    },
+    "iconEnd": {
+      "react": "iconEnd",
+      "svelte": "iconEnd",
+      "flutter": "iconEnd"
+    }
+  }
+}

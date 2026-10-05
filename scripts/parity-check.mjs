@@ -626,134 +626,254 @@ export function checkSvelteRefRest(rootDir = process.cwd(), names = SVELTE_REF_R
   return failures;
 }
 
+// --- Manifest & Triplet Parity Checking ---
+
+export function isFlutterExported(rootDir = process.cwd(), targetName = 'JoyButton') {
+  const entryFile = path.resolve(rootDir, 'packages/flutter/lib/joymify_flutter.dart');
+  if (!fs.existsSync(entryFile)) return false;
+  const content = fs.readFileSync(entryFile, 'utf8');
+  if (content.includes(targetName)) return true;
+
+  // Follow relative exports in joymify_flutter.dart
+  const exportMatches = content.matchAll(/export\s+['"]([^'"]+)['"]/g);
+  for (const match of exportMatches) {
+    const relPath = match[1];
+    const resolvedPath = path.resolve(rootDir, 'packages/flutter/lib', relPath);
+    if (fs.existsSync(resolvedPath)) {
+      const subContent = fs.readFileSync(resolvedPath, 'utf8');
+      if (subContent.includes(targetName)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function checkManifests(rootDir = process.cwd(), options = {}) {
+  const manifestsDir = path.resolve(rootDir, 'manifests');
+  if (!fs.existsSync(manifestsDir)) return [];
+
+  const checks = [];
+  const files = fs.readdirSync(manifestsDir).filter((f) => f.endsWith('.json'));
+
+  for (const file of files) {
+    const filePath = path.join(manifestsDir, file);
+    try {
+      const manifest = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const comp = manifest.component;
+      const targets = manifest.targets || {};
+
+      // Check Flutter target
+      if (options.triplet || options.flutter || options.side === 'flutter') {
+        const flutterTarget =
+          typeof targets.flutter === 'string' && targets.flutter !== 'required'
+            ? targets.flutter
+            : `Joy${comp}`;
+
+        if (!isFlutterExported(rootDir, flutterTarget)) {
+          checks.push({
+            component: comp,
+            check: `Flutter export (${flutterTarget} in joymify_flutter.dart)`,
+            status: 'FAIL'
+          });
+        } else {
+          checks.push({
+            component: comp,
+            check: `Flutter export (${flutterTarget})`,
+            status: 'PASS'
+          });
+        }
+      }
+
+      // Check React target file exists
+      if (options.triplet || options.side === 'react') {
+        const reactFile = path.resolve(rootDir, `packages/react/src/${comp}.tsx`);
+        if (!fs.existsSync(reactFile)) {
+          checks.push({
+            component: comp,
+            check: `React component file exists (${comp}.tsx)`,
+            status: 'FAIL'
+          });
+        } else {
+          checks.push({
+            component: comp,
+            check: `React component (${comp}.tsx)`,
+            status: 'PASS'
+          });
+        }
+      }
+
+      // Check Svelte target file exists
+      if (options.triplet || options.side === 'svelte') {
+        const svelteFile = path.resolve(rootDir, `packages/svelte/src/lib/${comp}.svelte`);
+        if (!fs.existsSync(svelteFile)) {
+          checks.push({
+            component: comp,
+            check: `Svelte component file exists (${comp}.svelte)`,
+            status: 'FAIL'
+          });
+        } else {
+          checks.push({
+            component: comp,
+            check: `Svelte component (${comp}.svelte)`,
+            status: 'PASS'
+          });
+        }
+      }
+    } catch (e) {
+      checks.push({
+        component: file,
+        check: `Manifest syntax valid JSON (${e.message})`,
+        status: 'FAIL'
+      });
+    }
+  }
+
+  return checks;
+}
+
 export function runParityCheck(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const themeCssPath = path.resolve(rootDir, 'packages/tokens/dist/theme.css');
   const themeCss = fs.readFileSync(themeCssPath, 'utf8');
   const defined = getDefinedClasses(themeCss);
 
-  const side = options.side || null; // 'svelte' | 'react' | null (twin mode)
+  const side = options.side || null; // 'svelte' | 'react' | 'flutter' | null (twin mode)
+  const triplet = Boolean(options.triplet);
+  const flutter = Boolean(options.flutter || side === 'flutter');
   const results = {};
   const checks = []; // structural checks: { component, check, status }
   let totalViolations = 0;
 
-  for (const comp of COMPONENTS) {
-    const svelteFile = path.resolve(rootDir, `packages/svelte/src/lib/${comp}.svelte`);
-    const reactFile = path.resolve(rootDir, `packages/react/src/${comp}.tsx`);
+  if (side !== 'flutter') {
+    for (const comp of COMPONENTS) {
+      const svelteFile = path.resolve(rootDir, `packages/svelte/src/lib/${comp}.svelte`);
+      const reactFile = path.resolve(rootDir, `packages/react/src/${comp}.tsx`);
 
-    const absent = [];
-    if (side !== 'react' && !fs.existsSync(svelteFile)) absent.push('svelte');
-    if (side !== 'svelte' && !fs.existsSync(reactFile)) absent.push('react');
-    if (absent.length > 0) {
-      for (const which of absent) {
-        checks.push({ component: comp, check: `${which} file exists`, status: 'FAIL' });
+      const absent = [];
+      if (side !== 'react' && !fs.existsSync(svelteFile)) absent.push('svelte');
+      if (side !== 'svelte' && !fs.existsSync(reactFile)) absent.push('react');
+      if (absent.length > 0) {
+        for (const which of absent) {
+          checks.push({ component: comp, check: `${which} file exists`, status: 'FAIL' });
+          totalViolations += 1;
+        }
+        continue;
+      }
+
+      // In lane mode only the checked side must exist; the other side may be absent.
+      const readIfPresent = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '');
+      const svelteSrc = readIfPresent(svelteFile);
+      const reactSrc = readIfPresent(reactFile);
+
+      const sClasses = classes(svelteSrc);
+      const rClasses = classes(reactSrc);
+
+      const sProps = svelteProps(svelteSrc);
+      const rProps = reactProps(comp, reactSrc);
+      const rPropsExplicit = reactPropsExplicit(comp, reactSrc);
+      const sHandlerCasing = handlerCasingViolations('svelte', svelteRawProps(svelteSrc));
+      const rHandlerCasing = handlerCasingViolations('react', reactRawProps(comp, reactSrc));
+
+      const contractProps = (CONTRACT[comp] || []).map(normaliseProp);
+      // A structural hook is exempt from the theme.css rule only while both twins carry it.
+      const isUndefined = (c, other) =>
+        needsThemeRule(c) && !defined.has(c) && !(STRUCTURAL_CLASSES.has(c) && other.has(c));
+
+      if (side === 'svelte') {
+        const undefinedClasses = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
+        const missingContractProps = contractProps.filter((p) => !sProps.has(p)).sort();
+        const violationsCount = undefinedClasses.length + missingContractProps.length + sHandlerCasing.length;
+        totalViolations += violationsCount;
+        results[comp] = {
+          undefinedClasses,
+          missingContractProps,
+          handlerCasing: sHandlerCasing,
+          hasViolations: violationsCount > 0
+        };
+      } else if (side === 'react') {
+        const undefinedClasses = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
+        const missingContractProps = contractProps.filter((p) => !rProps.has(p)).sort();
+        const violationsCount = undefinedClasses.length + missingContractProps.length + rHandlerCasing.length;
+        totalViolations += violationsCount;
+        results[comp] = {
+          undefinedClasses,
+          missingContractProps,
+          handlerCasing: rHandlerCasing,
+          hasViolations: violationsCount > 0
+        };
+      } else {
+        const sUndefined = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
+        const rUndefined = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
+        const sMissing = contractProps.filter((p) => !sProps.has(p)).sort();
+        const rMissing = contractProps.filter((p) => !rProps.has(p)).sort();
+        const classesOnlySvelte = [...sClasses].filter((c) => !rClasses.has(c)).sort();
+        const classesOnlyReact = [...rClasses].filter((c) => !sClasses.has(c)).sort();
+        const propsOnlySvelte = [...sProps].filter((p) => !rProps.has(p)).sort();
+        const propsOnlyReact = [...rProps]
+          .filter((p) => !sProps.has(p))
+          // `className` is never exempt: a React twin that takes it needs a Svelte `class` prop.
+          .filter((p) => !HTML_INHERITED_NORMALISED.has(p) || rPropsExplicit.has(p) || p === 'className')
+          .sort();
+
+        const violationsCount =
+          sUndefined.length +
+          rUndefined.length +
+          sMissing.length +
+          rMissing.length +
+          classesOnlySvelte.length +
+          classesOnlyReact.length +
+          propsOnlySvelte.length +
+          propsOnlyReact.length +
+          sHandlerCasing.length +
+          rHandlerCasing.length;
+
+        totalViolations += violationsCount;
+
+        results[comp] = {
+          undefinedClasses: { svelte: sUndefined, react: rUndefined },
+          missingContractProps: { svelte: sMissing, react: rMissing },
+          classesOnlyInSvelte: classesOnlySvelte,
+          classesOnlyInReact: classesOnlyReact,
+          propsOnlyInSvelte: propsOnlySvelte,
+          propsOnlyInReact: propsOnlyReact,
+          handlerCasing: { svelte: sHandlerCasing, react: rHandlerCasing },
+          hasViolations: violationsCount > 0
+        };
+      }
+    }
+
+    if (side !== 'svelte') {
+      for (const { component, missing } of checkRefForwarding(rootDir)) {
+        // A missing React file is already reported once by the file-exists check above.
+        if (missing.includes('file')) continue;
+        checks.push({ component, check: `ref forwarding (${missing.join(', ')})`, status: 'FAIL' });
         totalViolations += 1;
       }
-      continue;
     }
 
-    // In lane mode only the checked side must exist; the other side may be absent.
-    const readIfPresent = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '');
-    const svelteSrc = readIfPresent(svelteFile);
-    const reactSrc = readIfPresent(reactFile);
-
-    const sClasses = classes(svelteSrc);
-    const rClasses = classes(reactSrc);
-
-    const sProps = svelteProps(svelteSrc);
-    const rProps = reactProps(comp, reactSrc);
-    const rPropsExplicit = reactPropsExplicit(comp, reactSrc);
-    const sHandlerCasing = handlerCasingViolations('svelte', svelteRawProps(svelteSrc));
-    const rHandlerCasing = handlerCasingViolations('react', reactRawProps(comp, reactSrc));
-
-    const contractProps = (CONTRACT[comp] || []).map(normaliseProp);
-    // A structural hook is exempt from the theme.css rule only while both twins carry it.
-    const isUndefined = (c, other) =>
-      needsThemeRule(c) && !defined.has(c) && !(STRUCTURAL_CLASSES.has(c) && other.has(c));
-
-    if (side === 'svelte') {
-      const undefinedClasses = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
-      const missingContractProps = contractProps.filter((p) => !sProps.has(p)).sort();
-      const violationsCount = undefinedClasses.length + missingContractProps.length + sHandlerCasing.length;
-      totalViolations += violationsCount;
-      results[comp] = {
-        undefinedClasses,
-        missingContractProps,
-        handlerCasing: sHandlerCasing,
-        hasViolations: violationsCount > 0
-      };
-    } else if (side === 'react') {
-      const undefinedClasses = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
-      const missingContractProps = contractProps.filter((p) => !rProps.has(p)).sort();
-      const violationsCount = undefinedClasses.length + missingContractProps.length + rHandlerCasing.length;
-      totalViolations += violationsCount;
-      results[comp] = {
-        undefinedClasses,
-        missingContractProps,
-        handlerCasing: rHandlerCasing,
-        hasViolations: violationsCount > 0
-      };
-    } else {
-      const sUndefined = [...sClasses].filter((c) => isUndefined(c, rClasses)).sort();
-      const rUndefined = [...rClasses].filter((c) => isUndefined(c, sClasses)).sort();
-      const sMissing = contractProps.filter((p) => !sProps.has(p)).sort();
-      const rMissing = contractProps.filter((p) => !rProps.has(p)).sort();
-      const classesOnlySvelte = [...sClasses].filter((c) => !rClasses.has(c)).sort();
-      const classesOnlyReact = [...rClasses].filter((c) => !sClasses.has(c)).sort();
-      const propsOnlySvelte = [...sProps].filter((p) => !rProps.has(p)).sort();
-      const propsOnlyReact = [...rProps]
-        .filter((p) => !sProps.has(p))
-        // `className` is never exempt: a React twin that takes it needs a Svelte `class` prop.
-        .filter((p) => !HTML_INHERITED_NORMALISED.has(p) || rPropsExplicit.has(p) || p === 'className')
-        .sort();
-
-      const violationsCount =
-        sUndefined.length +
-        rUndefined.length +
-        sMissing.length +
-        rMissing.length +
-        classesOnlySvelte.length +
-        classesOnlyReact.length +
-        propsOnlySvelte.length +
-        propsOnlyReact.length +
-        sHandlerCasing.length +
-        rHandlerCasing.length;
-
-      totalViolations += violationsCount;
-
-      results[comp] = {
-        undefinedClasses: { svelte: sUndefined, react: rUndefined },
-        missingContractProps: { svelte: sMissing, react: rMissing },
-        classesOnlyInSvelte: classesOnlySvelte,
-        classesOnlyInReact: classesOnlyReact,
-        propsOnlyInSvelte: propsOnlySvelte,
-        propsOnlyInReact: propsOnlyReact,
-        handlerCasing: { svelte: sHandlerCasing, react: rHandlerCasing },
-        hasViolations: violationsCount > 0
-      };
+    if (side !== 'react') {
+      for (const { component, missing } of checkSvelteRefRest(rootDir)) {
+        // A missing Svelte file of a COMPONENTS entry is already reported by the file-exists check above.
+        if (missing.includes('file') && COMPONENTS.includes(component)) continue;
+        checks.push({ component, check: `Svelte ref/rest (${missing.join(', ')})`, status: 'FAIL' });
+        totalViolations += 1;
+      }
     }
   }
 
-  if (side !== 'svelte') {
-    for (const { component, missing } of checkRefForwarding(rootDir)) {
-      // A missing React file is already reported once by the file-exists check above.
-      if (missing.includes('file')) continue;
-      checks.push({ component, check: `ref forwarding (${missing.join(', ')})`, status: 'FAIL' });
-      totalViolations += 1;
-    }
-  }
-
-  if (side !== 'react') {
-    for (const { component, missing } of checkSvelteRefRest(rootDir)) {
-      // A missing Svelte file of a COMPONENTS entry is already reported by the file-exists check above.
-      if (missing.includes('file') && COMPONENTS.includes(component)) continue;
-      checks.push({ component, check: `Svelte ref/rest (${missing.join(', ')})`, status: 'FAIL' });
-      totalViolations += 1;
+  if (triplet || flutter) {
+    const manifestChecks = checkManifests(rootDir, { triplet, flutter, side });
+    for (const c of manifestChecks) {
+      checks.push(c);
+      if (c.status === 'FAIL') {
+        totalViolations += 1;
+      }
     }
   }
 
   return {
-    side: side || 'twin',
+    side: side || (triplet ? 'triplet' : 'twin'),
     passed: totalViolations === 0,
     totalViolations,
     results,
@@ -765,7 +885,10 @@ export function formatMarkdownTable(checkResult) {
   const { side, results, passed, totalViolations, checks = [] } = checkResult;
   const rows = [];
 
-  if (side === 'svelte' || side === 'react') {
+  if (side === 'flutter') {
+    rows.push('### Parity Check (Flutter)');
+    rows.push('');
+  } else if (side === 'svelte' || side === 'react') {
     rows.push(`### Parity Check (${side})`);
     rows.push('');
     rows.push('| Component | Classes without theme.css rule | CONTRACT props not implemented | Handler casing |');
@@ -776,6 +899,22 @@ export function formatMarkdownTable(checkResult) {
       const missing = data.missingContractProps.length > 0 ? data.missingContractProps.join(', ') : '-';
       const casing = data.handlerCasing.length > 0 ? data.handlerCasing.join(', ') : '-';
       rows.push(`| ${comp} | ${undef} | ${missing} | ${casing} |`);
+    }
+  } else if (side === 'triplet') {
+    rows.push('### Parity Check (Triplet Mode: Svelte vs React vs Flutter)');
+    rows.push('');
+    rows.push(
+      '| Component | Undefined Classes (S / R) | Missing CONTRACT Props (S / R) | Classes Diff (S only / R only) | Props Diff (S only / R only) | Handler Casing (S / R) |'
+    );
+    rows.push('| :--- | :--- | :--- | :--- | :--- | :--- |');
+    for (const [comp, data] of Object.entries(results)) {
+      if (!data.hasViolations) continue;
+      const undef = `S: [${data.undefinedClasses.svelte.join(', ') || '-'}]<br>R: [${data.undefinedClasses.react.join(', ') || '-'}]`;
+      const missing = `S: [${data.missingContractProps.svelte.join(', ') || '-'}]<br>R: [${data.missingContractProps.react.join(', ') || '-'}]`;
+      const diffClass = `S: [${data.classesOnlyInSvelte.join(', ') || '-'}]<br>R: [${data.classesOnlyInReact.join(', ') || '-'}]`;
+      const diffProp = `S: [${data.propsOnlyInSvelte.join(', ') || '-'}]<br>R: [${data.propsOnlyInReact.join(', ') || '-'}]`;
+      const casing = `S: [${data.handlerCasing.svelte.join(', ') || '-'}]<br>R: [${data.handlerCasing.react.join(', ') || '-'}]`;
+      rows.push(`| ${comp} | ${undef} | ${missing} | ${diffClass} | ${diffProp} | ${casing} |`);
     }
   } else {
     rows.push('### Parity Check (Twin Mode: Svelte vs React)');
@@ -822,6 +961,8 @@ const isDirectRun =
 if (isDirectRun) {
   const args = process.argv.slice(2);
   let side = null;
+  let triplet = false;
+  let flutter = false;
   let jsonOutput = false;
 
   for (let i = 0; i < args.length; i++) {
@@ -829,12 +970,16 @@ if (isDirectRun) {
       side = args[++i];
     } else if (args[i].startsWith('--side=')) {
       side = args[i].slice('--side='.length);
+    } else if (args[i] === '--triplet') {
+      triplet = true;
+    } else if (args[i] === '--flutter') {
+      flutter = true;
     } else if (args[i] === '--json') {
       jsonOutput = true;
     }
   }
 
-  const result = runParityCheck({ side });
+  const result = runParityCheck({ side, triplet, flutter });
 
   if (jsonOutput) {
     console.log(JSON.stringify(result, null, 2));
@@ -844,3 +989,4 @@ if (isDirectRun) {
 
   process.exit(result.passed ? 0 : 1);
 }
+
