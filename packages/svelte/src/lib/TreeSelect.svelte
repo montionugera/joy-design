@@ -9,6 +9,7 @@
 		value: string;
 		disabled?: boolean;
 		children?: TreeNode[];
+		loading?: boolean;
 	}
 
 	interface Props {
@@ -20,6 +21,8 @@
 		allowClear?: boolean;
 		disabled?: boolean;
 		treeDefaultExpandAll?: boolean;
+		searchable?: boolean | 'auto';
+		searchPlaceholder?: string;
 		class?: string;
 		style?: string;
 		ref?: HTMLDivElement | null;
@@ -36,6 +39,8 @@
 		allowClear = true,
 		disabled = false,
 		treeDefaultExpandAll = true,
+		searchable = 'auto',
+		searchPlaceholder = 'Search tree...',
 		class: className = '',
 		style = '',
 		ref = $bindable(null),
@@ -44,6 +49,7 @@
 	}: Props = $props();
 
 	let open = $state(false);
+	let searchQuery = $state('');
 	const uid = $props.id();
 	const panelId = `${uid}-panel`;
 	// `defaultValue`/`multiple` only seed the uncontrolled value; untrack makes the one-time read explicit.
@@ -57,6 +63,27 @@
 	let controlEl = $state<HTMLDivElement | null>(null);
 	let panelEl = $state<HTMLDivElement | null>(null);
 
+	let isSearchable = $derived(searchable === true || (searchable === 'auto' && treeData.length >= 6));
+
+	function filterTree(nodes: TreeNode[], q: string): TreeNode[] {
+		if (!q.trim()) return nodes;
+		const term = q.trim().toLowerCase();
+		const res: TreeNode[] = [];
+		for (const n of nodes) {
+			const titleMatches = (n.title || '').toLowerCase().includes(term);
+			const filteredKids = n.children ? filterTree(n.children, q) : [];
+			if (titleMatches || filteredKids.length > 0) {
+				res.push({
+					...n,
+					children: filteredKids.length > 0 ? filteredKids : n.children
+				});
+			}
+		}
+		return res;
+	}
+
+	let displayTreeData = $derived(filterTree(treeData, searchQuery));
+
 	$effect(() => {
 		if (!open || !controlEl || !panelEl) return;
 		const handle = openOverlay({
@@ -64,9 +91,28 @@
 			panel: panelEl,
 			onClose: () => {
 				open = false;
+				searchQuery = '';
 			}
 		});
 		return () => handle.dispose();
+	});
+
+	$effect(() => {
+		if (searchQuery.trim()) {
+			const matchingKeys = new Set<string>();
+			const collect = (nodes: TreeNode[]) => {
+				for (const n of nodes) {
+					if (n.children && n.children.length > 0) {
+						const term = searchQuery.trim().toLowerCase();
+						const hasMatch = n.children.some((c) => (c.title || '').toLowerCase().includes(term));
+						if (hasMatch) matchingKeys.add(n.key);
+						collect(n.children);
+					}
+				}
+			};
+			collect(treeData);
+			expandedKeys = new Set([...expandedKeys, ...matchingKeys]);
+		}
 	});
 
 	$effect(() => {
@@ -87,7 +133,7 @@
 
 	$effect(() => {
 		if (open) {
-			const visible = getVisibleNodes(treeData, expandedKeys);
+			const visible = getVisibleNodes(displayTreeData, expandedKeys);
 			if (visible.length > 0 && !focusedKey) {
 				focusedKey = visible[0].key;
 			}
@@ -342,6 +388,18 @@
 			tabindex="-1"
 			onkeydown={handleKeyDown}
 		>
+			{#if isSearchable}
+				<div class="joy-treeselect__search-wrapper" role="presentation">
+					<input
+						type="search"
+						class="joy-treeselect__search"
+						placeholder={searchPlaceholder}
+						bind:value={searchQuery}
+						aria-label={searchPlaceholder}
+					/>
+				</div>
+			{/if}
+
 			{#snippet renderNodes(nodes: TreeNode[], level: number)}
 				{#each nodes as node (node.key)}
 					{@const hasChildren = Boolean(node.children && node.children.length > 0)}
@@ -360,22 +418,30 @@
 						class="joy-treeselect__node {sel ? 'joy-treeselect__node--selected' : ''} {node.disabled ? 'joy-treeselect__node--disabled' : ''}"
 						onclick={() => handleSelect(node)}
 					>
+						{#each Array(level) as _}
+							<span class="joy-treeselect__indent-spacer" aria-hidden="true"></span>
+						{/each}
+
 						{#if hasChildren}
 							<button
 								type="button"
-								class="joy-treeselect__node-toggle"
+								class="joy-treeselect__node-toggle {isExp ? 'joy-treeselect__node-toggle--expanded' : ''}"
 								aria-label={isExp ? 'Collapse node' : 'Expand node'}
 								tabindex="-1"
 								onclick={(e) => toggleExpand(e, node.key)}
 							>
-								{#if isExp}
-									<ChevronDown />
-								{:else}
-									<ChevronRight />
-								{/if}
+								<ChevronRight />
 							</button>
 						{:else}
 							<span class="joy-treeselect__node-toggle" aria-hidden="true"></span>
+						{/if}
+
+						{#if node.loading}
+							<span class="joy-treeselect__node-loading" aria-hidden="true">
+								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+								</svg>
+							</span>
 						{/if}
 
 						{#if multiple}
@@ -395,8 +461,12 @@
 				{/each}
 			{/snippet}
 
-			{#if treeData.length > 0}
-				{@render renderNodes(treeData, 0)}
+			{#if displayTreeData.length > 0}
+				{@render renderNodes(displayTreeData, 0)}
+			{:else}
+				<div class="joy-treeselect__empty" role="presentation">
+					{searchQuery.trim() ? 'No options found' : 'No options available'}
+				</div>
 			{/if}
 		</div>
 	{/if}
