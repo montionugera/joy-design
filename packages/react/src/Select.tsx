@@ -21,6 +21,8 @@ export interface SelectProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   size?: 'sm' | 'md' | 'lg';
   name?: string;
   id?: string;
+  searchable?: boolean | 'auto';
+  searchPlaceholder?: string;
   className?: string;
   onChange?: (value: string) => void;
 }
@@ -38,6 +40,8 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
       size = 'md',
       name,
       id,
+      searchable = 'auto',
+      searchPlaceholder = 'Search options...',
       className = '',
       style,
       onChange,
@@ -56,16 +60,32 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
 
     const [open, setOpen] = React.useState(false);
     const [activeIndex, setActiveIndex] = React.useState(-1);
+    const [searchQuery, setSearchQuery] = React.useState('');
 
     const triggerRef = React.useRef<HTMLButtonElement | null>(null);
     const listRef = React.useRef<HTMLUListElement | null>(null);
+    const searchInputRef = React.useRef<HTMLInputElement | null>(null);
+
+    const isSearchable = searchable === true || (searchable === 'auto' && options.length >= 6);
+    const filteredOptions =
+      isSearchable && searchQuery.trim()
+        ? options.filter((o) => o.label.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+        : options;
 
     React.useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
 
     useOverlay(open, triggerRef, listRef, () => {
       setOpen(false);
       setActiveIndex(-1);
+      setSearchQuery('');
     });
+
+    React.useEffect(() => {
+      if (open && isSearchable) {
+        setSearchQuery('');
+        setTimeout(() => searchInputRef.current?.focus(), 0);
+      }
+    }, [open, isSearchable]);
 
     const generatedId = React.useId();
     const selectId = id || generatedId;
@@ -73,7 +93,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     const messageId = `${selectId}-message`;
 
     const activeDescendantId =
-      open && activeIndex >= 0 && activeIndex < options.length
+      open && activeIndex >= 0 && activeIndex < filteredOptions.length
         ? `${listboxId}-opt-${activeIndex}`
         : undefined;
 
@@ -87,6 +107,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
       onChange?.(opt.value);
       setOpen(false);
       setActiveIndex(-1);
+      setSearchQuery('');
       triggerRef.current?.focus();
     };
 
@@ -94,11 +115,13 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
       if (effectiveDisabled) return;
       setOpen((prev) => !prev);
       if (!open) {
-        const currIdx = options.findIndex((o) => o.value === currentValue);
-        const firstEnabled = options.findIndex((o) => !o.disabled);
+        setSearchQuery('');
+        const currIdx = filteredOptions.findIndex((o) => o.value === currentValue);
+        const firstEnabled = filteredOptions.findIndex((o) => !o.disabled);
         setActiveIndex(currIdx >= 0 ? currIdx : firstEnabled);
       } else {
         setActiveIndex(-1);
+        setSearchQuery('');
       }
     };
 
@@ -212,29 +235,83 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             className="joy-select__listbox joy-overlay"
             tabIndex={-1}
           >
-            {options.map((opt, i) => {
-              const isSelected = opt.value === currentValue;
-              const isActive = i === activeIndex;
-              return (
-                <li
-                  key={opt.value}
-                  id={`${listboxId}-opt-${i}`}
-                  role="option"
-                  aria-selected={isSelected}
-                  className={cx(
-                    'joy-select__option',
-                    isActive && 'joy-select__option--active',
-                    opt.disabled && 'joy-select__option--disabled'
-                  )}
-                  onClick={() => handleSelectOption(opt)}
-                  onMouseEnter={() => {
-                    if (!opt.disabled) setActiveIndex(i);
+            {isSearchable && (
+              <li className="joy-select__search-wrapper" role="presentation">
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  className="joy-select__search"
+                  placeholder={searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    const q = e.target.value;
+                    setSearchQuery(q);
+                    const matched = q.trim()
+                      ? options.filter((o) => o.label.toLowerCase().includes(q.trim().toLowerCase()))
+                      : options;
+                    const first = matched.findIndex((o) => !o.disabled);
+                    setActiveIndex(first);
                   }}
-                >
-                  {opt.label}
-                </li>
-              );
-            })}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      let next = activeIndex + 1;
+                      while (next < filteredOptions.length && filteredOptions[next].disabled) next++;
+                      if (next < filteredOptions.length) setActiveIndex(next);
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      let prev = activeIndex - 1;
+                      while (prev >= 0 && filteredOptions[prev].disabled) prev--;
+                      if (prev >= 0) setActiveIndex(prev);
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (
+                        activeIndex >= 0 &&
+                        activeIndex < filteredOptions.length &&
+                        !filteredOptions[activeIndex].disabled
+                      ) {
+                        handleSelectOption(filteredOptions[activeIndex]);
+                      }
+                    } else if (e.key === 'Escape') {
+                      e.preventDefault();
+                      setOpen(false);
+                      triggerRef.current?.focus();
+                    }
+                  }}
+                  role="searchbox"
+                  aria-label={searchPlaceholder}
+                />
+              </li>
+            )}
+            {filteredOptions.length === 0 ? (
+              <li className="joy-select__empty" role="presentation">
+                No options found
+              </li>
+            ) : (
+              filteredOptions.map((opt, i) => {
+                const isSelected = opt.value === currentValue;
+                const isActive = i === activeIndex;
+                return (
+                  <li
+                    key={opt.value}
+                    id={`${listboxId}-opt-${i}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    className={cx(
+                      'joy-select__option',
+                      isActive && 'joy-select__option--active',
+                      opt.disabled && 'joy-select__option--disabled'
+                    )}
+                    onClick={() => handleSelectOption(opt)}
+                    onMouseEnter={() => {
+                      if (!opt.disabled) setActiveIndex(i);
+                    }}
+                  >
+                    {opt.label}
+                  </li>
+                );
+              })
+            )}
           </ul>
         )}
         {message && (

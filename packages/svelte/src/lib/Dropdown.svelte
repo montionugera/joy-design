@@ -12,6 +12,8 @@
 
   interface Props {
     items: DropdownItem[];
+    searchable?: boolean | 'auto';
+    searchPlaceholder?: string;
     onselect?: (key: string) => void;
     children?: Snippet;
     class?: string;
@@ -22,6 +24,8 @@
 
   let {
     items,
+    searchable = 'auto',
+    searchPlaceholder = 'Search items...',
     onselect,
     children,
     class: className = '',
@@ -35,10 +39,23 @@
   let open = $state(false);
   let triggerEl = $state<HTMLDivElement | null>(null);
   let panelEl = $state<HTMLDivElement | null>(null);
+  let searchQuery = $state('');
+  let searchInputEl = $state<HTMLInputElement | null>(null);
+
+  const isSearchable = $derived(
+    searchable === true || (searchable === 'auto' && items.length >= 6)
+  );
+
+  const filteredItems = $derived(
+    isSearchable && searchQuery.trim()
+      ? items.filter((item) => String(item.label).toLowerCase().includes(searchQuery.trim().toLowerCase()))
+      : items
+  );
+
   // Which item the menu focuses when it opens by keyboard: ArrowUp opens on the last one.
   let openAt: 'first' | 'last' = 'first';
 
-  let disabledFlags = $derived(items.map((item) => !!item.disabled));
+  let disabledFlags = $derived(filteredItems.map((item) => !!item.disabled));
 
   function menuItems(): HTMLElement[] {
     return panelEl ? Array.from(panelEl.querySelectorAll<HTMLElement>('[role="menuitem"]')) : [];
@@ -48,23 +65,29 @@
   // positioning, so the menu also escapes overflow:hidden ancestors.
   $effect(() => {
     if (!open || !triggerEl || !panelEl) return;
-    const handle = openOverlay({ anchor: triggerEl, panel: panelEl, onClose: () => (open = false) });
+    const handle = openOverlay({ anchor: triggerEl, panel: panelEl, onClose: () => { open = false; searchQuery = ''; } });
     // Untracked: a reactive `items` list changing while the menu is open must not re-open it or move focus.
     untrack(() => {
-      const start = rovingNextIndex(openAt === 'last' ? 'End' : 'Home', -1, disabledFlags, 'vertical');
-      menuItems()[start]?.focus({ preventScroll: true });
+      if (isSearchable && searchInputEl) {
+        searchInputEl.focus();
+      } else {
+        const start = rovingNextIndex(openAt === 'last' ? 'End' : 'Home', -1, disabledFlags, 'vertical');
+        menuItems()[start]?.focus({ preventScroll: true });
+      }
     });
     return () => handle.dispose();
   });
 
   function openMenu(at: 'first' | 'last' = 'first') {
     openAt = at;
+    searchQuery = '';
     open = true;
   }
 
   function selectItem(item: DropdownItem) {
     if (item.disabled) return;
     open = false;
+    searchQuery = '';
     triggerEl?.focus();
     onselect?.(item.key);
   }
@@ -81,10 +104,25 @@
     }
   }
 
+  function handleSearchKeydown(e: KeyboardEvent) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const els = menuItems();
+      const start = rovingNextIndex('Home', -1, disabledFlags, 'vertical');
+      els[start]?.focus();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      open = false;
+      searchQuery = '';
+      triggerEl?.focus();
+    }
+  }
+
   function handleMenuKeydown(e: KeyboardEvent) {
     if (e.key === 'Tab') {
       // Tab leaves the menu: close it and let the browser move on from the trigger.
       open = false;
+      searchQuery = '';
       triggerEl?.focus();
       return;
     }
@@ -124,17 +162,35 @@
       aria-orientation="vertical"
       onkeydown={handleMenuKeydown}
     >
-      {#each items as item (item.key)}
-        <button
-          type="button"
-          role="menuitem"
-          class="joy-dropdown__item {item.danger ? 'joy-dropdown__item--danger' : ''}"
-          disabled={item.disabled}
-          onclick={() => selectItem(item)}
-        >
-          {item.label}
-        </button>
-      {/each}
+      {#if isSearchable}
+        <div class="joy-dropdown__search-wrapper" role="presentation">
+          <input
+            bind:this={searchInputEl}
+            type="search"
+            class="joy-dropdown__search"
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            oninput={(e) => (searchQuery = (e.target as HTMLInputElement).value)}
+            onkeydown={handleSearchKeydown}
+            aria-label={searchPlaceholder}
+          />
+        </div>
+      {/if}
+      {#if filteredItems.length === 0}
+        <div class="joy-dropdown__empty" role="presentation">No items found</div>
+      {:else}
+        {#each filteredItems as item (item.key)}
+          <button
+            type="button"
+            role="menuitem"
+            class="joy-dropdown__item {item.danger ? 'joy-dropdown__item--danger' : ''}"
+            disabled={item.disabled}
+            onclick={() => selectItem(item)}
+          >
+            {item.label}
+          </button>
+        {/each}
+      {/if}
     </div>
   {/if}
 </div>

@@ -272,6 +272,8 @@ One ordered scale; never a raw `999`.
 | `--joy-ease-out` | `cubic-bezier(0.0, 0.0, 0.2, 1)` |
 | `--joy-ease-in-out` | `cubic-bezier(0.4, 0.0, 0.2, 1)` |
 | `--joy-ease-emphasized` | `cubic-bezier(0.2, 0.0, 0, 1)` |
+| `--joy-ease-out-quint` | `cubic-bezier(0.23, 1, 0.32, 1)` |
+| `--joy-ease-in-out-quint` | `cubic-bezier(0.86, 0, 0.07, 1)` |
 
 Transitions use these durations with `--joy-ease-out`. Animate `transform`, `opacity` and colour, never layout. Every animation has a `prefers-reduced-motion: reduce` branch.
 
@@ -628,9 +630,9 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Segmented | `.joy-segmented` | sm | - | hover, focus-visible, active, disabled |
 | Form | `.joy-form` | - | horizontal, label-left, no-colon | - |
 | FormItem | `.joy-form-item` | - | horizontal, label-left, no-colon | error |
-| DatePicker | `.joy-date-picker` | sm, md (default), lg | - | hover, focus-visible, disabled, error |
+| DatePicker | `.joy-date-picker` | sm, md (default), lg | - | hover, focus-visible, disabled, error, selected, open |
 | TimePicker | `.joy-time-picker` | sm, md (default), lg | - | hover, focus-visible, disabled, error, selected |
-| DateRangePicker | `.joy-date-range-picker` | - | - | disabled |
+| DateRangePicker | `.joy-date-range-picker` | - | - | hover, focus-visible, active, disabled, error, selected, open |
 | Mentions | `.joy-mentions` | - | - | hover, focus-visible, active, disabled, error |
 | Upload | `.joy-upload` | sm, md, lg | - | hover, focus-visible, active, disabled, loading |
 | TreeSelect | `.joy-treeselect` | - | - | hover, focus-visible, disabled, selected, open |
@@ -658,7 +660,7 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | Notification | `.joy-notification` | - | - | hover, focus-visible, error |
 | Pagination | `.joy-pagination` | - | - | hover, focus-visible, active, disabled, error, selected, open |
 | Popconfirm | `.joy-popconfirm` | sm, md, lg | - | hover, focus-visible, active, disabled, loading |
-| Progress | `.joy-progress` | - | status-exception, status-success | - |
+| Progress | `.joy-progress` | - | status-exception, status-success | active |
 | Result | `.joy-result` | sm, md, lg | 403, 404, info, success, warning | hover, focus-visible, active, disabled, loading, error |
 | Skeleton | `.joy-skeleton` | - | circle, rect, text | - |
 | Space | `.joy-space` | - | vertical | - |

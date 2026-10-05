@@ -113,6 +113,8 @@ export const tokens = {
   "ease-out": "cubic-bezier(0.0, 0.0, 0.2, 1)",
   "ease-in-out": "cubic-bezier(0.4, 0.0, 0.2, 1)",
   "ease-emphasized": "cubic-bezier(0.2, 0.0, 0, 1)",
+  "ease-out-quint": "cubic-bezier(0.23, 1, 0.32, 1)",
+  "ease-in-out-quint": "cubic-bezier(0.86, 0, 0.07, 1)",
   "control-height-sm": "32px",
   "control-height-md": "40px",
   "control-height-lg": "48px",

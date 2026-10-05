@@ -112,6 +112,8 @@ export interface JoyTokens {
   'ease-out': string;
   'ease-in-out': string;
   'ease-emphasized': string;
+  'ease-out-quint': string;
+  'ease-in-out-quint': string;
   'control-height-sm': string;
   'control-height-md': string;
   'control-height-lg': string;

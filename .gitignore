@@ -1,6 +1,7 @@
 # ps-release-workflow (gitignored state)
 .claude/state/
 .claude/worktrees/
+.adal/
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 graft/

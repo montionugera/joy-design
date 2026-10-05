@@ -18,6 +18,8 @@
     size?: 'sm' | 'md' | 'lg';
     name?: string;
     id?: string;
+    searchable?: boolean | 'auto';
+    searchPlaceholder?: string;
     onchange?: (val: string) => void;
     class?: string;
     ref?: HTMLButtonElement | null;
@@ -34,6 +36,8 @@
     size = 'md',
     name,
     id,
+    searchable = 'auto',
+    searchPlaceholder = 'Search options...',
     onchange,
     class: className = '',
     ref = $bindable(null),
@@ -43,34 +47,46 @@
   let open = $state(false);
   let activeIndex = $state(-1);
   let panelEl = $state<HTMLElement | null>(null);
+  let searchQuery = $state('');
+  let searchInputEl = $state<HTMLInputElement | null>(null);
 
   const generatedId = $props.id();
+  const isSearchable = $derived(
+    searchable === true || (searchable === 'auto' && options.length >= 6)
+  );
+
+  const filteredOptions = $derived(
+    isSearchable && searchQuery.trim()
+      ? options.filter((o) => o.label.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+      : options
+  );
+
   const selectedOption = $derived(options.find((o) => o.value === value));
   const selectedLabel = $derived(selectedOption ? selectedOption.label : '');
   const listboxId = $derived(`${id || generatedId}-listbox`);
   const activeDescendantId = $derived(
-    open && activeIndex >= 0 && activeIndex < options.length
+    open && activeIndex >= 0 && activeIndex < filteredOptions.length
       ? `${listboxId}-opt-${activeIndex}`
       : undefined
   );
 
   function getFirstIndex(): number {
-    return options.findIndex((o) => !o.disabled);
+    return filteredOptions.findIndex((o) => !o.disabled);
   }
 
   function getLastIndex(): number {
-    for (let i = options.length - 1; i >= 0; i--) {
-      if (!options[i].disabled) return i;
+    for (let i = filteredOptions.length - 1; i >= 0; i--) {
+      if (!filteredOptions[i].disabled) return i;
     }
     return -1;
   }
 
   function getNextIndex(current: number, step: number): number {
-    const len = options.length;
+    const len = filteredOptions.length;
     if (len === 0) return -1;
     let next = current + step;
     while (next >= 0 && next < len) {
-      if (!options[next].disabled) return next;
+      if (!filteredOptions[next].disabled) return next;
       next += step;
     }
     return current;
@@ -81,14 +97,20 @@
     value = opt.value;
     onchange?.(opt.value);
     open = false;
+    searchQuery = '';
+    ref?.focus();
   }
 
   function toggleOpen() {
     if (disabled) return;
     open = !open;
     if (open) {
-      const idx = options.findIndex((o) => o.value === value);
-      activeIndex = idx >= 0 && !options[idx].disabled ? idx : getFirstIndex();
+      searchQuery = '';
+      const idx = filteredOptions.findIndex((o) => o.value === value);
+      activeIndex = idx >= 0 && !filteredOptions[idx].disabled ? idx : getFirstIndex();
+      if (isSearchable) {
+        setTimeout(() => searchInputEl?.focus(), 0);
+      }
     }
   }
 
@@ -99,8 +121,12 @@
       if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
         e.preventDefault();
         open = true;
-        const idx = options.findIndex((o) => o.value === value);
-        activeIndex = idx >= 0 && !options[idx].disabled ? idx : getFirstIndex();
+        searchQuery = '';
+        const idx = filteredOptions.findIndex((o) => o.value === value);
+        activeIndex = idx >= 0 && !filteredOptions[idx].disabled ? idx : getFirstIndex();
+        if (isSearchable) {
+          setTimeout(() => searchInputEl?.focus(), 0);
+        }
       }
       return;
     }
@@ -119,9 +145,37 @@
       activeIndex = getLastIndex();
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      if (activeIndex >= 0 && activeIndex < options.length) {
-        selectOption(options[activeIndex]);
+      if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
+        selectOption(filteredOptions[activeIndex]);
       }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      open = false;
+      ref?.focus();
+    }
+  }
+
+  function handleSearchInput(e: Event) {
+    searchQuery = (e.target as HTMLInputElement).value;
+    activeIndex = getFirstIndex();
+  }
+
+  function handleSearchKeydown(e: KeyboardEvent) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = getNextIndex(activeIndex, 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = getNextIndex(activeIndex, -1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
+        selectOption(filteredOptions[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      open = false;
+      ref?.focus();
     }
   }
 
@@ -132,6 +186,7 @@
       panel: panelEl,
       onClose: () => {
         open = false;
+        searchQuery = '';
       }
     });
     return () => handle.dispose();
@@ -171,20 +226,39 @@
   <input type="hidden" {name} value={value ?? ''} />
   {#if open}
     <ul bind:this={panelEl} id={listboxId} class="joy-select__listbox joy-overlay" role="listbox">
-      {#each options as opt, i}
-        <!-- False positive: options are not focusable; the keyboard is handled by the trigger button (aria-activedescendant, Arrow/Enter/Space). -->
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <li
-          id="{listboxId}-opt-{i}"
-          role="option"
-          class="joy-select__option {i === activeIndex ? 'joy-select__option--active' : ''} {opt.disabled ? 'joy-select__option--disabled' : ''}"
-          aria-selected={opt.value === value}
-          aria-disabled={opt.disabled || undefined}
-          onclick={() => selectOption(opt)}
-        >
-          {opt.label}
+      {#if isSearchable}
+        <li class="joy-select__search-wrapper" role="presentation">
+          <input
+            bind:this={searchInputEl}
+            type="search"
+            class="joy-select__search"
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            oninput={handleSearchInput}
+            onkeydown={handleSearchKeydown}
+            role="searchbox"
+            aria-label={searchPlaceholder}
+          />
         </li>
-      {/each}
+      {/if}
+      {#if filteredOptions.length === 0}
+        <li class="joy-select__empty" role="presentation">No options found</li>
+      {:else}
+        {#each filteredOptions as opt, i}
+          <!-- False positive: options are not focusable; the keyboard is handled by the trigger button (aria-activedescendant, Arrow/Enter/Space). -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <li
+            id="{listboxId}-opt-{i}"
+            role="option"
+            class="joy-select__option {i === activeIndex ? 'joy-select__option--active' : ''} {opt.disabled ? 'joy-select__option--disabled' : ''}"
+            aria-selected={opt.value === value}
+            aria-disabled={opt.disabled || undefined}
+            onclick={() => selectOption(opt)}
+          >
+            {opt.label}
+          </li>
+        {/each}
+      {/if}
     </ul>
   {/if}
   {#if message}
