@@ -30,7 +30,10 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: `npx --yes serve -p ${port} dist`,
+    command:
+      requestedPort === "6118"
+        ? `npx --yes serve -p ${port} ../flutter-hub/build/web`
+        : `npx --yes serve -p ${port} dist`,
     url: `http://127.0.0.1:${port}`,
     reuseExistingServer: !process.env.CI,
     cwd: __dirname,
