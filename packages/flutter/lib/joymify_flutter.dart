@@ -14,3 +14,5 @@ export 'src/components/layout/joy_divider.dart';
 export 'src/components/display/joy_badge.dart';
 export 'src/components/display/joy_tag.dart';
 export 'src/components/display/joy_avatar.dart';
+export 'src/components/form/joy_input.dart';
+export 'src/components/form/joy_input_number.dart';
