@@ -551,11 +551,12 @@ test.describe("Storybook Hub Quality Contracts", () => {
     }
     await menu.click();
     await expect(menu).toHaveAttribute("aria-expanded", "true");
-    await expect(page.locator(".sidebar [data-framework]")).toHaveCount(2);
+    await expect(page.locator(".sidebar [data-framework]")).toHaveCount(3);
     for (const sel of [
       ".sidebar-close-btn",
       '.sidebar [data-framework="svelte"]',
       '.sidebar [data-framework="react"]',
+      '.sidebar [data-framework="flutter"]',
     ]) {
       const s = await hitSize(page, sel);
       expect(s.width, `${sel} width`).toBeGreaterThanOrEqual(43.5);

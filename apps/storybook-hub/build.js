@@ -3732,6 +3732,17 @@ ${inlinedThemeCss}
         padding: 0 16px;
         flex-wrap: nowrap;
       }
+      .framework-pill--topbar {
+        display: none;
+      }
+      .framework-pill--drawer {
+        display: flex;
+        margin: var(--joy-space-3) var(--joy-space-4) 0;
+      }
+      .framework-pill--drawer .framework-btn {
+        flex: 1 1 0;
+        min-height: 44px;
+      }
       .content-area {
         padding: var(--joy-space-5) var(--joy-space-4) var(--joy-space-12);
         max-width: 100%;
@@ -4168,6 +4179,7 @@ ${inlinedThemeCss}
     <div class="framework-pill framework-pill--drawer" role="group" aria-label="Code framework">
       <button type="button" class="framework-btn active" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
       <button type="button" class="framework-btn" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
+      <button type="button" class="framework-btn" data-framework="flutter" aria-pressed="false" onclick="setFramework('flutter')">Flutter 3.32</button>
     </div>
     <div class="sidebar-search" role="search">
       <div class="sidebar-search__inner">
@@ -4296,6 +4308,7 @@ ${navigationHtml}
         <div class="framework-pill framework-pill--topbar" role="group" aria-label="Code framework">
           <button type="button" class="framework-btn active" id="btn-tab-svelte" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
           <button type="button" class="framework-btn" id="btn-tab-react" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
+          <button type="button" class="framework-btn" id="btn-tab-flutter" data-framework="flutter" aria-pressed="false" onclick="setFramework('flutter')">Flutter 3.32</button>
         </div>
       </div>
     </div>
@@ -4368,6 +4381,37 @@ ${navigationHtml}
           <div class="joy-alert__title">Complete Ant Design Parity Suite + OpenDesign Posture Engine</div>
           <div class="joy-alert__desc">
             Explore 18 standard & enterprise components including Modals, Drawers, Dropdown menus, Selects, and Live Trading Orderbooks with full GPU spring motion transitions and OpenDesign posture styling.
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Flutter Showcase (F-065) -->
+      <section id="view-flutter" class="view-panel">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--joy-space-3); margin-bottom: var(--joy-space-4);">
+          <div>
+            <h2 style="margin: 0 0 6px 0;">Flutter 3.32 Multi-Platform Workshop</h2>
+            <p class="header-tagline" style="margin: 0;">Full token and component parity running on Flutter Web CanvasKit with live JoyHubBridge theme synchronization.</p>
+          </div>
+          <div style="display: flex; gap: var(--joy-space-2); flex-wrap: wrap; align-items: center;">
+            <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Dart 3.8.1</span>
+            <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> 35+ Widgets</span>
+            <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> 44px Hit Bounds</span>
+            <a href="/flutter/index.html" target="_blank" rel="noopener" class="joy-button joy-button--outline joy-button--sm">Full Screen &nearr;</a>
+          </div>
+        </div>
+
+        <div class="playground-box" style="padding: 0; overflow: hidden; border-radius: var(--joy-radius-lg); border: 1px solid var(--hub-chrome-border); background: var(--joy-surface-canvas);">
+          <div class="playground-header" style="padding: 12px 16px; border-bottom: 1px solid var(--hub-chrome-border); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h4>Live Flutter Web Canvas</h4>
+              <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> CanvasKit / Wasm</span>
+            </div>
+            <div style="font-size: var(--joy-font-size-xs); color: var(--joy-text-secondary);">
+              Theme synchronized with Storybook Hub controls
+            </div>
+          </div>
+          <div style="position: relative; width: 100%; height: 860px; min-height: 520px; background: var(--joy-surface-canvas);">
+            <iframe id="flutter-hub-iframe" src="about:blank" data-src="/flutter/index.html" style="width: 100%; height: 100%; border: none; display: block;" title="Joymify Flutter Showcase"></iframe>
           </div>
         </div>
       </section>
@@ -9218,6 +9262,7 @@ export async function executeHedge(symbol: string, size: number) {
       try { localStorage.setItem('joy-theme', next); } catch (e) {}
       syncThemeToggle(next);
       redrawHubCharts();
+      syncThemeToFlutter(next);
     }
 
     const PALETTES = {
@@ -9545,6 +9590,20 @@ export async function executeHedge(symbol: string, size: number) {
       if (viewName === 'brand') {
         paintBrandTokenValues();
       }
+
+      // Lazy load Flutter Web iframe on demand
+      if (viewName === 'flutter') {
+        const iframe = document.getElementById('flutter-hub-iframe');
+        if (iframe) {
+          const dataSrc = iframe.getAttribute('data-src') || '/flutter/index.html';
+          if (!iframe.src || iframe.src === 'about:blank' || iframe.getAttribute('src') === 'about:blank') {
+            iframe.onload = () => syncThemeToFlutter();
+            iframe.setAttribute('src', dataSrc);
+          } else {
+            syncThemeToFlutter();
+          }
+        }
+      }
     }
     window.switchView = switchView;
 
@@ -9572,6 +9631,19 @@ export async function executeHedge(symbol: string, size: number) {
     // Following a link to the current hash fires no hashchange, so close the drawer on every nav pick.
     document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', () => toggleMobileMenu(false)));
 
+    function syncThemeToFlutter(theme) {
+      if (!theme) {
+        theme = document.documentElement.getAttribute('data-theme') || 'light';
+      }
+      try {
+        const iframe = document.getElementById('flutter-hub-iframe');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.__joyHub) {
+          iframe.contentWindow.__joyHub.setTheme(theme);
+        }
+      } catch (e) {}
+    }
+    window.syncThemeToFlutter = syncThemeToFlutter;
+
     function setFramework(fw) {
       activeFramework = fw;
       document.querySelectorAll('[data-framework]').forEach((btn) => {
@@ -9580,6 +9652,17 @@ export async function executeHedge(symbol: string, size: number) {
         btn.setAttribute('aria-pressed', String(on));
       });
       updateCodeSnippets();
+      if (fw === 'flutter') {
+        const iframe = document.getElementById('flutter-hub-iframe');
+        if (iframe) {
+          const dataSrc = iframe.getAttribute('data-src') || '/flutter/index.html';
+          if (!iframe.src || iframe.src === 'about:blank' || iframe.getAttribute('src') === 'about:blank') {
+            iframe.onload = () => syncThemeToFlutter();
+            iframe.setAttribute('src', dataSrc);
+          }
+        }
+      }
+      syncThemeToFlutter();
     }
 
     function handleBtnClick() {
@@ -10427,6 +10510,8 @@ export async function executeHedge(symbol: string, size: number) {
     function copyIconName(name) {
       const code = activeFramework === 'svelte'
         ? "import { " + name + " } from '@joymify/icons';"
+        : activeFramework === 'flutter'
+        ? "JoyIcons." + (name.charAt(0).toLowerCase() + name.slice(1))
         : "import { " + name + " } from '@joymify/icons/react';";
       navigator.clipboard.writeText(code).then(() => {
         showDemoToast('Copied: ' + code, 'success');
@@ -13374,6 +13459,8 @@ export async function executeHedge(symbol: string, size: number) {
       if (!btnSnippet) return;
       if (activeFramework === 'svelte') {
         btnSnippet.innerHTML = \`// Svelte 5 Runes Example<br>&lt;script&gt;<br>&nbsp;&nbsp;import { Button } from '@joymify/svelte';<br>&lt;/script&gt;<br><br>&lt;Button variant="solid" size="md" onclick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
+      } else if (activeFramework === 'flutter') {
+        btnSnippet.innerHTML = \`// Flutter 3.32+ Dart Example<br>import 'package:joymify_flutter/joymify_flutter.dart';<br><br>JoyButton(<br>&nbsp;&nbsp;variant: JoyButtonVariant.\${currentBtnVariant},<br>&nbsp;&nbsp;size: JoyButtonSize.\${currentBtnSize},<br>&nbsp;&nbsp;loading: \${isBtnLoading},<br>&nbsp;&nbsp;onPressed: () => print('Clicked'),<br>&nbsp;&nbsp;child: const Text('Action'),<br>)\`;
       } else {
         btnSnippet.innerHTML = \`// React 19 Modern Example<br>import { Button } from '@joymify/react';<br><br>&lt;Button variant="solid" size="md" onClick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
       }
@@ -13509,5 +13596,19 @@ for (const file of brandAssetFiles) {
   fs.copyFileSync(path.join(brandAssetsSrc, file), path.join(brandOutDir, file));
 }
 fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
+
+// Copy Flutter Web bundle if present (F-065)
+const flutterSrcDir = path.join(__dirname, "../flutter-hub/build/web");
+const flutterOutDir = path.join(outDir, "flutter");
+if (fs.existsSync(flutterSrcDir)) {
+  fs.cpSync(flutterSrcDir, flutterOutDir, { recursive: true });
+  const htmlPath = path.join(flutterOutDir, "index.html");
+  if (fs.existsSync(htmlPath)) {
+    let content = fs.readFileSync(htmlPath, "utf8");
+    content = content.replace('<base href="/">', '<base href="/flutter/">');
+    fs.writeFileSync(htmlPath, content, "utf8");
+  }
+  console.log("Copied Flutter Web bundle to", flutterOutDir);
+}
 
 console.log("Built Storybook Hub static distribution in", outDir);
