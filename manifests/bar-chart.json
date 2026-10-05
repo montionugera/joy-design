@@ -1,0 +1,20 @@
+{
+  "component": "BarChart",
+  "targets": {
+    "react": "JoyBarChart",
+    "svelte": "BarChart",
+    "flutter": "JoyBarChart"
+  },
+  "props": {
+    "data": { "type": "array" },
+    "height": { "type": "number", "default": 320 },
+    "showGrid": { "type": "boolean", "default": true }
+  },
+  "events": {
+    "hover": {
+      "react": "onHover",
+      "svelte": "onhover",
+      "flutter": "onHover"
+    }
+  }
+}

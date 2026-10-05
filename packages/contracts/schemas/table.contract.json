@@ -1,0 +1,41 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyTable",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "table_render",
+      "description": "Table renders column headers and data rows with semantic tokens",
+      "props": {
+        "striped": false,
+        "bordered": false
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "table_sort",
+      "description": "Tapping sortable column header triggers sort event with column key and direction",
+      "props": {
+        "striped": false
+      },
+      "actions": [{ "type": "tap_header" }],
+      "expect": {
+        "events": { "sort": 1 }
+      }
+    },
+    {
+      "id": "table_row_selection",
+      "description": "Tapping row selection checkbox updates selected rows set and fires selection callback",
+      "props": {
+        "bordered": true
+      },
+      "actions": [{ "type": "tap_checkbox" }],
+      "expect": {
+        "events": { "selection": 1 }
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyLineChart",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "line_chart_render",
+      "description": "Renders timeseries line curve with gradient area fill and accessible semantics",
+      "props": {
+        "height": 320.0,
+        "showGrid": true,
+        "showArea": true
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "line_chart_hover",
+      "description": "Hovering over timeseries points triggers onHover and activates magnetic crosshair",
+      "props": {
+        "height": 320.0
+      },
+      "actions": [{ "type": "hover" }],
+      "expect": {
+        "events": { "hover": 1 }
+      }
+    }
+  ]
+}

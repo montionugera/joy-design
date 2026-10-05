@@ -1,0 +1,31 @@
+{
+  "$schema": "./contract-schema-v2.json",
+  "component": "JoyCandlestickChart",
+  "version": "2.0.0",
+  "scenarios": [
+    {
+      "id": "candlestick_chart_render",
+      "description": "Renders candlestick price bars, volume histogram, and grid lines with zero color literals",
+      "props": {
+        "height": 360.0,
+        "showGrid": true
+      },
+      "actions": [],
+      "expect": {
+        "events": {}
+      }
+    },
+    {
+      "id": "candlestick_chart_hover",
+      "description": "Hovering over candle bar triggers onHover callback with hovered candle data",
+      "props": {
+        "height": 360.0,
+        "showCrosshair": true
+      },
+      "actions": [{ "type": "hover" }],
+      "expect": {
+        "events": { "hover": 1 }
+      }
+    }
+  ]
+}

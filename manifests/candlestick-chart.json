@@ -1,0 +1,21 @@
+{
+  "component": "CandlestickChart",
+  "targets": {
+    "react": "JoyCandlestickChart",
+    "svelte": "CandlestickChart",
+    "flutter": "JoyCandlestickChart"
+  },
+  "props": {
+    "data": { "type": "array" },
+    "height": { "type": "number", "default": 360 },
+    "showGrid": { "type": "boolean", "default": true },
+    "showCrosshair": { "type": "boolean", "default": true }
+  },
+  "events": {
+    "hover": {
+      "react": "onHover",
+      "svelte": "onhover",
+      "flutter": "onHover"
+    }
+  }
+}

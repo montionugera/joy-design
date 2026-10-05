@@ -1,0 +1,28 @@
+{
+  "component": "MetricTile",
+  "targets": {
+    "react": "JoyMetricTile",
+    "svelte": "MetricTile",
+    "flutter": "JoyMetricTile"
+  },
+  "variants": ["up", "down", "neutral"],
+  "props": {
+    "title": { "type": "string" },
+    "value": { "type": "string" },
+    "delta": { "type": "number" },
+    "deltaPeriod": { "type": "string" },
+    "trend": {
+      "type": "enum",
+      "values": ["up", "down", "neutral"],
+      "default": "neutral"
+    },
+    "loading": { "type": "boolean", "default": false }
+  },
+  "events": {
+    "tap": {
+      "react": "onClick",
+      "svelte": "onclick",
+      "flutter": "onTap"
+    }
+  }
+}
