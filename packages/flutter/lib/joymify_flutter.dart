@@ -37,5 +37,7 @@ export 'src/components/navigation/joy_pagination.dart';
 export 'src/components/navigation/joy_breadcrumb.dart';
 export 'src/components/navigation/joy_steps.dart';
 export 'src/components/navigation/joy_timeline.dart';
+export 'src/components/data_display/joy_table.dart';
+export 'src/components/data_display/joy_metric_tile.dart';
 
 
