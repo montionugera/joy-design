@@ -10,6 +10,7 @@ export interface CascaderOption {
   disabled?: boolean;
   children?: CascaderOption[];
   isLeaf?: boolean;
+  loading?: boolean;
 }
 
 export interface CascaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -20,6 +21,7 @@ export interface CascaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   allowClear?: boolean;
   disabled?: boolean;
   changeOnSelect?: boolean;
+  expandTrigger?: 'click' | 'hover';
   displayRender?: (labels: string[]) => string;
   onChange?: (value: string[], selectedOptions: CascaderOption[]) => void;
   className?: string;
@@ -36,6 +38,7 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
       allowClear = true,
       disabled = false,
       changeOnSelect = false,
+      expandTrigger = 'click',
       displayRender,
       onChange,
       className = '',
@@ -257,12 +260,24 @@ export const Cascader = React.forwardRef<HTMLDivElement, CascaderProps>(
                         tabIndex={isFocused ? 0 : -1}
                         className={cx(
                           'joy-cascader__item',
-                          isActive && 'joy-cascader__item--active'
+                          isActive && 'joy-cascader__item--active',
+                          option.disabled && 'joy-cascader__item--disabled'
                         )}
                         onClick={() => handleSelectOption(option, colIdx)}
+                        onMouseEnter={() => {
+                          if (expandTrigger === 'hover' && hasChildren && !option.disabled) {
+                            handleSelectOption(option, colIdx);
+                          }
+                        }}
                       >
                         <span>{option.label}</span>
-                        {hasChildren && (
+                        {option.loading ? (
+                          <span className="joy-cascader__item-loading" aria-hidden="true">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                            </svg>
+                          </span>
+                        ) : hasChildren && (
                           <span className="joy-cascader__item-arrow" aria-hidden="true">
                             <ChevronRight width={12} height={12} />
                           </span>

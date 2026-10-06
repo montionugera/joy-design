@@ -151,6 +151,18 @@ const componentStyles = `
   from { opacity: 0; transform: scale(0.96) translateY(-4px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+@keyframes joy-popover-enter-above {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes joy-cascader-column-enter {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes joy-check-scale {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
 @keyframes joy-tab-ink {
   from { transform: scaleX(0.4); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
@@ -160,8 +172,30 @@ const componentStyles = `
   to { background-position: 24px 0; }
 }
 @keyframes joy-modal-pop {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes joy-tooltip-zoom {
+  from { opacity: 0; transform: translateX(-50%) translateY(-2px) scale(0.92); }
+  to { opacity: 1; transform: translateX(-50%) translateY(-6px) scale(1); }
+}
+@keyframes joy-notification-slide-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes joy-segmented-thumb {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+@keyframes joy-step-pulse {
+  0% { box-shadow: 0 0 0 0 var(--joy-accent-subtle); }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes joy-star-hover {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+  100% { transform: scale(1.15); }
 }
 @keyframes joy-spin {
   from { transform: rotate(0deg); }
@@ -241,10 +275,12 @@ const componentStyles = `
   box-shadow: var(--joy-elevation-3);
   max-height: min(320px, 60vh);
   overflow: auto;
-  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+  animation: joy-popover-enter var(--joy-duration-fast) var(--joy-ease-out-quint);
+  transform-origin: top left;
 }
 .joy-overlay--above {
-  transform-origin: bottom;
+  transform-origin: bottom left;
+  animation-name: joy-popover-enter-above;
 }
 @media (max-width: 640px) {
   .joy-overlay--sheet {
@@ -1194,7 +1230,13 @@ select.joy-select:disabled,
   z-index: var(--joy-z-dropdown);
   overflow-x: hidden;
   overflow-y: auto;
-  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+  animation: joy-popover-enter var(--joy-duration-fast) var(--joy-ease-out-quint);
+  transform-origin: top left;
+}
+.joy-dropdown.joy-overlay--above,
+.joy-overlay--above.joy-dropdown {
+  transform-origin: bottom left;
+  animation-name: joy-popover-enter-above;
 }
 /* Fallback for panels that openOverlay has not taken over (static demos, unmigrated twins): anchor under the
    wrapper as before. openOverlay adds .joy-overlay and positions inline, which disables this. */
@@ -1216,7 +1258,7 @@ select.joy-select:disabled,
   font-size: 0.875rem;
   color: var(--joy-text-primary);
   cursor: pointer;
-  transition: background-color var(--joy-duration-fast);
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-dropdown__item:hover,
 .joy-dropdown__item:focus-visible {
@@ -1355,6 +1397,7 @@ select.joy-select:disabled,
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
+  transform-origin: center bottom;
   background: var(--joy-surface-inverse);
   color: var(--joy-text-inverse);
   padding: 6px 10px;
@@ -1365,7 +1408,7 @@ select.joy-select:disabled,
   pointer-events: none;
   z-index: var(--joy-z-tooltip);
   box-shadow: var(--joy-elevation-2);
-  animation: joy-fade-in var(--joy-duration-fast) var(--joy-ease-out);
+  animation: joy-tooltip-zoom var(--joy-duration-fast) var(--joy-ease-out-quint);
 }
 @media (prefers-reduced-motion: reduce) {
   .joy-tooltip {
@@ -3120,9 +3163,14 @@ h1, h2, h3, .joy-display {
   outline: var(--joy-focus-ring);
   outline-offset: 2px;
 }
+.joy-slider__handle:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 0 0 4px var(--joy-accent-subtle);
+}
 .joy-slider__handle:active {
   cursor: grabbing;
-  box-shadow: var(--joy-elevation-2);
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 0 0 5px var(--joy-accent-subtle);
 }
 .joy-slider--disabled {
   opacity: 0.5;
@@ -3842,6 +3890,12 @@ h1, h2, h3, .joy-display {
   color: var(--joy-surface-card);
   border-color: var(--joy-accent-text);
   box-shadow: 0 0 0 4px var(--joy-accent-subtle);
+  animation: joy-step-pulse 2s infinite var(--joy-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-steps__item--process .joy-steps__icon {
+    animation: none;
+  }
 }
 .joy-steps__item--finish .joy-steps__icon {
   background-color: var(--joy-status-success-bg);
@@ -4378,6 +4432,12 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-primary);
   font-weight: 600;
   box-shadow: var(--joy-elevation-1);
+  animation: joy-segmented-thumb var(--joy-duration-fast) var(--joy-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-segmented__item--active {
+    animation: none;
+  }
 }
 .joy-segmented__item:focus:not(:focus-visible) {
   outline: none;
@@ -4392,6 +4452,11 @@ h1, h2, h3, .joy-display {
 }
 .joy-segmented--sm .joy-segmented__item {
   min-height: var(--joy-control-height-sm);
+}
+@media (pointer: coarse) {
+  .joy-segmented__item {
+    min-height: 44px;
+  }
 }
 
 /* ── Ant Design Form & Advanced Data Entry Suite ── */
@@ -4526,6 +4591,17 @@ h1, h2, h3, .joy-display {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-input-number:hover .joy-input-number__handler-wrap,
+.joy-input-number:focus-within .joy-input-number__handler-wrap {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .joy-input-number__handler-wrap {
+    opacity: 1;
+  }
 }
 .joy-input-number__handler-up,
 .joy-input-number__handler-down {
@@ -4609,7 +4685,14 @@ h1, h2, h3, .joy-display {
   color: var(--joy-accent-default);
 }
 .joy-rate__star:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  animation: joy-star-hover var(--joy-duration-fast) var(--joy-ease-out) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-rate__star:hover {
+    animation: none;
+    transform: none;
+  }
 }
 .joy-rate__star:focus:not(:focus-visible) {
   outline: none;
@@ -5019,6 +5102,12 @@ h1, h2, h3, .joy-display {
   border-radius: var(--joy-radius-card);
   box-shadow: var(--joy-elevation-3);
   border: 1px solid var(--joy-border-subtle);
+  animation: joy-notification-slide-in var(--joy-duration-normal) var(--joy-ease-out-quint);
+}
+@media (prefers-reduced-motion: reduce) {
+  .joy-notification__notice {
+    animation: none;
+  }
 }
 .joy-notification__title {
   font-size: 0.9375rem;
@@ -5113,6 +5202,7 @@ h1, h2, h3, .joy-display {
   box-shadow: var(--joy-elevation-2);
   border: 1px solid var(--joy-border-subtle);
   z-index: var(--joy-z-popover);
+  animation: joy-popover-enter var(--joy-duration-fast) var(--joy-ease-out);
 }
 /* Fallback for panels that openOverlay has not taken over: float above the trigger as before. */
 .joy-popconfirm__panel:not(.joy-overlay) {
@@ -5120,6 +5210,16 @@ h1, h2, h3, .joy-display {
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
+}
+.joy-popconfirm__panel:not(.joy-overlay)::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--joy-surface-card) transparent transparent transparent;
 }
 /* The sheet keeps the overlay primitive's shape: .joy-popconfirm__panel is declared after .joy-overlay--sheet and
    would otherwise flatten the top radius, drop to elevation-2 and lose the safe-area inset. */
@@ -5469,6 +5569,14 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-muted);
   cursor: pointer;
   padding: 0;
+  opacity: 0;
+  transition: opacity var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-treeselect:hover .joy-treeselect__clear,
+.joy-treeselect:focus-within .joy-treeselect__clear,
+.joy-cascader:hover .joy-cascader__clear,
+.joy-cascader:focus-within .joy-cascader__clear {
+  opacity: 1;
 }
 .joy-treeselect__clear:hover,
 .joy-cascader__clear:hover {
@@ -5502,6 +5610,13 @@ h1, h2, h3, .joy-display {
   border-radius: var(--joy-radius-control);
   cursor: pointer;
   color: var(--joy-text-primary);
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-treeselect__indent-spacer {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 .joy-treeselect__node:hover {
   background: var(--joy-surface-raised);
@@ -5525,6 +5640,16 @@ h1, h2, h3, .joy-display {
   color: var(--joy-text-muted);
   cursor: pointer;
   padding: 0;
+  transition: color var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-treeselect__node-toggle:hover {
+  color: var(--joy-text-primary);
+}
+.joy-treeselect__node-toggle svg {
+  transition: transform var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-treeselect__node-toggle--expanded svg {
+  transform: rotate(90deg);
 }
 .joy-treeselect__node-checkbox {
   box-sizing: border-box;
@@ -5537,7 +5662,10 @@ h1, h2, h3, .joy-display {
   border-radius: var(--joy-radius-control);
   background: var(--joy-surface-card);
   flex-shrink: 0;
-  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out);
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out), box-shadow var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-treeselect__node-checkbox svg {
+  animation: joy-check-scale var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-treeselect__node--selected .joy-treeselect__node-checkbox {
   background: var(--joy-accent-default);
@@ -5546,6 +5674,46 @@ h1, h2, h3, .joy-display {
 .joy-treeselect__node--disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+.joy-treeselect__node-loading {
+  display: inline-flex;
+  align-items: center;
+  color: var(--joy-accent-default);
+  margin-right: 4px;
+}
+.joy-treeselect__node-loading svg {
+  animation: joy-spin 0.9s linear infinite;
+}
+.joy-treeselect__search-wrapper {
+  padding: var(--joy-space-1);
+  position: sticky;
+  top: 0;
+  background: var(--joy-surface-card);
+  border-bottom: 1px solid var(--joy-border-subtle);
+  z-index: 1;
+}
+.joy-treeselect__search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--joy-space-1) var(--joy-space-2);
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-sm);
+  color: var(--joy-text-primary);
+  background: var(--joy-surface-raised);
+  border: 1px solid var(--joy-border-default);
+  border-radius: var(--joy-radius-control);
+  outline: none;
+  transition: border-color var(--joy-duration-fast) var(--joy-ease-out), box-shadow var(--joy-duration-fast) var(--joy-ease-out);
+}
+.joy-treeselect__search:focus {
+  border-color: var(--joy-border-focus);
+  box-shadow: var(--joy-focus-ring);
+}
+.joy-treeselect__empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--joy-text-muted);
+  font-size: var(--joy-font-size-sm);
 }
 
 /* Cascader */
@@ -5571,6 +5739,7 @@ h1, h2, h3, .joy-display {
   max-height: 280px;
   overflow-y: auto;
   border-right: 1px solid var(--joy-border-subtle);
+  animation: joy-cascader-column-enter var(--joy-duration-fast) var(--joy-ease-out-quint);
 }
 .joy-cascader__column:last-child {
   border-right: 0;
@@ -5585,9 +5754,26 @@ h1, h2, h3, .joy-display {
   border-radius: var(--joy-radius-control);
   cursor: pointer;
   color: var(--joy-text-primary);
+  transition: background-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
 }
 .joy-cascader__item:hover {
   background: var(--joy-surface-raised);
+}
+.joy-cascader__item:hover:not(.joy-cascader__item--disabled) .joy-cascader__item-arrow {
+  transform: translateX(2px);
+}
+.joy-cascader__item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.joy-cascader__item-loading {
+  display: inline-flex;
+  align-items: center;
+  color: var(--joy-accent-default);
+}
+.joy-cascader__item-loading svg {
+  animation: joy-spin 0.9s linear infinite;
 }
 .joy-cascader__item--active {
   background: var(--joy-accent-subtle);
@@ -5601,6 +5787,7 @@ h1, h2, h3, .joy-display {
 .joy-cascader__item-arrow {
   display: inline-flex;
   color: var(--joy-text-muted);
+  transition: transform var(--joy-duration-fast) var(--joy-ease-out);
 }
 @media (max-width: 640px) {
   .joy-overlay--sheet .joy-cascader__columns {
