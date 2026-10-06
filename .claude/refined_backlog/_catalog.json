@@ -824,10 +824,11 @@
     "from_idea": "I-071",
     "created_at": "2026-10-05T23:47:32.320238+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "shipped",
+    "status": "promoted",
     "release_version": "3.2",
     "claimed_at": "2026-10-05T23:47:38.938863+00:00",
     "shipped_at": "2026-10-06T00:03:10.709117+00:00",
-    "shipped_sha": "f8d5ceb9a498d1fdec128ef7f31dd91640b42482"
+    "shipped_sha": "f8d5ceb9a498d1fdec128ef7f31dd91640b42482",
+    "promoted_at": "2026-10-06T00:46:59.918000+00:00"
   }
 ]
