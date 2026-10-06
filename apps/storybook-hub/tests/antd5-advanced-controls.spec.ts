@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
 
 test.describe('Ant Design 5 Benchmark Suite: Cascader & TreeSelect Advanced Controls', () => {
   test.beforeEach(async ({ page }) => {
@@ -209,9 +211,14 @@ test.describe('Ant Design 5 Benchmark Suite: Cascader & TreeSelect Advanced Cont
     await cascader.locator('.joy-cascader__control').click();
     await expect(cascader.locator('#demo-cascader-panel')).toBeVisible();
 
-    await advancedBox.screenshot({
-      path: '/Users/pasitnusso/.gemini/antigravity-cli/brain/303edbc8-e3aa-4cf2-b2b2-067d1de28bc8/evidence-antd5-cascader-light-1280.png'
-    });
+    const artifactDir = '/Users/pasitnusso/.gemini/antigravity-cli/brain/303edbc8-e3aa-4cf2-b2b2-067d1de28bc8';
+    const canSaveArtifacts = fs.existsSync(artifactDir);
+
+    if (canSaveArtifacts) {
+      await advancedBox.screenshot({
+        path: path.join(artifactDir, 'evidence-antd5-cascader-light-1280.png'),
+      });
+    }
 
     // Close cascader overlay before opening treeselect
     await cascader.locator('.joy-cascader__control').click();
@@ -225,9 +232,11 @@ test.describe('Ant Design 5 Benchmark Suite: Cascader & TreeSelect Advanced Cont
     await treeselect.locator('.joy-treeselect__control').click({ position: { x: 10, y: 10 } });
     await expect(treeselect.locator('#demo-treeselect-panel')).toBeVisible();
 
-    await advancedBox.screenshot({
-      path: '/Users/pasitnusso/.gemini/antigravity-cli/brain/303edbc8-e3aa-4cf2-b2b2-067d1de28bc8/evidence-antd5-treeselect-dark-1280.png'
-    });
+    if (canSaveArtifacts) {
+      await advancedBox.screenshot({
+        path: path.join(artifactDir, 'evidence-antd5-treeselect-dark-1280.png'),
+      });
+    }
 
     // 375px Mobile Viewport & Contract 6 verification
     await page.setViewportSize({ width: 375, height: 812 });
@@ -236,9 +245,11 @@ test.describe('Ant Design 5 Benchmark Suite: Cascader & TreeSelect Advanced Cont
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(scrollWidth).toBeLessThanOrEqual(376);
 
-    await page.screenshot({
-      path: '/Users/pasitnusso/.gemini/antigravity-cli/brain/303edbc8-e3aa-4cf2-b2b2-067d1de28bc8/evidence-antd5-controls-dark-375.png',
-      fullPage: false
-    });
+    if (canSaveArtifacts) {
+      await page.screenshot({
+        path: path.join(artifactDir, 'evidence-antd5-controls-dark-375.png'),
+        fullPage: false,
+      });
+    }
   });
 });
