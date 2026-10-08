@@ -20,6 +20,7 @@ if [ -z "$WORKSPACE_ROOT" ]; then
 fi
 
 HUB_DIST="$REPO_ROOT/apps/storybook-hub/dist"
+PORTAL_BUNDLES="$REPO_ROOT/apps/storybook-hub/portal-bundles"
 mkdir -p "$HUB_DIST"
 
 echo "==> Building Joy Design System Hub & Tokens..."
@@ -28,20 +29,17 @@ node "$REPO_ROOT/apps/storybook-hub/build.js"
 
 # 1. Node Server Decorator (Astro Starlight)
 DECORATOR_DIR="$WORKSPACE_ROOT/node-server-decorator"
-if [ -d "$DECORATOR_DIR" ]; then
+if [ -d "$DECORATOR_DIR" ] && [ -d "$DECORATOR_DIR/website/dist" ]; then
   echo "==> Found node-server-decorator repository at $DECORATOR_DIR"
-  if [ -d "$DECORATOR_DIR/website/dist" ]; then
-    echo "    Copying existing website/dist to $HUB_DIST/server-decorator..."
-    rm -rf "$HUB_DIST/server-decorator"
-    cp -r "$DECORATOR_DIR/website/dist" "$HUB_DIST/server-decorator"
-  elif [ -f "$DECORATOR_DIR/website/package.json" ]; then
-    echo "    Building node-server-decorator docs..."
-    (cd "$DECORATOR_DIR" && pnpm run docs:build)
-    rm -rf "$HUB_DIST/server-decorator"
-    cp -r "$DECORATOR_DIR/website/dist" "$HUB_DIST/server-decorator"
-  fi
+  echo "    Copying existing website/dist to $HUB_DIST/server-decorator..."
+  rm -rf "$HUB_DIST/server-decorator"
+  cp -r "$DECORATOR_DIR/website/dist" "$HUB_DIST/server-decorator"
+elif [ -d "$PORTAL_BUNDLES/server-decorator" ]; then
+  echo "==> Found tracked portal-bundles for node-server-decorator..."
+  rm -rf "$HUB_DIST/server-decorator"
+  cp -r "$PORTAL_BUNDLES/server-decorator" "$HUB_DIST/server-decorator"
 else
-  echo "    node-server-decorator repository not found at sibling path, creating stub index..."
+  echo "    node-server-decorator not found, creating stub index..."
   mkdir -p "$HUB_DIST/server-decorator"
   cat <<'EOF' > "$HUB_DIST/server-decorator/index.html"
 <!DOCTYPE html>
@@ -51,20 +49,17 @@ fi
 
 # 2. CLI State Handler (Vite Docs)
 CLI_DIR="$WORKSPACE_ROOT/cli-state-handler"
-if [ -d "$CLI_DIR" ]; then
+if [ -d "$CLI_DIR" ] && [ -d "$CLI_DIR/apps/docs/dist" ]; then
   echo "==> Found cli-state-handler repository at $CLI_DIR"
-  if [ -d "$CLI_DIR/apps/docs/dist" ]; then
-    echo "    Copying existing apps/docs/dist to $HUB_DIST/cli-state-handler..."
-    rm -rf "$HUB_DIST/cli-state-handler"
-    cp -r "$CLI_DIR/apps/docs/dist" "$HUB_DIST/cli-state-handler"
-  elif [ -f "$CLI_DIR/apps/docs/package.json" ]; then
-    echo "    Building cli-state-handler docs..."
-    (cd "$CLI_DIR/apps/docs" && pnpm run build)
-    rm -rf "$HUB_DIST/cli-state-handler"
-    cp -r "$CLI_DIR/apps/docs/dist" "$HUB_DIST/cli-state-handler"
-  fi
+  echo "    Copying existing apps/docs/dist to $HUB_DIST/cli-state-handler..."
+  rm -rf "$HUB_DIST/cli-state-handler"
+  cp -r "$CLI_DIR/apps/docs/dist" "$HUB_DIST/cli-state-handler"
+elif [ -d "$PORTAL_BUNDLES/cli-state-handler" ]; then
+  echo "==> Found tracked portal-bundles for cli-state-handler..."
+  rm -rf "$HUB_DIST/cli-state-handler"
+  cp -r "$PORTAL_BUNDLES/cli-state-handler" "$HUB_DIST/cli-state-handler"
 else
-  echo "    cli-state-handler repository not found at sibling path, creating stub index..."
+  echo "    cli-state-handler not found, creating stub index..."
   mkdir -p "$HUB_DIST/cli-state-handler"
   cat <<'EOF' > "$HUB_DIST/cli-state-handler/index.html"
 <!DOCTYPE html>
