@@ -80,7 +80,7 @@ test.describe("Storybook Hub Quality Contracts", () => {
   }) => {
     // Test on mobile viewport
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
+    await page.goto("/design/");
     await page.waitForLoadState("networkidle");
 
     const sidebar = page.locator(".sidebar");
@@ -175,7 +175,7 @@ test.describe("Storybook Hub Quality Contracts", () => {
   test("Contract 4: Semantic Navigation Taxonomy (Zero visible Wave labels)", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/design/");
     await page.waitForLoadState("networkidle");
 
     // Verify exactly 6 semantic category headings in sidebar
@@ -487,7 +487,7 @@ test.describe("Storybook Hub Quality Contracts", () => {
     for (const width of [375, 1280]) {
       await page.goto("about:blank"); // fresh document per viewport
       await page.setViewportSize({ width, height: 800 });
-      await page.goto("/#overview");
+      await page.goto("/design/#overview");
       await page.waitForLoadState("networkidle");
       await installPageTools(page);
       await installContrastTools(page);
@@ -792,7 +792,7 @@ test.describe("Contract 10: hub chrome carries no slop", () => {
       for (const width of [375, 1280]) {
         await page.goto("about:blank"); // fresh document per viewport
         await page.setViewportSize({ width, height: 800 });
-        await page.goto(`/#${view}`);
+        await page.goto(`/design/#${view}`);
         await page.waitForLoadState("networkidle");
         await installPageTools(page);
         if (width < 900) {

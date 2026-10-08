@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("sidebar nav keyboard access", () => {
   test("every nav item links to an existing view panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/design/");
     const items = await page.locator(".sidebar .nav-item").evaluateAll((els) =>
       els.map((el) => ({
         href: el.getAttribute("href"),
@@ -27,7 +27,7 @@ test.describe("sidebar nav keyboard access", () => {
       info.project.name !== "desktop-chrome",
       "sidebar is a drawer on mobile",
     );
-    await page.goto("/");
+    await page.goto("/design/");
     await page.locator('.nav-item[data-view="tokens"]').click();
     await expect(page).toHaveURL(/#tokens$/);
     await expect(page.locator("#view-tokens")).toHaveClass(/active/);
@@ -46,7 +46,7 @@ test.describe("sidebar nav keyboard access", () => {
       info.project.name !== "desktop-chrome",
       "sidebar is a drawer on mobile",
     );
-    await page.goto("/");
+    await page.goto("/design/");
     const target = page.locator('.nav-item[data-view="tokens"]');
     let reached = false;
     for (let i = 0; i < 80 && !reached; i++) {
@@ -66,7 +66,7 @@ test.describe("sidebar nav keyboard access", () => {
       info.project.name !== "mobile-chrome",
       "drawer only exists on mobile",
     );
-    await page.goto("/");
+    await page.goto("/design/");
     await page.locator(".mobile-menu-btn").click();
     await expect(page.locator(".sidebar")).toHaveClass(/open/);
     let navFocused = 0;
@@ -89,7 +89,7 @@ test.describe("sidebar nav keyboard access", () => {
       info.project.name !== "mobile-chrome",
       "drawer only exists on mobile",
     );
-    await page.goto("/#tokens");
+    await page.goto("/design/#tokens");
     await page.locator(".mobile-menu-btn").click();
     await expect(page.locator(".sidebar")).toHaveClass(/open/);
     await page.locator('.nav-item[data-view="tokens"]').click();

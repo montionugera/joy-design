@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Smart Search Bar & Auto Smart Search", () => {
   test.beforeEach(async ({ page }, info) => {
-    await page.goto("/");
+    await page.goto("/design/");
     await page.waitForLoadState("networkidle");
     if (info.project.name === "mobile-chrome") {
       await page.locator("#mobile-menu-toggle").click();

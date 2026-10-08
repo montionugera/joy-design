@@ -1923,7 +1923,7 @@ ${inlinedThemeCss}
     }
     .dev-portal-bento {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
       gap: var(--joy-space-4);
       margin-bottom: var(--joy-space-6);
     }
@@ -1997,6 +1997,144 @@ ${inlinedThemeCss}
       gap: var(--joy-space-2);
       padding-top: var(--joy-space-3);
       border-top: 1px solid var(--joy-border-subtle);
+    }
+
+    /* Dedicated Developer Portal Hero Landing Page (active on dev.joymify.com root) */
+    body.portal-mode {
+      background: var(--joy-surface-canvas);
+    }
+    body.portal-mode .sidebar,
+    body.portal-mode .sidebar-backdrop,
+    body.portal-mode .mobile-menu-btn {
+      display: none !important;
+    }
+    body.portal-mode .main {
+      margin-left: 0 !important;
+      max-width: 100% !important;
+      min-height: 100vh;
+    }
+    body.portal-mode .topbar {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: var(--joy-space-4) var(--joy-space-6);
+      width: 100%;
+      border-bottom: 1px solid var(--hub-chrome-border);
+      box-sizing: border-box;
+    }
+    body.portal-mode .topbar-brand {
+      display: inline-flex !important;
+      min-width: 0;
+    }
+    body.portal-mode .topbar-brand__name {
+      font-size: var(--joy-font-size-base);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    body.portal-mode .framework-pill--topbar {
+      display: none !important;
+    }
+    .topbar-portal-nav {
+      display: none;
+    }
+    @media (min-width: 901px) {
+      body.portal-mode .topbar-portal-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--joy-space-4);
+        margin-left: var(--joy-space-6);
+      }
+    }
+    .topbar-portal-link {
+      font-size: var(--joy-font-size-sm);
+      font-weight: 500;
+      color: var(--joy-text-secondary);
+      text-decoration: none;
+      transition: color var(--joy-duration-fast) var(--joy-ease-out-quint);
+    }
+    .topbar-portal-link:hover {
+      color: var(--joy-text-primary);
+    }
+    body.portal-mode .content-area {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: var(--joy-space-8) var(--joy-space-6);
+      box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+      body.portal-mode .topbar {
+        padding: var(--joy-space-2) var(--joy-space-3);
+      }
+      body.portal-mode .content-area {
+        padding: var(--joy-space-4) var(--joy-space-3);
+      }
+      body.portal-mode .portal-hero {
+        padding: var(--joy-space-8) var(--joy-space-3) var(--joy-space-6) var(--joy-space-3);
+      }
+    }
+    body.portal-mode .joy-hero {
+      display: none !important;
+    }
+    .portal-hero {
+      display: none;
+      text-align: center;
+      padding: var(--joy-space-12) var(--joy-space-4) var(--joy-space-10) var(--joy-space-4);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    body.portal-mode .portal-hero {
+      display: block;
+    }
+    .portal-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: var(--joy-space-4);
+    }
+    .portal-hero__title {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--joy-text-primary);
+      margin: 0 0 var(--joy-space-4) 0;
+    }
+    .portal-hero__title-emphasis {
+      color: var(--joy-accent-default);
+    }
+    .portal-hero__subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--joy-text-secondary);
+      max-width: 680px;
+      margin: 0 auto var(--joy-space-8) auto;
+    }
+    .portal-hero__ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--joy-space-3);
+      justify-content: center;
+      align-items: center;
+    }
+    .portal-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--joy-space-2);
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-primary);
+      text-decoration: none;
+      padding: var(--joy-space-2) var(--joy-space-3);
+      border-radius: var(--joy-radius-md);
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-subtle);
+      margin: 0 var(--joy-space-3) var(--joy-space-3) var(--joy-space-3);
+      transition: background var(--joy-duration-fast) var(--joy-ease-out-quint), color var(--joy-duration-fast) var(--joy-ease-out-quint);
+    }
+    .portal-back-link:hover {
+      background: var(--joy-surface-hover);
+      color: var(--joy-accent-default);
     }
 
     /* Component Canvas & Docs */
@@ -4457,6 +4595,10 @@ ${inlinedThemeCss}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
+    <a href="/" class="portal-back-link" title="Return to Joymify Developer Portal">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      <span>Developer Portal Home</span>
+    </a>
     <div class="framework-pill framework-pill--drawer" role="group" aria-label="Code framework">
       <button type="button" class="framework-btn active" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
       <button type="button" class="framework-btn" data-framework="react" aria-pressed="false" onclick="setFramework('react')">React 19</button>
@@ -4535,7 +4677,13 @@ ${navigationHtml}
         <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" onclick="toggleMobileMenu(true)" aria-label="Open navigation" aria-controls="hub-sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
-        <span class="topbar-brand"><span class="brand-logo brand-logo--compact" aria-hidden="true">${brandMarkPreview(16, true, true)}</span><span class="topbar-brand__name">Joymify Design</span></span>
+        <a href="/" class="topbar-brand" style="text-decoration: none; color: inherit;"><span class="brand-logo brand-logo--compact" aria-hidden="true">${brandMarkPreview(16, true, true)}</span><span class="topbar-brand__name" id="topbar-brand-title">Joymify Design</span></a>
+        <nav class="topbar-portal-nav" aria-label="Developer Portal Navigation">
+          <a href="/design/" class="topbar-portal-link">Design System</a>
+          <a href="/server-decorator/" class="topbar-portal-link">Server Decorator</a>
+          <a href="/cli-state-handler/" class="topbar-portal-link">CLI State Handler</a>
+          <a href="https://github.com/montionugera/joy-design" target="_blank" rel="noopener noreferrer" class="topbar-portal-link">GitHub</a>
+        </nav>
       </div>
       <div class="topbar__end">
         <div class="hub-palette-picker" id="hub-palette-picker">
@@ -4624,6 +4772,30 @@ ${navigationHtml}
 
       <!-- View: Overview -->
       <section id="view-overview" class="view-panel">
+        <!-- Developer Portal Dedicated Hero Landing Banner (active in portal-mode) -->
+        <section class="portal-hero" aria-label="Developer Portal Hero">
+          <div class="portal-hero__badge">
+            <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> dev.joymify.com / Developer Portal</span>
+          </div>
+          <h1 class="portal-hero__title">
+            The Unified Engineering Ecosystem for <span class="portal-hero__title-emphasis">Joymify</span>
+          </h1>
+          <p class="portal-hero__subtitle">
+            A single portal connecting Joymify's core open-source libraries: enterprise design systems, polyglot microservice decorators, and terminal state orchestration.
+          </p>
+          <div class="portal-hero__ctas">
+            <a href="/design/" class="joy-button joy-button--solid joy-button--lg" style="text-decoration: none;">
+              <span class="joy-button__label">Launch Design System</span>
+            </a>
+            <a href="/server-decorator/" class="joy-button joy-button--outline joy-button--lg" style="text-decoration: none;">
+              <span class="joy-button__label">Server Decorator Docs</span>
+            </a>
+            <a href="/cli-state-handler/" class="joy-button joy-button--outline joy-button--lg" style="text-decoration: none;">
+              <span class="joy-button__label">CLI State Handler</span>
+            </a>
+          </div>
+        </section>
+
         <!-- overview-hero:generated:start -->
         <!-- Generated by apps/storybook-hub/scripts/gen-landing-blocks.mjs from the HeroSection component: do not edit by hand. -->
         <section class="joy-hero">
@@ -4676,10 +4848,10 @@ ${navigationHtml}
                 </div>
               </div>
               <div class="dev-portal-card__footer">
-                <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="switchView('button')">
+                <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="if(document.body.classList.contains('portal-mode')){ window.location.href='/design/'; } else { switchView('button'); }">
                   <span>Explore 70+ Components</span>
                 </button>
-                <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="switchView('tokens')">
+                <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="if(document.body.classList.contains('portal-mode')){ window.location.href='/design/#tokens'; } else { switchView('tokens'); }">
                   <span>Tokens &amp; Motion</span>
                 </button>
               </div>
@@ -9991,6 +10163,12 @@ export async function executeHedge(symbol: string, size: number) {
     }
 
     function switchView(viewName, updateHash = true) {
+      if (viewName !== 'overview' && viewName !== 'portal') {
+        document.body.classList.remove('portal-mode');
+        const titleEl = document.getElementById('topbar-brand-title');
+        if (titleEl) titleEl.textContent = 'Joymify Design';
+      }
+
       if (updateHash && window.location.hash !== '#' + viewName) {
         if (window.history && window.history.pushState) {
           window.history.pushState(null, '', '#' + viewName);
@@ -10059,8 +10237,29 @@ export async function executeHedge(symbol: string, size: number) {
 
     function syncViewFromHash() {
       const hash = window.location.hash.replace(/^#/, '');
-      if (hash && document.getElementById('view-' + hash)) {
+      const isDesignRoute = window.location.pathname.startsWith('/design');
+      const isRootRoute = !isDesignRoute;
+
+      if (isRootRoute && (!hash || hash === 'overview' || hash === 'portal')) {
+        document.body.classList.add('portal-mode');
+        const titleEl = document.getElementById('topbar-brand-title');
+        if (titleEl) titleEl.textContent = 'Joymify Developer Portal';
+        document.title = 'Joymify Developer Portal · dev.joymify.com';
+        switchView('overview', false);
+      } else if (isRootRoute && hash && document.getElementById('view-' + hash)) {
+        document.body.classList.remove('portal-mode');
+        const titleEl = document.getElementById('topbar-brand-title');
+        if (titleEl) titleEl.textContent = 'Joymify Design';
         switchView(hash, false);
+      } else if (isDesignRoute) {
+        document.body.classList.remove('portal-mode');
+        const titleEl = document.getElementById('topbar-brand-title');
+        if (titleEl) titleEl.textContent = 'Joymify Design';
+        if (hash && document.getElementById('view-' + hash)) {
+          switchView(hash, false);
+        } else {
+          switchView('overview', false);
+        }
       } else {
         switchView('overview', false);
       }
@@ -14215,7 +14414,13 @@ export async function executeHedge(symbol: string, size: number) {
 
 `;
 
-fs.writeFileSync(path.join(outDir, "index.html"), html);
+// Portal Landing Page (dist/index.html): starts with body class="portal-mode"
+const portalHtml = html
+  .replace('<body>', '<body class="portal-mode">')
+  .replace('<title>Joymify Design System & Component Portal</title>', '<title>Joymify Developer Portal · dev.joymify.com</title>')
+  .replace('<span class="topbar-brand__name" id="topbar-brand-title">Joymify Design</span>', '<span class="topbar-brand__name" id="topbar-brand-title">Joymify Developer Portal</span>');
+
+fs.writeFileSync(path.join(outDir, "index.html"), portalHtml);
 
 // Joy Design Sub-Webapp directory (/design/index.html)
 const designOutDir = path.join(outDir, "design");
