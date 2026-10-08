@@ -1,0 +1,39 @@
+import{r as e,t}from"./react.yIOJJ3r4.js";import{n,t as r}from"./jsx-runtime.JMAt2w8r.js";import{t as i}from"./circle-check-big.9kdwx5z9.js";import{t as a}from"./refresh-cw.DyipJcV5.js";import{t as o}from"./PolyglotCodeTabs.1K7Ixw4G.js";var s={name:`activity`,size:24,node:[[`path`,{d:`M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2`,key:`169zse`}]]};s.node;var c=n(s),l={name:`triangle-alert`,size:24,node:[[`path`,{d:`m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3`,key:`wmoenq`}],[`path`,{d:`M12 9v4`,key:`juzpu7`}],[`path`,{d:`M12 17h.01`,key:`p32p05`}]],aliases:[`alert-triangle`]};l.node;var u=n(l),d={name:`zap`,size:24,node:[[`path`,{d:`M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z`,key:`1v7up4`}]]};d.node;var f=n(d),p=e(t(),1),m=r(),h=({failureThreshold:e=3,resetTimeoutMs:t=3e3,trialSuccesses:n=2})=>{let[r,s]=(0,p.useState)(e),[l,d]=(0,p.useState)(t),[h,g]=(0,p.useState)(n),[_,v]=(0,p.useState)(`CLOSED`),[y,b]=(0,p.useState)(0),[x,S]=(0,p.useState)(0),[C,w]=(0,p.useState)(0),[T,E]=(0,p.useState)([{id:`init`,time:new Date().toLocaleTimeString(),type:`info`,message:`Circuit initialized in CLOSED state. Monitoring service calls.`}]),D=(0,p.useRef)(null),O=(e,t)=>{E(n=>[{id:Math.random().toString(36).substring(2,9),time:new Date().toLocaleTimeString(),type:e,message:t},...n.slice(0,19)])};(0,p.useEffect)(()=>{if(_===`OPEN`){w(Math.ceil(l/1e3));let e=setInterval(()=>{w(t=>t<=1?(clearInterval(e),v(`HALF_OPEN`),S(0),O(`warn`,`Reset timeout expired. Transitioned to HALF-OPEN state (trial mode).`),0):t-1)},1e3);return D.current=e,()=>clearInterval(e)}},[_,l]);let k=()=>{if(_===`OPEN`){O(`fail`,`Blocked: CircuitBreakerOpenError! Call rejected immediately (fast failure).`);return}if(_===`HALF_OPEN`){let e=x+1;S(e),O(`success`,`Trial canary call succeeded (${e}/${h}).`),e>=h&&(v(`CLOSED`),b(0),S(0),O(`success`,`Health verified! Circuit recovered and transitioned to CLOSED state.`))}else O(`success`,`Call succeeded (200 OK). Circuit remains CLOSED.`)},A=()=>{if(_===`OPEN`){O(`fail`,`Blocked: CircuitBreakerOpenError! Downstream is protected from further load.`);return}if(_===`HALF_OPEN`){v(`OPEN`),S(0),O(`fail`,`Trial call failed! Canary tripped; circuit immediately reopened to OPEN state.`);return}let e=y+1;b(e),O(`fail`,`Call failed with 500 error (${e}/${r} threshold).`),e>=r&&(v(`OPEN`),b(0),O(`warn`,`Threshold reached (${r} errors)! Circuit TRIPPED to OPEN state.`))},j=()=>{_===`OPEN`&&(D.current&&clearInterval(D.current),w(0),v(`HALF_OPEN`),S(0),O(`info`,`Fast-forwarded timeout. Circuit transitioned to HALF-OPEN.`))},M=()=>{D.current&&clearInterval(D.current),v(`CLOSED`),b(0),S(0),w(0),O(`info`,`Manual reset applied: Circuit forced to CLOSED.`)},N=_===`CLOSED`?`badge-green`:_===`OPEN`?`badge-red`:`badge-amber`,P={typescript:`// TypeScript / Node
+import { withCircuitBreaker, CircuitBreakerOpenError } from '@montionugera/server-decorator';
+
+const resilientFetch = withCircuitBreaker(async (id: string) => {
+  return await fetchUserFromRemote(id);
+}, {
+  threshold: ${r},
+  resetTimeoutMs: ${l},
+  fallback: () => ({ id: 'fallback', name: 'Cached User' })
+});`,python:`# Python
+from server_decorator import circuit_breaker, CircuitBreakerOpenError
+
+@circuit_breaker(threshold=${r}, reset_timeout_ms=${l})
+async def fetch_user(user_id: str):
+    return await remote_service.get(user_id)`,go:`// Go
+import "github.com/montionugera/node-server-decorator/go/core"
+
+cb := core.NewCircuitBreaker(core.CircuitBreakerOptions{
+    FailureThreshold: ${r},
+    ResetTimeout:     ${l} * time.Millisecond,
+})
+res, err := cb.Execute(ctx, func() (any, error) {
+    return fetchUser(id)
+})`,nim:`// Nim
+import server_decorator/resilience
+
+let cb = newCircuitBreaker(
+  threshold = ${r},
+  resetTimeoutMs = ${l}
+)
+let result = cb.protect:
+  fetchUser(id)`,rust:`// Rust (Axum / Core)
+use server_decorator_core::circuit_breaker::{CircuitBreaker, CircuitBreakerOptions};
+
+let cb = CircuitBreaker::new(CircuitBreakerOptions {
+    threshold: ${r},
+    reset_timeout: Duration::from_millis(${l}),
+});
+let res = cb.call(|| async { fetch_user(id).await }).await;`};return(0,m.jsxs)(`div`,{className:`studio-card`,children:[(0,m.jsxs)(`div`,{className:`studio-header`,children:[(0,m.jsxs)(`h3`,{className:`studio-title`,children:[(0,m.jsx)(c,{size:22,color:`#58a6ff`}),` Circuit Breaker Interactive Simulator`]}),(0,m.jsxs)(`span`,{className:`studio-badge ${N}`,children:[`State: `,_]})]}),(0,m.jsxs)(`div`,{className:`studio-grid`,children:[(0,m.jsxs)(`div`,{className:`studio-panel`,children:[(0,m.jsxs)(`div`,{className:`studio-controls`,children:[(0,m.jsxs)(`div`,{className:`studio-control-row`,children:[(0,m.jsx)(`span`,{className:`studio-control-label`,children:`Failure Threshold:`}),(0,m.jsx)(`input`,{type:`number`,min:`1`,max:`10`,className:`studio-input`,value:r,onChange:e=>s(Number(e.target.value))})]}),(0,m.jsxs)(`div`,{className:`studio-control-row`,children:[(0,m.jsx)(`span`,{className:`studio-control-label`,children:`Reset Timeout (ms):`}),(0,m.jsx)(`input`,{type:`number`,min:`1000`,step:`500`,max:`10000`,className:`studio-input`,value:l,onChange:e=>d(Number(e.target.value))})]}),(0,m.jsxs)(`div`,{className:`studio-control-row`,children:[(0,m.jsx)(`span`,{className:`studio-control-label`,children:`Trial Successes Required:`}),(0,m.jsx)(`input`,{type:`number`,min:`1`,max:`5`,className:`studio-input`,value:h,onChange:e=>g(Number(e.target.value))})]})]}),(0,m.jsxs)(`div`,{style:{marginTop:`1rem`,padding:`0.75rem`,background:`#0d1117`,borderRadius:`0.375rem`,border:`1px solid #21262d`},children:[(0,m.jsxs)(`div`,{style:{fontSize:`0.85rem`,marginBottom:`0.4rem`,display:`flex`,justifyContent:`space-between`},children:[(0,m.jsx)(`span`,{children:`Failure Counter:`}),(0,m.jsxs)(`strong`,{style:{color:y>0?`#f85149`:`#3fb950`},children:[y,` / `,r]})]}),_===`OPEN`&&(0,m.jsxs)(`div`,{style:{fontSize:`0.85rem`,display:`flex`,justifyContent:`space-between`,color:`#f85149`},children:[(0,m.jsx)(`span`,{children:`Cooldown Remaining:`}),(0,m.jsxs)(`strong`,{children:[C,`s`]})]}),_===`HALF_OPEN`&&(0,m.jsxs)(`div`,{style:{fontSize:`0.85rem`,display:`flex`,justifyContent:`space-between`,color:`#d29922`},children:[(0,m.jsx)(`span`,{children:`Canary Successes:`}),(0,m.jsxs)(`strong`,{children:[x,` / `,h]})]})]}),(0,m.jsxs)(`div`,{className:`studio-btn-group`,children:[(0,m.jsxs)(`button`,{className:`studio-btn btn-primary`,onClick:k,children:[(0,m.jsx)(i,{size:16}),` Call (Success 200)`]}),(0,m.jsxs)(`button`,{className:`studio-btn btn-danger`,onClick:A,children:[(0,m.jsx)(u,{size:16}),` Call (Error 500)`]}),_===`OPEN`&&(0,m.jsxs)(`button`,{className:`studio-btn btn-accent`,onClick:j,children:[(0,m.jsx)(f,{size:16}),` Skip Cooldown`]}),(0,m.jsxs)(`button`,{className:`studio-btn btn-secondary`,onClick:M,children:[(0,m.jsx)(a,{size:16}),` Reset`]})]})]}),(0,m.jsxs)(`div`,{className:`studio-panel`,children:[(0,m.jsx)(`div`,{style:{fontSize:`0.875rem`,fontWeight:600,marginBottom:`0.5rem`,color:`#8b949e`},children:`Live Telemetry Log`}),(0,m.jsx)(`div`,{className:`studio-log-box`,children:T.map(e=>(0,m.jsxs)(`div`,{className:`log-entry log-${e.type}`,children:[(0,m.jsxs)(`span`,{style:{opacity:.5,marginRight:`0.4rem`},children:[`[`,e.time,`]`]}),e.message]},e.id))})]})]}),(0,m.jsxs)(`div`,{style:{marginTop:`1.5rem`},children:[(0,m.jsx)(`h4`,{style:{fontSize:`0.95rem`,fontWeight:600,marginBottom:`0.5rem`,color:`#8b949e`},children:`Polyglot Code Implementation`}),(0,m.jsx)(o,{snippets:P})]})]})};export{h as CircuitBreakerSimulator};

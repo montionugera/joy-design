@@ -6,7 +6,7 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
     await page.waitForSelector('#view-overview', { state: 'visible' });
   });
 
-  test('Bento grid renders 3 core libraries: Design System, Server Decorator, and CLI State Handler', async ({ page }) => {
+  test('Hero section and Bento grid render 3 core libraries: Design System, Server Decorator, and CLI State Handler', async ({ page }) => {
     const portalSection = page.locator('.dev-portal-section');
     await expect(portalSection).toBeVisible();
 
@@ -21,7 +21,7 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
 
     // Card 1: Design System
     await expect(designCard.locator('.dev-portal-card__title')).toContainText('Joy Design System');
-    await expect(designCard.locator('.dev-portal-version')).toContainText('v3.3');
+    await expect(designCard.locator('.dev-portal-version')).toContainText('v3.4');
     await expect(designCard.locator('button', { hasText: 'Explore 70+ Components' })).toBeVisible();
 
     // Card 2: Server Decorator
@@ -81,5 +81,22 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
     const lightTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     expect(lightTheme).toBe('light');
     await expect(designCard).toBeVisible();
+  });
+
+  test('Sub-webapp routes serve static documentation without 403 Forbidden', async ({ page }) => {
+    // 1. Server Decorator Starlight Studio
+    const resDecorator = await page.goto('/server-decorator/');
+    expect(resDecorator?.status()).toBe(200);
+    await expect(page).toHaveTitle(/server-decorator/);
+
+    // 2. CLI State Handler Vite Docs
+    const resCli = await page.goto('/cli-state-handler/');
+    expect(resCli?.status()).toBe(200);
+    await expect(page).toHaveTitle(/UCSA/);
+
+    // 3. Joy Design System Hub at /design/
+    const resDesign = await page.goto('/design/');
+    expect(resDesign?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Joymify Design System/);
   });
 });
