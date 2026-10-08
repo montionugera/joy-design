@@ -1923,7 +1923,7 @@ ${inlinedThemeCss}
     }
     .dev-portal-bento {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
       gap: var(--joy-space-4);
       margin-bottom: var(--joy-space-6);
     }
@@ -2019,20 +2019,33 @@ ${inlinedThemeCss}
       padding: var(--joy-space-4) var(--joy-space-6);
       width: 100%;
       border-bottom: 1px solid var(--hub-chrome-border);
+      box-sizing: border-box;
+    }
+    body.portal-mode .topbar-brand {
+      display: inline-flex !important;
+      min-width: 0;
     }
     body.portal-mode .topbar-brand__name {
       font-size: var(--joy-font-size-base);
       font-weight: 700;
       letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    body.portal-mode .framework-pill--topbar {
+      display: none !important;
     }
     .topbar-portal-nav {
       display: none;
     }
-    body.portal-mode .topbar-portal-nav {
-      display: flex;
-      align-items: center;
-      gap: var(--joy-space-4);
-      margin-left: var(--joy-space-6);
+    @media (min-width: 901px) {
+      body.portal-mode .topbar-portal-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--joy-space-4);
+        margin-left: var(--joy-space-6);
+      }
     }
     .topbar-portal-link {
       font-size: var(--joy-font-size-sm);
@@ -2048,6 +2061,18 @@ ${inlinedThemeCss}
       max-width: 1240px;
       margin: 0 auto;
       padding: var(--joy-space-8) var(--joy-space-6);
+      box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+      body.portal-mode .topbar {
+        padding: var(--joy-space-2) var(--joy-space-3);
+      }
+      body.portal-mode .content-area {
+        padding: var(--joy-space-4) var(--joy-space-3);
+      }
+      body.portal-mode .portal-hero {
+        padding: var(--joy-space-8) var(--joy-space-3) var(--joy-space-6) var(--joy-space-3);
+      }
     }
     body.portal-mode .joy-hero {
       display: none !important;
@@ -2098,17 +2123,18 @@ ${inlinedThemeCss}
       gap: var(--joy-space-2);
       font-size: var(--joy-font-size-xs);
       font-weight: 600;
-      color: var(--joy-accent-default);
+      color: var(--joy-text-primary);
       text-decoration: none;
       padding: var(--joy-space-2) var(--joy-space-3);
       border-radius: var(--joy-radius-md);
       background: var(--joy-surface-sunken);
       border: 1px solid var(--joy-border-subtle);
       margin: 0 var(--joy-space-3) var(--joy-space-3) var(--joy-space-3);
-      transition: background var(--joy-duration-fast) var(--joy-ease-out-quint);
+      transition: background var(--joy-duration-fast) var(--joy-ease-out-quint), color var(--joy-duration-fast) var(--joy-ease-out-quint);
     }
     .portal-back-link:hover {
       background: var(--joy-surface-hover);
+      color: var(--joy-accent-default);
     }
 
     /* Component Canvas & Docs */
@@ -4571,7 +4597,7 @@ ${inlinedThemeCss}
     </div>
     <a href="/" class="portal-back-link" title="Return to Joymify Developer Portal">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-      <span>&larr; Developer Portal Home</span>
+      <span>Developer Portal Home</span>
     </a>
     <div class="framework-pill framework-pill--drawer" role="group" aria-label="Code framework">
       <button type="button" class="framework-btn active" data-framework="svelte" aria-pressed="true" onclick="setFramework('svelte')">Svelte 5</button>
@@ -4749,7 +4775,7 @@ ${navigationHtml}
         <!-- Developer Portal Dedicated Hero Landing Banner (active in portal-mode) -->
         <section class="portal-hero" aria-label="Developer Portal Hero">
           <div class="portal-hero__badge">
-            <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> dev.joymify.com &middot; Developer Portal</span>
+            <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> dev.joymify.com / Developer Portal</span>
           </div>
           <h1 class="portal-hero__title">
             The Unified Engineering Ecosystem for <span class="portal-hero__title-emphasis">Joymify</span>
@@ -4759,7 +4785,7 @@ ${navigationHtml}
           </p>
           <div class="portal-hero__ctas">
             <a href="/design/" class="joy-button joy-button--solid joy-button--lg" style="text-decoration: none;">
-              <span class="joy-button__label">Launch Design System &rarr;</span>
+              <span class="joy-button__label">Launch Design System</span>
             </a>
             <a href="/server-decorator/" class="joy-button joy-button--outline joy-button--lg" style="text-decoration: none;">
               <span class="joy-button__label">Server Decorator Docs</span>

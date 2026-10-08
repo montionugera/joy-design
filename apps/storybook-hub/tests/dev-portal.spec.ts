@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', () => {
-  test('Visiting root / renders in portal-mode with Developer Portal Hero and hidden sidebar', async ({ page }) => {
+  test('Visiting root / renders in portal-mode with Developer Portal Hero and hidden sidebar', async ({ page }, info) => {
     await page.goto('/');
     await page.waitForSelector('.portal-hero', { state: 'visible' });
 
@@ -16,8 +16,12 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
     await expect(portalHero).toBeVisible();
     await expect(portalHero.locator('.portal-hero__title')).toContainText('The Unified Engineering Ecosystem');
 
-    // Topbar portal navigation links must be visible on desktop
-    await expect(page.locator('.topbar-portal-nav')).toBeVisible();
+    // Topbar portal navigation links must be visible on desktop and cleanly hidden on mobile
+    if (info.project.name === 'mobile-chrome') {
+      await expect(page.locator('.topbar-portal-nav')).toBeHidden();
+    } else {
+      await expect(page.locator('.topbar-portal-nav')).toBeVisible();
+    }
   });
 
   test('Hero section and Bento grid render 3 core libraries: Design System, Server Decorator, and CLI State Handler', async ({ page }) => {

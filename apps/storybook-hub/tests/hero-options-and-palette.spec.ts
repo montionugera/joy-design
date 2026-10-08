@@ -71,7 +71,7 @@ test.describe("Visual verification for F-054", () => {
     if (testInfo.project.name === "mobile-chrome") {
       test.skip();
     }
-    await page.goto("/#overview");
+    await page.goto("/design/#overview");
     const nav = page.locator(".nav");
     await expect(nav).toBeVisible();
 
