@@ -1,12 +1,39 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: joy-design-ingress
+  name: dev-joymify-ingress
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.org/server-snippets: "gzip on;"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - dev.joymify.com
+      secretName: dev-joymify-tls
+  rules:
+    - host: dev.joymify.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: joy-design-storybook
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: joy-design-legacy-redirect
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/permanent-redirect: "https://dev.joymify.com/design$request_uri"
 spec:
   ingressClassName: nginx
   tls:
