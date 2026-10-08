@@ -1,12 +1,29 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#overview');
-    await page.waitForSelector('#view-overview', { state: 'visible' });
+  test('Visiting root / renders in portal-mode with Developer Portal Hero and hidden sidebar', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.portal-hero', { state: 'visible' });
+
+    // Assert portal mode is active on body
+    await expect(page.locator('body')).toHaveClass(/portal-mode/);
+
+    // Sidebar must NOT be visible on root portal landing page
+    await expect(page.locator('.sidebar')).not.toBeVisible();
+
+    // Portal Hero must be prominent
+    const portalHero = page.locator('.portal-hero');
+    await expect(portalHero).toBeVisible();
+    await expect(portalHero.locator('.portal-hero__title')).toContainText('The Unified Engineering Ecosystem');
+
+    // Topbar portal navigation links must be visible on desktop
+    await expect(page.locator('.topbar-portal-nav')).toBeVisible();
   });
 
   test('Hero section and Bento grid render 3 core libraries: Design System, Server Decorator, and CLI State Handler', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.dev-portal-section', { state: 'visible' });
+
     const portalSection = page.locator('.dev-portal-section');
     await expect(portalSection).toBeVisible();
 
@@ -35,12 +52,27 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
     await expect(cliCard.locator('a[href="/cli-state-handler/"]')).toBeVisible();
   });
 
-  test('Sidebar cross-library suite navigator is visible and interactive', async ({ page }, info) => {
+  test('Visiting /design/ renders Joy Design System with visible component sidebar and portal back link', async ({ page }, info) => {
+    await page.goto('/design/');
+    await page.waitForSelector('#view-overview', { state: 'visible' });
+
+    // Assert body is NOT in portal-mode
+    await expect(page.locator('body')).not.toHaveClass(/portal-mode/);
+
     if (info.project.name === 'mobile-chrome') {
       await page.locator('#mobile-menu-toggle').click();
       await expect(page.locator('.sidebar')).toHaveClass(/open/);
+    } else {
+      // Sidebar must be visible on desktop
+      await expect(page.locator('.sidebar')).toBeVisible();
     }
 
+    // Portal back link must point to root /
+    const backLink = page.locator('.portal-back-link');
+    await expect(backLink).toBeVisible();
+    await expect(backLink).toHaveAttribute('href', '/');
+
+    // Sidebar cross-library suite navigator must be visible
     const suiteNav = page.locator('.sidebar-suite-wrap');
     await expect(suiteNav).toBeVisible();
 
@@ -56,6 +88,7 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
 
   test('Responsive layout at 375px mobile viewport has zero horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/');
     await page.waitForTimeout(100);
 
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
@@ -66,6 +99,9 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
   });
 
   test('Theme switching preserves Developer Portal visual integrity in dark and light modes', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#portal-card-design', { state: 'visible' });
+
     // Switch to dark
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await page.waitForTimeout(50);
