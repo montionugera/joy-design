@@ -12,8 +12,14 @@ RUN cd apps/storybook-hub && node build.js
 
 # Stage 2: Serve with NGINX
 FROM nginx:alpine AS runner
+WORKDIR /usr/share/nginx/html
+
 COPY --from=builder /app/apps/storybook-hub/dist /usr/share/nginx/html
 COPY --from=builder /app/packages/tokens/dist/theme.css /usr/share/nginx/html/theme.css
+
+# Ensure sub-paths exist for consolidated library doc portals
+RUN mkdir -p /usr/share/nginx/html/server-decorator /usr/share/nginx/html/cli-state-handler
+
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
