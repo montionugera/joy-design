@@ -4642,7 +4642,7 @@ ${navigationHtml}
         </section>
         <!-- overview-hero:generated:end -->
 
-        <!-- Joymify Developer Platform: Core Libraries Bento Grid -->
+        <!-- Joymify Developer Platform: Core Libraries Bento Grid (3 Sub-Webapps) -->
         <div class="dev-portal-section" aria-label="Joymify Core Libraries">
           <div class="dev-portal-header">
             <div class="dev-portal-header__badge">
@@ -4657,7 +4657,7 @@ ${navigationHtml}
             <div class="dev-portal-card" id="portal-card-design">
               <div class="dev-portal-card__header">
                 <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> UI Components &amp; Tokens</span>
-                <span class="dev-portal-version">v3.3</span>
+                <span class="dev-portal-version">v3.4</span>
               </div>
               <div class="dev-portal-card__body">
                 <h3 class="dev-portal-card__title">
@@ -14216,9 +14216,16 @@ export async function executeHedge(symbol: string, size: number) {
 `;
 
 fs.writeFileSync(path.join(outDir, "index.html"), html);
+
+// Joy Design Sub-Webapp directory (/design/index.html)
+const designOutDir = path.join(outDir, "design");
+fs.mkdirSync(designOutDir, { recursive: true });
+fs.writeFileSync(path.join(designOutDir, "index.html"), html);
+
 const tokensSrc = path.join(__dirname, "../../packages/tokens/dist/theme.css");
 if (fs.existsSync(tokensSrc)) {
   fs.copyFileSync(tokensSrc, path.join(outDir, "theme.css"));
+  fs.copyFileSync(tokensSrc, path.join(designOutDir, "theme.css"));
 }
 
 // Downloadable brand assets (F-043): copy the files listed in brandAssetFiles (read above) into the
@@ -14229,6 +14236,7 @@ for (const file of brandAssetFiles) {
   fs.copyFileSync(path.join(brandAssetsSrc, file), path.join(brandOutDir, file));
 }
 fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
+fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(designOutDir, "favicon.svg"));
 
 // Copy Flutter Web bundle if present (F-065)
 const flutterSrcDir = path.join(__dirname, "../flutter-hub/build/web");
@@ -14244,4 +14252,20 @@ if (fs.existsSync(flutterSrcDir)) {
   console.log("Copied Flutter Web bundle to", flutterOutDir);
 }
 
+// Copy tracked portal bundles if present into dist/server-decorator and dist/cli-state-handler
+const bundlesDir = path.join(__dirname, "portal-bundles");
+if (fs.existsSync(bundlesDir)) {
+  const decoratorBundle = path.join(bundlesDir, "server-decorator");
+  if (fs.existsSync(decoratorBundle)) {
+    fs.cpSync(decoratorBundle, path.join(outDir, "server-decorator"), { recursive: true });
+    console.log("Copied server-decorator bundle to dist/server-decorator");
+  }
+  const cliBundle = path.join(bundlesDir, "cli-state-handler");
+  if (fs.existsSync(cliBundle)) {
+    fs.cpSync(cliBundle, path.join(outDir, "cli-state-handler"), { recursive: true });
+    console.log("Copied cli-state-handler bundle to dist/cli-state-handler");
+  }
+}
+
 console.log("Built Storybook Hub static distribution in", outDir);
+

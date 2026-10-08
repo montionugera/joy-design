@@ -1,0 +1,37 @@
+import{r as e,t}from"./react.yIOJJ3r4.js";import{n,t as r}from"./jsx-runtime.JMAt2w8r.js";import{t as i}from"./play.B2b6MpNN.js";import{t as a}from"./PolyglotCodeTabs.1K7Ixw4G.js";var o={name:`circle-stop`,size:24,node:[[`circle`,{cx:`12`,cy:`12`,r:`10`,key:`1mglay`}],[`rect`,{x:`9`,y:`9`,width:`6`,height:`6`,rx:`1`,key:`1ssd4o`}]],aliases:[`stop-circle`]};o.node;var s=n(o),c={name:`heart`,size:24,node:[[`path`,{d:`M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5`,key:`mvr1a0`}]]};c.node;var l=n(c),u={name:`lock-open`,size:24,node:[[`rect`,{width:`18`,height:`11`,x:`3`,y:`11`,rx:`2`,ry:`2`,key:`1w4ew1`}],[`path`,{d:`M7 11V7a5 5 0 0 1 9.9-1`,key:`1mm8w8`}]],aliases:[`unlock`]};u.node;var d=n(u),f={name:`lock`,size:24,node:[[`rect`,{width:`18`,height:`11`,x:`3`,y:`11`,rx:`2`,ry:`2`,key:`1w4ew1`}],[`path`,{d:`M7 11V7a5 5 0 0 1 10 0v4`,key:`fwvmzm`}]]};f.node;var p=n(f),m={name:`octagon-alert`,size:24,node:[[`path`,{d:`M12 16h.01`,key:`1drbdi`}],[`path`,{d:`M12 8v4`,key:`1got3b`}],[`path`,{d:`M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z`,key:`1fd625`}]],aliases:[`alert-octagon`]};m.node;var h=n(m),g=e(t(),1),_=r(),v=({initialTtlMs:e=3e3})=>{let[t,n]=(0,g.useState)(e),[r,o]=(0,g.useState)(!1),[c,u]=(0,g.useState)(0),[f,m]=(0,g.useState)(!1),[v,y]=(0,g.useState)(!0),[b,x]=(0,g.useState)(0),[S,C]=(0,g.useState)([`Lock "lock:order:101" is currently idle in Redis.`]),w=(0,g.useRef)(null),T=(0,g.useRef)(null),E=e=>{C(t=>[`[${new Date().toLocaleTimeString()}] ${e}`,...t.slice(0,15)])},D=()=>{if(r){E(`Worker 1 already holds the lock.`);return}o(!0),y(!0),u(t),x(0),m(!1),E(`Acquired lock token with initial TTL: ${t}ms. Heartbeat watchdog running every ${Math.floor(t/3)}ms.`)};(0,g.useEffect)(()=>{if(r)return w.current=setInterval(()=>{u(e=>e<=100?(clearInterval(w.current),o(!1),E(`LOCK EXPIRED! TTL hit 0 (watchdog was stopped or lost).`),0):e-100)},100),()=>{w.current&&clearInterval(w.current)}},[r]),(0,g.useEffect)(()=>{if(r&&v){let e=Math.floor(t/3);return T.current=setInterval(()=>{u(t),x(e=>e+1),E(`Watchdog pulse: evaluated RENEW_LOCK_LUA in Redis. Extended TTL back to ${t}ms.`)},e),()=>{T.current&&clearInterval(T.current)}}},[r,v,t]);let O=()=>{y(!1),T.current&&clearInterval(T.current),E(`SIMULATION: Worker process hung / watchdog crashed! Watchdog stopped. Lock will expire when remaining TTL hits 0.`)},k=()=>{r?(m(!0),E(`Worker 2 attempted SET NX PX "lock:order:101" -> REJECTED: LockAcquisitionError (Contention)!`),setTimeout(()=>m(!1),2e3)):E(`Worker 2 attempted acquisition -> SUCCESS! Lock acquired by Worker 2.`)},A=()=>{w.current&&clearInterval(w.current),T.current&&clearInterval(T.current),o(!1),u(0),y(!0),E(`Evaluated RELEASE_LOCK_LUA in Redis. Lock cleanly released.`)},j={typescript:`// TypeScript / Node
+import { withDistributedLock, LockAcquisitionError } from '@montionugera/server-decorator';
+
+const processOrder = withDistributedLock('lock:order:101', async (orderId: string) => {
+  // Watchdog automatically extends lock TTL while this async function runs!
+  await performHeavyComputation();
+  return { status: 'processed' };
+}, {
+  ttlMs: ${t},
+  autoRenew: true,
+  waitTimeoutMs: 500 // Fail fast or wait
+});`,python:`# Python
+from server_decorator import distributed_lock
+
+@distributed_lock("lock:order:101", ttl_ms=${t}, auto_renew=True)
+async def process_order(order_id: str):
+    await heavy_computation()`,go:`// Go
+import "github.com/montionugera/node-server-decorator/go/core"
+
+err := lockManager.WithDistributedLock(ctx, "lock:order:101", core.LockOptions{
+    TTL:       ${t} * time.Millisecond,
+    AutoRenew: true,
+}, func() error {
+    return processOrder(orderId)
+})`,nim:`// Nim
+import server_decorator/distlock
+
+withLock("lock:order:101", ttlMs = ${t}, autoRenew = true):
+  processOrder(orderId)`,rust:`// Rust
+use server_decorator_core::distlock::{with_distributed_lock, LockOptions};
+
+let res = with_distributed_lock("lock:order:101", LockOptions {
+    ttl: Duration::from_millis(${t}),
+    auto_renew: true,
+}, || async {
+    process_order(order_id).await
+}).await;`};return(0,_.jsxs)(`div`,{className:`studio-card`,children:[(0,_.jsxs)(`div`,{className:`studio-header`,children:[(0,_.jsxs)(`h3`,{className:`studio-title`,children:[(0,_.jsx)(p,{size:22,color:`#f0883e`}),` Distributed Lock & Watchdog Simulator`]}),(0,_.jsx)(`span`,{className:`studio-badge ${r?`badge-amber`:`badge-green`}`,children:r?`Lock Held`:`Lock Free`})]}),(0,_.jsxs)(`div`,{className:`studio-grid`,children:[(0,_.jsxs)(`div`,{className:`studio-panel`,children:[(0,_.jsxs)(`div`,{className:`studio-controls`,children:[(0,_.jsxs)(`div`,{className:`studio-control-row`,children:[(0,_.jsx)(`span`,{className:`studio-control-label`,children:`Lock Base TTL (ms):`}),(0,_.jsx)(`input`,{type:`number`,min:`1000`,step:`500`,max:`10000`,className:`studio-input`,value:t,onChange:e=>n(Number(e.target.value))})]}),(0,_.jsxs)(`div`,{className:`studio-control-row`,children:[(0,_.jsx)(`span`,{className:`studio-control-label`,children:`Watchdog Interval:`}),(0,_.jsxs)(`span`,{style:{fontSize:`0.85rem`,color:`#58a6ff`},children:[`Every ~`,Math.floor(t/3),`ms (TTL / 3)`]})]})]}),(0,_.jsxs)(`div`,{style:{marginTop:`1.25rem`},children:[(0,_.jsxs)(`div`,{style:{display:`flex`,justifyContent:`space-between`,fontSize:`0.85rem`,marginBottom:`0.35rem`},children:[(0,_.jsx)(`span`,{children:`Remaining TTL:`}),(0,_.jsxs)(`strong`,{children:[c,`ms`]})]}),(0,_.jsx)(`div`,{style:{width:`100%`,height:`14px`,background:`#21262d`,borderRadius:`9999px`,overflow:`hidden`},children:(0,_.jsx)(`div`,{style:{width:`${c/t*100}%`,height:`100%`,background:r?`#f0883e`:`#238636`,transition:`width 0.1s linear`}})}),r&&v&&(0,_.jsxs)(`div`,{style:{display:`flex`,alignItems:`center`,gap:`0.4rem`,color:`#3fb950`,fontSize:`0.8rem`,marginTop:`0.5rem`},children:[(0,_.jsx)(l,{size:14,className:`pulse`}),` Watchdog active:`,` `,b,` renewals sent to Redis`]})]}),(0,_.jsxs)(`div`,{className:`studio-btn-group`,children:[r?(0,_.jsxs)(_.Fragment,{children:[(0,_.jsxs)(`button`,{className:`studio-btn btn-secondary`,onClick:A,children:[(0,_.jsx)(d,{size:16}),` Release Lock`]}),v&&(0,_.jsxs)(`button`,{className:`studio-btn btn-danger`,onClick:O,children:[(0,_.jsx)(h,{size:16}),` Simulate Worker Crash`]})]}):(0,_.jsxs)(`button`,{className:`studio-btn btn-primary`,onClick:D,children:[(0,_.jsx)(i,{size:16}),` Acquire Lock (Worker 1)`]}),(0,_.jsxs)(`button`,{className:`studio-btn ${f?`btn-danger`:`btn-accent`}`,onClick:k,children:[(0,_.jsx)(s,{size:16}),` Worker 2: Try Acquire`]})]})]}),(0,_.jsxs)(`div`,{className:`studio-panel`,children:[(0,_.jsx)(`div`,{style:{fontSize:`0.875rem`,fontWeight:600,marginBottom:`0.5rem`,color:`#8b949e`},children:`Distributed Lock Events`}),(0,_.jsx)(`div`,{className:`studio-log-box`,children:S.map((e,t)=>(0,_.jsx)(`div`,{className:`log-entry`,style:{color:e.includes(`REJECTED`)?`#f85149`:e.includes(`pulse`)?`#3fb950`:`#c9d1d9`},children:e},t))})]})]}),(0,_.jsxs)(`div`,{style:{marginTop:`1.5rem`},children:[(0,_.jsx)(`h4`,{style:{fontSize:`0.95rem`,fontWeight:600,marginBottom:`0.5rem`,color:`#8b949e`},children:`Polyglot Code Implementation`}),(0,_.jsx)(a,{snippets:j})]})]})};export{v as DistributedLockSimulator};
