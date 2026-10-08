@@ -247,8 +247,9 @@ jobs:
             --namespace=default \
             --timeout=180s
 
-      - name: 🚦 Smoke check — verify design.joymify.com
+      - name: 🚦 Smoke check — verify dev.joymify.com & legacy redirect
         run: |
+          ./scripts/smoke-prod.sh dev.joymify.com
           ./scripts/smoke-prod.sh design.joymify.com
 
       - name: 📋 Deploy summary
@@ -256,6 +257,7 @@ jobs:
         run: |
           echo "## 🚀 Joymify Design System Deploy Summary" >> $GITHUB_STEP_SUMMARY
           echo "- Image: \`$IMAGE_NAME:$IMAGE_TAG\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Endpoint: [https://design.joymify.com](https://design.joymify.com)" >> $GITHUB_STEP_SUMMARY
+          echo "- Endpoint: [https://dev.joymify.com](https://dev.joymify.com)" >> $GITHUB_STEP_SUMMARY
+          echo "- Legacy Alias: [https://design.joymify.com](https://design.joymify.com) (HTTP 301)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           kubectl get deployments joy-design-storybook -n default -o wide >> $GITHUB_STEP_SUMMARY || true
