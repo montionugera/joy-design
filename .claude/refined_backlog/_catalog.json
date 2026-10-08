@@ -849,8 +849,9 @@
     "title": "Hero Developer Portal landing page on dev.joymify.com fanning out to 3 sub-webapps: Design System, Server Decorator, and CLI State Handler",
     "from_idea": "I-073",
     "created_at": "2026-10-08T14:46:11.472666+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-10-08T14:46:28.684252+00:00"
   }
 ]
