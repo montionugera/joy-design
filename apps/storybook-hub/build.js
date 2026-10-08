@@ -1829,6 +1829,176 @@ ${inlinedThemeCss}
       line-height: 1.5;
     }
 
+    /* Joymify Developer Platform & Cross-Library Navigator */
+    .sidebar-suite-wrap {
+      border-top: 1px solid var(--hub-chrome-border);
+      padding: var(--joy-space-3) var(--joy-space-3) var(--joy-space-4);
+      background: var(--joy-surface-raised);
+      flex-shrink: 0;
+    }
+    .sidebar-suite-title {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+      padding: 0 var(--joy-space-1) var(--joy-space-2);
+    }
+    .sidebar-suite-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sidebar-suite-item {
+      display: flex;
+      align-items: center;
+      gap: var(--joy-space-2);
+      padding: var(--joy-space-2) var(--joy-space-2);
+      border-radius: var(--joy-radius-md);
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-secondary);
+      text-decoration: none;
+      transition: background var(--joy-duration-fast) var(--joy-ease-out-quint), color var(--joy-duration-fast) var(--joy-ease-out-quint);
+    }
+    .sidebar-suite-item:hover {
+      background: var(--joy-surface-sunken);
+      color: var(--joy-text-primary);
+    }
+    .sidebar-suite-item.active {
+      background: var(--joy-surface-sunken);
+      color: var(--joy-text-primary);
+      font-weight: 600;
+    }
+    .sidebar-suite-item__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--joy-text-secondary);
+      flex-shrink: 0;
+    }
+    .sidebar-suite-item.active .sidebar-suite-item__icon {
+      color: var(--joy-accent-default);
+    }
+    .sidebar-suite-item__name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-suite-item__badge {
+      font-size: var(--joy-font-size-xs);
+      padding: 1px 5px;
+      border-radius: var(--joy-radius-sm);
+      background: var(--joy-accent-subtle);
+      color: var(--joy-accent-text);
+      font-weight: 600;
+    }
+    .sidebar-suite-item__ext {
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    /* Developer Portal Bento Section */
+    .dev-portal-section {
+      margin-bottom: var(--joy-space-8);
+      margin-top: var(--joy-space-6);
+    }
+    .dev-portal-header {
+      margin-bottom: var(--joy-space-6);
+    }
+    .dev-portal-header__badge {
+      margin-bottom: var(--joy-space-2);
+    }
+    .dev-portal-heading {
+      font-size: var(--joy-font-size-2xl);
+      font-weight: 700;
+      color: var(--joy-text-primary);
+      margin: 0 0 var(--joy-space-2) 0;
+      letter-spacing: -0.02em;
+    }
+    .dev-portal-sub {
+      font-size: var(--joy-font-size-sm);
+      color: var(--joy-text-secondary);
+      max-width: 680px;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .dev-portal-bento {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--joy-space-4);
+      margin-bottom: var(--joy-space-6);
+    }
+    .dev-portal-card {
+      background: var(--joy-surface-raised);
+      border: 1px solid var(--hub-chrome-border);
+      border-radius: var(--joy-radius-lg);
+      padding: var(--joy-space-5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--joy-space-4);
+      transition: border-color var(--joy-duration-fast) var(--joy-ease-out-quint), box-shadow var(--joy-duration-fast) var(--joy-ease-out-quint), transform var(--joy-duration-fast) var(--joy-ease-out-quint);
+    }
+    .dev-portal-card:hover {
+      border-color: var(--joy-accent-default);
+      box-shadow: var(--joy-elevation-sm);
+      transform: translateY(-2px);
+    }
+    .dev-portal-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--joy-space-2);
+    }
+    .dev-portal-version {
+      font-size: var(--joy-font-size-xs);
+      font-weight: 600;
+      color: var(--joy-text-secondary);
+      font-family: var(--joy-font-family-mono);
+      background: var(--joy-surface-sunken);
+      padding: 2px 6px;
+      border-radius: var(--joy-radius-sm);
+      border: 1px solid var(--joy-border-subtle);
+    }
+    .dev-portal-card__title {
+      display: flex;
+      align-items: center;
+      gap: var(--joy-space-2);
+      font-size: var(--joy-font-size-lg);
+      font-weight: 600;
+      color: var(--joy-text-primary);
+      margin: 0 0 var(--joy-space-2) 0;
+    }
+    .dev-portal-card__desc {
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-secondary);
+      line-height: 1.5;
+      margin: 0 0 var(--joy-space-3) 0;
+    }
+    .dev-portal-card__code {
+      background: var(--joy-surface-sunken);
+      border: 1px solid var(--joy-border-subtle);
+      border-radius: var(--joy-radius-md);
+      padding: var(--joy-space-2) var(--joy-space-3);
+      margin-bottom: var(--joy-space-3);
+      font-family: var(--joy-font-family-mono);
+      font-size: var(--joy-font-size-xs);
+      color: var(--joy-text-primary);
+      line-height: 1.4;
+      overflow-x: auto;
+    }
+    .dev-portal-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--joy-space-1);
+    }
+    .dev-portal-card__footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--joy-space-2);
+      padding-top: var(--joy-space-3);
+      border-top: 1px solid var(--joy-border-subtle);
+    }
+
     /* Component Canvas & Docs */
     .view-panel {
       display: none;
@@ -4330,6 +4500,32 @@ ${navigationHtml}
         <div class="sidebar-search__empty-desc">Try another keyword or press <kbd style="padding: 1px 4px; font-size: 11px; background: var(--joy-surface-sunken); border: 1px solid var(--joy-border-default); border-radius: var(--joy-radius-sm);">Esc</kbd> to clear.</div>
       </div>
     </nav>
+    <div class="sidebar-suite-wrap" aria-label="Joymify Developer Platform">
+      <div class="sidebar-suite-title">Joymify Platform</div>
+      <nav class="sidebar-suite-list" aria-label="Platform Libraries">
+        <a href="#overview" class="sidebar-suite-item active" data-suite="design" title="Joy Design System">
+          <span class="sidebar-suite-item__icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </span>
+          <span class="sidebar-suite-item__name">Design System</span>
+          <span class="sidebar-suite-item__badge">v3.3</span>
+        </a>
+        <a href="/server-decorator/" class="sidebar-suite-item" data-suite="server-decorator" title="Node Server Decorator" target="_blank" rel="noopener noreferrer">
+          <span class="sidebar-suite-item__icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </span>
+          <span class="sidebar-suite-item__name">Server Decorator</span>
+          <svg class="sidebar-suite-item__ext" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a href="/cli-state-handler/" class="sidebar-suite-item" data-suite="cli-state" title="CLI State Handler" target="_blank" rel="noopener noreferrer">
+          <span class="sidebar-suite-item__icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          </span>
+          <span class="sidebar-suite-item__name">CLI State Handler</span>
+          <svg class="sidebar-suite-item__ext" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </nav>
+    </div>
   </aside>
 
   <!-- Main Canvas Area -->
@@ -4445,6 +4641,123 @@ ${navigationHtml}
           </div>
         </section>
         <!-- overview-hero:generated:end -->
+
+        <!-- Joymify Developer Platform: Core Libraries Bento Grid -->
+        <div class="dev-portal-section" aria-label="Joymify Core Libraries">
+          <div class="dev-portal-header">
+            <div class="dev-portal-header__badge">
+              <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> dev.joymify.com</span>
+            </div>
+            <h2 class="dev-portal-heading">Core Open-Source Libraries</h2>
+            <p class="dev-portal-sub">The foundational building blocks powering Joymify web interfaces, microservice backends, and autonomous developer tooling.</p>
+          </div>
+
+          <div class="dev-portal-bento">
+            <!-- Bento Card 1: Joy Design System -->
+            <div class="dev-portal-card" id="portal-card-design">
+              <div class="dev-portal-card__header">
+                <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> UI Components &amp; Tokens</span>
+                <span class="dev-portal-version">v3.3</span>
+              </div>
+              <div class="dev-portal-card__body">
+                <h3 class="dev-portal-card__title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <span>Joy Design System</span>
+                </h3>
+                <p class="dev-portal-card__desc">
+                  Ant Design 5 benchmarked component suite built for high-FPS trading dashboards and SaaS workflows with Svelte 5 Runes, React 19 forwardRef, and Flutter 3.32 parity. Strictly tokenized with zero color literals.
+                </p>
+                <div class="dev-portal-card__tags">
+                  <span class="joy-tag joy-tag--sm">React 19</span>
+                  <span class="joy-tag joy-tag--sm">Svelte 5</span>
+                  <span class="joy-tag joy-tag--sm">Flutter 3.32</span>
+                  <span class="joy-tag joy-tag--sm">W3C DTCG Tokens</span>
+                  <span class="joy-tag joy-tag--sm">WCAG 2.2 AA</span>
+                </div>
+              </div>
+              <div class="dev-portal-card__footer">
+                <button type="button" class="joy-button joy-button--solid joy-button--sm" onclick="switchView('button')">
+                  <span>Explore 70+ Components</span>
+                </button>
+                <button type="button" class="joy-button joy-button--ghost joy-button--sm" onclick="switchView('tokens')">
+                  <span>Tokens &amp; Motion</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Bento Card 2: Node Server Decorator -->
+            <div class="dev-portal-card" id="portal-card-decorator">
+              <div class="dev-portal-card__header">
+                <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Microservices</span>
+                <span class="dev-portal-version">v0.0.1</span>
+              </div>
+              <div class="dev-portal-card__body">
+                <h3 class="dev-portal-card__title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>Node Server Decorator</span>
+                </h3>
+                <p class="dev-portal-card__desc">
+                  Polyglot microservices decorator library for TypeScript, Python, Go, and Nim with distributed caching, queue emission, resilient retries, circuit breaking, and real-time SSE streaming.
+                </p>
+                <div class="dev-portal-card__code">
+                  <code>@cache({ ttl: '5m' })<br/>@tracking('order.executed')<br/>@circuit_breaker({ maxFailures: 3 })</code>
+                </div>
+                <div class="dev-portal-card__tags">
+                  <span class="joy-tag joy-tag--sm">TypeScript</span>
+                  <span class="joy-tag joy-tag--sm">Python</span>
+                  <span class="joy-tag joy-tag--sm">Go</span>
+                  <span class="joy-tag joy-tag--sm">Nim</span>
+                </div>
+              </div>
+              <div class="dev-portal-card__footer">
+                <a href="/server-decorator/" target="_blank" rel="noopener noreferrer" class="joy-button joy-button--outline joy-button--sm" style="text-decoration: none;">
+                  <span>Open Starlight Studio</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <a href="https://github.com/montionugera/node-server-decorator" target="_blank" rel="noopener noreferrer" class="joy-button joy-button--ghost joy-button--sm" style="text-decoration: none;">
+                  <span>GitHub</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Bento Card 3: CLI State Handler -->
+            <div class="dev-portal-card" id="portal-card-cli">
+              <div class="dev-portal-card__header">
+                <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> CLI &amp; Agents</span>
+                <span class="dev-portal-version">v0.1.0</span>
+              </div>
+              <div class="dev-portal-card__body">
+                <h3 class="dev-portal-card__title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                  <span>CLI State Handler</span>
+                </h3>
+                <p class="dev-portal-card__desc">
+                  Deterministic terminal state machine and workflow coordinator for high-reliability CLI tooling, interactive prompts, and autonomous agent execution loops.
+                </p>
+                <div class="dev-portal-card__code">
+                  <code>const machine = defineStateMachine({<br/>&nbsp;&nbsp;states: { idle, running, verified }<br/>});</code>
+                </div>
+                <div class="dev-portal-card__tags">
+                  <span class="joy-tag joy-tag--sm">UCSA Core</span>
+                  <span class="joy-tag joy-tag--sm">State Machine</span>
+                  <span class="joy-tag joy-tag--sm">React Ink</span>
+                  <span class="joy-tag joy-tag--sm">Vite Docs</span>
+                </div>
+              </div>
+              <div class="dev-portal-card__footer">
+                <a href="/cli-state-handler/" target="_blank" rel="noopener noreferrer" class="joy-button joy-button--outline joy-button--sm" style="text-decoration: none;">
+                  <span>Explore CLI Engine</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <a href="https://github.com/montionugera/cli-state-handler" target="_blank" rel="noopener noreferrer" class="joy-button joy-button--ghost joy-button--sm" style="text-decoration: none;">
+                  <span>GitHub</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="hub-card-grid">
           <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/tokens" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
