@@ -14,11 +14,32 @@ test('declares the optional cli_docs_tag input', () => {
   assert.match(ci, /cli_docs_tag:[\s\S]*?required: false[\s\S]*?default: ''/);
 });
 
-test('fetch step sits between Checkout and Set image tag', () => {
-  const a = ci.indexOf('- name: Checkout');
-  const b = ci.indexOf('- name: Fetch cli-state-handler docs');
-  const c = ci.indexOf('- name: Set image tag');
+function jobBlock() {
+  const start = ci.indexOf('\n  build-push-image:');
+  assert.ok(start >= 0, 'build-push-image job not found');
+  const next = ci.indexOf('\n  # ──', start + 1);
+  return ci.slice(start, next < 0 ? undefined : next);
+}
+
+test('fetch step sits between Checkout and Set image tag inside build-push-image', () => {
+  const job = jobBlock();
+  const a = job.indexOf('- name: Checkout');
+  const b = job.indexOf('- name: Fetch cli-state-handler docs');
+  const c = job.indexOf('- name: Set image tag');
   assert.ok(a >= 0 && b > a && c > b, `order was ${a}, ${b}, ${c}`);
+});
+
+test('cli_docs_tag reaches the shell only as the CLI_DOCS_TAG env value', () => {
+  const hits = ci.split('\n').filter((l) => l.includes('inputs.cli_docs_tag'));
+  assert.strictEqual(hits.length, 1);
+  assert.match(hits[0], /^\s*CLI_DOCS_TAG:/);
+});
+
+test('build-push-image never runs on pull requests', () => {
+  const job = jobBlock();
+  const cond = job.slice(job.indexOf('if: |'), job.indexOf('permissions:'));
+  assert.ok(cond.includes("github.event_name == 'push'") && cond.includes("github.event_name == 'workflow_dispatch'"));
+  assert.ok(!cond.includes('pull_request'));
 });
 
 test('token is passed only as GH_TOKEN of the fetch step', () => {
