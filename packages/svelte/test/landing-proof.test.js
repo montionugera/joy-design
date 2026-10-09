@@ -174,7 +174,7 @@ test('F-039 L4: FAQSection trigger is a real button that controls an answer whic
   assert.strictEqual(new Set([...markup.matchAll(/ id="([^"]+)"/g)].map((m) => m[1])).size, 6, 'every id is unique');
 });
 
-test('F-039 L4: FAQSection chevron is an @montionugera/joy-icons icon inside the rotating wrapper, and the title is sentence case', async () => {
+test('F-039 L4: FAQSection chevron is an @joymify/icons icon inside the rotating wrapper, and the title is sentence case', async () => {
   const markup = await faq();
   assert.strictEqual((markup.match(/<span class="joy-faq-item__icon" aria-hidden="true"><svg [^>]*><polyline points="6 9 12 15 18 9">/g) || []).length, 3);
   assert.match(markup, /<h2 class="joy-faq-section__title">Frequently asked questions<\/h2>/);

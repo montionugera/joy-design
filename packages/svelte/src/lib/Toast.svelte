@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { Close } from '@montionugera/joy-icons';
+  import { Close } from '@joymify/icons';
 
   interface Props {
     open?: boolean;

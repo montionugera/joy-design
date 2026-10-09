@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Calendar, ChevronLeft, ChevronRight, Close } from '@montionugera/joy-icons';
+  import { Calendar, ChevronLeft, ChevronRight, Close } from '@joymify/icons';
   import { openOverlay } from './overlay-utils.js';
   import {
     MONTH_NAMES,

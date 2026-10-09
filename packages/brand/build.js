@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds the static brand assets (SVG + PNG) from the resolved --joy-brand-*
-// token values in @montionugera/joy-tokens' dist/theme.css. Run: node build.js [--out <dir>]
+// token values in @joymify/tokens' dist/theme.css. Run: node build.js [--out <dir>]
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,28 +24,28 @@ function isHexColor(value) {
 }
 
 /**
- * Locates the installed @montionugera/joy-tokens package directory via Node's own
+ * Locates the installed @joymify/tokens package directory via Node's own
  * node_modules search order (require.resolve.paths), rather than a
- * hardcoded relative "../tokens" path. @montionugera/joy-tokens is declared as a
+ * hardcoded relative "../tokens" path. @joymify/tokens is declared as a
  * devDependency (workspace:*) precisely so this resolves through the
  * package manager/turbo's dependency graph instead of directory layout
  * assumptions; it also gives turbo's `^build` pipeline the edge it needs to
  * build tokens before brand.
  */
 function resolveTokensDir() {
-  const searchPaths = require.resolve.paths('@montionugera/joy-tokens') || [];
+  const searchPaths = require.resolve.paths('@joymify/tokens') || [];
   for (const base of searchPaths) {
-    const candidate = path.join(base, '@montionugera/joy-tokens');
+    const candidate = path.join(base, '@joymify/tokens');
     if (fs.existsSync(path.join(candidate, 'package.json'))) {
       return candidate;
     }
   }
-  throw new Error('readPalette: could not resolve the @montionugera/joy-tokens package directory');
+  throw new Error('readPalette: could not resolve the @joymify/tokens package directory');
 }
 
 /**
  * Reads the FIRST (light, `:root`) declaration of each --joy-brand-* token
- * from @montionugera/joy-tokens' built theme.css, and returns a camelCased palette
+ * from @joymify/tokens' built theme.css, and returns a camelCased palette
  * object. Builds tokens first if dist/theme.css doesn't exist yet.
  */
 export function readPalette() {

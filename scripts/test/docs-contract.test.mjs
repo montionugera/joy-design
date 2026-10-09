@@ -40,7 +40,7 @@ test('README lists every Gate 1 step and the theme contract', () => {
   for (const s of [...invoked, 'pnpm check', 'pnpm -r test', 'packages/tokens/test/contrast.test.js', 'scripts/test/*.test.mjs', 'scripts/epic-check.sh', 'scripts/integration.sh']) {
     assert.ok(readme.includes(s), `README must document the gate step ${s}`);
   }
-  for (const needle of ['data-theme', 'prefers-color-scheme', '@montionugera/joy-tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
+  for (const needle of ['data-theme', 'prefers-color-scheme', '@joymify/tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
     assert.ok(readme.includes(needle), `README must mention ${needle}`);
   }
 });
@@ -62,8 +62,8 @@ test('README documents installing from the registry, and AGENTS.md the build and
   for (const needle of [
     '@montionugera:registry=https://npm.pkg.github.com',
     '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}',
-    "import '@montionugera/joy-tokens/theme.css';",
-    "import { Button, Tabs } from '@montionugera/joy-react';",
+    "import '@joymify/tokens/theme.css';",
+    "import { Button, Tabs } from '@joymify/react';",
     'read:packages',
     'scripts/test/consumer-smoke.sh',
     '.github/workflows/publish.yml',

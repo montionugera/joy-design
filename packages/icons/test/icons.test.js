@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 
-test('@montionugera/joy-icons exports dual Svelte 5 and React 19 suites', () => {
+test('@joymify/icons exports dual Svelte 5 and React 19 suites', () => {
   const indexFile = fs.readFileSync(path.resolve('./src/index.ts'), 'utf8');
   assert.ok(indexFile.includes('TrendingUp'), 'Index must export TrendingUp');
   assert.ok(indexFile.includes('CandlestickChart'), 'Index must export CandlestickChart');
