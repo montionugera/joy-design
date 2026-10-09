@@ -169,11 +169,11 @@ Fonts are still loaded by the consumer (see `DESIGN.md`).
 
 ## Acceptance criteria
 
-1. Phase 1: the search in "Done when" is empty and `scripts/integration.sh` passes.
-2. Phase 2: `scripts/test/consumer-smoke.sh` passes locally, with the temporary app having no path into this repo's source.
-3. Each tarball's file list matches the `files` table, contains no test or story files, and its `package.json` has concrete versions in place of `workspace:*`.
-4. The workflow's dry run passes on GitHub and shows the four packages in dependency order.
-5. After the real publish (separate go-ahead, see Risks): `npm view` returns the expected version for each of the four names, and the smoke app installs them from the registry and builds.
+- [ ] Phase 1: the search in "Done when" is empty and `scripts/integration.sh` passes.
+- [ ] Phase 2: `scripts/test/consumer-smoke.sh` passes locally, with the temporary app having no path into this repo's source.
+- [ ] Each tarball's file list matches the `files` table, contains no test or story files, and its `package.json` has concrete versions in place of `workspace:*`.
+- [ ] The workflow's dry run passes on GitHub and shows the four packages in dependency order.
+- [ ] After the real publish (separate go-ahead, see Risks): `npm view` returns the expected version for each of the four names, and the smoke app installs them from the registry and builds.
 
 ## Risks
 
