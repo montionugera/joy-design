@@ -10164,6 +10164,10 @@ export async function executeHedge(symbol: string, size: number) {
 
     function switchView(viewName, updateHash = true) {
       if (viewName !== 'overview' && viewName !== 'portal') {
+        if (document.body.classList.contains('portal-mode')) {
+          window.location.href = '/design/#' + viewName;
+          return;
+        }
         document.body.classList.remove('portal-mode');
         const titleEl = document.getElementById('topbar-brand-title');
         if (titleEl) titleEl.textContent = 'Joymify Design';
@@ -10247,10 +10251,8 @@ export async function executeHedge(symbol: string, size: number) {
         document.title = 'Joymify Developer Portal · dev.joymify.com';
         switchView('overview', false);
       } else if (isRootRoute && hash && document.getElementById('view-' + hash)) {
-        document.body.classList.remove('portal-mode');
-        const titleEl = document.getElementById('topbar-brand-title');
-        if (titleEl) titleEl.textContent = 'Joymify Design';
-        switchView(hash, false);
+        window.location.replace('/design/#' + hash);
+        return;
       } else if (isDesignRoute) {
         document.body.classList.remove('portal-mode');
         const titleEl = document.getElementById('topbar-brand-title');
