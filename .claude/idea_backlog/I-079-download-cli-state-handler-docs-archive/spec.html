@@ -653,37 +653,37 @@ instead of quietly shipping old docs. Local builds on a laptop are
 unchanged.</p>
 <h2 id="problem">Problem</h2>
 <ul>
-<li><p><code>apps/storybook-hub/portal-bundles/cli-state-handler/</code>
-is a tracked snapshot of 3 files (<code>index.html</code> plus one JS
-and one CSS file), last touched by commit <code>b6df3811</code> (release
+<li><code>apps/storybook-hub/portal-bundles/cli-state-handler/</code> is
+a tracked snapshot of 3 files (<code>index.html</code> plus one JS and
+one CSS file), last touched by commit <code>b6df3811</code> (release
 3.6). <code>apps/storybook-hub/build.js</code> lines 14669-14681 copy it
 into <code>dist/cli-state-handler</code>, and <code>Dockerfile</code>
 line 11 runs that build. So the image serves <strong>stale docs that
 look healthy</strong>: <code>scripts/smoke-prod.sh</code> only checks
-for HTTP 200.</p></li>
-<li><p><code>Dockerfile</code> line 21
+for HTTP 200.</li>
+<li><code>Dockerfile</code> line 21
 (<code>mkdir -p .../cli-state-handler</code>) is a no-op once the
 snapshot is copied; the directory is empty only if the snapshot is ever
-deleted.</p></li>
-<li><p><code>scripts/assemble-portal.sh</code> lines 50-68 copy from a
+deleted.</li>
+<li><code>scripts/assemble-portal.sh</code> lines 50-68 copy from a
 sibling <code>cli-state-handler</code> checkout. Neither the
 <code>Dockerfile</code> nor <code>ci.yml</code> calls that script, and
-CI has no sibling checkout. It is a local-only helper.</p></li>
-<li><p><code>cli-state-handler/.github/workflows/release.yml</code> line
+CI has no sibling checkout. It is a local-only helper.</li>
+<li><code>cli-state-handler/.github/workflows/release.yml</code> line
 140 builds the archive
 (<code>tar -czf "$RUNNER_TEMP/docs-site.tgz" -C apps/docs/dist .</code>)
 and lines 154-163 try to start joy-design’s <code>ci.yml</code>, but the
 secret <code>PORTAL_DISPATCH_TOKEN</code> is not set
 (<code>gh secret list</code> shows none in that repository), so the step
 warns and exits 0: the exact failure mode this spec must not
-repeat.</p></li>
-<li><p>Nothing in joy-design downloads the Release asset. joy-design’s
-own <code>GITHUB_TOKEN</code> (the automatic per-run credential) cannot
-read another private repository.</p></li>
-<li><p>Why now: v0.2.0 (the only GitHub Release so far) has
+repeat.</li>
+<li>Nothing in joy-design downloads the Release asset. joy-design’s own
+<code>GITHUB_TOKEN</code> (the automatic per-run credential) cannot read
+another private repository.</li>
+<li>Why now: v0.2.0 (the only GitHub Release so far) has
 <code>docs-site.tgz</code> (176 KB) attached and the signal step exists;
 the download is the missing half, and three sibling follow-ups touch the
-same workflows.</p></li>
+same workflows.</li>
 </ul>
 <h2 id="decisions-already-made-not-reopened">Decisions already made (not
 reopened)</h2>
@@ -1096,7 +1096,7 @@ snapshot; replacing tokens with a GitHub App.</li>
 at the archive root, and core is <code>0.2.0</code> there.</li>
 <li>That no CDN or proxy in front of dev.joymify.com caches
 <code>version.json</code> (would make the smoke check flaky).</li>
-<li>The fine-grained permission mapping below was taken from GitHub’s
+<li>The fine-grained permission mapping above was taken from GitHub’s
 reference by the author; the audit did not re-read it.</li>
 <li>That <code>gh workflow run</code> with <code>-f</code> needs nothing
 beyond “Actions: Read and write” (the REST endpoint is confirmed; any
