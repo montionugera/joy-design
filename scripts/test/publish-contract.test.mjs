@@ -105,3 +105,21 @@ test('turbo builds dependencies before the type-check', () => {
   const turbo = readJson('turbo.json');
   assert.ok(turbo.tasks.check.dependsOn.includes('^build'), 'check must depend on ^build: joy-react reads joy-icons declarations from dist');
 });
+
+test('joy-react declares React 19 peer dependencies', () => {
+  const pkg = readJson('packages/react/package.json');
+  assert.strictEqual(pkg.peerDependencies.react, '^19.0.0');
+  assert.strictEqual(pkg.peerDependencies['react-dom'], '^19.0.0');
+});
+
+test('joy-icons declares React 19 peer dependency', () => {
+  const pkg = readJson('packages/icons/package.json');
+  assert.strictEqual(pkg.peerDependencies.react, '^19.0.0');
+});
+
+test('joy-tokens exports theme.css and tailwind entry points', () => {
+  const pkg = readJson('packages/tokens/package.json');
+  assert.strictEqual(pkg.exports['./theme.css'], './dist/theme.css');
+  assert.strictEqual(pkg.exports['./tailwind'], './dist/tailwind-theme.css');
+});
+
