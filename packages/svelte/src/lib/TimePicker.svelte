@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Clock } from '@montionugera/joy-icons';
+  import { Clock } from '@joymify/icons';
   import { openOverlay } from './overlay-utils.js';
 
   interface Props {

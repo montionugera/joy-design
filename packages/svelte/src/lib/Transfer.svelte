@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronRight, ChevronLeft } from '@montionugera/joy-icons';
+	import { ChevronRight, ChevronLeft } from '@joymify/icons';
 
 	export interface TransferItem {
 		key: string;
