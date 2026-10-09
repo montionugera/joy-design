@@ -40,7 +40,7 @@ test('README lists every Gate 1 step and the theme contract', () => {
   for (const s of [...invoked, 'pnpm check', 'pnpm -r test', 'packages/tokens/test/contrast.test.js', 'scripts/test/*.test.mjs', 'scripts/epic-check.sh', 'scripts/integration.sh']) {
     assert.ok(readme.includes(s), `README must document the gate step ${s}`);
   }
-  for (const needle of ['data-theme', 'prefers-color-scheme', '@joymify/tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
+  for (const needle of ['data-theme', 'prefers-color-scheme', '@montionugera/joy-tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
     assert.ok(readme.includes(needle), `README must mention ${needle}`);
   }
 });

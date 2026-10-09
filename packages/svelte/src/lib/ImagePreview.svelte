@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@joymify/icons';
+	import { ChevronLeft, ChevronRight, Close, Minimize2, RefreshCw, ZoomIn, ZoomOut } from '@montionugera/joy-icons';
 	import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
 	import { createOpenerTracker } from './dialog-opener.js';
 

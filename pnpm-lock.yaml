@@ -29,7 +29,7 @@ importers:
       '@fontsource/cormorant-garamond':
         specifier: ^5.3.0
         version: 5.3.0
-      '@joymify/tokens':
+      '@montionugera/joy-tokens':
         specifier: workspace:*
         version: link:../tokens
       '@resvg/resvg-js':
@@ -59,13 +59,13 @@ importers:
 
   packages/react:
     dependencies:
-      '@joymify/brand':
+      '@montionugera/joy-brand':
         specifier: workspace:*
         version: link:../brand
-      '@joymify/icons':
+      '@montionugera/joy-icons':
         specifier: workspace:*
         version: link:../icons
-      '@joymify/tokens':
+      '@montionugera/joy-tokens':
         specifier: workspace:*
         version: link:../tokens
       react:
@@ -84,13 +84,13 @@ importers:
 
   packages/svelte:
     dependencies:
-      '@joymify/brand':
+      '@montionugera/joy-brand':
         specifier: workspace:*
         version: link:../brand
-      '@joymify/icons':
+      '@montionugera/joy-icons':
         specifier: workspace:*
         version: link:../icons
-      '@joymify/tokens':
+      '@montionugera/joy-tokens':
         specifier: workspace:*
         version: link:../tokens
       svelte:

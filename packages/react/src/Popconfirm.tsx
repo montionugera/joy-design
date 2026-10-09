@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AlertCircle } from '@joymify/icons/react';
+import { AlertCircle } from '@montionugera/joy-icons/react';
 import { useOverlay } from './useOverlay.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');

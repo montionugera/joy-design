@@ -4,7 +4,7 @@ import { heroLattice, wordmarkLayout } from '../src/layout.js';
 import { WORDMARK } from '../src/geometry.js';
 
 // Fix round 1 (code-reviewer + typescript-reviewer Important #1): heroLattice and wordmarkLayout
-// were extracted from render.js so the static assets and the @joymify/svelte / @joymify/react
+// were extracted from render.js so the static assets and the @montionugera/joy-svelte / @montionugera/joy-react
 // components can no longer drift apart. These tests pin the exact numbers the canonical asset
 // build depends on (packages/brand/test/brand.test.js's drift test proves render.js still produces
 // byte-identical output using these helpers).

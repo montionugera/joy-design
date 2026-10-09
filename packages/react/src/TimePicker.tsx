@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Clock } from '@joymify/icons/react';
+import { Clock } from '@montionugera/joy-icons/react';
 import { useOverlay } from './useOverlay.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');

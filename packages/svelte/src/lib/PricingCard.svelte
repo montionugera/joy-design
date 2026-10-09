@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Check } from '@joymify/icons';
+	import { Check } from '@montionugera/joy-icons';
 	import Button from './Button.svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
