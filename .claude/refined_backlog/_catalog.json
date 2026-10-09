@@ -889,11 +889,12 @@
     "from_idea": "I-077",
     "created_at": "2026-10-09T07:16:21.537779+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "shipped",
+    "status": "promoted",
     "release_version": "3.7",
     "claimed_at": "2026-10-09T07:16:37.049144+00:00",
     "shipped_at": "2026-10-09T09:05:02.709708+00:00",
-    "shipped_sha": "4166427f53a5062f7cc76297bfb05b8460910543"
+    "shipped_sha": "4166427f53a5062f7cc76297bfb05b8460910543",
+    "promoted_at": "2026-10-09T11:17:53.245451+00:00"
   },
   {
     "id": "F-072",
@@ -901,10 +902,11 @@
     "from_idea": "I-078",
     "created_at": "2026-10-09T08:50:52.590117+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "shipped",
+    "status": "promoted",
     "release_version": "3.7",
     "claimed_at": "2026-10-09T08:51:26.267033+00:00",
     "shipped_at": "2026-10-09T10:16:56.285760+00:00",
-    "shipped_sha": "53b0c16f817ba9c40be0157f288e292b1c6ee7ca"
+    "shipped_sha": "53b0c16f817ba9c40be0157f288e292b1c6ee7ca",
+    "promoted_at": "2026-10-09T11:17:57.250378+00:00"
   }
 ]
