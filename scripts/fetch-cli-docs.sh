@@ -9,7 +9,7 @@ delay="${CLI_DOCS_RETRY_DELAY:-10}"
 fail() { echo "::error::cli-docs: $*" >&2; exit 1; }
 
 [ -n "${GH_TOKEN:-}" ] || fail "secret CLI_DOCS_READ_TOKEN is empty or missing (GH_TOKEN is not set)"
-work=$(mktemp -d); trap 'rm -rf "$work"' EXIT   # outside the repository: nothing may leak into apps/
+work=$(mktemp -d); trap 'rm -rf "$work" "$bundle_dir.new"' EXIT   # outside the repository: nothing may leak into apps/
 
 gh_retry() { # permanent errors fail at once; anything else gets 3 attempts in total
   local n=1
@@ -38,6 +38,8 @@ tar -xzf "$work/dl/$asset" --no-same-owner -C "$work/out" 2>"$work/tar.err" || f
 version=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$work/out/version.json" | head -n 1)
 [[ "$version" =~ ^[0-9A-Za-z._-]+$ ]] || fail "version.json has no version usable in an image tag"
 [ "v$version" = "$tag" ] || fail "version.json says $version but the release tag is $tag"
-rm -rf "$bundle_dir"; mkdir -p "$bundle_dir"; cp -R "$work/out/." "$bundle_dir/"
+# Copy beside the snapshot first so a failed copy never costs the old one; the trap removes any leftover .new
+rm -rf "$bundle_dir.new"; mkdir -p "$bundle_dir.new"; cp -R "$work/out/." "$bundle_dir.new/"
+rm -rf "$bundle_dir"; mv "$bundle_dir.new" "$bundle_dir"
 [ -z "${GITHUB_OUTPUT:-}" ] || echo "cli_docs_version=$version" >> "$GITHUB_OUTPUT"
 echo "cli-docs: fetched $tag (version.json $version)"
