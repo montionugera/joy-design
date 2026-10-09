@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FormContext } from './Form';
+import { FormContext } from './Form.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
