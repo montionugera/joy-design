@@ -36,7 +36,6 @@ the build **fails loudly** instead of quietly shipping old docs. Local builds on
   repository), so the step warns and exits 0: the exact failure mode this spec must not repeat.
 - Nothing in joy-design downloads the Release asset. joy-design's own `GITHUB_TOKEN` (the automatic
   per-run credential) cannot read another private repository.
-
 - Why now: v0.2.0 (the only GitHub Release so far) has `docs-site.tgz` (176 KB) attached and the signal
   step exists; the download is the missing half, and three sibling follow-ups touch the same workflows.
 
@@ -235,7 +234,7 @@ the `cli_docs_tag` input, the `CLI_DOCS_READ_TOKEN` secret and its renewal, the 
   `apps/docs/vite.config.ts` registers `apps/docs/vite-plugins/version-json.ts`, which emits
   `{"version":"<packages/core version>"}` plus a newline at the archive root, and core is `0.2.0` there.
 - That no CDN or proxy in front of dev.joymify.com caches `version.json` (would make the smoke check flaky).
-- The fine-grained permission mapping below was taken from GitHub's reference by the author; the audit did
+- The fine-grained permission mapping above was taken from GitHub's reference by the author; the audit did
   not re-read it.
 - That `gh workflow run` with `-f` needs nothing beyond "Actions: Read and write" (the REST endpoint is
   confirmed; any extra call made by the `gh` command itself was not traced).
