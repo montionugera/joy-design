@@ -57,4 +57,3 @@ test('runParityCheck passes in default twin mode', () => {
   assert.equal(result.passed, true);
   assert.equal(result.totalViolations, 0);
 });
-
