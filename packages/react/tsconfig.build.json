@@ -5,8 +5,7 @@
     "allowImportingTsExtensions": false,
     "rootDir": "src",
     "outDir": "dist",
-    "declaration": true,
-    "module": "ESNext"
+    "declaration": true
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.stories.ts", "src/**/*.stories.tsx"]

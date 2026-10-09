@@ -44,14 +44,19 @@ function covered(target, files) {
 for (const spec of PUBLISHED) {
   test(`${spec.name}: publish metadata matches the contract`, () => {
     const pkg = readJson(`packages/${spec.dir}/package.json`);
-    assert.strictEqual(pkg.name, spec.name);
-    assert.strictEqual(pkg.version, spec.version);
-    assert.notStrictEqual(pkg.private, true, 'a published package must not be private');
-    assert.deepStrictEqual(pkg.publishConfig, { registry: REGISTRY });
-    assert.deepStrictEqual(pkg.repository, { type: 'git', url: REPO_URL, directory: `packages/${spec.dir}` });
-    assert.strictEqual(pkg.license, spec.license);
-    assert.deepStrictEqual(pkg.sideEffects, spec.sideEffects);
-    assert.deepStrictEqual(pkg.files, spec.files);
+    assert.notStrictEqual(pkg.private, true, `${spec.name}: a published package must not be private`);
+    const expected = {
+      name: spec.name,
+      version: spec.version,
+      publishConfig: { registry: REGISTRY },
+      repository: { type: 'git', url: REPO_URL, directory: `packages/${spec.dir}` },
+      license: spec.license,
+      sideEffects: spec.sideEffects,
+      files: spec.files,
+    };
+    for (const [field, value] of Object.entries(expected)) {
+      assert.deepStrictEqual(pkg[field], value, `${spec.name}: ${field} does not match the contract`);
+    }
   });
 
   test(`${spec.name}: every exports, main, module and types path is inside files`, () => {
@@ -106,16 +111,12 @@ test('turbo builds dependencies before the type-check', () => {
   assert.ok(turbo.tasks.check.dependsOn.includes('^build'), 'check must depend on ^build: joy-react reads joy-icons declarations from dist');
 });
 
-test('joy-react declares React 19 peer dependencies', () => {
-  const pkg = readJson('packages/react/package.json');
-  assert.strictEqual(pkg.peerDependencies.react, '^19.0.0');
-  assert.strictEqual(pkg.peerDependencies['react-dom'], '^19.0.0');
-});
-
-test('joy-icons declares React 19 peer dependency', () => {
-  const pkg = readJson('packages/icons/package.json');
-  assert.strictEqual(pkg.peerDependencies.react, '^19.0.0');
-});
+for (const [dir, peers] of [['react', ['react', 'react-dom']], ['icons', ['react']]]) {
+  test(`joy-${dir} declares React 19 peer dependencies`, () => {
+    const pkg = readJson(`packages/${dir}/package.json`);
+    for (const peer of peers) assert.strictEqual(pkg.peerDependencies[peer], '^19.0.0', `joy-${dir}: peerDependencies.${peer}`);
+  });
+}
 
 test('joy-tokens exports theme.css and tailwind entry points', () => {
   const pkg = readJson('packages/tokens/package.json');
