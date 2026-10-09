@@ -16,10 +16,10 @@ const REPO_URL = 'git+https://github.com/montionugera/joy-design.git';
 
 // Dependency order: this is also the order the workflow publishes in.
 const PUBLISHED = [
-  { dir: 'tokens', name: '@montionugera/joy-tokens', version: '0.2.0', license: 'UNLICENSED', sideEffects: ['**/*.css'], files: ['dist'] },
-  { dir: 'icons', name: '@montionugera/joy-icons', version: '0.3.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['dist', 'src/index.ts', 'src/index.d.ts', 'src/*.svelte', 'PROVENANCE.md'] },
-  { dir: 'brand', name: '@montionugera/joy-brand', version: '0.2.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['src', 'assets', 'PROVENANCE.md'] },
-  { dir: 'react', name: '@montionugera/joy-react', version: '0.2.0', license: 'UNLICENSED', sideEffects: false, files: ['dist'] },
+  { dir: 'tokens', name: '@joymify/tokens', version: '0.2.0', license: 'UNLICENSED', sideEffects: ['**/*.css'], files: ['dist'] },
+  { dir: 'icons', name: '@joymify/icons', version: '0.3.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['dist', 'src/index.ts', 'src/index.d.ts', 'src/*.svelte', 'PROVENANCE.md'] },
+  { dir: 'brand', name: '@joymify/brand', version: '0.2.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['src', 'assets', 'PROVENANCE.md'] },
+  { dir: 'react', name: '@joymify/react', version: '0.2.0', license: 'UNLICENSED', sideEffects: false, files: ['dist'] },
 ];
 
 /** Every string leaf of an `exports` value. */
@@ -94,14 +94,14 @@ test('joy-react depends only on published workspace packages', () => {
   const workspaceDeps = Object.entries(pkg.dependencies).filter(([, range]) => String(range).startsWith('workspace:'));
   assert.deepStrictEqual(
     workspaceDeps.map(([name]) => name).sort(),
-    ['@montionugera/joy-brand', '@montionugera/joy-icons', '@montionugera/joy-tokens'],
+    ['@joymify/brand', '@joymify/icons', '@joymify/tokens'],
   );
   for (const [name] of workspaceDeps) assert.ok(publishedNames.includes(name), `${name} is not a published package`);
 });
 
 test('joy-svelte is renamed and private', () => {
   const pkg = readJson('packages/svelte/package.json');
-  assert.strictEqual(pkg.name, '@montionugera/joy-svelte');
+  assert.strictEqual(pkg.name, '@joymify/svelte');
   assert.strictEqual(pkg.private, true);
   assert.strictEqual(pkg.publishConfig, undefined);
 });
@@ -118,7 +118,7 @@ for (const [dir, peers] of [['react', ['react', 'react-dom']], ['icons', ['react
   });
 }
 
-test('joy-tokens exports theme.css and tailwind entry points', () => {
+test('@joymify/tokens exports theme.css and tailwind entry points', () => {
   const pkg = readJson('packages/tokens/package.json');
   assert.strictEqual(pkg.exports['./theme.css'], './dist/theme.css');
   assert.strictEqual(pkg.exports['./tailwind'], './dist/tailwind-theme.css');
@@ -172,16 +172,28 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.ok(!wf.includes('git fetch'), 'checkout drops credentials, so the workflow must not run git fetch against the private origin');
   assert.match(wf, /^    environment: packages$/m, 'the job must run in the packages environment so the repository setting can restrict it');
   assert.ok(!topLevel.includes('NODE_AUTH_TOKEN'), 'no top-level NODE_AUTH_TOKEN');
-  assert.ok(dryRunStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Dry run must have step-level NODE_AUTH_TOKEN');
-  assert.ok(publishStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Publish must have step-level NODE_AUTH_TOKEN');
-  assert.ok(verifyStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Verify must have step-level NODE_AUTH_TOKEN');
-  const tokenMatches = wf.match(/NODE_AUTH_TOKEN:\s*\${{\s*secrets\.GITHUB_TOKEN\s*}}/g) || [];
-  assert.strictEqual(tokenMatches.length, 3, 'NODE_AUTH_TOKEN must appear only in step-level env of the three steps');
+  assert.ok(dryRunStep.block.includes('NODE_AUTH_TOKEN:'), 'Dry run must have step-level NODE_AUTH_TOKEN');
+  assert.ok(!dryRunStep.block.includes('secrets.GITHUB_TOKEN'), 'Dry run must not use the built-in token');
+  assert.ok(publishStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'Publish must authenticate with JOYMIFY_PACKAGES_TOKEN');
+  assert.ok(verifyStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'Verify must authenticate with JOYMIFY_PACKAGES_TOKEN');
+  const tokenMatches = wf.match(/NODE_AUTH_TOKEN:\s*\${{\s*secrets\.JOYMIFY_PACKAGES_TOKEN\s*}}/g) || [];
+  assert.strictEqual(tokenMatches.length, 2, 'NODE_AUTH_TOKEN takes the org token only in the publish and verify steps');
+  assert.ok(!wf.includes('GITHUB_TOKEN'), 'the built-in GITHUB_TOKEN must not be used anywhere in the publish workflow');
+  assert.match(wf, /scope: '@joymify'/, 'setup-node must target the @joymify scope');
+  assert.match(wf, /registry-url: 'https:\/\/npm\.pkg\.github\.com'/, 'setup-node must target GitHub Packages');
+  const secretStep = steps.find((s) => s.name === 'Require the publish token');
+  assert.ok(secretStep, 'an early step must require the publish token');
+  assert.ok(secretStep.block.includes("if: env.DRY_RUN == 'false'"), 'the token check applies to real publishes only');
+  assert.ok(secretStep.block.includes('::error::'), 'the token check must fail with a clear ::error:: message');
+  assert.ok(secretStep.block.includes('JOYMIFY_PACKAGES_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'the token check reads the org secret');
+  assert.ok(wf.indexOf('Require the publish token') < wf.indexOf('Install pnpm'), 'the token check must run before any build work');
+  assert.ok(wf.includes('name="@joymify/$dir"'), 'the per-package loops must query @joymify/*');
+  assert.ok(!wf.includes('@montionugera'), 'no old scope in the publish workflow');
 
   const order = [
     'run: ./scripts/integration.sh',
-    'pnpm --filter @montionugera/joy-icons build',
-    'pnpm --filter @montionugera/joy-react build',
+    'pnpm --filter @joymify/icons build',
+    'pnpm --filter @joymify/react build',
     'run: ./scripts/test/consumer-smoke.sh',
     'git status --porcelain',
     'pnpm publish --dry-run --no-git-checks',
