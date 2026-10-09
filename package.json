@@ -7,7 +7,10 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "check": "turbo run check",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "portal:build": "node packages/tokens/build.js && node apps/storybook-hub/build.js",
+    "portal:serve": "npx serve -p 6006 apps/storybook-hub/dist",
+    "dev:portal": "pnpm portal:build && pnpm portal:serve"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
