@@ -325,7 +325,7 @@ test('Wave 2 B-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePick
   assert.ok(select.includes('type="hidden"'), 'Select must include type="hidden"');
 
   const datePicker = read('DatePicker');
-  assert.ok(datePicker.includes('@joymify/icons'), 'DatePicker must include @joymify/icons');
+  assert.ok(datePicker.includes('@montionugera/joy-icons'), 'DatePicker must include @montionugera/joy-icons');
 
   const dateRangePicker = read('DateRangePicker');
   assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
@@ -355,7 +355,7 @@ test('Wave 2 B-L2: TimePicker, Mentions, MarkdownEditor', () => {
 
   const md = read('MarkdownEditor');
   assert.ok(md.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
-  assert.ok(md.includes('@joymify/icons'), 'MarkdownEditor must include @joymify/icons');
+  assert.ok(md.includes('@montionugera/joy-icons'), 'MarkdownEditor must include @montionugera/joy-icons');
 });
 
 
@@ -436,7 +436,7 @@ test('Wave 2 B-L4: TreeSelect, Cascader, Transfer, Upload', () => {
   assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
 
   const upload = read('Upload');
-  assert.ok(upload.includes('@joymify/icons'), 'Upload must import from @joymify/icons');
+  assert.ok(upload.includes('@montionugera/joy-icons'), 'Upload must import from @montionugera/joy-icons');
 });
 
 test('F-037 lane review: Mentions per-instance id, Rate readonly semantics, Select activedescendant', () => {
@@ -555,7 +555,7 @@ test('F-038 B-L2 fix: deltaDirection follows the sign, never the tone', async ()
   for (const n of ['StatCard', 'MetricTile']) {
     const s = fs.readFileSync(path.resolve(`./src/lib/${n}.svelte`), 'utf8');
     assert.ok(!/__sr\s*\{/.test(s), `${n} must not redefine the build.js-owned __sr rule`);
-    assert.ok(/import\s*\{[^}]*TrendingUp[^}]*TrendingDown[^}]*\}\s*from\s*'@joymify\/icons'/.test(s), `${n} must import the trend icons`);
+    assert.ok(/import\s*\{[^}]*TrendingUp[^}]*TrendingDown[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(s), `${n} must import the trend icons`);
     assert.ok(!s.includes('▲') && !s.includes('▼'), `${n} must not use unicode trend glyphs`);
   }
 });
@@ -589,7 +589,7 @@ test('F-038 B-L3: Alert/EmptyState/Result/Skeleton use build.js-owned styles, to
   }
   const alert = read('Alert');
   assert.ok(!alert.includes('border-left'), 'Alert must not use a side stripe');
-  assert.ok(/import\s*\{[^}]*CheckCircle[^}]*\}\s*from\s*'@joymify\/icons'/.test(alert), 'Alert imports status icons from @joymify/icons');
+  assert.ok(/import\s*\{[^}]*CheckCircle[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(alert), 'Alert imports status icons from @montionugera/joy-icons');
   assert.ok(alert.includes('class="joy-alert__icon" aria-hidden="true"'), 'Alert icon is decorative (aria-hidden)');
   assert.ok(alert.includes('closable = false') && alert.includes('onclose'), 'Alert has closable (default false) and onclose');
   assert.ok(alert.includes('aria-label="Dismiss alert"') && alert.includes('joy-alert__close'), 'close button is labelled');
@@ -621,7 +621,7 @@ test('F-038 B-L3 fix: Skeleton renders one progressbar root, merges consumer sty
 
 const readLib = (f) => fs.readFileSync(path.resolve(`./src/lib/${f}`), 'utf8');
 
-test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned styles, tokens only, icons from @joymify/icons, ref+rest+class', () => {
+test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned styles, tokens only, icons from @montionugera/joy-icons, ref+rest+class', () => {
   for (const n of ['Message', 'Notification', 'Toast', 'Progress', 'Spin']) {
     const s = readLib(`${n}.svelte`);
     assert.ok(!/<style[\s>]/.test(s), `${n} must not carry a scoped <style> (build.js owns the joy-* rules)`);
@@ -635,7 +635,7 @@ test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned st
   }
   for (const n of ['Message', 'Notification']) {
     const s = readLib(`${n}.svelte`);
-    assert.ok(/import\s*\{[^}]*Info[^}]*\}\s*from\s*'@joymify\/icons'/.test(s), `${n} imports status icons from @joymify/icons`);
+    assert.ok(/import\s*\{[^}]*Info[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(s), `${n} imports status icons from @montionugera/joy-icons`);
     assert.ok(!/<svg/.test(s), `${n} must not inline raw svg markup`);
     assert.ok(s.includes(`joy-${n.toLowerCase()}__icon--{type}`) && s.includes('aria-hidden="true"'), `${n} icon is decorative and tone-classed`);
   }
@@ -643,13 +643,13 @@ test('F-038 B-L4: Message/Notification/Toast/Progress/Spin use build.js-owned st
 
 test('F-038 B-L4: Toast and Notification close buttons are labelled icon buttons, Toast renders it only with onclose', () => {
   const toast = readLib('Toast.svelte');
-  assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@joymify\/icons'/.test(toast), 'Toast imports Close');
+  assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(toast), 'Toast imports Close');
   assert.ok(!toast.includes('&times;'), 'Toast must not use a raw entity as an icon');
   assert.ok(/<button type="button" class="joy-toast__close" aria-label="Dismiss notification" onclick=\{onclose\}>/.test(toast), 'Toast close is a labelled type=button');
   assert.ok(toast.includes('{#if onclose}'), 'Toast close renders only when onclose is provided');
   const note = readLib('Notification.svelte');
   assert.ok(/<button type="button" class="joy-notification__close" aria-label="Dismiss notification" onclick=\{close\}>/.test(note), 'Notification close is a labelled type=button');
-  assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@joymify\/icons'/.test(note), 'Notification imports Close');
+  assert.ok(/import\s*\{[^}]*Close[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(note), 'Notification imports Close');
   const css = fs.readFileSync(path.resolve('../tokens/dist/theme.css'), 'utf8');
   for (const c of ['joy-toast__close', 'joy-notification__close']) {
     assert.match(css, new RegExp(`\\.${c}::before\\s*\\{[^}]*width:\\s*44px[^}]*height:\\s*44px`, 's'), `${c} ships a 44px hit area`);
@@ -735,7 +735,7 @@ test('F-038 B-L5: Pagination windows its pages, collapses under 480px via matchM
   assert.ok(p.includes('disabled={page <= 1}') && p.includes('disabled={page >= totalPages}') && p.includes("aria-current={p === page ? 'page' : undefined}"), 'active/disabled/prev/next work from the clamped page');
   assert.ok(!p.includes('Array.from({ length: totalPages }'), 'no button per page');
   assert.ok(!/&[lr]arr;/.test(p), 'no arrow entities');
-  assert.ok(/import\s*\{\s*ChevronLeft,\s*ChevronRight\s*\}\s*from\s*'@joymify\/icons'/.test(p));
+  assert.ok(/import\s*\{\s*ChevronLeft,\s*ChevronRight\s*\}\s*from\s*'@montionugera\/joy-icons'/.test(p));
   assert.ok(p.includes('let compact = $state(false)'), 'desktop-first default keeps SSR output full');
   assert.ok(p.includes("window.matchMedia('(max-width: 480px)')") && p.includes("removeEventListener('change', sync)"), 'listener is cleaned up');
   assert.ok(p.includes("typeof window === 'undefined'"), 'SSR-safe');
@@ -760,7 +760,7 @@ test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and l
     assert.ok(s.includes('const uid = $props.id()') && s.includes("aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}") && s.includes("aria-label={rest['aria-label'] ?? (title ? undefined :"), `${name} label id is per-instance, with an aria-label fallback`);
     assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover or dialog already claimed it`);
     assert.ok(s.includes('e.target === e.currentTarget'), `${name} closes on backdrop click`);
-    assert.ok(/import\s*\{\s*Close\s*\}\s*from\s*'@joymify\/icons'/.test(s) && !s.includes('&times;'), `${name} close button uses the Close icon`);
+    assert.ok(/import\s*\{\s*Close\s*\}\s*from\s*'@montionugera\/joy-icons'/.test(s) && !s.includes('&times;'), `${name} close button uses the Close icon`);
     assert.ok(s.includes(`class="joy-${cls}__close"`) && s.includes('type="button"'), `${name} close button`);
     assert.ok(s.includes('bind:this={ref}') && s.includes('{...rest}') && s.includes('ref = $bindable(null)'), `${name} exposes ref + rest on the dialog element`);
     assert.ok(!s.includes('<style>'), `${name} has no scoped style block`);
@@ -775,7 +775,7 @@ test('F-038 B-L6: Popconfirm and Dropdown go through openOverlay; Popconfirm is 
   assert.ok(p.includes("import { openOverlay } from './overlay-utils.js'") && p.includes('openOverlay({') && p.includes('handle.dispose()'));
   assert.ok(p.includes('role="alertdialog"') && p.includes('aria-labelledby={titleId}') && !p.includes('aria-modal'), 'non-modal alertdialog labelled by its title');
   assert.ok(p.includes("panelEl.querySelector<HTMLElement>('button')?.focus") && p.includes('focusTrigger()'), 'first button focused on open, focus returns to the trigger');
-  assert.ok(/import\s*\{\s*AlertCircle\s*\}\s*from\s*'@joymify\/icons'/.test(p) && !p.includes('#f59e0b') && !p.includes('joy-color-status-warning'), 'warning icon is a token-coloured icon');
+  assert.ok(/import\s*\{\s*AlertCircle\s*\}\s*from\s*'@montionugera\/joy-icons'/.test(p) && !p.includes('#f59e0b') && !p.includes('joy-color-status-warning'), 'warning icon is a token-coloured icon');
 
   const d = readLib('Dropdown.svelte');
   assert.ok(d.includes('openOverlay({') && d.includes('handle.dispose()') && d.includes("import { rovingNextIndex } from './roving-utils.js'"));
@@ -801,7 +801,7 @@ test('F-038 B-L6: ImagePreview and Image render classes owned by build.js (no sc
   const im = readLib('Image.svelte');
   assert.ok(!ip.includes('<style>') && !im.includes('<style>'), 'scoped style blocks are gone');
   assert.ok(!/style="[^"]*(rgba?\(|#[0-9a-f]{3,8}|z-index|backdrop-filter)/i.test(ip), 'no colour/z-index/blur in inline styles');
-  assert.ok(/import\s*\{[^}]*ZoomIn[^}]*ZoomOut[^}]*\}\s*from\s*'@joymify\/icons'/.test(ip) && ip.includes('Close') && ip.includes('RefreshCw'), 'toolbar icons come from @joymify/icons');
+  assert.ok(/import\s*\{[^}]*ZoomIn[^}]*ZoomOut[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(ip) && ip.includes('Close') && ip.includes('RefreshCw'), 'toolbar icons come from @montionugera/joy-icons');
   for (const label of ['Zoom in', 'Zoom out', 'Rotate left', 'Rotate right', 'Close preview', 'Previous image', 'Next image']) {
     assert.ok(ip.includes(`aria-label="${label}"`), `${label} button is labelled`);
   }
@@ -877,7 +877,7 @@ test('F-038 B-L7: Timeline text colours and weights come from classes; MarkdownV
   assert.ok(!/style="/.test(md), 'no inline styles (hr had a #e2e8f0 fallback)');
   assert.ok(md.includes('<hr />'), 'hr is styled by .joy-markdown hr');
   assert.ok(md.includes('aria-label="Copy code to clipboard"') && md.includes('type="button"') && !md.includes('aria-label="Copy code snippet"'), 'copy button label and type');
-  assert.ok(/import\s*\{\s*Check,\s*Copy\s*\}\s*from\s*'@joymify\/icons'/.test(md) && md.includes('<Check size="14" />') && md.includes('<Copy size="14" />') && !md.includes('<svg'), 'icons come from @joymify/icons');
+  assert.ok(/import\s*\{\s*Check,\s*Copy\s*\}\s*from\s*'@montionugera\/joy-icons'/.test(md) && md.includes('<Check size="14" />') && md.includes('<Copy size="14" />') && !md.includes('<svg'), 'icons come from @montionugera/joy-icons');
   assert.ok(md.includes('class="joy-markdown__status" role="status"') && md.includes("'Copied to clipboard'"), 'copied state is announced');
   assert.ok(md.includes('await navigator.clipboard.writeText(text)') && md.includes('clearTimeout(resetTimer)'), 'copied is only claimed after a successful write; timer cleaned up');
   assert.ok(md.includes('bind:this={ref}') && md.includes('class="joy-markdown {className}"') && md.includes('{...rest}'), 'class + ref + rest on the root');
@@ -1021,7 +1021,7 @@ test('F-038 fix: Modal, Drawer and ImagePreview keep role/aria-modal owned (rest
     fs.writeFileSync(iconsStub, ['Close', 'ChevronLeft', 'ChevronRight', 'Minimize2', 'RefreshCw', 'ZoomIn', 'ZoomOut'].map((n) => `export const ${n} = () => {};`).join('\n'));
     const load = async (name) => {
       const server = compile(readLib(`${name}.svelte`), { filename: `${name}.svelte`, generate: 'server', runes: true });
-      const code = server.js.code.replace("'./overlay-utils.js'", `'${lib('overlay-utils.ts')}'`).replace("'./dialog-opener.js'", `'${lib('dialog-opener.ts')}'`).replace("'@joymify/icons'", `'${pathToFileURL(iconsStub).href}'`);
+      const code = server.js.code.replace("'./overlay-utils.js'", `'${lib('overlay-utils.ts')}'`).replace("'./dialog-opener.js'", `'${lib('dialog-opener.ts')}'`).replace("'@montionugera/joy-icons'", `'${pathToFileURL(iconsStub).href}'`);
       const file = path.join(dir, `${name}.mjs`);
       fs.writeFileSync(file, code);
       return (await import(pathToFileURL(file).href)).default;

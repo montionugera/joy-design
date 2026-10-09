@@ -467,5 +467,17 @@
     "title": "Fix portal hash redirection and bundle browser-safe cli-state-handler",
     "created_at": "2026-10-09T00:29:13.692702+00:00",
     "promoted_to": "F-070"
+  },
+  {
+    "id": "I-077",
+    "title": "Publish joy-design packages to GitHub Packages under @montionugera",
+    "created_at": "2026-10-09T06:32:23.684561+00:00",
+    "promoted_to": "F-071"
+  },
+  {
+    "id": "I-078",
+    "title": "Syntax highlighting code box and Mermaid diagram support in MarkdownViewer",
+    "created_at": "2026-10-09T08:50:21.852148+00:00",
+    "promoted_to": "F-072"
   }
 ]

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronLeft, ChevronRight } from '@joymify/icons';
+  import { ChevronLeft, ChevronRight } from '@montionugera/joy-icons';
   import { clampPage, pageCount, pageItems } from './pagination-utils.js';
 
   interface Props {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronLeft, ChevronRight } from '@joymify/icons/react';
+import { ChevronLeft, ChevronRight } from '@montionugera/joy-icons/react';
 import { clampPage, pageCount, pageItems } from './pagination-utils.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');

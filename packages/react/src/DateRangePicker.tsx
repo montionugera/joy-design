@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Close, ArrowRight } from '@joymify/icons/react';
+import { Calendar, ChevronLeft, ChevronRight, Close, ArrowRight } from '@montionugera/joy-icons/react';
 import { useOverlay } from './useOverlay.js';
 import {
   MONTH_NAMES,

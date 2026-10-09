@@ -100,7 +100,11 @@ export const COMPONENTS = [
   'MatchScoreboard',
   'ChronometerDial',
   'TelemetryStrip',
-  'CommandIsland'
+  'CommandIsland',
+  // F-072
+  'CodeBlock',
+  'PolyglotCodeTabs',
+  'MermaidViewer'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a
@@ -155,7 +159,11 @@ export const REF_FORWARDING = [
   'MatchScoreboard',
   'ChronometerDial',
   'TelemetryStrip',
-  'CommandIsland'
+  'CommandIsland',
+  // F-072
+  'CodeBlock',
+  'PolyglotCodeTabs',
+  'MermaidViewer'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
@@ -191,7 +199,11 @@ export const SVELTE_REF_REST = [
   'MatchScoreboard',
   'ChronometerDial',
   'TelemetryStrip',
-  'CommandIsland'
+  'CommandIsland',
+  // F-072
+  'CodeBlock',
+  'PolyglotCodeTabs',
+  'MermaidViewer'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).
@@ -476,7 +488,9 @@ export function classes(src) {
   //  - CSS custom properties, kept with their leading dashes: `--joy-space-gap`
   //  - dynamic prefixes (a match followed by `-`, `_` or a template hole), kept with a trailing
   //    `*`: `joy-progress--status-${x}` -> `joy-progress--status-*`
-  const re = /(?<![\w-])(?:--)?joy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g;
+  //  - A `joy-` preceded by `/`, a word char or `-` is not a class: package specifiers such as
+  //    `@montionugera/joy-icons/react` and longer names like `foo-joy-x` are skipped
+  const re = /(?<![\w/-])(?:--)?joy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g;
   const out = new Set();
   let m;
   while ((m = re.exec(cleaned)) !== null) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { Cpu, Layers, Menu, Smartphone } from '@joymify/icons';
+  import { Cpu, Layers, Menu, Smartphone } from '@montionugera/joy-icons';
   import Badge from './Badge.svelte';
   import Drawer from './Drawer.svelte';
   import HeroSection from './HeroSection.svelte';

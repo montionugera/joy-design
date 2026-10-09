@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MARK, heroLattice } from '@joymify/brand';
+import { MARK, heroLattice } from '@montionugera/joy-brand';
 import { LandingAction } from './LandingAction.js';
 
 export interface BrandBannerProps {
@@ -17,7 +17,7 @@ export interface BrandBannerProps {
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 
-// Decorative diamond lattice: the same grid + right-edge fade as @joymify/brand's hero-banner.svg
+// Decorative diamond lattice: the same grid + right-edge fade as @montionugera/joy-brand's hero-banner.svg
 // asset (packages/brand/src/render.js's heroBannerSvg), sourced from the shared `heroLattice`
 // helper so the two can never drift apart. This is an `aria-hidden` overlay stroked with a
 // `--joy-brand-*` custom property rather than heroBannerSvg's fixed role="img" + resolved-hex

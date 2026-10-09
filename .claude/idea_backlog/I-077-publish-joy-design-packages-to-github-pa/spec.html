@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Publish joy-design packages to GitHub Packages under @montionugera</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090d;
+      --surface: #10141b;
+      --surface-2: #161b24;
+      --surface-3: #1b212c;
+      --border: #2a3340;
+      --border-soft: #1c232e;
+      --ink: #d6dde7;
+      --ink-bright: #f6f8fb;
+      --ink-dim: #8392a3;
+      --accent: #4ee39b;
+      --accent-dim: #2f8f63;
+      --amber: #ffc746;
+      --amber-dim: #a37a1a;
+      --blue: #74b0ff;
+      --blue-dim: #3a5d8a;
+      --red: #ff6b6b;
+      --red-dim: #a14242;
+      --purple: #b288ff;
+      --purple-dim: #7a4dc5;
+      --teal: #4ed2c8;
+      --teal-dim: #347e7a;
+      --serif-display: "Fraunces", Georgia, serif;
+      --serif-body: "Spectral", Georgia, serif;
+      --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: var(--serif-body);
+      font-size: 19.5px;
+      line-height: 1.66;
+      color: var(--ink);
+      background: var(--bg);
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 64px 30px 160px;
+      counter-reset: sec;
+      animation: riseIn .55s cubic-bezier(.2,.7,.2,1) both;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(900px 500px at 80% -10%, rgba(78,227,155,.10), transparent 62%),
+        radial-gradient(720px 520px at -4% 110%, rgba(255,199,70,.055), transparent 60%),
+        linear-gradient(rgba(255,255,255,.020) 1px, transparent 1px) 0 0 / 100% 30px,
+        linear-gradient(90deg, rgba(255,255,255,.020) 1px, transparent 1px) 0 0 / 30px 100%;
+    }
+
+    @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- headings ---------- */
+    h1, h2, h3, h4 { font-family: var(--serif-display); color: var(--ink-bright); line-height: 1.16; letter-spacing: -.012em; font-weight: 600; }
+    h1 {
+      font-size: 3.2rem; font-weight: 700; margin: 0 0 .25em; letter-spacing: -.028em;
+      background: linear-gradient(180deg, #ffffff, #afb9c5);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      counter-increment: sec;
+      font-size: 2rem; margin: 2.8em 0 .7em; padding-top: .65em;
+      border-top: 1px solid var(--border-soft);
+      display: flex; align-items: baseline; gap: .55em; flex-wrap: wrap;
+      font-weight: 700;
+    }
+    h2::before {
+      content: "§" counter(sec, decimal-leading-zero);
+      font-family: var(--mono); font-size: .74rem; font-weight: 600;
+      color: var(--accent); letter-spacing: .04em;
+      border: 1px solid var(--accent-dim); border-radius: 6px;
+      padding: .3em .55em; transform: translateY(-.22em);
+      background: rgba(78,227,155,.06);
+    }
+    h3 { font-size: 1.42rem; margin: 2.1em 0 .55em; color: var(--ink-bright); font-weight: 600; }
+    h3 code { font-size: .88em; }
+    h4 { font-size: 1.1rem; margin: 1.5em 0 .4em; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono); font-weight: 600; }
+
+    p { margin: .95em 0; }
+    strong { color: var(--ink-bright); font-weight: 600; }
+    em { color: #d4dce6; }
+
+    mark {
+      background: linear-gradient(180deg, rgba(255,199,70,.0) 60%, rgba(255,199,70,.32) 60%);
+      color: var(--ink-bright); padding: 0 .2em; border-radius: 3px;
+    }
+
+    /* ---------- links ---------- */
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(78,227,155,.32); transition: border-color .15s, color .15s; }
+    a:hover { color: #8af0c2; border-bottom-color: var(--accent); }
+
+    /* ---------- inline code & code blocks ---------- */
+    code { font-family: var(--mono); font-size: .85em; background: var(--surface-2); color: #e0ecf6; padding: .14em .45em; border-radius: 5px; border: 1px solid var(--border-soft); }
+    pre {
+      position: relative; font-size: .82rem; line-height: 1.62;
+      background: linear-gradient(180deg, #0e1219, #0a0d13);
+      border: 1px solid var(--border); border-radius: 11px;
+      padding: 20px 20px 18px; margin: 1.4em 0; overflow-x: auto;
+      box-shadow: 0 1px 0 rgba(255,255,255,.02) inset, 0 18px 44px -28px rgba(0,0,0,.9);
+    }
+    pre::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: linear-gradient(var(--accent), transparent); border-radius: 11px 0 0 11px; opacity: .6; }
+    pre code { background: none; border: none; padding: 0; color: #d3e4f3; font-size: 1em; }
+
+    kbd { font-family: var(--mono); font-size: .82em; background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; padding: 2px 8px; border-radius: 6px; color: var(--ink-bright); box-shadow: 0 1px 0 var(--border-soft); }
+
+    /* ---------- tables ---------- */
+    table { border-collapse: collapse; width: 100%; margin: 1.4em 0; font-size: .87rem; font-family: var(--mono); }
+    th, td { border: 1px solid var(--border); padding: 11px 14px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); color: var(--ink-bright); font-weight: 600; border-bottom: 2px solid var(--accent-dim); text-transform: uppercase; font-size: .76rem; letter-spacing: .08em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+    tr:hover td { background: rgba(78,227,155,.04); }
+    td code { font-size: .94em; }
+    td strong { color: var(--amber); }
+
+    /* ---------- lists ---------- */
+    ul, ol { padding-left: 1.5em; margin: .9em 0; }
+    li { margin: .4em 0; }
+    li::marker { color: var(--accent-dim); font-weight: 600; }
+    ul ul, ol ol, ul ol, ol ul { margin: .3em 0; }
+
+    /* ---------- blockquote (used by pandoc) ---------- */
+    blockquote { border-left: 3px solid var(--accent-dim); margin: 1.2em 0; padding: .2em 0 .2em 18px; color: var(--ink-dim); font-style: italic; }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.6em 0; }
+
+    /* ---------- masthead (h1 + first p) ---------- */
+    h1 + p { font-family: var(--mono); font-size: .82rem; color: var(--ink-dim); line-height: 2; letter-spacing: .02em; border-bottom: 1px solid var(--border-soft); padding-bottom: 1.2em; }
+    h1 + p strong { color: var(--amber); font-weight: 500; }
+
+    /* ---------- TOC ---------- */
+    #TOC {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 22px; margin: 1.8em 0 2.4em; font-family: var(--mono); font-size: .78rem;
+    }
+    #TOC::before { content: "CONTENTS"; display: block; color: var(--accent); letter-spacing: .22em; font-size: .7rem; margin-bottom: .7em; font-weight: 600; }
+    #TOC ul { list-style: none; padding-left: 0; margin: 0; }
+    #TOC > ul > li { margin: .22em 0; }
+    #TOC ul ul { padding-left: 1.1em; border-left: 1px solid var(--border-soft); margin: .25em 0 .5em; }
+    #TOC a { color: var(--ink); border: none; }
+    #TOC a:hover { color: var(--accent); }
+
+    @media (min-width: 1320px) {
+      #TOC {
+        position: fixed; top: 0; left: 0; bottom: 0; width: 300px; margin: 0;
+        border-radius: 0; border: none; border-right: 1px solid var(--border);
+        padding: 64px 28px; overflow-y: auto;
+        background: linear-gradient(180deg, rgba(13,17,23,.92), rgba(8,10,14,.92));
+        backdrop-filter: blur(6px);
+      }
+      body { max-width: 1320px; padding-left: 360px; }
+    }
+
+    /* ============================================================
+       CALLOUTS — info / warn / success / danger / idea / metric
+       Use via:
+         ::: callout-warn
+         **Heading**
+         body text
+         :::
+       or raw <div class="callout warn"> ... </div>
+       ============================================================ */
+    /* Robust layout: icon is absolutely positioned and the content is padded.
+       (An earlier `display:grid` + `.callout > * { grid-column: 2 }` approach broke
+       when pandoc emitted loose prose as bare text nodes — those became anonymous
+       grid items that fell into the icon column and wrapped one word per line.
+       Absolute icon + padding flows ANY content structure correctly: loose text,
+       multiple inline elements, nested lists.) */
+    .callout {
+      position: relative;
+      margin: 1.7em 0;
+      padding: 18px 22px 16px 58px;
+      border-radius: 13px;
+      border: 1px solid var(--callout-border, var(--border));
+      border-left-width: 4px;
+      background: var(--callout-bg, var(--surface));
+    }
+    .callout::before {
+      content: var(--callout-icon, "·");
+      position: absolute;
+      left: 14px; top: 16px;
+      width: 30px; text-align: center;
+      font-size: 28px; line-height: 1.1;
+      color: var(--callout-accent, var(--accent));
+    }
+    .callout > * { min-width: 0; margin-top: 0; }
+    .callout > * + * { margin-top: .55em; }
+    .callout > p:first-child strong:first-child {
+      display: block;
+      font-family: var(--serif-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--callout-accent, var(--ink-bright));
+      letter-spacing: -.01em;
+      margin-bottom: .35em;
+    }
+    .callout p { line-height: 1.55; }
+    .callout code { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.06); }
+
+    .callout.info,    .callout-info    { --callout-border: var(--blue-dim);   --callout-bg: rgba(116,176,255,.08);   --callout-accent: var(--blue);   --callout-icon: "ℹ"; }
+    .callout.warn,    .callout-warn    { --callout-border: var(--amber-dim);  --callout-bg: rgba(255,199,70,.09);    --callout-accent: var(--amber);  --callout-icon: "⚠"; }
+    .callout.success, .callout-success { --callout-border: var(--accent-dim); --callout-bg: rgba(78,227,155,.08);    --callout-accent: var(--accent); --callout-icon: "✓"; }
+    .callout.danger,  .callout-danger  { --callout-border: var(--red-dim);    --callout-bg: rgba(255,107,107,.09);   --callout-accent: var(--red);    --callout-icon: "✕"; }
+    .callout.idea,    .callout-idea    { --callout-border: var(--purple-dim); --callout-bg: rgba(178,136,255,.08);   --callout-accent: var(--purple); --callout-icon: "✦"; }
+    .callout.metric,  .callout-metric  { --callout-border: var(--teal-dim);   --callout-bg: rgba(78,210,200,.08);    --callout-accent: var(--teal);   --callout-icon: "Σ"; }
+    .callout.action,  .callout-action  { --callout-border: var(--accent-dim); --callout-bg: rgba(78,227,155,.04);    --callout-accent: var(--accent); --callout-icon: "▸"; }
+
+    /* ============================================================
+       METRIC TILES — grid of big-number cards
+       Use via raw HTML:
+         <div class="metric-grid">
+           <div class="metric-tile alarm">
+             <div class="label">Pass all gates</div>
+             <div class="value">21%</div>
+             <div class="delta">39 / 187 results</div>
+           </div>
+         </div>
+       Variants: .alarm (red), .win (green), .info (blue), .warn (amber)
+       ============================================================ */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 1.5em 0;
+    }
+    .metric-tile {
+      background: linear-gradient(180deg, var(--surface), var(--bg));
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--tile-accent, var(--accent));
+      border-radius: 12px;
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .metric-tile .label {
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .14em;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-tile .value {
+      font-family: var(--serif-display);
+      font-weight: 700;
+      font-size: 2.55rem;
+      color: var(--tile-accent, var(--ink-bright));
+      line-height: 1;
+      letter-spacing: -.025em;
+    }
+    .metric-tile .delta {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--ink-dim);
+    }
+    .metric-tile.alarm { --tile-accent: var(--red); }
+    .metric-tile.win   { --tile-accent: var(--accent); }
+    .metric-tile.info  { --tile-accent: var(--blue); }
+    .metric-tile.warn  { --tile-accent: var(--amber); }
+    .metric-tile.teal  { --tile-accent: var(--teal); }
+    .metric-tile.dim .value { color: var(--ink-bright); }
+
+    /* ============================================================
+       TOPIC CHIP — colored pill that can appear next to H2 text
+       ============================================================ */
+    .topic-chip {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .16em;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .topic-chip.warn   { background: var(--amber); }
+    .topic-chip.danger { background: var(--red);   color: #fff; }
+    .topic-chip.info   { background: var(--blue);  color: var(--bg); }
+    .topic-chip.idea   { background: var(--purple); color: #fff; }
+    .topic-chip.teal   { background: var(--teal);  color: var(--bg); }
+
+    /* ============================================================
+       PULL QUOTE
+       ============================================================ */
+    .pullquote {
+      font-family: var(--serif-display);
+      font-size: 1.55rem;
+      font-weight: 500;
+      line-height: 1.38;
+      color: var(--ink-bright);
+      border-left: 4px solid var(--accent);
+      padding: 4px 0 4px 22px;
+      margin: 1.8em 0;
+      letter-spacing: -.012em;
+    }
+
+    /* ============================================================
+       SCHEMATIC — ASCII box-drawing diagrams, monospace canvas
+       Use via:
+         <div class="schematic">
+         ┌─────────┐    ┌─────────┐
+         │ Phase 0 │ ─→ │ Phase 1 │
+         └─────────┘    └─────────┘
+         </div>
+       ============================================================ */
+    .schematic {
+      font-family: var(--mono);
+      font-size: .86rem;
+      line-height: 1.4;
+      background: linear-gradient(180deg, #0d1117, #0a0d13);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 28px;
+      margin: 1.6em 0;
+      color: #cfdcec;
+      white-space: pre;
+      overflow-x: auto;
+      position: relative;
+    }
+    .schematic::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: linear-gradient(var(--teal), transparent); border-radius: 12px 0 0 12px; opacity: .6; }
+
+    /* ============================================================
+       RAW SVG / inline diagrams
+       ============================================================ */
+    .diagram, svg.diagram, .figure {
+      display: block; margin: 1.6em auto; max-width: 100%;
+      background: linear-gradient(180deg, #0d1117, #0a0d13);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 22px 14px;
+    }
+    .figure-caption {
+      text-align: center; font-family: var(--mono); font-size: .76rem;
+      color: var(--ink-dim); margin-top: -.6em; margin-bottom: 1.6em;
+      letter-spacing: .04em;
+    }
+
+    /* ============================================================
+       MERMAID block — bigger frame, softer glow
+       ============================================================ */
+    .mermaid {
+      margin: 1.6em 0; text-align: center;
+      background: linear-gradient(180deg, #0e1320, #0a0d13);
+      border: 1px solid var(--border); border-radius: 13px;
+      padding: 24px 14px;
+      box-shadow: 0 18px 50px -36px rgba(78,227,155,.55) inset;
+    }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* Hide pandoc's title-block if present */
+    #title-block-header { display: none; }
+
+    /* ============================================================
+       UTILITY ROW — two-up / three-up adjacent blocks
+       ============================================================ */
+    .row {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      margin: 1.5em 0;
+    }
+    .row.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 760px) {
+      .row.two, .row.three { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const render = () => {
+      const blocks = new Set();
+      document.querySelectorAll('pre.mermaid, pre.sourceCode.mermaid').forEach((p) => blocks.add(p));
+      document.querySelectorAll('code.mermaid, code.language-mermaid').forEach((c) => {
+        const pre = c.closest('pre'); if (pre) blocks.add(pre);
+      });
+      blocks.forEach((pre) => {
+        const div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = pre.textContent.trim();
+        pre.replaceWith(div);
+      });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        fontFamily: 'IBM Plex Mono, monospace',
+        themeVariables: {
+          background: '#0a0d13',
+          primaryColor: '#1a212c',
+          primaryTextColor: '#f0f3f7',
+          primaryBorderColor: '#4ee39b',
+          lineColor: '#6c7a8b',
+          secondaryColor: '#191e28',
+          tertiaryColor: '#11161e',
+          tertiaryBorderColor: '#2a3340',
+          clusterBkg: 'rgba(78,227,155,.05)',
+          clusterBorder: '#2f8f63',
+          titleColor: '#4ee39b',
+          actorBkg: '#1a212c',
+          actorBorder: '#4ee39b',
+          actorTextColor: '#f0f3f7',
+          signalColor: '#9aa7b6',
+          signalTextColor: '#d3dbe5',
+          noteBkgColor: 'rgba(255,199,70,.14)',
+          noteBorderColor: '#ffc746',
+          noteTextColor: '#f6f8fb',
+          fontSize: '14px'
+        }
+      });
+      mermaid.run();
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+    else render();
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Publish joy-design packages to GitHub Packages under
+<span class="citation"
+data-cites="montionugera">@montionugera</span></h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#publish-joy-design-packages-to-github-packages-under-montionugera"
+id="toc-publish-joy-design-packages-to-github-packages-under-montionugera">Publish
+joy-design packages to GitHub Packages under <span class="citation"
+data-cites="montionugera">@montionugera</span></a>
+<ul>
+<li><a href="#problem" id="toc-problem">Problem</a></li>
+<li><a href="#why-now" id="toc-why-now">Why now</a></li>
+<li><a href="#decisions-already-made-by-the-owner"
+id="toc-decisions-already-made-by-the-owner">Decisions already made by
+the owner</a></li>
+<li><a href="#scope" id="toc-scope">Scope</a></li>
+<li><a href="#approaches-considered"
+id="toc-approaches-considered">Approaches considered</a></li>
+<li><a href="#delivery-in-two-phases"
+id="toc-delivery-in-two-phases">Delivery in two phases</a></li>
+<li><a href="#design" id="toc-design">Design</a></li>
+<li><a href="#error-handling" id="toc-error-handling">Error
+handling</a></li>
+<li><a href="#acceptance" id="toc-acceptance">Acceptance</a></li>
+<li><a href="#risks" id="toc-risks">Risks</a></li>
+<li><a href="#follow-ups-not-in-this-feature"
+id="toc-follow-ups-not-in-this-feature">Follow-ups (not in this
+feature)</a></li>
+<li><a href="#audit-trail" id="toc-audit-trail">Audit trail</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="publish-joy-design-packages-to-github-packages-under-montionugera">Publish
+joy-design packages to GitHub Packages under <span class="citation"
+data-cites="montionugera">@montionugera</span></h1>
+<div class="callout info">
+<p><strong>In one line:</strong> make the React-facing packages of this
+design system installable from a registry, so a project outside this
+repo can use them without copying files. The first consumer is the docs
+portal in the sibling repo <code>cli-state-handler</code> (its idea
+I-038).</p>
+</div>
+<h2 id="problem">Problem</h2>
+<p>Nothing in this repo is published. A project that wants the design
+system has two options today: live inside this workspace, or keep a
+hand-copied (“vendored”) copy, which is what <code>asset-studio</code>
+does for the Svelte and tokens packages. A copy drifts from the source
+and nobody is told when it does.</p>
+<p>The React packages are also not in a publishable state:</p>
+<ul>
+<li><code>@joymify/react</code> and <code>@joymify/icons</code> export
+TypeScript source (<code>main</code> points at
+<code>./src/index.ts</code>). A consumer would have to compile files
+inside <code>node_modules</code>.</li>
+<li>No package has <code>publishConfig</code>, <code>repository</code>,
+<code>license</code> or a <code>files</code> allowlist, so a publish
+today would ship tests and build scripts.</li>
+<li>The package scope is <code>@joymify</code>. GitHub Packages only
+accepts a scope that matches the owning account, and the owner decided
+(2026-10-09) to publish under the personal account
+<code>montionugera</code>, the same place
+<code>@montionugera/zen-ui</code> lives.</li>
+</ul>
+<h2 id="why-now">Why now</h2>
+<p>The docs portal in <code>cli-state-handler</code> (React 19, Vite)
+was built with its own hand-written styles. The owner wants it rebuilt
+with the Joymify React components, installed from a registry, not
+copied. That work (cli-state-handler I-038, planned for its release 1.9)
+cannot start until these packages exist on the registry.</p>
+<h2 id="decisions-already-made-by-the-owner">Decisions already made by
+the owner</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Choice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Registry</td>
+<td>GitHub Packages (<code>https://npm.pkg.github.com</code>)</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td><code>@montionugera</code></td>
+</tr>
+<tr>
+<td>Consumer uses</td>
+<td>the full React component package, not only the stylesheet</td>
+</tr>
+<tr>
+<td>Distribution</td>
+<td>publish first; no vendored copy, no link to a sibling checkout</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scope">Scope</h2>
+<p><strong>In scope:</strong> four packages that a React consumer
+needs.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Today</th>
+<th>Published name</th>
+<th>Ships</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@joymify/tokens</code></td>
+<td><code>@montionugera/joy-tokens</code></td>
+<td>the existing built <code>dist/</code> (CSS variables, component CSS,
+Tailwind theme, JS token map)</td>
+</tr>
+<tr>
+<td><code>@joymify/icons</code></td>
+<td><code>@montionugera/joy-icons</code></td>
+<td>built <code>dist/</code> for the React entry (<code>./react</code>);
+the Svelte entry (<code>.</code>) as source, as today;
+<code>PROVENANCE.md</code></td>
+</tr>
+<tr>
+<td><code>@joymify/brand</code></td>
+<td><code>@montionugera/joy-brand</code></td>
+<td><code>src/</code> (plain JavaScript plus its
+<code>index.d.ts</code>) and <code>assets/</code>, as they are</td>
+</tr>
+<tr>
+<td><code>@joymify/react</code></td>
+<td><code>@montionugera/joy-react</code></td>
+<td>built <code>dist/</code> (JavaScript plus type declarations)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Renamed but not published:</strong>
+<code>@joymify/svelte</code> becomes
+<code>@montionugera/joy-svelte</code> so the workspace has one scope,
+and is marked <code>"private": true</code>. Publishing it needs a Svelte
+packaging step and has no consumer asking for it yet.</p>
+<p><strong>Out of scope:</strong> changing any component’s look or
+behaviour; the Flutter package; migrating <code>asset-studio</code> off
+its vendored copy (it keeps working, because its copy has its own
+<code>@joymify/*</code> names); the restyle of the docs portal
+itself.</p>
+<h2 id="approaches-considered">Approaches considered</h2>
+<ol type="1">
+<li><strong>Rename in source (chosen).</strong> Change the package names
+and every import in this repo. One name everywhere: what the source says
+is what a consumer installs. Cost: a mechanical edit of about 122 source
+imports, 12 <code>package.json</code> entries, a handful of name strings
+in test helpers and build scripts, and the live docs.</li>
+<li><strong>Rename only at publish time.</strong> Keep
+<code>@joymify/*</code> in the workspace and have a script rewrite names
+into a staging folder before publishing. Smaller diff, but every reader
+would have to hold two names for one package, and the rewrite step is
+one more thing that can be wrong only in the published copy.</li>
+<li><strong>Aliases.</strong> Publish under <code>@montionugera</code>
+and have each consumer alias the names back to <code>@joymify/*</code>.
+Pushes permanent configuration onto every consumer to hide a rename we
+can simply do once.</li>
+</ol>
+<p>Approach 1 keeps one set of names. It does not by itself prove the
+built output works: today’s tests load <code>src/</code> directly and
+nothing loads <code>dist/</code>. That gap is closed by the scripted
+tarball test in section 4.</p>
+<h2 id="delivery-in-two-phases">Delivery in two phases</h2>
+<p>The rename and the build-and-publish work are independent. They ship
+as one feature in two phases, each with its own verify and review gate,
+and the rename lands first so a problem in one cannot hide in the
+other.</p>
+<h2 id="design">Design</h2>
+<h3 id="phase-1-rename">Phase 1: Rename</h3>
+<ul>
+<li><code>name</code> in the five <code>packages/*/package.json</code>
+files, and every <code>workspace:*</code> reference between them. Then
+regenerate <code>pnpm-lock.yaml</code> (the gate installs with
+<code>--frozen-lockfile</code>, so a stale lockfile fails it).</li>
+<li>Every import of the old names in <code>packages/</code>,
+<code>apps/</code> and <code>scripts/</code>.</li>
+<li>Name strings that are not imports, which a search-and-replace on
+import statements misses:
+<ul>
+<li>the package-id literals in
+<code>packages/react/test/helpers/load-tsx.js</code> and its copy in the
+Svelte package (if missed, the helper silently falls through to
+<code>dist</code>);</li>
+<li>the tokens lookup by name in
+<code>packages/brand/build.js</code>;</li>
+<li>the Playwright assertions in
+<code>apps/storybook-hub/tests/contracts.spec.ts</code> and
+<code>framework-switcher.spec.ts</code>;</li>
+<li>the README assertion in
+<code>scripts/test/docs-contract.test.mjs</code>.</li>
+</ul></li>
+<li>Live documentation: <code>README.md</code>, <code>AGENTS.md</code>,
+<code>PRODUCT.md</code>, and the generator
+<code>scripts/design-md/render.mjs</code> (then regenerate
+<code>DESIGN.md</code>; never hand-edit it).</li>
+<li>Not changed:
+<ul>
+<li>historical records under <code>.claude/</code> and
+<code>docs/superpowers/</code>;</li>
+<li>the fictional example consumer <code>@joymify/quant</code> in
+<code>apps/storybook-hub/build.js</code>, which is sample text, not one
+of our packages;</li>
+<li>CSS names. The <code>--joy-*</code> variables and
+<code>.joy-*</code> classes are the public styling contract and stay
+exactly as they are.</li>
+</ul></li>
+</ul>
+<p><strong>Done when</strong> a search for
+<code>@joymify/(tokens|icons|brand|react|svelte)</code> outside
+<code>.claude/</code>, <code>docs/superpowers/</code>,
+<code>node_modules</code>, <code>dist</code> and <code>graft</code>
+returns nothing, and <code>scripts/integration.sh</code> passes.</p>
+<h3 id="phase-2-part-1-build-output-for-joy-react-and-joy-icons">Phase
+2, part 1: Build output for <code>joy-react</code> and
+<code>joy-icons</code></h3>
+<p>Use the TypeScript compiler that is already a dependency; add no
+bundler.</p>
+<ul>
+<li><code>joy-react</code> gets a <code>tsconfig.build.json</code> that
+extends its existing config with <code>noEmit: false</code>,
+<code>allowImportingTsExtensions: false</code> (the compiler refuses to
+emit while that option is on; no import in <code>src</code> uses a
+<code>.ts</code> extension, so turning it off changes nothing else),
+<code>outDir: dist</code>, <code>declaration: true</code>, ES module
+output, and excludes tests and stories. Relative imports already use
+<code>.js</code> extensions, so emitted files resolve without
+rewriting.</li>
+<li><code>joy-icons</code> gets the same, limited to its React entry:
+<code>src/react.ts</code> and <code>src/react/</code>. Its Svelte entry
+(<code>src/index.ts</code>, which re-exports 138 <code>.svelte</code>
+files) cannot be compiled by the TypeScript compiler and is not built;
+it keeps shipping as source, which is the normal form for Svelte
+components.</li>
+<li>Each gets a <code>build</code> script
+(<code>tsc -p tsconfig.build.json</code>).</li>
+<li><code>main</code>, <code>module</code>, <code>types</code> and
+<code>exports</code> of <code>joy-react</code>, and the
+<code>./react</code> export of <code>joy-icons</code>, point at
+<code>dist/</code>. The <code>.</code> export of <code>joy-icons</code>
+is unchanged.</li>
+<li><code>dist/</code> stays untracked for these two packages. Tokens’
+committed <code>dist/</code> is an existing choice and is left
+alone.</li>
+</ul>
+<p><strong>Inside the workspace:</strong> tests keep loading
+<code>src/</code> through their existing helpers, and the Storybook hub
+reads package sources by relative path, so neither needs
+<code>dist/</code>. The one thing that does is <code>joy-react</code>‘s
+type-check, which reads <code>joy-icons</code>’ declarations: it works
+when run through <code>turbo</code> (which builds dependencies first)
+and fails when run directly with <code>pnpm --filter</code> on a clean
+checkout. The plan must add the build as a <code>turbo</code> dependency
+of <code>check</code> and say so in <code>AGENTS.md</code>.</p>
+<p><strong>First tasks of the plan (prove before building on
+them):</strong> run the declaration build of <code>joy-react</code> once
+and record any errors that only appear with
+<code>declaration: true</code>, since type-checking with
+<code>noEmit</code> never exercised them across its 103 files.</p>
+<h3 id="phase-2-part-2-package-metadata">Phase 2, part 2: Package
+metadata</h3>
+<p>Each published package gets:</p>
+<ul>
+<li><code>"publishConfig": { "registry": "https://npm.pkg.github.com" }</code></li>
+<li><code>"repository": { "type": "git", "url": "git+https://github.com/montionugera/joy-design.git", "directory": "packages/&lt;name&gt;" }</code>
+(this links the package to this private repo)</li>
+<li>a <code>files</code> allowlist, which must cover every path in that
+package’s <code>exports</code>:</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Package</th>
+<th><code>files</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>joy-tokens</code></td>
+<td><code>dist</code></td>
+</tr>
+<tr>
+<td><code>joy-icons</code></td>
+<td><code>dist</code>, <code>src/index.ts</code>,
+<code>src/index.d.ts</code>, <code>src/*.svelte</code>,
+<code>PROVENANCE.md</code></td>
+</tr>
+<tr>
+<td><code>joy-brand</code></td>
+<td><code>src</code>, <code>assets</code></td>
+</tr>
+<tr>
+<td><code>joy-react</code></td>
+<td><code>dist</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Licence.</strong> <code>joy-icons</code> contains icons
+derived from Lucide (ISC) and Feather (MIT); its
+<code>PROVENANCE.md</code> carries the notices those licences require to
+travel with every copy, so that file ships and the field is
+<code>"license": "SEE LICENSE IN PROVENANCE.md"</code>. The other three
+hold only original work and are <code>"license": "UNLICENSED"</code>
+(private, proprietary; no licence file exists and none is being
+invented).</li>
+<li><code>"sideEffects"</code>: <code>["**/*.css"]</code> for tokens,
+<code>false</code> for the others.</li>
+</ul>
+<p>Versions stay hand-set. The first publish is <code>0.2.0</code> for
+tokens, brand and react, and <code>0.3.0</code> for icons (it is already
+at <code>0.2.0</code>).</p>
+<h3 id="phase-2-part-3-publish-workflow">Phase 2, part 3: Publish
+workflow</h3>
+<p>A new <code>.github/workflows/publish.yml</code>, modelled on
+<code>zen-ui</code>’s:</p>
+<pre class="mermaid"><code>flowchart LR
+  T[&quot;Tag packages-v* on main&lt;br/&gt;or manual run&quot;] --&gt; G[&quot;Gate&lt;br/&gt;scripts/integration.sh&quot;]
+  G --&gt;|fail| X[&quot;Stop. Nothing published.&quot;]
+  G --&gt;|pass| B[&quot;Build joy-react and joy-icons&lt;br/&gt;then git diff --exit-code&quot;]
+  B --&gt; S[&quot;Tarball test&lt;br/&gt;pack, install into a fresh app, build it&quot;]
+  S --&gt;|fail| X
+  S --&gt;|pass| P[&quot;Publish the versions&lt;br/&gt;not yet on the registry&quot;]
+  P --&gt; V[&quot;Verify&lt;br/&gt;npm view each name@version&quot;]</code></pre>
+<ul>
+<li><strong>Trigger:</strong> a pushed tag matching
+<code>packages-v*</code>, or a manual run. Not every push to
+<code>main</code>: publishing is permanent, so it takes a deliberate
+act. The job refuses a tag whose commit is not on
+<code>main</code>.</li>
+<li><strong>Runner setup:</strong> the gate calls
+<code>scripts/precheck.sh</code>, which needs Flutter, Playwright’s
+Chromium and ripgrep and fails without them. The job repeats the setup
+steps of the existing <code>build</code> job in
+<code>.github/workflows/ci.yml</code>. It does not copy
+<code>zen-ui</code>’s lighter setup.</li>
+<li><strong>Build:</strong> only <code>joy-react</code> and
+<code>joy-icons</code> are built here. Tokens is already rebuilt by the
+gate, and brand’s build rewrites committed image files, so it is not
+run. <code>git diff --exit-code</code> after the gate and build fails
+the job if anything committed changed, so the bytes published are the
+bytes in git.</li>
+<li><strong>Tarball test (the check that the built output
+works):</strong> a script, <code>scripts/test/consumer-smoke.sh</code>,
+packs the four packages, installs the tarballs into a fresh Vite + React
+19 app created in a temporary folder outside the workspace, imports
+<code>theme.css</code>, renders <code>Button</code>, <code>Tabs</code>,
+one icon and <code>BrandMark</code>, and runs that app’s type-check and
+build. It also runs locally, so it is the same check before and during
+publish.</li>
+<li><strong>Publish:</strong> for each of the four names in dependency
+order (tokens, icons, brand, react), ask the registry whether
+<code>name@version</code> exists (<code>npm view</code>); if it does,
+skip it and say so; if not, <code>pnpm publish --no-git-checks</code>
+from that package’s folder. <code>pnpm publish</code> replaces
+<code>workspace:*</code> with the real version in the published
+<code>package.json</code>; <code>npm publish</code> does not, so it must
+not be used.</li>
+<li><strong>Auth:</strong> the workflow’s own <code>GITHUB_TOKEN</code>
+with <code>packages: write</code>, the pattern <code>zen-ui</code>
+already uses. No new secret.</li>
+<li><strong>Dry run:</strong> a <code>dry_run</code> input runs
+everything up to and including the tarball test, then
+<code>pnpm publish --dry-run</code>, and prints each tarball’s file
+list.</li>
+</ul>
+<h3 id="phase-2-part-4-what-a-consumer-does">Phase 2, part 4: What a
+consumer does</h3>
+<p>Documented in <code>README.md</code> under a new “Install from the
+registry” section:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode ini"><code class="sourceCode ini"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .npmrc in the consuming repo</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">@montionugera:registry</span><span class="ot">=</span><span class="st">https://npm.pkg.github.com</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">//npm.pkg.github.com/:_authToken</span><span class="ot">=</span><span class="st">${GITHUB_TOKEN}</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="st">&#39;@montionugera/joy-tokens/theme.css&#39;</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Button<span class="op">,</span> Tabs } <span class="im">from</span> <span class="st">&#39;@montionugera/joy-react&#39;</span><span class="op">;</span></span></code></pre></div>
+<p>Both the repo and its packages are private, so every install needs a
+token:</p>
+<ul>
+<li><strong>On a developer machine:</strong> a personal GitHub token
+with the <code>read:packages</code> permission, exported as
+<code>GITHUB_TOKEN</code>.</li>
+<li><strong>In another repo’s GitHub Actions:</strong> that repo’s
+automatic token cannot read these packages by default. Either each of
+the four packages is set (in its package settings on GitHub) to grant
+that repo access, or the consuming repo stores a personal token as a
+secret.</li>
+</ul>
+<p>Fonts are still loaded by the consumer (see
+<code>DESIGN.md</code>).</p>
+<h2 id="error-handling">Error handling</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gate or tarball test fails</td>
+<td>Workflow stops before any publish.</td>
+</tr>
+<tr>
+<td>Version already on the registry</td>
+<td>That package is skipped and reported; the others still publish.</td>
+</tr>
+<tr>
+<td>Publish succeeds for some packages and fails for others</td>
+<td>Re-running is safe, because published versions are skipped. The fix
+is a re-run, never an unpublish.</td>
+</tr>
+<tr>
+<td>A bad version is published</td>
+<td>Publish a higher fixed version. A published version is not
+reused.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="acceptance">Acceptance</h2>
+<ol type="1">
+<li>Phase 1: the search in “Done when” is empty and
+<code>scripts/integration.sh</code> passes.</li>
+<li>Phase 2: <code>scripts/test/consumer-smoke.sh</code> passes locally,
+with the temporary app having no path into this repo’s source.</li>
+<li>Each tarball’s file list matches the <code>files</code> table,
+contains no test or story files, and its <code>package.json</code> has
+concrete versions in place of <code>workspace:*</code>.</li>
+<li>The workflow’s dry run passes on GitHub and shows the four packages
+in dependency order.</li>
+<li>After the real publish (separate go-ahead, see Risks):
+<code>npm view</code> returns the expected version for each of the four
+names, and the smoke app installs them from the registry and
+builds.</li>
+</ol>
+<h2 id="risks">Risks</h2>
+<div class="callout danger">
+<p><strong>Publishing is the irreversible step.</strong> Everything up
+to and including the dry run can be undone with a revert. The first real
+tag push cannot. It needs the owner’s explicit go-ahead at that moment,
+separate from approval of this spec.</p>
+</div>
+<ul>
+<li><strong>Blast radius of the rename:</strong> every package in this
+repo refers to another by name, some of them in plain strings. A missed
+reference breaks the build or, in the test helper, silently changes what
+is tested. The explicit list in Phase 1 and the search check are the
+guard.</li>
+<li><strong>Deployed Storybook portal:</strong>
+<code>apps/storybook-hub</code> is deployed from <code>main</code>. It
+reads package sources by relative path, so the rename affects its text
+and its Playwright assertions, not its resolution. It is rebuilt and
+smoke-checked by the existing CI on merge.</li>
+<li><strong>Vendored copies elsewhere:</strong>
+<code>asset-studio</code> keeps <code>@joymify/*</code> names in its own
+copy. It is unaffected, and it will not receive this rename until
+someone re-syncs it.</li>
+<li><strong>Token on every consumer:</strong> private GitHub Packages
+cannot be installed anonymously (see Phase 2, part 4).</li>
+</ul>
+<h2 id="follow-ups-not-in-this-feature">Follow-ups (not in this
+feature)</h2>
+<ul>
+<li>Publish <code>joy-svelte</code> and move <code>asset-studio</code>
+from its vendored copy to the registry.</li>
+<li><code>joy-icons</code> declares <code>react ^19</code> as a peer
+while <code>joy-react</code> allows <code>^18 || ^19</code>; align
+them.</li>
+<li><code>packages/react/package.json</code> points <code>types</code>
+at a <code>src/index.d.ts</code> that does not exist; this feature
+replaces that entry with the built declarations.</li>
+<li>A versioning tool (for example Changesets) if hand-set versions
+become error-prone.</li>
+</ul>
+<h2 id="audit-trail">Audit trail</h2>
+<p>Independent audit, 2026-10-09 (read-only, against the repo at
+<code>release/3.7</code>). No critical findings; six high findings, all
+applied (the two about the <code>files</code> allowlist are combined in
+the second point):</p>
+<ul>
+<li>The Svelte icon entry cannot be compiled by the TypeScript compiler:
+now stated as fact, built output limited to the React entry.</li>
+<li>The <code>files</code> allowlist did not cover the Svelte entry of
+<code>joy-icons</code> or the type declarations of
+<code>joy-brand</code>: per-package table added.</li>
+<li><code>UNLICENSED</code> with a <code>dist</code>-only allowlist
+would have dropped third-party icon notices: <code>PROVENANCE.md</code>
+now ships with <code>joy-icons</code>.</li>
+<li>The publish gate needs Flutter, Playwright and ripgrep on the
+runner: setup now copied from the CI <code>build</code> job.</li>
+<li>Nothing automated loaded the built output: the tarball test is now a
+script run before every publish.</li>
+</ul>
+<p>Medium findings applied: the emit option conflict in the build
+config; declaration build as a first task; the rename’s done-criterion
+and its list of non-import name strings; lockfile regeneration; building
+only react and icons with a clean-tree check; consumer CI token access;
+an explicit registry check in place of an assumed skip behaviour. Scope
+kept as one feature in two gated phases.</p>
+</body>
+</html>

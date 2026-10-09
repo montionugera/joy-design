@@ -711,6 +711,9 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | ChronometerDial | `.joy-chronometer-dial` | - | - | active |
 | TelemetryStrip | `.joy-telemetry-strip` | - | - | - |
 | CommandIsland | `.joy-command-island` | - | bottom-fixed, bottom-floating, top-header | hover, active |
+| CodeBlock | `.joy-code-block` | - | with-lines | hover, focus-visible |
+| PolyglotCodeTabs | `.joy-polyglot-tabs` | - | - | hover, focus-visible, selected |
+| MermaidViewer | `.joy-mermaid` | - | - | hover, focus-visible |
 
 ## Brand
 
@@ -748,6 +751,6 @@ Colour roles: `--joy-brand-tile`, `--joy-brand-mark`, `--joy-brand-mark-on-tile`
 - Side-stripe `border-left` accents wider than 1px, gradient text, decorative glassmorphism.
 - Identical icon + heading + text card grids, a tracked all-caps eyebrow above every section, 01/02/03 markers on content that is not a sequence.
 - An arrow glyph appended to link text, `#111` standing in for black, middle-dot meta strings.
-- Raw OS emoji anywhere; use the SVG icons in `@joymify/icons`.
+- Raw OS emoji anywhere; use the SVG icons in `@montionugera/joy-icons`.
 - A flat single-colour hero button with a colour-only hover, a spinner-only loading state, or 32px controls on a phone.
 - Use semantic status colors (green, amber, red) for arbitrary decorative styling, general section backgrounds, or brand theme accents.
