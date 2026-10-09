@@ -133,10 +133,22 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
     const resCli = await page.goto('/cli-state-handler/');
     expect(resCli?.status()).toBe(200);
     await expect(page).toHaveTitle(/UCSA/);
+    await expect(page.locator('#root')).not.toBeEmpty();
 
     // 3. Joy Design System Hub at /design/
     const resDesign = await page.goto('/design/');
     expect(resDesign?.status()).toBe(200);
     await expect(page).toHaveTitle(/Joymify Design System/);
+  });
+
+  test('Component view hashes on root / redirect to /design/#viewName', async ({ page, isMobile }) => {
+    await page.goto('/#primitives');
+    await page.waitForURL('**/design/#primitives');
+    expect(page.url()).toContain('/design/#primitives');
+    if (!isMobile) {
+      const sidebar = page.locator('.sidebar');
+      await expect(sidebar).toBeVisible();
+    }
+    await expect(page.locator('#view-primitives')).toHaveClass(/active/);
   });
 });
