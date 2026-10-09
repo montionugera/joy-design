@@ -461,5 +461,11 @@
     "title": "list",
     "created_at": "2026-10-09T00:29:06.407528+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-076",
+    "title": "Fix portal hash redirection and bundle browser-safe cli-state-handler",
+    "created_at": "2026-10-09T00:29:13.692702+00:00",
+    "promoted_to": null
   }
 ]
