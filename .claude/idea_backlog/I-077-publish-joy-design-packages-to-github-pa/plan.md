@@ -38,11 +38,12 @@ Each item has evidence and what the plan does instead. None changes an owner dec
 1. **There is no copy of `load-tsx.js` in the Svelte package.** The spec (Phase 1) says "the package-id literals in `packages/react/test/helpers/load-tsx.js` and its copy in the Svelte package". `packages/svelte/test/helpers/` holds only `render-svelte.js` and `svelte-hooks.js`, and neither names a package. The equivalent Svelte-side literal is the string replace at `packages/svelte/test/components.test.js:1024` (`.replace("'@joymify/icons'", ...)`). The plan renames that line and lists it under non-import name strings.
 2. **The spec's completion search misses ten references.** `packages/svelte/test/components.test.js` lines 558, 592, 638, 646, 652, 738, 763, 778, 804 and 880 match the package name inside regex literals written `'@joymify\/icons'` (escaped slash). The spec's pattern `@joymify/(tokens|icons|brand|react|svelte)` does not match that spelling, and those assertions would fail after the sources are renamed. The plan uses the widened pattern `@joymify\\?/(tokens|icons|brand|react|svelte)` for both the rewrite and the completion search, and also runs the spec's literal pattern.
 3. **`turbo.json` already makes `check` depend on the build.** `turbo.json:12-15` is `"check": { "dependsOn": ["^build"], "outputs": [] }`. The spec says "the plan must add the build as a `turbo` dependency of `check`". There is nothing to add. The plan locks the existing edge with an assertion in `scripts/test/publish-contract.test.mjs` (Task 5) and writes the note in `AGENTS.md` (Task 8).
-4. **Pointing the icons React entry at built declarations would drop a public type.** The hand-written `packages/icons/src/react.d.ts:2` exports `IconProps`, but `packages/icons/src/react.ts` (138 lines, one per icon) does not, so the generated `dist/react.d.ts` would not either. Nothing in this repo imports `IconProps` from the entry, so no test would notice, but a consumer would. Task 4 adds `export type { IconProps } from "./react/Activity.js";` to `react.ts`. The now-unused `src/react.d.ts` is left in place (not shipped, not in `files`).
+4. **Pointing the icons React entry at built declarations would drop a public type.** The hand-written `packages/icons/src/react.d.ts:3` exports `IconProps`, but `packages/icons/src/react.ts` (138 lines, one per icon) does not, so the generated `dist/react.d.ts` would not either. Nothing in this repo imports `IconProps` from the entry, so no test would notice, but a consumer would. Task 4 adds `export type { IconProps } from "./react/Activity.js";` to `react.ts`. The now-unused `src/react.d.ts` is left in place (not shipped, not in `files`).
 5. **The gate already runs the brand build, so the clean-tree check covers more than the spec assumes.** The spec says brand's build "is not run". `scripts/precheck.sh:47` (step 2b) runs `pnpm check`, which is `turbo run check` with `dependsOn: ["^build"]`, and `joy-react` depends on `joy-brand`, so `node packages/brand/build.js` runs inside the gate and rewrites `packages/brand/assets/`. The gate's Flutter step also runs `flutter pub get` beside the tracked `apps/flutter-hub/pubspec.lock`. The workflow therefore does not run brand's build itself (as the spec says), keeps `git diff --exit-code`, and prints `git status --short` and `git diff --stat` on failure. Whether those files come out byte-identical on the Linux runner is **unproven until the first hosted dry run**; Task 1 and Task 9 check it locally on macOS.
 6. **Counts.** The spec estimates "about 122 source imports". Measured on `release/3.7`: 200 occurrences in 85 tracked files outside `.claude/` and `docs/superpowers/` (62 of them in 54 files under `packages/react/src` and `packages/svelte/src`). The name also appears in files the spec's list does not mention (`packages/brand/scripts/outline-text.mjs`, `packages/brand/src/layout.js`, `packages/brand/src/outlines.generated.js`, both `PROVENANCE.md` files, test titles, and hub text and `aria-label`s in `apps/storybook-hub/build.js`). All are enumerated in Task 1.
 7. **Main-branch check is applied to manual real runs too.** The spec says the job "refuses a tag whose commit is not on `main`". The workflow applies the same check to a manual run with `dry_run` off, so a real publish can never come from a side branch. Manual dry runs are allowed from any branch.
 8. **"Renders" is made checkable.** A Vite build compiles components but never calls them. `scripts/test/consumer-smoke.sh` also renders `Button`, `Tabs`, the `Check` icon and `BrandMark` to a string with `react-dom/server` under plain Node, and has two `@ts-expect-error` guards that fail the type-check if the published types degrade to `any`. This is additional evidence for Acceptance 2, not a change of scope.
+9. **Four relative imports in `joy-react` have no `.js` extension.** The spec (Phase 2, part 1) says "Relative imports already use `.js` extensions, so emitted files resolve without rewriting". That is true for 99 of the 103 files. `packages/react/src/Checkbox.tsx:2`, `FormItem.tsx:2`, `RadioGroup.tsx:2` and `Switch.tsx:2` read `import { FormContext } from './Form';` (`Input.tsx:2` and `Select.tsx:3` import the same symbol from `'./Form.js'`). The compiler copies the specifier as written, so `dist/Checkbox.js` would import `./Form`, which Node's module loader rejects (`ERR_MODULE_NOT_FOUND`); a bundler such as Vite hides it. No unit test loads those four files, and `tsc` with `moduleResolution: Bundler` accepts both spellings, so nothing reports it today. Task 3 Step 3b changes the four specifiers to `./Form.js` (no runtime or type change) and Task 3 Step 7 checks that no emitted relative import lacks `.js`. The React entry of `joy-icons` has no such import.
 
 ---
 
@@ -66,6 +67,7 @@ Modified:
 | `pnpm-lock.yaml` | Regenerated for the new names. |
 | 27 files in `packages/react/src`, 27 in `packages/svelte/src/lib` | Import specifiers and comments. |
 | `packages/icons/src/react.ts` | One added type re-export (`IconProps`). |
+| `packages/react/src/{Checkbox,FormItem,RadioGroup,Switch}.tsx` | Phase 2: line 2, import specifier `./Form` becomes `./Form.js` (deviation 9). |
 | Test files, helpers, `packages/brand/build.js`, brand scripts and sources, hub `build.js`, two Playwright specs, `scripts/test/docs-contract.test.mjs` | Name strings that are not imports. |
 | `README.md`, `AGENTS.md`, `PRODUCT.md`, both `PROVENANCE.md` files | Live docs: names; new "Install from the registry" section; build and type-check note. |
 | `scripts/design-md/render.mjs`, then generated `DESIGN.md` | Generator text, then regenerated output. |
@@ -128,7 +130,7 @@ Expected: no tracked changes.
 ```bash
 git grep -lE '@joymify\\?/(tokens|icons|brand|react|svelte)' -- . ':!.claude' ':!docs/superpowers' ':!**/dist/**' ':!pnpm-lock.yaml' ':!DESIGN.md' \
   | xargs perl -pi -e 's{\@joymify(\\?)/(tokens|icons|brand|react|svelte)\b}{\@montionugera$1/joy-$2}g'
-git status --short | wc -l
+git diff --name-only | wc -l
 ```
 
 Expected: `83` files modified. The capture group `(\\?)` keeps the escaped slash in the ten regex literals, so `'@joymify\/icons'` becomes `'@montionugera\/joy-icons'`.
@@ -363,6 +365,7 @@ This is deliberately first in Phase 2: `noEmit` type-checking never exercised de
 
 - Create: `packages/react/tsconfig.build.json`
 - Modify: `packages/react/package.json` (`scripts` only)
+- Modify: `packages/react/src/Checkbox.tsx`, `packages/react/src/FormItem.tsx`, `packages/react/src/RadioGroup.tsx`, `packages/react/src/Switch.tsx` (line 2 of each: import specifier only)
 - Modify: `research.md` beside this plan (record findings)
 - Possibly modify: files in `packages/react/src/` that fail declaration emit, and the byte-identical twin in `packages/svelte/src/lib/` when the file is a shared `.ts` helper
 - Test: the build itself
@@ -370,7 +373,7 @@ This is deliberately first in Phase 2: `noEmit` type-checking never exercised de
 **Interfaces:**
 
 - Consumes: package name `@montionugera/joy-react` (Task 1).
-- Produces: script `build` in `packages/react/package.json` (`tsc -p tsconfig.build.json`); output `packages/react/dist/index.js` and `packages/react/dist/index.d.ts` plus one `.js` and one `.d.ts` per source file; `dist/` untracked. `exports` still point at `src/` after this task (changed in Task 5).
+- Produces: script `build` in `packages/react/package.json` (`tsc -p tsconfig.build.json`); output `packages/react/dist/index.js` and `packages/react/dist/index.d.ts` plus one `.js` and one `.d.ts` per source file; every relative import in `dist/` ends in `.js`, so the output loads under plain Node as well as a bundler; `dist/` untracked. `exports` still point at `src/` after this task (changed in Task 5).
 
 - [ ] **Step 1: Write the failing check and see it fail.**
 
@@ -417,6 +420,26 @@ to
   },
 ```
 
+- [ ] **Step 3b: Give the four extensionless relative imports a `.js` extension (deviation 9).** The compiler emits import specifiers exactly as written, and Node cannot resolve `./Form` without an extension. List them first:
+
+```bash
+grep -rnE "(from|import)[[:space:]]+['\"]\.\.?/[^'\"]+['\"]" packages/react/src | grep -vE "\.js['\"]"
+```
+
+Expected before the edit: exactly four lines, `packages/react/src/Checkbox.tsx:2`, `FormItem.tsx:2`, `RadioGroup.tsx:2` and `Switch.tsx:2`, each `import { FormContext } from './Form';`. In each of those four files change line 2 from
+
+```ts
+import { FormContext } from './Form';
+```
+
+to
+
+```ts
+import { FormContext } from './Form.js';
+```
+
+Change nothing else in those files. Re-run the `grep` above. Expected after the edit: no output. If it lists any other line, give that specifier its `.js` extension in the same way (the target is always a sibling `.ts` or `.tsx` file) and re-run until it prints nothing.
+
 - [ ] **Step 4: Run the declaration build and capture the result.**
 
 ```bash
@@ -446,11 +469,12 @@ test -f packages/react/dist/index.js && test -f packages/react/dist/index.d.ts &
 ls packages/react/dist | grep -c '\.d\.ts$'
 ls packages/react/dist | grep -vc '\.d\.ts$'
 grep -rlE "from ['\"]\./[^'\"]+\.tsx?['\"]" packages/react/dist | wc -l
+grep -rhoE "from ['\"]\.\.?/[^'\"]+['\"]" packages/react/dist | grep -vE "\.js['\"]$" | wc -l
 git check-ignore -q packages/react/dist && echo ignored
 git status --short packages/react
 ```
 
-Expected: `present`; `103`; `103`; `0` (no emitted import ends in `.ts` or `.tsx`); `ignored`; and the status shows only `M packages/react/package.json` and `?? packages/react/tsconfig.build.json` (plus any source file fixed in Step 5).
+Expected: `present`; `103`; `103`; `0` (no emitted import ends in `.ts` or `.tsx`); `0` (every emitted relative import, in `.js` and `.d.ts` files alike, ends in `.js`; a non-zero count means Step 3b missed a specifier, so go back to it); `ignored`; and the status shows only `M packages/react/package.json`, the four `M` files of Step 3b and `?? packages/react/tsconfig.build.json` (plus any source file fixed in Step 5).
 
 - [ ] **Step 8: Confirm nothing else moved.**
 
@@ -465,6 +489,7 @@ Expected: both exit 0.
 
 ```bash
 git add packages/react/tsconfig.build.json packages/react/package.json
+git add packages/react/src/Checkbox.tsx packages/react/src/FormItem.tsx packages/react/src/RadioGroup.tsx packages/react/src/Switch.tsx
 git add -u .claude/refined_backlog
 git status --short
 git commit -m "build(joy-react): emit dist with declarations via tsc"
@@ -962,7 +987,7 @@ Expected: after the commit, `git status --short` shows no tracked changes.
 
 - [ ] **Step 12: Phase gate for Tasks 3, 4 and 5.**
   1. Verify: Steps 7, 9 and 10 of this task passed with the output shown (do not re-run the full gate here; Task 9 runs it).
-  2. Review: dispatch `code-reviewer` and `typescript-reviewer` in parallel on `git diff "$(git merge-base HEAD release/3.7)"..HEAD -- packages/react/tsconfig.build.json packages/icons/tsconfig.build.json packages/icons/src/react.ts 'packages/*/package.json' scripts/test/publish-contract.test.mjs` plus any source file changed in Task 3 Step 5. Brief: "Check the two build configs emit ES modules with declarations and nothing else; check each package's `files` covers every `exports` path; check `scripts/test/publish-contract.test.mjs` would fail if any metadata value drifted; report any behaviour change in component sources."
+  2. Review: dispatch `code-reviewer` and `typescript-reviewer` in parallel on `git diff "$(git merge-base HEAD release/3.7)"..HEAD -- packages/react/tsconfig.build.json packages/icons/tsconfig.build.json packages/icons/src/react.ts 'packages/*/package.json' scripts/test/publish-contract.test.mjs packages/react/src/Checkbox.tsx packages/react/src/FormItem.tsx packages/react/src/RadioGroup.tsx packages/react/src/Switch.tsx` plus any source file changed in Task 3 Step 5. Brief: "Check the two build configs emit ES modules with declarations and nothing else; check each package's `files` covers every `exports` path; check `scripts/test/publish-contract.test.mjs` would fail if any metadata value drifted; report any behaviour change in component sources."
   3. Refactor: fix every finding in a new commit, then run `/simplify` on the same diff.
   4. Re-verify: re-run Steps 7, 9 and 10 of this task. Expected: same passing output.
 
@@ -1252,6 +1277,13 @@ done
 if grep -nF "$repo_root" "$app/package.json" "$app/pnpm-lock.yaml"; then
   fail "the consumer app has a path into this repo (listed above)"
 fi
+# A copy fetched from a registry would also sit inside $work, so the path check above cannot
+# tell it from a tarball. The lockfile can: a registry resolution is keyed name@<version>,
+# a tarball resolution is keyed name@file:<path>. This covers the three packages joy-react
+# depends on, which are installed through the overrides and not as direct dependencies only.
+if grep -nE "@montionugera/joy-(tokens|icons|brand|react)@[0-9]" "$app/pnpm-lock.yaml"; then
+  fail "a joy package was resolved from a registry, not from its tarball (listed above)"
+fi
 
 echo "==> 6/7 Type-checking and building the consumer app"
 (cd "$app" && pnpm exec tsc --noEmit -p tsconfig.json)
@@ -1280,7 +1312,7 @@ Expected: `syntax exit 0`.
 ./scripts/test/consumer-smoke.sh > "$TMPDIR/consumer-smoke.log" 2>&1; echo "exit $?"; tail -n 30 "$TMPDIR/consumer-smoke.log"
 ```
 
-Expected: the seven `==>` stage lines, four `--- montionugera-joy-<name>-<version>.tgz: N files` lines, an `ssr-check: rendered ... characters of markup` line, last line `consumer-smoke: PASS`, `exit 0`. If stage 7 fails because a component module touches `window` or `document` when imported, that is a real defect a consumer would hit: stop and report it to the owner with the stack trace. Do not remove the check and do not change component behaviour in this feature.
+Expected: the seven `==>` stage lines, four `--- montionugera-joy-<name>-<version>.tgz: N files` lines, an `ssr-check: rendered ... characters of markup` line, last line `consumer-smoke: PASS`, `exit 0`. If stage 7 fails because a component module touches `window` or `document` when imported, that is a real defect a consumer would hit: stop and report it to the owner with the stack trace. Do not remove the check and do not change component behaviour in this feature. If stage 7 fails with `ERR_MODULE_NOT_FOUND` for a relative path inside `@montionugera/joy-react/dist`, a relative import is missing its `.js` extension: apply Task 3 Step 3b to the source file named in the error, commit it as `fix(joy-react): add the .js extension to a relative import`, and re-run this step. If stage 5 fails with `a joy package was resolved from a registry`, the overrides in the generated `package.json` were not applied to a transitive dependency: stop and report it with the matching lockfile lines; do not delete the check.
 
 - [ ] **Step 5: Prove it fails when it should, and cleans up.** Temporarily break the allowlist, run, then restore.
 
@@ -1826,4 +1858,25 @@ Expected: both print nothing.
 
 ## Audit trail
 
-Plan written 2026-10-09; not yet independently audited.
+Plan written 2026-10-09. Independent audit, 2026-10-09, read-only against the repo at `release/3.7` (no installs, builds or test runs; the smoke script and the workflow were read as code, not executed).
+
+Findings: 1 critical, 1 high, 4 medium, 7 low. The critical and the high are fixed in the plan text above, as are two one-line low items.
+
+Critical and high, fixed:
+
+- **Critical: the built `joy-react` would not load under Node.** `packages/react/src/Checkbox.tsx:2`, `FormItem.tsx:2`, `RadioGroup.tsx:2` and `Switch.tsx:2` import `'./Form'` with no extension, the compiler emits that unchanged, and the tarball test's render stage (and any consumer that loads the package outside a bundler) would fail with `ERR_MODULE_NOT_FOUND`, with no step to fix it. The plan now has deviation 9, Task 3 Step 3b (change the four specifiers to `./Form.js`), a stricter output check in Task 3 Step 7, the four files in the Task 3 commit and the Task 5 review diff, and a recovery note in Task 6 Step 4.
+- **High: the tarball test could pass while testing registry copies.** Its only resolution guard checked that each installed package sits inside the temporary folder, which is also true of a package fetched from a registry; the workflow configures the `@montionugera` registry before the test runs, so after the first publish a silently ignored override would go unnoticed. Stage 5 of `scripts/test/consumer-smoke.sh` now also fails if the app's lockfile holds any `@montionugera/joy-*@<version>` resolution.
+
+Low, fixed (one line each): Task 1 Step 3 counted files with `git status --short`, which also counts untracked files such as a rendered `spec.html`; it now uses `git diff --name-only`. Deviation 4 cited `react.d.ts:2`; the interface is on line 3.
+
+Left open:
+
+- Medium: `NODE_AUTH_TOKEN` (a token with `packages: write`) is set for the whole workflow, so the gate, the Playwright run and the consumer app's install scripts all see it. Narrowing it to the dry-run, publish and verify steps is safer; `actions/checkout` also leaves the same token in the git config unless `persist-credentials: false` is set.
+- Medium (spec-level, owner decision): `joy-brand` is `UNLICENSED` and described as original work, but `src/outlines.generated.js` is path data outlined from Cormorant Garamond (SIL OFL 1.1, `packages/brand/PROVENANCE.md:3-12`), and that file is not in the `files` list. Whether an attribution notice should ship is not decided here.
+- Medium (inferred, not run): the tarball test relies on `pnpm.overrides` with absolute `file:` tarball paths applying to the three dependencies of `joy-react`. This matches pnpm's documented behaviour but was not executed in the audit; the new stage 5 check reports it if it does not hold.
+- Medium: the two `build` scripts do not empty `dist/` first, so on a developer machine a deleted or renamed source file leaves stale output that a local pack would include. The workflow runs on a fresh checkout and is not affected.
+- Low: the consumer app installs `vite ^7`, `@vitejs/plugin-react ^5` and `react ^19` from npm at test time, so an upstream release can fail a publish run.
+- Low: the padded Markdown tables at `README.md:14-18` and `README.md:71` lose their column alignment after the rename; nothing in the gate checks formatting.
+- Low: the plan header and the Task 9 review brief name the spec as `.claude/refined_backlog/<F-NNN>/spec.md`; the number exists only after refine, so the executor substitutes it. `research.md` is located the same way.
+- Low: the workflow job has no `timeout-minutes`.
+- Low: the owner's machine runs Node 26 and CI runs Node 22; a pass locally is not proof for the runner, which the first hosted dry run covers.
