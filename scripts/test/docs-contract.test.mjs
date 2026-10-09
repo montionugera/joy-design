@@ -60,11 +60,12 @@ test('README documents installing from the registry, and AGENTS.md the build and
   const readme = read('README.md');
   assert.match(readme, /^## Install from the registry$/m, 'README needs the Install from the registry section');
   for (const needle of [
-    '@montionugera:registry=https://npm.pkg.github.com',
+    '@joymify:registry=https://npm.pkg.github.com',
     '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}',
     "import '@joymify/tokens/theme.css';",
     "import { Button, Tabs } from '@joymify/react';",
     'read:packages',
+    'access to the `joymify` organisation',
     'scripts/test/consumer-smoke.sh',
     '.github/workflows/publish.yml',
     'packages-v',
@@ -72,7 +73,7 @@ test('README documents installing from the registry, and AGENTS.md the build and
     assert.ok(readme.includes(needle), `README must mention ${needle}`);
   }
   for (const name of packageNames) assert.ok(readme.includes(name), `README must name ${name}`);
-  assert.ok(!/@joymify\/(tokens|icons|brand|react|svelte)/.test(readme), 'README must not use the old package scope');
+  assert.ok(!readme.includes('@montionugera/joy-'), 'README must not use the old package scope');
 
   const agents = read('AGENTS.md');
   for (const needle of ['tsconfig.build.json', 'pnpm check', '^build', 'turbo.json', 'scripts/test/consumer-smoke.sh', '.github/workflows/publish.yml']) {
