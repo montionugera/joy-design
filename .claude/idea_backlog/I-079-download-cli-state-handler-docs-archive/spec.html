@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Download cli-state-handler docs archive from its GitHub Release before the portal image build</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090d;
+      --surface: #10141b;
+      --surface-2: #161b24;
+      --surface-3: #1b212c;
+      --border: #2a3340;
+      --border-soft: #1c232e;
+      --ink: #d6dde7;
+      --ink-bright: #f6f8fb;
+      --ink-dim: #8392a3;
+      --accent: #4ee39b;
+      --accent-dim: #2f8f63;
+      --amber: #ffc746;
+      --amber-dim: #a37a1a;
+      --blue: #74b0ff;
+      --blue-dim: #3a5d8a;
+      --red: #ff6b6b;
+      --red-dim: #a14242;
+      --purple: #b288ff;
+      --purple-dim: #7a4dc5;
+      --teal: #4ed2c8;
+      --teal-dim: #347e7a;
+      --serif-display: "Fraunces", Georgia, serif;
+      --serif-body: "Spectral", Georgia, serif;
+      --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: var(--serif-body);
+      font-size: 19.5px;
+      line-height: 1.66;
+      color: var(--ink);
+      background: var(--bg);
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 64px 30px 160px;
+      counter-reset: sec;
+      animation: riseIn .55s cubic-bezier(.2,.7,.2,1) both;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(900px 500px at 80% -10%, rgba(78,227,155,.10), transparent 62%),
+        radial-gradient(720px 520px at -4% 110%, rgba(255,199,70,.055), transparent 60%),
+        linear-gradient(rgba(255,255,255,.020) 1px, transparent 1px) 0 0 / 100% 30px,
+        linear-gradient(90deg, rgba(255,255,255,.020) 1px, transparent 1px) 0 0 / 30px 100%;
+    }
+
+    @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- headings ---------- */
+    h1, h2, h3, h4 { font-family: var(--serif-display); color: var(--ink-bright); line-height: 1.16; letter-spacing: -.012em; font-weight: 600; }
+    h1 {
+      font-size: 3.2rem; font-weight: 700; margin: 0 0 .25em; letter-spacing: -.028em;
+      background: linear-gradient(180deg, #ffffff, #afb9c5);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      counter-increment: sec;
+      font-size: 2rem; margin: 2.8em 0 .7em; padding-top: .65em;
+      border-top: 1px solid var(--border-soft);
+      display: flex; align-items: baseline; gap: .55em; flex-wrap: wrap;
+      font-weight: 700;
+    }
+    h2::before {
+      content: "§" counter(sec, decimal-leading-zero);
+      font-family: var(--mono); font-size: .74rem; font-weight: 600;
+      color: var(--accent); letter-spacing: .04em;
+      border: 1px solid var(--accent-dim); border-radius: 6px;
+      padding: .3em .55em; transform: translateY(-.22em);
+      background: rgba(78,227,155,.06);
+    }
+    h3 { font-size: 1.42rem; margin: 2.1em 0 .55em; color: var(--ink-bright); font-weight: 600; }
+    h3 code { font-size: .88em; }
+    h4 { font-size: 1.1rem; margin: 1.5em 0 .4em; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono); font-weight: 600; }
+
+    p { margin: .95em 0; }
+    strong { color: var(--ink-bright); font-weight: 600; }
+    em { color: #d4dce6; }
+
+    mark {
+      background: linear-gradient(180deg, rgba(255,199,70,.0) 60%, rgba(255,199,70,.32) 60%);
+      color: var(--ink-bright); padding: 0 .2em; border-radius: 3px;
+    }
+
+    /* ---------- links ---------- */
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(78,227,155,.32); transition: border-color .15s, color .15s; }
+    a:hover { color: #8af0c2; border-bottom-color: var(--accent); }
+
+    /* ---------- inline code & code blocks ---------- */
+    code { font-family: var(--mono); font-size: .85em; background: var(--surface-2); color: #e0ecf6; padding: .14em .45em; border-radius: 5px; border: 1px solid var(--border-soft); }
+    pre {
+      position: relative; font-size: .82rem; line-height: 1.62;
+      background: linear-gradient(180deg, #0e1219, #0a0d13);
+      border: 1px solid var(--border); border-radius: 11px;
+      padding: 20px 20px 18px; margin: 1.4em 0; overflow-x: auto;
+      box-shadow: 0 1px 0 rgba(255,255,255,.02) inset, 0 18px 44px -28px rgba(0,0,0,.9);
+    }
+    pre::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: linear-gradient(var(--accent), transparent); border-radius: 11px 0 0 11px; opacity: .6; }
+    pre code { background: none; border: none; padding: 0; color: #d3e4f3; font-size: 1em; }
+
+    kbd { font-family: var(--mono); font-size: .82em; background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; padding: 2px 8px; border-radius: 6px; color: var(--ink-bright); box-shadow: 0 1px 0 var(--border-soft); }
+
+    /* ---------- tables ---------- */
+    table { border-collapse: collapse; width: 100%; margin: 1.4em 0; font-size: .87rem; font-family: var(--mono); }
+    th, td { border: 1px solid var(--border); padding: 11px 14px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); color: var(--ink-bright); font-weight: 600; border-bottom: 2px solid var(--accent-dim); text-transform: uppercase; font-size: .76rem; letter-spacing: .08em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+    tr:hover td { background: rgba(78,227,155,.04); }
+    td code { font-size: .94em; }
+    td strong { color: var(--amber); }
+
+    /* ---------- lists ---------- */
+    ul, ol { padding-left: 1.5em; margin: .9em 0; }
+    li { margin: .4em 0; }
+    li::marker { color: var(--accent-dim); font-weight: 600; }
+    ul ul, ol ol, ul ol, ol ul { margin: .3em 0; }
+
+    /* ---------- blockquote (used by pandoc) ---------- */
+    blockquote { border-left: 3px solid var(--accent-dim); margin: 1.2em 0; padding: .2em 0 .2em 18px; color: var(--ink-dim); font-style: italic; }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.6em 0; }
+
+    /* ---------- masthead (h1 + first p) ---------- */
+    h1 + p { font-family: var(--mono); font-size: .82rem; color: var(--ink-dim); line-height: 2; letter-spacing: .02em; border-bottom: 1px solid var(--border-soft); padding-bottom: 1.2em; }
+    h1 + p strong { color: var(--amber); font-weight: 500; }
+
+    /* ---------- TOC ---------- */
+    #TOC {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 22px; margin: 1.8em 0 2.4em; font-family: var(--mono); font-size: .78rem;
+    }
+    #TOC::before { content: "CONTENTS"; display: block; color: var(--accent); letter-spacing: .22em; font-size: .7rem; margin-bottom: .7em; font-weight: 600; }
+    #TOC ul { list-style: none; padding-left: 0; margin: 0; }
+    #TOC > ul > li { margin: .22em 0; }
+    #TOC ul ul { padding-left: 1.1em; border-left: 1px solid var(--border-soft); margin: .25em 0 .5em; }
+    #TOC a { color: var(--ink); border: none; }
+    #TOC a:hover { color: var(--accent); }
+
+    @media (min-width: 1320px) {
+      #TOC {
+        position: fixed; top: 0; left: 0; bottom: 0; width: 300px; margin: 0;
+        border-radius: 0; border: none; border-right: 1px solid var(--border);
+        padding: 64px 28px; overflow-y: auto;
+        background: linear-gradient(180deg, rgba(13,17,23,.92), rgba(8,10,14,.92));
+        backdrop-filter: blur(6px);
+      }
+      body { max-width: 1320px; padding-left: 360px; }
+    }
+
+    /* ============================================================
+       CALLOUTS — info / warn / success / danger / idea / metric
+       Use via:
+         ::: callout-warn
+         **Heading**
+         body text
+         :::
+       or raw <div class="callout warn"> ... </div>
+       ============================================================ */
+    /* Robust layout: icon is absolutely positioned and the content is padded.
+       (An earlier `display:grid` + `.callout > * { grid-column: 2 }` approach broke
+       when pandoc emitted loose prose as bare text nodes — those became anonymous
+       grid items that fell into the icon column and wrapped one word per line.
+       Absolute icon + padding flows ANY content structure correctly: loose text,
+       multiple inline elements, nested lists.) */
+    .callout {
+      position: relative;
+      margin: 1.7em 0;
+      padding: 18px 22px 16px 58px;
+      border-radius: 13px;
+      border: 1px solid var(--callout-border, var(--border));
+      border-left-width: 4px;
+      background: var(--callout-bg, var(--surface));
+    }
+    .callout::before {
+      content: var(--callout-icon, "·");
+      position: absolute;
+      left: 14px; top: 16px;
+      width: 30px; text-align: center;
+      font-size: 28px; line-height: 1.1;
+      color: var(--callout-accent, var(--accent));
+    }
+    .callout > * { min-width: 0; margin-top: 0; }
+    .callout > * + * { margin-top: .55em; }
+    .callout > p:first-child strong:first-child {
+      display: block;
+      font-family: var(--serif-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--callout-accent, var(--ink-bright));
+      letter-spacing: -.01em;
+      margin-bottom: .35em;
+    }
+    .callout p { line-height: 1.55; }
+    .callout code { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.06); }
+
+    .callout.info,    .callout-info    { --callout-border: var(--blue-dim);   --callout-bg: rgba(116,176,255,.08);   --callout-accent: var(--blue);   --callout-icon: "ℹ"; }
+    .callout.warn,    .callout-warn    { --callout-border: var(--amber-dim);  --callout-bg: rgba(255,199,70,.09);    --callout-accent: var(--amber);  --callout-icon: "⚠"; }
+    .callout.success, .callout-success { --callout-border: var(--accent-dim); --callout-bg: rgba(78,227,155,.08);    --callout-accent: var(--accent); --callout-icon: "✓"; }
+    .callout.danger,  .callout-danger  { --callout-border: var(--red-dim);    --callout-bg: rgba(255,107,107,.09);   --callout-accent: var(--red);    --callout-icon: "✕"; }
+    .callout.idea,    .callout-idea    { --callout-border: var(--purple-dim); --callout-bg: rgba(178,136,255,.08);   --callout-accent: var(--purple); --callout-icon: "✦"; }
+    .callout.metric,  .callout-metric  { --callout-border: var(--teal-dim);   --callout-bg: rgba(78,210,200,.08);    --callout-accent: var(--teal);   --callout-icon: "Σ"; }
+    .callout.action,  .callout-action  { --callout-border: var(--accent-dim); --callout-bg: rgba(78,227,155,.04);    --callout-accent: var(--accent); --callout-icon: "▸"; }
+
+    /* ============================================================
+       METRIC TILES — grid of big-number cards
+       Use via raw HTML:
+         <div class="metric-grid">
+           <div class="metric-tile alarm">
+             <div class="label">Pass all gates</div>
+             <div class="value">21%</div>
+             <div class="delta">39 / 187 results</div>
+           </div>
+         </div>
+       Variants: .alarm (red), .win (green), .info (blue), .warn (amber)
+       ============================================================ */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 1.5em 0;
+    }
+    .metric-tile {
+      background: linear-gradient(180deg, var(--surface), var(--bg));
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--tile-accent, var(--accent));
+      border-radius: 12px;
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .metric-tile .label {
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .14em;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-tile .value {
+      font-family: var(--serif-display);
+      font-weight: 700;
+      font-size: 2.55rem;
+      color: var(--tile-accent, var(--ink-bright));
+      line-height: 1;
+      letter-spacing: -.025em;
+    }
+    .metric-tile .delta {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--ink-dim);
+    }
+    .metric-tile.alarm { --tile-accent: var(--red); }
+    .metric-tile.win   { --tile-accent: var(--accent); }
+    .metric-tile.info  { --tile-accent: var(--blue); }
+    .metric-tile.warn  { --tile-accent: var(--amber); }
+    .metric-tile.teal  { --tile-accent: var(--teal); }
+    .metric-tile.dim .value { color: var(--ink-bright); }
+
+    /* ============================================================
+       TOPIC CHIP — colored pill that can appear next to H2 text
+       ============================================================ */
+    .topic-chip {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .16em;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .topic-chip.warn   { background: var(--amber); }
+    .topic-chip.danger { background: var(--red);   color: #fff; }
+    .topic-chip.info   { background: var(--blue);  color: var(--bg); }
+    .topic-chip.idea   { background: var(--purple); color: #fff; }
+    .topic-chip.teal   { background: var(--teal);  color: var(--bg); }
+
+    /* ============================================================
+       PULL QUOTE
+       ============================================================ */
+    .pullquote {
+      font-family: var(--serif-display);
+      font-size: 1.55rem;
+      font-weight: 500;
+      line-height: 1.38;
+      color: var(--ink-bright);
+      border-left: 4px solid var(--accent);
+      padding: 4px 0 4px 22px;
+      margin: 1.8em 0;
+      letter-spacing: -.012em;
+    }
+
+    /* ============================================================
+       SCHEMATIC — ASCII box-drawing diagrams, monospace canvas
+       Use via:
+         <div class="schematic">
+         ┌─────────┐    ┌─────────┐
+         │ Phase 0 │ ─→ │ Phase 1 │
+         └─────────┘    └─────────┘
+         </div>
+       ============================================================ */
+    .schematic {
+      font-family: var(--mono);
+      font-size: .86rem;
+      line-height: 1.4;
+      background: linear-gradient(180deg, #0d1117, #0a0d13);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 28px;
+      margin: 1.6em 0;
+      color: #cfdcec;
+      white-space: pre;
+      overflow-x: auto;
+      position: relative;
+    }
+    .schematic::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: linear-gradient(var(--teal), transparent); border-radius: 12px 0 0 12px; opacity: .6; }
+
+    /* ============================================================
+       RAW SVG / inline diagrams
+       ============================================================ */
+    .diagram, svg.diagram, .figure {
+      display: block; margin: 1.6em auto; max-width: 100%;
+      background: linear-gradient(180deg, #0d1117, #0a0d13);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 22px 14px;
+    }
+    .figure-caption {
+      text-align: center; font-family: var(--mono); font-size: .76rem;
+      color: var(--ink-dim); margin-top: -.6em; margin-bottom: 1.6em;
+      letter-spacing: .04em;
+    }
+
+    /* ============================================================
+       MERMAID block — bigger frame, softer glow
+       ============================================================ */
+    .mermaid {
+      margin: 1.6em 0; text-align: center;
+      background: linear-gradient(180deg, #0e1320, #0a0d13);
+      border: 1px solid var(--border); border-radius: 13px;
+      padding: 24px 14px;
+      box-shadow: 0 18px 50px -36px rgba(78,227,155,.55) inset;
+    }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* Hide pandoc's title-block if present */
+    #title-block-header { display: none; }
+
+    /* ============================================================
+       UTILITY ROW — two-up / three-up adjacent blocks
+       ============================================================ */
+    .row {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      margin: 1.5em 0;
+    }
+    .row.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 760px) {
+      .row.two, .row.three { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const render = () => {
+      const blocks = new Set();
+      document.querySelectorAll('pre.mermaid, pre.sourceCode.mermaid').forEach((p) => blocks.add(p));
+      document.querySelectorAll('code.mermaid, code.language-mermaid').forEach((c) => {
+        const pre = c.closest('pre'); if (pre) blocks.add(pre);
+      });
+      blocks.forEach((pre) => {
+        const div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = pre.textContent.trim();
+        pre.replaceWith(div);
+      });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        fontFamily: 'IBM Plex Mono, monospace',
+        themeVariables: {
+          background: '#0a0d13',
+          primaryColor: '#1a212c',
+          primaryTextColor: '#f0f3f7',
+          primaryBorderColor: '#4ee39b',
+          lineColor: '#6c7a8b',
+          secondaryColor: '#191e28',
+          tertiaryColor: '#11161e',
+          tertiaryBorderColor: '#2a3340',
+          clusterBkg: 'rgba(78,227,155,.05)',
+          clusterBorder: '#2f8f63',
+          titleColor: '#4ee39b',
+          actorBkg: '#1a212c',
+          actorBorder: '#4ee39b',
+          actorTextColor: '#f0f3f7',
+          signalColor: '#9aa7b6',
+          signalTextColor: '#d3dbe5',
+          noteBkgColor: 'rgba(255,199,70,.14)',
+          noteBorderColor: '#ffc746',
+          noteTextColor: '#f6f8fb',
+          fontSize: '14px'
+        }
+      });
+      mermaid.run();
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+    else render();
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Download cli-state-handler docs archive from its
+GitHub Release before the portal image build</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#download-cli-state-handler-docs-archive-from-its-github-release-before-the-portal-image-build"
+id="toc-download-cli-state-handler-docs-archive-from-its-github-release-before-the-portal-image-build">Download
+cli-state-handler docs archive from its GitHub Release before the portal
+image build</a>
+<ul>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
+<li><a href="#problem" id="toc-problem">Problem</a></li>
+<li><a href="#why-now" id="toc-why-now">Why now</a></li>
+<li><a href="#decisions-already-made-not-reopened"
+id="toc-decisions-already-made-not-reopened">Decisions already made (not
+reopened)</a></li>
+<li><a href="#sketch" id="toc-sketch">Sketch</a></li>
+<li><a href="#manual-steps-for-the-repository-owner"
+id="toc-manual-steps-for-the-repository-owner">Manual steps for the
+repository owner</a></li>
+<li><a href="#security-notes" id="toc-security-notes">Security
+notes</a></li>
+<li><a href="#acceptance-criteria"
+id="toc-acceptance-criteria">Acceptance criteria</a></li>
+<li><a href="#out-of-scope" id="toc-out-of-scope">Out of scope</a></li>
+<li><a href="#unverified" id="toc-unverified">UNVERIFIED</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="download-cli-state-handler-docs-archive-from-its-github-release-before-the-portal-image-build">Download
+cli-state-handler docs archive from its GitHub Release before the portal
+image build</h1>
+<h2 id="summary">Summary</h2>
+<p>The developer portal (dev.joymify.com, built from this repository,
+joy-design) shows the documentation of the
+<code>cli-state-handler</code> library under
+<code>/cli-state-handler/</code>. Today that documentation is a
+<strong>copy committed into joy-design months ago</strong>; nothing
+refreshes it. Meanwhile every <code>cli-state-handler</code> release
+already packs its freshly built docs into a file,
+<code>docs-site.tgz</code>, and attaches it to a GitHub Release (the
+page GitHub creates for a version tag such as <code>v0.2.0</code>).</p>
+<p>This spec makes joy-design’s CI (continuous integration, the GitHub
+Actions workflow <code>ci.yml</code>) <strong>download that file and
+unpack it just before the portal’s container image is built</strong>, so
+the portal always serves the docs of a real, named release. Both
+repositories are private, so the download needs a credential: a narrowly
+scoped, read-only token that the repository owner creates by hand. If
+the download cannot be done, the build <strong>fails loudly</strong>
+instead of quietly shipping old docs. Local builds on a laptop are
+unchanged.</p>
+<h2 id="problem">Problem</h2>
+<ul>
+<li><code>apps/storybook-hub/portal-bundles/cli-state-handler/</code> is
+a tracked snapshot of 3 files (<code>index.html</code> plus one JS and
+one CSS file), last touched by commit <code>b6df3811</code> (release
+3.6). <code>apps/storybook-hub/build.js</code> lines 14669-14681 copy it
+into <code>dist/cli-state-handler</code>, and <code>Dockerfile</code>
+line 11 runs that build. So the image serves <strong>stale docs that
+look healthy</strong>: <code>scripts/smoke-prod.sh</code> only checks
+for HTTP 200.</li>
+<li><code>Dockerfile</code> line 21
+(<code>mkdir -p .../cli-state-handler</code>) is a no-op once the
+snapshot is copied; the directory is empty only if the snapshot is ever
+deleted.</li>
+<li><code>scripts/assemble-portal.sh</code> lines 50-68 copy from a
+sibling <code>cli-state-handler</code> checkout. Neither the
+<code>Dockerfile</code> nor <code>ci.yml</code> calls that script, and
+CI has no sibling checkout. It is a local-only helper.</li>
+<li><code>cli-state-handler/.github/workflows/release.yml</code> line
+140 builds the archive
+(<code>tar -czf docs-site.tgz -C apps/docs/dist .</code>) and lines
+154-163 try to start joy-design’s <code>ci.yml</code>, but the secret
+<code>PORTAL_DISPATCH_TOKEN</code> is not set, so the step warns and
+exits 0. Nobody noticed: a warning that exits 0 is the exact failure
+mode this spec must not repeat.</li>
+<li>Nothing in joy-design downloads the Release asset. joy-design’s own
+<code>GITHUB_TOKEN</code> (the automatic per-run credential) cannot read
+another private repository.</li>
+</ul>
+<h2 id="why-now">Why now</h2>
+<p><code>cli-state-handler</code> v0.2.0 is released with
+<code>docs-site.tgz</code> (176 KB) attached, and its release workflow
+already contains the signal step. The download is the only missing half.
+Three sibling follow-ups (release pipeline adoption, npm publishing,
+Actions version bumps) touch the same workflows, so the contract is
+fixed here first.</p>
+<h2 id="decisions-already-made-not-reopened">Decisions already made (not
+reopened)</h2>
+<ul>
+<li>The download runs in joy-design’s CI, <strong>before the image
+build</strong>, using <code>gh release download</code> against
+<code>montionugera/cli-state-handler</code>.</li>
+<li>The credential is a fine-grained personal access token (a GitHub
+token limited to chosen repositories and permissions) with read-only
+<strong>Contents</strong> on <code>cli-state-handler</code>, stored as a
+joy-design Actions secret.</li>
+<li>Both tokens are created by the repository owner by hand (steps
+below). No automation creates secrets.</li>
+<li>Local builds keep working from the sibling checkout, then the
+tracked snapshot, exactly as today.</li>
+</ul>
+<h2 id="sketch">Sketch</h2>
+<h3 id="cross-repo-flow">Cross-repo flow</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant R as cli-state-handler release.yml
+    participant G as GitHub Release vX.Y.Z
+    participant C as joy-design ci.yml
+    participant I as Portal image (nginx)
+    R-&gt;&gt;G: attach docs-site.tgz
+    R-&gt;&gt;C: workflow_dispatch (PORTAL_DISPATCH_TOKEN), cli_docs_tag=vX.Y.Z
+    C-&gt;&gt;G: gh release download (CLI_DOCS_READ_TOKEN)
+    G--&gt;&gt;C: docs-site.tgz
+    C-&gt;&gt;C: unpack into portal-bundles/cli-state-handler, validate version.json
+    C-&gt;&gt;I: docker build copies apps/, build.js copies bundle into dist
+    I--&gt;&gt;C: deploy smoke check reads /cli-state-handler/version.json</code></pre>
+<h3 id="where-the-archive-is-fetched-and-unpacked">Where the archive is
+fetched and unpacked</h3>
+<p>The archive has <strong>no top-level folder</strong>: its root is the
+content of <code>apps/docs/dist</code> (<code>./index.html</code>,
+<code>./assets/...</code>, <code>./version.json</code>). The docs are
+built with Vite <code>base: "/cli-state-handler/"</code>, so they must
+be served at exactly that path. Unpack target:
+<code>apps/storybook-hub/portal-bundles/cli-state-handler/</code> in the
+CI workspace. The existing chain then does the rest with <strong>no
+Dockerfile change</strong>: <code>COPY apps/ ./apps/</code> (line 7),
+<code>build.js</code> copies the bundle to
+<code>dist/cli-state-handler</code> (line 11), nginx serves it
+(<code>nginx.conf</code> lines 50-56).</p>
+<p>Files to change:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scripts/fetch-cli-docs.sh</code> (new)</td>
+<td>Download, unpack to a temporary folder, validate, then replace the
+bundle folder. Takes an optional tag argument. Prints
+<code>cli-docs: fetched vX.Y.Z (version.json X.Y.Z)</code>.</td>
+</tr>
+<tr>
+<td><code>.github/workflows/ci.yml</code></td>
+<td>(1) new <code>workflow_dispatch</code> input
+<code>cli_docs_tag</code> (optional, default empty). (2) in job
+<code>build-push-image</code>, a step “Fetch cli-state-handler docs”
+after “Checkout” (line 126) and before “Build and push” (line 156), with
+<code>GH_TOKEN: ${{ secrets.CLI_DOCS_READ_TOKEN }}</code>, running the
+script and exporting the resolved version as job output
+<code>cli_docs_version</code>. (3) job <code>deploy</code> passes that
+output to the smoke check as
+<code>EXPECTED_CLI_DOCS_VERSION</code>.</td>
+</tr>
+<tr>
+<td><code>scripts/smoke-prod.sh</code></td>
+<td>When <code>EXPECTED_CLI_DOCS_VERSION</code> is set, fetch
+<code>/cli-state-handler/version.json</code> and fail unless the version
+matches. Unset (rollback by <code>image_tag</code>) skips the
+check.</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>See “README task”.</td>
+</tr>
+</tbody>
+</table>
+<p>Not changed: <code>Dockerfile</code>, <code>nginx.conf</code>,
+<code>scripts/assemble-portal.sh</code>, <code>build.js</code>, the
+tracked snapshot (it stays as the local fallback; CI overwrites it only
+inside the throwaway workspace, never commits it).</p>
+<h3 id="which-release-to-fetch">Which release to fetch</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th>Option A: always latest</th>
+<th>Option B: tag input, latest as default (recommended)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>How</td>
+<td><code>gh release download</code> with no tag</td>
+<td><code>cli_docs_tag</code> input; empty means latest</td>
+</tr>
+<tr>
+<td>Release-triggered run</td>
+<td>May race: “latest” can lag or be a newer release than the one that
+signalled</td>
+<td>Fetches exactly the release that signalled</td>
+</tr>
+<tr>
+<td>Push to joy-design <code>main</code></td>
+<td>Latest</td>
+<td>Latest (input is empty on push)</td>
+</tr>
+<tr>
+<td>Roll docs back</td>
+<td>Not possible without deleting a release</td>
+<td>Re-run <code>ci.yml</code> with an older tag</td>
+</tr>
+<tr>
+<td>Cross-repo coupling</td>
+<td>None</td>
+<td>One extra flag in <code>cli-state-handler</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation: Option B.</strong> It is deterministic for
+the run that matters and gives a rollback lever for one optional input.
+Matching change, a <strong>separate follow-up owned by
+<code>cli-state-handler</code></strong> (another session is editing that
+workflow now; not specified here beyond the line):
+<code>release.yml</code> line 163 passes
+<code>-f cli_docs_tag=v$VERSION</code>. Ordering constraint: joy-design
+must ship the input <strong>first</strong>, because GitHub rejects a
+dispatch carrying an input the target workflow does not declare. Until
+the follow-up lands, the signal arrives without the input and joy-design
+fetches latest, which is correct in the normal case. Note for that
+follow-up: the signal step (line 155) runs even when the tag check (line
+128) found no tag, so it could name a release that does not exist;
+joy-design then fails loudly, as designed below.</p>
+<h3 id="failure-behaviour">Failure behaviour</h3>
+<p>The fetch step runs only in <code>build-push-image</code>, which runs
+only on push to <code>main</code> or on a manual or signalled
+<code>workflow_dispatch</code> without <code>image_tag</code>. It never
+runs on pull requests.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Case</th>
+<th>Behaviour</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLI_DOCS_READ_TOKEN</code> empty or missing</td>
+<td><strong>Fail</strong> with <code>::error::</code> naming the
+secret</td>
+<td>A permanent misconfiguration; a warning was ignored once
+already</td>
+</tr>
+<tr>
+<td>Token rejected (expired, revoked, wrong scope)</td>
+<td><strong>Fail</strong></td>
+<td>Same; expiry must be visible on the day it happens</td>
+</tr>
+<tr>
+<td>Requested tag has no release, or release has no
+<code>docs-site.tgz</code></td>
+<td><strong>Fail</strong></td>
+<td>The caller asked for docs that do not exist</td>
+</tr>
+<tr>
+<td>No release at all when resolving latest</td>
+<td><strong>Fail</strong></td>
+<td>Cannot name the version being served</td>
+</tr>
+<tr>
+<td>Network or server error</td>
+<td>Retry 3 times, 10 s apart, then <strong>fail</strong></td>
+<td>Transient errors should not need a human; persistent ones
+should</td>
+</tr>
+<tr>
+<td>Archive unpacks without <code>index.html</code> or
+<code>version.json</code>, or <code>version.json</code> differs from the
+requested tag</td>
+<td><strong>Fail</strong>; the bundle folder is left untouched</td>
+<td>Validation happens in a temporary folder before the swap, so a bad
+archive never reaches the image</td>
+</tr>
+<tr>
+<td>Pull request builds</td>
+<td>Step does not run; tracked snapshot is used</td>
+<td>No image is published from pull requests</td>
+</tr>
+<tr>
+<td>Local <code>docker build</code> or
+<code>assemble-portal.sh</code></td>
+<td>Unchanged: sibling checkout, then snapshot, then stub</td>
+<td>Laptops have no token</td>
+</tr>
+</tbody>
+</table>
+<p>There is deliberately <strong>no “skip” switch</strong>. A failed
+fetch blocks new portal images until fixed; the live portal keeps
+running the previous image, and <code>workflow_dispatch</code> with
+<code>image_tag</code> still redeploys any existing image without
+building.</p>
+<h2 id="manual-steps-for-the-repository-owner">Manual steps for the
+repository owner</h2>
+<p><code>montionugera</code> is a personal account, not an organization,
+so both tokens must be created while signed in <strong>as
+<code>montionugera</code></strong> (a collaborator account cannot create
+a fine-grained token for these repositories). Path: GitHub Settings,
+Developer settings, Personal access tokens, Fine-grained tokens,
+Generate new token.</p>
+<ol type="1">
+<li>Token “joy-design reads cli docs”: resource owner
+<code>montionugera</code>; repository access “Only select repositories”
+= <code>cli-state-handler</code>; repository permission
+<strong>Contents: Read-only</strong> (Metadata: Read-only is added
+automatically); nothing else. Save it as Actions secret
+<strong><code>CLI_DOCS_READ_TOKEN</code></strong> in
+<strong><code>montionugera/joy-design</code></strong> (Settings, Secrets
+and variables, Actions, repository secret).</li>
+<li>Token “cli-state-handler signals portal”: resource owner
+<code>montionugera</code>; only repository <code>joy-design</code>;
+repository permission <strong>Actions: Read and write</strong>; nothing
+else. Save it as Actions secret
+<strong><code>PORTAL_DISPATCH_TOKEN</code></strong> in
+<strong><code>montionugera/cli-state-handler</code></strong>.</li>
+<li>Set an expiry and a calendar reminder for both; an expired token
+fails the build by design.</li>
+</ol>
+<p>Permission check (confirmed against GitHub’s “Permissions required
+for fine-grained personal access tokens” reference):
+<code>POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches</code>
+is listed under repository permission “Actions” at
+<strong>write</strong>, so the handoff’s “Actions: Read and write” is
+correct. The release and release-asset read endpoints are listed under
+“Contents” at <strong>read</strong>.</p>
+<h2 id="security-notes">Security notes</h2>
+<ul>
+<li>Each token covers one repository and the minimum permission; the
+docs token cannot write anything.</li>
+<li>The token is passed only as <code>GH_TOKEN</code> in the environment
+of the single fetch step. It is <strong>not</strong> a Docker build
+argument, not a build secret, and not in the build context: the image
+build only sees unpacked static files, so the token cannot land in an
+image layer or the build cache.</li>
+<li>The script never prints the token and does not enable shell tracing
+(<code>set -x</code>).</li>
+<li>GitHub does not pass secrets to workflows triggered by pull requests
+from forks, and the step’s job does not run on <code>pull_request</code>
+at all.</li>
+<li>The archive is unpacked with <code>tar --no-same-owner</code> into a
+fresh temporary folder; entries with absolute paths or <code>..</code>
+are rejected before the swap.</li>
+</ul>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><code>gh secret list -R montionugera/joy-design</code>
+lists <code>CLI_DOCS_READ_TOKEN</code>, and
+<code>gh secret list -R montionugera/cli-state-handler</code> lists
+<code>PORTAL_DISPATCH_TOKEN</code>.</label></li>
+<li><label><input type="checkbox" />Local, with a token in
+<code>GH_TOKEN</code>:
+<code>bash scripts/fetch-cli-docs.sh v0.2.0</code> exits 0, prints
+<code>cli-docs: fetched v0.2.0 (version.json 0.2.0)</code>, and
+<code>cat apps/storybook-hub/portal-bundles/cli-state-handler/version.json</code>
+prints <code>{"version":"0.2.0"}</code>. (This rewrites tracked files
+locally; do not commit them. Restore with
+<code>git checkout -- apps/storybook-hub/portal-bundles &amp;&amp; git clean -fd apps/storybook-hub/portal-bundles</code>
+after the image check below.)</label></li>
+<li><label><input
+type="checkbox" /><code>GH_TOKEN= bash scripts/fetch-cli-docs.sh</code>
+exits non-zero, prints an <code>::error::</code> line naming
+<code>CLI_DOCS_READ_TOKEN</code>, and
+<code>git status --short apps/storybook-hub/portal-bundles</code> prints
+nothing.</label></li>
+<li><label><input
+type="checkbox" /><code>bash scripts/fetch-cli-docs.sh v9.9.9</code>
+exits non-zero and leaves the bundle folder unchanged.</label></li>
+<li><label><input type="checkbox" />Image check after a successful local
+fetch:
+<code>docker build -t portal-test . &amp;&amp; docker run -d -p 8080:80 portal-test</code>,
+then <code>curl -s localhost:8080/cli-state-handler/version.json</code>
+prints <code>{"version":"0.2.0"}</code> and
+<code>curl -s -o /dev/null -w '%{http_code}' localhost:8080/cli-state-handler/</code>
+prints <code>200</code>.</label></li>
+<li><label><input
+type="checkbox" /><code>docker history --no-trunc portal-test | grep -ci 'github_pat\|GH_TOKEN'</code>
+prints <code>0</code>.</label></li>
+<li><label><input type="checkbox" />CI:
+<code>gh workflow run ci.yml -R montionugera/joy-design --ref main -f cli_docs_tag=v0.2.0</code>,
+then
+<code>gh run view &lt;id&gt; --log | grep 'cli-docs: fetched'</code>
+shows <code>cli-docs: fetched v0.2.0 (version.json 0.2.0)</code> and the
+run concludes <code>success</code>.</label></li>
+<li><label><input type="checkbox" />Deployed:
+<code>curl -s https://dev.joymify.com/cli-state-handler/version.json</code>
+prints <code>{"version":"0.2.0"}</code>, and the deploy job log shows
+the smoke check comparing that value.</label></li>
+<li><label><input type="checkbox" />End to end across both repositories
+(after the <code>cli-state-handler</code> follow-up): the next
+<code>cli-state-handler</code> release run logs no
+<code>PORTAL_DISPATCH_TOKEN is not set</code> warning;
+<code>gh run list -R montionugera/joy-design --workflow ci.yml --event workflow_dispatch --limit 1</code>
+shows a run started within minutes of it; and the deployed
+<code>version.json</code> equals the new release version.</label></li>
+<li><label><input type="checkbox" />A pull request run of
+<code>ci.yml</code> shows no “Fetch cli-state-handler docs” step and
+stays green.</label></li>
+<li><label><input type="checkbox" /><code>README.md</code> updated as
+described below.</label></li>
+</ul>
+<h3 id="readme-task">README task</h3>
+<p>Update <code>README.md</code>: correct line 312 (the image is built
+by the <code>Dockerfile</code>, not by
+<code>scripts/assemble-portal.sh</code>); add a short “CLI State Handler
+docs source” section covering the fetch step, the
+<code>cli_docs_tag</code> input, the <code>CLI_DOCS_READ_TOKEN</code>
+secret and its renewal, the fail-loud rule, and the
+<code>version.json</code> check command.</p>
+<h3 id="rollback">Rollback</h3>
+<ul>
+<li>Bad docs, good pipeline: re-run <code>ci.yml</code> with
+<code>cli_docs_tag</code> set to the previous release tag.</li>
+<li>Bad portal image: run <code>ci.yml</code> with
+<code>image_tag</code> set to the previous image tag (no build, no
+fetch).</li>
+<li>Bad change: revert the joy-design commit; the tracked snapshot is
+served again. Revoke both tokens if the feature is abandoned.</li>
+</ul>
+<h2 id="out-of-scope">Out of scope</h2>
+<ul>
+<li>Any edit to
+<code>cli-state-handler/.github/workflows/release.yml</code> (follow-up
+owned there).</li>
+<li><code>publish.yml</code> and the npm publishing work in joy-design
+(owned by another session).</li>
+<li>The <code>node-server-decorator</code> docs bundle (197 tracked
+files, same staleness problem; separate idea).</li>
+<li>Deleting or refreshing the tracked <code>cli-state-handler</code>
+snapshot; replacing tokens with a GitHub App.</li>
+<li>Bumping pinned GitHub Actions versions.</li>
+</ul>
+<h2 id="unverified">UNVERIFIED</h2>
+<ul>
+<li>That the <code>docs-site.tgz</code> attached to
+<strong>v0.2.0</strong> contains <code>version.json</code>. The Vite
+plugin that emits it exists in the current
+<code>cli-state-handler</code> tree, but the asset itself was not
+opened. If it is missing, the v0.2.0 criteria above need the next
+release instead; check with
+<code>tar -tzf docs-site.tgz | grep version</code>.</li>
+<li>That <code>gh workflow run</code> with <code>-f</code> needs nothing
+beyond “Actions: Read and write” (the REST endpoint is confirmed; any
+extra call made by the <code>gh</code> command itself was not
+traced).</li>
+<li>That GitHub returns an error for an undeclared dispatch input
+(stated from memory of the API behaviour, not re-read in the
+documentation); the ordering constraint is safe either way.</li>
+<li>Which GitHub account the owner signs in with; the local git user is
+<code>pasitnusso</code>, the repositories belong to
+<code>montionugera</code>.</li>
+</ul>
+</body>
+</html>
