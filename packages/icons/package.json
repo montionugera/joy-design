@@ -1,7 +1,24 @@
 {
   "name": "@montionugera/joy-icons",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
+  "license": "SEE LICENSE IN PROVENANCE.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montionugera/joy-design.git",
+    "directory": "packages/icons"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "dist",
+    "src/index.ts",
+    "src/index.d.ts",
+    "src/*.svelte",
+    "PROVENANCE.md"
+  ],
+  "sideEffects": false,
   "main": "./src/index.ts",
   "exports": {
     ".": {
@@ -10,8 +27,8 @@
       "default": "./src/index.ts"
     },
     "./react": {
-      "types": "./src/react.d.ts",
-      "default": "./src/react.ts"
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
     }
   },
   "scripts": {

@@ -1,7 +1,21 @@
 {
   "name": "@montionugera/joy-brand",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montionugera/joy-design.git",
+    "directory": "packages/brand"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "src",
+    "assets"
+  ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
