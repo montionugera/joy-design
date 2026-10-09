@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # The built-in GITHUB_TOKEN cannot write to the joymify organisation, so a real publish needs
+      # The automatic workflow token cannot write to the joymify organisation, so a real publish needs
       # the personal token stored as the Actions secret JOYMIFY_PACKAGES_TOKEN. A dry run needs no auth.
       - name: Require the publish token
         if: env.DRY_RUN == 'false'
