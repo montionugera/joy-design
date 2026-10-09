@@ -70,7 +70,7 @@ Blocks Task 8 (the real CI run) only. Tasks 2 to 7 proceed without it. The imple
 
 ### Task 2: Feature worktree
 
-- [ ] **Step 1:** In `joy-design`, run `psrw refine I-079` (psrw is the release tool; this mints a feature id F-NNN and commits the backlog entry locally on `release/3.8`), then `psrw claim F-NNN` (creates the isolated worktree `.claude/worktrees/F-NNN-<slug>` on branch `feat/F-NNN`). Neither command should push; if either offers to, decline.
+- [ ] **Step 1:** In `joy-design`, run `psrw refine I-079` (psrw is the release tool; this mints a feature id F-NNN and commits the backlog entry locally on `release/3.8`), then `psrw claim F-NNN` (creates the isolated worktree `.claude/worktrees/F-NNN-<slug>` on branch `feat/F-NNN`). Neither command pushes or fetches (checked in the tool source, `~/.claude/ps-release-workflow/scripts/promote_idea_to_refined.py` and `init_work_refined_backlog.py`: no `push`, no `fetch`). `psrw refine` does commit in the shared `_release` worktree, where another session is also committing: run `git -C .claude/worktrees/_release status --porcelain` first and wait if it shows that session's staged or half-written files.
 - [ ] **Step 2:** In the new worktree: `corepack enable && pnpm install --frozen-lockfile`. Expected: exits 0.
 - [ ] **Step 3:** Baseline before any edit: `bash scripts/precheck.sh 2>&1 | tail -n 5` exits 0, and `actionlint .github/workflows/ci.yml > /tmp/actionlint-before.txt; wc -l < /tmp/actionlint-before.txt` (keep the count).
 
@@ -137,7 +137,10 @@ Then one block per remaining case, each ending `|| die <name>; ok <name>`:
 | `archive_without_version_json_fails` / `archive_without_index_fails` | `run no-version v0.2.0` / `run no-index v0.2.0` | `code≠0`; `::error::`; `untouched` |
 | `version_mismatch_fails` | `run mismatch v0.2.0` | `code≠0`; output names both `0.1.0` and `v0.2.0`; `untouched` |
 | `path_traversal_rejected` | `run traversal v0.2.0` | `code≠0`; `untouched`; `[ ! -e "$fx/evil.txt" ]` |
-| `no_work_files_left_in_repo` | after all cases | `git -C "$repo_root" status --porcelain apps/` prints nothing |
+| `corrupt_archive_fails` | fixture `head -c 60 "$fx/good.tgz" > "$fx/corrupt.tgz"`; `run corrupt v0.2.0` | `code≠0`; `::error::` and `not a readable tar.gz`; `untouched` |
+| `link_entry_rejected` | fixture `(cd "$fx/src" && ln -s /etc/hosts leak && tar -czf "$fx/symlink.tgz" . && rm leak)`; `run symlink v0.2.0` | `code≠0`; `::error::` and `link or special file`; `untouched` |
+| `malformed_tag_rejected` | `run good "--skip-existing"` | `code≠0`; `::error::` and `not of the form`; `untouched`; `$fx/log` does not exist (the value never reaches `gh`) |
+| `no_work_files_left_in_repo` | record `before=$(git -C "$repo_root" status --porcelain apps/)` at the top of the script; after all cases | `[ "$(git -C "$repo_root" status --porcelain apps/)" = "$before" ]` (a before/after comparison: Gate 1 must not fail just because someone has unrelated uncommitted work under `apps/`) |
 
 - [ ] **Step 2: Run it, expect failure.** `bash scripts/test-fetch-cli-docs.sh` → `not ok - fetches_named_tag_and_swaps_bundle` (the script does not exist yet).
 - [ ] **Step 3: Implement** `scripts/fetch-cli-docs.sh` (`chmod +x`):
@@ -167,11 +170,17 @@ gh_retry() { # permanent errors fail at once; anything else gets 3 attempts in t
 
 [ -n "$tag" ] || tag=$(gh_retry gh release view -R "$repo" --json tagName -q .tagName)
 [ -n "$tag" ] || fail "no release found in $repo"
-gh_retry gh release download "$tag" -R "$repo" -p "$asset" -D "$work/dl"
+[[ "$tag" =~ ^v[0-9A-Za-z._-]+$ ]] || fail "release tag '$tag' is not of the form vX.Y.Z"   # also stops a tag being read as a gh flag
+mkdir "$work/dl"
+gh_retry gh release download "$tag" -R "$repo" -p "$asset" -D "$work/dl" --clobber   # --clobber: a retry may meet a partial file
 [ -s "$work/dl/$asset" ] || fail "release $tag has no $asset"
-tar -tzf "$work/dl/$asset" > "$work/list"   # to a file: grep -q on a pipe would hide a match under pipefail
+# Listings go to files: grep -q on a pipe would hide a match under pipefail. Every tar failure gets an ::error:: line.
+tar -tzf "$work/dl/$asset" > "$work/list" 2>"$work/tar.err" || fail "$asset is not a readable tar.gz: $(tr '\n' ' ' < "$work/tar.err")"
 if grep -qE '^/|(^|/)\.\.(/|$)' "$work/list"; then fail "archive contains an absolute or .. path"; fi
-mkdir "$work/out"; tar -xzf "$work/dl/$asset" --no-same-owner -C "$work/out"
+tar -tvzf "$work/dl/$asset" > "$work/vlist" 2>"$work/tar.err" || fail "$asset is not a readable tar.gz: $(tr '\n' ' ' < "$work/tar.err")"
+if grep -qvE '^[-d]' "$work/vlist"; then fail "archive contains a link or special file (only files and folders are allowed)"; fi
+mkdir "$work/out"
+tar -xzf "$work/dl/$asset" --no-same-owner -C "$work/out" 2>"$work/tar.err" || fail "could not unpack $asset: $(tr '\n' ' ' < "$work/tar.err")"
 [ -f "$work/out/index.html" ] || fail "archive has no index.html"
 [ -f "$work/out/version.json" ] || fail "archive has no version.json"
 version=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$work/out/version.json" | head -n 1)
@@ -182,7 +191,7 @@ rm -rf "$bundle_dir"; mkdir -p "$bundle_dir"; cp -R "$work/out/." "$bundle_dir/"
 echo "cli-docs: fetched $tag (version.json $version)"
 ```
 
-- [ ] **Step 4: Run, expect pass.** `bash scripts/test-fetch-cli-docs.sh` → eleven `ok - ...` lines, exit 0.
+- [ ] **Step 4: Run, expect pass.** `bash scripts/test-fetch-cli-docs.sh` → fourteen `ok - ...` lines, exit 0. (The script and these cases were run by the audit on macOS, bash 3.2 and bsdtar, with a stub `gh`; the runner uses bash 5 and GNU tar, which Gate 1 in CI then proves.)
 - [ ] **Step 5:** Add `bash scripts/test-fetch-cli-docs.sh` after line 44 of `scripts/precheck.sh`. Run `bash scripts/precheck.sh 2>&1 | tail -n 5` → exit 0.
 - [ ] **Step 6: Commit.** `git add scripts/fetch-cli-docs.sh scripts/test-fetch-cli-docs.sh scripts/precheck.sh && git commit -m "feat(F-NNN): fetch cli-state-handler docs archive, fail loud"`
 - [ ] **Step 7: Quality gate A** (credential-handling code, so the full gate):
@@ -231,7 +240,7 @@ echo "cli-docs: fetched $tag (version.json $version)"
 **Files:** Create `scripts/test/ci-cli-docs.test.mjs`. Modify `.github/workflows/ci.yml`.
 
 - [ ] **Step 1: Write the failing contract test** (reads the workflow as text, like `publish-contract.test.mjs`). Tests: `declares the optional cli_docs_tag input` (`/cli_docs_tag:[\s\S]*?required: false[\s\S]*?default: ''/`); `fetch step sits between Checkout and Set image tag` (`indexOf('- name: Checkout') < indexOf('- name: Fetch cli-state-handler docs') < indexOf('- name: Set image tag')`); `token is passed only as GH_TOKEN of the fetch step` (exactly one occurrence of `secrets.CLI_DOCS_READ_TOKEN`, and it is on a `GH_TOKEN:` line); `image tag carries the docs version` (`-cli${CLI_DOCS_VERSION}`); `build context stays the workspace` (`context: .`); `job exports cli_docs_version`; `only the dev.joymify.com smoke call gets EXPECTED_CLI_DOCS_VERSION`; `no build-arg or secret mount carries the token` (no `build-args:` or `secrets:` key under "Build and push").
-- [ ] **Step 2:** `node --test scripts/test/ci-cli-docs.test.mjs` → fails (`context: .` already holds; the other seven tests fail).
+- [ ] **Step 2:** `node --test scripts/test/ci-cli-docs.test.mjs` → fails: 2 pass, 6 fail (`context: .` and "no build-arg or secret mount" already hold on today's file; the other six fail).
 - [ ] **Step 3: Implement** four edits in `ci.yml`.
 
 Under `workflow_dispatch.inputs` (after `image_tag`, line 16):
@@ -243,7 +252,7 @@ Under `workflow_dispatch.inputs` (after `image_tag`, line 16):
         default: ''
 ```
 
-Job `build-push-image`: add output `cli_docs_version: ${{ steps.cli_docs.outputs.cli_docs_version }}`; add this step right after "Checkout" (so a bad token fails before the slow Flutter build); replace the body of "Set image tag (short SHA)":
+The step keeps its `id: meta`; only `env:` and `run:` change. Job `build-push-image`: add output `cli_docs_version: ${{ steps.cli_docs.outputs.cli_docs_version }}`; add this step right after "Checkout" (so a bad token fails before the slow Flutter build); replace the body of "Set image tag (short SHA)":
 
 ```yaml
       - name: Fetch cli-state-handler docs
@@ -258,6 +267,7 @@ Job `build-push-image`: add output `cli_docs_version: ${{ steps.cli_docs.outputs
         env:
           CLI_DOCS_VERSION: ${{ steps.cli_docs.outputs.cli_docs_version }}
         run: |
+          [ -n "$CLI_DOCS_VERSION" ] || { echo "::error::cli docs version is empty; refusing to publish an image tagged without it"; exit 1; }
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-12)
           IMAGE_TAG="${SHORT_SHA}-cli${CLI_DOCS_VERSION}"
           echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
@@ -275,18 +285,37 @@ Job `deploy`, step "Smoke check" (line 250): add `env: CLI_DOCS_VERSION: ${{ nee
   4. Refactor on the findings; new commit.
   5. Re-verify: repeat item 2, then `bash scripts/precheck.sh 2>&1 | tail -n 5` → exit 0.
 
-### Task 6: Local end-to-end, deploying nothing
+### Task 6: Local end-to-end on a fixture archive, deploying nothing
 
-No workflow is dispatched and nothing is pushed in this task. The real fine-grained token is not used; the real archive is.
+No workflow is dispatched, nothing is pushed, **nothing is downloaded from GitHub**, and no token is used. An earlier agent was refused permission to download the private v0.2.0 asset, so every required gate here runs on a fixture archive built on the spot. Step 7 (the real archive) is optional and owner-run.
 
-- [ ] **Step 1 (spec UNVERIFIED: "the v0.2.0 asset was not opened"):** using this machine's existing `gh` login, read-only: `mkdir -p "$TMPDIR/cli-real" && gh release download v0.2.0 -R montionugera/cli-state-handler -p docs-site.tgz -D "$TMPDIR/cli-real" && tar -xzOf "$TMPDIR/cli-real/docs-site.tgz" ./version.json`. Expected: `{"version":"0.2.0"}`. If it is missing, **stop and report**: the design depends on it.
-- [ ] **Step 2 (check the retry classifier against real `gh` wording):** `gh release download v9.9.9 -R montionugera/cli-state-handler -p docs-site.tgz -D "$TMPDIR/none" 2>&1 | head -n 3`. Expected: text matching `not found`. If the wording differs, extend the `grep -qiE` pattern in `gh_retry` and add a test case with that exact text.
-- [ ] **Step 3:** Run the real script on the real archive through the Task 3 stub (copy the stub `gh` to `$TMPDIR/stubbin/gh`): `PATH="$TMPDIR/stubbin:$PATH" GH_TOKEN=fake FAKE_GH_LOG=/dev/null FAKE_GH_ARCHIVE="$TMPDIR/cli-real/docs-site.tgz" bash scripts/fetch-cli-docs.sh v0.2.0`. Expected: `cli-docs: fetched v0.2.0 (version.json 0.2.0)`, and `cat apps/storybook-hub/portal-bundles/cli-state-handler/version.json` prints `{"version":"0.2.0"}`.
-- [ ] **Step 4 (image tag and image content):** `TAG="$(git rev-parse HEAD | cut -c1-12)-cli0.2.0"; docker build -t "portal-test:$TAG" . && docker run -d --rm --name portal-test -p 8080:80 "portal-test:$TAG"`, then `curl -s localhost:8080/cli-state-handler/version.json` → `{"version":"0.2.0"}`; `curl -s -o /dev/null -w '%{http_code}' localhost:8080/cli-state-handler/` → `200`; `docker history --no-trunc "portal-test:$TAG" | grep -ci 'github_pat\|GH_TOKEN'` → `0`.
-- [ ] **Step 5 (clean up):** `docker stop portal-test`; restore the snapshot with the command in Global Constraints; `git status --porcelain` prints nothing.
-- [ ] **Step 6 (spec UNVERIFIED: cache in front of the portal), read-only request:** `curl -sI https://dev.joymify.com/cli-state-handler/ | grep -iE 'cache-control|^age:|cf-cache-status|x-cache|^via:'`. No cache header: nothing to do. A cache header: report it to the owner before Task 8; do not add a workaround unasked.
+- [ ] **Step 1 (build the fixture and a stub `gh`, outside the repository):**
 
-**What this task cannot prove — only a real run on `main` can:** that `CLI_DOCS_READ_TOKEN` authenticates and is scoped correctly; that `gh` on the runner resolves "latest"; that the step order and job outputs behave as written; that Kubernetes pulls the new tag; that the smoke check passes against production; that a pull-request run shows no fetch step. The spec's laptop check "with a token in `GH_TOKEN`" is left to the owner (optional), because the implementer may not hold a token.
+```bash
+fx=$(mktemp -d); mkdir -p "$fx/src/assets" "$fx/bin"
+echo '<html>cli docs fixture</html>' > "$fx/src/index.html"; echo 'x' > "$fx/src/assets/a.js"
+printf '{"version":"0.2.0"}\n' > "$fx/src/version.json"
+tar -czf "$fx/docs-site.tgz" -C "$fx/src" .
+cat > "$fx/bin/gh" <<'STUB'
+#!/usr/bin/env bash
+while [ $# -gt 0 ]; do [ "$1" = "-D" ] && dest="$2"; shift; done
+mkdir -p "$dest"; cp "$FAKE_GH_ARCHIVE" "$dest/docs-site.tgz"
+STUB
+chmod +x "$fx/bin/gh"; echo "$fx"
+```
+
+Expected: prints the fixture folder path. The archive has the same shape as the real one (no top-level folder; `./index.html`, `./assets/...`, `./version.json`).
+
+- [ ] **Step 2 (the real script, the fixture archive):** `PATH="$fx/bin:$PATH" GH_TOKEN=fake FAKE_GH_ARCHIVE="$fx/docs-site.tgz" bash scripts/fetch-cli-docs.sh v0.2.0`. Expected: `cli-docs: fetched v0.2.0 (version.json 0.2.0)`; `cat apps/storybook-hub/portal-bundles/cli-state-handler/version.json` prints `{"version":"0.2.0"}`; `git status --porcelain apps/` lists only paths under `apps/storybook-hub/portal-bundles/cli-state-handler/`.
+- [ ] **Step 3 (image tag and image content):** `TAG="$(git rev-parse HEAD | cut -c1-12)-cli0.2.0"; docker build -t "portal-test:$TAG" . && docker run -d --rm --name portal-test -p 8080:80 "portal-test:$TAG"`, then `curl -s localhost:8080/cli-state-handler/version.json` → `{"version":"0.2.0"}`; `curl -s -o /dev/null -w '%{http_code}' localhost:8080/cli-state-handler/` → `200`; `docker history --no-trunc "portal-test:$TAG" | grep -ci 'github_pat\|GH_TOKEN'` → `0`. (If port 8080 is taken, use 8081 in both places.) This proves `docker build` accepts the tag form and that the unpacked files reach nginx at the right path.
+- [ ] **Step 4 (the smoke check against that container is not possible:** `smoke-prod.sh` speaks `https` only; its logic is covered by Task 4's stub tests.) Nothing to run; recorded so nobody tries to bend the script.
+- [ ] **Step 5 (clean up):** `docker stop portal-test`; restore the snapshot with the command in Global Constraints; `rm -rf "$fx"`; `git status --porcelain` prints nothing.
+- [ ] **Step 6 (spec UNVERIFIED: cache in front of the portal), read-only request to the public site:** `curl -sI https://dev.joymify.com/cli-state-handler/ | grep -iE 'cache-control|^age:|cf-cache-status|x-cache|^via:'`. No cache header: nothing to do. A cache header: report it to the owner before Task 8; do not add a workaround unasked.
+- [ ] **Step 7 — OPTIONAL, OWNER-RUN, not a gate. STOP — needs the owner's yes:** downloading the real private asset. If the owner wants the spec's UNVERIFIED item "the v0.2.0 asset was not opened" closed before the first production run, the owner runs: `d=$(mktemp -d) && gh release download v0.2.0 -R montionugera/cli-state-handler -p docs-site.tgz -D "$d" && tar -xzOf "$d/docs-site.tgz" ./version.json`. Expected: `{"version":"0.2.0"}`. The implementer does not run this and does not wait for it. If it is skipped, the first run on `main` (Task 8) is where a missing `version.json` shows up: the fetch step fails with `archive has no version.json`, no image is published, and the live portal keeps its previous image.
+
+**`gh` error wording (already checked by the audit, no action needed):** with `gh` 2.92.0 against a public repository, a missing release prints `release not found`, a release without a matching asset prints `no assets match the file pattern`, and a rejected token prints `HTTP 401: Bad credentials`. All three match the permanent-error pattern in `gh_retry`. Any wording the pattern does not know is retried and then **fails** after the third attempt, so an unknown error can cost 20 seconds but can never skip the fetch.
+
+**What this task cannot prove — only a real run on `main` can:** that the real archive contains `version.json` (unless Step 7 is run); that `CLI_DOCS_READ_TOKEN` authenticates and is scoped correctly; that `gh` on the runner resolves "latest" and words its errors the same way; that the step order and job outputs behave as written; that Kubernetes pulls the new tag; that the smoke check passes against production; that a pull-request run shows no fetch step. The spec's laptop check "with a token in `GH_TOKEN`" is likewise left to the owner (optional), because the implementer may not hold a token.
 
 ### Task 7: README (last implementation task)
 
@@ -298,9 +327,11 @@ No workflow is dispatched and nothing is pushed in this task. The real fine-grai
 
 ### Task 8: Release steps — every one waits for the owner
 
-- [ ] **STOP — needs the owner's yes:** `psrw ship` (runs Gate 1 and merges `feat/F-NNN` into `release/3.8`; treat as outward because it may push).
+Which release-tool commands reach the remote (read from `psrw ship --help` and the source under `~/.claude/ps-release-workflow/`): `psrw refine`, `psrw claim` and `psrw sync` are local only (no push, no fetch). `psrw ship` **does not push**; it fetches `origin/main` (read-only), merges `main` and then `feat/F-NNN` into the local `release/3.8`, and removes the feature worktree. `psrw promote` is the first command that pushes.
+
+- [ ] `psrw ship --no-deploy` from the feature worktree. Local and undoable (a merge commit on the local `release/3.8`), so no owner stop; but it lands on the branch the rename session is also shipping to, so say what you are doing first, and run it only when Gates A, B and C are green. Expected: Gate 1 passes, output ends with the feature marked shipped; `git -C .claude/worktrees/_release log --oneline -1` shows the merge. `--no-deploy` because another session is shipping to the same release (joy-design has no local deploy configured, so this is belt and braces).
 - [ ] **STOP — needs the owner's yes:** any `git push`.
-- [ ] **STOP — needs the owner's yes:** opening the pull request from `release/3.8` to `main` (`psrw promote`). Once open, check its `ci.yml` run: no "Fetch cli-state-handler docs" step, run green.
+- [ ] **STOP — needs the owner's yes:** `psrw promote`. It runs Gate 2 (the integration check), **pushes `release/3.8` to GitHub** and opens the pull request to `main`. It carries the whole release, including the other session's package rename, so it is the release manager's call, not this feature's. Once open, check its `ci.yml` run: no "Fetch cli-state-handler docs" step, run green.
 - [ ] **STOP — needs the owner's yes:** merging that pull request. **This builds and deploys the live developer portal**, and it is the first real use of `CLI_DOCS_READ_TOKEN`, so Task 1 must be done first or the build fails (by design; the live portal keeps its previous image).
 - [ ] After the merge run: `gh run view <id> --log | grep 'cli-docs: fetched'` shows the release line; `grep 'Deploying Storybook Hub'` shows a tag ending `-cli0.2.0`; the run concludes `success`; `curl -s https://dev.joymify.com/cli-state-handler/version.json` prints `{"version":"0.2.0"}`. Repeat the `curl` three times a minute apart (the cache UNVERIFIED item).
 - [ ] **STOP — needs the owner's yes:** the spec's dispatch acceptance check, `gh workflow run ci.yml -R montionugera/joy-design --ref main -f cli_docs_tag=v0.2.0`. **It deploys to production** (a dispatch always runs the `deploy` job). Skip it if the merge run already proved the same lines.
@@ -312,13 +343,36 @@ One line in `cli-state-handler/.github/workflows/release.yml` (line 163): pass `
 
 ## If it goes wrong
 
-Each of these is a production action: **STOP — needs the owner's yes** applies.
+The first, second and fourth are production actions and each carries its own stop.
 
-- **Bad docs, good pipeline:** re-run `ci.yml` with `cli_docs_tag` set to the previous release tag (usable from the second release; only v0.2.0 exists today).
-- **Bad portal image:** run `ci.yml` with `image_tag` set to the previous image tag. No build, no fetch; exact, because each tag names one commit plus one docs version.
+- **STOP — needs the owner's yes:** **Bad docs, good pipeline:** re-run `ci.yml` with `cli_docs_tag` set to the previous release tag (usable from the second release; only v0.2.0 exists today).
+- **STOP — needs the owner's yes:** **Bad portal image:** run `ci.yml` with `image_tag` set to the previous image tag. No build, no fetch; exact, because each tag names one commit plus one docs version.
 - **Build blocked by a failed fetch:** the live portal keeps the previous image. Fix the token or the release; there is no skip switch.
-- **Bad change:** revert the joy-design commits; the tracked snapshot is served again. Revoke both tokens if the feature is abandoned.
+- **STOP — needs the owner's yes:** **Bad change:** revert the joy-design commits (a push to `main`, which redeploys); the tracked snapshot is served again. Revoke both tokens if the feature is abandoned.
 
 ## Known limits carried from the spec's audit (not fixed here)
 
 Gate 1 and the Playwright contracts still test the tracked snapshot, not the fetched docs. If the release signal never arrives, the portal stays on older docs until the next push to `main`. `image_tag` and `cli_docs_tag` given together: the docs tag is ignored silently (now stated in the input description).
+
+## Audit trail
+
+Independent audit of this plan against the approved spec, 2026-10-09 (self-grill-audit method: refute against the real files). Read-only: nothing was dispatched, pushed or downloaded. The fetch script and its test were extracted from this plan and run in a scratch folder with a stub `gh`. Verdict: **ready after fixes** (applied below).
+
+| Severity | Finding | Change |
+| --- | --- | --- |
+| HIGH | Task 6 needed the real private v0.2.0 asset in three steps; an implementer refused that download could not finish any local gate. | Task 6 rewritten around a fixture archive and an inline stub; the real-archive check is Step 7, optional and owner-run. |
+| HIGH | `psrw ship` was labelled "may push". It does not. Its real effects (fetches `origin/main`, merges `main` into `release/3.8`, removes the worktree) were not stated, and `psrw promote` was not said to push the whole release, rename included. | Task 8 states which commands reach the remote; ship relabelled as local, promote's stop says what it pushes. |
+| HIGH | Rollback actions that redeploy production shared one sentence instead of each carrying the literal stop prefix. | Prefix added to each of the three. |
+| MEDIUM | A corrupt or truncated archive exited non-zero but with a bare `tar` message, against the plan's own rule that every failure prints `::error::`. Confirmed by running it. | Each `tar` call now ends in `fail`; test `corrupt_archive_fails`. |
+| MEDIUM | The traversal check read entry names only; a symbolic link entry passed it and would be copied into the image. (Both tar programs refuse to write through a link, so nothing escaped in the run.) | Links and special files rejected from the long listing; test `link_entry_rejected`. |
+| MEDIUM | A `cli_docs_tag` value beginning with `-` reached `gh` as a flag. Confirmed by running it. | Tag must match `vX.Y.Z` before any `gh` call; test `malformed_tag_rejected`. |
+| MEDIUM | A retry after a partial download could meet an existing file and fail three times for that reason alone. | `--clobber` (a real flag, per `gh release download --help`) and an explicit `mkdir`. |
+| MEDIUM | `no_work_files_left_in_repo` required a clean `apps/`, so Gate 1 would fail for anyone with unrelated uncommitted work there. | Before/after comparison. |
+| MEDIUM | An empty docs version would publish an image tagged `<hash>-cli`. | Guard in "Set image tag". |
+| MEDIUM | Task 5 Step 2 predicted 1 passing contract test; 2 already pass on today's file. | Corrected. |
+| LOW | The swap is delete-then-copy, not atomic; a failed copy leaves a partial folder. The script still exits non-zero, so no image is built from it, and locally `git checkout` restores it. | Left. |
+| LOW | The step-order contract test uses the first of three "Checkout" steps; only its "Fetch before Set image tag" half is meaningful. | Left. |
+
+Confirmed correct against the real files: `ci.yml` step lines 126, 139, 156, 250 and `context: .`; the image job never runs on `pull_request` (its `if`, lines 112-116), so the secret is never read there and the step is skipped, not failed; `deploy` is skipped when the image job fails (`!failure()`, line 174); the token appears only as `GH_TOKEN` of one step and never as a build argument; `inputs.cli_docs_tag` reaches the script through `env`, not through shell interpolation; `<hash>-cli<X.Y.Z>` is a legal image tag and is what the deploy job's `sed` writes into `k8s/deployment.yml` line 28; `precheck.sh` line 44 and its `scripts/test/*.test.mjs` glob (line 56); `smoke-prod.sh` lines 28 and 47; retry loop is 3 attempts in total; `gh release view --json/-q` and `gh release download -p/-D/-R` are real flags; the rename lane (94 changed files today) overlaps this plan only in `README.md`.
+
+Still UNVERIFIED: the real v0.2.0 archive's contents; the hardened script on GNU tar and bash 5 (run only on macOS); `gh` wording on the runner's version; the fine-grained token permission mapping; a cache in front of dev.joymify.com; whether GitHub rejects an undeclared dispatch input.
