@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TrendingUp, TrendingDown } from '@montionugera/joy-icons';
+	import { TrendingUp, TrendingDown } from '@joymify/icons';
 	import { deltaDirection } from './delta-utils.js';
 
 	export type Tone = 'positive' | 'critical' | 'info' | 'neutral';

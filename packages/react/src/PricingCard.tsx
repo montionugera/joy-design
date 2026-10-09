@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Check } from '@montionugera/joy-icons/react';
+import { Check } from '@joymify/icons/react';
 import { Button } from './Button.js';
 
 export interface PricingCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {

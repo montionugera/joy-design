@@ -1,7 +1,7 @@
-# @montionugera/joy-icons — Provenance & Attribution Manifest
+# @joymify/icons — Provenance & Attribution Manifest
 
 ## 1. Overview
-`@montionugera/joy-icons` is the official vector icon package of the Joymify Design System (`joy-design`). It provides dual-framework exports for **Svelte 5** (Runes) and **React 19** (TypeScript), rendered with SVG geometric precision, zero raw OS emojis, and full WCAG 2.2 accessibility defaults (`aria-hidden="true"`, `focusable="false"`).
+`@joymify/icons` is the official vector icon package of the Joymify Design System (`joy-design`). It provides dual-framework exports for **Svelte 5** (Runes) and **React 19** (TypeScript), rendered with SVG geometric precision, zero raw OS emojis, and full WCAG 2.2 accessibility defaults (`aria-hidden="true"`, `focusable="false"`).
 
 ## 2. Upstream Lineage & Licenses
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { Close } from '@montionugera/joy-icons';
+  import { Close } from '@joymify/icons';
   import { lockBodyScroll, registerDialog, trapFocus, type DialogHandle } from './overlay-utils.js';
   import { createOpenerTracker } from './dialog-opener.js';
 

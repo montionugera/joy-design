@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@montionugera/joy-icons';
+  import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@joymify/icons';
 
   interface Props {
     title?: string;
