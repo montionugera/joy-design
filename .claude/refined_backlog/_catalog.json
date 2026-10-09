@@ -876,8 +876,10 @@
     "from_idea": "I-076",
     "created_at": "2026-10-09T00:29:34.699384+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "claimed",
-    "release_version": null,
-    "claimed_at": "2026-10-09T00:29:52.221321+00:00"
+    "status": "shipped",
+    "release_version": "3.6",
+    "claimed_at": "2026-10-09T00:29:52.221321+00:00",
+    "shipped_at": "2026-10-09T01:07:04.613814+00:00",
+    "shipped_sha": "356b1491105c525ffce4329b7ad6cdca5ff5cfc6"
   }
 ]
