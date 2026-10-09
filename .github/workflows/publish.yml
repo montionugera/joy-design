@@ -238,39 +238,50 @@ jobs:
             node -e "const f='packages/$dir/package.json',p=require('./'+f);p.publishConfig={registry:'$NPMJS_URL'};require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
           done
           echo "## npmjs.org" >> "$GITHUB_STEP_SUMMARY"
+          # The first setup-node wrote @montionugera:registry=<GitHub Packages> into the user config,
+          # and npm reads a scope registry before --registry and publishConfig. Pin the scope on
+          # every npm call and print the result so the log shows where uploads go.
+          SCOPE_PIN="--@montionugera:registry=$NPMJS_URL"
+          echo "Scope registry used by this step: $(npm config get @montionugera:registry $SCOPE_PIN)"
           rc=0
           # Same order as the GitHub Packages publish: brand and react depend on tokens and icons.
+          # Stop at the first package that fails, so a later package is never published pinned to a
+          # dependency version that is not on npmjs.org.
           for dir in tokens icons brand react; do
             name="@montionugera/joy-$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
-            err="$RUNNER_TEMP/npmjs-view-$dir.err"
-            set +e
-            found="$(npm view "$name@$version" version --registry "$NPMJS_URL" 2> "$err")"
-            code=$?
-            set -e
-            if [ "$code" -eq 0 ] && [ "$found" = "$version" ]; then
+            # An unauthenticated read straight from npmjs.org: no npm config or placeholder token can
+            # redirect it or turn a missing package into a 401.
+            status="$(curl -s -o /dev/null -w '%{http_code}' "$NPMJS_URL/@montionugera%2fjoy-$dir/$version" || true)"
+            if [ "$status" = "200" ]; then
               echo "$name@$version is already on npmjs.org: skipped."
               echo "- \`$name@$version\`: already on npmjs.org, skipped" >> "$GITHUB_STEP_SUMMARY"
               continue
             fi
-            if [ "$code" -ne 0 ] && ! grep -q 'E404' "$err"; then
-              echo "::warning::Could not ask npmjs.org about $name@$version (npm view exit $code)."
-              cat "$err"
+            if [ "$status" != "404" ]; then
+              echo "::warning::Could not ask npmjs.org about $name@$version (HTTP $status). Stopping."
+              echo "- \`$name@$version\`: npmjs.org lookup failed (HTTP $status), stopped" >> "$GITHUB_STEP_SUMMARY"
               rc=1
-              continue
+              break
             fi
             # pnpm packs (it turns workspace:* into real versions); npm uploads (OIDC lives in npm).
             (cd "packages/$dir" && pnpm pack --pack-destination "$packs")
             tgz="$(ls "$packs"/montionugera-joy-"$dir"-*.tgz)"
             if [ "$DRY_RUN" = "true" ]; then
-              npm publish "$tgz" --access public --registry "$NPMJS_URL" --dry-run || rc=1
-              echo "- \`$name@$version\`: npmjs.org dry run" >> "$GITHUB_STEP_SUMMARY"
-            elif npm publish "$tgz" --access public --registry "$NPMJS_URL"; then
+              if npm publish "$tgz" --access public --registry "$NPMJS_URL" $SCOPE_PIN --dry-run; then
+                echo "- \`$name@$version\`: npmjs.org dry run" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "::warning::npmjs.org dry run failed for $name@$version. Stopping."
+                rc=1
+                break
+              fi
+            elif npm publish "$tgz" --access public --registry "$NPMJS_URL" $SCOPE_PIN; then
               echo "- \`$name@$version\`: published to npmjs.org" >> "$GITHUB_STEP_SUMMARY"
             else
-              echo "::warning::$name@$version was not published to npmjs.org."
-              echo "- \`$name@$version\`: npmjs.org publish FAILED" >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning::$name@$version was not published to npmjs.org. Stopping."
+              echo "- \`$name@$version\`: npmjs.org publish FAILED, stopped" >> "$GITHUB_STEP_SUMMARY"
               rc=1
+              break
             fi
           done
           exit "$rc"

@@ -192,6 +192,17 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.deepStrictEqual(positions, [...positions].sort((a, b) => a - b), 'steps must run in gate, build, tarball-test, clean-tree, publish order');
   // npm publish is allowed only for tarballs that pnpm pack already made (workspace:* is resolved there).
   assert.ok(!/\bnpm publish\b/.test(wf.replace(/pnpm publish/g, '').replace(/npm publish "\$tgz"/g, '')), 'npm publish may only upload a pnpm-packed tarball ("$tgz"), never a package directory');
+  // npmjs.org step: pnpm-packed tarballs only, scope pinned, tree restored, runs after GitHub Packages.
+  const npmjsStep = steps.find((s) => s.name.startsWith('Publish to npmjs.org'));
+  assert.ok(npmjsStep, 'npmjs.org publish step must exist');
+  assert.ok(npmjsStep.block.includes('pnpm pack --pack-destination'), 'the npmjs.org tarball must come from pnpm pack');
+  assert.ok(/--dry-run/.test(npmjsStep.block) && npmjsStep.block.includes('DRY_RUN" = "true"'), 'the npmjs.org dry-run branch must use --dry-run');
+  assert.ok(npmjsStep.block.includes('SCOPE_PIN="--@montionugera:registry=$NPMJS_URL"') && npmjsStep.block.includes('NPMJS_URL=https://registry.npmjs.org'), 'the @montionugera scope must be pinned to npmjs.org');
+  assert.ok((npmjsStep.block.match(/npm publish "\$tgz"[^\n]*\$SCOPE_PIN/g) || []).length === 2, 'both npm publish calls must carry the scope pin');
+  assert.ok(/trap 'git checkout -- packages\/tokens\/package\.json packages\/icons\/package\.json packages\/brand\/package\.json packages\/react\/package\.json' EXIT/.test(npmjsStep.block), 'the trap must restore the four package.json files');
+  assert.ok(npmjsStep.block.includes("curl -s -o /dev/null -w '%{http_code}'"), 'the already-published check must be an unauthenticated curl');
+  assert.ok(/rc=1\s+break/.test(npmjsStep.block), 'the npmjs.org loop must stop at the first failure');
+  assert.ok(wf.indexOf('name: Publish to npmjs.org') > wf.indexOf('pnpm publish --no-git-checks)'), 'the npmjs.org step must come after the GitHub Packages publish');
   assert.ok(wf.includes('npm view "$name@$version" version'), 'must ask the registry before publishing each package');
   const loops = wf.match(/for dir in ([a-z ]+); do/g) || [];
   assert.ok(loops.length >= 3, 'dry run, publish and verify each loop over the packages');
