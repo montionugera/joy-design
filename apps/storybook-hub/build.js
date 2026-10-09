@@ -767,7 +767,7 @@ function renderNavigationView() {
   );
   const markdownCard = hubCard(
     "markdown", "MarkdownViewer", "Rendered content region with the code-block copy contract.",
-    hubCell("viewer", `<div class="joy-markdown" role="region" aria-label="Markdown content"><h3>Release notes</h3><p>This release ships <strong>display, feedback and navigation</strong> fixes.</p><pre class="joy-markdown__pre"><code>pnpm --filter @montionugera/joy-svelte test</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre></div>`),
+    hubCell("viewer", `<div class="joy-markdown" role="region" aria-label="Markdown content"><h3>Release notes</h3><p>This release ships <strong>display, feedback and navigation</strong> fixes.</p><pre class="joy-markdown__pre"><code>pnpm --filter \\\n  @montionugera/joy-svelte test</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre></div>`),
     " hub-matrix--stack",
   );
   return `<section id="view-navigation-workflow" class="view-panel">
