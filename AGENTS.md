@@ -32,7 +32,7 @@
    - `@joymify/react` and the `./react` entry of `@joymify/icons` resolve to a built, untracked `dist/` (`tsc -p tsconfig.build.json`). Run the type-check through turbo with `pnpm check`: in `turbo.json`, `check` depends on `^build`, so dependencies are built first. `pnpm --filter @joymify/react check` on a clean checkout fails until `pnpm --filter @joymify/icons build` has run.
    - Unit tests load `src/` through their helpers and never need `dist/`. The only check of the built output is the tarball test `scripts/test/consumer-smoke.sh`.
    - Publishing is done only by `.github/workflows/publish.yml` (a `packages-v*` tag on `main`, or a manual dry run). Never run `npm publish`, or `pnpm publish` without `--dry-run`, by hand.
-   - The packages are `@joymify/tokens`, `@joymify/icons`, `@joymify/brand` and `@joymify/react` on GitHub Packages (private, organisation `joymify`). A real publish authenticates with the Actions secret `JOYMIFY_PACKAGES_TOKEN`, never the built-in token. A consumer's `.npmrc` needs `@joymify:registry=https://npm.pkg.github.com` and `//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}`, with a token that has `read:packages` and access to the `joymify` organisation.
+   - The packages are `@joymify/tokens`, `@joymify/icons`, `@joymify/brand` and `@joymify/react` on GitHub Packages (private, organisation `joymify`). A real publish authenticates with the secret `JOYMIFY_PACKAGES_TOKEN` of the `packages` environment, never the built-in token. A consumer's `.npmrc` needs `@joymify:registry=https://npm.pkg.github.com` and `//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}`, with a token that has `read:packages` and access to the `joymify` organisation.
 
 <!-- graft:start -->
 ## Graft — repo context graph

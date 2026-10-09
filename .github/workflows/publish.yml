@@ -17,7 +17,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 concurrency:
   group: publish-packages
@@ -42,14 +41,15 @@ jobs:
           persist-credentials: false
 
       # The automatic workflow token cannot write to the joymify organisation, so a real publish needs
-      # the personal token stored as the Actions secret JOYMIFY_PACKAGES_TOKEN. A dry run needs no auth.
+      # the personal token stored as the secret JOYMIFY_PACKAGES_TOKEN of the `packages` environment, so
+      # only runs that environment admits (main, packages-v* tags) can read it. A dry run never gets it.
       - name: Require the publish token
         if: env.DRY_RUN == 'false'
         env:
           JOYMIFY_PACKAGES_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}
         run: |
           if [ -z "$JOYMIFY_PACKAGES_TOKEN" ]; then
-            echo "::error::The Actions secret JOYMIFY_PACKAGES_TOKEN is empty or missing. Store a classic personal access token with write:packages, authorised for the joymify organisation, in this repository's secrets."
+            echo "::error::The Actions secret JOYMIFY_PACKAGES_TOKEN is empty or missing. Store a classic personal access token with write:packages, authorised for the joymify organisation, as a secret of the packages environment."
             exit 1
           fi
 
@@ -145,7 +145,7 @@ jobs:
       - name: Dry run (nothing is published)
         if: env.DRY_RUN == 'true'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN || 'dry-run-no-auth' }}
+          NODE_AUTH_TOKEN: dry-run-no-auth
         run: |
           mkdir -p "$RUNNER_TEMP/packs"
           echo "## Dry run: nothing was published" >> "$GITHUB_STEP_SUMMARY"

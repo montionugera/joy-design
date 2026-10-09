@@ -129,7 +129,8 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.match(wf, /^\s+- 'packages-v\*'$/m, 'trigger must be a packages-v* tag');
   assert.match(wf, /^\s+dry_run:$/m, 'manual runs need a dry_run input');
   assert.match(wf, /dry_run:[\s\S]*?default:\s*true/, 'dry_run input must default to true');
-  assert.match(wf, /^\s+packages: write$/m, 'the job token needs packages: write');
+  assert.doesNotMatch(wf, /packages: write/, 'the built-in token publishes nothing, so it must not get packages: write');
+  assert.ok(wf.includes('NODE_AUTH_TOKEN: dry-run-no-auth'), 'a dry run must never receive the real publish token');
   assert.ok(wf.includes('git merge-base --is-ancestor "$GITHUB_SHA" origin/main'), 'must refuse a commit that is not on main');
   for (const needle of ["flutter-version: '3.32.8'", 'playwright install --with-deps chromium', 'apt-get install -y -qq ripgrep', 'pnpm install --frozen-lockfile']) {
     assert.ok(wf.includes(needle), `runner setup must include: ${needle}`);

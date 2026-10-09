@@ -74,6 +74,7 @@ test('README documents installing from the registry, and AGENTS.md the build and
   }
   for (const name of packageNames) assert.ok(readme.includes(name), `README must name ${name}`);
   assert.ok(!readme.includes('@montionugera/joy-'), 'README must not use the old package scope');
+  assert.ok(!readme.includes('@joymify/joy-'), 'README must not use a half-renamed package name');
 
   const agents = read('AGENTS.md');
   for (const needle of ['tsconfig.build.json', 'pnpm check', '^build', 'turbo.json', 'scripts/test/consumer-smoke.sh', '.github/workflows/publish.yml']) {
