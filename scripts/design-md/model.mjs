@@ -13,7 +13,9 @@ export const CLASS_OVERRIDES = {
   LineChart: 'joy-chart',
   CandlestickChart: 'joy-chart',
   HeroSection: 'joy-hero',
-  LandingAction: 'joy-button' // internal helper of HeroSection/CTASection; renders a Button
+  LandingAction: 'joy-button', // internal helper of HeroSection/CTASection; renders a Button
+  PolyglotCodeTabs: 'joy-polyglot-tabs',
+  MermaidViewer: 'joy-mermaid'
 };
 
 export const SIZE_NAMES = ['xs', 'sm', 'md', 'lg', 'xl'];

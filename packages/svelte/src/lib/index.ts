@@ -122,3 +122,17 @@ export { default as MatchScoreboard } from './MatchScoreboard.svelte';
 export { default as ChronometerDial } from './ChronometerDial.svelte';
 export { default as TelemetryStrip } from './TelemetryStrip.svelte';
 export { default as CommandIsland } from './CommandIsland.svelte';
+
+// F-072: Syntax Highlighting Code Box, Polyglot Tabs & Mermaid Diagram Suite
+export { default as CodeBlock } from './CodeBlock.svelte';
+export { default as PolyglotCodeTabs } from './PolyglotCodeTabs.svelte';
+export type { PolyglotCodeItem } from './PolyglotCodeTabs.svelte';
+export { default as MermaidViewer } from './MermaidViewer.svelte';
+export {
+  highlightCodeToHtml,
+  tokenizeCode,
+  normalizeLanguage,
+  type SyntaxTokenType,
+  type TokenSpan
+} from './syntax-highlighter.js';
+export { renderMermaidToSvg, type MermaidRenderResult } from './mermaid-renderer.js';

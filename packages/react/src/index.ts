@@ -121,3 +121,16 @@ export { MatchScoreboard, type MatchScoreboardProps } from './MatchScoreboard.js
 export { ChronometerDial, type ChronometerDialProps, type LapRecord } from './ChronometerDial.js';
 export { TelemetryStrip, type TelemetryStripProps, type TelemetryMetric } from './TelemetryStrip.js';
 export { CommandIsland, type CommandIslandProps, type CommandIslandPosition, type CommandIslandItem } from './CommandIsland.js';
+
+// F-072: Syntax Highlighting Code Box, Polyglot Tabs & Mermaid Diagram Suite
+export { CodeBlock, type CodeBlockProps } from './CodeBlock.js';
+export { PolyglotCodeTabs, type PolyglotCodeTabsProps, type PolyglotCodeItem } from './PolyglotCodeTabs.js';
+export { MermaidViewer, type MermaidViewerProps } from './MermaidViewer.js';
+export {
+  highlightCodeToHtml,
+  tokenizeCode,
+  normalizeLanguage,
+  type SyntaxTokenType,
+  type TokenSpan
+} from './syntax-highlighter.js';
+export { renderMermaidToSvg, type MermaidRenderResult } from './mermaid-renderer.js';

@@ -3307,6 +3307,8 @@ h1, h2, h3, .joy-display {
     min-height: 44px;
     justify-content: center;
   }
+}
+
 /* ── Semantic Syntax Highlighting & Polyglot Code Blocks ── */
 .joy-syntax-keyword {
   color: var(--joy-accent-default);
@@ -3423,6 +3425,9 @@ h1, h2, h3, .joy-display {
   padding: 0;
   font-family: inherit;
   font-size: inherit;
+}
+.joy-code-block__wrapper {
+  position: relative;
 }
 .joy-code-block--with-lines {
   display: grid;
@@ -3570,6 +3575,11 @@ h1, h2, h3, .joy-display {
   max-width: 100%;
   height: auto;
   display: block;
+}
+.joy-mermaid__source {
+  margin: 0;
+  border: none;
+  border-radius: 0;
 }
 .joy-mermaid-node rect,
 .joy-mermaid-node polygon,
