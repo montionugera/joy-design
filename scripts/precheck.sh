@@ -42,6 +42,7 @@ bash scripts/lint-colors.sh
 echo "2a. Self-testing the gate scripts (lint-colors, epic-check)..."
 bash scripts/test-lint-colors.sh
 bash scripts/test-epic-check.sh
+bash scripts/test-fetch-cli-docs.sh
 
 echo "2b. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
 pnpm check
