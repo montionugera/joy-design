@@ -37,11 +37,8 @@ the build **fails loudly** instead of quietly shipping old docs. Local builds on
 - Nothing in joy-design downloads the Release asset. joy-design's own `GITHUB_TOKEN` (the automatic
   per-run credential) cannot read another private repository.
 
-## Why now
-
-`cli-state-handler` v0.2.0 (its only GitHub Release so far) has `docs-site.tgz` (176 KB) attached, and its
-release workflow already contains the signal step. The download is the missing half. Three sibling
-follow-ups touch the same workflows, so the contract is fixed here first.
+- Why now: v0.2.0 (the only GitHub Release so far) has `docs-site.tgz` (176 KB) attached and the signal
+  step exists; the download is the missing half, and three sibling follow-ups touch the same workflows.
 
 ## Decisions already made (not reopened)
 
@@ -89,8 +86,7 @@ commit hash (`ci.yml` lines 139-144 and 221-227). For any tag other than `latest
 **only if the node does not already hold that tag**. A release-signalled run builds from an unchanged
 joy-design commit, so it would reuse the previous tag: the node keeps its cached image, the old docs stay
 live, and the registry copy of that tag is overwritten. Therefore the tag becomes
-**`<12-char hash>-cli<X.Y.Z>`** (for example `3f6a81c0d2aa-cli0.2.0`), built from the version the fetch
-step resolved. Every docs version gets its own immutable tag, so rollout and rollback by `image_tag` are
+**`<12-char hash>-cli<X.Y.Z>`**, built from the version the fetch step resolved. Every docs version gets its own immutable tag, so rollout and rollback by `image_tag` are
 exact. Rejected: `imagePullPolicy: Always` alone, because the tag would still be overwritten.
 
 Files to change:

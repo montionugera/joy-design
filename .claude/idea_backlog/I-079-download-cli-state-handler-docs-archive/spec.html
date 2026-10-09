@@ -611,7 +611,6 @@ image build</a>
 <ul>
 <li><a href="#summary" id="toc-summary">Summary</a></li>
 <li><a href="#problem" id="toc-problem">Problem</a></li>
-<li><a href="#why-now" id="toc-why-now">Why now</a></li>
 <li><a href="#decisions-already-made-not-reopened"
 id="toc-decisions-already-made-not-reopened">Decisions already made (not
 reopened)</a></li>
@@ -625,6 +624,7 @@ notes</a></li>
 id="toc-acceptance-criteria">Acceptance criteria</a></li>
 <li><a href="#out-of-scope" id="toc-out-of-scope">Out of scope</a></li>
 <li><a href="#unverified" id="toc-unverified">UNVERIFIED</a></li>
+<li><a href="#audit-trail" id="toc-audit-trail">Audit trail</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -637,11 +637,11 @@ image build</h1>
 joy-design) shows the documentation of the
 <code>cli-state-handler</code> library under
 <code>/cli-state-handler/</code>. Today that documentation is a
-<strong>copy committed into joy-design months ago</strong>; nothing
-refreshes it. Meanwhile every <code>cli-state-handler</code> release
-already packs its freshly built docs into a file,
-<code>docs-site.tgz</code>, and attaches it to a GitHub Release (the
-page GitHub creates for a version tag such as <code>v0.2.0</code>).</p>
+<strong>copy committed into joy-design</strong>; nothing refreshes it.
+Meanwhile every <code>cli-state-handler</code> release already packs its
+freshly built docs into a file, <code>docs-site.tgz</code>, and attaches
+it to a GitHub Release (the page GitHub creates for a version tag such
+as <code>v0.2.0</code>).</p>
 <p>This spec makes joy-design’s CI (continuous integration, the GitHub
 Actions workflow <code>ci.yml</code>) <strong>download that file and
 unpack it just before the portal’s container image is built</strong>, so
@@ -653,40 +653,38 @@ instead of quietly shipping old docs. Local builds on a laptop are
 unchanged.</p>
 <h2 id="problem">Problem</h2>
 <ul>
-<li><code>apps/storybook-hub/portal-bundles/cli-state-handler/</code> is
-a tracked snapshot of 3 files (<code>index.html</code> plus one JS and
-one CSS file), last touched by commit <code>b6df3811</code> (release
+<li><p><code>apps/storybook-hub/portal-bundles/cli-state-handler/</code>
+is a tracked snapshot of 3 files (<code>index.html</code> plus one JS
+and one CSS file), last touched by commit <code>b6df3811</code> (release
 3.6). <code>apps/storybook-hub/build.js</code> lines 14669-14681 copy it
 into <code>dist/cli-state-handler</code>, and <code>Dockerfile</code>
 line 11 runs that build. So the image serves <strong>stale docs that
 look healthy</strong>: <code>scripts/smoke-prod.sh</code> only checks
-for HTTP 200.</li>
-<li><code>Dockerfile</code> line 21
+for HTTP 200.</p></li>
+<li><p><code>Dockerfile</code> line 21
 (<code>mkdir -p .../cli-state-handler</code>) is a no-op once the
 snapshot is copied; the directory is empty only if the snapshot is ever
-deleted.</li>
-<li><code>scripts/assemble-portal.sh</code> lines 50-68 copy from a
+deleted.</p></li>
+<li><p><code>scripts/assemble-portal.sh</code> lines 50-68 copy from a
 sibling <code>cli-state-handler</code> checkout. Neither the
 <code>Dockerfile</code> nor <code>ci.yml</code> calls that script, and
-CI has no sibling checkout. It is a local-only helper.</li>
-<li><code>cli-state-handler/.github/workflows/release.yml</code> line
+CI has no sibling checkout. It is a local-only helper.</p></li>
+<li><p><code>cli-state-handler/.github/workflows/release.yml</code> line
 140 builds the archive
-(<code>tar -czf docs-site.tgz -C apps/docs/dist .</code>) and lines
-154-163 try to start joy-design’s <code>ci.yml</code>, but the secret
-<code>PORTAL_DISPATCH_TOKEN</code> is not set, so the step warns and
-exits 0. Nobody noticed: a warning that exits 0 is the exact failure
-mode this spec must not repeat.</li>
-<li>Nothing in joy-design downloads the Release asset. joy-design’s own
-<code>GITHUB_TOKEN</code> (the automatic per-run credential) cannot read
-another private repository.</li>
+(<code>tar -czf "$RUNNER_TEMP/docs-site.tgz" -C apps/docs/dist .</code>)
+and lines 154-163 try to start joy-design’s <code>ci.yml</code>, but the
+secret <code>PORTAL_DISPATCH_TOKEN</code> is not set
+(<code>gh secret list</code> shows none in that repository), so the step
+warns and exits 0: the exact failure mode this spec must not
+repeat.</p></li>
+<li><p>Nothing in joy-design downloads the Release asset. joy-design’s
+own <code>GITHUB_TOKEN</code> (the automatic per-run credential) cannot
+read another private repository.</p></li>
+<li><p>Why now: v0.2.0 (the only GitHub Release so far) has
+<code>docs-site.tgz</code> (176 KB) attached and the signal step exists;
+the download is the missing half, and three sibling follow-ups touch the
+same workflows.</p></li>
 </ul>
-<h2 id="why-now">Why now</h2>
-<p><code>cli-state-handler</code> v0.2.0 is released with
-<code>docs-site.tgz</code> (176 KB) attached, and its release workflow
-already contains the signal step. The download is the only missing half.
-Three sibling follow-ups (release pipeline adoption, npm publishing,
-Actions version bumps) touch the same workflows, so the contract is
-fixed here first.</p>
 <h2 id="decisions-already-made-not-reopened">Decisions already made (not
 reopened)</h2>
 <ul>
@@ -714,7 +712,7 @@ tracked snapshot, exactly as today.</li>
     C-&gt;&gt;G: gh release download (CLI_DOCS_READ_TOKEN)
     G--&gt;&gt;C: docs-site.tgz
     C-&gt;&gt;C: unpack into portal-bundles/cli-state-handler, validate version.json
-    C-&gt;&gt;I: docker build copies apps/, build.js copies bundle into dist
+    C-&gt;&gt;I: docker build copies apps/, build.js copies bundle into dist, tag sha-cliX.Y.Z
     I--&gt;&gt;C: deploy smoke check reads /cli-state-handler/version.json</code></pre>
 <h3 id="where-the-archive-is-fetched-and-unpacked">Where the archive is
 fetched and unpacked</h3>
@@ -728,7 +726,25 @@ CI workspace. The existing chain then does the rest with <strong>no
 Dockerfile change</strong>: <code>COPY apps/ ./apps/</code> (line 7),
 <code>build.js</code> copies the bundle to
 <code>dist/cli-state-handler</code> (line 11), nginx serves it
-(<code>nginx.conf</code> lines 50-56).</p>
+(<code>nginx.conf</code> lines 50-56). This relies on the “Build and
+push” step keeping <code>context: .</code> (the workspace); without it
+the action builds from a fresh git checkout and the fetched files are
+ignored.</p>
+<h3 id="the-image-tag-must-carry-the-docs-version">The image tag must
+carry the docs version</h3>
+<p><code>k8s/deployment.yml</code> sets no <code>imagePullPolicy</code>,
+and the deploy job pins the image to the 12-character commit hash
+(<code>ci.yml</code> lines 139-144 and 221-227). For any tag other than
+<code>latest</code> Kubernetes then pulls <strong>only if the node does
+not already hold that tag</strong>. A release-signalled run builds from
+an unchanged joy-design commit, so it would reuse the previous tag: the
+node keeps its cached image, the old docs stay live, and the registry
+copy of that tag is overwritten. Therefore the tag becomes
+<strong><code>&lt;12-char hash&gt;-cli&lt;X.Y.Z&gt;</code></strong>,
+built from the version the fetch step resolved. Every docs version gets
+its own immutable tag, so rollout and rollback by <code>image_tag</code>
+are exact. Rejected: <code>imagePullPolicy: Always</code> alone, because
+the tag would still be overwritten.</p>
 <p>Files to change:</p>
 <table>
 <colgroup>
@@ -744,8 +760,12 @@ Dockerfile change</strong>: <code>COPY apps/ ./apps/</code> (line 7),
 <tbody>
 <tr>
 <td><code>scripts/fetch-cli-docs.sh</code> (new)</td>
-<td>Download, unpack to a temporary folder, validate, then replace the
-bundle folder. Takes an optional tag argument. Prints
+<td>Check <code>GH_TOKEN</code> is non-empty itself (a laptop’s stored
+<code>gh</code> login must not mask a missing token), download and
+unpack in a <code>mktemp -d</code> folder <strong>outside the
+repository</strong> (anything left under <code>apps/</code> would be
+copied into the image), validate, then replace the bundle folder. Takes
+an optional tag argument. Prints
 <code>cli-docs: fetched vX.Y.Z (version.json X.Y.Z)</code>.</td>
 </tr>
 <tr>
@@ -753,19 +773,24 @@ bundle folder. Takes an optional tag argument. Prints
 <td>(1) new <code>workflow_dispatch</code> input
 <code>cli_docs_tag</code> (optional, default empty). (2) in job
 <code>build-push-image</code>, a step “Fetch cli-state-handler docs”
-after “Checkout” (line 126) and before “Build and push” (line 156), with
+after “Checkout” (line 126) and <strong>before “Set image tag” (line
+139)</strong>, with
 <code>GH_TOKEN: ${{ secrets.CLI_DOCS_READ_TOKEN }}</code>, running the
 script and exporting the resolved version as job output
-<code>cli_docs_version</code>. (3) job <code>deploy</code> passes that
-output to the smoke check as
-<code>EXPECTED_CLI_DOCS_VERSION</code>.</td>
+<code>cli_docs_version</code>. (3) “Set image tag” appends
+<code>-cli&lt;version&gt;</code>. (4) job <code>deploy</code> passes
+<code>cli_docs_version</code> to the <code>dev.joymify.com</code> smoke
+call as <code>EXPECTED_CLI_DOCS_VERSION</code>.</td>
 </tr>
 <tr>
 <td><code>scripts/smoke-prod.sh</code></td>
-<td>When <code>EXPECTED_CLI_DOCS_VERSION</code> is set, fetch
-<code>/cli-state-handler/version.json</code> and fail unless the version
-matches. Unset (rollback by <code>image_tag</code>) skips the
-check.</td>
+<td>When <code>EXPECTED_CLI_DOCS_VERSION</code> is set, fetch the
+<strong>body</strong> of <code>/cli-state-handler/version.json</code>
+and fail unless its <code>version</code> matches. Status alone proves
+nothing: nginx answers a missing file with <code>index.html</code> and
+HTTP 200. The check sits in the non-legacy branch (the
+<code>design.joymify.com</code> call exits at line 28). Unset (rollback
+by <code>image_tag</code>, or a deploy with no build) skips it.</td>
 </tr>
 <tr>
 <td><code>README.md</code></td>
@@ -811,7 +836,8 @@ signalled</td>
 <tr>
 <td>Roll docs back</td>
 <td>Not possible without deleting a release</td>
-<td>Re-run <code>ci.yml</code> with an older tag</td>
+<td>Re-run <code>ci.yml</code> with an older tag (usable from the second
+release; only v0.2.0 exists today)</td>
 </tr>
 <tr>
 <td>Cross-repo coupling</td>
@@ -896,9 +922,10 @@ archive never reaches the image</td>
 <td>No image is published from pull requests</td>
 </tr>
 <tr>
-<td>Local <code>docker build</code> or
+<td>Local <code>docker build</code> /
 <code>assemble-portal.sh</code></td>
-<td>Unchanged: sibling checkout, then snapshot, then stub</td>
+<td>Unchanged: <code>docker build</code> uses the snapshot; the script
+uses sibling checkout, then snapshot, then stub</td>
 <td>Laptops have no token</td>
 </tr>
 </tbody>
@@ -980,7 +1007,8 @@ type="checkbox" /><code>GH_TOKEN= bash scripts/fetch-cli-docs.sh</code>
 exits non-zero, prints an <code>::error::</code> line naming
 <code>CLI_DOCS_READ_TOKEN</code>, and
 <code>git status --short apps/storybook-hub/portal-bundles</code> prints
-nothing.</label></li>
+nothing (run it on a machine where <code>gh auth status</code> is logged
+in, to prove the stored login is not used).</label></li>
 <li><label><input
 type="checkbox" /><code>bash scripts/fetch-cli-docs.sh v9.9.9</code>
 exits non-zero and leaves the bundle folder unchanged.</label></li>
@@ -994,23 +1022,32 @@ prints <code>200</code>.</label></li>
 <li><label><input
 type="checkbox" /><code>docker history --no-trunc portal-test | grep -ci 'github_pat\|GH_TOKEN'</code>
 prints <code>0</code>.</label></li>
-<li><label><input type="checkbox" />CI:
+<li><label><input type="checkbox" />CI (<strong>this run deploys to
+production</strong>; a dispatch always runs the <code>deploy</code> job,
+so get the owner’s go-ahead first):
 <code>gh workflow run ci.yml -R montionugera/joy-design --ref main -f cli_docs_tag=v0.2.0</code>,
 then
 <code>gh run view &lt;id&gt; --log | grep 'cli-docs: fetched'</code>
 shows <code>cli-docs: fetched v0.2.0 (version.json 0.2.0)</code> and the
 run concludes <code>success</code>.</label></li>
+<li><label><input type="checkbox" />Same run:
+<code>gh run view &lt;id&gt; --log | grep 'Deploying Storybook Hub'</code>
+shows a tag ending <code>-cli0.2.0</code>.</label></li>
 <li><label><input type="checkbox" />Deployed:
 <code>curl -s https://dev.joymify.com/cli-state-handler/version.json</code>
 prints <code>{"version":"0.2.0"}</code>, and the deploy job log shows
-the smoke check comparing that value.</label></li>
+the smoke check comparing that value. The tracked snapshot has no
+<code>version.json</code>, so this cannot pass on the old
+docs.</label></li>
 <li><label><input type="checkbox" />End to end across both repositories
 (after the <code>cli-state-handler</code> follow-up): the next
 <code>cli-state-handler</code> release run logs no
 <code>PORTAL_DISPATCH_TOKEN is not set</code> warning;
 <code>gh run list -R montionugera/joy-design --workflow ci.yml --event workflow_dispatch --limit 1</code>
-shows a run started within minutes of it; and the deployed
-<code>version.json</code> equals the new release version.</label></li>
+shows a run started within minutes of it; the deployed
+<code>version.json</code> equals the new release version; and the image
+tag differs from the previous run’s although the joy-design commit is
+the same.</label></li>
 <li><label><input type="checkbox" />A pull request run of
 <code>ci.yml</code> shows no “Fetch cli-state-handler docs” step and
 stays green.</label></li>
@@ -1031,7 +1068,8 @@ secret and its renewal, the fail-loud rule, and the
 <code>cli_docs_tag</code> set to the previous release tag.</li>
 <li>Bad portal image: run <code>ci.yml</code> with
 <code>image_tag</code> set to the previous image tag (no build, no
-fetch).</li>
+fetch). Exact because each tag now names one commit plus one docs
+version.</li>
 <li>Bad change: revert the joy-design commit; the tracked snapshot is
 served again. Revoke both tokens if the feature is abandoned.</li>
 </ul>
@@ -1050,13 +1088,16 @@ snapshot; replacing tokens with a GitHub App.</li>
 </ul>
 <h2 id="unverified">UNVERIFIED</h2>
 <ul>
-<li>That the <code>docs-site.tgz</code> attached to
-<strong>v0.2.0</strong> contains <code>version.json</code>. The Vite
-plugin that emits it exists in the current
-<code>cli-state-handler</code> tree, but the asset itself was not
-opened. If it is missing, the v0.2.0 criteria above need the next
-release instead; check with
-<code>tar -tzf docs-site.tgz | grep version</code>.</li>
+<li>The v0.2.0 asset was not opened. By source it does contain
+<code>version.json</code>: at tag <code>v0.2.0</code>,
+<code>apps/docs/vite.config.ts</code> registers
+<code>apps/docs/vite-plugins/version-json.ts</code>, which emits
+<code>{"version":"&lt;packages/core version&gt;"}</code> plus a newline
+at the archive root, and core is <code>0.2.0</code> there.</li>
+<li>That no CDN or proxy in front of dev.joymify.com caches
+<code>version.json</code> (would make the smoke check flaky).</li>
+<li>The fine-grained permission mapping below was taken from GitHub’s
+reference by the author; the audit did not re-read it.</li>
 <li>That <code>gh workflow run</code> with <code>-f</code> needs nothing
 beyond “Actions: Read and write” (the REST endpoint is confirmed; any
 extra call made by the <code>gh</code> command itself was not
@@ -1064,9 +1105,112 @@ traced).</li>
 <li>That GitHub returns an error for an undeclared dispatch input
 (stated from memory of the API behaviour, not re-read in the
 documentation); the ordering constraint is safe either way.</li>
-<li>Which GitHub account the owner signs in with; the local git user is
-<code>pasitnusso</code>, the repositories belong to
-<code>montionugera</code>.</li>
 </ul>
+<h2 id="audit-trail">Audit trail</h2>
+<p>Independent audit, 2026-10-09, checked against the real files in both
+repositories (read-only).</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Finding</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRITICAL</td>
+<td>A release-signalled run reuses the commit-hash image tag; with no
+<code>imagePullPolicy</code> the node keeps the cached image, so docs
+stay stale and the registry tag is overwritten.</td>
+<td>Fixed: new section, tag <code>&lt;hash&gt;-cli&lt;X.Y.Z&gt;</code>,
+step order, two acceptance checks, rollback note.</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>The CI acceptance check deploys to production and did not say
+so.</td>
+<td>Fixed: criterion now states it and asks for the owner’s
+go-ahead.</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>Open item: does the archive contain <code>version.json</code>?</td>
+<td>Resolved from source (yes); UNVERIFIED rewritten.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>Smoke check could be written as a status check (nginx returns 200
+for a missing file) or placed after the legacy-host early exit.</td>
+<td>Fixed in the files table.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>Empty-token test passes or fails by accident on a laptop with a
+stored <code>gh</code> login; temp folder location unspecified.</td>
+<td>Fixed in the files table and criterion.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>“Committed months ago” is a guess (snapshot last touched 2026-10-09
+by a squash commit); tar command misquoted; local
+<code>docker build</code> never reads the sibling checkout.</td>
+<td>Fixed.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td><code>PORTAL_DISPATCH_TOKEN</code> setup and its acceptance check
+belong to the signal half, not the download; they make this item depend
+on the other repository.</td>
+<td>Left; consider moving to the <code>cli-state-handler</code>
+follow-up.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>If the signal never arrives (secret unset is still a warning in
+<code>release.yml</code>), the portal stays on old docs until the next
+joy-design push; nothing in joy-design detects being behind.</td>
+<td>Left; <code>release.yml</code> is out of scope here.</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td><code>release.yml</code> builds docs from <code>main</code>, not the
+tag; a repair run for an older version would emit a newer
+<code>version.json</code> and fail the tag match (loudly).</td>
+<td>Left.</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td>Gate 1 and the Playwright contracts in job <code>build</code> still
+test the tracked snapshot, not the fetched docs.</td>
+<td>Left.</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td><code>image_tag</code> and <code>cli_docs_tag</code> given together:
+the docs tag is ignored without a message.</td>
+<td>Left.</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td>A dispatch from a non-<code>main</code> branch runs that branch’s
+script with the token; no new exposure (anyone who can dispatch can
+already read repository secrets).</td>
+<td>Left.</td>
+</tr>
+</tbody>
+</table>
+<p>Confirmed correct: <code>build.js</code> lines 14669-14681 (the file
+is 14,685 lines), <code>Dockerfile</code> lines 7, 11, 21,
+<code>ci.yml</code> lines 126 and 156, <code>assemble-portal.sh</code>
+lines 50-68, <code>README.md</code> line 312, <code>release.yml</code>
+lines 128, 140, 154-163, <code>nginx.conf</code> lines 50-56, both
+repositories private, <code>montionugera</code> a personal account and
+the account <code>gh</code> is signed in as on this machine.</p>
 </body>
 </html>
