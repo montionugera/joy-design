@@ -190,7 +190,8 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   const positions = order.map((needle) => wf.indexOf(needle));
   for (const [i, pos] of positions.entries()) assert.ok(pos >= 0, `workflow must contain: ${order[i]}`);
   assert.deepStrictEqual(positions, [...positions].sort((a, b) => a - b), 'steps must run in gate, build, tarball-test, clean-tree, publish order');
-  assert.ok(!/\bnpm publish\b/.test(wf.replace(/pnpm publish/g, '')), 'npm publish does not replace workspace:* and must not be used');
+  // npm publish is allowed only for tarballs that pnpm pack already made (workspace:* is resolved there).
+  assert.ok(!/\bnpm publish\b/.test(wf.replace(/pnpm publish/g, '').replace(/npm publish "\$tgz"/g, '')), 'npm publish may only upload a pnpm-packed tarball ("$tgz"), never a package directory');
   assert.ok(wf.includes('npm view "$name@$version" version'), 'must ask the registry before publishing each package');
   const loops = wf.match(/for dir in ([a-z ]+); do/g) || [];
   assert.ok(loops.length >= 3, 'dry run, publish and verify each loop over the packages');

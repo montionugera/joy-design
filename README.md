@@ -60,7 +60,7 @@ Import the stylesheet once: `import '@montionugera/joy-tokens/theme.css'`. Light
 
 ## Install from the registry
 
-Four packages are published to GitHub Packages under the `@montionugera` scope. `@montionugera/joy-svelte` is not published yet; it is used inside this workspace only.
+Four packages are published to GitHub Packages and, once the one-time setup below is done, also to the public npm registry (npmjs.org) under the `@montionugera` scope. `@montionugera/joy-svelte` is not published yet; it is used inside this workspace only.
 
 | Package | Ships | Import |
 | --- | --- | --- |
@@ -69,7 +69,15 @@ Four packages are published to GitHub Packages under the `@montionugera` scope. 
 | `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
 | `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
 
-Add an `.npmrc` to the consuming repo:
+**Public npm (no token needed):** once the packages are on npmjs.org, install with no `.npmrc` and no token:
+
+```bash
+pnpm add @montionugera/joy-tokens @montionugera/joy-icons @montionugera/joy-brand @montionugera/joy-react
+```
+
+Warning: a consumer `.npmrc` line `@montionugera:registry=https://npm.pkg.github.com` routes the whole `@montionugera` scope to GitHub Packages, including packages of this owner that exist only on npmjs.org. Remove that line to use the public registry, or keep it and use the token setup below.
+
+**GitHub Packages (token needed):** add an `.npmrc` to the consuming repo:
 
 ```ini
 # .npmrc in the consuming repo
@@ -99,6 +107,10 @@ Fonts are still loaded by the consumer (see `DESIGN.md`).
 ### Publishing
 
 Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed tag matching `packages-v*` whose commit is on `main`, or on a manual run, which defaults to a dry run. On a tag run the workflow fails unless the tag version (after `packages-v`) equals the version of at least one package; packages have independent versions, so it does not require all four to match. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons` and `@montionugera/joy-react`, runs the tarball test `scripts/test/consumer-smoke.sh`, fails if the gate or build left any changed or untracked file, then publishes tokens, icons, brand and react in that order, skipping any version already on the registry (a run where all four are already published fails on purpose: nothing to publish). The job runs in the GitHub environment `packages`, which the repository settings restrict to the `main` branch and `packages-v*` tags, so a manual run (dry or real) from any other branch is rejected. That restriction is a repository setting, not part of the workflow file: if the environment is missing or unrestricted, anyone with write access can start a manual run with the dry run switched off. Versions are set by hand in each `package.json`. A published version is never reused: fix a bad release by publishing a higher version.
+
+After the GitHub Packages publish, the same workflow publishes the same four packages to npmjs.org with npm trusted publishing (OIDC, no stored token). It packs with `pnpm pack` so `workspace:*` becomes real versions, points each package's `publishConfig.registry` at npmjs.org for that step only (the files are restored, so the tree stays clean), skips versions already on npmjs.org, publishes with `--access public`, and honours the dry-run input. A failure in this step is a warning and does not fail the run, because GitHub Packages is the release of record.
+
+**One-time setup for the repo owner (npmjs.org):** a trusted publisher can only be attached to a package that already exists, so for each of `@montionugera/joy-tokens`, `joy-icons`, `joy-brand` and `joy-react`: (1) publish a first version by hand from a logged-in machine (`pnpm pack`, then `npm publish <tarball> --access public` with `publishConfig.registry` pointed at npmjs.org); (2) on npmjs.com open the package settings, Trusted Publisher, and add GitHub Actions with repository `montionugera/joy-design`, workflow file `publish.yml` and environment `packages`. Until then the npmjs.org step warns and the GitHub Packages publish is unaffected. `@montionugera/joy-svelte` stays private and is not published.
 
 `scripts/test/consumer-smoke.sh` also runs locally. It packs the four packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, and type-checks, builds and renders it.
 

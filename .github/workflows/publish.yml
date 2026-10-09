@@ -18,6 +18,8 @@ on:
 permissions:
   contents: read
   packages: write
+  # Lets the npmjs.org step exchange this run's OIDC identity for a short-lived publish token.
+  id-token: write
 
 concurrency:
   group: publish-packages
@@ -206,3 +208,69 @@ jobs:
             fi
             echo "$name@$version is on the registry."
           done
+
+      # Also publish the public copies to npmjs.org with trusted publishing (OIDC): npmjs trusts this
+      # workflow directly, so no token is stored. Each package needs a trusted publisher on npmjs.com
+      # (repo montionugera/joy-design, workflow publish.yml, environment packages); see the README.
+      # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1, hence the second setup-node.
+      - name: Use Node 22 for npmjs.org trusted publishing
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish to npmjs.org (trusted publishing)
+        # Optional public mirror, as in node-server-decorator: the GitHub Packages publish above is
+        # the release of record, so a failure here (for example a package whose trusted publisher
+        # is not set up yet) is reported as a warning and does not fail the run.
+        continue-on-error: true
+        run: |
+          npm install -g 'npm@^11.5.1'
+          NPMJS_URL=https://registry.npmjs.org
+          packs="$RUNNER_TEMP/npmjs"
+          rm -rf "$packs"
+          mkdir -p "$packs"
+          # publishConfig.registry in a tarball's package.json would send the upload back to GitHub
+          # Packages, so rewrite it for this step only. The files are restored on exit, which keeps
+          # the tree clean. A scope mapping beats publishConfig, so pin the scope to npmjs too.
+          trap 'git checkout -- packages/tokens/package.json packages/icons/package.json packages/brand/package.json packages/react/package.json' EXIT
+          for dir in tokens icons brand react; do
+            node -e "const f='packages/$dir/package.json',p=require('./'+f);p.publishConfig={registry:'$NPMJS_URL'};require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
+          done
+          echo "## npmjs.org" >> "$GITHUB_STEP_SUMMARY"
+          rc=0
+          # Same order as the GitHub Packages publish: brand and react depend on tokens and icons.
+          for dir in tokens icons brand react; do
+            name="@montionugera/joy-$dir"
+            version="$(node -p "require('./packages/$dir/package.json').version")"
+            err="$RUNNER_TEMP/npmjs-view-$dir.err"
+            set +e
+            found="$(npm view "$name@$version" version --registry "$NPMJS_URL" 2> "$err")"
+            code=$?
+            set -e
+            if [ "$code" -eq 0 ] && [ "$found" = "$version" ]; then
+              echo "$name@$version is already on npmjs.org: skipped."
+              echo "- \`$name@$version\`: already on npmjs.org, skipped" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            if [ "$code" -ne 0 ] && ! grep -q 'E404' "$err"; then
+              echo "::warning::Could not ask npmjs.org about $name@$version (npm view exit $code)."
+              cat "$err"
+              rc=1
+              continue
+            fi
+            # pnpm packs (it turns workspace:* into real versions); npm uploads (OIDC lives in npm).
+            (cd "packages/$dir" && pnpm pack --pack-destination "$packs")
+            tgz="$(ls "$packs"/montionugera-joy-"$dir"-*.tgz)"
+            if [ "$DRY_RUN" = "true" ]; then
+              npm publish "$tgz" --access public --registry "$NPMJS_URL" --dry-run || rc=1
+              echo "- \`$name@$version\`: npmjs.org dry run" >> "$GITHUB_STEP_SUMMARY"
+            elif npm publish "$tgz" --access public --registry "$NPMJS_URL"; then
+              echo "- \`$name@$version\`: published to npmjs.org" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning::$name@$version was not published to npmjs.org."
+              echo "- \`$name@$version\`: npmjs.org publish FAILED" >> "$GITHUB_STEP_SUMMARY"
+              rc=1
+            fi
+          done
+          exit "$rc"
