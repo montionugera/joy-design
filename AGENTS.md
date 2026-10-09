@@ -28,6 +28,11 @@
    - Always work within isolated `psrw` worktrees.
    - Follow: `psrw new-release` → `psrw idea` → `psrw refine` → `psrw claim` → implement & test → `psrw ship` → `psrw promote --babysit`.
 
+5. **Package builds and type-check**:
+   - `@montionugera/joy-react` and the `./react` entry of `@montionugera/joy-icons` resolve to a built, untracked `dist/` (`tsc -p tsconfig.build.json`). Run the type-check through turbo with `pnpm check`: in `turbo.json`, `check` depends on `^build`, so dependencies are built first. `pnpm --filter @montionugera/joy-react check` on a clean checkout fails until `pnpm --filter @montionugera/joy-icons build` has run.
+   - Unit tests load `src/` through their helpers and never need `dist/`. The only check of the built output is the tarball test `scripts/test/consumer-smoke.sh`.
+   - Publishing is done only by `.github/workflows/publish.yml` (a `packages-v*` tag on `main`, or a manual dry run). Never run `npm publish`, or `pnpm publish` without `--dry-run`, by hand.
+
 <!-- graft:start -->
 ## Graft — repo context graph
 

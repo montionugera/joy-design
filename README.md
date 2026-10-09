@@ -58,6 +58,50 @@ Import the stylesheet once: `import '@montionugera/joy-tokens/theme.css'`. Light
 - **Chart `theme` prop is now live, both twins (Wave 6 review fix).** `BarChart`, `LineChart` and `CandlestickChart` used to apply `theme` only once, at mount — a later change to the prop was silently ignored. Both React and Svelte twins now re-apply it on every change via a new `JoyChartCore.setTheme(theme)` method, which mutates the existing chart instance in place and repaints (no instance recreation, no leaked canvas listeners).
 - **Ant Design 5 Quality Bar & Custom DatePickers.** Replaced unstyled native `<input type="date">` with custom accessible popover overlays. `DatePicker` provides `<< < Month Year > >>` navigation, 7x6 day grid, out-of-month muted cells, today highlight, quick-pick "Today", `min`/`max` boundary clamping, `disabledDate?: (current: Date) => boolean` predicate, `blackoutDates?: string[]`, and `blackoutRanges?: Array<[string, string]>`. `DateRangePicker` introduces a unified trigger pill `[ Start Date → End Date (x) [Calendar] ]` with side-by-side dual calendars (Month 1 & Month 2), continuous hover range trail highlighting intervals at 60fps, clear action `(x)`, financial presets (`Today`, `Last 7 Days`, `Last 30 Days`, `MTD`, `YTD`), and `forbidCrossBlackout?: boolean` to block selecting range spans across blackout windows. Shared `calendar-utils.ts` powers both React 19 and Svelte 5 twins with byte-identical parity.
 
+## Install from the registry
+
+Four packages are published to GitHub Packages under the `@montionugera` scope. `@montionugera/joy-svelte` is not published yet; it is used inside this workspace only.
+
+| Package | Ships | Import |
+| --- | --- | --- |
+| `@montionugera/joy-tokens` | Built CSS variables, component CSS, Tailwind theme and the JS token map. | `@montionugera/joy-tokens/theme.css`, `@montionugera/joy-tokens/tailwind`, `@montionugera/joy-tokens` |
+| `@montionugera/joy-icons` | React icons as built JavaScript with type declarations; Svelte icons as source. | `@montionugera/joy-icons/react` (React), `@montionugera/joy-icons` (Svelte) |
+| `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
+| `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
+
+Add an `.npmrc` to the consuming repo:
+
+```ini
+# .npmrc in the consuming repo
+@montionugera:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+Install and use:
+
+```bash
+pnpm add @montionugera/joy-tokens @montionugera/joy-icons @montionugera/joy-react
+```
+
+```ts
+import '@montionugera/joy-tokens/theme.css';
+import { Button, Tabs } from '@montionugera/joy-react';
+import { Check } from '@montionugera/joy-icons/react';
+```
+
+`@montionugera/joy-react` needs `react` and `react-dom` 18 or 19 as peers. The repo and its packages are private, so every install needs a token:
+
+- **On a developer machine:** a personal GitHub token with the `read:packages` permission, exported as `GITHUB_TOKEN`.
+- **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the four packages' settings on GitHub, or store a personal token as a secret in the consuming repo.
+
+Fonts are still loaded by the consumer (see `DESIGN.md`).
+
+### Publishing
+
+Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed tag matching `packages-v*` whose commit is on `main`, or on a manual run, which defaults to a dry run. The workflow checks the tag against package versions, and real publishes should run in a GitHub environment restricted to `main` and `packages-v*` tags. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons` and `@montionugera/joy-react`, fails if any tracked file changed, runs the tarball test `scripts/test/consumer-smoke.sh`, then publishes tokens, icons, brand and react in that order, skipping any version already on the registry. Versions are set by hand in each `package.json`. A published version is never reused: fix a bad release by publishing a higher version.
+
+`scripts/test/consumer-smoke.sh` also runs locally. It packs the four packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, and type-checks, builds and renders it.
+
 ## Quality gates
 
 **Gate 1** is `bash scripts/precheck.sh`. It runs before every ship, and CI runs it through `scripts/integration.sh`. Set a distinct `PLAYWRIGHT_PORT` per worktree.
@@ -68,7 +112,7 @@ Import the stylesheet once: `import '@montionugera/joy-tokens/theme.css'`. Light
 | 1    | emoji scan (inline Python)                                            | No raw OS emoji in tracked files.                                                                                                                                                                        |
 | 2    | `bash scripts/lint-colors.sh`                                         | No hex, `rgb()`/`hsl()` or `var(--joy-*, fallback)` in any package source or the hub. Every hit fails. Narrow exceptions live in `scripts/lint-colors.allow`.                                            |
 | 2a   | `bash scripts/test-lint-colors.sh`, `bash scripts/test-epic-check.sh` | Self-tests: the gate scripts still catch what they claim to.                                                                                                                                             |
-| 2b   | `pnpm check`                                                          | Type check: `tsc` for `@montionugera/joy-react` and `svelte-check` for `@montionugera/joy-svelte`, through turbo.                                                                                                          |
+| 2b   | `pnpm check`                                                          | Type check: `tsc` for `@montionugera/joy-react` and `svelte-check` for `@montionugera/joy-svelte`, through turbo, which builds dependencies first (`check` depends on `^build`).                        |
 | 2c   | `pnpm -r test`                                                        | Unit tests for every package, including the WCAG 2.2 AA contrast gate in both themes (`packages/tokens/test/contrast.test.js`) and icon Svelte/React parity (`packages/icons/test/icon-parity.test.js`). |
 | 2d   | `node scripts/parity-check.mjs`                                       | Svelte and React twins: props, classes and ref forwarding. It must report 0 violations.                                                                                                                  |
 | 2e   | `node --test 'scripts/test/*.test.mjs'`                               | DESIGN.md generator tests, the docs contract (AGENTS.md, PRODUCT.md, README and CI stay true to the code), and byte-identical shared helpers.                                                            |
