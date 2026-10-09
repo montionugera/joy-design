@@ -2,7 +2,7 @@
   "name": "@montionugera/joy-brand",
   "version": "0.2.0",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN PROVENANCE.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/montionugera/joy-design.git",
@@ -13,7 +13,8 @@
   },
   "files": [
     "src",
-    "assets"
+    "assets",
+    "PROVENANCE.md"
   ],
   "sideEffects": false,
   "exports": {
