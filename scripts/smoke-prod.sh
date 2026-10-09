@@ -45,6 +45,15 @@ else
     fi
     echo "[OK] Sub-webapp ${subpath} returned HTTP 200"
   done
+  if [ -n "${EXPECTED_CLI_DOCS_VERSION:-}" ]; then
+    vbody=$(curl -sS -k --max-time 15 "https://${host}/cli-state-handler/version.json" || true)
+    actual=$(printf '%s' "$vbody" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)
+    if [ "$actual" != "$EXPECTED_CLI_DOCS_VERSION" ]; then
+      echo "::error::cli-state-handler docs version is '${actual:-none}', expected '${EXPECTED_CLI_DOCS_VERSION}'"
+      exit 1
+    fi
+    echo "[OK] cli-state-handler docs version ${actual} matches the fetched release"
+  fi
 fi
 
 # Verify index content contains Joymify or Storybook token (following redirects with -L)
