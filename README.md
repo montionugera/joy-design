@@ -309,7 +309,19 @@ The primary design workshop provides a **3-way framework switcher**:
 - **Live Twin Toggling**: Hot-swap between Svelte 5 and React 19 component instances in-place with zero page reload.
 - **Flutter 3.32 Workshop**: Switch to Flutter to instantly view Dart widget code snippets (`JoyButton`, `JoyInput`, `JoyTable`), copy vector icon constants (`JoyIcons.<name>`), and explore the live Flutter Web CanvasKit app (`#flutter` view or `/flutter/index.html`).
 - **Synchronized Bridge**: Toggling between Light and Dark mode or selecting a brand palette preset (`Joy Classic`, `Ocean Blue`, etc.) propagates in real-time across both HTML DOM components and the embedded Flutter canvas via `JoyHubBridge`.
-- **Single-Pod Assembly**: Running `bash scripts/assemble-portal.sh` assembles all 3 static doc trees into `apps/storybook-hub/dist/` for Docker and K8s deployment.
+- **Single-Pod Assembly**: The portal image is built by the `Dockerfile` (`node apps/storybook-hub/build.js`). `scripts/assemble-portal.sh` is a local-only helper that copies the doc trees from sibling checkouts.
+
+### CLI State Handler docs source
+
+The portal serves the CLI State Handler docs at `/cli-state-handler/`. They are not tracked in this repo: the image job downloads `docs-site.tgz` from the latest `montionugera/cli-state-handler` GitHub Release.
+
+- **Where it runs**: the "Fetch cli-state-handler docs" step in `.github/workflows/ci.yml`, in the image job only. Pull requests never run it.
+- **Pick a release**: the `cli_docs_tag` dispatch input (for example `v0.2.0`). Blank means the latest release. It is ignored when `image_tag` is set.
+- **Image tag**: `<12-char hash>-cli<X.Y.Z>`, so each tag names one commit plus one docs version.
+- **Secret**: `CLI_DOCS_READ_TOKEN`, a fine-grained personal access token owned by `montionugera` with Contents read-only on `cli-state-handler`. Renew it before it expires and save it again as a repository secret here.
+- **Fail loud**: any fetch error fails the build and the live portal keeps its previous image. There is no skip switch.
+- **Check**: `curl -s https://dev.joymify.com/cli-state-handler/version.json` prints the served docs version.
+- **Roll back**: re-run `ci.yml` with `image_tag` set to the previous image tag (no build, no fetch), or with `cli_docs_tag` set to the previous release tag.
 
 ### Quickstart for Mobile Applications (`joymify_flutter`)
 
