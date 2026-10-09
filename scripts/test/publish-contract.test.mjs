@@ -128,23 +128,66 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   const wf = read('.github/workflows/publish.yml');
   assert.match(wf, /^\s+- 'packages-v\*'$/m, 'trigger must be a packages-v* tag');
   assert.match(wf, /^\s+dry_run:$/m, 'manual runs need a dry_run input');
+  assert.match(wf, /dry_run:[\s\S]*?default:\s*true/, 'dry_run input must default to true');
   assert.match(wf, /^\s+packages: write$/m, 'the job token needs packages: write');
   assert.ok(wf.includes('git merge-base --is-ancestor "$GITHUB_SHA" origin/main'), 'must refuse a commit that is not on main');
   for (const needle of ["flutter-version: '3.32.8'", 'playwright install --with-deps chromium', 'apt-get install -y -qq ripgrep', 'pnpm install --frozen-lockfile']) {
     assert.ok(wf.includes(needle), `runner setup must include: ${needle}`);
   }
+
+  // Structural step block checks
+  const [, ...stepBlocks] = wf.split('\n      - name:');
+  const steps = stepBlocks.map((b) => {
+    const newline = b.indexOf('\n');
+    const name = (newline === -1 ? b : b.slice(0, newline)).trim();
+    return { name, block: b };
+  });
+
+  const gateStep = steps.find((s) => s.block.includes('scripts/integration.sh'));
+  assert.ok(gateStep, 'gate step must exist');
+  assert.ok(!gateStep.block.includes('if:'), 'gate step must have no if:');
+  assert.ok(!gateStep.block.includes('continue-on-error'), 'gate step must have no continue-on-error');
+
+  const tarballStep = steps.find((s) => s.block.includes('scripts/test/consumer-smoke.sh'));
+  assert.ok(tarballStep, 'tarball step must exist');
+  assert.ok(!tarballStep.block.includes('if:'), 'tarball step must have no if:');
+  assert.ok(!tarballStep.block.includes('continue-on-error'), 'tarball step must have no continue-on-error');
+
+  const dryRunStep = steps.find((s) => s.block.includes('pnpm publish --dry-run'));
+  assert.ok(dryRunStep, 'Dry run step must exist');
+  assert.ok(dryRunStep.block.includes("if: env.DRY_RUN == 'true'"), "Dry run step must have if: env.DRY_RUN == 'true'");
+
+  const publishStep = steps.find((s) => s.block.includes('pnpm publish --no-git-checks'));
+  assert.ok(publishStep, 'Publish step must exist');
+  assert.ok(publishStep.block.includes("if: env.DRY_RUN == 'false'"), "Publish step must have if: env.DRY_RUN == 'false'");
+
+  const verifyStep = steps.find((s) => s.name.startsWith('Verify'));
+  assert.ok(verifyStep, 'Verify step must exist');
+
+  const tagStep = steps.find((s) => s.name === 'Check the tag matches the package versions');
+  assert.ok(tagStep, 'tag check step must exist');
+  assert.ok(tagStep.block.includes("if: github.ref_type == 'tag'"), "tag check step must have if: github.ref_type == 'tag'");
+
+  const topLevel = wf.split(/\njobs:\s*\n/)[0];
+  assert.ok(!topLevel.includes('NODE_AUTH_TOKEN'), 'no top-level NODE_AUTH_TOKEN');
+  assert.ok(dryRunStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Dry run must have step-level NODE_AUTH_TOKEN');
+  assert.ok(publishStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Publish must have step-level NODE_AUTH_TOKEN');
+  assert.ok(verifyStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Verify must have step-level NODE_AUTH_TOKEN');
+  const tokenMatches = wf.match(/NODE_AUTH_TOKEN:\s*\${{\s*secrets\.GITHUB_TOKEN\s*}}/g) || [];
+  assert.strictEqual(tokenMatches.length, 3, 'NODE_AUTH_TOKEN must appear only in step-level env of the three steps');
+
   const order = [
     'run: ./scripts/integration.sh',
     'pnpm --filter @montionugera/joy-icons build',
     'pnpm --filter @montionugera/joy-react build',
-    'git diff --exit-code',
     'run: ./scripts/test/consumer-smoke.sh',
+    'git status --porcelain',
     'pnpm publish --dry-run --no-git-checks',
     'pnpm publish --no-git-checks)',
   ];
   const positions = order.map((needle) => wf.indexOf(needle));
   for (const [i, pos] of positions.entries()) assert.ok(pos >= 0, `workflow must contain: ${order[i]}`);
-  assert.deepStrictEqual(positions, [...positions].sort((a, b) => a - b), 'steps must run in gate, build, clean-tree, tarball-test, publish order');
+  assert.deepStrictEqual(positions, [...positions].sort((a, b) => a - b), 'steps must run in gate, build, tarball-test, clean-tree, publish order');
   assert.ok(!/\bnpm publish\b/.test(wf.replace(/pnpm publish/g, '')), 'npm publish does not replace workspace:* and must not be used');
   assert.ok(wf.includes('npm view "$name@$version" version'), 'must ask the registry before publishing each package');
   const loops = wf.match(/for dir in ([a-z ]+); do/g) || [];

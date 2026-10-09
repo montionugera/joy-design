@@ -74,7 +74,9 @@ for pkg in "${packages[@]}"; do
   for required in $(required_files "$pkg"); do
     grep -qx "package/$required" "$list" || fail "$pkg tarball is missing $required"
   done
-  if tar -xOzf "$tgz" package/package.json | grep -n 'workspace:'; then
+  pkg_json="$work/tarballs/$pkg/package.json"
+  tar -xOzf "$tgz" package/package.json > "$pkg_json"
+  if grep -n 'workspace:' "$pkg_json"; then
     fail "$pkg tarball package.json still contains a workspace: range (listed above)"
   fi
 done
@@ -144,7 +146,7 @@ cat > "$app/tsconfig.json" << 'EOF'
     "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "isolatedModules": true,
     "types": ["vite/client"]
   },
@@ -166,8 +168,10 @@ createRoot(document.getElementById('root')!).render(
 EOF
 
 cat > "$app/src/App.tsx" << 'EOF'
-import { Button, Tabs, BrandMark, type ButtonProps, type TabItem } from '@montionugera/joy-react';
+import { Button, Tabs, BrandMark, type ButtonProps, type TabItem, type BrandMarkProps } from '@montionugera/joy-react';
 import { Check, type IconProps } from '@montionugera/joy-icons/react';
+import { MARK } from '@montionugera/joy-brand';
+import { tokens } from '@montionugera/joy-tokens';
 
 const items: TabItem[] = [
   { key: 'overview', label: 'Overview', content: <p>Overview panel</p> },
@@ -180,11 +184,19 @@ const items: TabItem[] = [
 export const badVariant: ButtonProps['variant'] = 'not-a-variant';
 // @ts-expect-error size is number | string, never a boolean
 export const badSize: IconProps['size'] = true;
+// @ts-expect-error MARK viewBox is a string, never a number
+export const badMark: typeof MARK.viewBox = 123;
+// @ts-expect-error surface-canvas token is a string, never a number
+export const badToken: typeof tokens['surface-canvas'] = 123;
+// @ts-expect-error TabItem key is a string, never a number
+export const badTabKey: TabItem['key'] = 123;
+// @ts-expect-error BrandMark variant is 'tile' | 'bare'
+export const badBrandMarkVariant: BrandMarkProps['variant'] = 'not-a-variant';
 
 export function App() {
   return (
-    <main>
-      <BrandMark size={32} variant="tile" title="Joymify" />
+    <main style={{ backgroundColor: tokens['surface-canvas'] }}>
+      <BrandMark size={32} variant="tile" title={`Joymify ${MARK.viewBox}`} />
       <Button variant="solid" size="md" iconStart={<Check size={16} />}>
         Save
       </Button>
@@ -199,12 +211,16 @@ cat > "$app/ssr-check.mjs" << 'EOF'
 // components; this calls them, and it resolves every package through its published exports.
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { createElement as h } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Button, Tabs, BrandMark } from '@montionugera/joy-react';
 import { Check } from '@montionugera/joy-icons/react';
 import { MARK } from '@montionugera/joy-brand';
 import * as tokens from '@montionugera/joy-tokens';
+
+const require = createRequire(import.meta.url);
+const cjsTokens = require('@montionugera/joy-tokens');
 
 const html = renderToStaticMarkup(
   h(
@@ -245,6 +261,10 @@ if (Object.keys(tokens).length === 0) {
   console.error('ssr-check: the joy-tokens JavaScript entry exports nothing');
   process.exit(1);
 }
+if (!cjsTokens || !cjsTokens.tokens || !cjsTokens.tokens['surface-canvas']) {
+  console.error('ssr-check: the joy-tokens CommonJS entry failed to load tokens');
+  process.exit(1);
+}
 console.log('ssr-check: rendered', html.length, 'characters of markup');
 EOF
 
@@ -252,7 +272,7 @@ echo "==> 5/7 Installing the tarballs"
 (cd "$app" && pnpm install --no-frozen-lockfile --ignore-workspace)
 
 for pkg in "${packages[@]}"; do
-  installed="$(cd "$app/node_modules/@montionugera/joy-$pkg" && pwd -P)"
+  installed="$(cd "$app/node_modules/@montionugera/joy-$pkg" || fail "joy-$pkg not installed"; pwd -P)"
   case "$installed/" in
     "$work"/*) ;;
     *) fail "joy-$pkg resolves to $installed, which is outside the temporary folder" ;;
