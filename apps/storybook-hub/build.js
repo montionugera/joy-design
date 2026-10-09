@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MARK, WORDMARK, heroLattice, wordmarkLayout, markScale } from "../../packages/brand/src/index.js";
+import { highlightCodeToHtml } from "../../packages/react/src/syntax-highlighter.ts";
+import { renderMermaidToSvg } from "../../packages/react/src/mermaid-renderer.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "dist");
@@ -315,6 +317,146 @@ const hubCard = (name, title, desc, cells, extra = "") => `<div class="component
     <div class="component-header"><div><div class="component-title">${title}</div><div class="component-desc">${desc}</div></div></div>
     <div class="component-canvas"><div class="hub-matrix${extra}" data-matrix="${name}">${cells}</div></div>
   </div>`;
+
+function renderHubCodeBlock(code, lang, title = "", showLineNumbers = true) {
+  const highlighted = highlightCodeToHtml(code, lang);
+  const lines = code.split("\n");
+  const lineCountHtml = lines.map((_, i) => `<div>${i + 1}</div>`).join("");
+  return `
+    <div class="joy-code-block" role="region" aria-label="${title || lang + ' code block'}">
+      <div class="joy-code-block__header">
+        <div class="joy-code-block__meta">
+          <span class="joy-code-block__lang">${lang.toUpperCase()}</span>
+          ${title ? `<span class="joy-code-block__title">${title}</span>` : ""}
+        </div>
+        <button type="button" class="joy-code-block__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">
+          ${iconSvg("Copy", "14")} Copy
+        </button>
+        <span class="joy-markdown__status" role="status"></span>
+      </div>
+      <div class="joy-code-block__wrapper ${showLineNumbers ? "joy-code-block--with-lines" : ""}">
+        ${showLineNumbers ? `<div class="joy-code-block__lines" aria-hidden="true">${lineCountHtml}</div>` : ""}
+        <pre class="joy-code-block__body"><code>${highlighted}</code></pre>
+      </div>
+    </div>
+  `;
+}
+
+function renderHubMermaid(code, title = "") {
+  const res = renderMermaidToSvg(code);
+  const svg = res.svg || "";
+  const displayTitle = title || res.title || "Diagram";
+  return `
+    <div class="joy-mermaid" role="region" aria-label="${displayTitle}">
+      <div class="joy-mermaid__header">
+        <div class="joy-mermaid__title">
+          <span class="joy-mermaid__badge">MERMAID</span>
+          <span>${displayTitle}</span>
+        </div>
+        <div class="joy-mermaid__actions">
+          <button type="button" class="joy-mermaid__btn" aria-label="Show mermaid source code" onclick="hubToggleMermaidView(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Source
+          </button>
+          <button type="button" class="joy-mermaid__btn" aria-label="Copy mermaid definition" onclick="copyHubCode(this)">
+            ${iconSvg("Copy", "14")} Copy
+          </button>
+          <span class="joy-markdown__status" role="status"></span>
+        </div>
+      </div>
+      <div class="joy-mermaid__viewport">
+        ${svg}
+      </div>
+      <div class="joy-mermaid__source" style="display: none;">
+        ${renderHubCodeBlock(code, "text", "", false)}
+      </div>
+    </div>
+  `;
+}
+
+function renderHubPolyglotTabs(items) {
+  const tabsList = items
+    .map((item, idx) => {
+      const isSelected = idx === 0;
+      return `<button type="button" role="tab" class="joy-polyglot-tabs__tab" aria-selected="${isSelected}" tabindex="${isSelected ? 0 : -1}" onclick="hubSelectPolyglotTab(this, '${item.lang}')">${item.label}</button>`;
+    })
+    .join("");
+
+  const panels = items
+    .map((item, idx) => {
+      return `<div class="joy-polyglot-tabs__panel-content" data-lang="${item.lang}" style="display: ${idx === 0 ? "block" : "none"};">
+        ${renderHubCodeBlock(item.code, item.lang, item.filename, true)}
+      </div>`;
+    })
+    .join("");
+
+  return `
+    <div class="joy-polyglot-tabs" role="region" aria-label="Multi-language code tabs">
+      <div class="joy-polyglot-tabs__bar">
+        <div class="joy-polyglot-tabs__list" role="tablist" aria-label="Programming languages">
+          ${tabsList}
+        </div>
+      </div>
+      <div class="joy-polyglot-tabs__panel" role="tabpanel">
+        ${panels}
+      </div>
+    </div>
+  `;
+}
+
+const hubRustSample = `// Joymify Delta-Neutral Arbitrage Engine
+use joymify_quant::{OrderBook, RiskEngine, Venue};
+
+pub async fn execute_arb(symbol: &str, target_spread: f64) -> Result<u64, String> {
+    let book = OrderBook::fetch(symbol).await?;
+    if book.spread() >= target_spread {
+        let order_id = RiskEngine::dispatch_limit(Venue::Hyperliquid, symbol, book.best_bid).await?;
+        Ok(order_id)
+    } else {
+        Err("Spread below threshold".to_string())
+    }
+}`;
+
+const hubTsSample = `// TypeScript Quantitative Order Router
+import { Router, OrderType, type Quote } from '@joymify/quant';
+
+export async function executeHedge(symbol: string, size: number): Promise<Quote> {
+  const quote = await Router.getOptimalQuote(symbol, size);
+  return Router.dispatch({
+    symbol,
+    size,
+    type: OrderType.LIMIT,
+    price: quote.bestAsk,
+  });
+}`;
+
+const hubPySample = `# Joymify Algorithmic Hedging Worker
+import asyncio
+from joymify.quant import BookStream, ExecutionPolicy
+
+async def stream_and_hedge(symbol: str, threshold: float = 0.0015):
+    async for tick in BookStream(symbol):
+        if tick.imbalance > threshold:
+            await ExecutionPolicy.rebalance(symbol, target_delta=0.0)`;
+
+const hubFlowchartCode = `flowchart TD
+  Client([Trading Terminal]) --> Gateway[Joy API Gateway]
+  Gateway --> Auth{Valid Token?}
+  Auth -->|Yes| Engine[Quant Execution Engine]
+  Auth -->|No| Reject[401 Unauthorized]
+  Engine --> OrderDB[(PostgreSQL Ledger)]
+  Engine --> L1[(Hyperliquid DEX)]`;
+
+const hubSequenceCode = `sequenceDiagram
+  participant Trader
+  participant Gateway as Joy Gateway
+  participant Engine as Arb Engine
+  participant Venue as Exchange L1
+  Trader->>Gateway: POST /orders (Arbitrage)
+  Gateway->>Engine: Route order intent
+  Engine->>Venue: Submit atomic limit
+  Venue-->>Engine: 200 OK (Fill Confirmation)
+  Engine-->>Gateway: Execution receipt
+  Gateway-->>Trader: Stream executed trade`;
 
 const hubAlert = (variant, title, desc, closable = false) =>
   `<div class="joy-alert joy-alert--${variant}" role="alert"><span class="joy-alert__icon" aria-hidden="true">${iconSvg(statusIcon[variant])}</span><div class="joy-alert__body"><div class="joy-alert__title">${title}</div><div class="joy-alert__desc">${desc}</div></div>${closable ? `<button type="button" class="joy-alert__close" aria-label="Dismiss alert" onclick="this.closest('.joy-alert').remove()">${iconSvg("Close")}</button>` : ""}</div>`;
@@ -6375,29 +6517,59 @@ ${navigationHtml}
         </div>
       </section>
 
-      <!-- View: MarkdownViewer (Cherry Engine) -->
+      <!-- View: MarkdownViewer & Code Box Suite -->
       <section id="view-markdown" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">MarkdownViewer (Cherry Engine Inspired)</h2>
-        <p class="header-tagline">Stream-safe high-performance markdown renderer with syntax code blocks, one-click copy, responsive tables, and callouts.</p>
+        <h2 style="margin: 0 0 8px 0;">Markdown, Code Box & Mermaid Suite</h2>
+        <p class="header-tagline">Stream-safe high-performance markdown renderer with semantic syntax highlighting (Rust, TypeScript, Python, SQL, Bash), line numbering, polyglot language tabs, and interactive Mermaid diagram rendering.</p>
 
+        <!-- 1. Standalone CodeBlock (Rust) -->
         <div class="playground-box">
           <div class="playground-header">
-            <h4>Live Stream-Safe Markdown Preview</h4>
+            <h4>Standalone CodeBlock (Rust with Semantic Token Highlighting & Line Numbers)</h4>
           </div>
-          <div class="canvas" style="padding: 24px; max-width: 720px;">
+          <div class="canvas" style="padding: 24px;">
+            ${renderHubCodeBlock(hubRustSample, "rust", "src/arbitrage.rs", true)}
+          </div>
+        </div>
+
+        <!-- 2. Polyglot Code Tabs -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>PolyglotCodeTabs (Interactive Multi-Language Switching)</h4>
+          </div>
+          <div class="canvas" style="padding: 24px;">
+            ${renderHubPolyglotTabs([
+              { label: "Rust", lang: "rust", filename: "src/arbitrage.rs", code: hubRustSample },
+              { label: "TypeScript", lang: "typescript", filename: "src/router.ts", code: hubTsSample },
+              { label: "Python", lang: "python", filename: "src/hedge.py", code: hubPySample }
+            ])}
+          </div>
+        </div>
+
+        <!-- 3. Mermaid Diagrams -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>MermaidViewer (Flowchart & Sequence Diagrams with Diagram/Source Switcher)</h4>
+          </div>
+          <div class="canvas" style="padding: 24px;">
+            ${renderHubMermaid(hubFlowchartCode, "Quant Execution Architecture")}
+            ${renderHubMermaid(hubSequenceCode, "Atomic Order Routing Sequence")}
+          </div>
+        </div>
+
+        <!-- 4. MarkdownViewer Live Document -->
+        <div class="playground-box">
+          <div class="playground-header">
+            <h4>MarkdownViewer (Stream-Safe Rich Technical Document with Code & Mermaid)</h4>
+          </div>
+          <div class="canvas" style="padding: 24px; max-width: 760px;">
             <div class="joy-markdown">
               <h2>Delta-Neutral Arbitrage Execution Spec</h2>
               <p>The <strong>Joymify Quant Strategy Engine</strong> executes cross-venue arbitrage across centralized and decentralized liquidity books.</p>
               <blockquote>
                 <strong>Execution Safety:</strong> Slippage protection circuit breaker is actively enforced at 0.05% tolerance.
               </blockquote>
-              <pre class="joy-markdown__pre"><code>// TypeScript Quantitative Order Router
-import { Router, OrderType } from '@joymify/quant';
-
-export async function executeHedge(symbol: string, size: number) {
-  const quote = await Router.getOptimalQuote(symbol, size);
-  return Router.dispatch({ symbol, size, type: OrderType.LIMIT, price: quote.bestAsk });
-}</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre>
+              ${renderHubCodeBlock(hubTsSample, "typescript", "router.ts", false)}
               <table class="joy-markdown__table">
                 <thead>
                   <tr>
@@ -6428,6 +6600,8 @@ export async function executeHedge(symbol: string, size: number) {
                   </tr>
                 </tbody>
               </table>
+              <h3>System Topology</h3>
+              ${renderHubMermaid(hubFlowchartCode, "System Topology")}
             </div>
           </div>
         </div>
@@ -11737,15 +11911,48 @@ export async function executeHedge(symbol: string, size: number) {
     hubPaintImages();
 
     function copyHubCode(btn) {
-      const pre = btn.closest('pre');
-      const code = pre.querySelector('code').innerText;
-      const status = pre.querySelector('.joy-markdown__status');
+      const container = btn.closest('.joy-code-block') || btn.closest('.joy-mermaid') || btn.closest('pre');
+      const codeEl = container ? container.querySelector('code') : null;
+      const code = codeEl ? codeEl.innerText : '';
+      const status = container ? container.querySelector('.joy-markdown__status') : null;
       const done = function () {
         if (status) status.textContent = 'Copied to clipboard';
         setTimeout(function () { if (status) status.textContent = ''; }, 2000);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, done);
       else done();
+    }
+
+    function hubSelectPolyglotTab(tabBtn, itemKey) {
+      const tabs = tabBtn.closest('.joy-polyglot-tabs');
+      if (!tabs) return;
+      tabs.querySelectorAll('.joy-polyglot-tabs__tab').forEach(function (t) {
+        const isSelected = t === tabBtn;
+        t.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        t.tabIndex = isSelected ? 0 : -1;
+      });
+      tabs.querySelectorAll('.joy-polyglot-tabs__panel-content').forEach(function (p) {
+        p.style.display = p.getAttribute('data-lang') === itemKey ? 'block' : 'none';
+      });
+    }
+
+    function hubToggleMermaidView(btn) {
+      const container = btn.closest('.joy-mermaid');
+      if (!container) return;
+      const viewport = container.querySelector('.joy-mermaid__viewport');
+      const source = container.querySelector('.joy-mermaid__source');
+      const isDiagram = viewport.style.display !== 'none';
+      if (isDiagram) {
+        viewport.style.display = 'none';
+        source.style.display = 'block';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Diagram';
+        btn.setAttribute('aria-label', 'Show diagram preview');
+      } else {
+        viewport.style.display = 'flex';
+        source.style.display = 'none';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Source';
+        btn.setAttribute('aria-label', 'Show mermaid source code');
+      }
     }
 
     // Live Pagination: same windowing and phone rule (current page only at 480px or less) as the component.

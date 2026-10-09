@@ -1,5 +1,7 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Copy } from '@montionugera/joy-icons/react';
+import { tokenizeCode } from './syntax-highlighter.js';
+import { MermaidViewer } from './MermaidViewer.js';
 
 export interface MarkdownViewerProps extends React.HTMLAttributes<HTMLDivElement> {
   content?: string;
@@ -144,9 +146,23 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
           if (block.type === 'quote') return <blockquote key={i}>{renderInline(block.content)}</blockquote>;
           if (block.type === 'hr') return <hr key={i} />;
           if (block.type === 'code') {
+            if (block.lang?.toLowerCase() === 'mermaid') {
+              return <MermaidViewer key={i} code={block.content} allowCopy={allowCopy} />;
+            }
+            const tokens = tokenizeCode(block.content, block.lang || 'text');
             return (
               <pre key={i} className="joy-markdown__pre">
-                <code>{block.content}</code>
+                <code>
+                  {tokens.map((tok, tIdx) =>
+                    tok.type === 'text' ? (
+                      tok.text
+                    ) : (
+                      <span key={tIdx} className={`joy-syntax-${tok.type}`}>
+                        {tok.text}
+                      </span>
+                    )
+                  )}
+                </code>
                 {allowCopy && (
                   <>
                     <button

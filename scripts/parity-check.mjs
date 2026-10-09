@@ -100,7 +100,11 @@ export const COMPONENTS = [
   'MatchScoreboard',
   'ChronometerDial',
   'TelemetryStrip',
-  'CommandIsland'
+  'CommandIsland',
+  // F-072
+  'CodeBlock',
+  'PolyglotCodeTabs',
+  'MermaidViewer'
 ];
 
 // React components that must use React.forwardRef and spread rest props onto a
@@ -155,7 +159,11 @@ export const REF_FORWARDING = [
   'MatchScoreboard',
   'ChronometerDial',
   'TelemetryStrip',
-  'CommandIsland'
+  'CommandIsland',
+  // F-072
+  'CodeBlock',
+  'PolyglotCodeTabs',
+  'MermaidViewer'
 ];
 
 // Svelte components that must destructure `ref = $bindable(null)`, spread
@@ -191,7 +199,11 @@ export const SVELTE_REF_REST = [
   'MatchScoreboard',
   'ChronometerDial',
   'TelemetryStrip',
-  'CommandIsland'
+  'CommandIsland',
+  // F-072
+  'CodeBlock',
+  'PolyglotCodeTabs',
+  'MermaidViewer'
 ];
 
 // Non-handler aliases between the twins (Svelte `class` is React `className`).

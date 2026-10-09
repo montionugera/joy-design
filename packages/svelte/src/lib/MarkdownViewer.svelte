@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Check, Copy } from '@montionugera/joy-icons';
+	import { tokenizeCode } from './syntax-highlighter.js';
+	import MermaidViewer from './MermaidViewer.svelte';
 
 	interface Props {
 		content?: string;
@@ -148,12 +150,16 @@
 		{:else if block.type === 'hr'}
 			<hr />
 		{:else if block.type === 'code'}
-			<pre class="joy-markdown__pre"><code>{block.content}</code>{#if allowCopy}<button
-					type="button"
-					class="joy-markdown__copy-btn"
-					onclick={() => copyToClipboard(block.content, i)}
-					aria-label="Copy code to clipboard"
-				>{#if copiedBlockIndex === i}<Check size="14" />Copied{:else}<Copy size="14" />Copy{/if}</button><span class="joy-markdown__status" role="status">{copiedBlockIndex === i ? 'Copied to clipboard' : ''}</span>{/if}</pre>
+			{#if block.lang?.toLowerCase() === 'mermaid'}
+				<MermaidViewer code={block.content} {allowCopy} />
+			{:else}
+				<pre class="joy-markdown__pre"><code>{#each tokenizeCode(block.content, block.lang || 'text') as tok}{#if tok.type === 'text'}{tok.text}{:else}<span class="joy-syntax-{tok.type}">{tok.text}</span>{/if}{/each}</code>{#if allowCopy}<button
+						type="button"
+						class="joy-markdown__copy-btn"
+						onclick={() => copyToClipboard(block.content, i)}
+						aria-label="Copy code to clipboard"
+					>{#if copiedBlockIndex === i}<Check size="14" />Copied{:else}<Copy size="14" />Copy{/if}</button><span class="joy-markdown__status" role="status">{copiedBlockIndex === i ? 'Copied to clipboard' : ''}</span>{/if}</pre>
+			{/if}
 		{:else if block.type === 'table' && block.rows && block.rows.length > 0}
 			<div class="joy-markdown__table-wrap">
 				<table class="joy-markdown__table">

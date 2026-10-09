@@ -711,6 +711,9 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | ChronometerDial | `.joy-chronometer-dial` | - | - | active |
 | TelemetryStrip | `.joy-telemetry-strip` | - | - | - |
 | CommandIsland | `.joy-command-island` | - | bottom-fixed, bottom-floating, top-header | hover, active |
+| CodeBlock | `.joy-code-block` | - | with-lines | hover, focus-visible |
+| PolyglotCodeTabs | `.joy-polyglot-tabs` | - | - | hover, focus-visible, selected |
+| MermaidViewer | `.joy-mermaid` | - | - | hover, focus-visible |
 
 ## Brand
 
