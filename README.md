@@ -65,7 +65,7 @@ Four packages are published to GitHub Packages under the `@montionugera` scope. 
 | Package | Ships | Import |
 | --- | --- | --- |
 | `@montionugera/joy-tokens` | Built CSS variables, component CSS, Tailwind theme and the JS token map. | `@montionugera/joy-tokens/theme.css`, `@montionugera/joy-tokens/tailwind`, `@montionugera/joy-tokens` |
-| `@montionugera/joy-icons` | React icons as built JavaScript with type declarations; Svelte icons as source. | `@montionugera/joy-icons/react` (React), `@montionugera/joy-icons` (Svelte) |
+| `@montionugera/joy-icons` | React icons as built JavaScript with type declarations; Svelte icons as source. | `@montionugera/joy-icons/react` (React), `@montionugera/joy-icons` (Svelte, needs a Svelte bundler) |
 | `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
 | `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
 
@@ -89,7 +89,7 @@ import { Button, Tabs } from '@montionugera/joy-react';
 import { Check } from '@montionugera/joy-icons/react';
 ```
 
-`@montionugera/joy-react` needs `react` and `react-dom` 18 or 19 as peers. The repo and its packages are private, so every install needs a token:
+`@montionugera/joy-react` needs `react` and `react-dom` 19 as peers. The repo and its packages are private, so every install needs a token:
 
 - **On a developer machine:** a personal GitHub token with the `read:packages` permission, exported as `GITHUB_TOKEN`.
 - **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the four packages' settings on GitHub, or store a personal token as a secret in the consuming repo.
@@ -98,7 +98,7 @@ Fonts are still loaded by the consumer (see `DESIGN.md`).
 
 ### Publishing
 
-Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed tag matching `packages-v*` whose commit is on `main`, or on a manual run, which defaults to a dry run. The workflow checks the tag against package versions, and real publishes should run in a GitHub environment restricted to `main` and `packages-v*` tags. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons` and `@montionugera/joy-react`, fails if any tracked file changed, runs the tarball test `scripts/test/consumer-smoke.sh`, then publishes tokens, icons, brand and react in that order, skipping any version already on the registry. Versions are set by hand in each `package.json`. A published version is never reused: fix a bad release by publishing a higher version.
+Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed tag matching `packages-v*` whose commit is on `main`, or on a manual run, which defaults to a dry run. On a tag run the workflow fails unless the tag version (after `packages-v`) equals the version of at least one package; packages have independent versions, so it does not require all four to match. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons` and `@montionugera/joy-react`, runs the tarball test `scripts/test/consumer-smoke.sh`, fails if the gate or build left any changed or untracked file, then publishes tokens, icons, brand and react in that order, skipping any version already on the registry (a run where all four are already published fails on purpose: nothing to publish). The workflow file has no branch protection of its own: anyone with write access can start a manual run with the dry run switched off, so restrict who can do that in the repository settings. Versions are set by hand in each `package.json`. A published version is never reused: fix a bad release by publishing a higher version.
 
 `scripts/test/consumer-smoke.sh` also runs locally. It packs the four packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, and type-checks, builds and renders it.
 
