@@ -169,6 +169,7 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.ok(tagStep.block.includes("if: github.ref_type == 'tag'"), "tag check step must have if: github.ref_type == 'tag'");
 
   const topLevel = wf.split(/\njobs:\s*\n/)[0];
+  assert.ok(!wf.includes('git fetch'), 'checkout drops credentials, so the workflow must not run git fetch against the private origin');
   assert.match(wf, /^    environment: packages$/m, 'the job must run in the packages environment so the repository setting can restrict it');
   assert.ok(!topLevel.includes('NODE_AUTH_TOKEN'), 'no top-level NODE_AUTH_TOKEN');
   assert.ok(dryRunStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Dry run must have step-level NODE_AUTH_TOKEN');
