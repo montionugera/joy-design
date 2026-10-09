@@ -14,6 +14,10 @@ on:
         description: 'Storybook image tag to deploy (e.g. short SHA or "latest"). Leave blank to use latest build from main.'
         required: false
         default: ''
+      cli_docs_tag:
+        description: 'cli-state-handler release tag whose docs to ship (e.g. v0.2.0). Blank = latest release. Ignored when image_tag is set.'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -121,10 +125,18 @@ jobs:
 
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
+      cli_docs_version: ${{ steps.cli_docs.outputs.cli_docs_version }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Fetch cli-state-handler docs
+        id: cli_docs
+        env:
+          GH_TOKEN: ${{ secrets.CLI_DOCS_READ_TOKEN }}
+          CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}
+        run: bash scripts/fetch-cli-docs.sh "$CLI_DOCS_TAG"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -138,10 +150,14 @@ jobs:
 
       - name: Set image tag (short SHA)
         id: meta
+        env:
+          CLI_DOCS_VERSION: ${{ steps.cli_docs.outputs.cli_docs_version }}
         run: |
+          [ -n "$CLI_DOCS_VERSION" ] || { echo "::error::cli docs version is empty; refusing to publish an image tagged without it"; exit 1; }
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-12)
-          echo "image_tag=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "IMAGE_TAG=${SHORT_SHA}" >> "$GITHUB_ENV"
+          IMAGE_TAG="${SHORT_SHA}-cli${CLI_DOCS_VERSION}"
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> "$GITHUB_ENV"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -248,8 +264,10 @@ jobs:
             --timeout=180s
 
       - name: 🚦 Smoke check — verify dev.joymify.com & legacy redirect
+        env:
+          CLI_DOCS_VERSION: ${{ needs.build-push-image.outputs.cli_docs_version }}
         run: |
-          ./scripts/smoke-prod.sh dev.joymify.com
+          EXPECTED_CLI_DOCS_VERSION="$CLI_DOCS_VERSION" ./scripts/smoke-prod.sh dev.joymify.com
           ./scripts/smoke-prod.sh design.joymify.com
 
       - name: 📋 Deploy summary
