@@ -167,7 +167,7 @@ Fonts are still loaded by the consumer (see `DESIGN.md`).
 | Publish succeeds for some packages and fails for others | Re-running is safe, because published versions are skipped. The fix is a re-run, never an unpublish. |
 | A bad version is published | Publish a higher fixed version. A published version is not reused. |
 
-## Acceptance
+## Acceptance criteria
 
 1. Phase 1: the search in "Done when" is empty and `scripts/integration.sh` passes.
 2. Phase 2: `scripts/test/consumer-smoke.sh` passes locally, with the temporary app having no path into this repo's source.
