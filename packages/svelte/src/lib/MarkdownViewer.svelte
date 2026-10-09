@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Check, Copy } from '@joymify/icons';
+	import { Check, Copy } from '@montionugera/joy-icons';
 
 	interface Props {
 		content?: string;

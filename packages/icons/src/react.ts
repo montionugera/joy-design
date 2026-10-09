@@ -136,3 +136,4 @@ export { YesFilled } from "./react/YesFilled.js";
 export { Zap } from "./react/Zap.js";
 export { ZoomIn } from "./react/ZoomIn.js";
 export { ZoomOut } from "./react/ZoomOut.js";
+export type { IconProps } from "./react/Activity.js";

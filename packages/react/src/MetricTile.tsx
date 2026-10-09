@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TrendingUp, TrendingDown } from '@joymify/icons/react';
+import { TrendingUp, TrendingDown } from '@montionugera/joy-icons/react';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 

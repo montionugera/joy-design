@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { Calendar, ChevronLeft, ChevronRight, Close, ArrowRight } from '@joymify/icons';
+  import { Calendar, ChevronLeft, ChevronRight, Close, ArrowRight } from '@montionugera/joy-icons';
   import { openOverlay } from './overlay-utils.js';
   import {
     MONTH_NAMES,

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TrendingUp, TrendingDown } from '@joymify/icons';
+  import { TrendingUp, TrendingDown } from '@montionugera/joy-icons';
 
   interface Props {
     title: string;

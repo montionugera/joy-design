@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Copy } from '@joymify/icons/react';
+import { Check, Copy } from '@montionugera/joy-icons/react';
 
 export interface MarkdownViewerProps extends React.HTMLAttributes<HTMLDivElement> {
   content?: string;
