@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isFlutterExported, checkManifests, runParityCheck } from '../parity-check.mjs';
+import { isFlutterExported, checkManifests, runParityCheck, classes } from '../parity-check.mjs';
 
 test('isFlutterExported returns true for existing tokens export', () => {
   // joy_tokens.g.dart is exported in joymify_flutter.dart
@@ -28,8 +28,33 @@ test('checkManifests parses manifests and verifies targets', () => {
   assert.ok(buttonFlutter, 'Flutter check exists for Button');
 });
 
+test('classes ignores package import specifiers while detecting classes and css variables', () => {
+  const sample = `
+    import { Check } from '@montionugera/joy-icons/react';
+    import { Logo } from '@montionugera/joy-brand';
+
+    export function Component() {
+      return (
+        <div className="joy-button joy-button--primary" style={{ color: 'var(--joy-color-navy-900)' }}>
+          <Check />
+          <Logo />
+        </div>
+      );
+    }
+  `;
+
+  const tokens = classes(sample);
+
+  assert.equal(tokens.has('joy-icons'), false, 'must not capture joy-icons from package specifier');
+  assert.equal(tokens.has('joy-brand'), false, 'must not capture joy-brand from package specifier');
+  assert.equal(tokens.has('joy-button'), true, 'must capture joy-button class');
+  assert.equal(tokens.has('joy-button--primary'), true, 'must capture joy-button--primary class');
+  assert.equal(tokens.has('--joy-color-navy-900'), true, 'must capture --joy-color-navy-900 css variable');
+});
+
 test('runParityCheck passes in default twin mode', () => {
   const result = runParityCheck();
   assert.equal(result.passed, true);
   assert.equal(result.totalViolations, 0);
 });
+
