@@ -31,6 +31,9 @@ jobs:
   publish:
     name: Gate, build, test, publish
     runs-on: ubuntu-latest
+    # The GitHub environment `packages` limits this job to the main branch and packages-v* tags
+    # (a repository setting, not part of this file). A manual dry run from another branch is rejected.
+    environment: packages
     steps:
       - name: Checkout
         uses: actions/checkout@v4

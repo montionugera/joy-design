@@ -18,7 +18,7 @@ const REPO_URL = 'git+https://github.com/montionugera/joy-design.git';
 const PUBLISHED = [
   { dir: 'tokens', name: '@montionugera/joy-tokens', version: '0.2.0', license: 'UNLICENSED', sideEffects: ['**/*.css'], files: ['dist'] },
   { dir: 'icons', name: '@montionugera/joy-icons', version: '0.3.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['dist', 'src/index.ts', 'src/index.d.ts', 'src/*.svelte', 'PROVENANCE.md'] },
-  { dir: 'brand', name: '@montionugera/joy-brand', version: '0.2.0', license: 'UNLICENSED', sideEffects: false, files: ['src', 'assets'] },
+  { dir: 'brand', name: '@montionugera/joy-brand', version: '0.2.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['src', 'assets', 'PROVENANCE.md'] },
   { dir: 'react', name: '@montionugera/joy-react', version: '0.2.0', license: 'UNLICENSED', sideEffects: false, files: ['dist'] },
 ];
 
@@ -169,6 +169,7 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.ok(tagStep.block.includes("if: github.ref_type == 'tag'"), "tag check step must have if: github.ref_type == 'tag'");
 
   const topLevel = wf.split(/\njobs:\s*\n/)[0];
+  assert.match(wf, /^    environment: packages$/m, 'the job must run in the packages environment so the repository setting can restrict it');
   assert.ok(!topLevel.includes('NODE_AUTH_TOKEN'), 'no top-level NODE_AUTH_TOKEN');
   assert.ok(dryRunStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Dry run must have step-level NODE_AUTH_TOKEN');
   assert.ok(publishStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Publish must have step-level NODE_AUTH_TOKEN');

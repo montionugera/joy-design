@@ -30,7 +30,7 @@ allowed_pattern() {
   case "$1" in
     tokens | react) echo '^package/(package\.json|dist/.+)$' ;;
     icons) echo '^package/(package\.json|PROVENANCE\.md|dist/.+|src/index\.ts|src/index\.d\.ts|src/[^/]+\.svelte)$' ;;
-    brand) echo '^package/(package\.json|src/.+|assets/.+)$' ;;
+    brand) echo '^package/(package\.json|PROVENANCE\.md|src/.+|assets/.+)$' ;;
   esac
 }
 
@@ -39,7 +39,7 @@ required_files() {
   case "$1" in
     tokens) echo "dist/theme.css dist/tailwind-theme.css dist/index.js dist/index.cjs dist/index.d.ts" ;;
     icons) echo "dist/react.js dist/react.d.ts dist/react/Check.js dist/react/Check.d.ts src/index.ts src/index.d.ts src/Check.svelte PROVENANCE.md" ;;
-    brand) echo "src/index.js src/index.d.ts src/geometry.js src/render.js src/layout.js src/outlines.generated.js assets/mark.svg assets/favicon.svg" ;;
+    brand) echo "src/index.js src/index.d.ts src/geometry.js src/render.js src/layout.js src/outlines.generated.js assets/mark.svg assets/favicon.svg PROVENANCE.md" ;;
     react) echo "dist/index.js dist/index.d.ts dist/Button.js dist/Button.d.ts dist/Tabs.js dist/BrandMark.js" ;;
   esac
 }
