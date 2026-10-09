@@ -124,3 +124,33 @@ test('joy-tokens exports theme.css and tailwind entry points', () => {
   assert.strictEqual(pkg.exports['./tailwind'], './dist/tailwind-theme.css');
 });
 
+test('the publish workflow gates, builds, tests, then publishes in dependency order', () => {
+  const wf = read('.github/workflows/publish.yml');
+  assert.match(wf, /^\s+- 'packages-v\*'$/m, 'trigger must be a packages-v* tag');
+  assert.match(wf, /^\s+dry_run:$/m, 'manual runs need a dry_run input');
+  assert.match(wf, /^\s+packages: write$/m, 'the job token needs packages: write');
+  assert.ok(wf.includes('git merge-base --is-ancestor "$GITHUB_SHA" origin/main'), 'must refuse a commit that is not on main');
+  for (const needle of ["flutter-version: '3.32.8'", 'playwright install --with-deps chromium', 'apt-get install -y -qq ripgrep', 'pnpm install --frozen-lockfile']) {
+    assert.ok(wf.includes(needle), `runner setup must include: ${needle}`);
+  }
+  const order = [
+    'run: ./scripts/integration.sh',
+    'pnpm --filter @montionugera/joy-icons build',
+    'pnpm --filter @montionugera/joy-react build',
+    'git diff --exit-code',
+    'run: ./scripts/test/consumer-smoke.sh',
+    'pnpm publish --dry-run --no-git-checks',
+    'pnpm publish --no-git-checks)',
+  ];
+  const positions = order.map((needle) => wf.indexOf(needle));
+  for (const [i, pos] of positions.entries()) assert.ok(pos >= 0, `workflow must contain: ${order[i]}`);
+  assert.deepStrictEqual(positions, [...positions].sort((a, b) => a - b), 'steps must run in gate, build, clean-tree, tarball-test, publish order');
+  assert.ok(!/\bnpm publish\b/.test(wf.replace(/pnpm publish/g, '')), 'npm publish does not replace workspace:* and must not be used');
+  assert.ok(wf.includes('npm view "$name@$version" version'), 'must ask the registry before publishing each package');
+  const loops = wf.match(/for dir in ([a-z ]+); do/g) || [];
+  assert.ok(loops.length >= 3, 'dry run, publish and verify each loop over the packages');
+  for (const loop of loops) assert.strictEqual(loop, 'for dir in tokens icons brand react; do', 'packages must be handled in dependency order');
+  assert.ok(!wf.includes('packages/brand && node build.js') && !wf.includes('joy-brand build'), 'the workflow must not run the brand build itself');
+});
+
+
