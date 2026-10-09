@@ -342,7 +342,7 @@ test('Wave 2 C-L1: Button, Input, InputNumber, Select, DatePicker, DateRangePick
   assert.ok(inputNumber.includes('inputMode="decimal"'), 'InputNumber must include inputMode="decimal"');
 
   const datePicker = read('DatePicker');
-  assert.ok(datePicker.includes('@joymify/icons/react'), 'DatePicker must import from @joymify/icons/react');
+  assert.ok(datePicker.includes('@montionugera/joy-icons/react'), 'DatePicker must import from @montionugera/joy-icons/react');
 
   const dateRangePicker = read('DateRangePicker');
   assert.ok(!dateRangePicker.includes('\u2192'), 'DateRangePicker must not include \u2192');
@@ -370,7 +370,7 @@ test('Wave 2 C-L2: TimePicker, Mentions, MarkdownEditor', () => {
   assert.ok(mentions.includes('useOverlay('), 'Mentions must include useOverlay(');
 
   const mdEditor = read('MarkdownEditor');
-  assert.ok(mdEditor.includes('@joymify/icons/react'), 'MarkdownEditor must import @joymify/icons/react');
+  assert.ok(mdEditor.includes('@montionugera/joy-icons/react'), 'MarkdownEditor must import @montionugera/joy-icons/react');
   assert.ok(mdEditor.includes('joy-markdown-editor__tool'), 'MarkdownEditor must include joy-markdown-editor__tool');
 });
 
@@ -431,7 +431,7 @@ test('Wave 2 C-L4: TreeSelect, Cascader, Transfer, Upload match contract', () =>
   assert.ok(cascader.includes('useOverlay('), 'Cascader must include useOverlay(');
   assert.ok(transfer.includes('joy-button--icon-only'), 'Transfer must include joy-button--icon-only');
   assert.ok(!transfer.includes('joy-button--primary'), 'Transfer must not include joy-button--primary');
-  assert.ok(upload.includes('@joymify/icons/react'), 'Upload must import @joymify/icons/react');
+  assert.ok(upload.includes('@montionugera/joy-icons/react'), 'Upload must import @montionugera/joy-icons/react');
   assert.ok(!upload.includes('\u{1F4C1}'), 'Upload must not include emoji');
 });
 
@@ -1317,7 +1317,7 @@ test('F-038 C-L6: Dropdown and Tooltip render the Svelte contract (aria wiring, 
   assert.strictEqual(tip, '<div data-x="1" class="joy-tooltip-wrapper mine"><button>b</button></div>');
 });
 
-test('F-038 C-L6: ImagePreview renders the Svelte class/aria contract with no inline colours and icons from @joymify/icons', () => {
+test('F-038 C-L6: ImagePreview renders the Svelte class/aria contract with no inline colours and icons from @montionugera/joy-icons', () => {
   const React = requireFromHere('react');
   const { renderToStaticMarkup } = requireFromHere('react-dom/server');
   const { ImagePreview } = loadComponent('ImagePreview');

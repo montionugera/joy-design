@@ -11,11 +11,11 @@ Enterprise multi-platform design system and composed Storybook workshop powering
 
 | Package                               | What it is                                                                                                                                                                                                                                                                        |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/tokens` (`@joymify/tokens`) | `src/tokens.json` is the only place colour values live. `node packages/tokens/build.js` generates `dist/theme.css` (CSS variables plus all component CSS), `dist/tailwind-theme.css` (Tailwind v4 `@theme`), and `dist/index.{js,cjs,d.ts}`.                                      |
-| `packages/icons` (`@joymify/icons`)   | SVG icons as Svelte 5 components (`@joymify/icons`) and React components (`@joymify/icons/react`), with identical rendering.                                                                                                                                                      |
-| `packages/brand` (`@joymify/brand`)   | The Joymify brand kit: geometry (`src/geometry.js`), pure SVG renderers (`src/render.js`), and `build.js`, which reads the light-theme `--joy-brand-*` values from `packages/tokens/dist/theme.css` and writes the static files in `assets/` (see [Brand kit](#brand-kit) below). |
-| `packages/svelte` (`@joymify/svelte`) | Svelte 5 (Runes) components.                                                                                                                                                                                                                                                      |
-| `packages/react` (`@joymify/react`)   | React 19 twins of the Svelte components: the same props, the same classes and ref forwarding.                                                                                                                                                                                     |
+| `packages/tokens` (`@montionugera/joy-tokens`) | `src/tokens.json` is the only place colour values live. `node packages/tokens/build.js` generates `dist/theme.css` (CSS variables plus all component CSS), `dist/tailwind-theme.css` (Tailwind v4 `@theme`), and `dist/index.{js,cjs,d.ts}`.                                      |
+| `packages/icons` (`@montionugera/joy-icons`)   | SVG icons as Svelte 5 components (`@montionugera/joy-icons`) and React components (`@montionugera/joy-icons/react`), with identical rendering.                                                                                                                                                      |
+| `packages/brand` (`@montionugera/joy-brand`)   | The Joymify brand kit: geometry (`src/geometry.js`), pure SVG renderers (`src/render.js`), and `build.js`, which reads the light-theme `--joy-brand-*` values from `packages/tokens/dist/theme.css` and writes the static files in `assets/` (see [Brand kit](#brand-kit) below). |
+| `packages/svelte` (`@montionugera/joy-svelte`) | Svelte 5 (Runes) components.                                                                                                                                                                                                                                                      |
+| `packages/react` (`@montionugera/joy-react`)   | React 19 twins of the Svelte components: the same props, the same classes and ref forwarding.                                                                                                                                                                                     |
 | `packages/flutter` (`joymify_flutter`) | Flutter 3.32+ / Dart 3.8.1 package providing semantic token parity (`JoyThemeTokens`), pure style resolvers, and native widgets (`JoyButton`). |
 | `packages/contracts`                  | Declarative behavioral JSON contracts (`schemas/*.contract.json`) executed across Web and Flutter runners. |
 | `apps/storybook-hub`                  | The unified Developer Portal at dev.joymify.com (with legacy 301 redirect from design.joymify.com). Serves the Developer Portal Hero Landing Page at `/`, fanning out to 3 isolated sub-webapps: Joy Design System (`/design/`), Node Server Decorator (`/server-decorator/`), and CLI State Handler (`/cli-state-handler/`) in a single high-performance Nginx pod. |
@@ -43,11 +43,11 @@ Design references: **`DESIGN.md`** holds the visual system in the Google Stitch 
 
 ### Theme switching contract
 
-Import the stylesheet once: `import '@joymify/tokens/theme.css'`. Light is the default. `data-theme="dark"` or `data-theme="light"` on `<html>` always wins. Without the attribute, `@media (prefers-color-scheme: dark)` applies dark through `:root:not([data-theme="light"])`. Set the attribute before first paint to avoid a flash. Components and charts repaint when it changes; charts also listen for the `joy-theme-change` event.
+Import the stylesheet once: `import '@montionugera/joy-tokens/theme.css'`. Light is the default. `data-theme="dark"` or `data-theme="light"` on `<html>` always wins. Without the attribute, `@media (prefers-color-scheme: dark)` applies dark through `:root:not([data-theme="light"])`. Set the attribute before first paint to avoid a flash. Components and charts repaint when it changes; charts also listen for the `joy-theme-change` event.
 
 ### Tailwind v4
 
-`@import "@joymify/tokens/tailwind";` (which is `dist/tailwind-theme.css`) adds the tokens to Tailwind's `@theme`, so utilities such as `bg-joy-navy-500` resolve to the same values. Prefer the semantic CSS variables for anything theme-dependent.
+`@import "@montionugera/joy-tokens/tailwind";` (which is `dist/tailwind-theme.css`) adds the tokens to Tailwind's `@theme`, so utilities such as `bg-joy-navy-500` resolve to the same values. Prefer the semantic CSS variables for anything theme-dependent.
 
 ### Consumer migration notes
 
@@ -57,6 +57,50 @@ Import the stylesheet once: `import '@joymify/tokens/theme.css'`. Light is the d
 - **React charts (Wave 6).** `BarChart`, `LineChart` and `CandlestickChart` now honour the `theme` prop. Before, it was never read and threw a ReferenceError when the chart mounted.
 - **Chart `theme` prop is now live, both twins (Wave 6 review fix).** `BarChart`, `LineChart` and `CandlestickChart` used to apply `theme` only once, at mount — a later change to the prop was silently ignored. Both React and Svelte twins now re-apply it on every change via a new `JoyChartCore.setTheme(theme)` method, which mutates the existing chart instance in place and repaints (no instance recreation, no leaked canvas listeners).
 - **Ant Design 5 Quality Bar & Custom DatePickers.** Replaced unstyled native `<input type="date">` with custom accessible popover overlays. `DatePicker` provides `<< < Month Year > >>` navigation, 7x6 day grid, out-of-month muted cells, today highlight, quick-pick "Today", `min`/`max` boundary clamping, `disabledDate?: (current: Date) => boolean` predicate, `blackoutDates?: string[]`, and `blackoutRanges?: Array<[string, string]>`. `DateRangePicker` introduces a unified trigger pill `[ Start Date → End Date (x) [Calendar] ]` with side-by-side dual calendars (Month 1 & Month 2), continuous hover range trail highlighting intervals at 60fps, clear action `(x)`, financial presets (`Today`, `Last 7 Days`, `Last 30 Days`, `MTD`, `YTD`), and `forbidCrossBlackout?: boolean` to block selecting range spans across blackout windows. Shared `calendar-utils.ts` powers both React 19 and Svelte 5 twins with byte-identical parity.
+
+## Install from the registry
+
+Four packages are published to GitHub Packages under the `@montionugera` scope. `@montionugera/joy-svelte` is not published yet; it is used inside this workspace only.
+
+| Package | Ships | Import |
+| --- | --- | --- |
+| `@montionugera/joy-tokens` | Built CSS variables, component CSS, Tailwind theme and the JS token map. | `@montionugera/joy-tokens/theme.css`, `@montionugera/joy-tokens/tailwind`, `@montionugera/joy-tokens` |
+| `@montionugera/joy-icons` | React icons as built JavaScript with type declarations; Svelte icons as source. | `@montionugera/joy-icons/react` (React), `@montionugera/joy-icons` (Svelte, needs a Svelte bundler) |
+| `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
+| `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
+
+Add an `.npmrc` to the consuming repo:
+
+```ini
+# .npmrc in the consuming repo
+@montionugera:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+Install and use:
+
+```bash
+pnpm add @montionugera/joy-tokens @montionugera/joy-icons @montionugera/joy-react
+```
+
+```ts
+import '@montionugera/joy-tokens/theme.css';
+import { Button, Tabs } from '@montionugera/joy-react';
+import { Check } from '@montionugera/joy-icons/react';
+```
+
+`@montionugera/joy-react` needs `react` and `react-dom` 19 as peers. The repo and its packages are private, so every install needs a token:
+
+- **On a developer machine:** a personal GitHub token with the `read:packages` permission, exported as `GITHUB_TOKEN`.
+- **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the four packages' settings on GitHub, or store a personal token as a secret in the consuming repo.
+
+Fonts are still loaded by the consumer (see `DESIGN.md`).
+
+### Publishing
+
+Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed tag matching `packages-v*` whose commit is on `main`, or on a manual run, which defaults to a dry run. On a tag run the workflow fails unless the tag version (after `packages-v`) equals the version of at least one package; packages have independent versions, so it does not require all four to match. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons` and `@montionugera/joy-react`, runs the tarball test `scripts/test/consumer-smoke.sh`, fails if the gate or build left any changed or untracked file, then publishes tokens, icons, brand and react in that order, skipping any version already on the registry (a run where all four are already published fails on purpose: nothing to publish). The workflow file has no branch protection of its own: anyone with write access can start a manual run with the dry run switched off, so restrict who can do that in the repository settings. Versions are set by hand in each `package.json`. A published version is never reused: fix a bad release by publishing a higher version.
+
+`scripts/test/consumer-smoke.sh` also runs locally. It packs the four packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, and type-checks, builds and renders it.
 
 ## Quality gates
 
@@ -68,7 +112,7 @@ Import the stylesheet once: `import '@joymify/tokens/theme.css'`. Light is the d
 | 1    | emoji scan (inline Python)                                            | No raw OS emoji in tracked files.                                                                                                                                                                        |
 | 2    | `bash scripts/lint-colors.sh`                                         | No hex, `rgb()`/`hsl()` or `var(--joy-*, fallback)` in any package source or the hub. Every hit fails. Narrow exceptions live in `scripts/lint-colors.allow`.                                            |
 | 2a   | `bash scripts/test-lint-colors.sh`, `bash scripts/test-epic-check.sh` | Self-tests: the gate scripts still catch what they claim to.                                                                                                                                             |
-| 2b   | `pnpm check`                                                          | Type check: `tsc` for `@joymify/react` and `svelte-check` for `@joymify/svelte`, through turbo.                                                                                                          |
+| 2b   | `pnpm check`                                                          | Type check: `tsc` for `@montionugera/joy-react` and `svelte-check` for `@montionugera/joy-svelte`, through turbo, which builds dependencies first (`check` depends on `^build`).                        |
 | 2c   | `pnpm -r test`                                                        | Unit tests for every package, including the WCAG 2.2 AA contrast gate in both themes (`packages/tokens/test/contrast.test.js`) and icon Svelte/React parity (`packages/icons/test/icon-parity.test.js`). |
 | 2d   | `node scripts/parity-check.mjs`                                       | Svelte and React twins: props, classes and ref forwarding. It must report 0 violations.                                                                                                                  |
 | 2e   | `node --test 'scripts/test/*.test.mjs'`                               | DESIGN.md generator tests, the docs contract (AGENTS.md, PRODUCT.md, README and CI stay true to the code), and byte-identical shared helpers.                                                            |
@@ -207,8 +251,8 @@ A component or screen is done when all of these are true:
 ## Framework Parity & Component Coverage
 
 Joymify Design System provides full **Triplet Parity** across three first-class frameworks:
-- **React 19** (`@joymify/react`): Production TSX twins with ref forwarding, standard camelCase event handlers, and full token fidelity.
-- **Svelte 5** (`@joymify/svelte`): Idiomatic Svelte 5 Runes components (`$state`, `$derived`, `$props`, `ref = $bindable(null)`).
+- **React 19** (`@montionugera/joy-react`): Production TSX twins with ref forwarding, standard camelCase event handlers, and full token fidelity.
+- **Svelte 5** (`@montionugera/joy-svelte`): Idiomatic Svelte 5 Runes components (`$state`, `$derived`, `$props`, `ref = $bindable(null)`).
 - **Flutter 3.32+ / Dart 3.8.1** (`joymify_flutter`): Production mobile and desktop widgets, pure style resolvers, and semantic token theme extensions.
 
 ### Triplet Parity Standards
@@ -365,7 +409,7 @@ class HomeScreen extends StatelessWidget {
 
 ## Form Controls (Wave 2)
 
-Wave 2 delivers production-grade, hero-tier Button and form control primitives with full cross-framework parity across `@joymify/svelte` (Svelte 5 Runes) and `@joymify/react` (React 19). All styling is powered strictly by semantic design tokens defined in `packages/tokens`.
+Wave 2 delivers production-grade, hero-tier Button and form control primitives with full cross-framework parity across `@montionugera/joy-svelte` (Svelte 5 Runes) and `@montionugera/joy-react` (React 19). All styling is powered strictly by semantic design tokens defined in `packages/tokens`.
 
 ### State Matrix & Component Coverage
 
@@ -382,7 +426,7 @@ All 21 form controls support a comprehensive state matrix across Light and Dark 
 
 ### Cross-Framework Casing & Prop Parity Rule
 
-Components in `@joymify/svelte` and `@joymify/react` share identical API contracts and emit the same CSS class hierarchy:
+Components in `@montionugera/joy-svelte` and `@montionugera/joy-react` share identical API contracts and emit the same CSS class hierarchy:
 
 - **Event Handlers**: React uses camelCase (`onChange`, `onInput`, `onSelect`, `onRemove`, `onSubmit`, `onClick`). Svelte uses standard lowercase runes/props (`onchange`, `oninput`, `onselect`, `onremove`, `onsubmit`, `onclick`).
 - **Class Attribute**: React accepts `className`; Svelte accepts `class`.
@@ -409,13 +453,13 @@ The full gate list is under [Quality gates](#quality-gates). Wave 2 added the pa
 
 ## Display, Feedback, Navigation & Overlay (Wave 3)
 
-Wave 3 brings the 39 display, feedback, navigation and overlay components plus the shared chart engine (`chart-core.ts`) to the same standard as Wave 2, in both `@joymify/svelte` and `@joymify/react`. Every component in this wave guarantees:
+Wave 3 brings the 39 display, feedback, navigation and overlay components plus the shared chart engine (`chart-core.ts`) to the same standard as Wave 2, in both `@montionugera/joy-svelte` and `@montionugera/joy-react`. Every component in this wave guarantees:
 
 - **Tokens only**: no hex/rgb/hsl literal and no `var(--joy-*, <foreign fallback>)` in the component files or their CSS (`packages/tokens/build.js` is the single source of truth for every `joy-*` class both twins render).
 - **Dark mode through tokens**: no per-component dark overrides; surfaces, borders and status fills flip with `[data-theme]`.
 - **44px touch targets** under `@media (pointer: coarse)` for pagination, tab, menu, dropdown, close and toolbar controls (tag close is a documented exception, see Known deviations).
 - **Keyboard and ARIA**: roles, names and keyboard operation listed in the table below.
-- **No banned patterns**: no side-stripe borders, no decorative `backdrop-filter`, no tracked uppercase eyebrow labels, no HTML-entity or Unicode-glyph icons (icons come from `@joymify/icons`).
+- **No banned patterns**: no side-stripe borders, no decorative `backdrop-filter`, no tracked uppercase eyebrow labels, no HTML-entity or Unicode-glyph icons (icons come from `@montionugera/joy-icons`).
 
 ### Components and contract points
 
@@ -550,7 +594,7 @@ Rationale for each lives in `.claude/refined_backlog/F-038-wave-3-display-feedba
 
 ## Landing suite (Wave 4)
 
-Wave 4 brings the 14 landing components to the same standard in both `@joymify/svelte` and `@joymify/react`: `HeroSection`, `CTASection`, `PricingCard`, `PricingMatrix`, `FeatureCard`, `FeatureGrid`, `BentoCard`, `BentoGrid`, `LogoCloud`, `FAQSection`, `StatsSection`, `TestimonialCard`, `SiteFooter` and `LandingPage`. An internal twin, `LandingAction` (not exported from either index), renders the CTA button for `HeroSection` and `CTASection`: without `href` it composes `Button`, with `href` it renders an anchor, and a disabled or loading link drops its `href` and leaves the tab order. The full record of rulings, deviations and deferrals is in `.claude/refined_backlog/F-039-wave-4-landing-suite-hero-and-cta-depth/research/rulings-and-deferrals.md`; the per-issue status of every audit finding is in `research/issue-coverage.md` next to it.
+Wave 4 brings the 14 landing components to the same standard in both `@montionugera/joy-svelte` and `@montionugera/joy-react`: `HeroSection`, `CTASection`, `PricingCard`, `PricingMatrix`, `FeatureCard`, `FeatureGrid`, `BentoCard`, `BentoGrid`, `LogoCloud`, `FAQSection`, `StatsSection`, `TestimonialCard`, `SiteFooter` and `LandingPage`. An internal twin, `LandingAction` (not exported from either index), renders the CTA button for `HeroSection` and `CTASection`: without `href` it composes `Button`, with `href` it renders an anchor, and a disabled or loading link drops its `href` and leaves the tab order. The full record of rulings, deviations and deferrals is in `.claude/refined_backlog/F-039-wave-4-landing-suite-hero-and-cta-depth/research/rulings-and-deferrals.md`; the per-issue status of every audit finding is in `research/issue-coverage.md` next to it.
 
 ### Props (notable components)
 
@@ -715,7 +759,7 @@ The Storybook Hub provides a monocular Optical See-Through (OST) Head-Up Display
 5. **Temple Capacitive Touchpad Gesture Simulator**:
    - Hardware controls: Tap (`▶ Select / ⏸ Interrupt`), Double Tap (`◄ Back`), Swipe Down / Up (`▼ / ▲ Cursor`), Hold (`● Record Memo`).
    - Live gesture event feed telemetry.
-   - Strict Zero OS Emoji policy with vector icons from `@joymify/icons` and 100% WCAG 2.2 AA token contrast.
+   - Strict Zero OS Emoji policy with vector icons from `@montionugera/joy-icons` and 100% WCAG 2.2 AA token contrast.
 
 ### Contracts and screenshots
 
@@ -742,7 +786,7 @@ The last command writes the 16 acceptance screenshots (landing, primitives, form
 
 ## Brand kit
 
-`packages/brand` (`@joymify/brand`) is the single source for the Joymify mark, wordmark, hero banner and social card. Geometry (`src/geometry.js`) and pure SVG renderers (`src/render.js`) take a palette built from the light-theme `--joy-brand-*` values in `packages/tokens/dist/theme.css`, so every asset traces back to the tokens, never a hand-typed hex. `node packages/brand/build.js` regenerates the committed files below; a drift test in `packages/brand/test/` fails if the committed output and a fresh build disagree. See the generated [Brand](DESIGN.md#brand) section of `DESIGN.md` for the mark geometry, the wordmark padding/overflow rules, the `--joy-brand-*` table and the Don'ts.
+`packages/brand` (`@montionugera/joy-brand`) is the single source for the Joymify mark, wordmark, hero banner and social card. Geometry (`src/geometry.js`) and pure SVG renderers (`src/render.js`) take a palette built from the light-theme `--joy-brand-*` values in `packages/tokens/dist/theme.css`, so every asset traces back to the tokens, never a hand-typed hex. `node packages/brand/build.js` regenerates the committed files below; a drift test in `packages/brand/test/` fails if the committed output and a fresh build disagree. See the generated [Brand](DESIGN.md#brand) section of `DESIGN.md` for the mark geometry, the wordmark padding/overflow rules, the `--joy-brand-*` table and the Don'ts.
 
 The `Wordmark` component's glyph deliberately overflows about 8% of its height on each edge (it renders with `overflow: visible`), so a parent must not clip it with `overflow: hidden` unless that parent also adds matching padding back.
 
@@ -760,7 +804,7 @@ The `Wordmark` component's glyph deliberately overflows about 8% of its height o
 
 ### Adoption
 
-Favicon and Open Graph tags, served from wherever a consumer copies `packages/brand/assets/` (e.g. `static/brand/`). A bundler-aware consumer can instead import a file directly through the package's `./assets/*` export, e.g. `@joymify/brand/assets/favicon.svg`:
+Favicon and Open Graph tags, served from wherever a consumer copies `packages/brand/assets/` (e.g. `static/brand/`). A bundler-aware consumer can instead import a file directly through the package's `./assets/*` export, e.g. `@montionugera/joy-brand/assets/favicon.svg`:
 
 ```html
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
@@ -771,11 +815,11 @@ Favicon and Open Graph tags, served from wherever a consumer copies `packages/br
 Components, Svelte and React:
 
 ```js
-import { BrandMark, Wordmark, Ribbon, BrandBanner } from "@joymify/svelte";
+import { BrandMark, Wordmark, Ribbon, BrandBanner } from "@montionugera/joy-svelte";
 ```
 
 ```jsx
-import { BrandMark, Wordmark, Ribbon, BrandBanner } from "@joymify/react";
+import { BrandMark, Wordmark, Ribbon, BrandBanner } from "@montionugera/joy-react";
 ```
 
 ## Palette presets
@@ -801,7 +845,7 @@ To apply a preset globally, set `data-palette` on `<html>` or any container subt
 <!-- BEGIN GENERATED:deprecated-aliases -->
 <!-- Generated by scripts/gen-design-md.mjs. Do not edit by hand. -->
 
-64 legacy aliases still resolve, marked `@deprecated` in `@joymify/tokens` types. Replace them with the semantic token.
+64 legacy aliases still resolve, marked `@deprecated` in `@montionugera/joy-tokens` types. Replace them with the semantic token.
 
 | Deprecated | Use instead |
 | --- | --- |

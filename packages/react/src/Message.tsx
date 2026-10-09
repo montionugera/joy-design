@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AlertCircle, AlertTriangle, CheckCircle, Info } from '@joymify/icons/react';
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from '@montionugera/joy-icons/react';
 import { createAutoDismiss, type AutoDismiss } from './auto-dismiss.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');

@@ -1,27 +1,43 @@
 {
-  "name": "@joymify/react",
-  "version": "0.1.0",
+  "name": "@montionugera/joy-react",
+  "version": "0.2.0",
   "type": "module",
-  "main": "./src/index.ts",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montionugera/joy-design.git",
+    "directory": "packages/react"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "test": "node --test test/*.test.js",
     "check": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@joymify/brand": "workspace:*",
-    "@joymify/icons": "workspace:*",
-    "@joymify/tokens": "workspace:*"
+    "@montionugera/joy-brand": "workspace:*",
+    "@montionugera/joy-icons": "workspace:*",
+    "@montionugera/joy-tokens": "workspace:*"
   },
   "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

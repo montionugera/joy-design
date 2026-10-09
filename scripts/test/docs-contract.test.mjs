@@ -40,7 +40,7 @@ test('README lists every Gate 1 step and the theme contract', () => {
   for (const s of [...invoked, 'pnpm check', 'pnpm -r test', 'packages/tokens/test/contrast.test.js', 'scripts/test/*.test.mjs', 'scripts/epic-check.sh', 'scripts/integration.sh']) {
     assert.ok(readme.includes(s), `README must document the gate step ${s}`);
   }
-  for (const needle of ['data-theme', 'prefers-color-scheme', '@joymify/tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
+  for (const needle of ['data-theme', 'prefers-color-scheme', '@montionugera/joy-tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
     assert.ok(readme.includes(needle), `README must mention ${needle}`);
   }
 });
@@ -55,3 +55,28 @@ test('the CI workflow runs the type check and Gate 1', () => {
 test('the stale F-031 plan.md is gone from the repo root', () => {
   assert.ok(!fs.existsSync(path.join(root, 'plan.md')));
 });
+
+test('README documents installing from the registry, and AGENTS.md the build and type-check rule', () => {
+  const readme = read('README.md');
+  assert.match(readme, /^## Install from the registry$/m, 'README needs the Install from the registry section');
+  for (const needle of [
+    '@montionugera:registry=https://npm.pkg.github.com',
+    '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}',
+    "import '@montionugera/joy-tokens/theme.css';",
+    "import { Button, Tabs } from '@montionugera/joy-react';",
+    'read:packages',
+    'scripts/test/consumer-smoke.sh',
+    '.github/workflows/publish.yml',
+    'packages-v',
+  ]) {
+    assert.ok(readme.includes(needle), `README must mention ${needle}`);
+  }
+  for (const name of packageNames) assert.ok(readme.includes(name), `README must name ${name}`);
+  assert.ok(!/@joymify\/(tokens|icons|brand|react|svelte)/.test(readme), 'README must not use the old package scope');
+
+  const agents = read('AGENTS.md');
+  for (const needle of ['tsconfig.build.json', 'pnpm check', '^build', 'turbo.json', 'scripts/test/consumer-smoke.sh', '.github/workflows/publish.yml']) {
+    assert.ok(agents.includes(needle), `AGENTS.md must mention ${needle}`);
+  }
+});
+

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 export const requireFromHere = createRequire(import.meta.url);
 
-/** Transpile a source file (.tsx/.ts) to CJS on the fly and load it. Relative ./X.js imports resolve to sibling .tsx/.ts; `@joymify/icons/react` resolves to the icons package source. */
+/** Transpile a source file (.tsx/.ts) to CJS on the fly and load it. Relative ./X.js imports resolve to sibling .tsx/.ts; `@montionugera/joy-icons/react` resolves to the icons package source. */
 const moduleCache = new Map();
 export function loadFile(file, cache = moduleCache) {
   if (cache.has(file)) return cache.get(file);
@@ -15,7 +15,7 @@ export function loadFile(file, cache = moduleCache) {
   }).outputText;
   const mod = { exports: {} };
   const localRequire = (id) => {
-    if (id === '@joymify/icons/react') return loadFile(fileURLToPath(new URL('../../../icons/src/react.ts', import.meta.url)), cache);
+    if (id === '@montionugera/joy-icons/react') return loadFile(fileURLToPath(new URL('../../../icons/src/react.ts', import.meta.url)), cache);
     const m = id.match(/^\.\/([\w/-]+)\.js$/);
     if (!m) return requireFromHere(id);
     const base = path.join(path.dirname(file), m[1]);

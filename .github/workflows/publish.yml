@@ -1,0 +1,203 @@
+name: Publish packages to GitHub Packages
+
+# Publishes @montionugera/joy-tokens, joy-icons, joy-brand and joy-react.
+# A published version is permanent, so this runs only on a deliberate act:
+# a pushed tag matching packages-v*, or a manual run. Manual runs default to a dry run.
+on:
+  push:
+    tags:
+      - 'packages-v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: gate, build and tarball test, then pnpm publish --dry-run. Nothing is published.'
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-packages
+  cancel-in-progress: false
+
+env:
+  REGISTRY_URL: https://npm.pkg.github.com
+  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+
+jobs:
+  publish:
+    name: Gate, build, test, publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # A real publish must come from a commit that is on main. Dry runs may run from any branch.
+      - name: Refuse a commit that is not on main
+        if: env.DRY_RUN == 'false'
+        run: |
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME ($GITHUB_SHA) is not on main. Publish only from a commit that has been merged to main."
+            exit 1
+          fi
+          echo "$GITHUB_SHA is on main."
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@montionugera'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm --filter storybook-hub exec playwright install --with-deps chromium
+
+      # scripts/lint-colors.sh and its self-test search with ripgrep, which the runner image lacks.
+      - name: Install ripgrep
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ripgrep
+
+      # The gate rebuilds tokens and, through turbo's ^build edge on check, the brand assets.
+      - name: Gate (scripts/precheck.sh via scripts/integration.sh)
+        run: ./scripts/integration.sh
+
+      # Only joy-icons and joy-react are built here; their dist/ is untracked.
+      - name: Build joy-icons and joy-react
+        run: |
+          pnpm --filter @montionugera/joy-icons build
+          pnpm --filter @montionugera/joy-react build
+
+      - name: Tarball test (scripts/test/consumer-smoke.sh)
+        run: ./scripts/test/consumer-smoke.sh
+
+      # The bytes published must be the bytes in git: fail if untracked or modified files were left.
+      - name: Check the tree is unchanged
+        run: |
+          if ! test -z "$(git status --porcelain)"; then
+            echo "::error::The working tree is not clean. Gate, build, or tests modified or created files."
+            git status --short
+            exit 1
+          fi
+          echo "Working tree is clean."
+
+      - name: Check the tag matches the package versions
+        if: github.ref_type == 'tag'
+        run: |
+          tag="$GITHUB_REF_NAME"
+          version="${tag#packages-v}"
+          if [ "$tag" = "$version" ]; then
+            echo "::error::Tag $tag does not start with packages-v"
+            exit 1
+          fi
+          matched=false
+          for pkg in packages/*/package.json; do
+            pkg_ver="$(node -p "require('./$pkg').version" 2>/dev/null || true)"
+            if [ -n "$pkg_ver" ] && [ "$pkg_ver" = "$version" ]; then
+              matched=true
+              break
+            fi
+          done
+          if [ "$matched" != "true" ]; then
+            echo "::error::Tag $tag ($version) does not match the version of any packages/*/package.json"
+            exit 1
+          fi
+          echo "Tag $tag matches at least one package version ($version)."
+
+      - name: Dry run (nothing is published)
+        if: env.DRY_RUN == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/packs"
+          echo "## Dry run: nothing was published" >> "$GITHUB_STEP_SUMMARY"
+          for dir in tokens icons brand react; do
+            name="@montionugera/joy-$dir"
+            version="$(node -p "require('./packages/$dir/package.json').version")"
+            echo "::group::$name@$version"
+            (cd "packages/$dir" && pnpm publish --dry-run --no-git-checks)
+            mkdir -p "$RUNNER_TEMP/packs/$dir"
+            (cd "packages/$dir" && pnpm pack --pack-destination "$RUNNER_TEMP/packs/$dir" > /dev/null)
+            echo "Tarball file list for $name@$version:"
+            tar -tzf "$RUNNER_TEMP/packs/$dir"/*.tgz | sort
+            echo "::endgroup::"
+            echo "- \`$name@$version\`: $(tar -tzf "$RUNNER_TEMP/packs/$dir"/*.tgz | wc -l | tr -d ' ') files" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Publish the versions not yet on the registry
+        if: env.DRY_RUN == 'false'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## Publish" >> "$GITHUB_STEP_SUMMARY"
+          published=0
+          for dir in tokens icons brand react; do
+            name="@montionugera/joy-$dir"
+            version="$(node -p "require('./packages/$dir/package.json').version")"
+            err="$RUNNER_TEMP/npm-view-$dir.err"
+            set +e
+            found="$(npm view "$name@$version" version --registry "$REGISTRY_URL" 2> "$err")"
+            code=$?
+            set -e
+            if [ "$code" -eq 0 ] && [ "$found" = "$version" ]; then
+              echo "$name@$version is already on the registry: skipped."
+              echo "- \`$name@$version\`: already published, skipped" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            if [ "$code" -ne 0 ] && ! grep -q 'E404' "$err"; then
+              echo "::error::Could not ask the registry about $name@$version (npm view exit $code)."
+              cat "$err"
+              exit 1
+            fi
+            echo "Publishing $name@$version"
+            (cd "packages/$dir" && pnpm publish --no-git-checks)
+            published=$((published + 1))
+            echo "- \`$name@$version\`: published" >> "$GITHUB_STEP_SUMMARY"
+          done
+          if [ "$published" -eq 0 ]; then
+            echo "::error::nothing to publish"
+            exit 1
+          fi
+
+      - name: Verify each version is on the registry
+        if: env.DRY_RUN == 'false'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for dir in tokens icons brand react; do
+            name="@montionugera/joy-$dir"
+            version="$(node -p "require('./packages/$dir/package.json').version")"
+            found=""
+            for attempt in 1 2 3 4 5; do
+              echo "Asking the registry for $name@$version (attempt $attempt of 5)"
+              found="$(npm view "$name@$version" version --registry "$REGISTRY_URL" 2> /dev/null || true)"
+              if [ "$found" = "$version" ]; then break; fi
+              sleep 5
+            done
+            if [ "$found" != "$version" ]; then
+              echo "::error::$name@$version is not visible on the registry after publish."
+              exit 1
+            fi
+            echo "$name@$version is on the registry."
+          done

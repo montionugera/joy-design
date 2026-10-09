@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { MARK, WORDMARK, wordmarkLayout, markScale } from '@joymify/brand';
+  import { MARK, WORDMARK, wordmarkLayout, markScale } from '@montionugera/joy-brand';
 
   // The "Joymify" outlined wordmark, optionally paired with the bare diamond mark. Geometry AND
-  // layout (the mark/gap/glyph proportions) come from @joymify/brand's `wordmarkLayout` — the same
+  // layout (the mark/gap/glyph proportions) come from @montionugera/joy-brand's `wordmarkLayout` — the same
   // helper the canonical wordmark-*.svg asset is built from (packages/brand/src/render.js), so this
   // component can never drift from the shipped asset the way a copied implementation once did.
   // Colours are `--joy-brand-*` custom properties chosen by `tone` so the lockup stays correct on
