@@ -489,7 +489,7 @@ export function classes(src) {
   //  - dynamic prefixes (a match followed by `-`, `_` or a template hole), kept with a trailing
   //    `*`: `joy-progress--status-${x}` -> `joy-progress--status-*`
   //  - A `joy-` preceded by `/`, a word char or `-` is not a class: package specifiers such as
-  //    `@montionugera/joy-icons/react` and longer names like `foo-joy-x` are skipped
+  //    `@joymify/icons/react` and longer names like `foo-joy-x` are skipped
   const re = /(?<![\w/-])(?:--)?joy-[a-z0-9]+(?:[_-]+[a-z0-9]+)*/g;
   const out = new Set();
   let m;

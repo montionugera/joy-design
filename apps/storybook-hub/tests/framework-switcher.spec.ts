@@ -44,13 +44,13 @@ test.describe("Storybook Hub Tri-Framework Switcher & Flutter Integration", () =
     const snippet = page.locator("#button-code");
 
     // 1. Initial Svelte 5
-    await expect(snippet).toContainText("@montionugera/joy-svelte");
+    await expect(snippet).toContainText("@joymify/svelte");
 
     // 2. Switch to React 19
     await reactBtn.click();
     await expect(reactBtn).toHaveAttribute("aria-pressed", "true");
     await expect(svelteBtn).toHaveAttribute("aria-pressed", "false");
-    await expect(snippet).toContainText("@montionugera/joy-react");
+    await expect(snippet).toContainText("@joymify/react");
     await expect(snippet).toContainText("onClick");
 
     // 3. Switch to Flutter 3.32
@@ -64,7 +64,7 @@ test.describe("Storybook Hub Tri-Framework Switcher & Flutter Integration", () =
     // 4. Switch back to Svelte 5
     await svelteBtn.click();
     await expect(svelteBtn).toHaveAttribute("aria-pressed", "true");
-    await expect(snippet).toContainText("@montionugera/joy-svelte");
+    await expect(snippet).toContainText("@joymify/svelte");
   });
 
   test("navigating to /#flutter mounts Flutter 3.32 showcase view without layout error", async ({ page }) => {

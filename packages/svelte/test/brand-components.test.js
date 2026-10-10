@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { compileSvelte, renderSvelte as renderRaw } from './helpers/render-svelte.js';
-import { MARK } from '@montionugera/joy-brand';
+import { MARK } from '@joymify/brand';
 
 // F-043: BrandMark + Wordmark (Svelte twin). The React twin asserts the same expectations in
 // packages/react/test/brand-components.test.js.

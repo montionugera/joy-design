@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Check, Minus } from '@montionugera/joy-icons/react';
+import { Check, Minus } from '@joymify/icons/react';
 
 export interface PricingMatrixRow {
   label: string;

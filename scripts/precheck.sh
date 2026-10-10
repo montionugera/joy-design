@@ -39,9 +39,11 @@ echo "   Zero emoji policy verified."
 echo "2. Checking color-token integrity (strict: every package and the hub)..."
 bash scripts/lint-colors.sh
 
-echo "2a. Self-testing the gate scripts (lint-colors, epic-check)..."
+echo "2a. Self-testing the gate scripts (lint-colors, epic-check, fetch-cli-docs, smoke-cli-docs)..."
 bash scripts/test-lint-colors.sh
 bash scripts/test-epic-check.sh
+bash scripts/test-fetch-cli-docs.sh
+bash scripts/test-smoke-cli-docs.sh
 
 echo "2b. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
 pnpm check

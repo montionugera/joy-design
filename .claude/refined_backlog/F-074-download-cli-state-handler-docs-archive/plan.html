@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>render-spec-3IRCk7</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090d;
+      --surface: #10141b;
+      --surface-2: #161b24;
+      --surface-3: #1b212c;
+      --border: #2a3340;
+      --border-soft: #1c232e;
+      --ink: #d6dde7;
+      --ink-bright: #f6f8fb;
+      --ink-dim: #8392a3;
+      --accent: #4ee39b;
+      --accent-dim: #2f8f63;
+      --amber: #ffc746;
+      --amber-dim: #a37a1a;
+      --blue: #74b0ff;
+      --blue-dim: #3a5d8a;
+      --red: #ff6b6b;
+      --red-dim: #a14242;
+      --purple: #b288ff;
+      --purple-dim: #7a4dc5;
+      --teal: #4ed2c8;
+      --teal-dim: #347e7a;
+      --serif-display: "Fraunces", Georgia, serif;
+      --serif-body: "Spectral", Georgia, serif;
+      --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: var(--serif-body);
+      font-size: 19.5px;
+      line-height: 1.66;
+      color: var(--ink);
+      background: var(--bg);
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 64px 30px 160px;
+      counter-reset: sec;
+      animation: riseIn .55s cubic-bezier(.2,.7,.2,1) both;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(900px 500px at 80% -10%, rgba(78,227,155,.10), transparent 62%),
+        radial-gradient(720px 520px at -4% 110%, rgba(255,199,70,.055), transparent 60%),
+        linear-gradient(rgba(255,255,255,.020) 1px, transparent 1px) 0 0 / 100% 30px,
+        linear-gradient(90deg, rgba(255,255,255,.020) 1px, transparent 1px) 0 0 / 30px 100%;
+    }
+
+    @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- headings ---------- */
+    h1, h2, h3, h4 { font-family: var(--serif-display); color: var(--ink-bright); line-height: 1.16; letter-spacing: -.012em; font-weight: 600; }
+    h1 {
+      font-size: 3.2rem; font-weight: 700; margin: 0 0 .25em; letter-spacing: -.028em;
+      background: linear-gradient(180deg, #ffffff, #afb9c5);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      counter-increment: sec;
+      font-size: 2rem; margin: 2.8em 0 .7em; padding-top: .65em;
+      border-top: 1px solid var(--border-soft);
+      display: flex; align-items: baseline; gap: .55em; flex-wrap: wrap;
+      font-weight: 700;
+    }
+    h2::before {
+      content: "§" counter(sec, decimal-leading-zero);
+      font-family: var(--mono); font-size: .74rem; font-weight: 600;
+      color: var(--accent); letter-spacing: .04em;
+      border: 1px solid var(--accent-dim); border-radius: 6px;
+      padding: .3em .55em; transform: translateY(-.22em);
+      background: rgba(78,227,155,.06);
+    }
+    h3 { font-size: 1.42rem; margin: 2.1em 0 .55em; color: var(--ink-bright); font-weight: 600; }
+    h3 code { font-size: .88em; }
+    h4 { font-size: 1.1rem; margin: 1.5em 0 .4em; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono); font-weight: 600; }
+
+    p { margin: .95em 0; }
+    strong { color: var(--ink-bright); font-weight: 600; }
+    em { color: #d4dce6; }
+
+    mark {
+      background: linear-gradient(180deg, rgba(255,199,70,.0) 60%, rgba(255,199,70,.32) 60%);
+      color: var(--ink-bright); padding: 0 .2em; border-radius: 3px;
+    }
+
+    /* ---------- links ---------- */
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(78,227,155,.32); transition: border-color .15s, color .15s; }
+    a:hover { color: #8af0c2; border-bottom-color: var(--accent); }
+
+    /* ---------- inline code & code blocks ---------- */
+    code { font-family: var(--mono); font-size: .85em; background: var(--surface-2); color: #e0ecf6; padding: .14em .45em; border-radius: 5px; border: 1px solid var(--border-soft); }
+    pre {
+      position: relative; font-size: .82rem; line-height: 1.62;
+      background: linear-gradient(180deg, #0e1219, #0a0d13);
+      border: 1px solid var(--border); border-radius: 11px;
+      padding: 20px 20px 18px; margin: 1.4em 0; overflow-x: auto;
+      box-shadow: 0 1px 0 rgba(255,255,255,.02) inset, 0 18px 44px -28px rgba(0,0,0,.9);
+    }
+    pre::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: linear-gradient(var(--accent), transparent); border-radius: 11px 0 0 11px; opacity: .6; }
+    pre code { background: none; border: none; padding: 0; color: #d3e4f3; font-size: 1em; }
+
+    kbd { font-family: var(--mono); font-size: .82em; background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; padding: 2px 8px; border-radius: 6px; color: var(--ink-bright); box-shadow: 0 1px 0 var(--border-soft); }
+
+    /* ---------- tables ---------- */
+    table { border-collapse: collapse; width: 100%; margin: 1.4em 0; font-size: .87rem; font-family: var(--mono); }
+    th, td { border: 1px solid var(--border); padding: 11px 14px; text-align: left; vertical-align: top; }
+    th { background: var(--surface); color: var(--ink-bright); font-weight: 600; border-bottom: 2px solid var(--accent-dim); text-transform: uppercase; font-size: .76rem; letter-spacing: .08em; }
+    tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+    tr:hover td { background: rgba(78,227,155,.04); }
+    td code { font-size: .94em; }
+    td strong { color: var(--amber); }
+
+    /* ---------- lists ---------- */
+    ul, ol { padding-left: 1.5em; margin: .9em 0; }
+    li { margin: .4em 0; }
+    li::marker { color: var(--accent-dim); font-weight: 600; }
+    ul ul, ol ol, ul ol, ol ul { margin: .3em 0; }
+
+    /* ---------- blockquote (used by pandoc) ---------- */
+    blockquote { border-left: 3px solid var(--accent-dim); margin: 1.2em 0; padding: .2em 0 .2em 18px; color: var(--ink-dim); font-style: italic; }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.6em 0; }
+
+    /* ---------- masthead (h1 + first p) ---------- */
+    h1 + p { font-family: var(--mono); font-size: .82rem; color: var(--ink-dim); line-height: 2; letter-spacing: .02em; border-bottom: 1px solid var(--border-soft); padding-bottom: 1.2em; }
+    h1 + p strong { color: var(--amber); font-weight: 500; }
+
+    /* ---------- TOC ---------- */
+    #TOC {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 22px; margin: 1.8em 0 2.4em; font-family: var(--mono); font-size: .78rem;
+    }
+    #TOC::before { content: "CONTENTS"; display: block; color: var(--accent); letter-spacing: .22em; font-size: .7rem; margin-bottom: .7em; font-weight: 600; }
+    #TOC ul { list-style: none; padding-left: 0; margin: 0; }
+    #TOC > ul > li { margin: .22em 0; }
+    #TOC ul ul { padding-left: 1.1em; border-left: 1px solid var(--border-soft); margin: .25em 0 .5em; }
+    #TOC a { color: var(--ink); border: none; }
+    #TOC a:hover { color: var(--accent); }
+
+    @media (min-width: 1320px) {
+      #TOC {
+        position: fixed; top: 0; left: 0; bottom: 0; width: 300px; margin: 0;
+        border-radius: 0; border: none; border-right: 1px solid var(--border);
+        padding: 64px 28px; overflow-y: auto;
+        background: linear-gradient(180deg, rgba(13,17,23,.92), rgba(8,10,14,.92));
+        backdrop-filter: blur(6px);
+      }
+      body { max-width: 1320px; padding-left: 360px; }
+    }
+
+    /* ============================================================
+       CALLOUTS — info / warn / success / danger / idea / metric
+       Use via:
+         ::: callout-warn
+         **Heading**
+         body text
+         :::
+       or raw <div class="callout warn"> ... </div>
+       ============================================================ */
+    /* Robust layout: icon is absolutely positioned and the content is padded.
+       (An earlier `display:grid` + `.callout > * { grid-column: 2 }` approach broke
+       when pandoc emitted loose prose as bare text nodes — those became anonymous
+       grid items that fell into the icon column and wrapped one word per line.
+       Absolute icon + padding flows ANY content structure correctly: loose text,
+       multiple inline elements, nested lists.) */
+    .callout {
+      position: relative;
+      margin: 1.7em 0;
+      padding: 18px 22px 16px 58px;
+      border-radius: 13px;
+      border: 1px solid var(--callout-border, var(--border));
+      border-left-width: 4px;
+      background: var(--callout-bg, var(--surface));
+    }
+    .callout::before {
+      content: var(--callout-icon, "·");
+      position: absolute;
+      left: 14px; top: 16px;
+      width: 30px; text-align: center;
+      font-size: 28px; line-height: 1.1;
+      color: var(--callout-accent, var(--accent));
+    }
+    .callout > * { min-width: 0; margin-top: 0; }
+    .callout > * + * { margin-top: .55em; }
+    .callout > p:first-child strong:first-child {
+      display: block;
+      font-family: var(--serif-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--callout-accent, var(--ink-bright));
+      letter-spacing: -.01em;
+      margin-bottom: .35em;
+    }
+    .callout p { line-height: 1.55; }
+    .callout code { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.06); }
+
+    .callout.info,    .callout-info    { --callout-border: var(--blue-dim);   --callout-bg: rgba(116,176,255,.08);   --callout-accent: var(--blue);   --callout-icon: "ℹ"; }
+    .callout.warn,    .callout-warn    { --callout-border: var(--amber-dim);  --callout-bg: rgba(255,199,70,.09);    --callout-accent: var(--amber);  --callout-icon: "⚠"; }
+    .callout.success, .callout-success { --callout-border: var(--accent-dim); --callout-bg: rgba(78,227,155,.08);    --callout-accent: var(--accent); --callout-icon: "✓"; }
+    .callout.danger,  .callout-danger  { --callout-border: var(--red-dim);    --callout-bg: rgba(255,107,107,.09);   --callout-accent: var(--red);    --callout-icon: "✕"; }
+    .callout.idea,    .callout-idea    { --callout-border: var(--purple-dim); --callout-bg: rgba(178,136,255,.08);   --callout-accent: var(--purple); --callout-icon: "✦"; }
+    .callout.metric,  .callout-metric  { --callout-border: var(--teal-dim);   --callout-bg: rgba(78,210,200,.08);    --callout-accent: var(--teal);   --callout-icon: "Σ"; }
+    .callout.action,  .callout-action  { --callout-border: var(--accent-dim); --callout-bg: rgba(78,227,155,.04);    --callout-accent: var(--accent); --callout-icon: "▸"; }
+
+    /* ============================================================
+       METRIC TILES — grid of big-number cards
+       Use via raw HTML:
+         <div class="metric-grid">
+           <div class="metric-tile alarm">
+             <div class="label">Pass all gates</div>
+             <div class="value">21%</div>
+             <div class="delta">39 / 187 results</div>
+           </div>
+         </div>
+       Variants: .alarm (red), .win (green), .info (blue), .warn (amber)
+       ============================================================ */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 1.5em 0;
+    }
+    .metric-tile {
+      background: linear-gradient(180deg, var(--surface), var(--bg));
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--tile-accent, var(--accent));
+      border-radius: 12px;
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .metric-tile .label {
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .14em;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-tile .value {
+      font-family: var(--serif-display);
+      font-weight: 700;
+      font-size: 2.55rem;
+      color: var(--tile-accent, var(--ink-bright));
+      line-height: 1;
+      letter-spacing: -.025em;
+    }
+    .metric-tile .delta {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--ink-dim);
+    }
+    .metric-tile.alarm { --tile-accent: var(--red); }
+    .metric-tile.win   { --tile-accent: var(--accent); }
+    .metric-tile.info  { --tile-accent: var(--blue); }
+    .metric-tile.warn  { --tile-accent: var(--amber); }
+    .metric-tile.teal  { --tile-accent: var(--teal); }
+    .metric-tile.dim .value { color: var(--ink-bright); }
+
+    /* ============================================================
+       TOPIC CHIP — colored pill that can appear next to H2 text
+       ============================================================ */
+    .topic-chip {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .16em;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .topic-chip.warn   { background: var(--amber); }
+    .topic-chip.danger { background: var(--red);   color: #fff; }
+    .topic-chip.info   { background: var(--blue);  color: var(--bg); }
+    .topic-chip.idea   { background: var(--purple); color: #fff; }
+    .topic-chip.teal   { background: var(--teal);  color: var(--bg); }
+
+    /* ============================================================
+       PULL QUOTE
+       ============================================================ */
+    .pullquote {
+      font-family: var(--serif-display);
+      font-size: 1.55rem;
+      font-weight: 500;
+      line-height: 1.38;
+      color: var(--ink-bright);
+      border-left: 4px solid var(--accent);
+      padding: 4px 0 4px 22px;
+      margin: 1.8em 0;
+      letter-spacing: -.012em;
+    }
+
+    /* ============================================================
+       SCHEMATIC — ASCII box-drawing diagrams, monospace canvas
+       Use via:
+         <div class="schematic">
+         ┌─────────┐    ┌─────────┐
+         │ Phase 0 │ ─→ │ Phase 1 │
+         └─────────┘    └─────────┘
+         </div>
+       ============================================================ */
+    .schematic {
+      font-family: var(--mono);
+      font-size: .86rem;
+      line-height: 1.4;
+      background: linear-gradient(180deg, #0d1117, #0a0d13);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 28px;
+      margin: 1.6em 0;
+      color: #cfdcec;
+      white-space: pre;
+      overflow-x: auto;
+      position: relative;
+    }
+    .schematic::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: linear-gradient(var(--teal), transparent); border-radius: 12px 0 0 12px; opacity: .6; }
+
+    /* ============================================================
+       RAW SVG / inline diagrams
+       ============================================================ */
+    .diagram, svg.diagram, .figure {
+      display: block; margin: 1.6em auto; max-width: 100%;
+      background: linear-gradient(180deg, #0d1117, #0a0d13);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 22px 14px;
+    }
+    .figure-caption {
+      text-align: center; font-family: var(--mono); font-size: .76rem;
+      color: var(--ink-dim); margin-top: -.6em; margin-bottom: 1.6em;
+      letter-spacing: .04em;
+    }
+
+    /* ============================================================
+       MERMAID block — bigger frame, softer glow
+       ============================================================ */
+    .mermaid {
+      margin: 1.6em 0; text-align: center;
+      background: linear-gradient(180deg, #0e1320, #0a0d13);
+      border: 1px solid var(--border); border-radius: 13px;
+      padding: 24px 14px;
+      box-shadow: 0 18px 50px -36px rgba(78,227,155,.55) inset;
+    }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* Hide pandoc's title-block if present */
+    #title-block-header { display: none; }
+
+    /* ============================================================
+       UTILITY ROW — two-up / three-up adjacent blocks
+       ============================================================ */
+    .row {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      margin: 1.5em 0;
+    }
+    .row.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 760px) {
+      .row.two, .row.three { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const render = () => {
+      const blocks = new Set();
+      document.querySelectorAll('pre.mermaid, pre.sourceCode.mermaid').forEach((p) => blocks.add(p));
+      document.querySelectorAll('code.mermaid, code.language-mermaid').forEach((c) => {
+        const pre = c.closest('pre'); if (pre) blocks.add(pre);
+      });
+      blocks.forEach((pre) => {
+        const div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = pre.textContent.trim();
+        pre.replaceWith(div);
+      });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        fontFamily: 'IBM Plex Mono, monospace',
+        themeVariables: {
+          background: '#0a0d13',
+          primaryColor: '#1a212c',
+          primaryTextColor: '#f0f3f7',
+          primaryBorderColor: '#4ee39b',
+          lineColor: '#6c7a8b',
+          secondaryColor: '#191e28',
+          tertiaryColor: '#11161e',
+          tertiaryBorderColor: '#2a3340',
+          clusterBkg: 'rgba(78,227,155,.05)',
+          clusterBorder: '#2f8f63',
+          titleColor: '#4ee39b',
+          actorBkg: '#1a212c',
+          actorBorder: '#4ee39b',
+          actorTextColor: '#f0f3f7',
+          signalColor: '#9aa7b6',
+          signalTextColor: '#d3dbe5',
+          noteBkgColor: 'rgba(255,199,70,.14)',
+          noteBorderColor: '#ffc746',
+          noteTextColor: '#f6f8fb',
+          fontSize: '14px'
+        }
+      });
+      mermaid.run();
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+    else render();
+  </script>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#fetch-cli-state-handler-docs-from-its-github-release-implementation-plan"
+id="toc-fetch-cli-state-handler-docs-from-its-github-release-implementation-plan">Fetch
+cli-state-handler docs from its GitHub Release — Implementation Plan</a>
+<ul>
+<li><a href="#global-constraints" id="toc-global-constraints">Global
+Constraints</a></li>
+<li><a href="#file-map" id="toc-file-map">File map</a></li>
+<li><a href="#follow-up-owned-elsewhere"
+id="toc-follow-up-owned-elsewhere">Follow-up owned elsewhere</a></li>
+<li><a href="#if-it-goes-wrong" id="toc-if-it-goes-wrong">If it goes
+wrong</a></li>
+<li><a href="#known-limits-carried-from-the-specs-audit-not-fixed-here"
+id="toc-known-limits-carried-from-the-specs-audit-not-fixed-here">Known
+limits carried from the spec’s audit (not fixed here)</a></li>
+<li><a href="#audit-trail" id="toc-audit-trail">Audit trail</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="fetch-cli-state-handler-docs-from-its-github-release-implementation-plan">Fetch
+cli-state-handler docs from its GitHub Release — Implementation
+Plan</h1>
+<blockquote>
+<p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use
+subagent-driven-development to implement this plan task-by-task. Steps
+use checkbox (<code>- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+<p><strong>Goal:</strong> joy-design’s CI (the GitHub Actions workflow
+<code>.github/workflows/ci.yml</code>) downloads
+<code>docs-site.tgz</code> from a <code>cli-state-handler</code> GitHub
+Release and unpacks it before the developer-portal image is built, so
+dev.joymify.com serves the docs of a named release, and fails loudly
+when it cannot.</p>
+<p><strong>Architecture:</strong> One new shell script does fetch,
+retry, unpack, validation and swap; <code>ci.yml</code> calls it in the
+image job, appends the docs version to the image tag
+(<code>&lt;12-char commit hash&gt;-cli&lt;X.Y.Z&gt;</code>), and hands
+the version to the post-deploy smoke script, which compares it with the
+served <code>/cli-state-handler/version.json</code>.
+<code>Dockerfile</code>, <code>nginx.conf</code>, <code>build.js</code>,
+<code>scripts/assemble-portal.sh</code> and the tracked docs snapshot
+are not changed.</p>
+<p><strong>Tech Stack:</strong> bash, <code>gh</code> (GitHub CLI),
+<code>tar</code>, GitHub Actions YAML, <code>node --test</code> contract
+tests, Docker for the local image check.</p>
+<p><strong>Spec:</strong>
+<code>.claude/idea_backlog/I-079-download-cli-state-handler-docs-archive/spec.md</code>
+(I-079 is this work item’s idea id; after Task 2 the folder is copied to
+<code>.claude/refined_backlog/F-NNN-.../</code>). Executors read
+both.</p>
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+<li><strong>Never create, read, print or echo a token.</strong> No
+<code>gh auth token</code>, no <code>gh secret set</code>, no
+<code>set -x</code>. Tokens are the owner’s job (Task 1).</li>
+<li><strong>No outward or irreversible step without the owner’s explicit
+yes.</strong> Every such step below starts with
+<code>STOP — needs the owner's yes:</code>. A yes covers that one step
+only.</li>
+<li>Edits happen only in the feature worktree from Task 2. The main
+checkout blocks edits. Never <code>git commit --amend</code>; one new
+commit per logical unit; stage by explicit path.</li>
+<li>There is deliberately <strong>no skip switch</strong>: every fetch
+failure exits non-zero with an <code>::error::</code> line.</li>
+<li>The token reaches only the fetch step’s environment as
+<code>GH_TOKEN</code>. Never a Docker build argument, build secret, or
+file in the build context.</li>
+<li>The “Build and push” step keeps <code>context: .</code> (otherwise
+the action builds from a fresh checkout and ignores the fetched
+files).</li>
+<li>Never commit the fetched docs. Restore with
+<code>git checkout -- apps/storybook-hub/portal-bundles &amp;&amp; git clean -fd apps/storybook-hub/portal-bundles</code>.</li>
+<li>Repository names: <code>montionugera/joy-design</code> (this one),
+<code>montionugera/cli-state-handler</code> (the docs source). Asset
+name: <code>docs-site.tgz</code>. Output line:
+<code>cli-docs: fetched vX.Y.Z (version.json X.Y.Z)</code>.</li>
+</ul>
+<h2 id="file-map">File map</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scripts/fetch-cli-docs.sh</code> (new)</td>
+<td>Download, retry, unpack in a temp folder outside the repository,
+validate, swap into
+<code>apps/storybook-hub/portal-bundles/cli-state-handler/</code>,
+report the version</td>
+</tr>
+<tr>
+<td><code>scripts/test-fetch-cli-docs.sh</code> (new)</td>
+<td>Tests for the above against fixture archives and a stub
+<code>gh</code></td>
+</tr>
+<tr>
+<td><code>scripts/smoke-prod.sh</code></td>
+<td>New body check of <code>/cli-state-handler/version.json</code> when
+<code>EXPECTED_CLI_DOCS_VERSION</code> is set</td>
+</tr>
+<tr>
+<td><code>scripts/test-smoke-cli-docs.sh</code> (new)</td>
+<td>Tests for that check with a stub <code>curl</code></td>
+</tr>
+<tr>
+<td><code>scripts/test/ci-cli-docs.test.mjs</code> (new)</td>
+<td>Text contract on <code>ci.yml</code> (same style as
+<code>scripts/test/publish-contract.test.mjs</code>)</td>
+</tr>
+<tr>
+<td><code>scripts/precheck.sh</code></td>
+<td>Two lines so Gate 1 (the pre-ship build and test check) runs both
+new shell tests</td>
+</tr>
+<tr>
+<td><code>.github/workflows/ci.yml</code></td>
+<td>Input, fetch step, image tag, job output, smoke environment
+variable</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>Fix line 312, add “CLI State Handler docs source”</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="task-0-has-the-package-rename-shipped-into-release-3.8">Task 0:
+Has the package rename shipped into release 3.8?</h3>
+<p>Another session (feature F-073) is renaming
+<code>@montionugera/joy-*</code> to <code>@joymify/*</code> across about
+85 files on the same release branch. This plan shares only
+<code>README.md</code> with it.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1:</strong> Run from
+the <code>_release</code> worktree
+(<code>joy-design/.claude/worktrees/_release</code>, the long-lived
+checkout of branch <code>release/3.8</code>):</label></li>
+</ul>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> grep <span class="at">-l</span> <span class="st">&#39;&quot;@montionugera/joy-&#39;</span> release/3.8 <span class="at">--</span> <span class="st">&#39;packages/*/package.json&#39;</span><span class="kw">;</span> <span class="ex">psrw</span> status <span class="kw">|</span> <span class="fu">head</span> <span class="at">-30</span></span></code></pre></div>
+<p>Expected when the rename <strong>has shipped</strong>: the
+<code>git grep</code> prints nothing and <code>psrw status</code> shows
+F-073 as shipped. Today it prints five <code>package.json</code> paths
+(not shipped). Record the answer; it is re-checked in Task 7, the only
+task it affects.</p>
+<h3
+id="task-1-owner-only-create-two-tokens-and-save-them-as-secrets">Task
+1: OWNER ONLY — create two tokens and save them as secrets</h3>
+<p>Blocks Task 8 (the real CI run) only. Tasks 2 to 7 proceed without
+it. The implementer does none of this and never sees a value.</p>
+<p><code>montionugera</code> is a personal account, so sign in
+<strong>as <code>montionugera</code></strong>. Path: GitHub Settings,
+Developer settings, Personal access tokens, Fine-grained tokens,
+Generate new token.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th>Token 1 “joy-design reads cli docs”</th>
+<th>Token 2 “cli-state-handler signals portal”</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Token type</td>
+<td>Fine-grained personal access token</td>
+<td>Fine-grained personal access token</td>
+</tr>
+<tr>
+<td>Resource owner</td>
+<td><code>montionugera</code></td>
+<td><code>montionugera</code></td>
+</tr>
+<tr>
+<td>Repository access</td>
+<td>Only select repositories: <code>cli-state-handler</code></td>
+<td>Only select repositories: <code>joy-design</code></td>
+</tr>
+<tr>
+<td>Repository permission</td>
+<td><strong>Contents: Read-only</strong> (Metadata: Read-only is added
+automatically); nothing else</td>
+<td><strong>Actions: Read and write</strong>; nothing else</td>
+</tr>
+<tr>
+<td>Secret name</td>
+<td><code>CLI_DOCS_READ_TOKEN</code></td>
+<td><code>PORTAL_DISPATCH_TOKEN</code></td>
+</tr>
+<tr>
+<td>Saved in (Settings, Secrets and variables, Actions, repository
+secret)</td>
+<td><code>montionugera/joy-design</code></td>
+<td><code>montionugera/cli-state-handler</code></td>
+</tr>
+<tr>
+<td>Expiry</td>
+<td>Set one, plus a calendar reminder; an expired token fails the build
+by design</td>
+<td>Same</td>
+</tr>
+</tbody>
+</table>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1 (owner):</strong>
+UNVERIFIED in the spec: the permission mapping was not re-read by the
+audit. Before generating, confirm on GitHub’s “Permissions required for
+fine-grained personal access tokens” page that release-asset reads sit
+under Contents (read) and workflow dispatch under Actions
+(write).</label></li>
+<li><label><input type="checkbox" /><strong>Step 2 (owner):</strong>
+create and save both, as in the table.</label></li>
+<li><label><input type="checkbox" /><strong>Step 3 (implementer, names
+only):</strong> <code>gh secret list -R montionugera/joy-design</code>
+lists <code>CLI_DOCS_READ_TOKEN</code>;
+<code>gh secret list -R montionugera/cli-state-handler</code> lists
+<code>PORTAL_DISPATCH_TOKEN</code>.</label></li>
+</ul>
+<h3 id="task-2-feature-worktree">Task 2: Feature worktree</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1:</strong> In
+<code>joy-design</code>, run <code>psrw refine I-079</code> (psrw is the
+release tool; this mints a feature id F-NNN and commits the backlog
+entry locally on <code>release/3.8</code>), then
+<code>psrw claim F-NNN</code> (creates the isolated worktree
+<code>.claude/worktrees/F-NNN-&lt;slug&gt;</code> on branch
+<code>feat/F-NNN</code>). Neither command pushes or fetches (checked in
+the tool source,
+<code>~/.claude/ps-release-workflow/scripts/promote_idea_to_refined.py</code>
+and <code>init_work_refined_backlog.py</code>: no <code>push</code>, no
+<code>fetch</code>). <code>psrw refine</code> does commit in the shared
+<code>_release</code> worktree, where another session is also
+committing: run
+<code>git -C .claude/worktrees/_release status --porcelain</code> first
+and wait if it shows that session’s staged or half-written
+files.</label></li>
+<li><label><input type="checkbox" /><strong>Step 2:</strong> In the new
+worktree:
+<code>corepack enable &amp;&amp; pnpm install --frozen-lockfile</code>.
+Expected: exits 0.</label></li>
+<li><label><input type="checkbox" /><strong>Step 3:</strong> Baseline
+before any edit:
+<code>bash scripts/precheck.sh 2&gt;&amp;1 | tail -n 5</code> exits 0,
+and
+<code>actionlint .github/workflows/ci.yml &gt; /tmp/actionlint-before.txt; wc -l &lt; /tmp/actionlint-before.txt</code>
+(keep the count).</label></li>
+</ul>
+<h3 id="task-3-scriptsfetch-cli-docs.sh-test-first">Task 3:
+<code>scripts/fetch-cli-docs.sh</code>, test-first</h3>
+<p><strong>Files:</strong> Create
+<code>scripts/test-fetch-cli-docs.sh</code>,
+<code>scripts/fetch-cli-docs.sh</code>. Modify
+<code>scripts/precheck.sh</code> (after line 44).</p>
+<p><strong>Interfaces — produces:</strong>
+<code>bash scripts/fetch-cli-docs.sh [tag]</code>; empty or absent tag
+means the latest release. Reads <code>GH_TOKEN</code>. Test seams:
+<code>CLI_DOCS_BUNDLE_DIR</code> (default the tracked bundle folder),
+<code>CLI_DOCS_RETRY_DELAY</code> (default <code>10</code> seconds). On
+success appends <code>cli_docs_version=X.Y.Z</code> to
+<code>$GITHUB_OUTPUT</code> when that variable is set and prints the
+output line. “Retry 3 times” is implemented as <strong>3 attempts in
+total</strong>.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1: Write the failing
+test.</strong> <code>scripts/test-fetch-cli-docs.sh</code>, modelled on
+<code>scripts/test-lint-colors.sh</code> (fixtures in
+<code>mktemp -d</code>, removed by a trap). No real network, no real
+token.</label></li>
+</ul>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Break caught: a missing token, a bad archive or a failed download ships stale docs silently.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="va">repo_root</span><span class="op">=</span><span class="va">$(</span><span class="bu">cd</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">dirname</span> <span class="st">&quot;</span><span class="va">$0</span><span class="st">&quot;</span><span class="va">)</span><span class="st">/..&quot;</span> <span class="kw">&amp;&amp;</span> <span class="bu">pwd</span><span class="va">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="va">fx</span><span class="op">=</span><span class="va">$(</span><span class="fu">mktemp</span> <span class="at">-d</span><span class="va">)</span><span class="kw">;</span> <span class="bu">trap</span> <span class="st">&#39;rm -rf &quot;$fx&quot;&#39;</span> EXIT</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/assets&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;&lt;html&gt;new&lt;/html&gt;&#39;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/index.html&quot;</span><span class="kw">;</span> <span class="bu">echo</span> <span class="st">&#39;x&#39;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/assets/a.js&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">&#39;{&quot;version&quot;:&quot;0.2.0&quot;}\n&#39;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/version.json&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-czf</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/good.tgz&quot;</span> <span class="at">-C</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src&quot;</span> .</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">mk()</span> <span class="kw">{</span> <span class="fu">rm</span> <span class="at">-rf</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/v&quot;</span> <span class="kw">&amp;&amp;</span> <span class="fu">cp</span> <span class="at">-R</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/v&quot;</span> <span class="kw">&amp;&amp;</span> <span class="kw">(</span><span class="bu">cd</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/v&quot;</span> <span class="kw">&amp;&amp;</span> <span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$2</span><span class="st">&quot;</span><span class="kw">)</span> <span class="kw">&amp;&amp;</span> <span class="fu">tar</span> <span class="at">-czf</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/</span><span class="va">$1</span><span class="st">.tgz&quot;</span> <span class="at">-C</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/v&quot;</span> .<span class="kw">;</span> <span class="kw">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">mk</span> no-version <span class="st">&#39;rm version.json&#39;</span><span class="kw">;</span> <span class="ex">mk</span> no-index <span class="st">&#39;rm index.html&#39;</span><span class="kw">;</span> <span class="ex">mk</span> mismatch <span class="st">&#39;echo &quot;{\&quot;version\&quot;:\&quot;0.1.0\&quot;}&quot; &gt; version.json&#39;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-c</span> <span class="st">&quot;import tarfile,sys;t=tarfile.open(sys.argv[1],&#39;w:gz&#39;);t.add(sys.argv[2],arcname=&#39;../evil.txt&#39;);t.close()&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/traversal.tgz&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/index.html&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin/gh&quot;</span> <span class="op">&lt;&lt;&#39;STUB&#39;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="st">#!/usr/bin/env bash</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="st">echo &quot;$*&quot; &gt;&gt; &quot;$FAKE_GH_LOG&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="st">case &quot;${FAKE_GH_MODE:-ok}&quot; in</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="st">  notfound) echo &quot;release not found&quot; &gt;&amp;2; exit 1 ;;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="st">  flaky) n=$(cat &quot;$FAKE_GH_COUNT&quot; 2&gt;/dev/null || echo 0); echo $((n + 1)) &gt; &quot;$FAKE_GH_COUNT&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="st">         [ &quot;$n&quot; -ge &quot;${FAKE_GH_FAILS:-2}&quot; ] || { echo &quot;connection reset by peer&quot; &gt;&amp;2; exit 1; } ;;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="st">esac</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="st">if [ &quot;$2&quot; = &quot;view&quot; ]; then echo &quot;v0.2.0&quot;; exit 0; fi</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="st">while [ $# -gt 0 ]; do [ &quot;$1&quot; = &quot;-D&quot; ] &amp;&amp; dest=&quot;$2&quot;; shift; done</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="st">mkdir -p &quot;$dest&quot;; cp &quot;$FAKE_GH_ARCHIVE&quot; &quot;$dest/docs-site.tgz&quot;</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="op">STUB</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin/gh&quot;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="fu">run()</span> <span class="kw">{</span> <span class="co"># run &lt;archive&gt; &lt;tag&gt; [VAR=value...] -&gt; sets $code, $out; bundle starts as an &quot;old&quot; snapshot</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="bu">local</span> <span class="va">archive</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="va">tag</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$2</span><span class="st">&quot;</span><span class="kw">;</span> <span class="bu">shift</span> 2</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rm</span> <span class="at">-rf</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/count&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/log&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/ghout&quot;</span><span class="kw">;</span> <span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle&quot;</span><span class="kw">;</span> <span class="bu">echo</span> old <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle/index.html&quot;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="bu">set</span> +e</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="va">out</span><span class="op">=</span><span class="va">$(</span><span class="fu">env</span> PATH=<span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin:</span><span class="va">$PATH</span><span class="st">&quot;</span> GH_TOKEN=fake FAKE_GH_ARCHIVE=<span class="st">&quot;</span><span class="va">$fx</span><span class="st">/</span><span class="va">$archive</span><span class="st">.tgz&quot;</span> FAKE_GH_LOG=<span class="st">&quot;</span><span class="va">$fx</span><span class="st">/log&quot;</span> FAKE_GH_COUNT=<span class="st">&quot;</span><span class="va">$fx</span><span class="st">/count&quot;</span> <span class="dt">\</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    CLI_DOCS_BUNDLE_DIR=<span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle&quot;</span> CLI_DOCS_RETRY_DELAY=0 GITHUB_OUTPUT=<span class="st">&quot;</span><span class="va">$fx</span><span class="st">/ghout&quot;</span> <span class="st">&quot;</span><span class="va">$@</span><span class="st">&quot;</span> bash <span class="st">&quot;</span><span class="va">$repo_root</span><span class="st">/scripts/fetch-cli-docs.sh&quot;</span> <span class="va">$tag</span> <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span><span class="va">)</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="va">code</span><span class="op">=</span><span class="va">$?</span><span class="kw">;</span> <span class="bu">set</span> <span class="at">-e</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="fu">ok()</span> <span class="kw">{</span> <span class="bu">echo</span> <span class="st">&quot;ok - </span><span class="va">$1</span><span class="st">&quot;</span><span class="kw">;</span> <span class="kw">};</span> <span class="fu">die()</span> <span class="kw">{</span> <span class="bu">echo</span> <span class="st">&quot;not ok - </span><span class="va">$1</span><span class="st">&quot;</span><span class="kw">;</span> <span class="bu">echo</span> <span class="st">&quot;</span><span class="va">$out</span><span class="st">&quot;</span><span class="kw">;</span> <span class="bu">exit</span> 1<span class="kw">;</span> <span class="kw">}</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="fu">untouched()</span> <span class="kw">{</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">cat</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle/index.html&quot;</span><span class="va">)</span><span class="st">&quot;</span> <span class="ot">=</span> old <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="bu">[</span> <span class="ot">!</span> <span class="ot">-e</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle/version.json&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="kw">}</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ex">run</span> good v0.2.0</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="st">&quot;</span><span class="va">$code</span><span class="st">&quot;</span> <span class="ot">=</span> 0 <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">&quot;</span><span class="va">$out</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-qx</span> <span class="st">&#39;cli-docs: fetched v0.2.0 (version.json 0.2.0)&#39;</span> <span class="kw">&amp;&amp;</span> <span class="fu">grep</span> <span class="at">-qx</span> <span class="st">&#39;cli_docs_version=0.2.0&#39;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/ghout&quot;</span> <span class="dt">\</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&amp;&amp;</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">cat</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle/version.json&quot;</span><span class="va">)</span><span class="st">&quot;</span> <span class="ot">=</span> <span class="st">&#39;{&quot;version&quot;:&quot;0.2.0&quot;}&#39;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="fu">grep</span> <span class="at">-q</span> new <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bundle/index.html&quot;</span> <span class="kw">||</span> <span class="ex">die</span> fetches_named_tag_and_swaps_bundle</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ex">ok</span> fetches_named_tag_and_swaps_bundle</span></code></pre></div>
+<p>Then one block per remaining case, each ending
+<code>|| die &lt;name&gt;; ok &lt;name&gt;</code>:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Test name</th>
+<th><code>run</code> call</th>
+<th>Must hold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>empty_tag_resolves_latest</code></td>
+<td><code>run good ""</code></td>
+<td><code>code=0</code>; output line names <code>v0.2.0</code>;
+<code>$fx/log</code> contains <code>release view</code></td>
+</tr>
+<tr>
+<td><code>empty_token_fails_naming_secret</code></td>
+<td><code>run good v0.2.0 GH_TOKEN=</code></td>
+<td><code>code≠0</code>; output has <code>::error::</code> and
+<code>CLI_DOCS_READ_TOKEN</code>; <code>untouched</code>;
+<code>$fx/log</code> does not exist (<code>gh</code> never called, so a
+stored login cannot mask it)</td>
+</tr>
+<tr>
+<td><code>missing_release_fails_without_retry</code></td>
+<td><code>run good v9.9.9 FAKE_GH_MODE=notfound</code></td>
+<td><code>code≠0</code>; <code>untouched</code>;
+<code>wc -l &lt; $fx/log</code> is <code>1</code></td>
+</tr>
+<tr>
+<td><code>transient_error_retried_then_succeeds</code></td>
+<td><code>run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=2</code></td>
+<td><code>code=0</code>; log has 3 lines</td>
+</tr>
+<tr>
+<td><code>persistent_error_fails_after_three_attempts</code></td>
+<td><code>run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=9</code></td>
+<td><code>code≠0</code>; log has 3 lines; <code>untouched</code></td>
+</tr>
+<tr>
+<td><code>archive_without_version_json_fails</code> /
+<code>archive_without_index_fails</code></td>
+<td><code>run no-version v0.2.0</code> /
+<code>run no-index v0.2.0</code></td>
+<td><code>code≠0</code>; <code>::error::</code>;
+<code>untouched</code></td>
+</tr>
+<tr>
+<td><code>version_mismatch_fails</code></td>
+<td><code>run mismatch v0.2.0</code></td>
+<td><code>code≠0</code>; output names both <code>0.1.0</code> and
+<code>v0.2.0</code>; <code>untouched</code></td>
+</tr>
+<tr>
+<td><code>path_traversal_rejected</code></td>
+<td><code>run traversal v0.2.0</code></td>
+<td><code>code≠0</code>; <code>untouched</code>;
+<code>[ ! -e "$fx/evil.txt" ]</code></td>
+</tr>
+<tr>
+<td><code>corrupt_archive_fails</code></td>
+<td>fixture
+<code>head -c 60 "$fx/good.tgz" &gt; "$fx/corrupt.tgz"</code>;
+<code>run corrupt v0.2.0</code></td>
+<td><code>code≠0</code>; <code>::error::</code> and
+<code>not a readable tar.gz</code>; <code>untouched</code></td>
+</tr>
+<tr>
+<td><code>link_entry_rejected</code></td>
+<td>fixture
+<code>(cd "$fx/src" &amp;&amp; ln -s /etc/hosts leak &amp;&amp; tar -czf "$fx/symlink.tgz" . &amp;&amp; rm leak)</code>;
+<code>run symlink v0.2.0</code></td>
+<td><code>code≠0</code>; <code>::error::</code> and
+<code>link or special file</code>; <code>untouched</code></td>
+</tr>
+<tr>
+<td><code>malformed_tag_rejected</code></td>
+<td><code>run good "--skip-existing"</code></td>
+<td><code>code≠0</code>; <code>::error::</code> and
+<code>not of the form</code>; <code>untouched</code>;
+<code>$fx/log</code> does not exist (the value never reaches
+<code>gh</code>)</td>
+</tr>
+<tr>
+<td><code>no_work_files_left_in_repo</code></td>
+<td>record
+<code>before=$(git -C "$repo_root" status --porcelain apps/)</code> at
+the top of the script; after all cases</td>
+<td><code>[ "$(git -C "$repo_root" status --porcelain apps/)" = "$before" ]</code>
+(a before/after comparison: Gate 1 must not fail just because someone
+has unrelated uncommitted work under <code>apps/</code>)</td>
+</tr>
+</tbody>
+</table>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 2: Run it, expect
+failure.</strong> <code>bash scripts/test-fetch-cli-docs.sh</code> →
+<code>not ok - fetches_named_tag_and_swaps_bundle</code> (the script
+does not exist yet).</label></li>
+<li><label><input type="checkbox" /><strong>Step 3: Implement</strong>
+<code>scripts/fetch-cli-docs.sh</code>
+(<code>chmod +x</code>):</label></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Fetch cli-state-handler&#39;s docs-site.tgz from its GitHub Release and swap it into the portal bundle folder.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Fails loudly on every error; there is no skip switch. Never prints the token; do not add `set -x`.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="va">repo</span><span class="op">=</span><span class="st">&quot;montionugera/cli-state-handler&quot;</span><span class="kw">;</span> <span class="va">asset</span><span class="op">=</span><span class="st">&quot;docs-site.tgz&quot;</span><span class="kw">;</span> <span class="va">tag</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${1</span><span class="op">:-</span><span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="va">repo_root</span><span class="op">=</span><span class="va">$(</span><span class="bu">cd</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">dirname</span> <span class="st">&quot;</span><span class="va">$0</span><span class="st">&quot;</span><span class="va">)</span><span class="st">/..&quot;</span> <span class="kw">&amp;&amp;</span> <span class="bu">pwd</span><span class="va">)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="va">bundle_dir</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${CLI_DOCS_BUNDLE_DIR</span><span class="op">:-</span><span class="va">$repo_root</span>/apps/storybook-hub/portal-bundles/cli-state-handler<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="va">delay</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${CLI_DOCS_RETRY_DELAY</span><span class="op">:-</span>10<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">fail()</span> <span class="kw">{</span> <span class="bu">echo</span> <span class="st">&quot;::error::cli-docs: </span><span class="va">$*</span><span class="st">&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span><span class="kw">;</span> <span class="bu">exit</span> 1<span class="kw">;</span> <span class="kw">}</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-n</span> <span class="st">&quot;</span><span class="va">${GH_TOKEN</span><span class="op">:-</span><span class="va">}</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;secret CLI_DOCS_READ_TOKEN is empty or missing (GH_TOKEN is not set)&quot;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="va">work</span><span class="op">=</span><span class="va">$(</span><span class="fu">mktemp</span> <span class="at">-d</span><span class="va">)</span><span class="kw">;</span> <span class="bu">trap</span> <span class="st">&#39;rm -rf &quot;$work&quot;&#39;</span> EXIT   <span class="co"># outside the repository: nothing may leak into apps/</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">gh_retry()</span> <span class="kw">{</span> <span class="co"># permanent errors fail at once; anything else gets 3 attempts in total</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="bu">local</span> <span class="va">n</span><span class="op">=</span>1</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="ot">! </span><span class="st">&quot;</span><span class="va">$@</span><span class="st">&quot;</span> <span class="dv">2</span><span class="op">&gt;</span><span class="st">&quot;</span><span class="va">$work</span><span class="st">/gh.err&quot;</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">grep</span> <span class="at">-qiE</span> <span class="st">&#39;not found|HTTP 40[134]|bad credentials|no assets&#39;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/gh.err&quot;</span><span class="kw">;</span> <span class="cf">then</span> <span class="ex">fail</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">tr</span> <span class="st">&#39;\n&#39;</span> <span class="st">&#39; &#39;</span> <span class="op">&lt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/gh.err&quot;</span><span class="va">)</span><span class="st">&quot;</span><span class="kw">;</span> <span class="cf">fi</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$n</span><span class="st">&quot;</span> <span class="ot">-lt</span> 3 <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;gave up after 3 attempts: </span><span class="va">$(</span><span class="fu">tr</span> <span class="st">&#39;\n&#39;</span> <span class="st">&#39; &#39;</span> <span class="op">&lt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/gh.err&quot;</span><span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">n</span><span class="op">=</span><span class="va">$((n</span> <span class="op">+</span> <span class="dv">1</span><span class="va">))</span><span class="kw">;</span> <span class="fu">sleep</span> <span class="st">&quot;</span><span class="va">$delay</span><span class="st">&quot;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">done</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-n</span> <span class="st">&quot;</span><span class="va">$tag</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="va">tag</span><span class="op">=</span><span class="va">$(</span><span class="ex">gh_retry</span> gh release view <span class="at">-R</span> <span class="st">&quot;</span><span class="va">$repo</span><span class="st">&quot;</span> <span class="at">--json</span> tagName <span class="at">-q</span> .tagName<span class="va">)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-n</span> <span class="st">&quot;</span><span class="va">$tag</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;no release found in </span><span class="va">$repo</span><span class="st">&quot;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$tag</span><span class="st">&quot;</span> <span class="ot">=~</span> <span class="pp">^</span><span class="ss">v</span><span class="op">[</span><span class="ss">0</span><span class="op">-</span><span class="ss">9A</span><span class="op">-</span><span class="ss">Za</span><span class="op">-</span><span class="ss">z._-</span><span class="op">]</span><span class="pp">+</span><span class="op">$</span> <span class="kw">]]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;release tag &#39;</span><span class="va">$tag</span><span class="st">&#39; is not of the form vX.Y.Z&quot;</span>   <span class="co"># also stops a tag being read as a gh flag</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/dl&quot;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ex">gh_retry</span> gh release download <span class="st">&quot;</span><span class="va">$tag</span><span class="st">&quot;</span> <span class="at">-R</span> <span class="st">&quot;</span><span class="va">$repo</span><span class="st">&quot;</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">$asset</span><span class="st">&quot;</span> <span class="at">-D</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/dl&quot;</span> <span class="at">--clobber</span>   <span class="co"># --clobber: a retry may meet a partial file</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-s</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/dl/</span><span class="va">$asset</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;release </span><span class="va">$tag</span><span class="st"> has no </span><span class="va">$asset</span><span class="st">&quot;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Listings go to files: grep -q on a pipe would hide a match under pipefail. Every tar failure gets an ::error:: line.</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-tzf</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/dl/</span><span class="va">$asset</span><span class="st">&quot;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/list&quot;</span> <span class="dv">2</span><span class="op">&gt;</span><span class="st">&quot;</span><span class="va">$work</span><span class="st">/tar.err&quot;</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;</span><span class="va">$asset</span><span class="st"> is not a readable tar.gz: </span><span class="va">$(</span><span class="fu">tr</span> <span class="st">&#39;\n&#39;</span> <span class="st">&#39; &#39;</span> <span class="op">&lt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/tar.err&quot;</span><span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="fu">grep</span> <span class="at">-qE</span> <span class="st">&#39;^/|(^|/)\.\.(/|$)&#39;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/list&quot;</span><span class="kw">;</span> <span class="cf">then</span> <span class="ex">fail</span> <span class="st">&quot;archive contains an absolute or .. path&quot;</span><span class="kw">;</span> <span class="cf">fi</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-tvzf</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/dl/</span><span class="va">$asset</span><span class="st">&quot;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/vlist&quot;</span> <span class="dv">2</span><span class="op">&gt;</span><span class="st">&quot;</span><span class="va">$work</span><span class="st">/tar.err&quot;</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;</span><span class="va">$asset</span><span class="st"> is not a readable tar.gz: </span><span class="va">$(</span><span class="fu">tr</span> <span class="st">&#39;\n&#39;</span> <span class="st">&#39; &#39;</span> <span class="op">&lt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/tar.err&quot;</span><span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="fu">grep</span> <span class="at">-qvE</span> <span class="st">&#39;^[-d]&#39;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/vlist&quot;</span><span class="kw">;</span> <span class="cf">then</span> <span class="ex">fail</span> <span class="st">&quot;archive contains a link or special file (only files and folders are allowed)&quot;</span><span class="kw">;</span> <span class="cf">fi</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/out&quot;</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzf</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/dl/</span><span class="va">$asset</span><span class="st">&quot;</span> <span class="at">--no-same-owner</span> <span class="at">-C</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/out&quot;</span> <span class="dv">2</span><span class="op">&gt;</span><span class="st">&quot;</span><span class="va">$work</span><span class="st">/tar.err&quot;</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;could not unpack </span><span class="va">$asset</span><span class="st">: </span><span class="va">$(</span><span class="fu">tr</span> <span class="st">&#39;\n&#39;</span> <span class="st">&#39; &#39;</span> <span class="op">&lt;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/tar.err&quot;</span><span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/out/index.html&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;archive has no index.html&quot;</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/out/version.json&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;archive has no version.json&quot;</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="va">version</span><span class="op">=</span><span class="va">$(</span><span class="fu">sed</span> <span class="at">-n</span> <span class="st">&#39;s/.*&quot;version&quot;[[:space:]]*:[[:space:]]*&quot;\([^&quot;]*\)&quot;.*/\1/p&#39;</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/out/version.json&quot;</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 1<span class="va">)</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$version</span><span class="st">&quot;</span> <span class="ot">=~</span> <span class="pp">^</span><span class="op">[</span><span class="ss">0</span><span class="op">-</span><span class="ss">9A</span><span class="op">-</span><span class="ss">Za</span><span class="op">-</span><span class="ss">z._-</span><span class="op">]</span><span class="pp">+</span><span class="op">$</span> <span class="kw">]]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;version.json has no version usable in an image tag&quot;</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="st">&quot;v</span><span class="va">$version</span><span class="st">&quot;</span> <span class="ot">=</span> <span class="st">&quot;</span><span class="va">$tag</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="ex">fail</span> <span class="st">&quot;version.json says </span><span class="va">$version</span><span class="st"> but the release tag is </span><span class="va">$tag</span><span class="st">&quot;</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> <span class="st">&quot;</span><span class="va">$bundle_dir</span><span class="st">&quot;</span><span class="kw">;</span> <span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">$bundle_dir</span><span class="st">&quot;</span><span class="kw">;</span> <span class="fu">cp</span> <span class="at">-R</span> <span class="st">&quot;</span><span class="va">$work</span><span class="st">/out/.&quot;</span> <span class="st">&quot;</span><span class="va">$bundle_dir</span><span class="st">/&quot;</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">${GITHUB_OUTPUT</span><span class="op">:-</span><span class="va">}</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">||</span> <span class="bu">echo</span> <span class="st">&quot;cli_docs_version=</span><span class="va">$version</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> <span class="st">&quot;</span><span class="va">$GITHUB_OUTPUT</span><span class="st">&quot;</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;cli-docs: fetched </span><span class="va">$tag</span><span class="st"> (version.json </span><span class="va">$version</span><span class="st">)&quot;</span></span></code></pre></div>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 4: Run, expect
+pass.</strong> <code>bash scripts/test-fetch-cli-docs.sh</code> →
+fourteen <code>ok - ...</code> lines, exit 0. (The script and these
+cases were run by the audit on macOS, bash 3.2 and bsdtar, with a stub
+<code>gh</code>; the runner uses bash 5 and GNU tar, which Gate 1 in CI
+then proves.)</label></li>
+<li><label><input type="checkbox" /><strong>Step 5:</strong> Add
+<code>bash scripts/test-fetch-cli-docs.sh</code> after line 44 of
+<code>scripts/precheck.sh</code>. Run
+<code>bash scripts/precheck.sh 2&gt;&amp;1 | tail -n 5</code> → exit
+0.</label></li>
+<li><label><input type="checkbox" /><strong>Step 6: Commit.</strong>
+<code>git add scripts/fetch-cli-docs.sh scripts/test-fetch-cli-docs.sh scripts/precheck.sh &amp;&amp; git commit -m "feat(F-NNN): fetch cli-state-handler docs archive, fail loud"</code></label></li>
+<li><label><input type="checkbox" /><strong>Step 7: Quality gate
+A</strong> (credential-handling code, so the full gate):</label>
+<ol type="1">
+<li>Implement: Steps 1 to 6.</li>
+<li>Verify:
+<code>bash scripts/test-fetch-cli-docs.sh; echo exit=$?</code> →
+<code>exit=0</code>;
+<code>grep -n '^ *set -x' scripts/fetch-cli-docs.sh</code> prints
+nothing.</li>
+<li>Independent review of
+<code>git diff release/3.8...HEAD -- scripts/</code>: dispatch
+<code>code-reviewer</code> and <code>security-reviewer</code> (token
+never printed, temp folder outside the repo, traversal check, no stale
+file survives the swap).</li>
+<li>Refactor on the findings (<code>/simplify</code>); new commit.</li>
+<li>Re-verify: repeat item 2.</li>
+</ol></li>
+</ul>
+<h3
+id="task-4-smoke-check-compares-the-served-docs-version-test-first">Task
+4: Smoke check compares the served docs version, test-first</h3>
+<p><strong>Files:</strong> Create
+<code>scripts/test-smoke-cli-docs.sh</code>. Modify
+<code>scripts/smoke-prod.sh</code> (inside the non-legacy
+<code>else</code> branch, after the sub-webapp loop that ends at line
+47), <code>scripts/precheck.sh</code>.</p>
+<p><strong>Interfaces — consumes:</strong> environment variable
+<code>EXPECTED_CLI_DOCS_VERSION</code> (unset or empty skips the
+check).</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1: Write the failing
+test.</strong> A stub <code>curl</code> on <code>PATH</code>: when its
+arguments contain <code>-I</code> it prints <code>HTTP/2 200</code>;
+when the URL ends in <code>/cli-state-handler/version.json</code> it
+prints <code>$FAKE_VERSION_BODY</code>; otherwise it prints
+<code>&lt;html&gt;joymify&lt;/html&gt;</code>. Cases, each asserting the
+exit code of
+<code>PATH="$fx/bin:$PATH" bash scripts/smoke-prod.sh dev.joymify.com</code>:</label></li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Test name</th>
+<th>Environment</th>
+<th>Must hold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>matching_version_passes</code></td>
+<td><code>EXPECTED_CLI_DOCS_VERSION=0.2.0</code>, body
+<code>{"version":"0.2.0"}</code></td>
+<td>exit 0; output has
+<code>cli-state-handler docs version 0.2.0</code></td>
+</tr>
+<tr>
+<td><code>wrong_version_fails</code></td>
+<td>expected <code>0.3.0</code>, body
+<code>{"version":"0.2.0"}</code></td>
+<td>exit ≠ 0; <code>::error::</code> names both values</td>
+</tr>
+<tr>
+<td><code>index_html_instead_of_json_fails</code></td>
+<td>expected <code>0.2.0</code>, body
+<code>&lt;html&gt;joymify&lt;/html&gt;</code> (what nginx returns with
+HTTP 200 for a missing file)</td>
+<td>exit ≠ 0</td>
+</tr>
+<tr>
+<td><code>unset_expected_version_skips</code></td>
+<td>variable unset, body <code>&lt;html&gt;</code></td>
+<td>exit 0; no <code>docs version</code> line</td>
+</tr>
+<tr>
+<td><code>legacy_host_never_checks</code></td>
+<td>expected <code>0.3.0</code>, host
+<code>design.joymify.com</code></td>
+<td>exit 0</td>
+</tr>
+</tbody>
+</table>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 2:</strong>
+<code>bash scripts/test-smoke-cli-docs.sh</code> →
+<code>not ok - wrong_version_fails</code> (the check does not exist;
+today the script exits 0).</label></li>
+<li><label><input type="checkbox" /><strong>Step 3: Implement</strong>,
+inserted after the loop’s <code>done</code>, still inside the
+<code>else</code>:</label></li>
+</ul>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="bu">[</span> <span class="ot">-n</span> <span class="st">&quot;</span><span class="va">${EXPECTED_CLI_DOCS_VERSION</span><span class="op">:-</span><span class="va">}</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">vbody</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-sS</span> <span class="at">-k</span> <span class="at">--max-time</span> 15 <span class="st">&quot;https://</span><span class="va">${host}</span><span class="st">/cli-state-handler/version.json&quot;</span> <span class="kw">||</span> <span class="fu">true</span><span class="va">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">actual</span><span class="op">=</span><span class="va">$(</span><span class="bu">printf</span> <span class="st">&#39;%s&#39;</span> <span class="st">&quot;</span><span class="va">$vbody</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-n</span> <span class="st">&#39;s/.*&quot;version&quot;[[:space:]]*:[[:space:]]*&quot;\([^&quot;]*\)&quot;.*/\1/p&#39;</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 1<span class="va">)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$actual</span><span class="st">&quot;</span> <span class="ot">!=</span> <span class="st">&quot;</span><span class="va">$EXPECTED_CLI_DOCS_VERSION</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="bu">echo</span> <span class="st">&quot;::error::cli-state-handler docs version is &#39;</span><span class="va">${actual</span><span class="op">:-</span>none<span class="va">}</span><span class="st">&#39;, expected &#39;</span><span class="va">${EXPECTED_CLI_DOCS_VERSION}</span><span class="st">&#39;&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="bu">exit</span> 1</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;[OK] cli-state-handler docs version </span><span class="va">${actual}</span><span class="st"> matches the fetched release&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">fi</span></span></code></pre></div>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 4:</strong>
+<code>bash scripts/test-smoke-cli-docs.sh</code> → five <code>ok</code>
+lines. Add it to <code>scripts/precheck.sh</code> next to the Task 3
+line.</label></li>
+<li><label><input type="checkbox" /><strong>Step 5: Commit</strong> the
+three files:
+<code>feat(F-NNN): smoke check compares served cli docs version</code>.</label></li>
+</ul>
+<h3 id="task-5-wire-ci.yml-test-first">Task 5: Wire <code>ci.yml</code>,
+test-first</h3>
+<p><strong>Files:</strong> Create
+<code>scripts/test/ci-cli-docs.test.mjs</code>. Modify
+<code>.github/workflows/ci.yml</code>.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1: Write the failing
+contract test</strong> (reads the workflow as text, like
+<code>publish-contract.test.mjs</code>). Tests:
+<code>declares the optional cli_docs_tag input</code>
+(<code>/cli_docs_tag:[\s\S]*?required: false[\s\S]*?default: ''/</code>);
+<code>fetch step sits between Checkout and Set image tag</code>
+(<code>indexOf('- name: Checkout') &lt; indexOf('- name: Fetch cli-state-handler docs') &lt; indexOf('- name: Set image tag')</code>);
+<code>token is passed only as GH_TOKEN of the fetch step</code> (exactly
+one occurrence of <code>secrets.CLI_DOCS_READ_TOKEN</code>, and it is on
+a <code>GH_TOKEN:</code> line);
+<code>image tag carries the docs version</code>
+(<code>-cli${CLI_DOCS_VERSION}</code>);
+<code>build context stays the workspace</code>
+(<code>context: .</code>); <code>job exports cli_docs_version</code>;
+<code>only the dev.joymify.com smoke call gets EXPECTED_CLI_DOCS_VERSION</code>;
+<code>no build-arg or secret mount carries the token</code> (no
+<code>build-args:</code> or <code>secrets:</code> key under “Build and
+push”).</label></li>
+<li><label><input type="checkbox" /><strong>Step 2:</strong>
+<code>node --test scripts/test/ci-cli-docs.test.mjs</code> → fails: 2
+pass, 6 fail (<code>context: .</code> and “no build-arg or secret mount”
+already hold on today’s file; the other six fail).</label></li>
+<li><label><input type="checkbox" /><strong>Step 3: Implement</strong>
+four edits in <code>ci.yml</code>.</label></li>
+</ul>
+<p>Under <code>workflow_dispatch.inputs</code> (after
+<code>image_tag</code>, line 16):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">cli_docs_tag</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">description</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;cli-state-handler release tag whose docs to ship (e.g. v0.2.0). Blank = latest release. Ignored when image_tag is set.&#39;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">required</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;&#39;</span></span></code></pre></div>
+<p>The step keeps its <code>id: meta</code>; only <code>env:</code> and
+<code>run:</code> change. Job <code>build-push-image</code>: add output
+<code>cli_docs_version: ${{ steps.cli_docs.outputs.cli_docs_version }}</code>;
+add this step right after “Checkout” (so a bad token fails before the
+slow Flutter build); replace the body of “Set image tag (short
+SHA)”:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Fetch cli-state-handler docs</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">id</span><span class="kw">:</span><span class="at"> cli_docs</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">GH_TOKEN</span><span class="kw">:</span><span class="at"> ${{ secrets.CLI_DOCS_READ_TOKEN }}</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">CLI_DOCS_TAG</span><span class="kw">:</span><span class="at"> ${{ inputs.cli_docs_tag }}</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> bash scripts/fetch-cli-docs.sh &quot;$CLI_DOCS_TAG&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">CLI_DOCS_VERSION</span><span class="kw">:</span><span class="at"> ${{ steps.cli_docs.outputs.cli_docs_version }}</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>          [ -n &quot;$CLI_DOCS_VERSION&quot; ] || { echo &quot;::error::cli docs version is empty; refusing to publish an image tagged without it&quot;; exit 1; }</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>          SHORT_SHA=$(echo &quot;${{ github.sha }}&quot; | cut -c1-12)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          IMAGE_TAG=&quot;${SHORT_SHA}-cli${CLI_DOCS_VERSION}&quot;</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>          echo &quot;image_tag=${IMAGE_TAG}&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>          echo &quot;IMAGE_TAG=${IMAGE_TAG}&quot; &gt;&gt; &quot;$GITHUB_ENV&quot;</span></code></pre></div>
+<p>Job <code>deploy</code>, step “Smoke check” (line 250): add
+<code>env: CLI_DOCS_VERSION: ${{ needs.build-push-image.outputs.cli_docs_version }}</code>
+and change the first call to
+<code>EXPECTED_CLI_DOCS_VERSION="$CLI_DOCS_VERSION" ./scripts/smoke-prod.sh dev.joymify.com</code>.
+The <code>design.joymify.com</code> call is unchanged. A rollback by
+<code>image_tag</code> skips the image job, so the value is empty and
+the check is skipped.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 4:</strong>
+<code>node --test scripts/test/ci-cli-docs.test.mjs</code> → 8 pass.
+<code>actionlint .github/workflows/ci.yml | wc -l</code> → no higher
+than the Task 2 baseline.</label></li>
+<li><label><input type="checkbox" /><strong>Step 5: Commit</strong> both
+files:
+<code>ci(F-NNN): fetch cli docs before image build, tag image with docs version</code>.</label></li>
+<li><label><input type="checkbox" /><strong>Step 6: Quality gate
+B</strong> (covers Tasks 4 and 5; this is deploy surface):</label>
+<ol type="1">
+<li>Implement: Tasks 4 and 5.</li>
+<li>Verify:
+<code>bash scripts/test-smoke-cli-docs.sh &amp;&amp; node --test 'scripts/test/*.test.mjs' 2&gt;&amp;1 | tail -n 8</code>
+→ <code>fail 0</code>.</li>
+<li>Independent review of
+<code>git diff release/3.8...HEAD -- .github scripts/smoke-prod.sh scripts/test</code>:
+dispatch <code>code-reviewer</code>, asking specifically: can any path
+publish an image without the fetch; does a pull-request run reach the
+fetch step; is the token in exactly one step.</li>
+<li>Refactor on the findings; new commit.</li>
+<li>Re-verify: repeat item 2, then
+<code>bash scripts/precheck.sh 2&gt;&amp;1 | tail -n 5</code> → exit
+0.</li>
+</ol></li>
+</ul>
+<h3
+id="task-6-local-end-to-end-on-a-fixture-archive-deploying-nothing">Task
+6: Local end-to-end on a fixture archive, deploying nothing</h3>
+<p>No workflow is dispatched, nothing is pushed, <strong>nothing is
+downloaded from GitHub</strong>, and no token is used. An earlier agent
+was refused permission to download the private v0.2.0 asset, so every
+required gate here runs on a fixture archive built on the spot. Step 7
+(the real archive) is optional and owner-run.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1 (build the fixture
+and a stub <code>gh</code>, outside the
+repository):</strong></label></li>
+</ul>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="va">fx</span><span class="op">=</span><span class="va">$(</span><span class="fu">mktemp</span> <span class="at">-d</span><span class="va">)</span><span class="kw">;</span> <span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/assets&quot;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin&quot;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;&lt;html&gt;cli docs fixture&lt;/html&gt;&#39;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/index.html&quot;</span><span class="kw">;</span> <span class="bu">echo</span> <span class="st">&#39;x&#39;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/assets/a.js&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">&#39;{&quot;version&quot;:&quot;0.2.0&quot;}\n&#39;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src/version.json&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-czf</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/docs-site.tgz&quot;</span> <span class="at">-C</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/src&quot;</span> .</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin/gh&quot;</span> <span class="op">&lt;&lt;&#39;STUB&#39;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">#!/usr/bin/env bash</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">while [ $# -gt 0 ]; do [ &quot;$1&quot; = &quot;-D&quot; ] &amp;&amp; dest=&quot;$2&quot;; shift; done</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="st">mkdir -p &quot;$dest&quot;; cp &quot;$FAKE_GH_ARCHIVE&quot; &quot;$dest/docs-site.tgz&quot;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="op">STUB</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x <span class="st">&quot;</span><span class="va">$fx</span><span class="st">/bin/gh&quot;</span><span class="kw">;</span> <span class="bu">echo</span> <span class="st">&quot;</span><span class="va">$fx</span><span class="st">&quot;</span></span></code></pre></div>
+<p>Expected: prints the fixture folder path. The archive has the same
+shape as the real one (no top-level folder; <code>./index.html</code>,
+<code>./assets/...</code>, <code>./version.json</code>).</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 2 (the real script, the
+fixture archive):</strong>
+<code>PATH="$fx/bin:$PATH" GH_TOKEN=fake FAKE_GH_ARCHIVE="$fx/docs-site.tgz" bash scripts/fetch-cli-docs.sh v0.2.0</code>.
+Expected: <code>cli-docs: fetched v0.2.0 (version.json 0.2.0)</code>;
+<code>cat apps/storybook-hub/portal-bundles/cli-state-handler/version.json</code>
+prints <code>{"version":"0.2.0"}</code>;
+<code>git status --porcelain apps/</code> lists only paths under
+<code>apps/storybook-hub/portal-bundles/cli-state-handler/</code>.</label></li>
+<li><label><input type="checkbox" /><strong>Step 3 (image tag and image
+content):</strong>
+<code>TAG="$(git rev-parse HEAD | cut -c1-12)-cli0.2.0"; docker build -t "portal-test:$TAG" . &amp;&amp; docker run -d --rm --name portal-test -p 8080:80 "portal-test:$TAG"</code>,
+then <code>curl -s localhost:8080/cli-state-handler/version.json</code>
+→ <code>{"version":"0.2.0"}</code>;
+<code>curl -s -o /dev/null -w '%{http_code}' localhost:8080/cli-state-handler/</code>
+→ <code>200</code>;
+<code>docker history --no-trunc "portal-test:$TAG" | grep -ci 'github_pat\|GH_TOKEN'</code>
+→ <code>0</code>. (If port 8080 is taken, use 8081 in both places.) This
+proves <code>docker build</code> accepts the tag form and that the
+unpacked files reach nginx at the right path.</label></li>
+<li><label><input type="checkbox" /><strong>Step 4 (the smoke check
+against that container is not possible:</strong>
+<code>smoke-prod.sh</code> speaks <code>https</code> only; its logic is
+covered by Task 4’s stub tests.) Nothing to run; recorded so nobody
+tries to bend the script.</label></li>
+<li><label><input type="checkbox" /><strong>Step 5 (clean up):</strong>
+<code>docker stop portal-test</code>; restore the snapshot with the
+command in Global Constraints; <code>rm -rf "$fx"</code>;
+<code>git status --porcelain</code> prints nothing.</label></li>
+<li><label><input type="checkbox" /><strong>Step 6 (spec UNVERIFIED:
+cache in front of the portal), read-only request to the public
+site:</strong>
+<code>curl -sI https://dev.joymify.com/cli-state-handler/ | grep -iE 'cache-control|^age:|cf-cache-status|x-cache|^via:'</code>.
+No cache header: nothing to do. A cache header: report it to the owner
+before Task 8; do not add a workaround unasked.</label></li>
+<li><label><input type="checkbox" /><strong>Step 7 — OPTIONAL,
+OWNER-RUN, not a gate. STOP — needs the owner’s yes:</strong>
+downloading the real private asset. If the owner wants the spec’s
+UNVERIFIED item “the v0.2.0 asset was not opened” closed before the
+first production run, the owner runs:
+<code>d=$(mktemp -d) &amp;&amp; gh release download v0.2.0 -R montionugera/cli-state-handler -p docs-site.tgz -D "$d" &amp;&amp; tar -xzOf "$d/docs-site.tgz" ./version.json</code>.
+Expected: <code>{"version":"0.2.0"}</code>. The implementer does not run
+this and does not wait for it. If it is skipped, the first run on
+<code>main</code> (Task 8) is where a missing <code>version.json</code>
+shows up: the fetch step fails with
+<code>archive has no version.json</code>, no image is published, and the
+live portal keeps its previous image.</label></li>
+</ul>
+<p><strong><code>gh</code> error wording (already checked by the audit,
+no action needed):</strong> with <code>gh</code> 2.92.0 against a public
+repository, a missing release prints <code>release not found</code>, a
+release without a matching asset prints
+<code>no assets match the file pattern</code>, and a rejected token
+prints <code>HTTP 401: Bad credentials</code>. All three match the
+permanent-error pattern in <code>gh_retry</code>. Any wording the
+pattern does not know is retried and then <strong>fails</strong> after
+the third attempt, so an unknown error can cost 20 seconds but can never
+skip the fetch.</p>
+<p><strong>What this task cannot prove — only a real run on
+<code>main</code> can:</strong> that the real archive contains
+<code>version.json</code> (unless Step 7 is run); that
+<code>CLI_DOCS_READ_TOKEN</code> authenticates and is scoped correctly;
+that <code>gh</code> on the runner resolves “latest” and words its
+errors the same way; that the step order and job outputs behave as
+written; that Kubernetes pulls the new tag; that the smoke check passes
+against production; that a pull-request run shows no fetch step. The
+spec’s laptop check “with a token in <code>GH_TOKEN</code>” is likewise
+left to the owner (optional), because the implementer may not hold a
+token.</p>
+<h3 id="task-7-readme-last-implementation-task">Task 7: README (last
+implementation task)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>Step 1:</strong> Re-run the
+Task 0 command. If the rename has shipped, bring it in first with
+<code>psrw sync</code> (merges <code>release/3.8</code> into this
+worktree; do not rebase by hand and do not force anything), resolve, and
+re-run <code>bash scripts/precheck.sh</code>. If it has not shipped,
+write the README change anyway and expect whichever lane ships second to
+merge the other’s README hunk; keep the edit to the two places below so
+that merge is trivial.</label></li>
+<li><label><input type="checkbox" /><strong>Step 2:</strong> In
+<code>README.md</code>, correct line 312: the portal image is built by
+the <code>Dockerfile</code>
+(<code>node apps/storybook-hub/build.js</code>);
+<code>scripts/assemble-portal.sh</code> is a local-only helper that
+copies from sibling checkouts. Then add a section “CLI State Handler
+docs source” directly below, covering, from what Tasks 3 to 6 verified:
+the fetch step and where it runs (image job only, never pull requests);
+the <code>cli_docs_tag</code> input (blank means latest; ignored with
+<code>image_tag</code>); the image tag form
+<code>&lt;12-char hash&gt;-cli&lt;X.Y.Z&gt;</code>; the secret
+<code>CLI_DOCS_READ_TOKEN</code>, its scope and how to renew it (Task 1
+table); the fail-loud rule and that there is no skip switch; the check
+command
+<code>curl -s https://dev.joymify.com/cli-state-handler/version.json</code>;
+the rollback levers from “If it goes wrong”. Keep the edit outside
+generated regions.</label></li>
+<li><label><input type="checkbox" /><strong>Step 3: Verify.</strong>
+<code>node scripts/gen-design-md.mjs --check</code> exits 0;
+<code>pnpm exec prettier --check README.md</code> passes;
+<code>grep -n 'CLI_DOCS_READ_TOKEN\|cli_docs_tag' README.md</code> shows
+both.</label></li>
+<li><label><input type="checkbox" /><strong>Step 4: Commit</strong>
+<code>README.md</code> only:
+<code>docs(F-NNN): document the cli docs fetch step</code>.</label></li>
+<li><label><input type="checkbox" /><strong>Step 5: Quality gate
+C:</strong> verify (Step 3 plus <code>bash scripts/precheck.sh</code>
+exit 0) → independent <code>code-reviewer</code> pass over the whole
+feature diff, checking every README claim against the code → fix in a
+new commit → re-verify.</label></li>
+</ul>
+<h3 id="task-8-release-steps-every-one-waits-for-the-owner">Task 8:
+Release steps — every one waits for the owner</h3>
+<p>Which release-tool commands reach the remote (read from
+<code>psrw ship --help</code> and the source under
+<code>~/.claude/ps-release-workflow/</code>): <code>psrw refine</code>,
+<code>psrw claim</code> and <code>psrw sync</code> are local only (no
+push, no fetch). <code>psrw ship</code> <strong>does not push</strong>;
+it fetches <code>origin/main</code> (read-only), merges
+<code>main</code> and then <code>feat/F-NNN</code> into the local
+<code>release/3.8</code>, and removes the feature worktree.
+<code>psrw promote</code> is the first command that pushes.</p>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>psrw ship --no-deploy</code>
+from the feature worktree. Local and undoable (a merge commit on the
+local <code>release/3.8</code>), so no owner stop; but it lands on the
+branch the rename session is also shipping to, so say what you are doing
+first, and run it only when Gates A, B and C are green. Expected: Gate 1
+passes, output ends with the feature marked shipped;
+<code>git -C .claude/worktrees/_release log --oneline -1</code> shows
+the merge. <code>--no-deploy</code> because another session is shipping
+to the same release (joy-design has no local deploy configured, so this
+is belt and braces).</label></li>
+<li><label><input type="checkbox" /><strong>STOP — needs the owner’s
+yes:</strong> any <code>git push</code>.</label></li>
+<li><label><input type="checkbox" /><strong>STOP — needs the owner’s
+yes:</strong> <code>psrw promote</code>. It runs Gate 2 (the integration
+check), <strong>pushes <code>release/3.8</code> to GitHub</strong> and
+opens the pull request to <code>main</code>. It carries the whole
+release, including the other session’s package rename, so it is the
+release manager’s call, not this feature’s. Once open, check its
+<code>ci.yml</code> run: no “Fetch cli-state-handler docs” step, run
+green.</label></li>
+<li><label><input type="checkbox" /><strong>STOP — needs the owner’s
+yes:</strong> merging that pull request. <strong>This builds and deploys
+the live developer portal</strong>, and it is the first real use of
+<code>CLI_DOCS_READ_TOKEN</code>, so Task 1 must be done first or the
+build fails (by design; the live portal keeps its previous
+image).</label></li>
+<li><label><input type="checkbox" />After the merge run:
+<code>gh run view &lt;id&gt; --log | grep 'cli-docs: fetched'</code>
+shows the release line; <code>grep 'Deploying Storybook Hub'</code>
+shows a tag ending <code>-cli0.2.0</code>; the run concludes
+<code>success</code>;
+<code>curl -s https://dev.joymify.com/cli-state-handler/version.json</code>
+prints <code>{"version":"0.2.0"}</code>. Repeat the <code>curl</code>
+three times a minute apart (the cache UNVERIFIED item).</label></li>
+<li><label><input type="checkbox" /><strong>STOP — needs the owner’s
+yes:</strong> the spec’s dispatch acceptance check,
+<code>gh workflow run ci.yml -R montionugera/joy-design --ref main -f cli_docs_tag=v0.2.0</code>.
+<strong>It deploys to production</strong> (a dispatch always runs the
+<code>deploy</code> job). Skip it if the merge run already proved the
+same lines.</label></li>
+<li><label><input type="checkbox" /><strong>STOP — needs the owner’s
+yes:</strong> anything touching the cluster directly
+(<code>kubectl</code>), including a rollback.</label></li>
+</ul>
+<h2 id="follow-up-owned-elsewhere">Follow-up owned elsewhere</h2>
+<p>One line in
+<code>cli-state-handler/.github/workflows/release.yml</code> (line 163):
+pass <code>-f cli_docs_tag=v$VERSION</code> when signalling the portal.
+<strong>Not part of this plan.</strong> Order: joy-design must ship the
+<code>cli_docs_tag</code> input to <code>main</code> first (Task 8),
+because a dispatch naming an undeclared input is expected to be rejected
+(UNVERIFIED; the order is safe either way). Checks that belong to that
+follow-up: that <code>gh workflow run -f</code> needs nothing beyond
+“Actions: Read and write” on <code>PORTAL_DISPATCH_TOKEN</code>; that
+the next release logs no <code>PORTAL_DISPATCH_TOKEN is not set</code>
+warning; that the resulting joy-design run produces a new image tag from
+an unchanged commit.</p>
+<h2 id="if-it-goes-wrong">If it goes wrong</h2>
+<p>The first, second and fourth are production actions and each carries
+its own stop.</p>
+<ul>
+<li><strong>STOP — needs the owner’s yes:</strong> <strong>Bad docs,
+good pipeline:</strong> re-run <code>ci.yml</code> with
+<code>cli_docs_tag</code> set to the previous release tag (usable from
+the second release; only v0.2.0 exists today).</li>
+<li><strong>STOP — needs the owner’s yes:</strong> <strong>Bad portal
+image:</strong> run <code>ci.yml</code> with <code>image_tag</code> set
+to the previous image tag. No build, no fetch; exact, because each tag
+names one commit plus one docs version.</li>
+<li><strong>Build blocked by a failed fetch:</strong> the live portal
+keeps the previous image. Fix the token or the release; there is no skip
+switch.</li>
+<li><strong>STOP — needs the owner’s yes:</strong> <strong>Bad
+change:</strong> revert the joy-design commits (a push to
+<code>main</code>, which redeploys); the tracked snapshot is served
+again. Revoke both tokens if the feature is abandoned.</li>
+</ul>
+<h2 id="known-limits-carried-from-the-specs-audit-not-fixed-here">Known
+limits carried from the spec’s audit (not fixed here)</h2>
+<p>Gate 1 and the Playwright contracts still test the tracked snapshot,
+not the fetched docs. If the release signal never arrives, the portal
+stays on older docs until the next push to <code>main</code>.
+<code>image_tag</code> and <code>cli_docs_tag</code> given together: the
+docs tag is ignored silently (now stated in the input description).</p>
+<h2 id="audit-trail">Audit trail</h2>
+<p>Independent audit of this plan against the approved spec, 2026-10-09
+(self-grill-audit method: refute against the real files). Read-only:
+nothing was dispatched, pushed or downloaded. The fetch script and its
+test were extracted from this plan and run in a scratch folder with a
+stub <code>gh</code>. Verdict: <strong>ready after fixes</strong>
+(applied below).</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Finding</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HIGH</td>
+<td>Task 6 needed the real private v0.2.0 asset in three steps; an
+implementer refused that download could not finish any local gate.</td>
+<td>Task 6 rewritten around a fixture archive and an inline stub; the
+real-archive check is Step 7, optional and owner-run.</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td><code>psrw ship</code> was labelled “may push”. It does not. Its
+real effects (fetches <code>origin/main</code>, merges <code>main</code>
+into <code>release/3.8</code>, removes the worktree) were not stated,
+and <code>psrw promote</code> was not said to push the whole release,
+rename included.</td>
+<td>Task 8 states which commands reach the remote; ship relabelled as
+local, promote’s stop says what it pushes.</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>Rollback actions that redeploy production shared one sentence
+instead of each carrying the literal stop prefix.</td>
+<td>Prefix added to each of the three.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>A corrupt or truncated archive exited non-zero but with a bare
+<code>tar</code> message, against the plan’s own rule that every failure
+prints <code>::error::</code>. Confirmed by running it.</td>
+<td>Each <code>tar</code> call now ends in <code>fail</code>; test
+<code>corrupt_archive_fails</code>.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>The traversal check read entry names only; a symbolic link entry
+passed it and would be copied into the image. (Both tar programs refuse
+to write through a link, so nothing escaped in the run.)</td>
+<td>Links and special files rejected from the long listing; test
+<code>link_entry_rejected</code>.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>A <code>cli_docs_tag</code> value beginning with <code>-</code>
+reached <code>gh</code> as a flag. Confirmed by running it.</td>
+<td>Tag must match <code>vX.Y.Z</code> before any <code>gh</code> call;
+test <code>malformed_tag_rejected</code>.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>A retry after a partial download could meet an existing file and
+fail three times for that reason alone.</td>
+<td><code>--clobber</code> (a real flag, per
+<code>gh release download --help</code>) and an explicit
+<code>mkdir</code>.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td><code>no_work_files_left_in_repo</code> required a clean
+<code>apps/</code>, so Gate 1 would fail for anyone with unrelated
+uncommitted work there.</td>
+<td>Before/after comparison.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>An empty docs version would publish an image tagged
+<code>&lt;hash&gt;-cli</code>.</td>
+<td>Guard in “Set image tag”.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>Task 5 Step 2 predicted 1 passing contract test; 2 already pass on
+today’s file.</td>
+<td>Corrected.</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td>The swap is delete-then-copy, not atomic; a failed copy leaves a
+partial folder. The script still exits non-zero, so no image is built
+from it, and locally <code>git checkout</code> restores it.</td>
+<td>Left.</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td>The step-order contract test uses the first of three “Checkout”
+steps; only its “Fetch before Set image tag” half is meaningful.</td>
+<td>Left.</td>
+</tr>
+</tbody>
+</table>
+<p>Confirmed correct against the real files: <code>ci.yml</code> step
+lines 126, 139, 156, 250 and <code>context: .</code>; the image job
+never runs on <code>pull_request</code> (its <code>if</code>, lines
+112-116), so the secret is never read there and the step is skipped, not
+failed; <code>deploy</code> is skipped when the image job fails
+(<code>!failure()</code>, line 174); the token appears only as
+<code>GH_TOKEN</code> of one step and never as a build argument;
+<code>inputs.cli_docs_tag</code> reaches the script through
+<code>env</code>, not through shell interpolation;
+<code>&lt;hash&gt;-cli&lt;X.Y.Z&gt;</code> is a legal image tag and is
+what the deploy job’s <code>sed</code> writes into
+<code>k8s/deployment.yml</code> line 28; <code>precheck.sh</code> line
+44 and its <code>scripts/test/*.test.mjs</code> glob (line 56);
+<code>smoke-prod.sh</code> lines 28 and 47; retry loop is 3 attempts in
+total; <code>gh release view --json/-q</code> and
+<code>gh release download -p/-D/-R</code> are real flags; the rename
+lane (94 changed files today) overlaps this plan only in
+<code>README.md</code>.</p>
+<p>Still UNVERIFIED: the real v0.2.0 archive’s contents; the hardened
+script on GNU tar and bash 5 (run only on macOS); <code>gh</code>
+wording on the runner’s version; the fine-grained token permission
+mapping; a cache in front of dev.joymify.com; whether GitHub rejects an
+undeclared dispatch input.</p>
+</body>
+</html>

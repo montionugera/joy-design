@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useOverlay } from './useOverlay.js';
-import { ChevronDown, ChevronRight, Close, Check } from '@montionugera/joy-icons/react';
+import { ChevronDown, ChevronRight, Close, Check } from '@joymify/icons/react';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 

@@ -40,7 +40,7 @@ test('README lists every Gate 1 step and the theme contract', () => {
   for (const s of [...invoked, 'pnpm check', 'pnpm -r test', 'packages/tokens/test/contrast.test.js', 'scripts/test/*.test.mjs', 'scripts/epic-check.sh', 'scripts/integration.sh']) {
     assert.ok(readme.includes(s), `README must document the gate step ${s}`);
   }
-  for (const needle of ['data-theme', 'prefers-color-scheme', '@montionugera/joy-tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
+  for (const needle of ['data-theme', 'prefers-color-scheme', '@joymify/tokens/tailwind', 'What production-grade means here', 'DESIGN.md', 'PRODUCT.md', '.claude/refined_backlog']) {
     assert.ok(readme.includes(needle), `README must mention ${needle}`);
   }
 });
@@ -60,11 +60,12 @@ test('README documents installing from the registry, and AGENTS.md the build and
   const readme = read('README.md');
   assert.match(readme, /^## Install from the registry$/m, 'README needs the Install from the registry section');
   for (const needle of [
-    '@montionugera:registry=https://npm.pkg.github.com',
+    '@joymify:registry=https://npm.pkg.github.com',
     '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}',
-    "import '@montionugera/joy-tokens/theme.css';",
-    "import { Button, Tabs } from '@montionugera/joy-react';",
+    "import '@joymify/tokens/theme.css';",
+    "import { Button, Tabs } from '@joymify/react';",
     'read:packages',
+    'access to the `joymify` organisation',
     'scripts/test/consumer-smoke.sh',
     '.github/workflows/publish.yml',
     'packages-v',
@@ -72,7 +73,8 @@ test('README documents installing from the registry, and AGENTS.md the build and
     assert.ok(readme.includes(needle), `README must mention ${needle}`);
   }
   for (const name of packageNames) assert.ok(readme.includes(name), `README must name ${name}`);
-  assert.ok(!/@joymify\/(tokens|icons|brand|react|svelte)/.test(readme), 'README must not use the old package scope');
+  assert.ok(!readme.includes('@montionugera/joy-'), 'README must not use the old package scope');
+  assert.ok(!readme.includes('@joymify/joy-'), 'README must not use a half-renamed package name');
 
   const agents = read('AGENTS.md');
   for (const needle of ['tsconfig.build.json', 'pnpm check', '^build', 'turbo.json', 'scripts/test/consumer-smoke.sh', '.github/workflows/publish.yml']) {

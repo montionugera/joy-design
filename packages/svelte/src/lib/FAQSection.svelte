@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { ChevronDown } from '@montionugera/joy-icons';
+  import { ChevronDown } from '@joymify/icons';
 
   interface FAQItem {
     question: string;

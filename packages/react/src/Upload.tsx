@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Upload as UploadIcon, File as FileIcon, Close as CloseIcon } from '@montionugera/joy-icons/react';
+import { Upload as UploadIcon, File as FileIcon, Close as CloseIcon } from '@joymify/icons/react';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 

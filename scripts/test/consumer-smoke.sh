@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Tarball test for the four published packages (spec I-077, Phase 2 part 3).
 #
-# Packs @montionugera/joy-tokens, joy-icons, joy-brand and joy-react exactly as `pnpm publish`
+# Packs @joymify/tokens, icons, brand and react exactly as `pnpm publish`
 # would, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside
 # this workspace, then type-checks, builds and renders that app. It is the only check that
 # loads the built output: the unit tests load src/ through their helpers.
@@ -49,8 +49,8 @@ tarball_of() {
 }
 
 echo "==> 1/7 Building joy-icons and joy-react"
-(cd "$repo_root" && pnpm --filter @montionugera/joy-icons build)
-(cd "$repo_root" && pnpm --filter @montionugera/joy-react build)
+(cd "$repo_root" && pnpm --filter @joymify/icons build)
+(cd "$repo_root" && pnpm --filter @joymify/react build)
 
 echo "==> 2/7 Packing the four packages"
 for pkg in "${packages[@]}"; do
@@ -89,10 +89,10 @@ TOKENS_TGZ="$(tarball_of tokens)" ICONS_TGZ="$(tarball_of icons)" BRAND_TGZ="$(t
   node -e '
 const fs = require("node:fs");
 const tarballs = {
-  "@montionugera/joy-tokens": "file:" + process.env.TOKENS_TGZ,
-  "@montionugera/joy-icons": "file:" + process.env.ICONS_TGZ,
-  "@montionugera/joy-brand": "file:" + process.env.BRAND_TGZ,
-  "@montionugera/joy-react": "file:" + process.env.REACT_TGZ,
+  "@joymify/tokens": "file:" + process.env.TOKENS_TGZ,
+  "@joymify/icons": "file:" + process.env.ICONS_TGZ,
+  "@joymify/brand": "file:" + process.env.BRAND_TGZ,
+  "@joymify/react": "file:" + process.env.REACT_TGZ,
 };
 const pkg = {
   name: "joy-consumer-smoke",
@@ -157,7 +157,7 @@ EOF
 cat > "$app/src/main.tsx" << 'EOF'
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@montionugera/joy-tokens/theme.css';
+import '@joymify/tokens/theme.css';
 import { App } from './App';
 
 createRoot(document.getElementById('root')!).render(
@@ -168,10 +168,10 @@ createRoot(document.getElementById('root')!).render(
 EOF
 
 cat > "$app/src/App.tsx" << 'EOF'
-import { Button, Tabs, BrandMark, type ButtonProps, type TabItem, type BrandMarkProps } from '@montionugera/joy-react';
-import { Check, type IconProps } from '@montionugera/joy-icons/react';
-import { MARK } from '@montionugera/joy-brand';
-import { tokens } from '@montionugera/joy-tokens';
+import { Button, Tabs, BrandMark, type ButtonProps, type TabItem, type BrandMarkProps } from '@joymify/react';
+import { Check, type IconProps } from '@joymify/icons/react';
+import { MARK } from '@joymify/brand';
+import { tokens } from '@joymify/tokens';
 
 const items: TabItem[] = [
   { key: 'overview', label: 'Overview', content: <p>Overview panel</p> },
@@ -214,13 +214,13 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { createElement as h } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Button, Tabs, BrandMark } from '@montionugera/joy-react';
-import { Check } from '@montionugera/joy-icons/react';
-import { MARK } from '@montionugera/joy-brand';
-import * as tokens from '@montionugera/joy-tokens';
+import { Button, Tabs, BrandMark } from '@joymify/react';
+import { Check } from '@joymify/icons/react';
+import { MARK } from '@joymify/brand';
+import * as tokens from '@joymify/tokens';
 
 const require = createRequire(import.meta.url);
-const cjsTokens = require('@montionugera/joy-tokens');
+const cjsTokens = require('@joymify/tokens');
 
 const html = renderToStaticMarkup(
   h(
@@ -252,7 +252,7 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-const themeCss = fs.readFileSync(fileURLToPath(import.meta.resolve('@montionugera/joy-tokens/theme.css')), 'utf8');
+const themeCss = fs.readFileSync(fileURLToPath(import.meta.resolve('@joymify/tokens/theme.css')), 'utf8');
 if (!themeCss.includes('--joy-surface-canvas')) {
   console.error('ssr-check: theme.css does not define --joy-surface-canvas');
   process.exit(1);
@@ -272,10 +272,10 @@ echo "==> 5/7 Installing the tarballs"
 (cd "$app" && pnpm install --no-frozen-lockfile --ignore-workspace)
 
 for pkg in "${packages[@]}"; do
-  installed="$(cd "$app/node_modules/@montionugera/joy-$pkg" || fail "joy-$pkg not installed"; pwd -P)"
+  installed="$(cd "$app/node_modules/@joymify/$pkg" || fail "@joymify/$pkg not installed"; pwd -P)"
   case "$installed/" in
     "$work"/*) ;;
-    *) fail "joy-$pkg resolves to $installed, which is outside the temporary folder" ;;
+    *) fail "@joymify/$pkg resolves to $installed, which is outside the temporary folder" ;;
   esac
 done
 if grep -nF "$repo_root" "$app/package.json" "$app/pnpm-lock.yaml"; then
@@ -283,10 +283,10 @@ if grep -nF "$repo_root" "$app/package.json" "$app/pnpm-lock.yaml"; then
 fi
 # A copy fetched from a registry would also sit inside $work, so the path check above cannot
 # tell it from a tarball. The lockfile can: a registry resolution is keyed name@<version>,
-# a tarball resolution is keyed name@file:<path>. This covers the three packages joy-react
+# a tarball resolution is keyed name@file:<path>. This covers the three packages @joymify/react
 # depends on, which are installed through the overrides and not as direct dependencies only.
-if grep -nE "@montionugera/joy-(tokens|icons|brand|react)@[0-9]" "$app/pnpm-lock.yaml"; then
-  fail "a joy package was resolved from a registry, not from its tarball (listed above)"
+if grep -nE "@joymify/(tokens|icons|brand|react)@[0-9]" "$app/pnpm-lock.yaml"; then
+  fail "a @joymify package was resolved from a registry, not from its tarball (listed above)"
 fi
 
 echo "==> 6/7 Type-checking and building the consumer app"

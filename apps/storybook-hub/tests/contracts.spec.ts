@@ -65,7 +65,7 @@ test.describe("Storybook Hub Quality Contracts", () => {
     await page.goto("/#overview");
     await page.waitForLoadState("networkidle");
 
-    const card = page.locator('.hub-card[aria-label="Open @montionugera/joy-tokens"]');
+    const card = page.locator('.hub-card[aria-label="Open @joymify/tokens"]');
     await card.focus();
     await expect(card).toBeFocused();
     await page.keyboard.press("Enter");

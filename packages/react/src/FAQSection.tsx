@@ -1,5 +1,5 @@
 import React, { useId, useState } from 'react';
-import { ChevronDown } from '@montionugera/joy-icons/react';
+import { ChevronDown } from '@joymify/icons/react';
 
 export interface FAQItem {
   question: string;
