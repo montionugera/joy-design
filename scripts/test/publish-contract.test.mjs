@@ -16,7 +16,7 @@ const REPO_URL = 'git+https://github.com/montionugera/joy-design.git';
 
 // Dependency order: this is also the order the workflow publishes in.
 const PUBLISHED = [
-  { dir: 'tokens', name: '@montionugera/joy-tokens', version: '0.2.0', license: 'MIT', sideEffects: ['**/*.css'], files: ['dist'] },
+  { dir: 'tokens', name: '@montionugera/joy-tokens', version: '0.2.1', license: 'MIT', sideEffects: ['**/*.css'], files: ['dist'] },
   { dir: 'icons', name: '@montionugera/joy-icons', version: '0.3.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['dist', 'src/index.ts', 'src/index.d.ts', 'src/*.svelte', 'PROVENANCE.md'] },
   { dir: 'brand', name: '@montionugera/joy-brand', version: '0.2.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['src', 'assets', 'PROVENANCE.md'] },
   { dir: 'react', name: '@montionugera/joy-react', version: '0.2.0', license: 'MIT', sideEffects: false, files: ['dist'] },
