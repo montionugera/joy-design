@@ -521,5 +521,11 @@
     "title": "Fix flaky framework-switcher mobile test and short Playwright server timeout",
     "created_at": "2026-10-11T05:59:09.999587+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-086",
+    "title": "Add automated release notes and GitHub Releases for the joymify packages",
+    "created_at": "2026-10-11T05:59:10.537510+00:00",
+    "promoted_to": null
   }
 ]
