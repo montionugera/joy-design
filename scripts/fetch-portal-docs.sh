@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Usage: fetch-portal-docs.sh <owner/repo> <bundle-name> [vX.Y.Z]
+# With PORTAL_DOCS_RESOLVE_ONLY=1 it only resolves the tag (blank = latest release), writes <name>_docs_tag=<tag>
+# to $GITHUB_OUTPUT and downloads nothing: CI resolves once and every later job fetches exactly that tag.
 # Fetch <owner/repo>'s docs-site.tgz from its GitHub Release (blank tag = latest) and swap it into
 # apps/storybook-hub/portal-bundles/<bundle-name>. Used for cli-state-handler and server-decorator.
 # Fails loudly on every error; there is no skip switch. Never prints the token; do not add `set -x`.
@@ -15,18 +17,25 @@ delay="${PORTAL_DOCS_RETRY_DELAY:-10}"
 [ -n "${GH_TOKEN:-}" ] || fail 'GH_TOKEN is empty or missing (CI passes the built-in github.token; locally run: GH_TOKEN=$(gh auth token) bash scripts/fetch-portal-docs.sh $repo $name)'
 work=$(mktemp -d); trap 'rm -rf "$work" "$bundle_dir.new"' EXIT   # outside the repository: nothing may leak into apps/
 
-gh_retry() { # permanent errors fail at once; anything else gets 3 attempts in total
+gh_retry() { # permanent errors fail at once; network errors, 5xx and rate limits (403/429) get 3 attempts in total
   local n=1
   while ! "$@" 2>"$work/gh.err"; do
-    if grep -qiE 'not found|HTTP 40[134]|bad credentials|no assets' "$work/gh.err"; then fail "$(tr '\n' ' ' < "$work/gh.err")"; fi
+    # A 403 carrying a rate-limit message is transient; any other 403, 401, 404 is permanent.
+    if ! grep -qiE 'rate limit|abuse detection' "$work/gh.err" && grep -qiE 'not found|HTTP 40[134]|bad credentials|no assets' "$work/gh.err"; then fail "$(tr '\n' ' ' < "$work/gh.err")"; fi
     [ "$n" -lt 3 ] || fail "gave up after 3 attempts: $(tr '\n' ' ' < "$work/gh.err")"
-    n=$((n + 1)); sleep "$delay"
+    # The reason is gh's own first stderr line (never the request headers), capped at 200 chars.
+    echo "portal-docs: attempt $n of 3 failed ($(head -n 1 "$work/gh.err" | cut -c1-200)); retrying in $((delay * n))s" >&2
+    sleep $((delay * n)); n=$((n + 1))   # linear back-off: a rate limit needs longer than a reset connection
   done
 }
 
 [ -n "$tag" ] || tag=$(gh_retry gh release view -R "$repo" --json tagName -q .tagName)
 [ -n "$tag" ] || fail "no release found in $repo"
 [[ "$tag" =~ ^v[0-9A-Za-z._-]+$ ]] || fail "release tag '$tag' is not of the form vX.Y.Z"   # also stops a tag being read as a gh flag
+if [ -n "${PORTAL_DOCS_RESOLVE_ONLY:-}" ]; then
+  [ -z "${GITHUB_OUTPUT:-}" ] || echo "${name//-/_}_docs_tag=$tag" >> "$GITHUB_OUTPUT"
+  echo "portal-docs: resolved $name to $tag"; exit 0
+fi
 mkdir "$work/dl"
 gh_retry gh release download "$tag" -R "$repo" -p "$asset" -D "$work/dl" --clobber   # --clobber: a retry may meet a partial file
 [ -s "$work/dl/$asset" ] || fail "release $tag has no $asset"

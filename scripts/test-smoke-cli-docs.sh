@@ -14,7 +14,7 @@ chmod +x "$fx/bin/curl"
 run() { # run <host> [VAR=value...] -> sets $code, $out
   local host="$1"; shift
   set +e
-  out=$(env PATH="$fx/bin:$PATH" "$@" bash "$repo_root/scripts/smoke-prod.sh" "$host" 2>&1)
+  out=$(env PATH="$fx/bin:$PATH" 'FAKE_VERSION_BODY={"version":"0.2.0"}' 'FAKE_DECORATOR_BODY={"version":"2.0.26"}' "$@" bash "$repo_root/scripts/smoke-prod.sh" "$host" 2>&1)
   code=$?; set -e
 }
 ok() { echo "ok - $1"; }; die() { echo "not ok - $1"; echo "$out"; exit 1; }
@@ -31,9 +31,29 @@ run dev.joymify.com EXPECTED_CLI_DOCS_VERSION=0.2.0 'FAKE_VERSION_BODY=<html>joy
 [ "$code" != 0 ] || die index_html_instead_of_json_fails
 ok index_html_instead_of_json_fails
 
-run dev.joymify.com 'FAKE_VERSION_BODY=<html>'
-[ "$code" = 0 ] && ! echo "$out" | grep -q 'docs version' || die unset_expected_version_skips
-ok unset_expected_version_skips
+# No image built in the run: nothing to compare with, so only presence and a well-formed version are checked, and the log says so.
+G='FAKE_VERSION_BODY={"version":"0.2.0"}'; D='FAKE_DECORATOR_BODY={"version":"2.0.26"}'
+run dev.joymify.com "$G" "$D"
+[ "$code" = 0 ] && echo "$out" | grep -q 'cli-state-handler docs version 0.2.0 is served' && echo "$out" | grep -q 'server-decorator docs version 2.0.26 is served' \
+  && echo "$out" | grep -q 'presence only, not equality' || die unset_expected_checks_presence_only_and_says_so
+ok unset_expected_checks_presence_only_and_says_so
+
+run dev.joymify.com 'FAKE_VERSION_BODY=<html>joymify</html>' "$D"
+[ "$code" != 0 ] && echo "$out" | grep -q '::error::cli-state-handler' || die unset_expected_html_instead_of_json_fails
+ok unset_expected_html_instead_of_json_fails
+
+run dev.joymify.com "$G" 'FAKE_DECORATOR_BODY={"version":""}'
+[ "$code" != 0 ] && echo "$out" | grep -q '::error::server-decorator' || die unset_expected_empty_version_fails
+ok unset_expected_empty_version_fails
+
+run dev.joymify.com "$G" 'FAKE_DECORATOR_BODY={"version":"2 0;rm"}'
+[ "$code" != 0 ] && echo "$out" | grep -q '::error::server-decorator' || die unset_expected_malformed_version_fails
+ok unset_expected_malformed_version_fails
+
+run dev.joymify.com EXPECTED_CLI_DOCS_VERSION=0.2.0 "$G" "$D"
+[ "$code" = 0 ] && echo "$out" | grep -q 'cli-state-handler docs version 0.2.0 matches' && echo "$out" | grep -q 'server-decorator docs version 2.0.26 is served' \
+  && ! echo "$out" | grep -q 'cli-state-handler.*presence only' || die one_expected_one_presence_only
+ok one_expected_one_presence_only
 
 run design.joymify.com EXPECTED_CLI_DOCS_VERSION=0.3.0 'FAKE_VERSION_BODY={"version":"0.2.0"}'
 [ "$code" = 0 ] || die legacy_host_never_checks

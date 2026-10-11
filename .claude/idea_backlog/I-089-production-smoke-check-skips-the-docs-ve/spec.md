@@ -8,16 +8,18 @@ status: idea
 
 ## Problem
 
-(what hurts; concrete examples)
+scripts/smoke-prod.sh skips the docs version comparison when the run built no image (expected versions empty), so a missing or malformed version.json goes unnoticed.
 
 ## Why now
 
-(opportunity; deadline; constraint)
+Deploys without a fresh image (k8s-only changes) are smoked with nothing checked for the docs sites.
 
 ## Sketch
 
-(rough shape; not a design yet)
+When expected values are empty, still fetch each docs version.json, require a well-formed version, and log plainly that only presence was checked, not equality.
 
 ## Acceptance criteria
 
-- [ ] (one observable, testable outcome per item; refine refuses a spec without any)
+- [ ] With no expected versions, each version.json must be served and hold a well-formed version, else the smoke fails.
+- [ ] The log states that only presence was checked, not equality.
+- [ ] With expected versions the equality check is unchanged.

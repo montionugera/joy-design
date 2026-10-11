@@ -28,7 +28,7 @@ case "${FAKE_GH_MODE:-ok}" in
   forbidden) echo "HTTP 403: Resource not accessible" >&2; exit 1 ;;
   weird) echo "something nobody has seen before" >&2; exit 1 ;;
   flaky) n=$(cat "$FAKE_GH_COUNT" 2>/dev/null || echo 0); echo $((n + 1)) > "$FAKE_GH_COUNT"
-         [ "$n" -ge "${FAKE_GH_FAILS:-2}" ] || { echo "connection reset by peer" >&2; exit 1; } ;;
+         [ "$n" -ge "${FAKE_GH_FAILS:-2}" ] || { echo "${FAKE_GH_MSG:-connection reset by peer}" >&2; exit 1; } ;;
 esac
 if [ "$2" = "view" ]; then echo "v0.2.0"; exit 0; fi
 while [ $# -gt 0 ]; do [ "$1" = "-D" ] && dest="$2"; shift; done
@@ -76,6 +76,23 @@ ok missing_release_fails_without_retry
 run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=2
 [ "$code" = 0 ] && [ "$(lines)" = 3 ] || die transient_error_retried_then_succeeds
 ok transient_error_retried_then_succeeds
+
+# Each retry logs attempt N of M, the reason and the delay before sleeping; the token never appears in the log.
+run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=2 GH_TOKEN=sekrit-token-123 PORTAL_DOCS_RETRY_DELAY=0
+[ "$code" = 0 ] && [ "$(echo "$out" | grep -c '^portal-docs: attempt .* of 3 failed')" = 2 ] \
+  && echo "$out" | grep -qx 'portal-docs: attempt 1 of 3 failed (connection reset by peer); retrying in 0s' \
+  && echo "$out" | grep -qx 'portal-docs: attempt 2 of 3 failed (connection reset by peer); retrying in 0s' \
+  && ! echo "$out" | grep -q 'sekrit-token-123' || die retry_logs_attempt_reason_and_delay_without_token
+ok retry_logs_attempt_reason_and_delay_without_token
+
+run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=2 PORTAL_DOCS_RETRY_DELAY=1
+[ "$code" = 0 ] && echo "$out" | grep -qx 'portal-docs: attempt 1 of 3 failed (connection reset by peer); retrying in 1s' \
+  && echo "$out" | grep -qx 'portal-docs: attempt 2 of 3 failed (connection reset by peer); retrying in 2s' || die retry_log_shows_linear_backoff_delay
+ok retry_log_shows_linear_backoff_delay
+
+run good v0.2.0
+[ "$code" = 0 ] && ! echo "$out" | grep -q 'attempt' || die no_retry_log_on_first_try_success
+ok no_retry_log_on_first_try_success
 
 run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=9
 [ "$code" != 0 ] && [ "$(lines)" = 3 ] && untouched || die persistent_error_fails_after_three_attempts
@@ -125,6 +142,44 @@ ok permanent_error_fails_on_first_attempt
 run good v0.2.0 FAKE_GH_MODE=weird
 [ "$code" != 0 ] && echo "$out" | grep -q '::error::' && [ "$(lines)" = 3 ] && untouched && [ ! -s "$fx/ghout" ] || die unrecognised_error_fails_not_skips
 ok unrecognised_error_fails_not_skips
+
+# Rate limits and server errors are transient: retried, then succeed. 404 and 401 stay permanent.
+for msg in "HTTP 403: API rate limit exceeded for user (https://api.github.com/x)" "HTTP 403: You have exceeded a secondary rate limit" "HTTP 429: Too Many Requests" "HTTP 502: Bad Gateway" "HTTP 503: Service Unavailable"; do
+  run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=2 FAKE_GH_MSG="$msg"
+  [ "$code" = 0 ] && [ "$(lines)" = 3 ] || die "transient_retried: $msg"
+done
+ok rate_limit_and_5xx_errors_are_retried
+
+run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=9 FAKE_GH_MSG="HTTP 403: API rate limit exceeded"
+[ "$code" != 0 ] && [ "$(lines)" = 3 ] && echo "$out" | grep -q 'gave up after 3 attempts' && untouched || die rate_limit_gives_up_after_three_attempts
+ok rate_limit_gives_up_after_three_attempts
+
+for msg in "HTTP 404: Not Found" "HTTP 401: Bad credentials"; do
+  run good v0.2.0 FAKE_GH_MODE=flaky FAKE_GH_FAILS=9 FAKE_GH_MSG="$msg"
+  [ "$code" != 0 ] && [ "$(lines)" = 1 ] && untouched || die "permanent_not_retried: $msg"
+done
+ok not_found_and_bad_credentials_fail_on_first_attempt
+
+# Resolve-only mode: prints the tag CI will pin, writes it to GITHUB_OUTPUT, downloads nothing, touches no bundle.
+run good "" PORTAL_DOCS_RESOLVE_ONLY=1
+[ "$code" = 0 ] && grep -qx 'cli_state_handler_docs_tag=v0.2.0' "$fx/ghout" && [ "$(lines)" = 1 ] && grep -q 'release view' "$fx/log" && untouched || die resolve_only_outputs_latest_tag_without_download
+ok resolve_only_outputs_latest_tag_without_download
+
+run good v0.3.1 PORTAL_DOCS_RESOLVE_ONLY=1
+[ "$code" = 0 ] && grep -qx 'cli_state_handler_docs_tag=v0.3.1' "$fx/ghout" && [ ! -e "$fx/log" ] || die resolve_only_keeps_explicit_tag_without_api_call
+ok resolve_only_keeps_explicit_tag_without_api_call
+
+run good "" PORTAL_DOCS_RESOLVE_ONLY=1 FAKE_GH_MODE=flaky FAKE_GH_FAILS=2 FAKE_GH_MSG="HTTP 503: Service Unavailable"
+[ "$code" = 0 ] && grep -qx 'cli_state_handler_docs_tag=v0.2.0' "$fx/ghout" && [ "$(lines)" = 3 ] || die resolve_only_retries_transient_errors
+ok resolve_only_retries_transient_errors
+
+run good "" PORTAL_DOCS_RESOLVE_ONLY=1 FAKE_GH_MODE=notfound
+[ "$code" != 0 ] && [ "$(lines)" = 1 ] && [ ! -s "$fx/ghout" ] || die resolve_only_fails_on_missing_release
+ok resolve_only_fails_on_missing_release
+
+run good "--skip-existing" PORTAL_DOCS_RESOLVE_ONLY=1
+[ "$code" != 0 ] && echo "$out" | grep -q 'not of the form' && [ ! -s "$fx/ghout" ] || die resolve_only_rejects_malformed_tag
+ok resolve_only_rejects_malformed_tag
 
 run plus-version v0.2.0
 [ "$code" != 0 ] && echo "$out" | grep -q 'usable in an image tag' && untouched || die plus_in_version_rejected

@@ -538,12 +538,24 @@
     "id": "I-088",
     "title": "Portal build fails at once if an upstream latest release is broken: add retry and resolve the docs versions once per run",
     "created_at": "2026-10-11T15:48:27.197227+00:00",
-    "promoted_to": null
+    "promoted_to": "F-081"
   },
   {
     "id": "I-089",
     "title": "Production smoke check skips the docs version comparison when no image was built in the run",
     "created_at": "2026-10-11T15:48:27.484034+00:00",
+    "promoted_to": "F-082"
+  },
+  {
+    "id": "I-090",
+    "title": "Flaky Playwright test: antd5-advanced-controls Tabs active indicator and Segmented toggle on desktop-chrome",
+    "created_at": "2026-10-11T17:34:35.838216+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-091",
+    "title": "Keep infrastructure-only deploys independent of the docs lookup and tighten the resolve job",
+    "created_at": "2026-10-11T17:40:24.332159+00:00",
+    "promoted_to": "F-083"
   }
 ]
