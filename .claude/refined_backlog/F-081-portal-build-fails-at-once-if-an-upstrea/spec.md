@@ -1,26 +1,14 @@
 ---
-title: "Portal build fails at once if an upstream latest release is broken: add retry and resolve the docs versions once per run"
 id: F-081
-status: refined
-from_idea: I-088
+title: Retry transient docs-fetch errors and resolve docs versions once per run
 ---
 
-# Portal build fails at once if an upstream latest release is broken: add retry and resolve the docs versions once per run
+# F-081 (I-088)
 
-## Problem
+Goal: a transient GitHub error never fails the portal build, and one workflow run ships exactly the docs it gated.
 
-The portal build resolves "latest release" of two upstream repositories separately in the Gate 1 job and the image job, so a release landing mid-run can ship docs the gate never tested. A rate-limit 403 fails at once instead of being retried.
-
-## Why now
-
-Both jobs run minutes apart on every push to main; a deploy to dev.joymify.com follows.
-
-## Sketch
-
-Extend scripts/fetch-portal-docs.sh retry (rate-limit 403/429 retried, 404/401/bad credentials permanent) and add a resolve-only mode. A first CI job resolves both tags once (honouring cli_docs_tag and decorator_docs_tag) and later jobs fetch exactly those tags.
-
-## Acceptance criteria
-
-- [ ] Network errors, HTTP 5xx and rate-limit 403/429 are retried; 404 and other permanent errors fail on the first attempt.
-- [ ] One workflow run resolves each docs tag once; the gate and the image build use the same tags.
-- [ ] The cli_docs_tag and decorator_docs_tag dispatch inputs keep their names and meaning.
+- `scripts/fetch-portal-docs.sh`: the existing `gh_retry` also treats 403 with a rate-limit message as transient (429 and 5xx already were); 404, 401, other 403 stay permanent. Delay grows linearly (`PORTAL_DOCS_RETRY_DELAY`).
+- New `PORTAL_DOCS_RESOLVE_ONLY=1` mode: resolve the tag (retrying), validate its form, write `<name>_docs_tag` to `$GITHUB_OUTPUT`, download nothing.
+- `ci.yml`: new first job `resolve-docs` reads the `cli_docs_tag` / `decorator_docs_tag` inputs (names unchanged) and exports both tags; `build` (Gate 1) and `build-push-image` take them from `needs.resolve-docs.outputs`.
+- Proof: `scripts/test-fetch-portal-docs.sh` (fake `gh`: rate-limit/5xx retried, 404/401 not, resolve-only), `scripts/test/ci-portal-docs.test.mjs` (job wiring, inputs read once, no `${{ }}` in `run:`), `actionlint`.
+- README documents the flow and the retry rules.
