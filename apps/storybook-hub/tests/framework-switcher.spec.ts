@@ -99,3 +99,38 @@ test.describe("Storybook Hub Tri-Framework Switcher & Flutter Integration", () =
     expect(lightTheme).toBe("light");
   });
 });
+
+// Root cause of the flaky mobile "switching frameworks" click: build.js ends its 100 ms "Initial render" timer with
+// syncViewFromHash(), whose switchView() closes the drawer. On a loaded machine that timer fires after the test (or a
+// user) has already opened the drawer, so the drawer closes under the pointer and the React button hides again.
+// This test holds the 100 ms timer back, opens the drawer, then releases it: the order is forced, not left to machine speed.
+test.describe("mobile drawer vs the initial render timer", () => {
+  test("a drawer opened before the initial render timer fires stays open", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "the drawer only exists at drawer widths");
+    await page.addInitScript(() => {
+      const w = window as unknown as { __held: Array<() => void> };
+      w.__held = [];
+      const realSetTimeout = window.setTimeout.bind(window);
+      window.setTimeout = ((fn: TimerHandler, ms?: number, ...args: unknown[]) => {
+        if (ms === 100 && typeof fn === "function") {
+          w.__held.push(() => (fn as (...a: unknown[]) => void)(...args));
+          return 0;
+        }
+        return realSetTimeout(fn, ms, ...args);
+      }) as typeof window.setTimeout;
+    });
+    await page.goto("/design/#button");
+    await page.locator("#mobile-menu-toggle").click();
+    const sidebar = page.locator("#hub-sidebar");
+    await expect(sidebar).toHaveClass(/open/);
+
+    const released = await page.evaluate(() => {
+      const w = window as unknown as { __held: Array<() => void> };
+      w.__held.forEach((run) => run());
+      return w.__held.length;
+    });
+    expect(released).toBeGreaterThan(0); // the "Initial render" timer really was held and has now run
+    await expect(sidebar).toHaveClass(/open/);
+    await expect(page.locator(".framework-pill--drawer").locator('[data-framework="react"]')).toBeVisible();
+  });
+});
