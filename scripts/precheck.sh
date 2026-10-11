@@ -39,11 +39,12 @@ echo "   Zero emoji policy verified."
 echo "2. Checking color-token integrity (strict: every package and the hub)..."
 bash scripts/lint-colors.sh
 
-echo "2a. Self-testing the gate scripts (lint-colors, epic-check, fetch-cli-docs, smoke-cli-docs)..."
+echo "2a. Self-testing the gate scripts (lint-colors, epic-check, fetch-cli-docs, smoke-cli-docs, assemble-portal)..."
 bash scripts/test-lint-colors.sh
 bash scripts/test-epic-check.sh
 bash scripts/test-fetch-cli-docs.sh
 bash scripts/test-smoke-cli-docs.sh
+bash scripts/test-assemble-portal.sh
 
 echo "2b. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
 pnpm check
@@ -71,6 +72,19 @@ else
   else
     echo "   [warn] Flutter SDK not found in PATH; skipping Flutter gate on local machine."
   fi
+fi
+
+echo "3a. Fetching the cli-state-handler docs (the hub serves them and Playwright checks /cli-state-handler/)..."
+if [ ! -s apps/storybook-hub/portal-bundles/cli-state-handler/version.json ]; then
+  if [ -z "${GH_TOKEN:-}" ]; then
+    if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1; then
+      echo "ERROR: GH_TOKEN is not set and the GitHub CLI is not logged in, so the cli-state-handler docs cannot be downloaded." >&2
+      echo "       Run 'gh auth login' (then re-run this script), or export GH_TOKEN before running it." >&2
+      exit 1
+    fi
+  fi
+  # CLI_DOCS_TAG (optional) pins the docs release so the gate checks the version the image ships.
+  GH_TOKEN="${GH_TOKEN:-$(gh auth token)}" bash scripts/fetch-cli-docs.sh "${CLI_DOCS_TAG:-}"
 fi
 
 echo "3. Compiling Storybook Hub..."

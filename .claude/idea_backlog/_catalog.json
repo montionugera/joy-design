@@ -496,6 +496,42 @@
     "id": "I-081",
     "title": "Flutter smoke test gives its own web server only 15 seconds to start and fails the gate under load",
     "created_at": "2026-10-09T15:29:04.392711+00:00",
+    "promoted_to": "F-077"
+  },
+  {
+    "id": "I-082",
+    "title": "Portal build downloads the server-decorator docs from its GitHub Release",
+    "created_at": "2026-10-11T05:59:08.736746+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-083",
+    "title": "Remove the stale committed cli-state-handler docs copy",
+    "created_at": "2026-10-11T05:59:09.116342+00:00",
+    "promoted_to": "F-075"
+  },
+  {
+    "id": "I-084",
+    "title": "Move GitHub Actions off retired Node 20 majors and pin the Ubuntu runner",
+    "created_at": "2026-10-11T05:59:09.523864+00:00",
+    "promoted_to": "F-078"
+  },
+  {
+    "id": "I-085",
+    "title": "Fix flaky framework-switcher mobile test and short Playwright server timeout",
+    "created_at": "2026-10-11T05:59:09.999587+00:00",
+    "promoted_to": "F-076"
+  },
+  {
+    "id": "I-086",
+    "title": "Add automated release notes and GitHub Releases for the joymify packages",
+    "created_at": "2026-10-11T05:59:10.537510+00:00",
+    "promoted_to": null
+  },
+  {
+    "id": "I-087",
+    "title": "Give the package-publish gate a token for the docs download and tidy the docs-fetch loose ends",
+    "created_at": "2026-10-11T09:45:03.762241+00:00",
+    "promoted_to": "F-079"
   }
 ]

@@ -8,7 +8,7 @@ bundle_dir="${CLI_DOCS_BUNDLE_DIR:-$repo_root/apps/storybook-hub/portal-bundles/
 delay="${CLI_DOCS_RETRY_DELAY:-10}"
 fail() { echo "::error::cli-docs: $*" >&2; exit 1; }
 
-[ -n "${GH_TOKEN:-}" ] || fail "secret CLI_DOCS_READ_TOKEN is empty or missing (GH_TOKEN is not set)"
+[ -n "${GH_TOKEN:-}" ] || fail 'GH_TOKEN is empty or missing (CI passes the built-in github.token; locally run: GH_TOKEN=$(gh auth token) bash scripts/fetch-cli-docs.sh)'
 work=$(mktemp -d); trap 'rm -rf "$work" "$bundle_dir.new"' EXIT   # outside the repository: nothing may leak into apps/
 
 gh_retry() { # permanent errors fail at once; anything else gets 3 attempts in total

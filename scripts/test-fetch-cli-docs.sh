@@ -66,8 +66,8 @@ run good ""
 ok empty_tag_resolves_latest
 
 run good v0.2.0 GH_TOKEN=
-[ "$code" != 0 ] && echo "$out" | grep -q '::error::' && echo "$out" | grep -q CLI_DOCS_READ_TOKEN && untouched && [ ! -e "$fx/log" ] || die empty_token_fails_naming_secret
-ok empty_token_fails_naming_secret
+[ "$code" != 0 ] && echo "$out" | grep -q '::error::' && echo "$out" | grep -q 'gh auth token' && untouched && [ ! -e "$fx/log" ] || die empty_token_fails_naming_local_command
+ok empty_token_fails_naming_local_command
 
 run good v9.9.9 FAKE_GH_MODE=notfound
 [ "$code" != 0 ] && untouched && [ "$(lines)" = 1 ] || die missing_release_fails_without_retry

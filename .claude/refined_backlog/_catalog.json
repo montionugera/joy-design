@@ -934,5 +934,65 @@
     "shipped_at": "2026-10-09T18:36:16.615828+00:00",
     "shipped_sha": "720d5cbda2489eafe9e8517256e5f5778b508d7c",
     "promoted_at": "2026-10-10T14:28:35.209593+00:00"
+  },
+  {
+    "id": "F-075",
+    "title": "Remove the stale committed cli-state-handler docs copy",
+    "from_idea": "I-083",
+    "created_at": "2026-10-11T06:01:25.290880+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.9",
+    "claimed_at": "2026-10-11T06:01:39.314121+00:00",
+    "shipped_at": "2026-10-11T07:30:26.354018+00:00",
+    "shipped_sha": "ae07a1392d948ac1166f805b2a995f26a99469a4"
+  },
+  {
+    "id": "F-076",
+    "title": "Fix flaky framework-switcher mobile test and short Playwright server timeout",
+    "from_idea": "I-085",
+    "created_at": "2026-10-11T07:30:54.588429+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.9",
+    "claimed_at": "2026-10-11T07:31:03.189671+00:00",
+    "shipped_at": "2026-10-11T08:00:02.188590+00:00",
+    "shipped_sha": "6de16169adb3d3b255f9d9cd68293d10f71621a8"
+  },
+  {
+    "id": "F-077",
+    "title": "Flutter smoke test gives its own web server only 15 seconds to start and fails the gate under load",
+    "from_idea": "I-081",
+    "created_at": "2026-10-11T07:30:55.052105+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.9",
+    "claimed_at": "2026-10-11T08:45:15.492486+00:00",
+    "shipped_at": "2026-10-11T09:19:18.794298+00:00",
+    "shipped_sha": "51f358f57e82d6690a402e8b057d0e9ef69064de"
+  },
+  {
+    "id": "F-078",
+    "title": "Move GitHub Actions off retired Node 20 majors and pin the Ubuntu runner",
+    "from_idea": "I-084",
+    "created_at": "2026-10-11T09:20:17.889127+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.9",
+    "claimed_at": "2026-10-11T09:20:30.547814+00:00",
+    "shipped_at": "2026-10-11T09:41:25.256849+00:00",
+    "shipped_sha": "5dc2e2ed41d091d5e145dc5561baeaab6d2b9020"
+  },
+  {
+    "id": "F-079",
+    "title": "Give the package-publish gate a token for the docs download and tidy the docs-fetch loose ends",
+    "from_idea": "I-087",
+    "created_at": "2026-10-11T09:45:14.872478+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.9",
+    "claimed_at": "2026-10-11T09:45:19.870749+00:00",
+    "shipped_at": "2026-10-11T09:59:34.007128+00:00",
+    "shipped_sha": "b86b60903fcc2e6b8242b996b2f4a320ec8bad1f"
   }
 ]

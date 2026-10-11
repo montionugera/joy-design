@@ -55,16 +55,13 @@ if [ -d "$CLI_DIR" ] && [ -d "$CLI_DIR/apps/docs/dist" ]; then
   rm -rf "$HUB_DIST/cli-state-handler"
   cp -r "$CLI_DIR/apps/docs/dist" "$HUB_DIST/cli-state-handler"
 elif [ -d "$PORTAL_BUNDLES/cli-state-handler" ]; then
-  echo "==> Found tracked portal-bundles for cli-state-handler..."
+  echo "==> Found fetched portal-bundles for cli-state-handler..."
   rm -rf "$HUB_DIST/cli-state-handler"
   cp -r "$PORTAL_BUNDLES/cli-state-handler" "$HUB_DIST/cli-state-handler"
 else
-  echo "    cli-state-handler not found, creating stub index..."
-  mkdir -p "$HUB_DIST/cli-state-handler"
-  cat <<'EOF' > "$HUB_DIST/cli-state-handler/index.html"
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>CLI State Handler Documentation</title><meta http-equiv="refresh" content="0; url=https://github.com/montionugera/cli-state-handler"></head><body>Redirecting to GitHub...</body></html>
-EOF
+  echo "ERROR: no cli-state-handler docs found (no sibling checkout, no downloaded bundle)." >&2
+  echo "       Download them first: GH_TOKEN=\$(gh auth token) bash scripts/fetch-cli-docs.sh" >&2
+  exit 1
 fi
 
 echo "==> Successfully assembled Unified Developer Portal distribution in $HUB_DIST"
