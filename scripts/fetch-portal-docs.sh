@@ -23,6 +23,8 @@ gh_retry() { # permanent errors fail at once; network errors, 5xx and rate limit
     # A 403 carrying a rate-limit message is transient; any other 403, 401, 404 is permanent.
     if ! grep -qiE 'rate limit|abuse detection' "$work/gh.err" && grep -qiE 'not found|HTTP 40[134]|bad credentials|no assets' "$work/gh.err"; then fail "$(tr '\n' ' ' < "$work/gh.err")"; fi
     [ "$n" -lt 3 ] || fail "gave up after 3 attempts: $(tr '\n' ' ' < "$work/gh.err")"
+    # The reason is gh's own first stderr line (never the request headers), capped at 200 chars.
+    echo "portal-docs: attempt $n of 3 failed ($(head -n 1 "$work/gh.err" | cut -c1-200)); retrying in $((delay * n))s" >&2
     sleep $((delay * n)); n=$((n + 1))   # linear back-off: a rate limit needs longer than a reset connection
   done
 }

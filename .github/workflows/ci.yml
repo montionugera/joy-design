@@ -67,6 +67,15 @@ jobs:
   resolve-docs:
     name: 📌 Resolve docs versions
     runs-on: ubuntu-latest
+    needs: changes
+    # Same condition as build: when the docs are not needed this job is skipped, so an infrastructure-only
+    # push (k8s/** alone) never depends on the GitHub release lookup and deploys exactly as before.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.app == 'true' ||
+      github.event_name == 'pull_request'
+    permissions:
+      contents: read
     outputs:
       cli_tag: ${{ steps.resolve.outputs.cli_state_handler_docs_tag }}
       decorator_tag: ${{ steps.resolve.outputs.server_decorator_docs_tag }}
@@ -130,6 +139,14 @@ jobs:
       - name: Type check (pnpm check)
         run: pnpm check
 
+      - name: Require resolved docs tags
+        env:
+          CLI_DOCS_TAG: ${{ needs.resolve-docs.outputs.cli_tag }}
+          DECORATOR_DOCS_TAG: ${{ needs.resolve-docs.outputs.decorator_tag }}
+        run: |
+          [ -n "$CLI_DOCS_TAG" ] || { echo "::error::resolved cli docs tag is empty; refusing to fall back to latest"; exit 1; }
+          [ -n "$DECORATOR_DOCS_TAG" ] || { echo "::error::resolved decorator docs tag is empty; refusing to fall back to latest"; exit 1; }
+
       # integration.sh runs Gate 1 (scripts/precheck.sh): emoji policy, strict colour lint
       # (scripts/lint-colors.sh), gate self-tests, contrast test, pnpm check, workspace tests,
       # parity (scripts/parity-check.mjs), hub build and Playwright contracts.
@@ -164,6 +181,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Require resolved docs tags
+        env:
+          CLI_DOCS_TAG: ${{ needs.resolve-docs.outputs.cli_tag }}
+          DECORATOR_DOCS_TAG: ${{ needs.resolve-docs.outputs.decorator_tag }}
+        run: |
+          [ -n "$CLI_DOCS_TAG" ] || { echo "::error::resolved cli docs tag is empty; refusing to fall back to latest"; exit 1; }
+          [ -n "$DECORATOR_DOCS_TAG" ] || { echo "::error::resolved decorator docs tag is empty; refusing to fall back to latest"; exit 1; }
 
       - name: Fetch portal docs
         id: docs
