@@ -134,7 +134,7 @@ jobs:
       - name: Fetch cli-state-handler docs
         id: cli_docs
         env:
-          GH_TOKEN: ${{ secrets.CLI_DOCS_READ_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}
         run: bash scripts/fetch-cli-docs.sh "$CLI_DOCS_TAG"
 
