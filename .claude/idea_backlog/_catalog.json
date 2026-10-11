@@ -502,7 +502,7 @@
     "id": "I-082",
     "title": "Portal build downloads the server-decorator docs from its GitHub Release",
     "created_at": "2026-10-11T05:59:08.736746+00:00",
-    "promoted_to": null
+    "promoted_to": "F-080"
   },
   {
     "id": "I-083",
@@ -533,5 +533,17 @@
     "title": "Give the package-publish gate a token for the docs download and tidy the docs-fetch loose ends",
     "created_at": "2026-10-11T09:45:03.762241+00:00",
     "promoted_to": "F-079"
+  },
+  {
+    "id": "I-088",
+    "title": "Portal build fails at once if an upstream latest release is broken: add retry and resolve the docs versions once per run",
+    "created_at": "2026-10-11T15:48:27.197227+00:00",
+    "promoted_to": null
+  },
+  {
+    "id": "I-089",
+    "title": "Production smoke check skips the docs version comparison when no image was built in the run",
+    "created_at": "2026-10-11T15:48:27.484034+00:00",
+    "promoted_to": null
   }
 ]
