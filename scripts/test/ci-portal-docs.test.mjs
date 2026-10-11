@@ -31,15 +31,15 @@ test('fetch step sits between Checkout and Set image tag inside build-push-image
   assert.ok(a >= 0 && b > a && c > b, `order was ${a}, ${b}, ${c}`);
 });
 
-test('cli_docs_tag reaches the shell only as the CLI_DOCS_TAG env value', () => {
+test('cli_docs_tag reaches the shell only as the CLI_DOCS_TAG env value, in the resolve job alone', () => {
   const hits = ci.split('\n').filter((l) => l.includes('inputs.cli_docs_tag'));
-  assert.strictEqual(hits.length, 2, 'fetch step and Gate 1 step');
+  assert.strictEqual(hits.length, 1, 'only the resolve-docs step reads the dispatch input');
   for (const h of hits) assert.match(h, /^\s*CLI_DOCS_TAG:/);
 });
 
-test('decorator_docs_tag reaches the shell only as the DECORATOR_DOCS_TAG env value', () => {
+test('decorator_docs_tag reaches the shell only as the DECORATOR_DOCS_TAG env value, in the resolve job alone', () => {
   const hits = ci.split('\n').filter((l) => l.includes('inputs.decorator_docs_tag'));
-  assert.strictEqual(hits.length, 2, 'fetch step and Gate 1 step');
+  assert.strictEqual(hits.length, 1, 'only the resolve-docs step reads the dispatch input');
   for (const h of hits) assert.match(h, /^\s*DECORATOR_DOCS_TAG:/);
 });
 
@@ -61,7 +61,7 @@ test('build-push-image never runs on pull requests', () => {
 test('fetch step uses the built-in github.token as GH_TOKEN and no personal secret remains', () => {
   assert.ok(!ci.includes('CLI_DOCS_READ_TOKEN'), 'the personal secret must no longer be referenced');
   const hits = ci.split('\n').filter((l) => l.includes('github.token'));
-  assert.strictEqual(hits.length, 2, 'fetch step and the Gate 1 step only in ci.yml');
+  assert.strictEqual(hits.length, 3, 'resolve step, fetch step and the Gate 1 step only in ci.yml');
   for (const h of hits) assert.match(h, /^\s*GH_TOKEN: \$\{\{ github\.token \}\}/);
   const job = jobBlock();
   const step = job.slice(job.indexOf('- name: Fetch portal docs'), job.indexOf('- name: Set up Flutter'));
@@ -160,8 +160,37 @@ test('every workflow step running the gate scripts provides GH_TOKEN via env', (
 
 test('the Gate 1 step in ci.yml passes both tags so the gate checks the shipped docs versions', () => {
   const gate = ci.slice(ci.indexOf('- name: Gate 1'), ci.indexOf('# ── Job 2'));
-  assert.match(gate, /CLI_DOCS_TAG: \$\{\{ inputs\.cli_docs_tag \}\}/);
-  assert.match(gate, /DECORATOR_DOCS_TAG: \$\{\{ inputs\.decorator_docs_tag \}\}/);
+  assert.match(gate, /CLI_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.cli_tag \}\}/);
+  assert.match(gate, /DECORATOR_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.decorator_tag \}\}/);
+});
+
+// I-088: the docs versions are resolved once per run; gate and image build fetch exactly those tags.
+function section(name, until) {
+  const start = ci.indexOf(`\n  ${name}:`);
+  assert.ok(start >= 0, `${name} job not found`);
+  const next = ci.indexOf(until, start + 1);
+  return ci.slice(start, next < 0 ? undefined : next);
+}
+
+test('resolve-docs resolves both tags once, honouring the dispatch inputs, and exports them', () => {
+  const job = section('resolve-docs', '\n  # ──');
+  assert.match(job, /PORTAL_DOCS_RESOLVE_ONLY: '1'/);
+  assert.match(job, /CLI_DOCS_TAG: \$\{\{ inputs\.cli_docs_tag \}\}/);
+  assert.match(job, /DECORATOR_DOCS_TAG: \$\{\{ inputs\.decorator_docs_tag \}\}/);
+  assert.match(job, /fetch-portal-docs\.sh montionugera\/cli-state-handler cli-state-handler "\$CLI_DOCS_TAG"/);
+  assert.match(job, /fetch-portal-docs\.sh montionugera\/node-server-decorator server-decorator "\$DECORATOR_DOCS_TAG"/);
+  assert.match(job, /cli_tag: \$\{\{ steps\.resolve\.outputs\.cli_state_handler_docs_tag \}\}/);
+  assert.match(job, /decorator_tag: \$\{\{ steps\.resolve\.outputs\.server_decorator_docs_tag \}\}/);
+  assert.ok(!/needs:/.test(job), 'resolves first so every later job can use it');
+});
+
+test('build and build-push-image depend on resolve-docs and fetch the resolved tags', () => {
+  assert.match(section('build', '\n  # ──'), /needs: \[changes, resolve-docs\]/);
+  const img = jobBlock();
+  assert.match(img, /needs: \[changes, build, resolve-docs\]/);
+  assert.match(img, /CLI_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.cli_tag \}\}/);
+  assert.match(img, /DECORATOR_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.decorator_tag \}\}/);
+  assert.ok(!img.includes('PORTAL_DOCS_RESOLVE_ONLY'), 'the image job fetches, it never re-resolves latest');
 });
 
 test('precheck.sh fetches both bundles when empty and explains a missing token without printing one', () => {
