@@ -8,19 +8,24 @@ status: idea
 
 ## Problem
 
-(what hurts; concrete examples)
+The /server-decorator/ pages are a hand-committed copy of 197 files under apps/storybook-hub/portal-bundles/server-decorator, refreshed by hand, so they drift from upstream releases.
 
 ## Why now
 
-(opportunity; deadline; constraint)
+Upstream v2.0.26 now ships version.json in docs-site.tgz, which removes the blocker below. cli-state-handler already uses the download pattern (release 3.9).
 
 ## Sketch
 
-(rough shape; not a design yet)
+Generalise scripts/fetch-cli-docs.sh (repo and target folder as parameters), call it for both bundles in ci.yml and precheck.sh, gitignore and delete the committed copy, extend image tag and smoke-prod.sh.
 
 ## Acceptance criteria
 
-- [ ] (one observable, testable outcome per item; refine refuses a spec without any)
+- [ ] One fetch script downloads both bundles with version.json cross-check.
+- [ ] The committed server-decorator files are gone from git; missing bundle fails assemble, Dockerfile, precheck loudly.
+- [ ] ci.yml has a decorator_docs_tag input, image tag carries the decorator version, smoke checks /server-decorator/version.json.
+- [ ] README documents the local fetch flow for both bundles.
+
+## Notes
 
 The /server-decorator/ pages come from a hand-committed copy: 197 files tracked under apps/storybook-hub/portal-bundles/server-decorator (last refreshed by hand in 203e578b, #56), copied by scripts/assemble-portal.sh:38. node-server-decorator now attaches docs-site.tgz to its Releases (latest v2.0.22). Done: ci.yml fetches that archive like scripts/fetch-cli-docs.sh (ci.yml:139) does for cli-state-handler, with a pinned tag and a self-test, and the committed copy is removed.
 
