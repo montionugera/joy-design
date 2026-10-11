@@ -515,5 +515,11 @@
     "title": "Move GitHub Actions off retired Node 20 majors and pin the Ubuntu runner",
     "created_at": "2026-10-11T05:59:09.523864+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-085",
+    "title": "Fix flaky framework-switcher mobile test and short Playwright server timeout",
+    "created_at": "2026-10-11T05:59:09.999587+00:00",
+    "promoted_to": null
   }
 ]
