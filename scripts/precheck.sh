@@ -39,11 +39,12 @@ echo "   Zero emoji policy verified."
 echo "2. Checking color-token integrity (strict: every package and the hub)..."
 bash scripts/lint-colors.sh
 
-echo "2a. Self-testing the gate scripts (lint-colors, epic-check, fetch-cli-docs, smoke-cli-docs)..."
+echo "2a. Self-testing the gate scripts (lint-colors, epic-check, fetch-cli-docs, smoke-cli-docs, assemble-portal)..."
 bash scripts/test-lint-colors.sh
 bash scripts/test-epic-check.sh
 bash scripts/test-fetch-cli-docs.sh
 bash scripts/test-smoke-cli-docs.sh
+bash scripts/test-assemble-portal.sh
 
 echo "2b. Type checking (pnpm check: tsc for React, svelte-check for Svelte)..."
 pnpm check
@@ -71,6 +72,11 @@ else
   else
     echo "   [warn] Flutter SDK not found in PATH; skipping Flutter gate on local machine."
   fi
+fi
+
+echo "3a. Fetching the cli-state-handler docs (the hub serves them and Playwright checks /cli-state-handler/)..."
+if [ ! -s apps/storybook-hub/portal-bundles/cli-state-handler/version.json ]; then
+  GH_TOKEN="${GH_TOKEN:-$(gh auth token)}" bash scripts/fetch-cli-docs.sh
 fi
 
 echo "3. Compiling Storybook Hub..."

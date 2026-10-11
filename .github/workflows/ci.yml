@@ -105,6 +105,8 @@ jobs:
       # (scripts/lint-colors.sh), gate self-tests, contrast test, pnpm check, workspace tests,
       # parity (scripts/parity-check.mjs), hub build and Playwright contracts.
       - name: Gate 1 (scripts/precheck.sh via scripts/integration.sh)
+        env:
+          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the cli-state-handler docs it serves
         run: ./scripts/integration.sh
 
   # ── Job 2: Build & Push Image to GHCR ─────────────────────
@@ -134,7 +136,7 @@ jobs:
       - name: Fetch cli-state-handler docs
         id: cli_docs
         env:
-          GH_TOKEN: ${{ secrets.CLI_DOCS_READ_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}
         run: bash scripts/fetch-cli-docs.sh "$CLI_DOCS_TAG"
 

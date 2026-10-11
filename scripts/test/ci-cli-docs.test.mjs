@@ -42,10 +42,32 @@ test('build-push-image never runs on pull requests', () => {
   assert.ok(!cond.includes('pull_request'));
 });
 
-test('token is passed only as GH_TOKEN of the fetch step', () => {
-  const hits = ci.split('\n').filter((l) => l.includes('secrets.CLI_DOCS_READ_TOKEN'));
-  assert.strictEqual(hits.length, 1);
-  assert.match(hits[0], /^\s*GH_TOKEN:/);
+test('fetch step uses the built-in github.token as GH_TOKEN and no personal secret remains', () => {
+  assert.ok(!ci.includes('CLI_DOCS_READ_TOKEN'), 'the personal secret must no longer be referenced');
+  const hits = ci.split('\n').filter((l) => l.includes('github.token'));
+  assert.strictEqual(hits.length, 2, 'fetch step and the Gate 1 step only');
+  for (const h of hits) assert.match(h, /^\s*GH_TOKEN: \$\{\{ github\.token \}\}/);
+  const job = jobBlock();
+  const step = job.slice(job.indexOf('- name: Fetch cli-state-handler docs'), job.indexOf('- name: Set up Flutter'));
+  assert.ok(step.includes('GH_TOKEN: ${{ github.token }}'));
+});
+
+test('Gate 1 gets a token and precheck.sh fetches the docs before the hub build', () => {
+  const gate = ci.slice(ci.indexOf('- name: Gate 1'), ci.indexOf('# ── Job 2'));
+  assert.match(gate, /GH_TOKEN: \$\{\{ github\.token \}\}/);
+  const pre = fs.readFileSync(path.join(root, 'scripts/precheck.sh'), 'utf8');
+  const f = pre.indexOf('scripts/fetch-cli-docs.sh');
+  assert.ok(f > 0 && f < pre.indexOf('node apps/storybook-hub/build.js'));
+});
+
+test('image build fails when the cli-state-handler bundle is missing', () => {
+  const dockerfile = fs.readFileSync(path.join(root, 'Dockerfile'), 'utf8');
+  assert.match(dockerfile, /RUN test -s apps\/storybook-hub\/dist\/cli-state-handler\/version\.json/);
+});
+
+test('the fetched bundle folder is gitignored', () => {
+  const ignore = fs.readFileSync(path.join(root, '.gitignore'), 'utf8').split('\n');
+  assert.ok(ignore.includes('apps/storybook-hub/portal-bundles/cli-state-handler/'));
 });
 
 test('image tag carries the docs version', () => {
