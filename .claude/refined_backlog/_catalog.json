@@ -955,5 +955,14 @@
     "claimed_by": null,
     "status": "open",
     "release_version": null
+  },
+  {
+    "id": "F-077",
+    "title": "Flutter smoke test gives its own web server only 15 seconds to start and fails the gate under load",
+    "from_idea": "I-081",
+    "created_at": "2026-10-11T07:30:55.052105+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
