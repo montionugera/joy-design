@@ -105,6 +105,8 @@ jobs:
       # (scripts/lint-colors.sh), gate self-tests, contrast test, pnpm check, workspace tests,
       # parity (scripts/parity-check.mjs), hub build and Playwright contracts.
       - name: Gate 1 (scripts/precheck.sh via scripts/integration.sh)
+        env:
+          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the cli-state-handler docs it serves
         run: ./scripts/integration.sh
 
   # ── Job 2: Build & Push Image to GHCR ─────────────────────

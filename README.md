@@ -319,7 +319,7 @@ The portal serves the CLI State Handler docs at `/cli-state-handler/`. They are 
 - **Pick a release**: the `cli_docs_tag` dispatch input (for example `v0.2.0`). Blank means the latest release. It is ignored when `image_tag` is set.
 - **Image tag**: `<12-char hash>-cli<X.Y.Z>`, so each tag names one commit plus one docs version.
 - **Token**: none to manage. The source repository is public, so the step passes the built-in `${{ github.token }}` as `GH_TOKEN`. (The old `CLI_DOCS_READ_TOKEN` secret is no longer used and can be deleted from the repository settings.)
-- **Local development**: the folder `apps/storybook-hub/portal-bundles/cli-state-handler/` is gitignored. Download it with `GH_TOKEN=$(gh auth token) bash scripts/fetch-cli-docs.sh [vX.Y.Z]`, or keep a sibling `cli-state-handler` checkout with a built `apps/docs/dist`.
+- **Local development**: the folder `apps/storybook-hub/portal-bundles/cli-state-handler/` is gitignored. Download it with `GH_TOKEN=$(gh auth token) bash scripts/fetch-cli-docs.sh [vX.Y.Z]`, or keep a sibling `cli-state-handler` checkout with a built `apps/docs/dist`. `scripts/precheck.sh` (Gate 1) runs the same download itself when the folder is empty, because the Playwright contracts open `/cli-state-handler/`.
 - **Fail loud**: any fetch error fails the build and the live portal keeps its previous image. There is no skip switch, and the `Dockerfile` fails if `dist/cli-state-handler/version.json` is missing.
 - **Check**: `curl -s https://dev.joymify.com/cli-state-handler/version.json` prints the served docs version.
 - **Roll back**: re-run `ci.yml` with `image_tag` set to the previous image tag (no build, no fetch), or with `cli_docs_tag` set to the previous release tag.

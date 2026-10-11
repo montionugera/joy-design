@@ -74,6 +74,11 @@ else
   fi
 fi
 
+echo "3a. Fetching the cli-state-handler docs (the hub serves them and Playwright checks /cli-state-handler/)..."
+if [ ! -s apps/storybook-hub/portal-bundles/cli-state-handler/version.json ]; then
+  GH_TOKEN="${GH_TOKEN:-$(gh auth token)}" bash scripts/fetch-cli-docs.sh
+fi
+
 echo "3. Compiling Storybook Hub..."
 node apps/storybook-hub/build.js
 
