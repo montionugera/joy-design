@@ -527,5 +527,11 @@
     "title": "Add automated release notes and GitHub Releases for the joymify packages",
     "created_at": "2026-10-11T05:59:10.537510+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-087",
+    "title": "Give the package-publish gate a token for the docs download and tidy the docs-fetch loose ends",
+    "created_at": "2026-10-11T09:45:03.762241+00:00",
+    "promoted_to": null
   }
 ]
