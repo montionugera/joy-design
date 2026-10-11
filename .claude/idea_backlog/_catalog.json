@@ -497,5 +497,11 @@
     "title": "Flutter smoke test gives its own web server only 15 seconds to start and fails the gate under load",
     "created_at": "2026-10-09T15:29:04.392711+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-082",
+    "title": "Portal build downloads the server-decorator docs from its GitHub Release",
+    "created_at": "2026-10-11T05:59:08.736746+00:00",
+    "promoted_to": null
   }
 ]
