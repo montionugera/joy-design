@@ -503,5 +503,11 @@
     "title": "Portal build downloads the server-decorator docs from its GitHub Release",
     "created_at": "2026-10-11T05:59:08.736746+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-083",
+    "title": "Remove the stale committed cli-state-handler docs copy",
+    "created_at": "2026-10-11T05:59:09.116342+00:00",
+    "promoted_to": null
   }
 ]
