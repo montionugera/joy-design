@@ -31,8 +31,8 @@ test('fetch step sits between Checkout and Set image tag inside build-push-image
 
 test('cli_docs_tag reaches the shell only as the CLI_DOCS_TAG env value', () => {
   const hits = ci.split('\n').filter((l) => l.includes('inputs.cli_docs_tag'));
-  assert.strictEqual(hits.length, 1);
-  assert.match(hits[0], /^\s*CLI_DOCS_TAG:/);
+  assert.strictEqual(hits.length, 2, 'fetch step and Gate 1 step');
+  for (const h of hits) assert.match(h, /^\s*CLI_DOCS_TAG:/);
 });
 
 test('build-push-image never runs on pull requests', () => {
@@ -45,7 +45,7 @@ test('build-push-image never runs on pull requests', () => {
 test('fetch step uses the built-in github.token as GH_TOKEN and no personal secret remains', () => {
   assert.ok(!ci.includes('CLI_DOCS_READ_TOKEN'), 'the personal secret must no longer be referenced');
   const hits = ci.split('\n').filter((l) => l.includes('github.token'));
-  assert.strictEqual(hits.length, 2, 'fetch step and the Gate 1 step only');
+  assert.strictEqual(hits.length, 2, 'fetch step and the Gate 1 step only in ci.yml');
   for (const h of hits) assert.match(h, /^\s*GH_TOKEN: \$\{\{ github\.token \}\}/);
   const job = jobBlock();
   const step = job.slice(job.indexOf('- name: Fetch cli-state-handler docs'), job.indexOf('- name: Set up Flutter'));
@@ -93,4 +93,44 @@ test('no build-arg or secret mount carries the token', () => {
   const block = ci.slice(start, ci.indexOf('\n  # ──', start));
   assert.ok(start > 0);
   assert.ok(!/build-args:|secrets:/.test(block));
+});
+
+// Every workflow step that runs a gate script (precheck.sh pulls the docs bundle on a fresh runner and
+// fetch-cli-docs.sh exits 1 on an empty token) must get GH_TOKEN through its env: block.
+function workflowSteps(text) {
+  const code = text.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  const parts = code.split(/\n(?=\s*- (?:name|uses|run):)/);
+  return parts.slice(1);
+}
+
+test('every workflow step running the gate scripts provides GH_TOKEN via env', () => {
+  const dir = path.join(root, '.github/workflows');
+  const files = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f));
+  assert.ok(files.length >= 2);
+  let seen = 0;
+  for (const f of files) {
+    for (const step of workflowSteps(fs.readFileSync(path.join(dir, f), 'utf8'))) {
+      const runLine = step.split('\n').find((l) => /^\s*(- )?run:/.test(l)) ?? '';
+      const runs = /(precheck|integration|assemble-portal|fetch-cli-docs)\.sh/.test(
+        step.slice(step.search(/^\s*(- )?run:/m) >= 0 ? step.search(/^\s*(- )?run:/m) : step.length),
+      );
+      if (!runs) continue;
+      seen++;
+      const name = step.split('\n')[0].trim();
+      assert.match(step, /^\s+GH_TOKEN: \$\{\{ github\.token \}\}/m, `${f}: step "${name}" needs GH_TOKEN`);
+      assert.ok(!/GH_TOKEN/.test(runLine), `${f}: token must come from env:, not the run line`);
+    }
+  }
+  assert.ok(seen >= 3, `expected at least 3 gate steps, saw ${seen}`);
+});
+
+test('the Gate 1 step in ci.yml passes CLI_DOCS_TAG so the gate checks the shipped docs version', () => {
+  const gate = ci.slice(ci.indexOf('- name: Gate 1'), ci.indexOf('# ── Job 2'));
+  assert.match(gate, /CLI_DOCS_TAG: \$\{\{ inputs\.cli_docs_tag \}\}/);
+});
+
+test('precheck.sh fetches CLI_DOCS_TAG and explains a missing token without printing one', () => {
+  const pre = fs.readFileSync(path.join(root, 'scripts/precheck.sh'), 'utf8');
+  assert.match(pre, /fetch-cli-docs\.sh "\$\{CLI_DOCS_TAG:-\}"|fetch-cli-docs\.sh \$\{CLI_DOCS_TAG/);
+  assert.match(pre, /gh auth login/);
 });

@@ -98,6 +98,8 @@ jobs:
 
       # The gate rebuilds tokens and, through turbo's ^build edge on check, the brand assets.
       - name: Gate (scripts/precheck.sh via scripts/integration.sh)
+        env:
+          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the cli-state-handler docs it serves
         run: ./scripts/integration.sh
 
       # Only icons and react are built here; their dist/ is untracked.

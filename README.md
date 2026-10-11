@@ -315,7 +315,7 @@ The primary design workshop provides a **3-way framework switcher**:
 
 The portal serves the CLI State Handler docs at `/cli-state-handler/`. They are not tracked in this repo: the image job downloads `docs-site.tgz` from the latest `montionugera/cli-state-handler` GitHub Release.
 
-- **Where it runs**: the "Fetch cli-state-handler docs" step in `.github/workflows/ci.yml`, in the image job only. Pull requests never run it.
+- **Where it runs**: the "Fetch cli-state-handler docs" step in `.github/workflows/ci.yml`, in the image job (which never runs on pull requests), and again by `scripts/precheck.sh` inside the Gate 1 step, which also runs on pull requests and in `publish.yml`. Both pass the built-in `${{ github.token }}` as `GH_TOKEN`; a manual dispatch with `cli_docs_tag` sets `CLI_DOCS_TAG` so the gate checks the same docs version the image ships.
 - **Pick a release**: the `cli_docs_tag` dispatch input (for example `v0.2.0`). Blank means the latest release. It is ignored when `image_tag` is set.
 - **Image tag**: `<12-char hash>-cli<X.Y.Z>`, so each tag names one commit plus one docs version.
 - **Token**: none to manage. The source repository is public, so the step passes the built-in `${{ github.token }}` as `GH_TOKEN`. (The old `CLI_DOCS_READ_TOKEN` secret is no longer used and can be deleted from the repository settings.)
