@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-# Fetch cli-state-handler's docs-site.tgz from its GitHub Release and swap it into the portal bundle folder.
+# Usage: fetch-portal-docs.sh <owner/repo> <bundle-name> [vX.Y.Z]
+# Fetch <owner/repo>'s docs-site.tgz from its GitHub Release (blank tag = latest) and swap it into
+# apps/storybook-hub/portal-bundles/<bundle-name>. Used for cli-state-handler and server-decorator.
 # Fails loudly on every error; there is no skip switch. Never prints the token; do not add `set -x`.
 set -euo pipefail
-repo="montionugera/cli-state-handler"; asset="docs-site.tgz"; tag="${1:-}"
+asset="docs-site.tgz"; repo="${1:-}"; name="${2:-}"; tag="${3:-}"
+fail() { echo "::error::portal-docs: $*" >&2; exit 1; }
+[[ "$repo" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || fail "usage: fetch-portal-docs.sh <owner/repo> <bundle-name> [vX.Y.Z]; got repo '$repo'"
+[[ "$name" =~ ^[a-z][a-z0-9-]*$ ]] || fail "bundle name '$name' must be lowercase letters, digits and dashes"
 repo_root=$(cd "$(dirname "$0")/.." && pwd)
-bundle_dir="${CLI_DOCS_BUNDLE_DIR:-$repo_root/apps/storybook-hub/portal-bundles/cli-state-handler}"
-delay="${CLI_DOCS_RETRY_DELAY:-10}"
-fail() { echo "::error::cli-docs: $*" >&2; exit 1; }
+bundle_dir="${PORTAL_DOCS_BUNDLE_DIR:-$repo_root/apps/storybook-hub/portal-bundles/$name}"
+delay="${PORTAL_DOCS_RETRY_DELAY:-10}"
 
-[ -n "${GH_TOKEN:-}" ] || fail 'GH_TOKEN is empty or missing (CI passes the built-in github.token; locally run: GH_TOKEN=$(gh auth token) bash scripts/fetch-cli-docs.sh)'
+[ -n "${GH_TOKEN:-}" ] || fail 'GH_TOKEN is empty or missing (CI passes the built-in github.token; locally run: GH_TOKEN=$(gh auth token) bash scripts/fetch-portal-docs.sh $repo $name)'
 work=$(mktemp -d); trap 'rm -rf "$work" "$bundle_dir.new"' EXIT   # outside the repository: nothing may leak into apps/
 
 gh_retry() { # permanent errors fail at once; anything else gets 3 attempts in total
@@ -41,5 +45,5 @@ version=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$wo
 # Copy beside the snapshot first so a failed copy never costs the old one; the trap removes any leftover .new
 rm -rf "$bundle_dir.new"; mkdir -p "$bundle_dir.new"; cp -R "$work/out/." "$bundle_dir.new/"
 rm -rf "$bundle_dir"; mv "$bundle_dir.new" "$bundle_dir"
-[ -z "${GITHUB_OUTPUT:-}" ] || echo "cli_docs_version=$version" >> "$GITHUB_OUTPUT"
-echo "cli-docs: fetched $tag (version.json $version)"
+[ -z "${GITHUB_OUTPUT:-}" ] || echo "${name//-/_}_docs_version=$version" >> "$GITHUB_OUTPUT"
+echo "portal-docs: fetched $name $tag (version.json $version)"

@@ -111,7 +111,7 @@ Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed 
 | 0    | `pnpm install --frozen-lockfile`                                      | Workspace packages are linked, including any package a merge just added.                                                                                                                                 |
 | 1    | emoji scan (inline Python)                                            | No raw OS emoji in tracked files.                                                                                                                                                                        |
 | 2    | `bash scripts/lint-colors.sh`                                         | No hex, `rgb()`/`hsl()` or `var(--joy-*, fallback)` in any package source or the hub. Every hit fails. Narrow exceptions live in `scripts/lint-colors.allow`.                                            |
-| 2a   | `bash scripts/test-lint-colors.sh`, `bash scripts/test-epic-check.sh`, `bash scripts/test-fetch-cli-docs.sh`, `bash scripts/test-smoke-cli-docs.sh`, `bash scripts/test-assemble-portal.sh` | Self-tests: the gate scripts still catch what they claim to.                                                                                                                                             |
+| 2a   | `bash scripts/test-lint-colors.sh`, `bash scripts/test-epic-check.sh`, `bash scripts/test-fetch-portal-docs.sh`, `bash scripts/test-smoke-cli-docs.sh`, `bash scripts/test-assemble-portal.sh` | Self-tests: the gate scripts still catch what they claim to.                                                                                                                                             |
 | 2b   | `pnpm check`                                                          | Type check: `tsc` for `@joymify/react` and `svelte-check` for `@joymify/svelte`, through turbo, which builds dependencies first (`check` depends on `^build`).                        |
 | 2c   | `pnpm -r test`                                                        | Unit tests for every package, including the WCAG 2.2 AA contrast gate in both themes (`packages/tokens/test/contrast.test.js`) and icon Svelte/React parity (`packages/icons/test/icon-parity.test.js`). |
 | 2d   | `node scripts/parity-check.mjs`                                       | Svelte and React twins: props, classes and ref forwarding. It must report 0 violations.                                                                                                                  |
@@ -309,20 +309,33 @@ The primary design workshop provides a **3-way framework switcher**:
 - **Live Twin Toggling**: Hot-swap between Svelte 5 and React 19 component instances in-place with zero page reload.
 - **Flutter 3.32 Workshop**: Switch to Flutter to instantly view Dart widget code snippets (`JoyButton`, `JoyInput`, `JoyTable`), copy vector icon constants (`JoyIcons.<name>`), and explore the live Flutter Web CanvasKit app (`#flutter` view or `/flutter/index.html`).
 - **Synchronized Bridge**: Toggling between Light and Dark mode or selecting a brand palette preset (`Joy Classic`, `Ocean Blue`, etc.) propagates in real-time across both HTML DOM components and the embedded Flutter canvas via `JoyHubBridge`.
-- **Single-Pod Assembly**: The portal image is built by the `Dockerfile` (`node apps/storybook-hub/build.js`). `scripts/assemble-portal.sh` is a local-only helper that copies the doc trees from sibling checkouts. For `/cli-state-handler/` it stops with an error when neither a sibling checkout nor a downloaded bundle exists (no stub, no stale copy).
+- **Single-Pod Assembly**: The portal image is built by the `Dockerfile` (`node apps/storybook-hub/build.js`). `scripts/assemble-portal.sh` is a local-only helper that copies the doc trees from sibling checkouts. For `/cli-state-handler/` and `/server-decorator/` it stops with an error when neither a sibling checkout nor a downloaded bundle exists (no stub, no stale copy).
 
-### CLI State Handler docs source
+### Portal docs source (CLI State Handler and Node Server Decorator)
 
-The portal serves the CLI State Handler docs at `/cli-state-handler/`. They are not tracked in this repo: the image job downloads `docs-site.tgz` from the latest `montionugera/cli-state-handler` GitHub Release.
+The portal serves two documentation sites, `/cli-state-handler/` and `/server-decorator/`. Neither is tracked in this repo: both folders under `apps/storybook-hub/portal-bundles/` are gitignored, and the image job downloads `docs-site.tgz` from the latest GitHub Release of `montionugera/cli-state-handler` and `montionugera/node-server-decorator`. Each archive must contain `index.html` and a `version.json` (`{"version":"X.Y.Z"}`) equal to the release tag without the leading `v`.
 
-- **Where it runs**: the "Fetch cli-state-handler docs" step in `.github/workflows/ci.yml`, in the image job (which never runs on pull requests), and again by `scripts/precheck.sh` inside the Gate 1 step, which also runs on pull requests and in `publish.yml`. Both pass the built-in `${{ github.token }}` as `GH_TOKEN`; a manual dispatch with `cli_docs_tag` sets `CLI_DOCS_TAG` so the gate checks the same docs version the image ships.
-- **Pick a release**: the `cli_docs_tag` dispatch input (for example `v0.2.0`). Blank means the latest release. It is ignored when `image_tag` is set.
-- **Image tag**: `<12-char hash>-cli<X.Y.Z>`, so each tag names one commit plus one docs version.
-- **Token**: none to manage. The source repository is public, so the step passes the built-in `${{ github.token }}` as `GH_TOKEN`. (The old `CLI_DOCS_READ_TOKEN` secret is no longer used and can be deleted from the repository settings.)
-- **Local development**: the folder `apps/storybook-hub/portal-bundles/cli-state-handler/` is gitignored. Download it with `GH_TOKEN=$(gh auth token) bash scripts/fetch-cli-docs.sh [vX.Y.Z]`, or keep a sibling `cli-state-handler` checkout with a built `apps/docs/dist`. `scripts/precheck.sh` (Gate 1) runs the same download itself when the folder is empty, because the Playwright contracts open `/cli-state-handler/`.
-- **Fail loud**: any fetch error fails the build and the live portal keeps its previous image. There is no skip switch, and the `Dockerfile` fails if `dist/cli-state-handler/version.json` is missing.
-- **Check**: `curl -s https://dev.joymify.com/cli-state-handler/version.json` prints the served docs version.
-- **Roll back**: re-run `ci.yml` with `image_tag` set to the previous image tag (no build, no fetch), or with `cli_docs_tag` set to the previous release tag.
+| Bundle folder (`apps/storybook-hub/portal-bundles/`) | Source repository | Dispatch input | Image tag part |
+| --- | --- | --- | --- |
+| `cli-state-handler/` | `montionugera/cli-state-handler` | `cli_docs_tag` (for example `v0.4.0`) | `-cli<X.Y.Z>` |
+| `server-decorator/` | `montionugera/node-server-decorator` | `decorator_docs_tag` (for example `v2.0.26`) | `-dec<X.Y.Z>` |
+
+- **One script**: `scripts/fetch-portal-docs.sh <owner/repo> <bundle-name> [vX.Y.Z]` does the download for both. It rejects absolute or `..` paths, links and special files, requires `index.html` and `version.json`, and checks that `version.json` matches the tag.
+- **Where it runs**: the "Fetch portal docs" step in `.github/workflows/ci.yml`, in the image job (which never runs on pull requests), and again by `scripts/precheck.sh` inside the Gate 1 step, which also runs on pull requests and in `publish.yml`. Both pass the built-in `${{ github.token }}` as `GH_TOKEN`; a manual dispatch with `cli_docs_tag` or `decorator_docs_tag` sets `CLI_DOCS_TAG` / `DECORATOR_DOCS_TAG` so the gate checks the same docs versions the image ships.
+- **Pick a release**: the dispatch inputs above. Blank means the latest release. Both are ignored when `image_tag` is set.
+- **Image tag**: `<12-char hash>-cli<X.Y.Z>-dec<X.Y.Z>`, so each tag names one commit plus both docs versions and a docs-only release produces a new tag. The step fails if the tag is not a valid Docker tag (at most 128 characters).
+- **Token**: none to manage. Both source repositories are public, so the steps pass the built-in `${{ github.token }}` as `GH_TOKEN`.
+- **Local development**: download both bundles with
+
+  ```bash
+  GH_TOKEN=$(gh auth token) bash scripts/fetch-portal-docs.sh montionugera/cli-state-handler cli-state-handler [vX.Y.Z]
+  GH_TOKEN=$(gh auth token) bash scripts/fetch-portal-docs.sh montionugera/node-server-decorator server-decorator [vX.Y.Z]
+  ```
+
+  or keep sibling `cli-state-handler` (built `apps/docs/dist`) and `node-server-decorator` (built `website/dist`) checkouts. `scripts/precheck.sh` (Gate 1) runs the same downloads itself for any bundle folder that is empty, because the Playwright contracts open both routes.
+- **Fail loud**: any fetch error fails the build and the live portal keeps its previous image. There is no skip switch and no stub page: `scripts/assemble-portal.sh` stops with an error for a missing bundle, and the `Dockerfile` fails if `dist/cli-state-handler/version.json` or `dist/server-decorator/version.json` is missing.
+- **Check**: `curl -s https://dev.joymify.com/cli-state-handler/version.json` and `curl -s https://dev.joymify.com/server-decorator/version.json` print the served docs versions. The production smoke check (`scripts/smoke-prod.sh`) compares both with the versions CI fetched.
+- **Roll back**: re-run `ci.yml` with `image_tag` set to the previous image tag (no build, no fetch), or with `cli_docs_tag` / `decorator_docs_tag` set to the previous release tag.
 
 ### Quickstart for Mobile Applications (`joymify_flutter`)
 

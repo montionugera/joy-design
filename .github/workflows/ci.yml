@@ -18,6 +18,10 @@ on:
         description: 'cli-state-handler release tag whose docs to ship (e.g. v0.2.0). Blank = latest release. Ignored when image_tag is set.'
         required: false
         default: ''
+      decorator_docs_tag:
+        description: 'node-server-decorator release tag whose docs to ship (e.g. v2.0.26). Blank = latest release. Ignored when image_tag is set.'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -106,8 +110,9 @@ jobs:
       # parity (scripts/parity-check.mjs), hub build and Playwright contracts.
       - name: Gate 1 (scripts/precheck.sh via scripts/integration.sh)
         env:
-          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the cli-state-handler docs it serves
-          CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}   # gate on the same docs version the image ships
+          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the portal docs it serves
+          CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}   # gate on the same docs versions the image ships
+          DECORATOR_DOCS_TAG: ${{ inputs.decorator_docs_tag }}
         run: ./scripts/integration.sh
 
   # ── Job 2: Build & Push Image to GHCR ─────────────────────
@@ -128,18 +133,22 @@ jobs:
 
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
-      cli_docs_version: ${{ steps.cli_docs.outputs.cli_docs_version }}
+      cli_docs_version: ${{ steps.docs.outputs.cli_state_handler_docs_version }}
+      decorator_docs_version: ${{ steps.docs.outputs.server_decorator_docs_version }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Fetch cli-state-handler docs
-        id: cli_docs
+      - name: Fetch portal docs
+        id: docs
         env:
           GH_TOKEN: ${{ github.token }}
           CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}
-        run: bash scripts/fetch-cli-docs.sh "$CLI_DOCS_TAG"
+          DECORATOR_DOCS_TAG: ${{ inputs.decorator_docs_tag }}
+        run: |
+          bash scripts/fetch-portal-docs.sh montionugera/cli-state-handler cli-state-handler "$CLI_DOCS_TAG"
+          bash scripts/fetch-portal-docs.sh montionugera/node-server-decorator server-decorator "$DECORATOR_DOCS_TAG"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -154,11 +163,17 @@ jobs:
       - name: Set image tag (short SHA)
         id: meta
         env:
-          CLI_DOCS_VERSION: ${{ steps.cli_docs.outputs.cli_docs_version }}
+          CLI_DOCS_VERSION: ${{ steps.docs.outputs.cli_state_handler_docs_version }}
+          DECORATOR_DOCS_VERSION: ${{ steps.docs.outputs.server_decorator_docs_version }}
         run: |
           [ -n "$CLI_DOCS_VERSION" ] || { echo "::error::cli docs version is empty; refusing to publish an image tagged without it"; exit 1; }
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-12)
-          IMAGE_TAG="${SHORT_SHA}-cli${CLI_DOCS_VERSION}"
+          [ -n "$DECORATOR_DOCS_VERSION" ] || { echo "::error::decorator docs version is empty; refusing to publish an image tagged without it"; exit 1; }
+          SHORT_SHA="${GITHUB_SHA:0:12}"
+          IMAGE_TAG="${SHORT_SHA}-cli${CLI_DOCS_VERSION}-dec${DECORATOR_DOCS_VERSION}"
+          # Docker tag rule: [A-Za-z0-9_][A-Za-z0-9_.-]{0,127}
+          if [ ${#IMAGE_TAG} -le 128 ] && [[ "$IMAGE_TAG" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]*$ ]]; then :; else
+            echo "::error::image tag '$IMAGE_TAG' is not a valid Docker tag (max 128 chars)"; exit 1
+          fi
           echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
           echo "IMAGE_TAG=${IMAGE_TAG}" >> "$GITHUB_ENV"
 
@@ -269,8 +284,9 @@ jobs:
       - name: 🚦 Smoke check — verify dev.joymify.com & legacy redirect
         env:
           CLI_DOCS_VERSION: ${{ needs.build-push-image.outputs.cli_docs_version }}
+          DECORATOR_DOCS_VERSION: ${{ needs.build-push-image.outputs.decorator_docs_version }}
         run: |
-          EXPECTED_CLI_DOCS_VERSION="$CLI_DOCS_VERSION" ./scripts/smoke-prod.sh dev.joymify.com
+          EXPECTED_CLI_DOCS_VERSION="$CLI_DOCS_VERSION" EXPECTED_DECORATOR_DOCS_VERSION="$DECORATOR_DOCS_VERSION" ./scripts/smoke-prod.sh dev.joymify.com
           ./scripts/smoke-prod.sh design.joymify.com
 
       - name: 📋 Deploy summary

@@ -45,15 +45,19 @@ else
     fi
     echo "[OK] Sub-webapp ${subpath} returned HTTP 200"
   done
-  if [ -n "${EXPECTED_CLI_DOCS_VERSION:-}" ]; then
-    vbody=$(curl -sS -k --max-time 15 "https://${host}/cli-state-handler/version.json" || true)
+  # check_docs_version <folder> <expected>: the served version.json must equal the version CI fetched
+  check_docs_version() {
+    local vbody actual
+    vbody=$(curl -sS -k --max-time 15 "https://${host}/$1/version.json" || true)
     actual=$(printf '%s' "$vbody" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)
-    if [ "$actual" != "$EXPECTED_CLI_DOCS_VERSION" ]; then
-      echo "::error::cli-state-handler docs version is '${actual:-none}', expected '${EXPECTED_CLI_DOCS_VERSION}'"
+    if [ "$actual" != "$2" ]; then
+      echo "::error::$1 docs version is '${actual:-none}', expected '$2'"
       exit 1
     fi
-    echo "[OK] cli-state-handler docs version ${actual} matches the fetched release"
-  fi
+    echo "[OK] $1 docs version ${actual} matches the fetched release"
+  }
+  if [ -n "${EXPECTED_CLI_DOCS_VERSION:-}" ]; then check_docs_version cli-state-handler "$EXPECTED_CLI_DOCS_VERSION"; fi
+  if [ -n "${EXPECTED_DECORATOR_DOCS_VERSION:-}" ]; then check_docs_version server-decorator "$EXPECTED_DECORATOR_DOCS_VERSION"; fi
 fi
 
 # Verify index content contains Joymify or Storybook token (following redirects with -L)

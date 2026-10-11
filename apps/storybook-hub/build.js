@@ -14667,7 +14667,7 @@ if (fs.existsSync(flutterSrcDir)) {
   console.log("Copied Flutter Web bundle to", flutterOutDir);
 }
 
-// Copy tracked portal bundles if present into dist/server-decorator and dist/cli-state-handler
+// Copy the downloaded portal bundles (scripts/fetch-portal-docs.sh; gitignored) if present into dist/server-decorator and dist/cli-state-handler
 const bundlesDir = path.join(__dirname, "portal-bundles");
 if (fs.existsSync(bundlesDir)) {
   const decoratorBundle = path.join(bundlesDir, "server-decorator");
