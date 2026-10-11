@@ -335,7 +335,7 @@ The portal serves two documentation sites, `/cli-state-handler/` and `/server-de
 
   or keep sibling `cli-state-handler` (built `apps/docs/dist`) and `node-server-decorator` (built `website/dist`) checkouts. `scripts/precheck.sh` (Gate 1) runs the same downloads itself for any bundle folder that is empty, because the Playwright contracts open both routes.
 - **Fail loud**: any fetch error fails the build and the live portal keeps its previous image. There is no skip switch and no stub page: `scripts/assemble-portal.sh` stops with an error for a missing bundle, and the `Dockerfile` fails if `dist/cli-state-handler/version.json` or `dist/server-decorator/version.json` is missing.
-- **Check**: `curl -s https://dev.joymify.com/cli-state-handler/version.json` and `curl -s https://dev.joymify.com/server-decorator/version.json` print the served docs versions. The production smoke check (`scripts/smoke-prod.sh`) compares both with the versions CI fetched.
+- **Check**: `curl -s https://dev.joymify.com/cli-state-handler/version.json` and `curl -s https://dev.joymify.com/server-decorator/version.json` print the served docs versions. The production smoke check (`scripts/smoke-prod.sh`) compares both with the versions CI fetched; when the run built no image there is nothing to compare with, so it still requires each `version.json` to be served with a well-formed version and logs that it checked presence only, not equality.
 - **Roll back**: re-run `ci.yml` with `image_tag` set to the previous image tag (no build, no fetch), or with `cli_docs_tag` / `decorator_docs_tag` set to the previous release tag.
 
 ### Quickstart for Mobile Applications (`joymify_flutter`)
