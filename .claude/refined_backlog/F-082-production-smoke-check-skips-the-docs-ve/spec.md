@@ -1,26 +1,14 @@
 ---
-title: "Production smoke check skips the docs version comparison when no image was built in the run"
 id: F-082
-status: refined
-from_idea: I-089
+title: Smoke check verifies docs version.json is served even without an expected version
 ---
 
-# Production smoke check skips the docs version comparison when no image was built in the run
+# F-082 (I-089)
 
-## Problem
+Goal: a deploy without a fresh image can no longer pass the smoke check with a missing or broken docs `version.json`.
 
-scripts/smoke-prod.sh skips the docs version comparison when the run built no image (expected versions empty), so a missing or malformed version.json goes unnoticed.
-
-## Why now
-
-Deploys without a fresh image (k8s-only changes) are smoked with nothing checked for the docs sites.
-
-## Sketch
-
-When expected values are empty, still fetch each docs version.json, require a well-formed version, and log plainly that only presence was checked, not equality.
-
-## Acceptance criteria
-
-- [ ] With no expected versions, each version.json must be served and hold a well-formed version, else the smoke fails.
-- [ ] The log states that only presence was checked, not equality.
-- [ ] With expected versions the equality check is unchanged.
+- `scripts/smoke-prod.sh`: `check_docs_version <folder> [expected]` always runs for `cli-state-handler` and `server-decorator`. With an expected version it must equal it (unchanged). Without one, the served `version.json` must contain a version matching `^[0-9A-Za-z][0-9A-Za-z._-]*$`, else `::error::` and exit 1.
+- Presence-only success logs "(presence only, not equality: ...)" so the log never implies equality was verified.
+- design.joymify.com (legacy redirect host) is still not checked.
+- Proof: `scripts/test-smoke-cli-docs.sh` (fake curl): presence-only pass and message, HTML / empty / malformed version fail, one expected plus one presence-only, equality tests unchanged.
+- README sentence updated.
