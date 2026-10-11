@@ -539,5 +539,11 @@
     "title": "Portal build fails at once if an upstream latest release is broken: add retry and resolve the docs versions once per run",
     "created_at": "2026-10-11T15:48:27.197227+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-089",
+    "title": "Production smoke check skips the docs version comparison when no image was built in the run",
+    "created_at": "2026-10-11T15:48:27.484034+00:00",
+    "promoted_to": null
   }
 ]
