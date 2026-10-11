@@ -509,5 +509,11 @@
     "title": "Remove the stale committed cli-state-handler docs copy",
     "created_at": "2026-10-11T05:59:09.116342+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-084",
+    "title": "Move GitHub Actions off retired Node 20 majors and pin the Ubuntu runner",
+    "created_at": "2026-10-11T05:59:09.523864+00:00",
+    "promoted_to": null
   }
 ]
