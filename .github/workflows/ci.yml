@@ -107,6 +107,7 @@ jobs:
       - name: Gate 1 (scripts/precheck.sh via scripts/integration.sh)
         env:
           GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the cli-state-handler docs it serves
+          CLI_DOCS_TAG: ${{ inputs.cli_docs_tag }}   # gate on the same docs version the image ships
         run: ./scripts/integration.sh
 
   # ── Job 2: Build & Push Image to GHCR ─────────────────────
