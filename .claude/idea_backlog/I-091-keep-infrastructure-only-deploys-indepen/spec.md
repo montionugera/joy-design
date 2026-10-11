@@ -8,16 +8,19 @@ status: idea
 
 ## Problem
 
-(what hurts; concrete examples)
+In ci.yml the resolve-docs job has no `if:` and is an ancestor of deploy, so a k8s-only push to main now fails to deploy when the docs lookup fails. It also inherits packages: write, silently accepts empty resolved tags, and the fetch script retries without logging.
 
 ## Why now
 
-(opportunity; deadline; constraint)
+Review of release 3.11; merging deploys the live site.
 
 ## Sketch
 
-(rough shape; not a design yet)
+resolve-docs needs changes and shares build's if condition; permissions contents: read; consuming jobs fail on empty tags (shell, env vars); fetch-portal-docs.sh logs each retry.
 
 ## Acceptance criteria
 
-- [ ] (one observable, testable outcome per item; refine refuses a spec without any)
+- [ ] resolve-docs is skipped when build is skipped, and deploy behaves as before for k8s-only pushes
+- [ ] resolve-docs has permissions contents: read only
+- [ ] consuming jobs exit non-zero on an empty resolved tag
+- [ ] fetch-portal-docs.sh logs attempt, reason and delay before each retry sleep, with no token
