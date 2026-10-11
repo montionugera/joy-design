@@ -1019,9 +1019,11 @@
     "from_idea": "I-088",
     "created_at": "2026-10-11T16:32:41.043180+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "claimed",
-    "release_version": null,
-    "claimed_at": "2026-10-11T16:32:48.983871+00:00"
+    "status": "shipped",
+    "release_version": "3.11",
+    "claimed_at": "2026-10-11T16:32:48.983871+00:00",
+    "shipped_at": "2026-10-11T17:04:42.721221+00:00",
+    "shipped_sha": "f2c7939ddf71c3aef28a05b127fefc887e0b34a4"
   },
   {
     "id": "F-082",
