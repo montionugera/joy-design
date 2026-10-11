@@ -10336,7 +10336,7 @@ ${navigationHtml}
       });
     }
 
-    function switchView(viewName, updateHash = true) {
+    function switchView(viewName, updateHash = true, closeDrawer = true) {
       if (viewName !== 'overview' && viewName !== 'portal') {
         if (document.body.classList.contains('portal-mode')) {
           window.location.href = '/design/#' + viewName;
@@ -10370,8 +10370,8 @@ ${navigationHtml}
       const main = document.querySelector('.main');
       if (main) main.scrollTop = 0;
 
-      // Close mobile drawer on item selection
-      toggleMobileMenu(false);
+      // Close mobile drawer on item selection (not on the silent re-sync that follows the initial render)
+      if (closeDrawer) toggleMobileMenu(false);
 
       // Trigger 3D particle canvas resize when entering landing blocks
       if (viewName === 'landing-blocks') {
@@ -10413,7 +10413,7 @@ ${navigationHtml}
       });
     }
 
-    function syncViewFromHash() {
+    function syncViewFromHash(closeDrawer = true) {
       const hash = window.location.hash.replace(/^#/, '');
       const isDesignRoute = window.location.pathname.startsWith('/design');
       const isRootRoute = !isDesignRoute;
@@ -10423,7 +10423,7 @@ ${navigationHtml}
         const titleEl = document.getElementById('topbar-brand-title');
         if (titleEl) titleEl.textContent = 'Joymify Developer Portal';
         document.title = 'Joymify Developer Portal · dev.joymify.com';
-        switchView('overview', false);
+        switchView('overview', false, closeDrawer);
       } else if (isRootRoute && hash && document.getElementById('view-' + hash)) {
         window.location.replace('/design/#' + hash);
         return;
@@ -10432,18 +10432,18 @@ ${navigationHtml}
         const titleEl = document.getElementById('topbar-brand-title');
         if (titleEl) titleEl.textContent = 'Joymify Design';
         if (hash && document.getElementById('view-' + hash)) {
-          switchView(hash, false);
+          switchView(hash, false, closeDrawer);
         } else {
-          switchView('overview', false);
+          switchView('overview', false, closeDrawer);
         }
       } else {
-        switchView('overview', false);
+        switchView('overview', false, closeDrawer);
       }
     }
 
     // Synchronize view immediately on script load to eliminate theme/overview flash
     syncViewFromHash();
-    window.addEventListener('hashchange', syncViewFromHash);
+    window.addEventListener('hashchange', () => syncViewFromHash());
     // Following a link to the current hash fires no hashchange, so close the drawer on every nav pick.
     document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', () => toggleMobileMenu(false)));
 
@@ -14417,7 +14417,8 @@ ${navigationHtml}
       renderTransferDemo();
       initKineticCanvas();
       initMesh3dCanvas();
-      syncViewFromHash();
+      // Re-sync once the canvases exist, but never close a drawer the user opened in the meantime.
+      syncViewFromHash(false);
     }, 100);
 
     function switchSimulatorViewport(width, btn) {
