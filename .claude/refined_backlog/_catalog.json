@@ -1030,8 +1030,9 @@
     "title": "Production smoke check skips the docs version comparison when no image was built in the run",
     "from_idea": "I-089",
     "created_at": "2026-10-11T16:32:41.371721+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-10-11T17:04:57.223769+00:00"
   }
 ]
