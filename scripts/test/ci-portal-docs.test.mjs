@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -181,7 +181,7 @@ test('resolve-docs resolves both tags once, honouring the dispatch inputs, and e
   assert.match(job, /fetch-portal-docs\.sh montionugera\/node-server-decorator server-decorator "\$DECORATOR_DOCS_TAG"/);
   assert.match(job, /cli_tag: \$\{\{ steps\.resolve\.outputs\.cli_state_handler_docs_tag \}\}/);
   assert.match(job, /decorator_tag: \$\{\{ steps\.resolve\.outputs\.server_decorator_docs_tag \}\}/);
-  assert.ok(!/needs:/.test(job), 'resolves first so every later job can use it');
+  assert.match(job, /needs: changes\n/, 'resolve-docs only waits for the path filter');
 });
 
 test('build and build-push-image depend on resolve-docs and fetch the resolved tags', () => {
@@ -200,3 +200,83 @@ test('precheck.sh fetches both bundles when empty and explains a missing token w
   assert.match(pre, /portal-bundles\/\$2\/version\.json/);
   assert.match(pre, /gh auth login/);
 });
+
+// F-083: the docs lookup must never gate an infrastructure-only deploy, and the resolve job stays minimal.
+const ifBlock = (job) => {
+  const m = job.match(/\n    if: \|\n((?:      .*\n)+)/);
+  assert.ok(m, 'job has a multi-line if:');
+  return m[1].split('\n').map((l) => l.trim()).join(' ').trim();
+};
+const jobs = () => ({
+  resolve: section('resolve-docs', '\n  # ──'),
+  build: section('build', '\n  # ──'),
+  image: jobBlock(),
+  deploy: section('deploy', '\n  # ──'),
+});
+
+test('resolve-docs has exactly the same if: condition as build, so it is skipped whenever build is', () => {
+  const { resolve, build } = jobs();
+  assert.strictEqual(ifBlock(resolve), ifBlock(build));
+  assert.match(ifBlock(build), /workflow_dispatch.*needs\.changes\.outputs\.app == 'true'.*pull_request/);
+});
+
+test('deploy does not depend on resolve-docs, directly or through a job that would skip with it', () => {
+  const { deploy } = jobs();
+  assert.match(deploy, /needs: \[changes, build, build-push-image\]/);
+  assert.ok(!deploy.includes('resolve-docs'));
+  assert.match(deploy, /!failure\(\) && !cancelled\(\)/);
+});
+
+test('only build and build-push-image consume resolve-docs, and the latter also needs build', () => {
+  const { image, build } = jobs();
+  assert.match(build, /needs: \[changes, resolve-docs\]/);
+  assert.match(image, /needs: \[changes, build, resolve-docs\]/);
+  const needsLines = ci.split('\n').filter((l) => /^\s+needs: .*resolve-docs/.test(l));
+  assert.strictEqual(needsLines.length, 2, 'no other job waits on the docs lookup');
+});
+
+test('resolve-docs drops packages: write and keeps contents: read only', () => {
+  const { resolve } = jobs();
+  assert.match(resolve, /\n    permissions:\n      contents: read\n/);
+  assert.ok(!/packages:/.test(resolve) && !/pull-requests:/.test(resolve));
+  assert.match(ci, /^permissions:\n  contents: read\n  packages: write/m, 'workflow default is unchanged');
+});
+
+// Pulls a step's run script out of the workflow and executes it with the given env.
+function runStep(job, stepName, env) {
+  const start = job.indexOf(`- name: ${stepName}`);
+  assert.ok(start >= 0, `${stepName} step not found`);
+  const rest = job.slice(start);
+  const end = rest.indexOf('\n      - name:', 1);
+  const step = end < 0 ? rest : rest.slice(0, end);
+  const m = step.match(/run: \|\n((?:          .*\n?)+)/);
+  assert.ok(m, 'step has a run block');
+  assert.ok(!m[1].includes('${{'), 'no expression inside the run script');
+  const script = m[1].split('\n').map((l) => l.replace(/^ {10}/, '')).join('\n');
+  const r = spawnSync('bash', ['-c', script], { env: { PATH: process.env.PATH, ...env }, encoding: 'utf8' });
+  return { code: r.status, out: `${r.stdout}${r.stderr}`, step };
+}
+
+for (const [label, pick] of [['build', (j) => j.build], ['build-push-image', (j) => j.image]]) {
+  test(`${label} fails loudly before any fetch when a resolved docs tag is empty`, () => {
+    const job = pick(jobs());
+    const name = 'Require resolved docs tags';
+    const guard = job.indexOf(`- name: ${name}`);
+    const first = job.search(/Gate 1 \(|Fetch portal docs/);
+    assert.ok(guard > 0 && guard < first, 'guard sits before the step that fetches the docs');
+    const ok = runStep(job, name, { CLI_DOCS_TAG: 'v0.2.0', DECORATOR_DOCS_TAG: 'v2.0.26' });
+    assert.strictEqual(ok.code, 0, ok.out);
+    for (const env of [
+      { CLI_DOCS_TAG: '', DECORATOR_DOCS_TAG: 'v2.0.26' },
+      { CLI_DOCS_TAG: 'v0.2.0', DECORATOR_DOCS_TAG: '' },
+      { CLI_DOCS_TAG: '', DECORATOR_DOCS_TAG: '' },
+      {},
+    ]) {
+      const bad = runStep(job, name, env);
+      assert.notStrictEqual(bad.code, 0, JSON.stringify(env));
+      assert.match(bad.out, /::error::.*docs tag/);
+    }
+    assert.match(ok.step, /CLI_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.cli_tag \}\}/);
+    assert.match(ok.step, /DECORATOR_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.decorator_tag \}\}/);
+  });
+}
