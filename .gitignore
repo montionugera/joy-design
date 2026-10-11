@@ -8,6 +8,7 @@ graft/
 apps/storybook-hub/dist/
 # Downloaded by scripts/fetch-cli-docs.sh (local runs and CI); never commit it
 apps/storybook-hub/portal-bundles/cli-state-handler/
+apps/storybook-hub/portal-bundles/server-decorator/
 node_modules/
 **/node_modules/
 dist/

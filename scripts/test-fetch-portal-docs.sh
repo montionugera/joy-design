@@ -49,7 +49,7 @@ run() { # run <archive> <tag> [VAR=value...] -> sets $code, $out; bundle starts 
   rm -rf "$fx/bundle" "$fx/count" "$fx/log" "$fx/ghout"; mkdir -p "$fx/bundle"; echo old > "$fx/bundle/index.html"
   set +e
   out=$(env PATH="$fx/bin:$PATH" GH_TOKEN=fake FAKE_GH_ARCHIVE="$fx/$archive.tgz" FAKE_GH_LOG="$fx/log" FAKE_GH_COUNT="$fx/count" \
-    CLI_DOCS_BUNDLE_DIR="$fx/bundle" CLI_DOCS_RETRY_DELAY=0 GITHUB_OUTPUT="$fx/ghout" "$@" bash "$repo_root/scripts/fetch-cli-docs.sh" $tag 2>&1)
+    PORTAL_DOCS_BUNDLE_DIR="$fx/bundle" PORTAL_DOCS_RETRY_DELAY=0 GITHUB_OUTPUT="$fx/ghout" "$@" bash "$repo_root/scripts/fetch-portal-docs.sh" "${FETCH_REPO:-montionugera/cli-state-handler}" "${FETCH_NAME:-cli-state-handler}" $tag 2>&1)
   code=$?; set -e
 }
 ok() { echo "ok - $1"; }; die() { echo "not ok - $1"; echo "$out"; exit 1; }
@@ -57,7 +57,7 @@ untouched() { [ "$(cat "$fx/bundle/index.html")" = old ] && [ ! -e "$fx/bundle/v
 lines() { wc -l < "$fx/log" | tr -d ' '; }
 
 run good v0.2.0
-[ "$code" = 0 ] && echo "$out" | grep -qx 'cli-docs: fetched v0.2.0 (version.json 0.2.0)' && grep -qx 'cli_docs_version=0.2.0' "$fx/ghout" \
+[ "$code" = 0 ] && echo "$out" | grep -qx 'portal-docs: fetched cli-state-handler v0.2.0 (version.json 0.2.0)' && grep -qx 'cli_state_handler_docs_version=0.2.0' "$fx/ghout" \
   && [ "$(cat "$fx/bundle/version.json")" = '{"version":"0.2.0"}' ] && grep -q new "$fx/bundle/index.html" || die fetches_named_tag_and_swaps_bundle
 ok fetches_named_tag_and_swaps_bundle
 
@@ -137,6 +137,20 @@ ok github_output_unwritten_on_failure
 run good "--skip-existing"
 [ "$code" != 0 ] && echo "$out" | grep -q '::error::' && echo "$out" | grep -q 'not of the form' && untouched && [ ! -e "$fx/log" ] || die malformed_tag_rejected
 ok malformed_tag_rejected
+
+# Second bundle: the repository and name are parameters, so the same script fetches server-decorator.
+FETCH_REPO=montionugera/node-server-decorator FETCH_NAME=server-decorator run good v0.2.0
+[ "$code" = 0 ] && grep -q 'montionugera/node-server-decorator' "$fx/log" && ! grep -q 'cli-state-handler' "$fx/log" \
+  && echo "$out" | grep -qx 'portal-docs: fetched server-decorator v0.2.0 (version.json 0.2.0)' && grep -qx 'server_decorator_docs_version=0.2.0' "$fx/ghout" || die fetches_other_repository_by_parameter
+ok fetches_other_repository_by_parameter
+
+FETCH_REPO=not-a-repo run good v0.2.0
+[ "$code" != 0 ] && echo "$out" | grep -q '::error::' && echo "$out" | grep -q 'usage' && untouched && [ ! -e "$fx/log" ] || die malformed_repo_rejected
+ok malformed_repo_rejected
+
+FETCH_NAME=../escape run good v0.2.0
+[ "$code" != 0 ] && echo "$out" | grep -q 'bundle name' && untouched && [ ! -e "$fx/log" ] || die malformed_bundle_name_rejected
+ok malformed_bundle_name_rejected
 
 [ "$(git -C "$repo_root" status --porcelain apps/)" = "$before" ] || die no_work_files_left_in_repo
 ok no_work_files_left_in_repo
