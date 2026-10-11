@@ -1042,8 +1042,9 @@
     "title": "Keep infrastructure-only deploys independent of the docs lookup and tighten the resolve job",
     "from_idea": "I-091",
     "created_at": "2026-10-11T17:40:32.190232+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-10-11T17:40:36.801368+00:00"
   }
 ]
