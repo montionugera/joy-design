@@ -20,7 +20,7 @@
    - **Touch and motion.** Touch targets are at least 44px on coarse pointers. Every animation has a `prefers-reduced-motion` branch.
    - **Svelte/React parity.** Twins share props, classes and ref forwarding (`scripts/parity-check.mjs`), and the shared `.ts` helpers stay byte-identical.
    - **AI-slop bans.** No side-stripe accents, gradient text, decorative glassmorphism, identical icon-card grids, tracked all-caps eyebrows on every section, fake 01/02/03 sequences, or arrow glyphs appended to link text. The full list is in `DESIGN.md` under Do's and Don'ts.
-   - **Zero Emoji Policy**: Enterprise components must NEVER use raw OS emojis (`🟢`, `🔴`, `⏳`, `🌙`). Always use crisp, scalable vector SVG icons from `@joymify/icons`.
+   - **Zero Emoji Policy**: Enterprise components must NEVER use raw OS emojis (`🟢`, `🔴`, `⏳`, `🌙`). Always use crisp, scalable vector SVG icons from `@montionugera/joy-icons`.
    - **Verification before done.** Check both themes, take screenshots at 375px and 1280px, and compute contrast (the tokens contrast test). Gate 1 (`scripts/precheck.sh`) must exit 0.
    - **Design skills.** For design judgement use `impeccable` and `frontend-design:frontend-design`, plus `design-taste-frontend` where it is installed.
 
@@ -29,10 +29,10 @@
    - Follow: `psrw new-release` → `psrw idea` → `psrw refine` → `psrw claim` → implement & test → `psrw ship` → `psrw promote --babysit`.
 
 5. **Package builds and type-check**:
-   - `@joymify/react` and the `./react` entry of `@joymify/icons` resolve to a built, untracked `dist/` (`tsc -p tsconfig.build.json`). Run the type-check through turbo with `pnpm check`: in `turbo.json`, `check` depends on `^build`, so dependencies are built first. `pnpm --filter @joymify/react check` on a clean checkout fails until `pnpm --filter @joymify/icons build` has run.
+   - `@montionugera/joy-react` and the `./react` entry of `@montionugera/joy-icons` resolve to a built, untracked `dist/` (`tsc -p tsconfig.build.json`). Run the type-check through turbo with `pnpm check`: in `turbo.json`, `check` depends on `^build`, so dependencies are built first. `pnpm --filter @montionugera/joy-react check` on a clean checkout fails until `pnpm --filter @montionugera/joy-icons build` has run.
    - Unit tests load `src/` through their helpers and never need `dist/`. The only check of the built output is the tarball test `scripts/test/consumer-smoke.sh`.
-   - Publishing is done only by `.github/workflows/publish.yml` (a `packages-v*` tag on `main`, or a manual dry run). Never run `npm publish`, or `pnpm publish` without `--dry-run`, by hand.
-   - The packages are `@joymify/tokens`, `@joymify/icons`, `@joymify/brand` and `@joymify/react` on GitHub Packages (private, organisation `joymify`). A real publish authenticates with the secret `JOYMIFY_PACKAGES_TOKEN` of the `packages` environment, never the built-in token. A consumer's `.npmrc` needs `@joymify:registry=https://npm.pkg.github.com` and `//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}`, with a token that has `read:packages` and access to the `joymify` organisation.
+   - Publishing is done only by `.github/workflows/publish.yml` (a `packages-v*` tag on `main`, or a manual dry run). Never run `npm publish`, or `pnpm publish` without `--dry-run`, by hand. The workflow has two jobs: `build` (read-only token) gates, builds, tests and packs the tarballs; `publish` (`packages: write`, `id-token: write`) only downloads and uploads them, to GitHub Packages and then npmjs.org. Keep the publish job free of checkout, `pnpm` and repository scripts, and do not rename the workflow file or the `packages` environment: npmjs.org trusted publishing is bound to both. A re-run skips versions already on a registry, so it finishes a run whose npmjs.org step failed.
+   - The packages are `@montionugera/joy-tokens`, `@montionugera/joy-icons`, `@montionugera/joy-brand` and `@montionugera/joy-react` on GitHub Packages (private, owned by `montionugera`) and on npmjs.org (public). A real publish authenticates to GitHub Packages with the repository's built-in token and to npmjs.org with OIDC trusted publishing; no publish secret is stored. A consumer's `.npmrc` needs `@montionugera:registry=https://npm.pkg.github.com` and `//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}`, with a token that has `read:packages`.
 
 <!-- graft:start -->
 ## Graft — repo context graph

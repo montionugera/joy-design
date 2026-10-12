@@ -2,7 +2,7 @@
 // Outline the wordmark and tagline text with opentype.js into static SVG path
 // data, so the brand kit never depends on a font being installed at runtime.
 //
-// Run: pnpm --filter @joymify/brand outline
+// Run: pnpm --filter @montionugera/joy-brand outline
 // Writes: src/outlines.generated.js
 
 import fs from 'node:fs';
@@ -99,7 +99,7 @@ const WORDMARK = outline(WORDMARK_FONT, WORDMARK_TEXT);
 const TAGLINE = outline(TAGLINE_FONT, TAGLINE_TEXT);
 
 const header = `// GENERATED FILE — do not edit by hand.
-// Regenerate with: pnpm --filter @joymify/brand outline
+// Regenerate with: pnpm --filter @montionugera/joy-brand outline
 // Source: Cormorant Garamond (SIL OFL 1.1), see PROVENANCE.md
 `;
 

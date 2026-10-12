@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@joymify/icons/react';
+import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@montionugera/joy-icons/react';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 

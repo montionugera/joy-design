@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Copy } from '@joymify/icons/react';
+import { Check, Copy } from '@montionugera/joy-icons/react';
 import { tokenizeCode } from './syntax-highlighter.js';
 import { MermaidViewer } from './MermaidViewer.js';
 

@@ -11,7 +11,7 @@
     List,
     Grid,
     FileText
-  } from '@joymify/icons';
+  } from '@montionugera/joy-icons';
 
   interface Props {
     value?: string;

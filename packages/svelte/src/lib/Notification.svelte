@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { createAutoDismiss } from './auto-dismiss.js';
-  import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@joymify/icons';
+  import { AlertCircle, AlertTriangle, CheckCircle, Close, Info } from '@montionugera/joy-icons';
 
   interface Props {
     title?: string;

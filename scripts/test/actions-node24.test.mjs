@@ -13,6 +13,8 @@ const MIN_MAJOR = {
   'actions/checkout': 5,
   'actions/setup-node': 5,
   'pnpm/action-setup': 5,
+  'actions/upload-artifact': 6, // v5 is node20 (action.yml read 2026-10-12)
+  'actions/download-artifact': 7, // v6 is still node20 (action.yml read 2026-10-12)
   'dorny/paths-filter': 4,
   'docker/setup-buildx-action': 4,
   'docker/login-action': 4,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Check, Copy, FileText, Eye } from '@joymify/icons';
+	import { Check, Copy, FileText, Eye } from '@montionugera/joy-icons';
 	import { renderMermaidToSvg } from './mermaid-renderer.js';
 	import CodeBlock from './CodeBlock.svelte';
 

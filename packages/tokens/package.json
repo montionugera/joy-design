@@ -1,8 +1,8 @@
 {
-  "name": "@joymify/tokens",
-  "version": "0.2.0",
+  "name": "@montionugera/joy-tokens",
+  "version": "0.2.1",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/montionugera/joy-design.git",

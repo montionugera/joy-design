@@ -1,5 +1,5 @@
 // Pure layout math for the brand kit: no palette, no XML, no side effects. render.js (the static
-// asset generator) and the @joymify/svelte / @joymify/react BrandBanner + Wordmark components both
+// asset generator) and the @montionugera/joy-svelte / @montionugera/joy-react BrandBanner + Wordmark components both
 // consume these so the grid/fade and lockup proportions can never drift apart again (Fix round 1,
 // code-reviewer + typescript-reviewer Important #1: this math used to be copied verbatim into
 // three places and had already drifted — the components used glyph 0.70/gap 0.30 of the lockup

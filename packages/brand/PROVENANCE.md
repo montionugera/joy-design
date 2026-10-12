@@ -23,13 +23,13 @@ a literal in `src/geometry.js` per the F-043 plan's Global Constraints.
 
 ## Regenerating
 
-- Outlines (wordmark + tagline path data): `pnpm --filter @joymify/brand outline`
+- Outlines (wordmark + tagline path data): `pnpm --filter @montionugera/joy-brand outline`
   — regenerates `src/outlines.generated.js` from the Cormorant Garamond
   `.woff` files bundled by `@fontsource/cormorant-garamond`. Commit the
   result; it is a generated file (do not hand-edit).
-- Assets (SVG + PNG in `assets/`): `pnpm --filter @joymify/brand build`
+- Assets (SVG + PNG in `assets/`): `pnpm --filter @montionugera/joy-brand build`
   (`node build.js`) — reads the resolved `--joy-brand-*` token values from
-  `@joymify/tokens`' `dist/theme.css` (building it first if missing) and
+  `@montionugera/joy-tokens`' `dist/theme.css` (building it first if missing) and
   writes every asset deterministically. Commit the result.
 
 ## Licences

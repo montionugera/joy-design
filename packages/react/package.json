@@ -1,8 +1,8 @@
 {
-  "name": "@joymify/react",
-  "version": "0.2.0",
+  "name": "@montionugera/joy-react",
+  "version": "0.2.1",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/montionugera/joy-design.git",
@@ -31,9 +31,9 @@
     "check": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@joymify/brand": "workspace:*",
-    "@joymify/icons": "workspace:*",
-    "@joymify/tokens": "workspace:*"
+    "@montionugera/joy-brand": "workspace:*",
+    "@montionugera/joy-icons": "workspace:*",
+    "@montionugera/joy-tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0",
