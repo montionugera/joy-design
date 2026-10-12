@@ -28,7 +28,7 @@ esac
 # Paths every tarball may contain, as one anchored pattern per package (the `files` table).
 allowed_pattern() {
   case "$1" in
-    tokens | react) echo '^package/(package\.json|dist/.+)$' ;;
+    tokens | react) echo '^package/(package\.json|LICENSE|dist/.+)$' ;;
     icons) echo '^package/(package\.json|PROVENANCE\.md|dist/.+|src/index\.ts|src/index\.d\.ts|src/[^/]+\.svelte)$' ;;
     brand) echo '^package/(package\.json|PROVENANCE\.md|src/.+|assets/.+)$' ;;
   esac
@@ -285,8 +285,8 @@ fi
 # tell it from a tarball. The lockfile can: a registry resolution is keyed name@<version>,
 # a tarball resolution is keyed name@file:<path>. This covers the three packages @montionugera/joy-react
 # depends on, which are installed through the overrides and not as direct dependencies only.
-if grep -nE "@joymify/(tokens|icons|brand|react)@[0-9]" "$app/pnpm-lock.yaml"; then
-  fail "a @joymify package was resolved from a registry, not from its tarball (listed above)"
+if grep -nE "@montionugera/joy-(tokens|icons|brand|react)@[0-9]" "$app/pnpm-lock.yaml"; then
+  fail "a @montionugera/joy-* package was resolved from a registry, not from its tarball (listed above)"
 fi
 
 echo "==> 6/7 Type-checking and building the consumer app"

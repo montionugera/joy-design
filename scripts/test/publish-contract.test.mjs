@@ -129,7 +129,7 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.match(wf, /^\s+- 'packages-v\*'$/m, 'trigger must be a packages-v* tag');
   assert.match(wf, /^\s+dry_run:$/m, 'manual runs need a dry_run input');
   assert.match(wf, /dry_run:[\s\S]*?default:\s*true/, 'dry_run input must default to true');
-  assert.doesNotMatch(wf, /packages: write/, 'the built-in token publishes nothing, so it must not get packages: write');
+  assert.match(wf, /^permissions:\n  contents: read\n(?:  #.*\n)*  packages: write$/m, 'the built-in token publishes to GitHub Packages, so it needs packages: write');
   assert.ok(wf.includes('NODE_AUTH_TOKEN: dry-run-no-auth'), 'a dry run must never receive the real publish token');
   assert.ok(wf.includes('git merge-base --is-ancestor "$GITHUB_SHA" origin/main'), 'must refuse a commit that is not on main');
   for (const needle of ["flutter-version: '3.32.8'", 'playwright install --with-deps chromium', 'apt-get install -y -qq ripgrep', 'pnpm install --frozen-lockfile']) {
@@ -175,19 +175,13 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.ok(!topLevel.includes('NODE_AUTH_TOKEN'), 'no top-level NODE_AUTH_TOKEN');
   assert.ok(dryRunStep.block.includes('NODE_AUTH_TOKEN:'), 'Dry run must have step-level NODE_AUTH_TOKEN');
   assert.ok(!dryRunStep.block.includes('secrets.GITHUB_TOKEN'), 'Dry run must not use the built-in token');
-  assert.ok(publishStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'Publish must authenticate with JOYMIFY_PACKAGES_TOKEN');
-  assert.ok(verifyStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'Verify must authenticate with JOYMIFY_PACKAGES_TOKEN');
-  const tokenMatches = wf.match(/NODE_AUTH_TOKEN:\s*\${{\s*secrets\.JOYMIFY_PACKAGES_TOKEN\s*}}/g) || [];
-  assert.strictEqual(tokenMatches.length, 2, 'NODE_AUTH_TOKEN takes the org token only in the publish and verify steps');
-  assert.ok(!wf.includes('GITHUB_TOKEN'), 'the built-in GITHUB_TOKEN must not be used anywhere in the publish workflow');
+  assert.ok(publishStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Publish must authenticate with the built-in token');
+  assert.ok(verifyStep.block.includes('NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}'), 'Verify must authenticate with the built-in token');
+  const tokenMatches = wf.match(/secrets\.GITHUB_TOKEN/g) || [];
+  assert.strictEqual(tokenMatches.length, 2, 'the built-in token is used only in the publish and verify steps');
+  assert.ok(!wf.includes('JOYMIFY_PACKAGES_TOKEN'), 'no organisation token: the packages live under the repository owner');
   assert.match(wf, /scope: '@montionugera'/, 'setup-node must target the @montionugera scope');
   assert.match(wf, /registry-url: 'https:\/\/npm\.pkg\.github\.com'/, 'setup-node must target GitHub Packages');
-  const secretStep = steps.find((s) => s.name === 'Require the publish token');
-  assert.ok(secretStep, 'an early step must require the publish token');
-  assert.ok(secretStep.block.includes("if: env.DRY_RUN == 'false'"), 'the token check applies to real publishes only');
-  assert.ok(secretStep.block.includes('::error::'), 'the token check must fail with a clear ::error:: message');
-  assert.ok(secretStep.block.includes('JOYMIFY_PACKAGES_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'the token check reads the org secret');
-  assert.ok(wf.indexOf('Require the publish token') < wf.indexOf('Install pnpm'), 'the token check must run before any build work');
   assert.ok(wf.includes('name="@montionugera/joy-$dir"'), 'the per-package loops must query @montionugera/joy-*');
   assert.ok(!wf.includes('@joymify'), 'no old scope in the publish workflow');
 

@@ -65,7 +65,6 @@ test('README documents installing from the registry, and AGENTS.md the build and
     "import '@montionugera/joy-tokens/theme.css';",
     "import { Button, Tabs } from '@montionugera/joy-react';",
     'read:packages',
-    'access to the `joymify` organisation',
     'scripts/test/consumer-smoke.sh',
     '.github/workflows/publish.yml',
     'packages-v',
