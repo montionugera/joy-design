@@ -1,6 +1,6 @@
 name: Publish packages to GitHub Packages
 
-# Publishes @joymify/tokens, icons, brand and react.
+# Publishes @montionugera/joy-tokens, icons, brand and react.
 # A published version is permanent, so this runs only on a deliberate act:
 # a pushed tag matching packages-v*, or a manual run. Manual runs default to a dry run.
 on:
@@ -17,7 +17,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
   # Lets the npmjs.org step exchange this run's OIDC identity for a short-lived publish token.
   id-token: write
 
@@ -80,7 +79,7 @@ jobs:
           node-version: 22
           cache: 'pnpm'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@joymify'
+          scope: '@montionugera'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -108,8 +107,8 @@ jobs:
       # Only icons and react are built here; their dist/ is untracked.
       - name: Build icons and react
         run: |
-          pnpm --filter @joymify/icons build
-          pnpm --filter @joymify/react build
+          pnpm --filter @montionugera/joy-icons build
+          pnpm --filter @montionugera/joy-react build
 
       - name: Tarball test (scripts/test/consumer-smoke.sh)
         run: ./scripts/test/consumer-smoke.sh
@@ -155,7 +154,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/packs"
           echo "## Dry run: nothing was published" >> "$GITHUB_STEP_SUMMARY"
           for dir in tokens icons brand react; do
-            name="@joymify/$dir"
+            name="@montionugera/joy-$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
             echo "::group::$name@$version"
             (cd "packages/$dir" && pnpm publish --dry-run --no-git-checks)
@@ -175,7 +174,7 @@ jobs:
           echo "## Publish" >> "$GITHUB_STEP_SUMMARY"
           published=0
           for dir in tokens icons brand react; do
-            name="@joymify/$dir"
+            name="@montionugera/joy-$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
             err="$RUNNER_TEMP/npm-view-$dir.err"
             set +e
@@ -208,7 +207,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}
         run: |
           for dir in tokens icons brand react; do
-            name="@joymify/$dir"
+            name="@montionugera/joy-$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
             found=""
             for attempt in 1 2 3 4 5; do
@@ -229,7 +228,7 @@ jobs:
       # (repo montionugera/joy-design, workflow publish.yml, environment packages); see the README.
       # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1, hence the second setup-node.
       - name: Use Node 22 for npmjs.org trusted publishing
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'

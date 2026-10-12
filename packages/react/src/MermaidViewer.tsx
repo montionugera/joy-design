@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Copy, FileText, Eye } from '@joymify/icons/react';
+import { Check, Copy, FileText, Eye } from '@montionugera/joy-icons/react';
 import { renderMermaidToSvg } from './mermaid-renderer.js';
 import { CodeBlock } from './CodeBlock.js';
 

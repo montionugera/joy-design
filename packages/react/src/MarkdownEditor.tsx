@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Edit, Eye, Maximize2, Minimize2, Link, List } from '@joymify/icons/react';
+import { Edit, Eye, Maximize2, Minimize2, Link, List } from '@montionugera/joy-icons/react';
 import { MarkdownViewer } from './MarkdownViewer.js';
 
 const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');

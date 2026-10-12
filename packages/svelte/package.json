@@ -1,5 +1,5 @@
 {
-  "name": "@joymify/svelte",
+  "name": "@montionugera/joy-svelte",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,9 +16,9 @@
     "check": "svelte-check --tsconfig ./tsconfig.json --threshold error"
   },
   "dependencies": {
-    "@joymify/brand": "workspace:*",
-    "@joymify/icons": "workspace:*",
-    "@joymify/tokens": "workspace:*"
+    "@montionugera/joy-brand": "workspace:*",
+    "@montionugera/joy-icons": "workspace:*",
+    "@montionugera/joy-tokens": "workspace:*"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"

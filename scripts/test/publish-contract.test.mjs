@@ -94,14 +94,14 @@ test('joy-react depends only on published workspace packages', () => {
   const workspaceDeps = Object.entries(pkg.dependencies).filter(([, range]) => String(range).startsWith('workspace:'));
   assert.deepStrictEqual(
     workspaceDeps.map(([name]) => name).sort(),
-    ['@joymify/brand', '@joymify/icons', '@joymify/tokens'],
+    ['@montionugera/joy-brand', '@montionugera/joy-icons', '@montionugera/joy-tokens'],
   );
   for (const [name] of workspaceDeps) assert.ok(publishedNames.includes(name), `${name} is not a published package`);
 });
 
 test('joy-svelte is renamed and private', () => {
   const pkg = readJson('packages/svelte/package.json');
-  assert.strictEqual(pkg.name, '@joymify/svelte');
+  assert.strictEqual(pkg.name, '@montionugera/joy-svelte');
   assert.strictEqual(pkg.private, true);
   assert.strictEqual(pkg.publishConfig, undefined);
 });
@@ -118,7 +118,7 @@ for (const [dir, peers] of [['react', ['react', 'react-dom']], ['icons', ['react
   });
 }
 
-test('@joymify/tokens exports theme.css and tailwind entry points', () => {
+test('@montionugera/joy-tokens exports theme.css and tailwind entry points', () => {
   const pkg = readJson('packages/tokens/package.json');
   assert.strictEqual(pkg.exports['./theme.css'], './dist/theme.css');
   assert.strictEqual(pkg.exports['./tailwind'], './dist/tailwind-theme.css');
@@ -180,7 +180,7 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   const tokenMatches = wf.match(/NODE_AUTH_TOKEN:\s*\${{\s*secrets\.JOYMIFY_PACKAGES_TOKEN\s*}}/g) || [];
   assert.strictEqual(tokenMatches.length, 2, 'NODE_AUTH_TOKEN takes the org token only in the publish and verify steps');
   assert.ok(!wf.includes('GITHUB_TOKEN'), 'the built-in GITHUB_TOKEN must not be used anywhere in the publish workflow');
-  assert.match(wf, /scope: '@joymify'/, 'setup-node must target the @joymify scope');
+  assert.match(wf, /scope: '@montionugera'/, 'setup-node must target the @montionugera scope');
   assert.match(wf, /registry-url: 'https:\/\/npm\.pkg\.github\.com'/, 'setup-node must target GitHub Packages');
   const secretStep = steps.find((s) => s.name === 'Require the publish token');
   assert.ok(secretStep, 'an early step must require the publish token');
@@ -188,13 +188,13 @@ test('the publish workflow gates, builds, tests, then publishes in dependency or
   assert.ok(secretStep.block.includes('::error::'), 'the token check must fail with a clear ::error:: message');
   assert.ok(secretStep.block.includes('JOYMIFY_PACKAGES_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}'), 'the token check reads the org secret');
   assert.ok(wf.indexOf('Require the publish token') < wf.indexOf('Install pnpm'), 'the token check must run before any build work');
-  assert.ok(wf.includes('name="@joymify/$dir"'), 'the per-package loops must query @joymify/*');
-  assert.ok(!wf.includes('@montionugera'), 'no old scope in the publish workflow');
+  assert.ok(wf.includes('name="@montionugera/joy-$dir"'), 'the per-package loops must query @montionugera/joy-*');
+  assert.ok(!wf.includes('@joymify'), 'no old scope in the publish workflow');
 
   const order = [
     'run: ./scripts/integration.sh',
-    'pnpm --filter @joymify/icons build',
-    'pnpm --filter @joymify/react build',
+    'pnpm --filter @montionugera/joy-icons build',
+    'pnpm --filter @montionugera/joy-react build',
     'run: ./scripts/test/consumer-smoke.sh',
     'git status --porcelain',
     'pnpm publish --dry-run --no-git-checks',

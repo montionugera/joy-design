@@ -30,8 +30,8 @@ test('checkManifests parses manifests and verifies targets', () => {
 
 test('classes ignores package import specifiers while detecting classes and css variables', () => {
   const sample = `
-    import { Check } from '@joymify/icons/react';
-    import { Logo } from '@joymify/brand';
+    import { Check } from '@montionugera/joy-icons/react';
+    import { Logo } from '@montionugera/joy-brand';
 
     export function Component() {
       return (

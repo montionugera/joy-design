@@ -239,7 +239,7 @@ function dosAndDonts() {
 - Side-stripe \`border-left\` accents wider than 1px, gradient text, decorative glassmorphism.
 - Identical icon + heading + text card grids, a tracked all-caps eyebrow above every section, 01/02/03 markers on content that is not a sequence.
 - An arrow glyph appended to link text, \`#111\` standing in for black, middle-dot meta strings.
-- Raw OS emoji anywhere; use the SVG icons in \`@joymify/icons\`.
+- Raw OS emoji anywhere; use the SVG icons in \`@montionugera/joy-icons\`.
 - A flat single-colour hero button with a colour-only hover, a spinner-only loading state, or 32px controls on a phone.
 - Use semantic status colors (green, amber, red) for arbitrary decorative styling, general section backgrounds, or brand theme accents.`;
 }
@@ -262,7 +262,7 @@ export function renderInventory(inventory) {
 
 export function renderAliases(aliases) {
   const rows = aliases.map((a) => [code(a.alias), a.target ? code(a.target) : 'no direct replacement; pick the semantic role that matches the use']);
-  return `${aliases.length} legacy aliases still resolve, marked \`@deprecated\` in \`@joymify/tokens\` types. Replace them with the semantic token.\n\n${table(['Deprecated', 'Use instead'], rows)}`;
+  return `${aliases.length} legacy aliases still resolve, marked \`@deprecated\` in \`@montionugera/joy-tokens\` types. Replace them with the semantic token.\n\n${table(['Deprecated', 'Use instead'], rows)}`;
 }
 
 export function replaceRegion(text, name, body) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Upload, File, Close } from '@joymify/icons';
+	import { Upload, File, Close } from '@montionugera/joy-icons';
 
 	export interface UploadFile {
 		id: string;
