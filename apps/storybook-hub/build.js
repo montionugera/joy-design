@@ -17,7 +17,7 @@ const inlinedThemeCss = fs.existsSync(tokensSrcPath)
   ? fs.readFileSync(tokensSrcPath, "utf8")
   : "";
 
-// Extract vector SVGs from @montionugera/joy-icons
+// Extract vector SVGs from @joymify/icons
 const iconsSrcDir = path.join(__dirname, "../../packages/icons/src");
 const iconCardsHtml = fs.existsSync(iconsSrcDir)
   ? fs
@@ -161,7 +161,7 @@ function markOutlineAndInner(color) {
 // header sites, the Brand nav icon, and the Brand view's size/tile grid). Mirrors BrandMark.svelte's
 // own tile/bare branches exactly (rect + outline + inner + contrast dot when tile, bare outline +
 // inner otherwise) so it can never drift from the real component, and geometry always comes from
-// @montionugera/joy-brand's MARK with var(--joy-brand-*) fills, never a resolved hex.
+// @joymify/brand's MARK with var(--joy-brand-*) fills, never a resolved hex.
 // `decorative` drops the img role/label for sites where an adjacent visible label already names the
 // mark (the header logos sit next to "Joymify Design" text; the nav icon sits next to its own link
 // label) — without it, screen readers would announce "Joymify" twice.
@@ -199,7 +199,7 @@ function brandBannerLatticeSvg() {
   return `<svg class="joy-brand-banner__lattice" viewBox="0 0 ${lattice.width} ${lattice.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${diamonds}</svg>`;
 }
 
-// Every generated file in @montionugera/joy-brand's assets/ folder (mark, wordmark, favicon, hero banner, OG
+// Every generated file in @joymify/brand's assets/ folder (mark, wordmark, favicon, hero banner, OG
 // card variants): read once here so the Brand view's download links (below) and the dist copy step
 // at the end of this file always list the exact same files, with no separate hardcoded list to drift
 // out of sync with the folder. The <link rel="icon"> further below is unconditional, so a missing or
@@ -209,7 +209,7 @@ function brandBannerLatticeSvg() {
 // own order isn't guaranteed stable across filesystems.
 const brandAssetsSrc = path.join(__dirname, "../../packages/brand/assets");
 if (!fs.existsSync(brandAssetsSrc)) {
-  throw new Error(`Brand assets folder not found: ${brandAssetsSrc}. Run "pnpm --filter @montionugera/joy-brand build" first.`);
+  throw new Error(`Brand assets folder not found: ${brandAssetsSrc}. Run "pnpm --filter @joymify/brand build" first.`);
 }
 const brandAssetDisplayOrder = ["mark.svg", "mark-bare.svg", "favicon.svg", "favicon-32.png", "apple-touch-icon.png", "wordmark-cream.svg", "wordmark-deep.svg", "hero-banner.svg", "og-card.svg", "og-card.png"];
 const brandAssetFiles = fs
@@ -276,7 +276,7 @@ const navigationHtml = manifest.categories
   .join("\n\n");
 
 // ── Wave 3 (F-038) aspect views ──────────────────────────────────────────────
-// Markup below mirrors the SSR output of the Svelte components (icons are read from @montionugera/joy-icons at
+// Markup below mirrors the SSR output of the Svelte components (icons are read from @joymify/icons at
 // build time, so the hub demos and the components can never drift on icon geometry).
 const iconMarkupCache = {};
 function iconSvg(name, size = "1em") {
@@ -285,7 +285,7 @@ function iconSvg(name, size = "1em") {
     const match = fs.existsSync(file)
       ? fs.readFileSync(file, "utf8").match(/<svg[\s\S]*?<\/svg>/)
       : null;
-    if (!match) throw new Error(`Icon ${name} not found in @montionugera/joy-icons`);
+    if (!match) throw new Error(`Icon ${name} not found in @joymify/icons`);
     iconMarkupCache[name] = match[0].replace(/\s*\n\s*/g, " ");
   }
   return iconMarkupCache[name]
@@ -909,7 +909,7 @@ function renderNavigationView() {
   );
   const markdownCard = hubCard(
     "markdown", "MarkdownViewer", "Rendered content region with the code-block copy contract.",
-    hubCell("viewer", `<div class="joy-markdown" role="region" aria-label="Markdown content"><h3>Release notes</h3><p>This release ships <strong>display, feedback and navigation</strong> fixes.</p><pre class="joy-markdown__pre"><code>pnpm --filter \\\n  @montionugera/joy-svelte test</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre></div>`),
+    hubCell("viewer", `<div class="joy-markdown" role="region" aria-label="Markdown content"><h3>Release notes</h3><p>This release ships <strong>display, feedback and navigation</strong> fixes.</p><pre class="joy-markdown__pre"><code>pnpm --filter \\\n  @joymify/svelte test</code><button type="button" class="joy-markdown__copy-btn" aria-label="Copy code to clipboard" onclick="copyHubCode(this)">${iconSvg("Copy", "14")} Copy</button><span class="joy-markdown__status" role="status"></span></pre></div>`),
     " hub-matrix--stack",
   );
   return `<section id="view-navigation-workflow" class="view-panel">
@@ -5074,31 +5074,31 @@ ${navigationHtml}
         </div>
 
         <div class="hub-card-grid">
-          <div class="hub-card" role="link" tabindex="0" aria-label="Open @montionugera/joy-tokens" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/tokens" onclick="switchView('tokens')" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--success joy-badge--sm"><span class="joy-badge__dot"></span> Live Tokens & Motion</span>
             </div>
-            <h3 style="margin: 0 0 8px 0;">@montionugera/joy-tokens</h3>
+            <h3 style="margin: 0 0 8px 0;">@joymify/tokens</h3>
             <p class="hub-card__desc">
               W3C DTCG tokens with OpenDesign posture integration, GPU spring motion curves, and hairline borders.
             </p>
           </div>
 
-          <div class="hub-card" role="link" tabindex="0" aria-label="Open @montionugera/joy-svelte" onclick="switchView('button'); setFramework('svelte');" onkeydown="hubCardActivate(event)">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/svelte" onclick="switchView('button'); setFramework('svelte');" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> Svelte 5 Runes</span>
             </div>
-            <h3 style="margin: 0 0 8px 0;">@montionugera/joy-svelte</h3>
+            <h3 style="margin: 0 0 8px 0;">@joymify/svelte</h3>
             <p class="hub-card__desc">
               Zero-overhead Runes ($state, $props, $derived, $bindable) engineered for real-time order books and high-FPS canvases.
             </p>
           </div>
 
-          <div class="hub-card" role="link" tabindex="0" aria-label="Open @montionugera/joy-react" onclick="switchView('button'); setFramework('react');" onkeydown="hubCardActivate(event)">
+          <div class="hub-card" role="link" tabindex="0" aria-label="Open @joymify/react" onclick="switchView('button'); setFramework('react');" onkeydown="hubCardActivate(event)">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
               <span class="joy-badge joy-badge--neutral joy-badge--sm"><span class="joy-badge__dot"></span> React 19 Ready</span>
             </div>
-            <h3 style="margin: 0 0 8px 0;">@montionugera/joy-react</h3>
+            <h3 style="margin: 0 0 8px 0;">@joymify/react</h3>
             <p class="hub-card__desc">
               Strict WAI-ARIA accessible React 19 component library with forwardRef support and zero runtime CSS overhead.
             </p>
@@ -5157,7 +5157,7 @@ ${navigationHtml}
       <!-- View: Brand Assets (F-043) -->
       <section id="view-brand" class="view-panel">
         <h2 style="margin: 0 0 8px 0;">Brand Assets</h2>
-        <p class="header-tagline">The Joymify diamond mark, wordmark and hero lattice: live renders sourced from @montionugera/joy-brand, plus the downloadable asset kit generated from the same geometry.</p>
+        <p class="header-tagline">The Joymify diamond mark, wordmark and hero lattice: live renders sourced from @joymify/brand, plus the downloadable asset kit generated from the same geometry.</p>
 
         <div class="playground-box">
           <div class="playground-header"><h4>Mark: sizes and surfaces</h4></div>
@@ -5674,7 +5674,7 @@ ${navigationHtml}
         <div class="code-snippet" id="button-code">
           // Svelte 5 Runes Example<br>
           &lt;script&gt;<br>
-          &nbsp;&nbsp;import { Button } from '@montionugera/joy-svelte';<br>
+          &nbsp;&nbsp;import { Button } from '@joymify/svelte';<br>
           &lt;/script&gt;<br><br>
           &lt;Button variant="solid" size="md" onclick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;
         </div>
@@ -6609,7 +6609,7 @@ ${navigationHtml}
 
       <!-- View: Icons Gallery -->
       <section id="view-icons-gallery" class="view-panel">
-        <h2 style="margin: 0 0 8px 0;">Vector Icons Gallery (@montionugera/joy-icons)</h2>
+        <h2 style="margin: 0 0 8px 0;">Vector Icons Gallery (@joymify/icons)</h2>
         <p class="header-tagline">138 enterprise SVG icons covering trading, navigation, file ops, and observability with full dark-mode and stroke/fill adaptability. Click any icon to copy its component import.</p>
 
         <div class="playground-box">
@@ -9434,7 +9434,7 @@ ${navigationHtml}
             <div class="apple-bento-tile apple-bento-tile--col-6">
               <span class="apple-eyebrow">Zero Emoji Policy</span>
               <h4 style="font-size: var(--joy-font-size-lg); margin: 0 0 8px 0;">Enterprise Optical Contract</h4>
-              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">OS emojis render unpredictable multi-color bitmaps that ruin optical waveguides. All symbols use standard non-emoji geometric unicode (U+25B6, U+00D7, U+25C4) or scalable vector SVGs from <code>@montionugera/joy-icons</code>.</p>
+              <p style="color: var(--joy-text-secondary); margin: 0 0 12px 0;">OS emojis render unpredictable multi-color bitmaps that ruin optical waveguides. All symbols use standard non-emoji geometric unicode (U+25B6, U+00D7, U+25C4) or scalable vector SVGs from <code>@joymify/icons</code>.</p>
               <span class="joy-badge joy-badge--neutral joy-badge--sm">Zero OS Emojis</span>
             </div>
           </div>
@@ -10336,7 +10336,7 @@ ${navigationHtml}
       });
     }
 
-    function switchView(viewName, updateHash = true) {
+    function switchView(viewName, updateHash = true, closeDrawer = true) {
       if (viewName !== 'overview' && viewName !== 'portal') {
         if (document.body.classList.contains('portal-mode')) {
           window.location.href = '/design/#' + viewName;
@@ -10370,8 +10370,8 @@ ${navigationHtml}
       const main = document.querySelector('.main');
       if (main) main.scrollTop = 0;
 
-      // Close mobile drawer on item selection
-      toggleMobileMenu(false);
+      // Close mobile drawer on item selection (not on the silent re-sync that follows the initial render)
+      if (closeDrawer) toggleMobileMenu(false);
 
       // Trigger 3D particle canvas resize when entering landing blocks
       if (viewName === 'landing-blocks') {
@@ -10413,7 +10413,7 @@ ${navigationHtml}
       });
     }
 
-    function syncViewFromHash() {
+    function syncViewFromHash(closeDrawer = true) {
       const hash = window.location.hash.replace(/^#/, '');
       const isDesignRoute = window.location.pathname.startsWith('/design');
       const isRootRoute = !isDesignRoute;
@@ -10423,7 +10423,7 @@ ${navigationHtml}
         const titleEl = document.getElementById('topbar-brand-title');
         if (titleEl) titleEl.textContent = 'Joymify Developer Portal';
         document.title = 'Joymify Developer Portal · dev.joymify.com';
-        switchView('overview', false);
+        switchView('overview', false, closeDrawer);
       } else if (isRootRoute && hash && document.getElementById('view-' + hash)) {
         window.location.replace('/design/#' + hash);
         return;
@@ -10432,18 +10432,18 @@ ${navigationHtml}
         const titleEl = document.getElementById('topbar-brand-title');
         if (titleEl) titleEl.textContent = 'Joymify Design';
         if (hash && document.getElementById('view-' + hash)) {
-          switchView(hash, false);
+          switchView(hash, false, closeDrawer);
         } else {
-          switchView('overview', false);
+          switchView('overview', false, closeDrawer);
         }
       } else {
-        switchView('overview', false);
+        switchView('overview', false, closeDrawer);
       }
     }
 
     // Synchronize view immediately on script load to eliminate theme/overview flash
     syncViewFromHash();
-    window.addEventListener('hashchange', syncViewFromHash);
+    window.addEventListener('hashchange', () => syncViewFromHash());
     // Following a link to the current hash fires no hashchange, so close the drawer on every nav pick.
     document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', () => toggleMobileMenu(false)));
 
@@ -11325,10 +11325,10 @@ ${navigationHtml}
 
     function copyIconName(name) {
       const code = activeFramework === 'svelte'
-        ? "import { " + name + " } from '@montionugera/joy-icons';"
+        ? "import { " + name + " } from '@joymify/icons';"
         : activeFramework === 'flutter'
         ? "JoyIcons." + (name.charAt(0).toLowerCase() + name.slice(1))
-        : "import { " + name + " } from '@montionugera/joy-icons/react';";
+        : "import { " + name + " } from '@joymify/icons/react';";
       navigator.clipboard.writeText(code).then(() => {
         showDemoToast('Copied: ' + code, 'success');
         const banner = document.getElementById('copy-toast-banner');
@@ -14417,7 +14417,8 @@ ${navigationHtml}
       renderTransferDemo();
       initKineticCanvas();
       initMesh3dCanvas();
-      syncViewFromHash();
+      // Re-sync once the canvases exist, but never close a drawer the user opened in the meantime.
+      syncViewFromHash(false);
     }, 100);
 
     function switchSimulatorViewport(width, btn) {
@@ -14499,11 +14500,11 @@ ${navigationHtml}
       const btnSnippet = document.getElementById('button-code');
       if (!btnSnippet) return;
       if (activeFramework === 'svelte') {
-        btnSnippet.innerHTML = \`// Svelte 5 Runes Example<br>&lt;script&gt;<br>&nbsp;&nbsp;import { Button } from '@montionugera/joy-svelte';<br>&lt;/script&gt;<br><br>&lt;Button variant="solid" size="md" onclick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
+        btnSnippet.innerHTML = \`// Svelte 5 Runes Example<br>&lt;script&gt;<br>&nbsp;&nbsp;import { Button } from '@joymify/svelte';<br>&lt;/script&gt;<br><br>&lt;Button variant="solid" size="md" onclick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
       } else if (activeFramework === 'flutter') {
         btnSnippet.innerHTML = \`// Flutter 3.32+ Dart Example<br>import 'package:joymify_flutter/joymify_flutter.dart';<br><br>JoyButton(<br>&nbsp;&nbsp;variant: JoyButtonVariant.\${currentBtnVariant},<br>&nbsp;&nbsp;size: JoyButtonSize.\${currentBtnSize},<br>&nbsp;&nbsp;loading: \${isBtnLoading},<br>&nbsp;&nbsp;onPressed: () => print('Clicked'),<br>&nbsp;&nbsp;child: const Text('Action'),<br>)\`;
       } else {
-        btnSnippet.innerHTML = \`// React 19 Modern Example<br>import { Button } from '@montionugera/joy-react';<br><br>&lt;Button variant="solid" size="md" onClick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
+        btnSnippet.innerHTML = \`// React 19 Modern Example<br>import { Button } from '@joymify/react';<br><br>&lt;Button variant="solid" size="md" onClick={() => alert('Clicked')}&gt;Action&lt;/Button&gt;\`;
       }
     }
 
@@ -14666,7 +14667,7 @@ if (fs.existsSync(flutterSrcDir)) {
   console.log("Copied Flutter Web bundle to", flutterOutDir);
 }
 
-// Copy tracked portal bundles if present into dist/server-decorator and dist/cli-state-handler
+// Copy the downloaded portal bundles (scripts/fetch-portal-docs.sh; gitignored) if present into dist/server-decorator and dist/cli-state-handler
 const bundlesDir = path.join(__dirname, "portal-bundles");
 if (fs.existsSync(bundlesDir)) {
   const decoratorBundle = path.join(bundlesDir, "server-decorator");

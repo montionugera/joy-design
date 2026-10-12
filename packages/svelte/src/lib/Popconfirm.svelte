@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { AlertCircle } from '@montionugera/joy-icons';
+  import { AlertCircle } from '@joymify/icons';
   import { openOverlay } from './overlay-utils.js';
 
   interface Props {

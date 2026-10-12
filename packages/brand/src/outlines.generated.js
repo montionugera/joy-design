@@ -1,5 +1,5 @@
 // GENERATED FILE — do not edit by hand.
-// Regenerate with: pnpm --filter @montionugera/joy-brand outline
+// Regenerate with: pnpm --filter @joymify/brand outline
 // Source: Cormorant Garamond (SIL OFL 1.1), see PROVENANCE.md
 
 export const WORDMARK = {

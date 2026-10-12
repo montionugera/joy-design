@@ -27,44 +27,28 @@ echo "==> Building Joy Design System Hub & Tokens..."
 node "$REPO_ROOT/packages/tokens/build.js"
 node "$REPO_ROOT/apps/storybook-hub/build.js"
 
-# 1. Node Server Decorator (Astro Starlight)
-DECORATOR_DIR="$WORKSPACE_ROOT/node-server-decorator"
-if [ -d "$DECORATOR_DIR" ] && [ -d "$DECORATOR_DIR/website/dist" ]; then
-  echo "==> Found node-server-decorator repository at $DECORATOR_DIR"
-  echo "    Copying existing website/dist to $HUB_DIST/server-decorator..."
-  rm -rf "$HUB_DIST/server-decorator"
-  cp -r "$DECORATOR_DIR/website/dist" "$HUB_DIST/server-decorator"
-elif [ -d "$PORTAL_BUNDLES/server-decorator" ]; then
-  echo "==> Found tracked portal-bundles for node-server-decorator..."
-  rm -rf "$HUB_DIST/server-decorator"
-  cp -r "$PORTAL_BUNDLES/server-decorator" "$HUB_DIST/server-decorator"
-else
-  echo "    node-server-decorator not found, creating stub index..."
-  mkdir -p "$HUB_DIST/server-decorator"
-  cat <<'EOF' > "$HUB_DIST/server-decorator/index.html"
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Node Server Decorator Documentation</title><meta http-equiv="refresh" content="0; url=https://github.com/montionugera/node-server-decorator"></head><body>Redirecting to GitHub...</body></html>
-EOF
-fi
+# place_docs <name> <sibling-built-dir> <fetch-repo>: sibling build first, then the downloaded bundle, else fail
+# loudly (no stub, no stale copy).
+place_docs() {
+  local name="$1" sibling="$2" repo="$3"
+  if [ -d "$sibling" ]; then
+    echo "==> Found $name build at $sibling; copying to $HUB_DIST/$name..."
+    rm -rf "$HUB_DIST/$name"
+    cp -r "$sibling" "$HUB_DIST/$name"
+  elif [ -d "$PORTAL_BUNDLES/$name" ]; then
+    echo "==> Found fetched portal-bundles for $name..."
+    rm -rf "$HUB_DIST/$name"
+    cp -r "$PORTAL_BUNDLES/$name" "$HUB_DIST/$name"
+  else
+    echo "ERROR: no $name docs found (no sibling build, no downloaded bundle)." >&2
+    echo "       Download them first: GH_TOKEN=\$(gh auth token) bash scripts/fetch-portal-docs.sh $repo $name" >&2
+    exit 1
+  fi
+}
 
+# 1. Node Server Decorator (Astro Starlight)
+place_docs server-decorator "$WORKSPACE_ROOT/node-server-decorator/website/dist" montionugera/node-server-decorator
 # 2. CLI State Handler (Vite Docs)
-CLI_DIR="$WORKSPACE_ROOT/cli-state-handler"
-if [ -d "$CLI_DIR" ] && [ -d "$CLI_DIR/apps/docs/dist" ]; then
-  echo "==> Found cli-state-handler repository at $CLI_DIR"
-  echo "    Copying existing apps/docs/dist to $HUB_DIST/cli-state-handler..."
-  rm -rf "$HUB_DIST/cli-state-handler"
-  cp -r "$CLI_DIR/apps/docs/dist" "$HUB_DIST/cli-state-handler"
-elif [ -d "$PORTAL_BUNDLES/cli-state-handler" ]; then
-  echo "==> Found tracked portal-bundles for cli-state-handler..."
-  rm -rf "$HUB_DIST/cli-state-handler"
-  cp -r "$PORTAL_BUNDLES/cli-state-handler" "$HUB_DIST/cli-state-handler"
-else
-  echo "    cli-state-handler not found, creating stub index..."
-  mkdir -p "$HUB_DIST/cli-state-handler"
-  cat <<'EOF' > "$HUB_DIST/cli-state-handler/index.html"
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>CLI State Handler Documentation</title><meta http-equiv="refresh" content="0; url=https://github.com/montionugera/cli-state-handler"></head><body>Redirecting to GitHub...</body></html>
-EOF
-fi
+place_docs cli-state-handler "$WORKSPACE_ROOT/cli-state-handler/apps/docs/dist" montionugera/cli-state-handler
 
 echo "==> Successfully assembled Unified Developer Portal distribution in $HUB_DIST"

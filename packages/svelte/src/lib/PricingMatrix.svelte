@@ -7,7 +7,7 @@
 
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Check, Minus } from '@montionugera/joy-icons';
+	import { Check, Minus } from '@joymify/icons';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	// `columns` and `rows` are a pair. Pass both for the data variant (a real table in a scroll region, `label` names that

@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
-import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn, execSync, type ChildProcess } from "node:child_process";
+import { isReachable, waitForServer } from "./wait-for-server";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const flutterHubDir = path.resolve(__dirname, "../../flutter-hub");
@@ -13,19 +13,6 @@ const flutterPort = process.env.FLUTTER_PORT ?? "6118";
 const flutterUrl = `http://127.0.0.1:${flutterPort}`;
 
 let serverProcess: ChildProcess | null = null;
-
-function isReachable(urlStr: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const req = http.get(urlStr, (res) => {
-      resolve(res.statusCode !== undefined && res.statusCode < 500);
-    });
-    req.on("error", () => resolve(false));
-    req.setTimeout(800, () => {
-      req.destroy();
-      resolve(false);
-    });
-  });
-}
 
 function resolveTargetUrl(baseURL?: string): string {
   if (baseURL && baseURL.includes("6118")) {
@@ -38,6 +25,7 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Flutter Web Showcase & JoyHubBridge Smoke", () => {
   test.beforeAll(async () => {
+    test.setTimeout(180_000); // the hook budget must exceed the server wait below, or the default 30 s would cut it short
     // Ensure Flutter web bundle exists
     if (!fs.existsSync(path.join(flutterWebDir, "index.html"))) {
       execSync("flutter build web", { cwd: flutterHubDir, stdio: "inherit" });
@@ -54,12 +42,8 @@ test.describe("Flutter Web Showcase & JoyHubBridge Smoke", () => {
         },
       );
 
-      // Wait for server to become responsive
-      const start = Date.now();
-      while (Date.now() - start < 15000) {
-        if (await isReachable(flutterUrl)) break;
-        await new Promise((r) => setTimeout(r, 200));
-      }
+      // A cold `npx serve` on a loaded machine can take far longer than a few seconds; fail here with a clear message.
+      await waitForServer(flutterUrl, { timeoutMs: 120_000 });
     }
   });
 

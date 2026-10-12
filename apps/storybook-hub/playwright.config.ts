@@ -37,7 +37,8 @@ export default defineConfig({
     url: `http://127.0.0.1:${port}`,
     reuseExistingServer: !process.env.CI,
     cwd: __dirname,
-    timeout: 30000,
+    // Cold `npx serve` on a loaded machine (or CI) can take well over 30 s to answer the first request.
+    timeout: 120000,
   },
   projects: [
     {

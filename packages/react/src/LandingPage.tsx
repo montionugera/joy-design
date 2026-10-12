@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, Layers, Menu, Smartphone } from '@montionugera/joy-icons/react';
+import { Cpu, Layers, Menu, Smartphone } from '@joymify/icons/react';
 import { Badge } from './Badge.js';
 import { Drawer } from './Drawer.js';
 import { HeroSection } from './HeroSection.js';

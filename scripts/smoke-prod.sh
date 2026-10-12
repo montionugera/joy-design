@@ -45,6 +45,29 @@ else
     fi
     echo "[OK] Sub-webapp ${subpath} returned HTTP 200"
   done
+  # check_docs_version <folder> [expected]: the served version.json must hold a well-formed version.
+  # With <expected> (the version CI fetched) it must equal it; without it (no image was built in this run,
+  # so there is nothing to compare with) only presence and form are checked, and the log says so.
+  check_docs_version() {
+    local vbody actual
+    vbody=$(curl -sS -k --max-time 15 "https://${host}/$1/version.json" || true)
+    actual=$(printf '%s' "$vbody" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)
+    if [ -n "${2:-}" ]; then
+      if [ "$actual" != "$2" ]; then
+        echo "::error::$1 docs version is '${actual:-none}', expected '$2'"
+        exit 1
+      fi
+      echo "[OK] $1 docs version ${actual} matches the fetched release"
+    else
+      if ! [[ "$actual" =~ ^[0-9A-Za-z][0-9A-Za-z._-]*$ ]]; then
+        echo "::error::$1 docs version.json is missing or has no well-formed version (got '${actual:-none}')"
+        exit 1
+      fi
+      echo "[OK] $1 docs version ${actual} is served (presence only, not equality: no expected version because no image was built in this run)"
+    fi
+  }
+  check_docs_version cli-state-handler "${EXPECTED_CLI_DOCS_VERSION:-}"
+  check_docs_version server-decorator "${EXPECTED_DECORATOR_DOCS_VERSION:-}"
 fi
 
 # Verify index content contains Joymify or Storybook token (following redirects with -L)

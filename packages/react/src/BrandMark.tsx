@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { MARK } from '@montionugera/joy-brand';
+import { MARK } from '@joymify/brand';
 
-// The Joymify diamond mark. Geometry comes from @montionugera/joy-brand (never copy the paths); every
+// The Joymify diamond mark. Geometry comes from @joymify/brand (never copy the paths); every
 // colour is a `--joy-brand-*` custom property so the mark stays correct across light/dark themes,
-// unlike the static assets in @montionugera/joy-brand which bake in resolved hex values.
+// unlike the static assets in @joymify/brand which bake in resolved hex values.
 export interface BrandMarkProps {
   size?: number;
   variant?: 'tile' | 'bare';

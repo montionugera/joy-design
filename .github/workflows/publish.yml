@@ -1,6 +1,6 @@
 name: Publish packages to GitHub Packages
 
-# Publishes @montionugera/joy-tokens, joy-icons, joy-brand and joy-react.
+# Publishes @joymify/tokens, icons, brand and react.
 # A published version is permanent, so this runs only on a deliberate act:
 # a pushed tag matching packages-v*, or a manual run. Manual runs default to a dry run.
 on:
@@ -38,10 +38,23 @@ jobs:
     environment: packages
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      # The automatic workflow token cannot write to the joymify organisation, so a real publish needs
+      # the personal token stored as the secret JOYMIFY_PACKAGES_TOKEN of the `packages` environment, so
+      # only runs that environment admits (main, packages-v* tags) can read it. A dry run never gets it.
+      - name: Require the publish token
+        if: env.DRY_RUN == 'false'
+        env:
+          JOYMIFY_PACKAGES_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}
+        run: |
+          if [ -z "$JOYMIFY_PACKAGES_TOKEN" ]; then
+            echo "::error::The Actions secret JOYMIFY_PACKAGES_TOKEN is empty or missing. Store a classic personal access token with write:packages, authorised for the joymify organisation, as a secret of the packages environment."
+            exit 1
+          fi
 
       # A real publish must come from a commit that is on main. Dry runs may run from any branch.
       - name: Refuse a commit that is not on main
@@ -57,17 +70,17 @@ jobs:
           echo "$GITHUB_SHA is on main."
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10.13.1
 
       - name: Setup Node 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'pnpm'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@montionugera'
+          scope: '@joymify'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -88,13 +101,15 @@ jobs:
 
       # The gate rebuilds tokens and, through turbo's ^build edge on check, the brand assets.
       - name: Gate (scripts/precheck.sh via scripts/integration.sh)
+        env:
+          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the portal docs it serves
         run: ./scripts/integration.sh
 
-      # Only joy-icons and joy-react are built here; their dist/ is untracked.
-      - name: Build joy-icons and joy-react
+      # Only icons and react are built here; their dist/ is untracked.
+      - name: Build icons and react
         run: |
-          pnpm --filter @montionugera/joy-icons build
-          pnpm --filter @montionugera/joy-react build
+          pnpm --filter @joymify/icons build
+          pnpm --filter @joymify/react build
 
       - name: Tarball test (scripts/test/consumer-smoke.sh)
         run: ./scripts/test/consumer-smoke.sh
@@ -135,12 +150,12 @@ jobs:
       - name: Dry run (nothing is published)
         if: env.DRY_RUN == 'true'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: dry-run-no-auth
         run: |
           mkdir -p "$RUNNER_TEMP/packs"
           echo "## Dry run: nothing was published" >> "$GITHUB_STEP_SUMMARY"
           for dir in tokens icons brand react; do
-            name="@montionugera/joy-$dir"
+            name="@joymify/$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
             echo "::group::$name@$version"
             (cd "packages/$dir" && pnpm publish --dry-run --no-git-checks)
@@ -155,12 +170,12 @@ jobs:
       - name: Publish the versions not yet on the registry
         if: env.DRY_RUN == 'false'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}
         run: |
           echo "## Publish" >> "$GITHUB_STEP_SUMMARY"
           published=0
           for dir in tokens icons brand react; do
-            name="@montionugera/joy-$dir"
+            name="@joymify/$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
             err="$RUNNER_TEMP/npm-view-$dir.err"
             set +e
@@ -190,10 +205,10 @@ jobs:
       - name: Verify each version is on the registry
         if: env.DRY_RUN == 'false'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.JOYMIFY_PACKAGES_TOKEN }}
         run: |
           for dir in tokens icons brand react; do
-            name="@montionugera/joy-$dir"
+            name="@joymify/$dir"
             version="$(node -p "require('./packages/$dir/package.json').version")"
             found=""
             for attempt in 1 2 3 4 5; do

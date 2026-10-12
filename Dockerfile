@@ -9,6 +9,9 @@ COPY apps/ ./apps/
 # Compile tokens and static hub
 RUN node packages/tokens/build.js
 RUN cd apps/storybook-hub && node build.js
+# The docs are downloaded before the build (scripts/fetch-portal-docs.sh); never ship a portal without them
+RUN test -s apps/storybook-hub/dist/cli-state-handler/version.json || { echo 'cli-state-handler docs missing: run scripts/fetch-portal-docs.sh montionugera/cli-state-handler cli-state-handler before docker build' >&2; exit 1; }
+RUN test -s apps/storybook-hub/dist/server-decorator/version.json || { echo 'server-decorator docs missing: run scripts/fetch-portal-docs.sh montionugera/node-server-decorator server-decorator before docker build' >&2; exit 1; }
 
 # Stage 2: Serve with NGINX
 FROM nginx:alpine AS runner

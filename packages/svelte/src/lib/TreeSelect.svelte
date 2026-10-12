@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChevronDown, ChevronRight, Close, Check } from '@montionugera/joy-icons';
+	import { ChevronDown, ChevronRight, Close, Check } from '@joymify/icons';
 	import { untrack } from 'svelte';
 	import { openOverlay } from './overlay-utils.js';
 

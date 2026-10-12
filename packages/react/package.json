@@ -1,5 +1,5 @@
 {
-  "name": "@montionugera/joy-react",
+  "name": "@joymify/react",
   "version": "0.2.0",
   "type": "module",
   "license": "MIT",
@@ -31,9 +31,9 @@
     "check": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@montionugera/joy-brand": "workspace:*",
-    "@montionugera/joy-icons": "workspace:*",
-    "@montionugera/joy-tokens": "workspace:*"
+    "@joymify/brand": "workspace:*",
+    "@joymify/icons": "workspace:*",
+    "@joymify/tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0",

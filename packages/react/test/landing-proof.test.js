@@ -180,7 +180,7 @@ test('F-039 L4: FAQSection ids are scoped per instance, so two sections on one p
   assert.strictEqual(new Set(ids).size, 12);
 });
 
-test('F-039 L4: FAQSection chevron is an @montionugera/joy-icons icon inside the rotating wrapper, and the title is sentence case', () => {
+test('F-039 L4: FAQSection chevron is an @joymify/icons icon inside the rotating wrapper, and the title is sentence case', () => {
   const markup = faq();
   assert.strictEqual((markup.match(/<span class="joy-faq-item__icon" aria-hidden="true"><svg [^>]*><polyline points="6 9 12 15 18 9">/g) || []).length, 3);
   assert.match(markup, /<h2 class="joy-faq-section__title">Frequently asked questions<\/h2>/);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Check, Copy } from '@montionugera/joy-icons';
+	import { Check, Copy } from '@joymify/icons';
 	import { tokenizeCode } from './syntax-highlighter.js';
 	import MermaidViewer from './MermaidViewer.svelte';
 

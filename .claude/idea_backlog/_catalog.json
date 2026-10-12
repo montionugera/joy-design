@@ -479,5 +479,83 @@
     "title": "Syntax highlighting code box and Mermaid diagram support in MarkdownViewer",
     "created_at": "2026-10-09T08:50:21.852148+00:00",
     "promoted_to": "F-072"
+  },
+  {
+    "id": "I-079",
+    "title": "Download cli-state-handler docs archive from its GitHub Release before the portal image build",
+    "created_at": "2026-10-09T12:46:25.635262+00:00",
+    "promoted_to": "F-074"
+  },
+  {
+    "id": "I-080",
+    "title": "Rename packages to @joymify and publish to the joymify organisation on GitHub Packages",
+    "created_at": "2026-10-09T12:54:26.441522+00:00",
+    "promoted_to": "F-073"
+  },
+  {
+    "id": "I-081",
+    "title": "Flutter smoke test gives its own web server only 15 seconds to start and fails the gate under load",
+    "created_at": "2026-10-09T15:29:04.392711+00:00",
+    "promoted_to": "F-077"
+  },
+  {
+    "id": "I-082",
+    "title": "Portal build downloads the server-decorator docs from its GitHub Release",
+    "created_at": "2026-10-11T05:59:08.736746+00:00",
+    "promoted_to": "F-080"
+  },
+  {
+    "id": "I-083",
+    "title": "Remove the stale committed cli-state-handler docs copy",
+    "created_at": "2026-10-11T05:59:09.116342+00:00",
+    "promoted_to": "F-075"
+  },
+  {
+    "id": "I-084",
+    "title": "Move GitHub Actions off retired Node 20 majors and pin the Ubuntu runner",
+    "created_at": "2026-10-11T05:59:09.523864+00:00",
+    "promoted_to": "F-078"
+  },
+  {
+    "id": "I-085",
+    "title": "Fix flaky framework-switcher mobile test and short Playwright server timeout",
+    "created_at": "2026-10-11T05:59:09.999587+00:00",
+    "promoted_to": "F-076"
+  },
+  {
+    "id": "I-086",
+    "title": "Add automated release notes and GitHub Releases for the joymify packages",
+    "created_at": "2026-10-11T05:59:10.537510+00:00",
+    "promoted_to": null
+  },
+  {
+    "id": "I-087",
+    "title": "Give the package-publish gate a token for the docs download and tidy the docs-fetch loose ends",
+    "created_at": "2026-10-11T09:45:03.762241+00:00",
+    "promoted_to": "F-079"
+  },
+  {
+    "id": "I-088",
+    "title": "Portal build fails at once if an upstream latest release is broken: add retry and resolve the docs versions once per run",
+    "created_at": "2026-10-11T15:48:27.197227+00:00",
+    "promoted_to": "F-081"
+  },
+  {
+    "id": "I-089",
+    "title": "Production smoke check skips the docs version comparison when no image was built in the run",
+    "created_at": "2026-10-11T15:48:27.484034+00:00",
+    "promoted_to": "F-082"
+  },
+  {
+    "id": "I-090",
+    "title": "Flaky Playwright test: antd5-advanced-controls Tabs active indicator and Segmented toggle on desktop-chrome",
+    "created_at": "2026-10-11T17:34:35.838216+00:00",
+    "promoted_to": null
+  },
+  {
+    "id": "I-091",
+    "title": "Keep infrastructure-only deploys independent of the docs lookup and tighten the resolve job",
+    "created_at": "2026-10-11T17:40:24.332159+00:00",
+    "promoted_to": "F-083"
   }
 ]
