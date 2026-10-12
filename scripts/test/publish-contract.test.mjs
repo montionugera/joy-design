@@ -312,16 +312,21 @@ test('the publish job publishes to GitHub Packages, verifies, then npmjs.org, in
   assert.ok(githubPublish.block.includes('npm view "$name@$version" version --registry "$REGISTRY_URL"'), 'must ask GitHub Packages before publishing each package');
   assert.ok(githubPublish.block.includes("grep -q 'E404'"), 'only a 404 means "not published yet"; any other lookup failure stops the run');
   assert.ok(githubPublish.block.includes('SCOPE_PIN="--@montionugera:registry=$REGISTRY_URL"'), 'the scope must be pinned to GitHub Packages');
-  assert.strictEqual(count(githubPublish.block, /npm publish "\$tgz" --registry "\$REGISTRY_URL" "\$SCOPE_PIN"$/gm), 1, 'GitHub Packages publish uploads the github-set tarball');
-  assert.ok(githubPublish.block.includes(".$dir.github") && !githubPublish.block.includes(".$dir.npmjs"), 'GitHub Packages gets the github set');
+  assert.strictEqual(count(githubPublish.block, /npm publish "\$tgz" --ignore-scripts --registry "\$REGISTRY_URL" "\$SCOPE_PIN"$/gm), 1, 'GitHub Packages publish uploads the github-set tarball and runs no lifecycle script');
+  // The privileged job builds each tarball path from fixed parts, never from a path in the artifact.
+  assert.ok(githubPublish.block.includes('tgz="$packs/github/montionugera-joy-$dir-$version.tgz"'), 'the GitHub Packages tarball path is fixed');
+  assert.ok(npmjs.block.includes('tgz="$packs/npmjs/montionugera-joy-$dir-$version.tgz"'), 'the npmjs.org tarball path is fixed');
+  assert.ok(!/manifest\.json'\)\.\$dir\.(github|npmjs)/.test(jobs.publish), 'the publish job must not take a tarball path from the manifest');
+  assert.strictEqual(count(jobs.publish, /\[ ! -f "\$tgz" \]/g), 2, 'each publish refuses a tarball path that is not a regular file');
+  assert.ok(githubPublish.block.includes('"$packs/github/') && !githubPublish.block.includes('"$packs/npmjs/'), 'GitHub Packages gets the github set');
   assert.ok(topLevel.includes('REGISTRY_URL: https://npm.pkg.github.com'), 'REGISTRY_URL is GitHub Packages');
   assert.ok(verify.block.includes('npm view "$name@$version" version --registry "$REGISTRY_URL"') && verify.block.includes('exit 1'), 'verify must fail when a version is not on GitHub Packages');
 
   // npmjs.org
   assert.ok(npmjs.block.includes('SCOPE_PIN="--@montionugera:registry=$NPMJS_URL"') && npmjs.block.includes(`NPMJS_URL=${NPMJS}`), 'the @montionugera scope must be pinned to npmjs.org');
-  assert.strictEqual(count(npmjs.block, /npm publish "\$tgz" --access public --registry "\$NPMJS_URL" "\$SCOPE_PIN"/g), 1, 'the npmjs.org publish must be public and carry the scope pin');
+  assert.strictEqual(count(npmjs.block, /npm publish "\$tgz" --ignore-scripts --access public --registry "\$NPMJS_URL" "\$SCOPE_PIN"/g), 1, 'the npmjs.org publish must be public, carry the scope pin and run no lifecycle script');
   assert.strictEqual(count(npmjs.block, /npm publish/g), 1, 'one npm publish call in the npmjs.org step');
-  assert.ok(npmjs.block.includes(".$dir.npmjs") && !npmjs.block.includes(".$dir.github"), 'npmjs.org gets the npmjs set');
+  assert.ok(npmjs.block.includes('"$packs/npmjs/') && !npmjs.block.includes('"$packs/github/'), 'npmjs.org gets the npmjs set');
   assert.ok(npmjs.block.includes("curl -s -o /dev/null -w '%{http_code}'"), 'the already-published check must be an unauthenticated curl');
   assert.strictEqual(count(npmjs.block, /rc=1\s+break/g), 2, 'the npmjs.org loop must stop at the first failure (lookup or publish)');
   assert.ok(/exit "\$rc"$/.test(npmjs.block.trimEnd()), 'the npmjs.org step must exit with the failure code');

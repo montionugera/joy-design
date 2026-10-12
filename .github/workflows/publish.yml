@@ -1,4 +1,4 @@
-name: Publish packages to GitHub Packages
+name: Publish packages to GitHub Packages and npmjs.org
 
 # Publishes @montionugera/joy-tokens, icons, brand and react to GitHub Packages and to npmjs.org.
 # Two jobs: `build` runs every piece of third-party code (install, gate, build, tests) with a
@@ -47,7 +47,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # A real publish must come from a commit that is on main. Dry runs may run from any branch.
+      # A real publish must come from a commit that is on main. A dry run skips this check; the
+      # `packages` environment still limits which branches can start one.
       - name: Refuse a commit that is not on main
         if: env.DRY_RUN == 'false'
         run: |
@@ -209,7 +210,8 @@ jobs:
             name="@montionugera/joy-$dir"
             version="$(node -p "require('$packs/manifest.json').$dir.version")"
             echo "::group::$name@$version"
-            # The same two command lines as the publish job, with --dry-run added.
+            # The publish job's two command lines with --dry-run added, on this job's bundled npm
+            # (the publish job upgrades npm for trusted publishing).
             tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.github")"
             npm publish "$tgz" --registry "$REGISTRY_URL" "--@montionugera:registry=$REGISTRY_URL" --dry-run
             tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.npmjs")"
@@ -297,8 +299,14 @@ jobs:
               exit 1
             fi
             echo "Publishing $name@$version"
-            tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.github")"
-            npm publish "$tgz" --registry "$REGISTRY_URL" "$SCOPE_PIN"
+            # The path is built from fixed parts and lifecycle scripts are refused, so nothing the
+            # build job put in the artifact can choose what this job runs.
+            tgz="$packs/github/montionugera-joy-$dir-$version.tgz"
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [ ! -f "$tgz" ]; then
+              echo "::error::No tarball for $name@$version at the expected path."
+              exit 1
+            fi
+            npm publish "$tgz" --ignore-scripts --registry "$REGISTRY_URL" "$SCOPE_PIN"
             published=$((published + 1))
             echo "- \`$name@$version\`: published" >> "$GITHUB_STEP_SUMMARY"
           done
@@ -377,8 +385,14 @@ jobs:
               rc=1
               break
             fi
-            tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.npmjs")"
-            if npm publish "$tgz" --access public --registry "$NPMJS_URL" "$SCOPE_PIN"; then
+            # The path is built from fixed parts and lifecycle scripts are refused, so nothing the
+            # build job put in the artifact can choose what this job runs.
+            tgz="$packs/npmjs/montionugera-joy-$dir-$version.tgz"
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [ ! -f "$tgz" ]; then
+              echo "::error::No tarball for $name@$version at the expected path."
+              exit 1
+            fi
+            if npm publish "$tgz" --ignore-scripts --access public --registry "$NPMJS_URL" "$SCOPE_PIN"; then
               published=$((published + 1))
               echo "- \`$name@$version\`: published to npmjs.org" >> "$GITHUB_STEP_SUMMARY"
             else
