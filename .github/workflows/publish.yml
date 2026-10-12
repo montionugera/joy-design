@@ -1,6 +1,9 @@
 name: Publish packages to GitHub Packages
 
-# Publishes @montionugera/joy-tokens, icons, brand and react.
+# Publishes @montionugera/joy-tokens, icons, brand and react to GitHub Packages and to npmjs.org.
+# Two jobs: `build` runs every piece of third-party code (install, gate, build, tests) with a
+# read-only token and packs the tarballs; `publish` holds the publish permissions and only uploads
+# those tarballs. It checks out nothing and installs nothing from this repository.
 # A published version is permanent, so this runs only on a deliberate act:
 # a pushed tag matching packages-v*, or a manual run. Manual runs default to a dry run.
 on:
@@ -10,17 +13,14 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run: gate, build and tarball test, then pnpm publish --dry-run. Nothing is published.'
+        description: 'Dry run: gate, build, tarball test and pack, then a publish dry run of the tarballs. Nothing is published.'
         type: boolean
         required: false
         default: true
 
+# Read-only by default. Only the publish job asks for more.
 permissions:
   contents: read
-  # The packages live under this repository's owner, so the built-in token publishes them.
-  packages: write
-  # Lets the npmjs.org step exchange this run's OIDC identity for a short-lived publish token.
-  id-token: write
 
 concurrency:
   group: publish-packages
@@ -31,12 +31,15 @@ env:
   DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
 
 jobs:
-  publish:
-    name: Gate, build, test, publish
+  build:
+    name: Gate, build, test, pack
     runs-on: ubuntu-latest
     # The GitHub environment `packages` limits this job to the main branch and packages-v* tags
     # (a repository setting, not part of this file). A manual dry run from another branch is rejected.
+    # This job has no id-token permission, so being in the environment does not let it publish.
     environment: packages
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -48,8 +51,9 @@ jobs:
       - name: Refuse a commit that is not on main
         if: env.DRY_RUN == 'false'
         run: |
-          # Checkout used fetch-depth 0 and persist-credentials false, so origin/main is already
-          # here, and asking the private origin again would fail to authenticate.
+          # Checkout used fetch-depth 0, so origin/main is already here. No git fetch: checkout
+          # dropped its credentials (persist-credentials false) so later steps cannot use them,
+          # and a fetch could move origin/main after the commit under test was chosen.
           git rev-parse --verify --quiet refs/remotes/origin/main > /dev/null || { echo "::error::origin/main was not fetched by checkout."; exit 1; }
           if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
             echo "::error::$GITHUB_REF_NAME ($GITHUB_SHA) is not on main. Publish only from a commit that has been merged to main."
@@ -90,7 +94,9 @@ jobs:
       # The gate rebuilds tokens and, through turbo's ^build edge on check, the brand assets.
       - name: Gate (scripts/precheck.sh via scripts/integration.sh)
         env:
-          GH_TOKEN: ${{ github.token }}   # precheck.sh downloads the portal docs it serves
+          # Read-only in this job (contents: read). precheck.sh passes it to
+          # scripts/fetch-portal-docs.sh, which uses `gh release` to download the portal docs.
+          GH_TOKEN: ${{ github.token }}
         run: ./scripts/integration.sh
 
       # Only icons and react are built here; their dist/ is untracked.
@@ -102,7 +108,7 @@ jobs:
       - name: Tarball test (scripts/test/consumer-smoke.sh)
         run: ./scripts/test/consumer-smoke.sh
 
-      # The bytes published must be the bytes in git: fail if untracked or modified files were left.
+      # The tarballs must be built from the files in git: fail if untracked or modified files were left.
       - name: Check the tree is unchanged
         run: |
           if ! test -z "$(git status --porcelain)"; then
@@ -135,36 +141,139 @@ jobs:
           fi
           echo "Tag $tag matches at least one package version ($version)."
 
+      # Pack once, here, so the publish job needs no checkout, no install and no build.
+      #   github/  what `pnpm publish` would upload: publishConfig.registry is GitHub Packages.
+      #   npmjs/   the same files, except that package.json has publishConfig.registry rewritten
+      #            to npmjs.org (npm reads publishConfig from the tarball it uploads).
+      # pnpm packs because it turns workspace:* into real versions.
+      - name: Pack the GitHub Packages and npmjs.org tarball sets
+        run: |
+          out="$RUNNER_TEMP/publish-tarballs"
+          NPMJS_URL=https://registry.npmjs.org
+          rm -rf "$out"
+          mkdir -p "$out/github" "$out/npmjs"
+          for dir in tokens icons brand react; do
+            (cd "packages/$dir" && pnpm pack --pack-destination "$out/github" > /dev/null)
+          done
+          (
+            # The rewrite is for the npmjs.org set only. The files are restored when this subshell exits.
+            trap 'git checkout -- packages/tokens/package.json packages/icons/package.json packages/brand/package.json packages/react/package.json' EXIT
+            for dir in tokens icons brand react; do
+              node -e "const f='packages/$dir/package.json',p=require('./'+f);p.publishConfig={registry:'$NPMJS_URL'};require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
+              (cd "packages/$dir" && pnpm pack --pack-destination "$out/npmjs" > /dev/null)
+            done
+          )
+          if ! test -z "$(git status --porcelain)"; then
+            echo "::error::Packing left the working tree changed."
+            git status --short
+            exit 1
+          fi
+          # The manifest tells the publish job each package's version and tarball, so it needs no source.
+          node -e "
+            const fs = require('fs'), out = process.argv[1], manifest = {};
+            for (const dir of ['tokens', 'icons', 'brand', 'react']) {
+              const pkg = require('./packages/' + dir + '/package.json');
+              const file = pkg.name.replace('@', '').replace('/', '-') + '-' + pkg.version + '.tgz';
+              for (const set of ['github', 'npmjs']) {
+                if (!fs.existsSync(out + '/' + set + '/' + file)) throw new Error('missing tarball ' + set + '/' + file);
+              }
+              manifest[dir] = { name: pkg.name, version: pkg.version, github: 'github/' + file, npmjs: 'npmjs/' + file };
+            }
+            fs.writeFileSync(out + '/manifest.json', JSON.stringify(manifest, null, 2) + '\n');
+          " "$out"
+          cat "$out/manifest.json"
+          # Each tarball must name the registry of its own set.
+          for dir in tokens icons brand react; do
+            for set in github npmjs; do
+              want="$REGISTRY_URL"
+              if [ "$set" = "npmjs" ]; then want="$NPMJS_URL"; fi
+              tgz="$out/$(node -p "require('$out/manifest.json').$dir.$set")"
+              got="$(tar -xzOf "$tgz" package/package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).publishConfig.registry")"
+              if [ "$got" != "$want" ]; then
+                echo "::error::$tgz has publishConfig.registry $got, expected $want"
+                exit 1
+              fi
+            done
+          done
+
+      # A dry run stops in this job, which has no publish permission and no real token.
       - name: Dry run (nothing is published)
         if: env.DRY_RUN == 'true'
         env:
           NODE_AUTH_TOKEN: dry-run-no-auth
         run: |
-          mkdir -p "$RUNNER_TEMP/packs"
+          packs="$RUNNER_TEMP/publish-tarballs"
+          NPMJS_URL=https://registry.npmjs.org
           echo "## Dry run: nothing was published" >> "$GITHUB_STEP_SUMMARY"
           for dir in tokens icons brand react; do
             name="@montionugera/joy-$dir"
-            version="$(node -p "require('./packages/$dir/package.json').version")"
+            version="$(node -p "require('$packs/manifest.json').$dir.version")"
             echo "::group::$name@$version"
-            (cd "packages/$dir" && pnpm publish --dry-run --no-git-checks)
-            mkdir -p "$RUNNER_TEMP/packs/$dir"
-            (cd "packages/$dir" && pnpm pack --pack-destination "$RUNNER_TEMP/packs/$dir" > /dev/null)
+            # The same two command lines as the publish job, with --dry-run added.
+            tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.github")"
+            npm publish "$tgz" --registry "$REGISTRY_URL" "--@montionugera:registry=$REGISTRY_URL" --dry-run
+            tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.npmjs")"
+            npm publish "$tgz" --access public --registry "$NPMJS_URL" "--@montionugera:registry=$NPMJS_URL" --dry-run
             echo "Tarball file list for $name@$version:"
-            tar -tzf "$RUNNER_TEMP/packs/$dir"/*.tgz | sort
+            tar -tzf "$tgz" | sort
             echo "::endgroup::"
-            echo "- \`$name@$version\`: $(tar -tzf "$RUNNER_TEMP/packs/$dir"/*.tgz | wc -l | tr -d ' ') files" >> "$GITHUB_STEP_SUMMARY"
+            echo "- \`$name@$version\`: $(tar -tzf "$tgz" | wc -l | tr -d ' ') files" >> "$GITHUB_STEP_SUMMARY"
           done
 
-      - name: Publish the versions not yet on the registry
+      - name: Upload the tarballs for the publish job
+        uses: actions/upload-artifact@v6
+        with:
+          name: publish-tarballs
+          path: ${{ runner.temp }}/publish-tarballs
+          if-no-files-found: error
+
+  publish:
+    name: Publish the packed tarballs
+    needs: build
+    # Real runs only: a tag push, or a manual run with the dry run switched off.
+    if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
+    runs-on: ubuntu-latest
+    # npmjs.org trusts exactly this workflow file and this environment; do not rename either.
+    environment: packages
+    permissions:
+      contents: read
+      # The packages live under this repository's owner, so the built-in token publishes them.
+      packages: write
+      # Lets the npmjs.org step exchange this run's OIDC identity for a short-lived publish token.
+      id-token: write
+    # No checkout, no pnpm install, no build and no repository script in this job: it runs only
+    # the Node and npm that setup-node provides, against the tarballs the build job packed.
+    steps:
+      - name: Download the tarballs packed by the build job
+        uses: actions/download-artifact@v7
+        with:
+          name: publish-tarballs
+          path: ${{ runner.temp }}/publish-tarballs
+
+      - name: Setup Node 22 for GitHub Packages
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@montionugera'
+
+      - name: Publish to GitHub Packages the versions not yet there
+        id: github
         if: env.DRY_RUN == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "## Publish" >> "$GITHUB_STEP_SUMMARY"
+          packs="$RUNNER_TEMP/publish-tarballs"
+          SCOPE_PIN="--@montionugera:registry=$REGISTRY_URL"
+          echo "## GitHub Packages" >> "$GITHUB_STEP_SUMMARY"
           published=0
           for dir in tokens icons brand react; do
             name="@montionugera/joy-$dir"
-            version="$(node -p "require('./packages/$dir/package.json').version")"
+            if [ "$(node -p "require('$packs/manifest.json').$dir.name")" != "$name" ]; then
+              echo "::error::The manifest does not name $name for $dir."
+              exit 1
+            fi
+            version="$(node -p "require('$packs/manifest.json').$dir.version")"
             err="$RUNNER_TEMP/npm-view-$dir.err"
             set +e
             found="$(npm view "$name@$version" version --registry "$REGISTRY_URL" 2> "$err")"
@@ -181,23 +290,22 @@ jobs:
               exit 1
             fi
             echo "Publishing $name@$version"
-            (cd "packages/$dir" && pnpm publish --no-git-checks)
+            tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.github")"
+            npm publish "$tgz" --registry "$REGISTRY_URL" "$SCOPE_PIN"
             published=$((published + 1))
             echo "- \`$name@$version\`: published" >> "$GITHUB_STEP_SUMMARY"
           done
-          if [ "$published" -eq 0 ]; then
-            echo "::error::nothing to publish"
-            exit 1
-          fi
+          echo "published=$published" >> "$GITHUB_OUTPUT"
 
       - name: Verify each version is on the registry
         if: env.DRY_RUN == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          packs="$RUNNER_TEMP/publish-tarballs"
           for dir in tokens icons brand react; do
             name="@montionugera/joy-$dir"
-            version="$(node -p "require('./packages/$dir/package.json').version")"
+            version="$(node -p "require('$packs/manifest.json').$dir.version")"
             found=""
             for attempt in 1 2 3 4 5; do
               echo "Asking the registry for $name@$version (attempt $attempt of 5)"
@@ -213,46 +321,41 @@ jobs:
           done
 
       # Also publish the public copies to npmjs.org with trusted publishing (OIDC): npmjs trusts this
-      # workflow directly, so no token is stored. Each package needs a trusted publisher on npmjs.com
+      # workflow directly, so no token is stored. Each package has a trusted publisher on npmjs.com
       # (repo montionugera/joy-design, workflow publish.yml, environment packages); see the README.
-      # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1, hence the second setup-node.
+      # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1. node-version '22' means the newest
+      # 22.x, and the publish step checks the Node version and installs that npm before it uploads.
       - name: Use Node 22 for npmjs.org trusted publishing
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
+      # No NODE_AUTH_TOKEN and no stored secret here: npm gets its token from the OIDC exchange.
+      # A failure fails the job and is reported as an error. By this point GitHub Packages is
+      # published and verified, and a re-run skips what is already there and retries npmjs.org.
       - name: Publish to npmjs.org (trusted publishing)
-        # Optional public mirror, as in node-server-decorator: the GitHub Packages publish above is
-        # the release of record, so a failure here (for example a package whose trusted publisher
-        # is not set up yet) is reported as a warning and does not fail the run.
-        continue-on-error: true
+        id: npmjs
+        if: env.DRY_RUN == 'false'
         run: |
+          node -e "const [a, b] = process.versions.node.split('.').map(Number); if (a < 22 || (a === 22 && b < 14)) { console.error('::error::Trusted publishing needs Node >= 22.14, found ' + process.versions.node); process.exit(1); }"
           npm install -g 'npm@^11.5.1'
           NPMJS_URL=https://registry.npmjs.org
-          packs="$RUNNER_TEMP/npmjs"
-          rm -rf "$packs"
-          mkdir -p "$packs"
-          # publishConfig.registry in a tarball's package.json would send the upload back to GitHub
-          # Packages, so rewrite it for this step only. The files are restored on exit, which keeps
-          # the tree clean. A scope mapping beats publishConfig, so pin the scope to npmjs too.
-          trap 'git checkout -- packages/tokens/package.json packages/icons/package.json packages/brand/package.json packages/react/package.json' EXIT
-          for dir in tokens icons brand react; do
-            node -e "const f='packages/$dir/package.json',p=require('./'+f);p.publishConfig={registry:'$NPMJS_URL'};require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
-          done
+          packs="$RUNNER_TEMP/publish-tarballs"
           echo "## npmjs.org" >> "$GITHUB_STEP_SUMMARY"
           # The first setup-node wrote @montionugera:registry=<GitHub Packages> into the user config,
           # and npm reads a scope registry before --registry and publishConfig. Pin the scope on
           # every npm call and print the result so the log shows where uploads go.
           SCOPE_PIN="--@montionugera:registry=$NPMJS_URL"
-          echo "Scope registry used by this step: $(npm config get @montionugera:registry $SCOPE_PIN)"
+          echo "Scope registry used by this step: $(npm config get @montionugera:registry "$SCOPE_PIN")"
           rc=0
+          published=0
           # Same order as the GitHub Packages publish: brand and react depend on tokens and icons.
           # Stop at the first package that fails, so a later package is never published pinned to a
           # dependency version that is not on npmjs.org.
           for dir in tokens icons brand react; do
             name="@montionugera/joy-$dir"
-            version="$(node -p "require('./packages/$dir/package.json').version")"
+            version="$(node -p "require('$packs/manifest.json').$dir.version")"
             # An unauthenticated read straight from npmjs.org: no npm config or placeholder token can
             # redirect it or turn a missing package into a 401.
             status="$(curl -s -o /dev/null -w '%{http_code}' "$NPMJS_URL/@montionugera%2fjoy-$dir/$version" || true)"
@@ -262,29 +365,36 @@ jobs:
               continue
             fi
             if [ "$status" != "404" ]; then
-              echo "::warning::Could not ask npmjs.org about $name@$version (HTTP $status). Stopping."
+              echo "::error::Could not ask npmjs.org about $name@$version (HTTP $status). Stopping."
               echo "- \`$name@$version\`: npmjs.org lookup failed (HTTP $status), stopped" >> "$GITHUB_STEP_SUMMARY"
               rc=1
               break
             fi
-            # pnpm packs (it turns workspace:* into real versions); npm uploads (OIDC lives in npm).
-            (cd "packages/$dir" && pnpm pack --pack-destination "$packs")
-            tgz="$(ls "$packs"/montionugera-joy-"$dir"-*.tgz)"
-            if [ "$DRY_RUN" = "true" ]; then
-              if npm publish "$tgz" --access public --registry "$NPMJS_URL" $SCOPE_PIN --dry-run; then
-                echo "- \`$name@$version\`: npmjs.org dry run" >> "$GITHUB_STEP_SUMMARY"
-              else
-                echo "::warning::npmjs.org dry run failed for $name@$version. Stopping."
-                rc=1
-                break
-              fi
-            elif npm publish "$tgz" --access public --registry "$NPMJS_URL" $SCOPE_PIN; then
+            tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.npmjs")"
+            if npm publish "$tgz" --access public --registry "$NPMJS_URL" "$SCOPE_PIN"; then
+              published=$((published + 1))
               echo "- \`$name@$version\`: published to npmjs.org" >> "$GITHUB_STEP_SUMMARY"
             else
-              echo "::warning::$name@$version was not published to npmjs.org. Stopping."
+              echo "::error::$name@$version was not published to npmjs.org. Stopping. Re-run this job to retry: versions already published are skipped."
               echo "- \`$name@$version\`: npmjs.org publish FAILED, stopped" >> "$GITHUB_STEP_SUMMARY"
               rc=1
               break
             fi
           done
+          echo "published=$published" >> "$GITHUB_OUTPUT"
           exit "$rc"
+
+      # Runs only when both registries were handled without error. A run that found every version
+      # already on both registries fails on purpose: the tag asked for a release and nothing was new.
+      - name: Fail when nothing was published to either registry
+        if: env.DRY_RUN == 'false'
+        env:
+          GITHUB_PUBLISHED: ${{ steps.github.outputs.published }}
+          NPMJS_PUBLISHED: ${{ steps.npmjs.outputs.published }}
+        run: |
+          total=$(( ${GITHUB_PUBLISHED:-0} + ${NPMJS_PUBLISHED:-0} ))
+          echo "Published in this run: GitHub Packages ${GITHUB_PUBLISHED:-0}, npmjs.org ${NPMJS_PUBLISHED:-0}."
+          if [ "$total" -eq 0 ]; then
+            echo "::error::nothing to publish: every version is already on GitHub Packages and on npmjs.org."
+            exit 1
+          fi
