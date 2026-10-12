@@ -235,6 +235,7 @@ test('the build job checks out without credentials, gates, builds, tests and pac
   assert.strictEqual(count(dryRun.block, /npm publish/g), 2, 'the dry run has no npm publish without --dry-run');
   assert.ok(dryRun.block.includes(`"--@montionugera:registry=$NPMJS_URL" --dry-run`) && dryRun.block.includes(`NPMJS_URL=${NPMJS}`), 'the npmjs.org dry run must pin the scope to npmjs.org');
   assert.strictEqual(count(jobs.build, /npm publish/g), 2, 'the build job never publishes: its only npm publish calls are the dry run');
+  assert.ok(dryRun.block.includes("curl -s -o /dev/null -w '%{http_code}'") && dryRun.block.includes('if [ "$status" = "200" ]; then'), 'the dry run must skip a version already on npmjs.org: npm refuses to dry-run it');
 
   // Pack: both sets from pnpm pack, publishConfig rewritten for the npmjs.org set only, tree restored.
   assert.ok(pack.block.includes('pnpm pack --pack-destination "$out/github"') && pack.block.includes('pnpm pack --pack-destination "$out/npmjs"'), 'both tarball sets must come from pnpm pack (it resolves workspace:*)');

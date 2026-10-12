@@ -213,7 +213,14 @@ jobs:
             tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.github")"
             npm publish "$tgz" --registry "$REGISTRY_URL" "--@montionugera:registry=$REGISTRY_URL" --dry-run
             tgz="$packs/$(node -p "require('$packs/manifest.json').$dir.npmjs")"
-            npm publish "$tgz" --access public --registry "$NPMJS_URL" "--@montionugera:registry=$NPMJS_URL" --dry-run
+            # npm refuses even a dry run of a version that is already on the registry, and a real
+            # run would skip it, so skip it here too. GitHub Packages cannot be asked without a token.
+            status="$(curl -s -o /dev/null -w '%{http_code}' "$NPMJS_URL/@montionugera%2fjoy-$dir/$version" || true)"
+            if [ "$status" = "200" ]; then
+              echo "$name@$version is already on npmjs.org: a real run would skip it."
+            else
+              npm publish "$tgz" --access public --registry "$NPMJS_URL" "--@montionugera:registry=$NPMJS_URL" --dry-run
+            fi
             echo "Tarball file list for $name@$version:"
             tar -tzf "$tgz" | sort
             echo "::endgroup::"
