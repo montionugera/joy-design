@@ -569,7 +569,7 @@
     "id": "I-093",
     "title": "Slice 2: SwiftUI Component Primitives and Linter Parity",
     "created_at": "2026-10-16T09:07:20.466185+00:00",
-    "promoted_to": null,
+    "promoted_to": "F-085",
     "epic": "E-003"
   }
 ]
