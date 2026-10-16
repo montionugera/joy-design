@@ -1,4 +1,5 @@
 import XCTest
+import SwiftUI
 @testable import JoyDesign
 
 final class JoyTokensTests: XCTestCase {
@@ -24,5 +25,35 @@ final class JoyTokensTests: XCTestCase {
     func testSemanticModes() {
         XCTAssertFalse(JoyThemeTokens.light.isDark)
         XCTAssertTrue(JoyThemeTokens.dark.isDark)
+    }
+
+    func testBadgeTonesAndComponentsInitialize() {
+        let tones: [JoyDesign.BadgeTone] = [.gold, .bronze, .success, .danger, .warn, .info, .neutral]
+        for tone in tones {
+            XCTAssertNotNil(tone.foreground)
+            XCTAssertNotNil(tone.background)
+            XCTAssertNotNil(tone.border)
+        }
+
+        let badge = JoyBadge("READY", tone: .success)
+        XCTAssertEqual(badge.text, "READY")
+
+        let kpi = JoyKpiTile(label: "FPS", value: "60", subtitle: "60 Hz", accentTone: .gold)
+        XCTAssertEqual(kpi.label, "FPS")
+        XCTAssertEqual(kpi.value, "60")
+
+        let card = JoyCard(title: "Telemetry", badge: "LIVE", badgeTone: .gold, strongBorder: true) {
+            JoyWell {
+                Text("Content")
+            }
+        }
+        XCTAssertEqual(card.title, "Telemetry")
+        XCTAssertEqual(card.badgeText, "LIVE")
+        XCTAssertTrue(card.strongBorder)
+
+        let primaryStyle = JoyPrimaryButtonStyle()
+        let ghostStyle = JoyGhostButtonStyle(isActive: true)
+        XCTAssertNotNil(primaryStyle)
+        XCTAssertTrue(ghostStyle.isActive)
     }
 }
