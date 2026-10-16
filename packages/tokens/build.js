@@ -7822,3 +7822,9 @@ const dartGenScript = path.join(__dirname, 'scripts/gen-dart-tokens.mjs');
 if (fs.existsSync(dartGenScript)) {
   execSync(`node "${dartGenScript}"`, { stdio: 'inherit' });
 }
+
+// Generate Swift tokens if generator exists
+const swiftGenScript = path.join(__dirname, 'scripts/gen-swift-tokens.mjs');
+if (fs.existsSync(swiftGenScript)) {
+  execSync(`node "${swiftGenScript}"`, { stdio: 'inherit' });
+}
