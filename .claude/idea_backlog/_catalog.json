@@ -557,5 +557,19 @@
     "title": "Keep infrastructure-only deploys independent of the docs lookup and tighten the resolve job",
     "created_at": "2026-10-11T17:40:24.332159+00:00",
     "promoted_to": "F-083"
+  },
+  {
+    "id": "I-092",
+    "title": "Slice 1: Swift Token Compiler and SwiftPM Package Foundation",
+    "created_at": "2026-10-16T09:07:20.465168+00:00",
+    "promoted_to": null,
+    "epic": "E-003"
+  },
+  {
+    "id": "I-093",
+    "title": "Slice 2: SwiftUI Component Primitives and Linter Parity",
+    "created_at": "2026-10-16T09:07:20.466185+00:00",
+    "promoted_to": null,
+    "epic": "E-003"
   }
 ]
