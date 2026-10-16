@@ -34,5 +34,5 @@ Native macOS and iOS SwiftUI applications (`atlas-world-svc/tools/mac-observator
 
 ## Acceptance criteria
 
-- `node packages/tokens/build.js` generates `packages/swift/Sources/JoyDesign/JoyTokens.g.swift` and `node packages/tokens/scripts/gen-swift-tokens.mjs --check` exits 0.
-- `pnpm --filter @montionugera/joy-tokens test` and `(cd packages/swift && swift test)` pass.
+- [ ] `node packages/tokens/build.js` generates `packages/swift/Sources/JoyDesign/JoyTokens.g.swift` and `node packages/tokens/scripts/gen-swift-tokens.mjs --check` exits 0.
+- [ ] `pnpm --filter @montionugera/joy-tokens test` and `(cd packages/swift && swift test)` pass.

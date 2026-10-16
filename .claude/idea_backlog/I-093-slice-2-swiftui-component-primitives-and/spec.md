@@ -24,5 +24,5 @@ With `JoyTokens.g.swift` generated in `packages/swift`, macOS/iOS consumers need
 
 ## Acceptance criteria
 
-- `packages/swift/Sources/JoyDesign/JoyComponents.swift` implements `JoyBadge`, `JoyCard`, `JoyWell`, `JoyKpiTile`, `JoyPrimaryButtonStyle`, and `JoyGhostButtonStyle` with zero hardcoded color literals.
-- `bash scripts/lint-colors.sh packages/swift/Sources`, `bash scripts/test-lint-colors.sh`, and `(cd packages/swift && swift test)` pass.
+- [ ] `packages/swift/Sources/JoyDesign/JoyComponents.swift` implements `JoyBadge`, `JoyCard`, `JoyWell`, `JoyKpiTile`, `JoyPrimaryButtonStyle`, and `JoyGhostButtonStyle` with zero hardcoded color literals.
+- [ ] `bash scripts/lint-colors.sh packages/swift/Sources`, `bash scripts/test-lint-colors.sh`, and `(cd packages/swift && swift test)` pass.
