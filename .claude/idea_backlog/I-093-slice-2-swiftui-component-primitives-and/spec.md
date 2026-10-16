@@ -21,3 +21,8 @@ With `JoyTokens.g.swift` generated in `packages/swift`, macOS/iOS consumers need
 3. **Tests & Gate Verification**:
    - Extend `packages/swift/Tests/JoyDesignTests/JoyTokensTests.swift` to test `JoyBadge`, `JoyCard`, `JoyWell`, `JoyKpiTile`, `JoyPrimaryButtonStyle`, and `JoyGhostButtonStyle`.
    - Add Swift check step to `scripts/precheck.sh` (runs `swift test` in `packages/swift` when `swift` is in `PATH` and `bash scripts/lint-colors.sh packages/swift/Sources`).
+
+## Acceptance criteria
+
+- `packages/swift/Sources/JoyDesign/JoyComponents.swift` implements `JoyBadge`, `JoyCard`, `JoyWell`, `JoyKpiTile`, `JoyPrimaryButtonStyle`, and `JoyGhostButtonStyle` with zero hardcoded color literals.
+- `bash scripts/lint-colors.sh packages/swift/Sources`, `bash scripts/test-lint-colors.sh`, and `(cd packages/swift && swift test)` pass.

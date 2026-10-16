@@ -31,3 +31,8 @@ Native macOS and iOS SwiftUI applications (`atlas-world-svc/tools/mac-observator
 4. **Tests**:
    - `packages/tokens/test/swift-tokens.test.js`: verifies `JoyTokens.g.swift` exists, `--check` passes, and key token ramps (`navy800`, `gold500`, `JoyThemeTokens.light`, `JoyThemeTokens.dark`, `JoyDesign.Palette`) are present.
    - `packages/swift/Tests/JoyDesignTests/JoyTokensTests.swift`: XCTest suite verifying spacing, radii, and token ramp invariants.
+
+## Acceptance criteria
+
+- `node packages/tokens/build.js` generates `packages/swift/Sources/JoyDesign/JoyTokens.g.swift` and `node packages/tokens/scripts/gen-swift-tokens.mjs --check` exits 0.
+- `pnpm --filter @montionugera/joy-tokens test` and `(cd packages/swift && swift test)` pass.
