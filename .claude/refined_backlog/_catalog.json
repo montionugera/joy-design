@@ -1070,9 +1070,10 @@
     "title": "Slice 2: SwiftUI Component Primitives and Linter Parity",
     "from_idea": "I-093",
     "created_at": "2026-10-16T09:38:49.324161+00:00",
-    "claimed_by": null,
-    "status": "open",
+    "claimed_by": "ab007fef-1d38-4fa6-99ed-7b47e6c491b5",
+    "status": "claimed",
     "release_version": null,
-    "epic": "E-003"
+    "epic": "E-003",
+    "claimed_at": "2026-10-16T09:38:51.421583+00:00"
   }
 ]
