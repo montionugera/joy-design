@@ -18,7 +18,7 @@ pattern = re.compile(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0
 violations = []
 for root, dirs, files in os.walk('.'):
     # test-results/, playwright-report/, .turbo/, graft/ are gitignored build/cache output, not codebase files.
-    if any(x in root for x in ['node_modules', '.git', 'dist', 'portal-bundles', '.claude', '.turbo', 'test-results', 'playwright-report', '.adal', '.gemini', '.cursor', '.kiro', '.windsurf', '.dart_tool', 'build', '.flutter-plugins', 'graft']): continue
+    if any(x in root for x in ['node_modules', '.git', 'dist', 'portal-bundles', '.claude', '.turbo', 'test-results', 'playwright-report', '.adal', '.gemini', '.cursor', '.kiro', '.windsurf', '.dart_tool', 'build', '.flutter-plugins', 'graft', '.build', '.swiftpm']): continue
     for f in files:
         if f in ['pnpm-lock.yaml', 'AGENTS.md'] or (f.endswith('.html') and 'docs' in root): continue
         p = os.path.join(root, f)
