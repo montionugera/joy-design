@@ -74,6 +74,13 @@ else
   fi
 fi
 
+echo "2h. Checking Swift package tests (packages/swift)..."
+if command -v swift >/dev/null 2>&1; then
+  (cd packages/swift && swift test)
+else
+  echo "   [warn] Swift toolchain not found in PATH; skipping Swift package tests."
+fi
+
 echo "3a. Fetching the portal docs (the hub serves them and Playwright checks /cli-state-handler/ and /server-decorator/)..."
 # fetch_docs <owner/repo> <bundle-name> <tag-or-blank>: downloads only when the bundle folder is empty.
 # The tag (CLI_DOCS_TAG / DECORATOR_DOCS_TAG, optional) pins the release so the gate checks the version the image ships.

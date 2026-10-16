@@ -114,7 +114,7 @@ wave6_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir"' EXIT
 mkdir -p "$wave6_dir/packages/svelte/src" "$wave6_dir/packages/react/src" "$wave6_dir/packages/icons/src" \
   "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens" "$wave6_dir/packages/brand/src" \
-  "$wave6_dir/packages/flutter/lib"
+  "$wave6_dir/packages/flutter/lib" "$wave6_dir/packages/swift/Sources/JoyDesign"
 cp "$clean_file" "$wave6_dir/packages/svelte/src/Clean.svelte"
 cp "$clean_file" "$wave6_dir/packages/react/src/Clean.tsx"
 cp "$clean_file" "$wave6_dir/packages/icons/src/Clean.svelte"
@@ -123,6 +123,7 @@ printf '%s\n' 'const componentStyles = `' '.x { color: var(--joy-text-primary); 
 cp "$clean_file" "$wave6_dir/packages/brand/src/Clean.js"
 cp "$clean_file" "$wave6_dir/packages/brand/build.js"
 printf '%s\n' 'class CleanWidget {}' > "$wave6_dir/packages/flutter/lib/clean.dart"
+printf '%s\n' 'struct CleanView {}' > "$wave6_dir/packages/swift/Sources/JoyDesign/Clean.swift"
 (cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1 || {
   echo "expected default mode to pass on a clean copy of every default target" >&2
   exit 1
@@ -186,6 +187,47 @@ cp "$dart_generated_file" "$dart_fixture_dir/packages/flutter/lib/src/tokens.g.d
 cp "$dart_literal_file" "$dart_fixture_dir/packages/flutter/lib/bad.dart"
 if (cd "$dart_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/flutter/lib) >/dev/null 2>&1; then
   echo "expected packages/flutter/lib scan to reject a Dart file with Color(0x...)" >&2
+  exit 1
+fi
+
+# Swift Color Linter tests
+swift_fixture_dir=$(mktemp -d)
+trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir" "$dart_fixture_dir" "$swift_fixture_dir"' EXIT
+
+swift_clean_file="$swift_fixture_dir/clean.swift"
+swift_literal_file="$swift_fixture_dir/bad_color.swift"
+swift_nscolor_file="$swift_fixture_dir/bad_nscolor.swift"
+swift_generated_file="$swift_fixture_dir/JoyTokens.g.swift"
+
+printf '%s\n' 'struct MyView { let color = JoyDesign.Colors.primary }' > "$swift_clean_file"
+printf '%s\n' 'struct MyView { let color = Color(hex: 0x112233) }' > "$swift_literal_file"
+printf '%s\n' 'struct MyView { let color = NSColor(red: 1, green: 0, blue: 0, alpha: 1) }' > "$swift_nscolor_file"
+printf '%s\n' 'public enum JoyDesign { public static let gold500 = Color(joyHex: 0xFFD700) }' > "$swift_generated_file"
+
+"$repo_root/scripts/lint-colors.sh" --strict "$swift_clean_file" >/dev/null
+"$repo_root/scripts/lint-colors.sh" --strict "$swift_generated_file" >/dev/null
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$swift_literal_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Swift Color(hex: 0x...) literal" >&2
+  exit 1
+fi
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$swift_nscolor_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Swift NSColor(...) literal" >&2
+  exit 1
+fi
+
+mkdir -p "$swift_fixture_dir/packages/swift/Sources/JoyDesign"
+cp "$swift_clean_file" "$swift_fixture_dir/packages/swift/Sources/JoyDesign/JoyComponents.swift"
+cp "$swift_generated_file" "$swift_fixture_dir/packages/swift/Sources/JoyDesign/JoyTokens.g.swift"
+(cd "$swift_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/swift/Sources) >/dev/null 2>&1 || {
+  echo "expected packages/swift/Sources scan to pass on clean swift files and generated .g.swift files" >&2
+  exit 1
+}
+
+cp "$swift_literal_file" "$swift_fixture_dir/packages/swift/Sources/JoyDesign/Bad.swift"
+if (cd "$swift_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/swift/Sources) >/dev/null 2>&1; then
+  echo "expected packages/swift/Sources scan to reject a Swift file with Color(hex: 0x...)" >&2
   exit 1
 fi
 
