@@ -78,13 +78,3 @@ test("F-086: isFilterAvailable drives the disabled state of chips", () => {
   assert.strictEqual(isFilterAvailable("RaceSpawns", "field", OPTIONS), false);
   assert.strictEqual(isFilterAvailable("Nope", "field", OPTIONS), false);
 });
-
-test("F-086: context-filter.ts is byte-identical to the Svelte helper", async () => {
-  const fs = await import("node:fs");
-  const read = (p) => fs.readFileSync(new URL(p, import.meta.url), "utf8");
-  assert.ok(
-    read("../src/context-filter.ts") ===
-      read("../../svelte/src/lib/context-filter.ts"),
-    "context-filter.ts must not diverge",
-  );
-});

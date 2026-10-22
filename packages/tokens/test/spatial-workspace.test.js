@@ -246,3 +246,77 @@ test("F-086: the omni bar keeps a usable width when hosted in the lens bar trail
     /\.joy-lens-bar__trailing \.joy-omni-command-bar \{[^}]*flex:\s*0 0 320px/,
   );
 });
+
+// Rules of the form `sel { ... }` inside a CSS chunk, as [selectorList[], body].
+function rules(chunk) {
+  return [...chunk.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => [
+    m[1].split(",").map((x) => x.trim()),
+    m[2],
+  ]);
+}
+
+test("F-086 (review): each interactive selector itself carries the 44px coarse target", () => {
+  const s = section();
+  const coarse = [...s.matchAll(/@media \(pointer: coarse\) \{([\s\S]*?)\n\}/g)]
+    .map((m) => m[1])
+    .join("\n");
+  for (const sel of INTERACTIVE) {
+    assert.ok(
+      rules(coarse).some(
+        ([sels, body]) => sels.includes(sel) && /min-height:\s*44px/.test(body),
+      ),
+      `${sel} must be listed in a coarse rule that sets min-height: 44px`,
+    );
+  }
+});
+
+test("F-086 (review): every transitioned or animated selector is named exactly in a reduced-motion rule", () => {
+  const s = section();
+  const reduced = [
+    ...s.matchAll(
+      /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/g,
+    ),
+  ]
+    .map((m) => m[1])
+    .join("\n");
+  const calmed = new Set(rules(reduced).flatMap(([sels]) => sels));
+  const outside = s.replace(
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\n\}/g,
+    "",
+  );
+  for (const [sels, body] of rules(outside)) {
+    if (!/\b(transition|animation):/.test(body)) continue;
+    for (const sel of sels)
+      assert.ok(
+        calmed.has(sel),
+        `${sel} animates without an exact reduced-motion rule`,
+      );
+  }
+});
+
+test("F-086 (review): hover never overrides a pressed or selected state", () => {
+  const s = section();
+  assert.ok(
+    s.includes(
+      '.joy-context-filter-bar__chip:hover:not(:disabled):not([aria-pressed="true"])',
+    ),
+  );
+  assert.ok(
+    s.includes(
+      '.joy-spatial-shell__toggle:hover:not(:disabled):not([aria-pressed="true"])',
+    ),
+  );
+  assert.ok(
+    s.includes(
+      '.joy-lens-bar__tab:hover:not(:disabled):not([aria-selected="true"])',
+    ),
+  );
+});
+
+test("F-086 (review): an active omni tray lifts the chrome above the mobile left sheet", () => {
+  const s = section();
+  assert.match(
+    s,
+    /\.joy-spatial-shell__chrome:focus-within,\s*\.joy-spatial-shell__chrome:has\(\.joy-omni-command-bar\[data-open="true"\]\) \{\s*z-index: var\(--joy-z-popover\);/,
+  );
+});

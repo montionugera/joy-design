@@ -7558,6 +7558,10 @@ a.joy-logo-cloud__item:focus-visible {
   background: var(--joy-surface-card);
   border-bottom: 1px solid var(--joy-border-subtle);
 }
+.joy-spatial-shell__chrome:focus-within,
+.joy-spatial-shell__chrome:has(.joy-omni-command-bar[data-open="true"]) {
+  z-index: var(--joy-z-popover);
+}
 .joy-spatial-shell__body {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -7667,7 +7671,7 @@ a.joy-logo-cloud__item:focus-visible {
   touch-action: manipulation;
   transition: background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
 }
-.joy-spatial-shell__toggle:hover:not(:disabled) {
+.joy-spatial-shell__toggle:hover:not(:disabled):not([aria-pressed="true"]) {
   border-color: var(--joy-border-default);
   color: var(--joy-text-primary);
 }
@@ -7754,7 +7758,7 @@ a.joy-logo-cloud__item:focus-visible {
   touch-action: manipulation;
   transition: background-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out), box-shadow var(--joy-duration-fast) var(--joy-ease-out);
 }
-.joy-lens-bar__tab:hover:not(:disabled) {
+.joy-lens-bar__tab:hover:not(:disabled):not([aria-selected="true"]) {
   background: var(--joy-surface-sunken);
   color: var(--joy-text-primary);
 }
@@ -7852,7 +7856,7 @@ a.joy-logo-cloud__item:focus-visible {
   touch-action: manipulation;
   transition: background-color var(--joy-duration-fast) var(--joy-ease-out), border-color var(--joy-duration-fast) var(--joy-ease-out), color var(--joy-duration-fast) var(--joy-ease-out);
 }
-.joy-context-filter-bar__chip:hover:not(:disabled) {
+.joy-context-filter-bar__chip:hover:not(:disabled):not([aria-pressed="true"]) {
   border-color: var(--joy-border-strong);
   color: var(--joy-text-primary);
 }
