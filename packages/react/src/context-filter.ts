@@ -15,13 +15,13 @@ export interface FilterResolution {
   effective: string;
   healed: boolean;
   /** `incompatible`: known filter, not valid here. `unknown`: id not in the options (e.g. a stale deep link). */
-  reason?: 'incompatible' | 'unknown';
+  reason?: "incompatible" | "unknown";
 }
 
 export function isFilterAvailable<C extends string>(
   id: string,
   context: C,
-  options: readonly ContextFilterOption<C>[]
+  options: readonly ContextFilterOption<C>[],
 ): boolean {
   const option = options.find((o) => o.id === id);
   return option !== undefined && option.contexts.includes(context);
@@ -31,14 +31,20 @@ export function resolveFilter<C extends string>(
   requested: string,
   context: C,
   options: readonly ContextFilterOption<C>[],
-  fallback = 'All'
+  fallback = "All",
 ): FilterResolution {
   if (isFilterAvailable(requested, context, options)) {
     return { effective: requested, healed: false };
   }
   if (!isFilterAvailable(fallback, context, options)) {
-    throw new Error(`resolveFilter: fallback "${fallback}" is not available in context "${context}"`);
+    throw new Error(
+      `resolveFilter: fallback "${fallback}" is not available in context "${context}"`,
+    );
   }
   const known = options.some((o) => o.id === requested);
-  return { effective: fallback, healed: true, reason: known ? 'incompatible' : 'unknown' };
+  return {
+    effective: fallback,
+    healed: true,
+    reason: known ? "incompatible" : "unknown",
+  };
 }
