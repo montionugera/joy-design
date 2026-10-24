@@ -8,16 +8,28 @@ status: idea
 
 ## Problem
 
-(what hurts; concrete examples)
+`psrw promote` runs `scripts/epic-check.sh` in a fresh detached worktree. The portal
+bundles (`apps/storybook-hub/portal-bundles/{cli-state-handler,server-decorator}`) are
+gitignored, so the hub is built without them and the Playwright test
+"Sub-webapp routes serve static documentation" gets 404 on `/server-decorator/`.
+Release 3.12 promote failed on E-003 (G-E3) for this reason. `precheck.sh` already has
+a `fetch_docs` helper that avoids this; `epic-check.sh` does not.
 
 ## Why now
 
-(opportunity; deadline; constraint)
+Release 3.12 (F-084..F-087) cannot be promoted until the check passes.
 
 ## Sketch
 
-(rough shape; not a design yet)
+Reuse the `fetch_docs` logic from `scripts/precheck.sh` (skip when `version.json`
+exists; use `GH_TOKEN` or `gh auth token`; fail loudly if neither) in
+`scripts/epic-check.sh`, called for both bundles before "Storybook Hub build".
+Honour `CLI_DOCS_TAG` / `DECORATOR_DOCS_TAG`. No new fetch logic.
 
 ## Acceptance criteria
 
-- [ ] (one observable, testable outcome per item; refine refuses a spec without any)
+- [ ] `scripts/epic-check.sh` fetches both portal bundles before the hub build when missing.
+- [ ] With bundles already present it makes no network call.
+- [ ] With no token and no `gh` login it exits non-zero with a message naming `gh auth login`.
+- [ ] `scripts/test-epic-check.sh` covers the three cases above and passes.
+- [ ] `psrw promote` passes the E-003 check for release 3.12.
