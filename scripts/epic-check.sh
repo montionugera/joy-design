@@ -37,7 +37,7 @@ run_playwright_contracts() {
 # The portal bundles are gitignored, so a fresh detached worktree has none and the hub
 # serves 404 for /server-decorator/ and /cli-state-handler/. Mirrors precheck.sh fetch_docs.
 fetch_docs() {
-  [[ -s "${PORTAL_BUNDLES_DIR:-apps/storybook-hub/portal-bundles}/$2/version.json" ]] && return 0
+  [[ -s "${EPIC_CHECK_BUNDLES_DIR:-apps/storybook-hub/portal-bundles}/$2/version.json" ]] && return 0
   if [[ -z "${GH_TOKEN:-}" ]]; then
     if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1; then
       echo "ERROR: GH_TOKEN is not set and the GitHub CLI is not logged in, so the $2 docs cannot be downloaded." >&2
@@ -45,7 +45,7 @@ fetch_docs() {
       return 1
     fi
   fi
-  GH_TOKEN="${GH_TOKEN:-$(gh auth token)}" bash "${PORTAL_DOCS_FETCH_SCRIPT:-scripts/fetch-portal-docs.sh}" "$1" "$2" "$3"
+  GH_TOKEN="${GH_TOKEN:-$(gh auth token)}" bash "${EPIC_CHECK_FETCH_SCRIPT:-scripts/fetch-portal-docs.sh}" "$1" "$2" "$3"
 }
 
 echo "==> Epic design-system check <=="
