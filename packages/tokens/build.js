@@ -692,6 +692,12 @@ select.joy-select:disabled,
   line-height: 1.5;
   opacity: 0.9;
 }
+.joy-alert__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--joy-space-2);
+  margin-top: var(--joy-space-2);
+}
 .joy-alert__close {
   position: relative;
   flex: none;

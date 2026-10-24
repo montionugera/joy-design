@@ -5,6 +5,8 @@
     checked?: boolean;
     disabled?: boolean;
     label?: string;
+    /** When true, toggling only calls `onchange(!checked)`; the parent owns `checked`. */
+    controlled?: boolean;
     size?: 'sm' | 'md';
     id?: string;
     name?: string;
@@ -18,6 +20,7 @@
     checked = $bindable(false),
     disabled = false,
     label,
+    controlled = false,
     size = 'md',
     id,
     name,
@@ -33,6 +36,10 @@
 
   function toggle() {
     if (effectiveDisabled) return;
+    if (controlled) {
+      onchange?.(!checked);
+      return;
+    }
     checked = !checked;
     onchange?.(checked);
   }

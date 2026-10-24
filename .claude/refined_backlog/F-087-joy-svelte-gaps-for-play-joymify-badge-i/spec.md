@@ -14,7 +14,7 @@ from_idea: I-095
 Publishing `joy-svelte` (separate, permanent step). Migrating `play-joymify`. Flutter/Swift twins. New components (ConfirmDialog, ToastHost, LinkButton, ChipGroup, QrCode are a later idea).
 
 ## Rule for every change
-Additive and opt-in: with the new prop unset, rendered output is byte-identical to today. Svelte and React twins change together (parity invariant) with matching tests.
+Additive and opt-in: with the new prop unset, the rendered DOM is identical to today. (Raw Svelte SSR strings gain one hydration-marker comment per new `{#if}`; Badge `icon` shifts the generated hub badge text by one collapsed space, so the hub landing blocks were regenerated.) Svelte and React twins change together (parity invariant) with matching tests.
 
 ## Acceptance criteria (EARS requirements, each with Given/When/Then)
 - [ ] 1. **Badge `icon?: Snippet`** (React: `icon?: ReactNode`). When `icon` is given, the badge shall render it in `<span aria-hidden="true">` before the children. Given `icon`, the HTML contains that span before the text; without `icon` output is unchanged.
@@ -42,3 +42,7 @@ Rebuild locally in play-joymify (status quo: what this idea removes). Wrapper co
 - ASSUMED: Svelte `icon` is a snippet, React is a node — reversible: Y.
 - ASSUMED: no Flutter/Swift parity in this idea — reversible: Y.
 - ASSUMED: version bump and publish happen later, by the user — reversible: N (publishing is permanent).
+
+## Known gaps (recorded at review)
+- `returnFocusTo` is verified by source pin only on both twins: the suites are server-render, so focus behavior is not run. Real proof comes from play-joymify's jsdom Modal/ConfirmDialog tests during migration.
+- React `Switch.controlled` is a deliberate parity no-op (React Switch is always parent-owned).

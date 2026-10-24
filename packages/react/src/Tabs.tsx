@@ -13,10 +13,12 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   items: TabItem[];
   activeKey?: string;
   onChange?: (key: string) => void;
+  /** aria-label of the tablist. */
+  label?: string;
 }
 
 export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-  ({ items, activeKey: controlledKey, onChange, className = '', ...rest }, ref) => {
+  ({ items, activeKey: controlledKey, onChange, label, className = '', ...rest }, ref) => {
     const uid = React.useId();
     const [internalKey, setInternalKey] = React.useState(items[0]?.key || '');
     const activeKey = controlledKey !== undefined ? controlledKey : internalKey;
@@ -45,7 +47,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 
     return (
       <div ref={ref} className={cx('joy-tabs-container', className)} {...rest}>
-        <div className="joy-tabs" role="tablist" aria-orientation="horizontal">
+        <div className="joy-tabs" role="tablist" aria-orientation="horizontal" aria-label={label}>
           {items.map((item, index) => {
             const isActive = activeKey === item.key;
             return (

@@ -4,6 +4,8 @@
     width?: string | number;
     height?: string | number;
     lines?: number;
+    /** Purely visual: aria-hidden, and no role or aria-busy. */
+    decorative?: boolean;
     class?: string;
     style?: string;
     /** Bound to the single root element (the element itself, or the lines wrapper when `lines > 1`). */
@@ -16,6 +18,7 @@
     width,
     height,
     lines = 1,
+    decorative = false,
     class: className = '',
     style: consumerStyle = '',
     ref = $bindable(null),
@@ -31,8 +34,9 @@
     bind:this={ref}
     class={className}
     style={consumerStyle}
-    role="progressbar"
-    aria-busy="true"
+    role={decorative ? undefined : 'progressbar'}
+    aria-busy={decorative ? undefined : 'true'}
+    aria-hidden={decorative ? 'true' : undefined}
     {...rest}
   >
     {#each Array.from({ length: lines }, (_, i) => i) as idx}
@@ -47,8 +51,9 @@
     bind:this={ref}
     class="joy-skeleton joy-skeleton--{variant} {className}"
     style="{decl('width', formatDim(width))} {decl('height', formatDim(height))} {consumerStyle}"
-    role="progressbar"
-    aria-busy="true"
+    role={decorative ? undefined : 'progressbar'}
+    aria-busy={decorative ? undefined : 'true'}
+    aria-hidden={decorative ? 'true' : undefined}
     {...rest}
   ></div>
 {/if}

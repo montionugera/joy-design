@@ -10,12 +10,16 @@ export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   onClose?: () => void;
   children?: React.ReactNode;
   footer?: React.ReactNode;
+  role?: 'dialog' | 'alertdialog';
+  closeLabel?: string;
+  /** On close, focus goes here if connected, else to the opener. */
+  returnFocusTo?: HTMLElement | null | React.RefObject<HTMLElement | null>;
   className?: string;
 }
 
 /** `ref` and `...rest` land on the dialog element (`.joy-modal`), like the Svelte twin. */
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
-  ({ open = false, title, onClose, children, footer, className = '', ...rest }, ref) => {
+  ({ open = false, title, onClose, children, footer, role = 'dialog', closeLabel = 'Close dialog', returnFocusTo, className = '', ...rest }, ref) => {
     // Unique per instance, so several modals (or a modal plus a drawer) never share a label id.
     const titleId = `${React.useId()}-title`;
     const dialogRef = React.useRef<HTMLDivElement | null>(null);
@@ -28,6 +32,21 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         onClose?.();
       }
     });
+
+    // Declared after useDialog so its cleanup runs after the opener restore and wins when connected.
+    const returnRef = React.useRef(returnFocusTo);
+    returnRef.current = returnFocusTo;
+    React.useEffect(() => {
+      if (!open) return;
+      return () => {
+        const r = returnRef.current;
+        const el = r && 'current' in r ? r.current : (r as HTMLElement | null | undefined);
+        if (el && el.isConnected) el.focus();
+      };
+    }, [open]);
+
+    // Default role="dialog"; only the exact value 'alertdialog' is honoured (consumer rest cannot clobber it).
+    const dialogRole = role === 'alertdialog' ? 'alertdialog' : 'dialog';
 
     if (!open) return null;
 
@@ -43,7 +62,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
           {...rest}
           ref={setDialogRef}
           className={cx('joy-modal', className)}
-          role="dialog"
+          role={dialogRole}
           aria-modal="true"
           aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}
           aria-label={rest['aria-label'] ?? (title ? undefined : 'Dialog')}
@@ -58,7 +77,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
               type="button"
               className="joy-modal__close"
               onClick={() => onClose?.()}
-              aria-label="Close dialog"
+              aria-label={closeLabel}
             >
               <Close size="1.25rem" />
             </button>
