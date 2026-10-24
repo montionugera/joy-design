@@ -1089,5 +1089,14 @@
     "claimed_at": "2026-10-22T01:16:11.631615+00:00",
     "shipped_at": "2026-10-22T12:04:53.565853+00:00",
     "shipped_sha": "ab8757407a575aef4f7a796cd636c32cce06ae94"
+  },
+  {
+    "id": "F-087",
+    "title": "joy-svelte gaps for play-joymify: Badge icon, Switch controlled, Skeleton decorative, Button loadingLabel, Alert actions, Modal role+returnFocusTo, Tabs label",
+    "from_idea": "I-095",
+    "created_at": "2026-10-24T07:51:56.150250+00:00",
+    "claimed_by": null,
+    "status": "open",
+    "release_version": null
   }
 ]
