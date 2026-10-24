@@ -27,6 +27,18 @@ EOF
 chmod +x "$fixture_dir/bin/pnpm" "$fixture_dir/bin/node" "$fixture_dir/bin/playwright"
 
 export EPIC_CHECK_LOG="$fixture_dir/checks.log"
+# Portal bundles: present by default so the earlier cases never touch the network.
+export EPIC_CHECK_BUNDLES_DIR="$fixture_dir/bundles"
+mkdir -p "$EPIC_CHECK_BUNDLES_DIR/cli-state-handler" "$EPIC_CHECK_BUNDLES_DIR/server-decorator"
+echo '{}' > "$EPIC_CHECK_BUNDLES_DIR/cli-state-handler/version.json"
+echo '{}' > "$EPIC_CHECK_BUNDLES_DIR/server-decorator/version.json"
+export EPIC_CHECK_FETCH_SCRIPT="$fixture_dir/fake-fetch.sh"
+cat > "$EPIC_CHECK_FETCH_SCRIPT" <<'EOF'
+#!/usr/bin/env bash
+printf 'fetch %s\n' "$*" >> "$FETCH_LOG"
+mkdir -p "$EPIC_CHECK_BUNDLES_DIR/$2" && echo '{}' > "$EPIC_CHECK_BUNDLES_DIR/$2/version.json"
+EOF
+export FETCH_LOG="$fixture_dir/fetch.log"; : > "$FETCH_LOG"
 # An installed node_modules fixture, so these runs never depend on the caller's checkout.
 installed="$fixture_dir/installed/node_modules"
 mkdir -p "$installed"
@@ -64,5 +76,23 @@ if EPIC_CHECK_FAIL_INSTALL=1 EPIC_CHECK_NODE_MODULES="$missing_deps" PATH="$fixt
 fi
 grep -q 'FAIL epic-check: dependency install' "$fixture_dir/install.log" || fail "missing dependency-install failure message"
 [[ $(cat "$EPIC_CHECK_LOG") == 'pnpm install --frozen-lockfile --prefer-offline' ]] || fail "epic-check ran steps after a failed install"
+
+# Bundles present: no fetch. Bundles missing + token: both fetched. Missing, no token, no gh login: fail.
+[[ ! -s "$FETCH_LOG" ]] || fail "fetched bundles that were already present"
+rm -rf "${EPIC_CHECK_BUNDLES_DIR:?}"/*
+: > "$EPIC_CHECK_LOG"
+GH_TOKEN=t EPIC_CHECK_NODE_MODULES="$installed" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >/dev/null
+[[ $(cat "$FETCH_LOG") == $'fetch montionugera/cli-state-handler cli-state-handler \nfetch montionugera/node-server-decorator server-decorator ' ]] || fail "missing bundles not fetched: $(tr '\n' '|' < "$FETCH_LOG")"
+
+rm -rf "${EPIC_CHECK_BUNDLES_DIR:?}"/*
+cat > "$fixture_dir/bin/gh" <<'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+chmod +x "$fixture_dir/bin/gh"
+if env -u GH_TOKEN EPIC_CHECK_NODE_MODULES="$installed" PATH="$fixture_dir/bin:$PATH" "$repo_root/scripts/epic-check.sh" >"$fixture_dir/token.log" 2>&1; then
+  fail "expected missing token and gh login to fail epic-check"
+fi
+grep -q 'gh auth login' "$fixture_dir/token.log" || fail "missing gh auth login hint"
 
 echo "PASS scripts/test-epic-check.sh"
