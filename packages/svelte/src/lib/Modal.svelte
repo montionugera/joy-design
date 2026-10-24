@@ -8,6 +8,10 @@
     open?: boolean;
     title?: string;
     onclose?: () => void;
+    role?: 'dialog' | 'alertdialog';
+    closeLabel?: string;
+    /** Focus target on close; used when connected, else the tracked opener. */
+    returnFocusTo?: HTMLElement | null;
     children?: Snippet;
     footer?: Snippet;
     class?: string;
@@ -20,6 +24,9 @@
     open = false,
     title = '',
     onclose,
+    role = 'dialog',
+    closeLabel = 'Close dialog',
+    returnFocusTo = null,
     children,
     footer,
     class: className = '',
@@ -59,7 +66,8 @@
       handle.unregister();
       if (dialog === handle) dialog = null;
       unlock();
-      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+      if (returnFocusTo?.isConnected) returnFocusTo.focus();
+      else if (previouslyFocused?.isConnected) previouslyFocused.focus();
     };
   });
 </script>
@@ -76,7 +84,7 @@
       {...rest}
       bind:this={ref}
       class="joy-modal {className}"
-      role="dialog"
+      role={role === 'alertdialog' ? 'alertdialog' : 'dialog'}
       aria-modal="true"
       aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}
       aria-label={rest['aria-label'] ?? (title ? undefined : 'Dialog')}
@@ -89,7 +97,7 @@
           type="button"
           class="joy-modal__close"
           onclick={() => onclose?.()}
-          aria-label="Close dialog"
+          aria-label={closeLabel}
         >
           <Close size="1.25rem" />
         </button>

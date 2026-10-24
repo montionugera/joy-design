@@ -10,6 +10,8 @@
     variant?: 'neutral' | 'success' | 'warning' | 'danger' | 'brand';
     size?: 'sm' | 'md';
     dot?: boolean;
+    /** Decorative icon, rendered in an aria-hidden span before the children. */
+    icon?: Snippet;
     children?: Snippet;
     class?: string;
     ref?: HTMLSpanElement | null;
@@ -19,6 +21,7 @@
     variant = 'neutral',
     size = 'md',
     dot = false,
+    icon,
     children,
     class: className = '',
     ref = $bindable(null),
@@ -29,6 +32,9 @@
 <span bind:this={ref} class="joy-badge joy-badge--{variant} joy-badge--{size} {className}" {...rest}>
   {#if dot}
     <span class="joy-badge__dot" aria-hidden="true"></span>
+  {/if}
+  {#if icon}
+    <span aria-hidden="true">{@render icon()}</span>
   {/if}
   {#if children}
     {@render children()}

@@ -12,6 +12,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   type?: 'button' | 'submit' | 'reset';
   iconStart?: React.ReactNode;
   iconEnd?: React.ReactNode;
+  /** Shown instead of children while `loading`. */
+  loadingLabel?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   children?: React.ReactNode;
   className?: string;
@@ -29,6 +31,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       type = 'button',
       iconStart,
       iconEnd,
+      loadingLabel,
       onClick,
       children,
       className = '',
@@ -55,7 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...rest}
       >
         {iconStart && <span className="joy-button__icon">{iconStart}</span>}
-        <span className="joy-button__label">{children}</span>
+        <span className="joy-button__label">{loading && loadingLabel ? loadingLabel : children}</span>
         {iconEnd && <span className="joy-button__icon">{iconEnd}</span>}
         {loading && (
           <span className="joy-button__spinner" aria-hidden="true">

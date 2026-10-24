@@ -11,6 +11,8 @@ export interface SwitchProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   id?: string;
   name?: string;
   onChange?: (checked: boolean) => void;
+  /** When true the parent owns state: a toggle only calls onChange(!checked). */
+  controlled?: boolean;
 }
 
 export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
@@ -23,6 +25,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
       id,
       name,
       onChange,
+      controlled = false,
       className = '',
       ...rest
     },

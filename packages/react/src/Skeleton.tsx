@@ -7,17 +7,24 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   width?: string | number;
   height?: string | number;
   lines?: number;
+  /** Purely visual: aria-hidden, no role/aria-busy. */
+  decorative?: boolean;
   className?: string;
 }
 
 export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ variant = 'text', width, height, lines = 1, className = '', style, ...rest }, ref) => {
+  ({ variant = 'text', width, height, lines = 1, decorative = false, className = '', style, ...rest }, ref) => {
     const formatDim = (d?: string | number) => (typeof d === 'number' ? `${d}px` : d);
+
+    // Default is role="progressbar" + aria-busy; decorative swaps both for aria-hidden.
+    const a11y = decorative
+      ? ({ 'aria-hidden': true } as const)
+      : ({ role: 'progressbar', 'aria-busy': true } as const);
 
     // lines > 1: one wrapper (ref, className, style, rest, one progressbar) around N plain lines.
     if (variant === 'text' && lines > 1) {
       return (
-        <div ref={ref} className={className} style={style} role="progressbar" aria-busy="true" {...rest}>
+        <div ref={ref} className={className} style={style} {...a11y} {...rest}>
           {Array.from({ length: lines }).map((_, idx) => (
             <div
               key={idx}
@@ -38,8 +45,7 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
         ref={ref}
         className={cx('joy-skeleton', `joy-skeleton--${variant}`, className)}
         style={{ width: formatDim(width), height: formatDim(height), ...style }}
-        role="progressbar"
-        aria-busy="true"
+        {...a11y}
         {...rest}
       />
     );

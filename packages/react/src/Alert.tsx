@@ -15,6 +15,10 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
    */
   closable?: boolean;
   onClose?: () => void;
+  /** Rendered in `.joy-alert__actions` after the body content. */
+  actions?: React.ReactNode;
+  /** aria-label of the close button. */
+  dismissLabel?: string;
   children?: React.ReactNode;
   className?: string;
 }
@@ -34,6 +38,8 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       variant = 'info',
       closable = false,
       onClose,
+      actions,
+      dismissLabel = 'Dismiss alert',
       children,
       className = '',
       ...rest
@@ -66,9 +72,10 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           {title && <div className="joy-alert__title">{title}</div>}
           {description && <div className="joy-alert__desc">{description}</div>}
           {children}
+          {actions != null && actions !== false && <div className="joy-alert__actions">{actions}</div>}
         </div>
         {closable && (
-          <button type="button" className="joy-alert__close" aria-label="Dismiss alert" onClick={dismiss}>
+          <button type="button" className="joy-alert__close" aria-label={dismissLabel} onClick={dismiss}>
             <Close size="1em" />
           </button>
         )}

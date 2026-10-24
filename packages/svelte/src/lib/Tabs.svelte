@@ -12,6 +12,8 @@
     items: TabItem[];
     activeKey?: string;
     onchange?: (key: string) => void;
+    /** Accessible name for the tablist. */
+    label?: string;
     class?: string;
     ref?: HTMLElement | null;
     [key: string]: any;
@@ -21,6 +23,7 @@
     items,
     activeKey = $bindable(items[0]?.key || ''),
     onchange,
+    label,
     class: className = '',
     ref = $bindable(null),
     ...rest
@@ -50,7 +53,7 @@
 </script>
 
 <div bind:this={ref} class="joy-tabs-container {className}" {...rest}>
-  <div class="joy-tabs" role="tablist" aria-orientation="horizontal">
+  <div class="joy-tabs" role="tablist" aria-orientation="horizontal" aria-label={label}>
     {#each items as item, index (item.key)}
       <button
         type="button"

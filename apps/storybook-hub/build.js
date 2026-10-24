@@ -7026,7 +7026,7 @@ ${navigationHtml}
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-3">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -7041,7 +7041,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -7056,7 +7056,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
+                      <span class="joy-badge joy-badge--warning joy-badge--sm">  Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -7078,7 +7078,7 @@ ${navigationHtml}
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-4">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -7093,7 +7093,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -7108,7 +7108,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
+                      <span class="joy-badge joy-badge--warning joy-badge--sm">  Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -7123,7 +7123,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm">  Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -7145,7 +7145,7 @@ ${navigationHtml}
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-5">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -7160,7 +7160,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -7175,7 +7175,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
+                      <span class="joy-badge joy-badge--warning joy-badge--sm">  Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -7190,7 +7190,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm">  Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -7205,7 +7205,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Security</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Security</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("LockClose", "22")}
@@ -7227,7 +7227,7 @@ ${navigationHtml}
                 <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead" id="blocks-feature-lead-6">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -7242,7 +7242,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -7257,7 +7257,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
+                      <span class="joy-badge joy-badge--warning joy-badge--sm">  Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -7272,7 +7272,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm">  Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -7287,7 +7287,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Security</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Security</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("LockClose", "22")}
@@ -7302,7 +7302,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> Charts</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  Charts</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("CandlestickChart", "22")}
@@ -7324,7 +7324,7 @@ ${navigationHtml}
                 <div class="joy-feature-grid joy-feature-grid--cols-3" id="blocks-feature-uniform">
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Speed</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Speed</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Cpu", "22")}
@@ -7339,7 +7339,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG 2.2 AA</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  WCAG 2.2 AA</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Shield", "22")}
@@ -7354,7 +7354,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--warning joy-badge--sm"> Twin packages</span>
+                      <span class="joy-badge joy-badge--warning joy-badge--sm">  Twin packages</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Layers", "22")}
@@ -7369,7 +7369,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--neutral joy-badge--sm"> Data</span>
+                      <span class="joy-badge joy-badge--neutral joy-badge--sm">  Data</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("Database", "22")}
@@ -7384,7 +7384,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--brand joy-badge--sm"> Security</span>
+                      <span class="joy-badge joy-badge--brand joy-badge--sm">  Security</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("LockClose", "22")}
@@ -7399,7 +7399,7 @@ ${navigationHtml}
                   </div>
                   <div class="joy-feature-card">
                     <div class="joy-feature-card__badge">
-                      <span class="joy-badge joy-badge--success joy-badge--sm"> Charts</span>
+                      <span class="joy-badge joy-badge--success joy-badge--sm">  Charts</span>
                     </div>
                     <div class="joy-feature-card__icon">
                       ${simIcon("CandlestickChart", "22")}
@@ -7443,7 +7443,7 @@ ${navigationHtml}
                 </div>
                 <div class="joy-bento-card__content">
                   <div class="landing-demo__chips">
-                    <span class="joy-badge joy-badge--success joy-badge--sm"> 0.42 ms</span><span class="joy-badge joy-badge--brand joy-badge--sm"> DPDK</span>
+                    <span class="joy-badge joy-badge--success joy-badge--sm">  0.42 ms</span><span class="joy-badge joy-badge--brand joy-badge--sm">  DPDK</span>
                   </div>
                 </div>
               </div>
@@ -7461,7 +7461,7 @@ ${navigationHtml}
                 </div>
                 <div class="joy-bento-card__content">
                   <div class="landing-demo__chips">
-                    <span class="joy-badge joy-badge--brand joy-badge--sm"> 14 chains</span><span class="joy-badge joy-badge--neutral joy-badge--sm"> No slippage</span>
+                    <span class="joy-badge joy-badge--brand joy-badge--sm">  14 chains</span><span class="joy-badge joy-badge--neutral joy-badge--sm">  No slippage</span>
                   </div>
                 </div>
               </div>
@@ -7479,7 +7479,7 @@ ${navigationHtml}
                 </div>
                 <div class="joy-bento-card__content">
                   <div class="landing-demo__chips">
-                    <span class="joy-badge joy-badge--warning joy-badge--sm"> VAR 99.9%</span><span class="joy-badge joy-badge--brand joy-badge--sm"> 60 FPS</span>
+                    <span class="joy-badge joy-badge--warning joy-badge--sm">  VAR 99.9%</span><span class="joy-badge joy-badge--brand joy-badge--sm">  60 FPS</span>
                   </div>
                 </div>
               </div>
@@ -7497,7 +7497,7 @@ ${navigationHtml}
                 </div>
                 <div class="joy-bento-card__content">
                   <div class="landing-demo__chips">
-                    <span class="joy-badge joy-badge--success joy-badge--sm"> FIPS 140-3</span>
+                    <span class="joy-badge joy-badge--success joy-badge--sm">  FIPS 140-3</span>
                   </div>
                 </div>
               </div>
@@ -7515,7 +7515,7 @@ ${navigationHtml}
                 </div>
                 <div class="joy-bento-card__content">
                   <div class="landing-demo__chips">
-                    <span class="joy-badge joy-badge--brand joy-badge--sm"> Write once</span><span class="joy-badge joy-badge--success joy-badge--sm"> SOC 2 Type II</span><span class="joy-badge joy-badge--neutral joy-badge--sm"> Live attestation</span>
+                    <span class="joy-badge joy-badge--brand joy-badge--sm">  Write once</span><span class="joy-badge joy-badge--success joy-badge--sm">  SOC 2 Type II</span><span class="joy-badge joy-badge--neutral joy-badge--sm">  Live attestation</span>
                   </div>
                 </div>
               </div>
@@ -8560,7 +8560,7 @@ ${navigationHtml}
                   <div class="joy-feature-grid joy-feature-grid--cols-3 joy-feature-grid--lead">
                     <div class="joy-feature-card">
                       <div class="joy-feature-card__badge">
-                        <span class="joy-badge joy-badge--brand joy-badge--sm"> FPGA-Core</span>
+                        <span class="joy-badge joy-badge--brand joy-badge--sm">  FPGA-Core</span>
                       </div>
                       <div class="joy-feature-card__icon">
                         <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
@@ -8575,7 +8575,7 @@ ${navigationHtml}
                     </div>
                     <div class="joy-feature-card">
                       <div class="joy-feature-card__badge">
-                        <span class="joy-badge joy-badge--success joy-badge--sm"> WCAG AA</span>
+                        <span class="joy-badge joy-badge--success joy-badge--sm">  WCAG AA</span>
                       </div>
                       <div class="joy-feature-card__icon">
                         <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
@@ -8590,7 +8590,7 @@ ${navigationHtml}
                     </div>
                     <div class="joy-feature-card">
                       <div class="joy-feature-card__badge">
-                        <span class="joy-badge joy-badge--warning joy-badge--sm"> Adaptive</span>
+                        <span class="joy-badge joy-badge--warning joy-badge--sm">  Adaptive</span>
                       </div>
                       <div class="joy-feature-card__icon">
                         <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>

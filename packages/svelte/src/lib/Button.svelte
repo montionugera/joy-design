@@ -6,6 +6,8 @@
     size?: 'sm' | 'md' | 'lg';
     disabled?: boolean;
     loading?: boolean;
+    /** Replaces the children text while `loading`. */
+    loadingLabel?: string;
     block?: boolean;
     iconOnly?: boolean;
     type?: 'button' | 'submit' | 'reset';
@@ -22,6 +24,7 @@
     size = 'md',
     disabled = false,
     loading = false,
+    loadingLabel,
     block = false,
     iconOnly = false,
     type = 'button',
@@ -47,7 +50,7 @@
   {#if iconStart}
     <span class="joy-button__icon">{@render iconStart()}</span>
   {/if}
-  <span class="joy-button__label">{@render children?.()}</span>
+  <span class="joy-button__label">{#if loading && loadingLabel}{loadingLabel}{:else}{@render children?.()}{/if}</span>
   {#if iconEnd}
     <span class="joy-button__icon">{@render iconEnd()}</span>
   {/if}
