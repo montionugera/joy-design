@@ -11,7 +11,7 @@ export interface SwitchProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   id?: string;
   name?: string;
   onChange?: (checked: boolean) => void;
-  /** When true the parent owns state: a toggle only calls onChange(!checked). */
+  /** Svelte-twin parity. React Switch is always parent-owned: a toggle only calls onChange(!checked), flag or not. Accepted so it never reaches the DOM. */
   controlled?: boolean;
 }
 

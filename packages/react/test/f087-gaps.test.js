@@ -72,3 +72,13 @@ test('F-087: Tabs label sets aria-label on tablist only when given', () => {
   assert.match(r(Tabs, { items, label: 'Sections' }), /role="tablist"[^>]*aria-label="Sections"/);
   assert.ok(!/aria-label=/.test(r(Tabs, { items })));
 });
+
+test('F-087 Modal: returnFocusTo effect is declared after useDialog so it wins when connected (DOM-only; pinned by source)', async () => {
+  const fs = await import('node:fs');
+  const src = fs.readFileSync(new URL('../src/Modal.tsx', import.meta.url), 'utf8');
+  const dialog = src.indexOf('useDialog(');
+  const effect = src.indexOf('returnRef.current');
+  assert.ok(dialog > -1 && effect > dialog, 'returnFocusTo effect is declared after useDialog');
+  assert.match(src, /'current' in r/, 'accepts an element or a ref');
+  assert.match(src, /el && el\.isConnected/, 'only focuses a connected element');
+});
