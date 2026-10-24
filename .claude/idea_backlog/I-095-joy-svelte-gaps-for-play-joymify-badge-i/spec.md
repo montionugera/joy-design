@@ -16,13 +16,13 @@ Publishing `joy-svelte` (separate, permanent step). Migrating `play-joymify`. Fl
 Additive and opt-in: with the new prop unset, rendered output is byte-identical to today. Svelte and React twins change together (parity invariant) with matching tests.
 
 ## Acceptance criteria (EARS requirements, each with Given/When/Then)
-1. **Badge `icon?: Snippet`** (React: `icon?: ReactNode`). When `icon` is given, the badge shall render it in `<span aria-hidden="true">` before the children. Given `icon`, the HTML contains that span before the text; without `icon` output is unchanged.
-2. **Switch `controlled?: boolean`** (default false). When `controlled` is true, a toggle shall call `onchange(!checked)` and shall NOT change its own `checked`; `aria-checked` follows the prop only. Given controlled, checked=false, click: `onchange(true)` fires and `aria-checked` stays `false` until the parent passes `true`.
-3. **Skeleton `decorative?: boolean`** (default false). When true, the root shall have `aria-hidden="true"` and no `role` or `aria-busy`. (With `lines > 1`, the wrapper is hidden, not each row.)
-4. **Button `loadingLabel?: string`**. When `loading` and `loadingLabel` are both set, the label span shall show `loadingLabel` instead of the children. Unset: unchanged.
-5. **Alert `actions?: Snippet`** (React `actions?: ReactNode`) rendered in `<div class="joy-alert__actions">` after the body content; **`dismissLabel?: string`** (default `"Dismiss alert"`) used as the close button `aria-label`.
-6. **Modal `role?: 'dialog' | 'alertdialog'`** (default `dialog`); **`closeLabel?: string`** (default `"Close dialog"`); **`returnFocusTo?: HTMLElement | null`** (React: `RefObject`/element) — on close, focus goes there if connected, else to the tracked opener as today.
-7. **Tabs `label?: string`**. When set, the tablist shall have `aria-label={label}`.
+- [ ] 1. **Badge `icon?: Snippet`** (React: `icon?: ReactNode`). When `icon` is given, the badge shall render it in `<span aria-hidden="true">` before the children. Given `icon`, the HTML contains that span before the text; without `icon` output is unchanged.
+- [ ] 2. **Switch `controlled?: boolean`** (default false). When `controlled` is true, a toggle shall call `onchange(!checked)` and shall NOT change its own `checked`; `aria-checked` follows the prop only. Given controlled, checked=false, click: `onchange(true)` fires and `aria-checked` stays `false` until the parent passes `true`.
+- [ ] 3. **Skeleton `decorative?: boolean`** (default false). When true, the root shall have `aria-hidden="true"` and no `role` or `aria-busy`. (With `lines > 1`, the wrapper is hidden, not each row.)
+- [ ] 4. **Button `loadingLabel?: string`**. When `loading` and `loadingLabel` are both set, the label span shall show `loadingLabel` instead of the children. Unset: unchanged.
+- [ ] 5. **Alert `actions?: Snippet`** (React `actions?: ReactNode`) rendered in `<div class="joy-alert__actions">` after the body content; **`dismissLabel?: string`** (default `"Dismiss alert"`) used as the close button `aria-label`.
+- [ ] 6. **Modal `role?: 'dialog' | 'alertdialog'`** (default `dialog`); **`closeLabel?: string`** (default `"Close dialog"`); **`returnFocusTo?: HTMLElement | null`** (React: `RefObject`/element) — on close, focus goes there if connected, else to the tracked opener as today.
+- [ ] 7. **Tabs `label?: string`**. When set, the tablist shall have `aria-label={label}`.
 
 ## Failure twins
 If `returnFocusTo` is disconnected at close, fall back to the opener. If `loadingLabel` is set but `loading` is false, show children. `decorative` never removes the Skeleton's classes.
