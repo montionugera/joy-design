@@ -15,7 +15,7 @@ Publishing `joy-svelte` (separate, permanent step). Migrating `play-joymify`. Fl
 ## Rule for every change
 Additive and opt-in: with the new prop unset, rendered output is byte-identical to today. Svelte and React twins change together (parity invariant) with matching tests.
 
-## Requirements (EARS) and acceptance
+## Acceptance criteria (EARS requirements, each with Given/When/Then)
 1. **Badge `icon?: Snippet`** (React: `icon?: ReactNode`). When `icon` is given, the badge shall render it in `<span aria-hidden="true">` before the children. Given `icon`, the HTML contains that span before the text; without `icon` output is unchanged.
 2. **Switch `controlled?: boolean`** (default false). When `controlled` is true, a toggle shall call `onchange(!checked)` and shall NOT change its own `checked`; `aria-checked` follows the prop only. Given controlled, checked=false, click: `onchange(true)` fires and `aria-checked` stays `false` until the parent passes `true`.
 3. **Skeleton `decorative?: boolean`** (default false). When true, the root shall have `aria-hidden="true"` and no `role` or `aria-busy`. (With `lines > 1`, the wrapper is hidden, not each row.)
