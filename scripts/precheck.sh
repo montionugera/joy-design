@@ -75,7 +75,11 @@ else
 fi
 
 echo "2h. Checking Swift package tests (packages/swift)..."
-if command -v swift >/dev/null 2>&1; then
+# The package imports SwiftUI, which only exists on Apple platforms: a Linux runner's
+# Swift toolchain cannot build it. So the tests run on macOS (local ship gate) only.
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "   [warn] SwiftUI needs macOS (this is $(uname -s)); skipping Swift package tests."
+elif command -v swift >/dev/null 2>&1; then
   (cd packages/swift && swift test)
 else
   echo "   [warn] Swift toolchain not found in PATH; skipping Swift package tests."
