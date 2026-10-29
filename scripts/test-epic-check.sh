@@ -26,6 +26,8 @@ printf 'playwright %s\n' "$*" >> "$EPIC_CHECK_LOG"
 EOF
 chmod +x "$fixture_dir/bin/pnpm" "$fixture_dir/bin/node" "$fixture_dir/bin/playwright"
 
+# CI exports the resolved docs tags; the fetch assertions below expect them unset.
+unset CLI_DOCS_TAG DECORATOR_DOCS_TAG
 export EPIC_CHECK_LOG="$fixture_dir/checks.log"
 # Portal bundles: present by default so the earlier cases never touch the network.
 export EPIC_CHECK_BUNDLES_DIR="$fixture_dir/bundles"
