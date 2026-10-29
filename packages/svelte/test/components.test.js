@@ -22,7 +22,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(alert.includes('role="alert"'), 'Alert must have accessible role');
 
   const modal = fs.readFileSync(path.resolve('./src/lib/Modal.svelte'), 'utf8');
-  assert.ok(modal.includes('role="dialog"'), 'Modal must implement dialog role');
+  assert.ok(modal.includes("role === 'alertdialog' ? 'alertdialog' : 'dialog'"), 'Modal must implement dialog role (only alertdialog may replace it)');
   assert.ok(modal.includes('$props()'), 'Modal must use Svelte 5 runes');
 
   const dropdown = fs.readFileSync(path.resolve('./src/lib/Dropdown.svelte'), 'utf8');
@@ -68,7 +68,7 @@ test('Svelte 5 standard library components implement Runes and enterprise contra
   assert.ok(pagination.includes('$derived'), 'Pagination must use Svelte 5 $derived()');
 
   const skeleton = fs.readFileSync(path.resolve('./src/lib/Skeleton.svelte'), 'utf8');
-  assert.ok(skeleton.includes('role="progressbar"'), 'Skeleton must implement role=progressbar');
+  assert.ok(skeleton.includes("'progressbar'"), 'Skeleton must implement role=progressbar (unless decorative)');
   assert.ok(skeleton.includes('joy-skeleton'), 'Skeleton must have joy-skeleton class');
 
   // Wave 3 / Enterprise Parity Assertions (DatePicker, Breadcrumb, StatCard, Progress, EmptyState)
@@ -592,13 +592,13 @@ test('F-038 B-L3: Alert/EmptyState/Result/Skeleton use build.js-owned styles, to
   assert.ok(/import\s*\{[^}]*CheckCircle[^}]*\}\s*from\s*'@montionugera\/joy-icons'/.test(alert), 'Alert imports status icons from @montionugera/joy-icons');
   assert.ok(alert.includes('class="joy-alert__icon" aria-hidden="true"'), 'Alert icon is decorative (aria-hidden)');
   assert.ok(alert.includes('closable = false') && alert.includes('onclose'), 'Alert has closable (default false) and onclose');
-  assert.ok(alert.includes('aria-label="Dismiss alert"') && alert.includes('joy-alert__close'), 'close button is labelled');
+  assert.ok(alert.includes('aria-label={dismissLabel}') && alert.includes("dismissLabel = 'Dismiss alert'") && alert.includes('joy-alert__close'), 'close button is labelled');
   assert.ok(alert.includes('{#if closable}'), 'close button renders only when closable');
 });
 
 test('F-038 B-L3: Alert close control is an accessible 44px button and the dismiss model is documented', () => {
   const alert = fs.readFileSync(path.resolve('./src/lib/Alert.svelte'), 'utf8');
-  assert.ok(/<button type="button" class="joy-alert__close" aria-label="Dismiss alert" onclick=\{dismiss\}>/.test(alert), 'close is a type=button with aria-label wired to dismiss');
+  assert.ok(/<button type="button" class="joy-alert__close" aria-label=\{dismissLabel\} onclick=\{dismiss\}>/.test(alert), 'close is a type=button with aria-label wired to dismiss');
   const fn = alert.match(/function dismiss\(\)\s*\{([^}]*)\}/);
   assert.ok(fn && fn[1].includes('dismissed = true') && fn[1].includes('onclose?.()'), 'dismiss hides then notifies');
   assert.ok(alert.includes('{#if !dismissed}'), 'markup is gated on dismissed');
@@ -609,7 +609,7 @@ test('F-038 B-L3: Alert close control is an accessible 44px button and the dismi
 
 test('F-038 B-L3 fix: Skeleton renders one progressbar root, merges consumer style and accepts numeric sizes', () => {
   const src = fs.readFileSync(path.resolve('./src/lib/Skeleton.svelte'), 'utf8');
-  assert.strictEqual((src.match(/role="progressbar"/g) || []).length, 2, 'one role per branch (lines wrapper, single element), never per line');
+  assert.strictEqual((src.match(/'progressbar'/g) || []).length, 2, 'one role per branch (lines wrapper, single element), never per line');
   assert.strictEqual((src.match(/\{\.\.\.rest\}/g) || []).length, 2, 'rest spread once per branch, not on lines');
   const lineEl = src.match(/\{#each[\s\S]*?\{\/each\}/)[0];
   assert.ok(!lineEl.includes('rest') && !lineEl.includes('role='), 'line elements carry no rest/role');
@@ -756,7 +756,7 @@ test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and l
     assert.ok(/import \{[^}]*lockBodyScroll[^}]*trapFocus[^}]*\} from '\.\/overlay-utils\.js'/.test(s), `${name} imports the overlay primitive`);
     assert.ok(s.includes('if (!open || !ref) return;') && s.includes('lockBodyScroll()') && s.includes('trapFocus(ref)'), `${name} locks + traps while open`);
     assert.ok(s.includes('const previouslyFocused = opener.current') && s.includes('previouslyFocused.focus()') && s.includes('$effect.pre(() => opener.sync(open))'), `${name} restores focus`);
-    assert.ok(s.includes('role="dialog"') && s.includes('aria-modal="true"'), `${name} is a modal dialog`);
+    assert.ok((s.includes('role="dialog"') || s.includes(": 'dialog'")) && s.includes('aria-modal="true"'), `${name} is a modal dialog`);
     assert.ok(s.includes('const uid = $props.id()') && s.includes("aria-labelledby={rest['aria-labelledby'] ?? (title ? titleId : undefined)}") && s.includes("aria-label={rest['aria-label'] ?? (title ? undefined :"), `${name} label id is per-instance, with an aria-label fallback`);
     assert.ok(s.includes("e.key === 'Escape' && open && !e.defaultPrevented"), `${name} closes on Escape unless a nested popover or dialog already claimed it`);
     assert.ok(s.includes('e.target === e.currentTarget'), `${name} closes on backdrop click`);
@@ -765,7 +765,7 @@ test('F-038 B-L6: Modal and Drawer lock scroll, trap focus, restore focus, and l
     assert.ok(s.includes('bind:this={ref}') && s.includes('{...rest}') && s.includes('ref = $bindable(null)'), `${name} exposes ref + rest on the dialog element`);
     assert.ok(!s.includes('<style>'), `${name} has no scoped style block`);
   }
-  assert.ok(readLib('Modal.svelte').includes('aria-label="Close dialog"'));
+  assert.ok(readLib('Modal.svelte').includes('aria-label={closeLabel}') && readLib('Modal.svelte').includes("closeLabel = 'Close dialog'"));
   assert.ok(readLib('Drawer.svelte').includes('aria-label="Close drawer"'));
   assert.ok(readLib('Drawer.svelte').includes('class:joy-drawer-backdrop--left={placement === \'left\'}'), 'placement is a class, not an inline style');
 });

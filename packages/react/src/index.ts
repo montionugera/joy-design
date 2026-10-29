@@ -92,6 +92,7 @@ export {
   type OverlayOptions,
   type OverlayHandle
 } from './overlay-utils.js';
+export { resolveFilter, isFilterAvailable, type ContextFilterOption, type FilterResolution } from './context-filter.js';
 export { useOverlay } from './useOverlay.js';
 // Wave 13B: Landing Page Component Suite
 export { FeatureCard, type FeatureCardProps } from './FeatureCard.js';

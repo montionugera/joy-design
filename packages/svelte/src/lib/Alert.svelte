@@ -12,6 +12,10 @@
      */
     closable?: boolean;
     onclose?: () => void;
+    /** Accessible name of the dismiss button. */
+    dismissLabel?: string;
+    /** Action buttons/links rendered after the body content. */
+    actions?: Snippet;
     children?: Snippet;
     class?: string;
     ref?: HTMLDivElement | null;
@@ -24,6 +28,8 @@
     variant = 'info',
     closable = false,
     onclose,
+    dismissLabel = 'Dismiss alert',
+    actions,
     children,
     class: className = '',
     ref = $bindable(null),
@@ -61,9 +67,12 @@
       {#if children}
         {@render children()}
       {/if}
+      {#if actions}
+        <div class="joy-alert__actions">{@render actions()}</div>
+      {/if}
     </div>
     {#if closable}
-      <button type="button" class="joy-alert__close" aria-label="Dismiss alert" onclick={dismiss}>
+      <button type="button" class="joy-alert__close" aria-label={dismissLabel} onclick={dismiss}>
         <Close size="1em" />
       </button>
     {/if}

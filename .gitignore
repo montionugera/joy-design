@@ -17,3 +17,9 @@ test-results/
 playwright-report/
 docs/**/*.html
 .thinker.json
+
+# Swift Package Manager build artifacts
+.build/
+**/.build/
+.swiftpm/
+**/.swiftpm/

@@ -94,6 +94,7 @@ export {
   type OverlayOptions,
   type OverlayHandle
 } from './overlay-utils.js';
+export { resolveFilter, isFilterAvailable, type ContextFilterOption, type FilterResolution } from './context-filter.js';
 // Wave 13B: Landing Page Component Suite
 export { default as FeatureCard } from './FeatureCard.svelte';
 export { default as FeatureGrid } from './FeatureGrid.svelte';

@@ -1051,5 +1051,67 @@
     "shipped_at": "2026-10-11T18:00:30.290083+00:00",
     "shipped_sha": "92e9778cc7f50020a85110b21c151538473896a0",
     "promoted_at": "2026-10-11T18:47:53.038326+00:00"
+  },
+  {
+    "id": "F-084",
+    "title": "Slice 1: Swift Token Compiler and SwiftPM Package Foundation",
+    "from_idea": "I-092",
+    "created_at": "2026-10-16T09:08:31.274055+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.12",
+    "epic": "E-003",
+    "claimed_at": "2026-10-16T09:08:51.714844+00:00",
+    "shipped_at": "2026-10-16T09:38:26.537089+00:00",
+    "shipped_sha": "ad99407c41ccd8055c3a309d4e6661f672b43e1b"
+  },
+  {
+    "id": "F-085",
+    "title": "Slice 2: SwiftUI Component Primitives and Linter Parity",
+    "from_idea": "I-093",
+    "created_at": "2026-10-16T09:38:49.324161+00:00",
+    "claimed_by": "ab007fef-1d38-4fa6-99ed-7b47e6c491b5",
+    "status": "shipped",
+    "release_version": "3.12",
+    "epic": "E-003",
+    "claimed_at": "2026-10-16T09:38:51.421583+00:00",
+    "shipped_at": "2026-10-16T09:47:16.961922+00:00",
+    "shipped_sha": "701162aa34bec5ea6b7dabd44dc8230264160497"
+  },
+  {
+    "id": "F-086",
+    "title": "Spatial workspace CSS contracts: spatial shell, lens bar, context filter bar, omni command bar",
+    "from_idea": "I-094",
+    "created_at": "2026-10-22T01:16:06.516522+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.12",
+    "claimed_at": "2026-10-22T01:16:11.631615+00:00",
+    "shipped_at": "2026-10-22T12:04:53.565853+00:00",
+    "shipped_sha": "ab8757407a575aef4f7a796cd636c32cce06ae94"
+  },
+  {
+    "id": "F-087",
+    "title": "joy-svelte gaps for play-joymify: Badge icon, Switch controlled, Skeleton decorative, Button loadingLabel, Alert actions, Modal role+returnFocusTo, Tabs label",
+    "from_idea": "I-095",
+    "created_at": "2026-10-24T07:51:56.150250+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.12",
+    "claimed_at": "2026-10-24T07:52:03.515664+00:00",
+    "shipped_at": "2026-10-24T08:07:46.327852+00:00",
+    "shipped_sha": "cf643ae53ea7275bed99bffff2aba64d0ee8d281"
+  },
+  {
+    "id": "F-088",
+    "title": "epic-check.sh fetches gitignored portal bundles so promote passes in a fresh worktree",
+    "from_idea": "I-096",
+    "created_at": "2026-10-24T23:10:15.007534+00:00",
+    "claimed_by": "claude-a6c35399",
+    "status": "shipped",
+    "release_version": "3.12",
+    "claimed_at": "2026-10-24T23:10:18.538971+00:00",
+    "shipped_at": "2026-10-24T23:22:25.735917+00:00",
+    "shipped_sha": "475426052b547b1f7cd00a5e0c97d88e31687dde"
   }
 ]
