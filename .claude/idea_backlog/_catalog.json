@@ -595,5 +595,11 @@
     "title": "Genre theme engine: opt-in genres.css with 5-axis game palettes (button/card decoration)",
     "created_at": "2026-10-30T04:18:05.438530+00:00",
     "promoted_to": "F-089"
+  },
+  {
+    "id": "I-098",
+    "title": "CI speed: shard Playwright (workers=1 on CI is ~13 of 16 min), cache Flutter, path-filter heavy jobs, skip duplicate post-merge gate",
+    "created_at": "2026-10-30T05:28:27.705025+00:00",
+    "promoted_to": null
   }
 ]
