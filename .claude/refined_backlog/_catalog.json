@@ -1125,10 +1125,11 @@
     "from_idea": "I-097",
     "created_at": "2026-10-30T04:18:32.357717+00:00",
     "claimed_by": "claude-a6c35399",
-    "status": "shipped",
+    "status": "promoted",
     "release_version": "3.13",
     "claimed_at": "2026-10-30T04:18:35.646221+00:00",
     "shipped_at": "2026-10-30T04:43:53.825498+00:00",
-    "shipped_sha": "3663e6c6f5ef8313fa5ef7d3671bb472117c076e"
+    "shipped_sha": "3663e6c6f5ef8313fa5ef7d3671bb472117c076e",
+    "promoted_at": "2026-10-30T05:28:01.982667+00:00"
   }
 ]
