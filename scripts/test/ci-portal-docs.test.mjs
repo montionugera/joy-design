@@ -61,7 +61,7 @@ test('build-push-image never runs on pull requests', () => {
 test('fetch step uses the built-in github.token as GH_TOKEN and no personal secret remains', () => {
   assert.ok(!ci.includes('CLI_DOCS_READ_TOKEN'), 'the personal secret must no longer be referenced');
   const hits = ci.split('\n').filter((l) => l.includes('github.token'));
-  assert.strictEqual(hits.length, 3, 'resolve step, fetch step and the Gate 1 step only in ci.yml');
+  assert.strictEqual(hits.length, 4, 'resolve step, fetch step, the Gate 1 step and the reuse-gate lookup only in ci.yml');
   for (const h of hits) assert.match(h, /^\s*GH_TOKEN: \$\{\{ github\.token \}\}/);
   const job = jobBlock();
   const step = job.slice(job.indexOf('- name: Fetch portal docs'), job.indexOf('- name: Set up Flutter'));
@@ -185,9 +185,9 @@ test('resolve-docs resolves both tags once, honouring the dispatch inputs, and e
 });
 
 test('build and build-push-image depend on resolve-docs and fetch the resolved tags', () => {
-  assert.match(section('build', '\n  # ──'), /needs: \[changes, resolve-docs\]/);
+  assert.match(section('build', '\n  # ──'), /needs: \[changes, resolve-docs, reuse-gate\]/);
   const img = jobBlock();
-  assert.match(img, /needs: \[changes, build, resolve-docs\]/);
+  assert.match(img, /needs: \[changes, build, resolve-docs, reuse-gate\]/);
   assert.match(img, /CLI_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.cli_tag \}\}/);
   assert.match(img, /DECORATOR_DOCS_TAG: \$\{\{ needs\.resolve-docs\.outputs\.decorator_tag \}\}/);
   assert.ok(!img.includes('PORTAL_DOCS_RESOLVE_ONLY'), 'the image job fetches, it never re-resolves latest');
@@ -214,10 +214,13 @@ const jobs = () => ({
   deploy: section('deploy', '\n  # ──'),
 });
 
-test('resolve-docs has exactly the same if: condition as build, so it is skipped whenever build is', () => {
+test('build runs under resolve-docs\'s if: condition plus the reuse-gate skip, so resolve-docs is skipped whenever build is', () => {
   const { resolve, build } = jobs();
-  assert.strictEqual(ifBlock(resolve), ifBlock(build));
-  assert.match(ifBlock(build), /workflow_dispatch.*needs\.changes\.outputs\.app == 'true'.*pull_request/);
+  const base = ifBlock(resolve);
+  assert.match(base, /workflow_dispatch.*needs\.changes\.outputs\.app == 'true'.*pull_request/);
+  // I-098: build adds the cancel/failure guards and `reuse-gate` may skip it; it never runs where resolve-docs would not.
+  assert.ok(ifBlock(build).replace(/\s+/g, ' ').includes(`( ${base} )`), 'build keeps the resolve-docs condition');
+  assert.match(ifBlock(build), /needs\.reuse-gate\.outputs\.reuse != 'true'/);
 });
 
 test('deploy does not depend on resolve-docs, directly or through a job that would skip with it', () => {
@@ -229,8 +232,8 @@ test('deploy does not depend on resolve-docs, directly or through a job that wou
 
 test('only build and build-push-image consume resolve-docs, and the latter also needs build', () => {
   const { image, build } = jobs();
-  assert.match(build, /needs: \[changes, resolve-docs\]/);
-  assert.match(image, /needs: \[changes, build, resolve-docs\]/);
+  assert.match(build, /needs: \[changes, resolve-docs, reuse-gate\]/);
+  assert.match(image, /needs: \[changes, build, resolve-docs, reuse-gate\]/);
   const needsLines = ci.split('\n').filter((l) => /^\s+needs: .*resolve-docs/.test(l));
   assert.strictEqual(needsLines.length, 2, 'no other job waits on the docs lookup');
 });
