@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildGenresCss } from './scripts/genres.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const tokensPath = path.join(__dirname, 'src/tokens.json');
@@ -8272,6 +8273,7 @@ function writeFileAtomic(target, data) {
 }
 
 writeFileAtomic(path.join(outDir, 'theme.css'), themeCss);
+writeFileAtomic(path.join(outDir, 'genres.css'), buildGenresCss());
 
 // 2. tailwind-theme.css with semantic category mapping
 const twEntries = [];
