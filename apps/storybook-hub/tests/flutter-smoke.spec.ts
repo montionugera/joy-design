@@ -24,6 +24,8 @@ function resolveTargetUrl(baseURL?: string): string {
 test.describe.configure({ mode: "serial" });
 
 test.describe("Flutter Web Showcase & JoyHubBridge Smoke", () => {
+  test.skip(process.env.SKIP_FLUTTER === "1", "SKIP_FLUTTER=1: no Flutter-relevant change");
+
   test.beforeAll(async () => {
     test.setTimeout(180_000); // the hook budget must exceed the server wait below, or the default 30 s would cut it short
     // Ensure Flutter web bundle exists

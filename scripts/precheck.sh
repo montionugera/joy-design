@@ -43,6 +43,7 @@ echo "2a. Self-testing the gate scripts (lint-colors, epic-check, fetch-portal-d
 bash scripts/test-lint-colors.sh
 bash scripts/test-epic-check.sh
 bash scripts/test-fetch-portal-docs.sh
+bash scripts/test-gate-reuse.sh
 bash scripts/test-smoke-cli-docs.sh
 bash scripts/test-assemble-portal.sh
 
@@ -62,7 +63,10 @@ echo "2f. Checking DESIGN.md and README generated regions are up to date (script
 node scripts/gen-design-md.mjs --check
 
 echo "2g. Checking Flutter analyze and tests..."
-if command -v flutter >/dev/null 2>&1; then
+# SKIP_FLUTTER=1 (set by CI when no Flutter-relevant path changed) skips this step and flutter-smoke.spec.ts.
+if [ "${SKIP_FLUTTER:-}" = "1" ]; then
+  echo "   [skip] SKIP_FLUTTER=1: no Flutter-relevant change."
+elif command -v flutter >/dev/null 2>&1; then
   (cd packages/flutter && flutter pub get && flutter analyze --fatal-infos && flutter test)
   (cd apps/flutter-hub && flutter pub get && flutter analyze --fatal-infos && flutter build web)
 else
