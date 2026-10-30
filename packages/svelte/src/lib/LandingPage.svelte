@@ -19,7 +19,7 @@
    */
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
     /** A plain `data-palette` attribute; the theme is decided by `data-theme` alone. */
-    palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium';
+    palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium' | 'astral';
     ondeployclick?: () => void;
     ondocsclick?: () => void;
     interactiveSlot?: Snippet;
