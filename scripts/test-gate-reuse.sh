@@ -11,7 +11,7 @@ path="$2"; jq_expr=""
 while [ $# -gt 0 ]; do [ "$1" = "--jq" ] && jq_expr="$2"; shift; done
 # Defaults live in variables: a `}` inside a ${VAR:-default} would end the expansion early.
 pulls_ok='[{"merged_at":"2026-01-01","merge_commit_sha":"main1","head":{"sha":"head1"}}]'
-checks_ok='{"check_runs":[{"name":"🔨 Build & Check","conclusion":"success"}]}'
+checks_ok='{"check_runs":[{"name":"Build & Check","conclusion":"success"}]}'
 case "$path" in
   */commits/main1/pulls) body="${FAKE_PULLS:-$pulls_ok}" ;;
   */commits/main1) body="{\"commit\":{\"tree\":{\"sha\":\"tree-main\"}}}" ;;
@@ -33,8 +33,8 @@ expect false FAKE_HEAD_TREE=tree-other
 expect false 'FAKE_PULLS=[]'
 expect false 'FAKE_PULLS=[{"merged_at":null,"merge_commit_sha":"main1","head":{"sha":"head1"}}]'
 expect false 'FAKE_PULLS=[{"merged_at":"2026-01-01","merge_commit_sha":"other","head":{"sha":"head1"}}]'
-expect false 'FAKE_CHECKS={"check_runs":[{"name":"🔨 Build & Check","conclusion":"failure"}]}'
-expect false 'FAKE_CHECKS={"check_runs":[{"name":"🔨 Build & Check","conclusion":"success"},{"name":"🔨 Build & Check","conclusion":"failure"}]}'
+expect false 'FAKE_CHECKS={"check_runs":[{"name":"Build & Check","conclusion":"failure"}]}'
+expect false 'FAKE_CHECKS={"check_runs":[{"name":"Build & Check","conclusion":"success"},{"name":"Build & Check","conclusion":"failure"}]}'
 expect false 'FAKE_CHECKS={"check_runs":[{"name":"Detect changes","conclusion":"success"}]}'
 expect false 'FAKE_CHECKS={"check_runs":[]}'
 expect false FAKE_API_DOWN=1
