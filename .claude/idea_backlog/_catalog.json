@@ -600,6 +600,6 @@
     "id": "I-098",
     "title": "CI speed: shard Playwright (workers=1 on CI is ~13 of 16 min), cache Flutter, path-filter heavy jobs, skip duplicate post-merge gate",
     "created_at": "2026-10-30T05:28:27.705025+00:00",
-    "promoted_to": null
+    "promoted_to": "F-090"
   }
 ]
