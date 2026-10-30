@@ -17,7 +17,7 @@ import { SiteFooter } from './SiteFooter.js';
  */
 export interface LandingPageProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   /** A plain `data-palette` attribute; the theme is decided by `data-theme` alone. */
-  palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium';
+  palette?: 'joymify' | 'obsidian' | 'quantum' | 'cyberpunk' | 'titanium' | 'astral';
   onDeployClick?: () => void;
   onDocsClick?: () => void;
   interactiveSlot?: React.ReactNode;

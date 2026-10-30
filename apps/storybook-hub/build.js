@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { SVG_ORNAMENTS } from "../../packages/tokens/scripts/genres.mjs";
 import { MARK, WORDMARK, heroLattice, wordmarkLayout, markScale } from "../../packages/brand/src/index.js";
 import { highlightCodeToHtml } from "../../packages/react/src/syntax-highlighter.ts";
 import { renderMermaidToSvg } from "../../packages/react/src/mermaid-renderer.ts";
@@ -16,6 +17,107 @@ const tokensSrcPath = path.join(
 const inlinedThemeCss = fs.existsSync(tokensSrcPath)
   ? fs.readFileSync(tokensSrcPath, "utf8")
   : "";
+const genresSrcPath = path.join(
+  __dirname,
+  "../../packages/tokens/dist/genres.css",
+);
+const inlinedGenresCss = fs.existsSync(genresSrcPath)
+  ? fs.readFileSync(genresSrcPath, "utf8")
+  : "";
+
+// Hub-only genre styling (hub chrome selectors do not belong in the published genres.css).
+const hubGenreCss = `
+[data-palette="obsidian"] :is(.view-panel > h2, .dev-portal-heading),
+[data-palette="astral"] :is(.view-panel > h2, .dev-portal-heading) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 12px;
+}
+[data-palette="obsidian"] :is(.view-panel > h2, .dev-portal-heading)::before,
+[data-palette="obsidian"] :is(.view-panel > h2, .dev-portal-heading)::after,
+[data-palette="astral"] :is(.view-panel > h2, .dev-portal-heading)::before,
+[data-palette="astral"] :is(.view-panel > h2, .dev-portal-heading)::after {
+  content: "";
+  display: inline-block;
+  width: 104px;
+  height: 16px;
+  flex-shrink: 0;
+  background-color: var(--joy-accent-default);
+}
+[data-palette="obsidian"] :is(.view-panel > h2, .dev-portal-heading)::before { -webkit-mask: ${SVG_ORNAMENTS.flankingDiamondLeftGold} no-repeat center / contain; mask: ${SVG_ORNAMENTS.flankingDiamondLeftGold} no-repeat center / contain; }
+[data-palette="obsidian"] :is(.view-panel > h2, .dev-portal-heading)::after { -webkit-mask: ${SVG_ORNAMENTS.flankingDiamondRightGold} no-repeat center / contain; mask: ${SVG_ORNAMENTS.flankingDiamondRightGold} no-repeat center / contain; }
+[data-palette="astral"] :is(.view-panel > h2, .dev-portal-heading)::before { width: 110px; -webkit-mask: ${SVG_ORNAMENTS.beadedDiamondWingLeft} no-repeat center / contain; mask: ${SVG_ORNAMENTS.beadedDiamondWingLeft} no-repeat center / contain; }
+[data-palette="astral"] :is(.view-panel > h2, .dev-portal-heading)::after { width: 110px; -webkit-mask: ${SVG_ORNAMENTS.beadedDiamondWingRight} no-repeat center / contain; mask: ${SVG_ORNAMENTS.beadedDiamondWingRight} no-repeat center / contain; }
+
+[data-palette="cyberpunk"] :is(.view-panel > h2, .dev-portal-heading)::before,
+[data-palette="titanium"] :is(.view-panel > h2, .dev-portal-heading)::before {
+  content: "";
+  display: inline-block;
+  width: 30px;
+  height: 22px;
+  margin-right: 10px;
+  vertical-align: -3px;
+  background-color: var(--joy-accent-default);
+  -webkit-mask: ${SVG_ORNAMENTS.diagonalStripePrefixCyan} no-repeat center / contain;
+  mask: ${SVG_ORNAMENTS.diagonalStripePrefixCyan} no-repeat center / contain;
+}
+
+[data-palette="obsidian"] .nav-item.active {
+  background: linear-gradient(90deg, var(--joy-accent-subtle) 0%, transparent 92%);
+  border-top: 1px solid var(--joy-border-strong);
+  border-bottom: 1px solid var(--joy-border-strong);
+  border-left: 3px solid var(--joy-accent-default);
+}
+[data-palette="astral"] .nav-item.active {
+  position: relative;
+  background: linear-gradient(90deg, var(--joy-accent-subtle) 0%, transparent 100%);
+  box-shadow: inset 0 -2px 0 var(--joy-accent-default);
+}
+[data-palette="cyberpunk"] .nav-item.active,
+[data-palette="titanium"] .nav-item.active {
+  border-left: 3px solid var(--joy-accent-default);
+  background: linear-gradient(90deg, var(--joy-accent-subtle) 0%, transparent 90%);
+}
+[data-palette="obsidian"] .nav-item.active::before,
+[data-palette="astral"] .nav-item.active::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  background-color: var(--joy-accent-default);
+}
+[data-palette="obsidian"] .nav-item.active::before { -webkit-mask: ${SVG_ORNAMENTS.diamondEmblemPrefix} no-repeat center / contain; mask: ${SVG_ORNAMENTS.diamondEmblemPrefix} no-repeat center / contain; }
+[data-palette="astral"] .nav-item.active::before { -webkit-mask: ${SVG_ORNAMENTS.starlightPrefix} no-repeat center / contain; mask: ${SVG_ORNAMENTS.starlightPrefix} no-repeat center / contain; }
+[data-palette="cyberpunk"] .nav-item.active::before,
+[data-palette="titanium"] .nav-item.active::before {
+  content: "\\25B8 ";
+  content: "\\25B8 " / "";
+  color: var(--joy-accent-text);
+  font-weight: 700;
+}
+:is([data-palette="obsidian"], [data-palette="astral"], [data-palette="cyberpunk"], [data-palette="quantum"], [data-palette="titanium"]) .hub-card {
+  padding: 18px;
+}
+:is([data-palette="obsidian"], [data-palette="astral"], [data-palette="cyberpunk"], [data-palette="quantum"], [data-palette="titanium"]) .hub-card h3 {
+  font-family: var(--joy-font-family-sans);
+  font-size: var(--joy-font-size-sm);
+  letter-spacing: -0.02em;
+  text-transform: none;
+  white-space: nowrap;
+}
+@media (forced-colors: active) {
+  .nav-item.active::before,
+  .view-panel > h2::before,
+  .view-panel > h2::after,
+  .dev-portal-heading::before,
+  .dev-portal-heading::after { display: none; }
+}
+`;
 
 // Extract vector SVGs from @montionugera/joy-icons
 const iconsSrcDir = path.join(__dirname, "../../packages/icons/src");
@@ -1492,10 +1594,14 @@ const html = `<!DOCTYPE html>
   <style id="joy-theme-inline">
 ${inlinedThemeCss}
   </style>
+  <style id="joy-genres-inline">
+${inlinedGenresCss}
+${hubGenreCss}
+  </style>
   <link rel="stylesheet" href="/theme.css?v=2.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
       --sidebar-width: 280px;
@@ -1847,7 +1953,9 @@ ${inlinedThemeCss}
       position: absolute;
       top: calc(100% + 4px);
       right: 0;
-      width: 260px;
+      width: 276px;
+      max-height: 440px;
+      overflow-y: auto;
       background: var(--joy-surface-card);
       border: 1px solid var(--joy-border-default);
       border-radius: var(--joy-radius-card);
@@ -1891,6 +1999,16 @@ ${inlinedThemeCss}
     .hub-palette-sub {
       font-size: var(--joy-font-size-xs);
       color: var(--joy-text-muted);
+    }
+    .hub-palette-group-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--joy-text-muted);
+      padding: var(--joy-space-2) var(--joy-space-3) 4px;
+      border-top: 1px solid var(--joy-border-subtle);
+      margin-top: 4px;
     }
     .framework-pill {
       display: inline-flex;
@@ -4892,6 +5010,62 @@ ${navigationHtml}
               <div class="hub-palette-text">
                 <span class="hub-palette-name">Verdant Lawn</span>
                 <span class="hub-palette-sub">Wimbledon Green & Champagne</span>
+              </div>
+            </div>
+            <div class="hub-palette-group-label" role="presentation">Immersive &amp; Genre (5-Axis)</div>
+            <div class="hub-palette-item" role="option" data-palette="cyberpunk" onclick="setPalette('cyberpunk')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-cyberpunk-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-cyberpunk-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-cyberpunk-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Cyberpunk HUD</span>
+                <span class="hub-palette-sub">45deg Chamfer &amp; Neon Telemetry</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="obsidian" onclick="setPalette('obsidian')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-obsidian-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-obsidian-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-obsidian-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Obsidian RPG</span>
+                <span class="hub-palette-sub">Dark Fantasy Reliquary &amp; Serif</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="astral" onclick="setPalette('astral')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-astral-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-astral-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-astral-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Astral Gacha</span>
+                <span class="hub-palette-sub">Anime Squircle &amp; Hard Cel Shadow</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="quantum" onclick="setPalette('quantum')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-quantum-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-quantum-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-quantum-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Quantum Brutalist</span>
+                <span class="hub-palette-sub">0px Raw Block &amp; Acid Grid</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="titanium" onclick="setPalette('titanium')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-titanium-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-titanium-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-titanium-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Titanium Mecha</span>
+                <span class="hub-palette-sub">Hard-Surface Hangar &amp; Hazard</span>
               </div>
             </div>
           </div>
@@ -10057,7 +10231,12 @@ ${navigationHtml}
       'bauhaus-primary': 'Bauhaus Primary',
       'clay-court': 'Clay Court',
       'nordic-slate': 'Nordic Slate',
-      'verdant-lawn': 'Verdant Lawn'
+      'verdant-lawn': 'Verdant Lawn',
+      'cyberpunk': 'Cyberpunk HUD',
+      'obsidian': 'Obsidian RPG',
+      'astral': 'Astral Gacha',
+      'quantum': 'Quantum Brutalist',
+      'titanium': 'Titanium Mecha'
     };
 
     function togglePaletteMenu() {
