@@ -606,7 +606,7 @@
     "id": "I-099",
     "title": "hub version badges read the release version from package.json",
     "created_at": "2026-10-31T18:02:54.516961+00:00",
-    "promoted_to": null
+    "promoted_to": "F-091"
   },
   {
     "id": "I-100",
