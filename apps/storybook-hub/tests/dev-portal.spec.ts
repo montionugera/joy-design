@@ -1,4 +1,11 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const releaseVersion = JSON.parse(
+  fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../.release.json'), 'utf8')
+).last_promoted_version;
 
 test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', () => {
   test('Visiting root / renders in portal-mode with Developer Portal Hero and hidden sidebar', async ({ page }, info) => {
@@ -42,7 +49,7 @@ test.describe('Developer Portal & Cross-Library Hub Suite (dev.joymify.com)', ()
 
     // Card 1: Design System
     await expect(designCard.locator('.dev-portal-card__title')).toContainText('Joy Design System');
-    await expect(designCard.locator('.dev-portal-version')).toContainText('v3.4');
+    await expect(designCard.locator('.dev-portal-version')).toContainText(`v${releaseVersion}`);
     await expect(designCard.locator('button', { hasText: 'Explore 70+ Components' })).toBeVisible();
 
     // Card 2: Server Decorator

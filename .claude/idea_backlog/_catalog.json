@@ -601,5 +601,17 @@
     "title": "CI speed: shard Playwright (workers=1 on CI is ~13 of 16 min), cache Flutter, path-filter heavy jobs, skip duplicate post-merge gate",
     "created_at": "2026-10-30T05:28:27.705025+00:00",
     "promoted_to": "F-090"
+  },
+  {
+    "id": "I-099",
+    "title": "hub version badges read the release version from package.json",
+    "created_at": "2026-10-31T18:02:54.516961+00:00",
+    "promoted_to": "F-091"
+  },
+  {
+    "id": "I-100",
+    "title": "joy-svelte publishable: remove private, publishConfig, publish workflow, version bump (no publish)",
+    "created_at": "2026-10-31T18:02:55.054655+00:00",
+    "promoted_to": "F-092"
   }
 ]

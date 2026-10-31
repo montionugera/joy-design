@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
-# Tarball test for the four published packages (spec I-077, Phase 2 part 3).
+# Tarball test for the five published packages (spec I-077, Phase 2 part 3).
 #
-# Packs @montionugera/joy-tokens, icons, brand and react exactly as `pnpm publish`
+# Packs @montionugera/joy-tokens, icons, brand, react and svelte exactly as `pnpm publish`
 # would, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside
-# this workspace, then type-checks, builds and renders that app. It is the only check that
+# this workspace, then type-checks, builds and renders that app, and server-renders
+# joy-svelte through Vite (source-exported, so it is compiled by the consumer). It is the only check that
 # loads the built output: the unit tests load src/ through their helpers.
 #
 # Usage: scripts/test/consumer-smoke.sh   (from anywhere; needs network for the app's own deps)
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-packages=(tokens icons brand react)
+packages=(tokens icons brand react svelte)
 
 fail() {
   echo "consumer-smoke: FAIL: $*" >&2
@@ -31,6 +32,7 @@ allowed_pattern() {
     tokens | react) echo '^package/(package\.json|LICENSE|dist/.+)$' ;;
     icons) echo '^package/(package\.json|PROVENANCE\.md|dist/.+|src/index\.ts|src/index\.d\.ts|src/[^/]+\.svelte)$' ;;
     brand) echo '^package/(package\.json|PROVENANCE\.md|src/.+|assets/.+)$' ;;
+    svelte) echo '^package/(package\.json|LICENSE|src/lib/.+)$' ;;
   esac
 }
 
@@ -41,6 +43,7 @@ required_files() {
     icons) echo "dist/react.js dist/react.d.ts dist/react/Check.js dist/react/Check.d.ts src/index.ts src/index.d.ts src/Check.svelte PROVENANCE.md" ;;
     brand) echo "src/index.js src/index.d.ts src/geometry.js src/render.js src/layout.js src/outlines.generated.js assets/mark.svg assets/favicon.svg PROVENANCE.md" ;;
     react) echo "dist/index.js dist/index.d.ts dist/Button.js dist/Button.d.ts dist/Tabs.js dist/BrandMark.js" ;;
+    svelte) echo "LICENSE src/lib/index.ts src/lib/Badge.svelte src/lib/Button.svelte src/lib/Modal.svelte" ;;
   esac
 }
 
@@ -52,7 +55,7 @@ echo "==> 1/7 Building joy-icons and joy-react"
 (cd "$repo_root" && pnpm --filter @montionugera/joy-icons build)
 (cd "$repo_root" && pnpm --filter @montionugera/joy-react build)
 
-echo "==> 2/7 Packing the four packages"
+echo "==> 2/7 Packing the five packages"
 for pkg in "${packages[@]}"; do
   mkdir -p "$work/tarballs/$pkg"
   (cd "$repo_root/packages/$pkg" && pnpm pack --pack-destination "$work/tarballs/$pkg" > /dev/null)
@@ -85,7 +88,7 @@ echo "==> 4/7 Creating the consumer app in $work/app"
 app="$work/app"
 mkdir -p "$app/src"
 
-TOKENS_TGZ="$(tarball_of tokens)" ICONS_TGZ="$(tarball_of icons)" BRAND_TGZ="$(tarball_of brand)" REACT_TGZ="$(tarball_of react)" \
+TOKENS_TGZ="$(tarball_of tokens)" ICONS_TGZ="$(tarball_of icons)" BRAND_TGZ="$(tarball_of brand)" REACT_TGZ="$(tarball_of react)" SVELTE_TGZ="$(tarball_of svelte)" \
   node -e '
 const fs = require("node:fs");
 const tarballs = {
@@ -93,17 +96,19 @@ const tarballs = {
   "@montionugera/joy-icons": "file:" + process.env.ICONS_TGZ,
   "@montionugera/joy-brand": "file:" + process.env.BRAND_TGZ,
   "@montionugera/joy-react": "file:" + process.env.REACT_TGZ,
+  "@montionugera/joy-svelte": "file:" + process.env.SVELTE_TGZ,
 };
 const pkg = {
   name: "joy-consumer-smoke",
   private: true,
   version: "0.0.0",
   type: "module",
-  dependencies: { ...tarballs, react: "^19.0.0", "react-dom": "^19.0.0" },
+  dependencies: { ...tarballs, react: "^19.0.0", "react-dom": "^19.0.0", svelte: "^5.57.1" },
   devDependencies: {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
     typescript: "^5.9.3",
     vite: "^7.0.0",
   },
@@ -268,6 +273,44 @@ if (!cjsTokens || !cjsTokens.tokens || !cjsTokens.tokens['surface-canvas']) {
 console.log('ssr-check: rendered', html.length, 'characters of markup');
 EOF
 
+cat > "$app/ssr-svelte-check.mjs" << 'EOF'
+// joy-svelte ships .svelte/.ts source, so a consumer compiles it. Load the packed tarball through
+// Vite SSR with the Svelte plugin and render a component, as an app such as play-joymify would.
+import { createServer } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+
+const server = await createServer({
+  root: process.cwd(),
+  configFile: false,
+  logLevel: 'error',
+  appType: 'custom',
+  server: { middlewareMode: true },
+  plugins: [svelte()],
+  resolve: { dedupe: ['svelte', '@montionugera/joy-icons', '@montionugera/joy-brand'] },
+  ssr: { noExternal: ['svelte', '@montionugera/joy-svelte', '@montionugera/joy-icons'] },
+});
+try {
+  // render() must come from the same svelte instance as the components, so load it through Vite too.
+  const { render } = await server.ssrLoadModule('svelte/server');
+  const mod = await server.ssrLoadModule('@montionugera/joy-svelte');
+  const missingExports = ['Badge', 'Button', 'Modal', 'Tabs', 'Alert', 'Switch', 'Skeleton'].filter((name) => !mod[name]);
+  if (missingExports.length > 0) {
+    console.error('ssr-svelte-check: joy-svelte does not export:', missingExports);
+    process.exit(1);
+  }
+  const { body } = render(mod.Badge, { props: { variant: 'brand', dot: true } });
+  for (const needle of ['joy-badge', 'joy-badge--brand']) {
+    if (!body.includes(needle)) {
+      console.error('ssr-svelte-check: Badge markup is missing', needle, 'in', body);
+      process.exit(1);
+    }
+  }
+  console.log('ssr-svelte-check: rendered Badge:', body);
+} finally {
+  await server.close();
+}
+EOF
+
 echo "==> 5/7 Installing the tarballs"
 (cd "$app" && pnpm install --no-frozen-lockfile --ignore-workspace)
 
@@ -285,7 +328,7 @@ fi
 # tell it from a tarball. The lockfile can: a registry resolution is keyed name@<version>,
 # a tarball resolution is keyed name@file:<path>. This covers the three packages @montionugera/joy-react
 # depends on, which are installed through the overrides and not as direct dependencies only.
-if grep -nE "@montionugera/joy-(tokens|icons|brand|react)@[0-9]" "$app/pnpm-lock.yaml"; then
+if grep -nE "@montionugera/joy-(tokens|icons|brand|react|svelte)@[0-9]" "$app/pnpm-lock.yaml"; then
   fail "a @montionugera/joy-* package was resolved from a registry, not from its tarball (listed above)"
 fi
 
@@ -297,5 +340,8 @@ grep -rq -e '--joy-surface-canvas' "$app/dist/assets" || fail "the built CSS doe
 
 echo "==> 7/7 Rendering Button, Tabs, the Check icon and BrandMark"
 (cd "$app" && node ssr-check.mjs)
+
+echo "==> 7b/7 Server-rendering joy-svelte through Vite"
+(cd "$app" && node ssr-svelte-check.mjs)
 
 echo "consumer-smoke: PASS"

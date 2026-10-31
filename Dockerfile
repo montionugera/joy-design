@@ -2,7 +2,7 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-COPY package.json pnpm-workspace.yaml turbo.json ./
+COPY package.json .release.json pnpm-workspace.yaml turbo.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 
