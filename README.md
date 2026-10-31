@@ -69,7 +69,7 @@ Five packages are publishable to GitHub Packages and to the public npm registry 
 | `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
 | `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
 
-**Public npm (no token needed):** all four packages are on npmjs.org, so install with no `.npmrc` and no token:
+**Public npm (no token needed):** tokens, icons, brand and react are on npmjs.org (svelte is not yet), so install with no `.npmrc` and no token:
 
 ```bash
 pnpm add @montionugera/joy-tokens @montionugera/joy-icons @montionugera/joy-brand @montionugera/joy-react
@@ -100,7 +100,7 @@ import { Check } from '@montionugera/joy-icons/react';
 `@montionugera/joy-react` needs `react` and `react-dom` 19 as peers. The copies on GitHub Packages are private, so every install from there needs a token:
 
 - **On a developer machine:** a classic personal GitHub token with the `read:packages` scope, exported as `GITHUB_TOKEN`.
-- **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the four packages' settings on GitHub, or store a personal token with `read:packages` as a secret in the consuming repo.
+- **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the five packages' settings on GitHub, or store a personal token with `read:packages` as a secret in the consuming repo.
 
 Fonts are still loaded by the consumer (see `DESIGN.md`).
 
@@ -117,7 +117,7 @@ Both jobs run in the GitHub environment `packages`, which the repository setting
 
 **npmjs.org trusted publishers.** tokens, icons, brand and react are live on npmjs.org and each has a trusted publisher: GitHub Actions, repository `montionugera/joy-design`, workflow file `publish.yml`, environment `packages`. Renaming the workflow file or the environment breaks the npmjs.org publish until the trusted publishers are updated. A new package needs the same one-time setup, because a trusted publisher can only be attached to a package that already exists: publish its first version by hand from a logged-in machine (`pnpm pack`, then `npm publish <tarball> --access public --registry https://registry.npmjs.org --@montionugera:registry=https://registry.npmjs.org`, with `publishConfig.registry` in the tarball pointed at npmjs.org), then add the trusted publisher in the package settings on npmjs.com. `@montionugera/joy-svelte` has no npmjs.org package yet, so its first version needs that one-time manual publish and trusted-publisher setup before the workflow can publish it to npmjs.org. It is source-exported (`.svelte` and `.ts` under `src/lib`), so a consumer compiles it and must dedupe `svelte`, `@montionugera/joy-icons` and `@montionugera/joy-brand` in Vite (`resolve.dedupe`).
 
-`scripts/test/consumer-smoke.sh` also runs locally. It packs the four packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, and type-checks, builds and renders it.
+`scripts/test/consumer-smoke.sh` also runs locally. It packs the five packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, type-checks, builds and renders it, and server-renders joy-svelte through Vite.
 
 ## Quality gates
 
