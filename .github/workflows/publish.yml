@@ -1,6 +1,6 @@
 name: Publish packages to GitHub Packages and npmjs.org
 
-# Publishes @montionugera/joy-tokens, icons, brand and react to GitHub Packages and to npmjs.org.
+# Publishes @montionugera/joy-tokens, icons, brand, react and svelte to GitHub Packages and to npmjs.org.
 # Two jobs: `build` runs every piece of third-party code (install, gate, build, tests) with a
 # read-only token and packs the tarballs; `publish` holds the publish permissions and only uploads
 # those tarballs. It checks out nothing and installs nothing from this repository.
@@ -153,13 +153,13 @@ jobs:
           NPMJS_URL=https://registry.npmjs.org
           rm -rf "$out"
           mkdir -p "$out/github" "$out/npmjs"
-          for dir in tokens icons brand react; do
+          for dir in tokens icons brand react svelte; do
             (cd "packages/$dir" && pnpm pack --pack-destination "$out/github" > /dev/null)
           done
           (
             # The rewrite is for the npmjs.org set only. The files are restored when this subshell exits.
-            trap 'git checkout -- packages/tokens/package.json packages/icons/package.json packages/brand/package.json packages/react/package.json' EXIT
-            for dir in tokens icons brand react; do
+            trap 'git checkout -- packages/tokens/package.json packages/icons/package.json packages/brand/package.json packages/react/package.json packages/svelte/package.json' EXIT
+            for dir in tokens icons brand react svelte; do
               node -e "const f='packages/$dir/package.json',p=require('./'+f);p.publishConfig={registry:'$NPMJS_URL'};require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
               (cd "packages/$dir" && pnpm pack --pack-destination "$out/npmjs" > /dev/null)
             done
@@ -172,7 +172,7 @@ jobs:
           # The manifest tells the publish job each package's version and tarball, so it needs no source.
           node -e "
             const fs = require('fs'), out = process.argv[1], manifest = {};
-            for (const dir of ['tokens', 'icons', 'brand', 'react']) {
+            for (const dir of ['tokens', 'icons', 'brand', 'react', 'svelte']) {
               const pkg = require('./packages/' + dir + '/package.json');
               const file = pkg.name.replace('@', '').replace('/', '-') + '-' + pkg.version + '.tgz';
               for (const set of ['github', 'npmjs']) {
@@ -184,7 +184,7 @@ jobs:
           " "$out"
           cat "$out/manifest.json"
           # Each tarball must name the registry of its own set.
-          for dir in tokens icons brand react; do
+          for dir in tokens icons brand react svelte; do
             for set in github npmjs; do
               want="$REGISTRY_URL"
               if [ "$set" = "npmjs" ]; then want="$NPMJS_URL"; fi
@@ -206,7 +206,7 @@ jobs:
           packs="$RUNNER_TEMP/publish-tarballs"
           NPMJS_URL=https://registry.npmjs.org
           echo "## Dry run: nothing was published" >> "$GITHUB_STEP_SUMMARY"
-          for dir in tokens icons brand react; do
+          for dir in tokens icons brand react svelte; do
             name="@montionugera/joy-$dir"
             version="$(node -p "require('$packs/manifest.json').$dir.version")"
             echo "::group::$name@$version"
@@ -276,7 +276,7 @@ jobs:
           SCOPE_PIN="--@montionugera:registry=$REGISTRY_URL"
           echo "## GitHub Packages" >> "$GITHUB_STEP_SUMMARY"
           published=0
-          for dir in tokens icons brand react; do
+          for dir in tokens icons brand react svelte; do
             name="@montionugera/joy-$dir"
             if [ "$(node -p "require('$packs/manifest.json').$dir.name")" != "$name" ]; then
               echo "::error::The manifest does not name $name for $dir."
@@ -318,7 +318,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           packs="$RUNNER_TEMP/publish-tarballs"
-          for dir in tokens icons brand react; do
+          for dir in tokens icons brand react svelte; do
             name="@montionugera/joy-$dir"
             version="$(node -p "require('$packs/manifest.json').$dir.version")"
             found=""
@@ -365,10 +365,10 @@ jobs:
           echo "Scope registry used by this step: $(npm config get @montionugera:registry "$SCOPE_PIN")"
           rc=0
           published=0
-          # Same order as the GitHub Packages publish: brand and react depend on tokens and icons.
+          # Same order as the GitHub Packages publish: brand, react and svelte depend on tokens and icons.
           # Stop at the first package that fails, so a later package is never published pinned to a
           # dependency version that is not on npmjs.org.
-          for dir in tokens icons brand react; do
+          for dir in tokens icons brand react svelte; do
             name="@montionugera/joy-$dir"
             version="$(node -p "require('$packs/manifest.json').$dir.version")"
             # An unauthenticated read straight from npmjs.org: no npm config or placeholder token can
