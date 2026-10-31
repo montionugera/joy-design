@@ -8,6 +8,9 @@ import { renderMermaidToSvg } from "../../packages/react/src/mermaid-renderer.ts
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "dist");
+// The hub badges show the last promoted release (.release.json, kept by psrw); fail loudly if absent.
+const releaseVersion = JSON.parse(fs.readFileSync(path.join(__dirname, "../../.release.json"), "utf8")).last_promoted_version;
+if (!releaseVersion) throw new Error(".release.json has no last_promoted_version");
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
 const tokensSrcPath = path.join(
@@ -4910,7 +4913,7 @@ ${navigationHtml}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           </span>
           <span class="sidebar-suite-item__name">Design System</span>
-          <span class="sidebar-suite-item__badge">v3.3</span>
+          <span class="sidebar-suite-item__badge">v${releaseVersion}</span>
         </a>
         <a href="/server-decorator/" class="sidebar-suite-item" data-suite="server-decorator" title="Node Server Decorator" target="_blank" rel="noopener noreferrer">
           <span class="sidebar-suite-item__icon">
@@ -5145,7 +5148,7 @@ ${navigationHtml}
             <div class="dev-portal-card" id="portal-card-design">
               <div class="dev-portal-card__header">
                 <span class="joy-badge joy-badge--brand joy-badge--sm"><span class="joy-badge__dot"></span> UI Components &amp; Tokens</span>
-                <span class="dev-portal-version">v3.4</span>
+                <span class="dev-portal-version">v${releaseVersion}</span>
               </div>
               <div class="dev-portal-card__body">
                 <h3 class="dev-portal-card__title">
