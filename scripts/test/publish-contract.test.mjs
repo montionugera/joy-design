@@ -1,4 +1,4 @@
-// Holds the four published packages to the publish contract (spec I-077): names, versions,
+// Holds the five published packages to the publish contract (spec I-077): names, versions,
 // registry, repository link, licence, sideEffects, the files allowlist and that every path in
 // `exports` is covered by it. Reading package.json is the behaviour under test.
 import test from 'node:test';
@@ -20,6 +20,7 @@ const PUBLISHED = [
   { dir: 'icons', name: '@montionugera/joy-icons', version: '0.3.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['dist', 'src/index.ts', 'src/index.d.ts', 'src/*.svelte', 'PROVENANCE.md'] },
   { dir: 'brand', name: '@montionugera/joy-brand', version: '0.2.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['src', 'assets', 'PROVENANCE.md'] },
   { dir: 'react', name: '@montionugera/joy-react', version: '0.2.1', license: 'MIT', sideEffects: false, files: ['dist'] },
+  { dir: 'svelte', name: '@montionugera/joy-svelte', version: '0.2.0', license: 'MIT', sideEffects: false, files: ['src/lib'] },
 ];
 
 /** Every string leaf of an `exports` value. */
@@ -99,11 +100,11 @@ test('joy-react depends only on published workspace packages', () => {
   for (const [name] of workspaceDeps) assert.ok(publishedNames.includes(name), `${name} is not a published package`);
 });
 
-test('joy-svelte is renamed and private', () => {
+test('joy-svelte ships its source: every export points into the published src/lib', () => {
   const pkg = readJson('packages/svelte/package.json');
   assert.strictEqual(pkg.name, '@montionugera/joy-svelte');
-  assert.strictEqual(pkg.private, true);
-  assert.strictEqual(pkg.publishConfig, undefined);
+  assert.deepStrictEqual(pkg.exports['.'], { types: './src/lib/index.ts', svelte: './src/lib/index.ts', default: './src/lib/index.ts' });
+  assert.ok(fs.existsSync(path.join(root, 'packages/svelte/src/lib/index.ts')), 'the export target must exist');
 });
 
 test('turbo builds dependencies before the type-check', () => {
@@ -241,7 +242,7 @@ test('the build job checks out without credentials, gates, builds, tests and pac
   assert.ok(pack.block.includes('pnpm pack --pack-destination "$out/github"') && pack.block.includes('pnpm pack --pack-destination "$out/npmjs"'), 'both tarball sets must come from pnpm pack (it resolves workspace:*)');
   assert.ok(pack.block.indexOf('"$out/github"') < pack.block.indexOf('p.publishConfig='), 'the GitHub Packages set must be packed before publishConfig is rewritten');
   assert.ok(pack.block.includes(`NPMJS_URL=${NPMJS}`) && pack.block.includes("p.publishConfig={registry:'$NPMJS_URL'}"), 'the npmjs.org set must carry publishConfig.registry for npmjs.org');
-  assert.ok(/trap 'git checkout -- packages\/tokens\/package\.json packages\/icons\/package\.json packages\/brand\/package\.json packages\/react\/package\.json' EXIT/.test(pack.block), 'the trap must restore the four package.json files');
+  assert.ok(/trap 'git checkout -- packages\/tokens\/package\.json packages\/icons\/package\.json packages\/brand\/package\.json packages\/react\/package\.json packages\/svelte\/package\.json' EXIT/.test(pack.block), 'the trap must restore the five package.json files');
   assert.ok(pack.block.indexOf('git status --porcelain') > pack.block.indexOf('trap '), 'packing must end by checking the tree is clean again');
   assert.ok(pack.block.includes('manifest.json') && pack.block.includes('.publishConfig.registry'), 'the pack step writes the manifest and checks each tarball registry');
   assert.ok(upload.block.includes('name: publish-tarballs') && upload.block.includes('if-no-files-found: error'), 'the tarballs and manifest are uploaded as the publish-tarballs artifact');
@@ -336,7 +337,7 @@ test('the publish job publishes to GitHub Packages, verifies, then npmjs.org, in
   // Dependency order, and the fixed names: nothing is taken from the artifact but versions and files.
   const loops = code.match(/for dir in ([a-z ]+); do/g) || [];
   assert.ok(loops.length >= 7, 'pack (two sets and a check), dry run, publish, verify and npmjs.org each loop over the packages');
-  for (const loop of loops) assert.strictEqual(loop, 'for dir in tokens icons brand react; do', 'packages must be handled in dependency order');
+  for (const loop of loops) assert.strictEqual(loop, 'for dir in tokens icons brand react svelte; do', 'packages must be handled in dependency order');
   for (const s of [githubPublish, verify, npmjs]) {
     assert.ok(s.block.includes('name="@montionugera/joy-$dir"'), `${s.name}: the loop must use the fixed @montionugera/joy-* names`);
   }
