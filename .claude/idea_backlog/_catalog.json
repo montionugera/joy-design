@@ -613,5 +613,11 @@
     "title": "joy-svelte publishable: remove private, publishConfig, publish workflow, version bump (no publish)",
     "created_at": "2026-10-31T18:02:55.054655+00:00",
     "promoted_to": "F-092"
+  },
+  {
+    "id": "I-101",
+    "title": "Hub version badge trails one release: add .release.json to CI app path filter",
+    "created_at": "2026-10-31T20:02:24.832948+00:00",
+    "promoted_to": null
   }
 ]
