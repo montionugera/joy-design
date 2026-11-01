@@ -619,5 +619,11 @@
     "title": "Hub version badge trails one release: add .release.json to CI app path filter",
     "created_at": "2026-10-31T20:02:24.832948+00:00",
     "promoted_to": null
+  },
+  {
+    "id": "I-102",
+    "title": "joy-svelte parity gaps from play-joymify: Modal title level prop, Tabs panel tabindex, Button loading keeps label visible",
+    "created_at": "2026-11-01T04:19:06.292162+00:00",
+    "promoted_to": null
   }
 ]
