@@ -118,6 +118,8 @@ export interface JoyTokens {
   'control-height-md': string;
   'control-height-lg': string;
   'font-family-sans': string;
+  'font-family-ui': string;
+  'font-family-rounded': string;
   'font-family-mono': string;
   'font-family-display': string;
   'surface-canvas': string;

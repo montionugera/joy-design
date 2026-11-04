@@ -1604,7 +1604,7 @@ ${hubGenreCss}
   <link rel="stylesheet" href="/theme.css?v=2.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Anuphan:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
       --sidebar-width: 280px;
@@ -5069,6 +5069,28 @@ ${navigationHtml}
               <div class="hub-palette-text">
                 <span class="hub-palette-name">Titanium Mecha</span>
                 <span class="hub-palette-sub">Hard-Surface Hangar &amp; Hazard</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="honey" onclick="setPalette('honey')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-honey-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-honey-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-honey-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Honey Quest</span>
+                <span class="hub-palette-sub">Rounded Game Pill &amp; Cozy Gold</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="studio" onclick="setPalette('studio')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-studio-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-studio-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-studio-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Studio Prism</span>
+                <span class="hub-palette-sub">Creator Console &amp; Electric Indigo</span>
               </div>
             </div>
           </div>
@@ -10239,7 +10261,9 @@ ${navigationHtml}
       'obsidian': 'Obsidian RPG',
       'astral': 'Astral Gacha',
       'quantum': 'Quantum Brutalist',
-      'titanium': 'Titanium Mecha'
+      'titanium': 'Titanium Mecha',
+      'honey': 'Honey Quest',
+      'studio': 'Studio Prism'
     };
 
     function togglePaletteMenu() {

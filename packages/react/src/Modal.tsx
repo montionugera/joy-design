@@ -7,6 +7,8 @@ const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(
 export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   open?: boolean;
   title?: string;
+  /** Heading level for `title` (`2` | `3` | `4`, default `3`). */
+  titleLevel?: 2 | 3 | 4;
   onClose?: () => void;
   children?: React.ReactNode;
   footer?: React.ReactNode;
@@ -19,9 +21,10 @@ export interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
 
 /** `ref` and `...rest` land on the dialog element (`.joy-modal`), like the Svelte twin. */
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
-  ({ open = false, title, onClose, children, footer, role = 'dialog', closeLabel = 'Close dialog', returnFocusTo, className = '', ...rest }, ref) => {
+  ({ open = false, title, titleLevel = 3, onClose, children, footer, role = 'dialog', closeLabel = 'Close dialog', returnFocusTo, className = '', ...rest }, ref) => {
     // Unique per instance, so several modals (or a modal plus a drawer) never share a label id.
     const titleId = `${React.useId()}-title`;
+    const HeadingTag = titleLevel === 2 ? 'h2' : titleLevel === 4 ? 'h4' : 'h3';
     const dialogRef = React.useRef<HTMLDivElement | null>(null);
     const setDialogRef = useMergedRef(ref, dialogRef);
     // Only the topmost dialog answers Escape, and a popover/menu/tooltip inside claims it first
@@ -69,9 +72,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         >
           <div className="joy-modal__header">
             {title ? (
-              <h3 id={titleId} className="joy-modal__title">
+              <HeadingTag id={titleId} className="joy-modal__title">
                 {title}
-              </h3>
+              </HeadingTag>
             ) : null}
             <button
               type="button"

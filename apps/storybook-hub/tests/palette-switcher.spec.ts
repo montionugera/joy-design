@@ -34,7 +34,7 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
     await expect(dropdown).toBeVisible();
 
     const items = dropdown.locator(".hub-palette-item");
-    await expect(items).toHaveCount(10);
+    await expect(items).toHaveCount(12);
 
     const palettes = await items.evaluateAll((els) =>
       els.map((el) => el.getAttribute("data-palette")),
@@ -50,6 +50,8 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
       "astral",
       "quantum",
       "titanium",
+      "honey",
+      "studio",
     ]);
   });
 
@@ -218,6 +220,8 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
       "astral",
       "quantum",
       "titanium",
+      "honey",
+      "studio",
     ];
     const themes = ["light", "dark"];
 

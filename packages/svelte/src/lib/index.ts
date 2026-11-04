@@ -137,3 +137,14 @@ export {
   type TokenSpan
 } from './syntax-highlighter.js';
 export { renderMermaidToSvg, type MermaidRenderResult } from './mermaid-renderer.js';
+
+// F-093: SFX Audio Suite & Modern Creator Studio Primitives
+export { default as SoundController } from './SoundController.svelte';
+export { default as SoundTile } from './SoundTile.svelte';
+export { default as AudioPlayer } from './AudioPlayer.svelte';
+export type { AudioCueMarker } from './AudioPlayer.svelte';
+export { default as FilterChips } from './FilterChips.svelte';
+export type { FilterChipItem } from './FilterChips.svelte';
+export { default as InspectorPane } from './InspectorPane.svelte';
+export { default as CommandPalette } from './CommandPalette.svelte';
+export type { CommandPaletteItem } from './CommandPalette.svelte';
