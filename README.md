@@ -102,7 +102,11 @@ import { Check } from '@montionugera/joy-icons/react';
 - **On a developer machine:** a classic personal GitHub token with the `read:packages` scope, exported as `GITHUB_TOKEN`.
 - **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the five packages' settings on GitHub, or store a personal token with `read:packages` as a secret in the consuming repo.
 
-Fonts are still loaded by the consumer (see `DESIGN.md`).
+Fonts are still loaded by the consumer (see `DESIGN.md`). The token stacks name **Plus Jakarta Sans** (Latin UI), **Anuphan** (Thai) and, for `--joy-font-family-rounded` and the Honey Quest genre, **Baloo 2** and **Nunito**; if the app does not load them, text silently falls back to Inter or the system font. One Google Fonts link covers them all:
+
+```html
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Anuphan:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+```
 
 ### Publishing
 
