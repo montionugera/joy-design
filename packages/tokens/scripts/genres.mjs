@@ -592,7 +592,7 @@ export const genrePresets = {
       "surface-card": "#ffffff",
       "surface-raised": "#eef2f6",
       "surface-sunken": "#e6ebf2",
-      "text-primary": "#0f172a",
+      "text-primary": "#141a33",
       "text-secondary": "#334155",
       "text-muted": "#526077",
       "text-on-accent": "#ffffff",
