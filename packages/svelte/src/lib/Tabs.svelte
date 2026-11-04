@@ -14,6 +14,8 @@
     onchange?: (key: string) => void;
     /** Accessible name for the tablist. */
     label?: string;
+    /** `tabindex` on the `role="tabpanel"` element (defaults to `0` per WAI-ARIA Tabs pattern). */
+    panelTabIndex?: number;
     class?: string;
     ref?: HTMLElement | null;
     [key: string]: any;
@@ -24,6 +26,7 @@
     activeKey = $bindable(items[0]?.key || ''),
     onchange,
     label,
+    panelTabIndex,
     class: className = '',
     ref = $bindable(null),
     ...rest
@@ -71,7 +74,7 @@
     {/each}
   </div>
 
-  <div class="joy-tab-content" role="tabpanel" id="{uid}-panel" aria-labelledby={activeIndex >= 0 ? `${uid}-tab-${activeIndex}` : undefined}>
+  <div class="joy-tab-content" role="tabpanel" id="{uid}-panel" tabindex={panelTabIndex} aria-labelledby={activeIndex >= 0 ? `${uid}-tab-${activeIndex}` : undefined}>
     {#each items as item (item.key)}
       {#if activeKey === item.key && item.content}
         {@render item.content()}

@@ -138,37 +138,37 @@ colors:
   result-title-dark: "#e9cd94"
 typography:
   display:
-    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "2.986rem"
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.015em"
   headline:
-    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "2.074rem"
     fontWeight: 600
     lineHeight: 1.15
     letterSpacing: "-0.015em"
   title:
-    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "1.44rem"
     fontWeight: 600
     lineHeight: 1.375
     letterSpacing: "0em"
   body:
-    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "0em"
   label:
-    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 500
     lineHeight: 1.5
     letterSpacing: "0em"
   caption:
-    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 400
     lineHeight: 1.5
@@ -550,7 +550,7 @@ Inputs to the semantic layer. Components never reference these directly.
 
 ## Typography
 
-Sans: `Inter, -apple-system, BlinkMacSystemFont, sans-serif`. Mono (code, tabular data): `JetBrains Mono, Menlo, monospace`. A 1.2 modular scale from a 16px body.
+Sans: `'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif`. Mono (code, tabular data): `JetBrains Mono, Menlo, monospace`. A 1.2 modular scale from a 16px body.
 
 | Token | Size |
 | --- | --- |
@@ -714,6 +714,12 @@ Read from the stylesheet (`packages/tokens/dist/theme.css`): for each component,
 | CodeBlock | `.joy-code-block` | - | with-lines | hover, focus-visible |
 | PolyglotCodeTabs | `.joy-polyglot-tabs` | - | - | hover, focus-visible, selected |
 | MermaidViewer | `.joy-mermaid` | - | - | hover, focus-visible |
+| SoundController | `.joy-sound-controller` | - | blocked, ducked, muted | hover, focus-visible, active |
+| SoundTile | `.joy-sound-tile` | - | pinned, playing | hover, focus-visible, active |
+| AudioPlayer | `.joy-audio-player` | - | playing | hover, focus-visible, active |
+| FilterChips | `.joy-filter-chips` | - | empty | hover, focus-visible |
+| InspectorPane | `.joy-inspector-pane` | - | closed | hover, focus-visible, open |
+| CommandPalette | `.joy-command-palette` | - | - | hover, active |
 
 ## Brand
 

@@ -7,6 +7,8 @@
   interface Props {
     open?: boolean;
     title?: string;
+    /** Heading level for `title` (`2` | `3` | `4`, default `3`). */
+    titleLevel?: 2 | 3 | 4;
     onclose?: () => void;
     role?: 'dialog' | 'alertdialog';
     closeLabel?: string;
@@ -23,6 +25,7 @@
   let {
     open = false,
     title = '',
+    titleLevel = 3,
     onclose,
     role = 'dialog',
     closeLabel = 'Close dialog',
@@ -37,6 +40,7 @@
   // Unique per instance, so several modals (or a modal plus a drawer) never share a label id.
   const uid = $props.id();
   const titleId = `${uid}-title`;
+  const headingTag = $derived(titleLevel === 2 ? 'h2' : titleLevel === 4 ? 'h4' : 'h3');
 
   // Set while open; only the topmost dialog answers Escape (a modal opened from a drawer closes alone).
   let dialog: DialogHandle | null = null;
@@ -91,7 +95,7 @@
     >
       <div class="joy-modal__header">
         {#if title}
-          <h3 id={titleId} class="joy-modal__title">{title}</h3>
+          <svelte:element this={headingTag} id={titleId} class="joy-modal__title">{title}</svelte:element>
         {/if}
         <button
           type="button"

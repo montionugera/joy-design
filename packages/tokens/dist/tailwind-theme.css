@@ -141,7 +141,9 @@
   --radius-joy-card: 12px;
   --radius-joy-overlay: 16px;
   --radius-joy-pill: 9999px;
-  --font-joy-sans: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-joy-sans: 'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-joy-ui: 'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', system-ui, -apple-system, sans-serif;
+  --font-joy-rounded: 'Baloo 2', 'Nunito', 'Mali', 'Anuphan', system-ui, sans-serif;
   --font-joy-mono: JetBrains Mono, Menlo, monospace;
   --font-joy-display: "Cormorant Garamond", "Noto Serif", Georgia, serif;
   --text-joy-xs: 0.75rem;

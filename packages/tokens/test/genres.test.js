@@ -220,3 +220,34 @@ test("Genre buttons look disabled, and ornaments degrade under forced-colors / r
     "published genres.css must not contain hub-only selectors",
   );
 });
+
+test("honey and studio genres: round friendly game look and modern creator console", () => {
+  const css = fs.readFileSync(path.resolve(__dirname, "../dist/genres.css"), "utf8");
+  const themeCss = fs.readFileSync(path.resolve(__dirname, "../dist/theme.css"), "utf8");
+
+  assert.ok(css.includes('[data-palette="honey"]'), "honey selector");
+  assert.ok(css.includes('[data-palette="studio"]'), "studio selector");
+  assert.ok(!themeCss.includes('[data-palette="honey"]'), "honey stays in genres.css");
+  assert.ok(!themeCss.includes('[data-palette="studio"]'), "studio stays in genres.css");
+
+  const h = genrePresets.honey;
+  assert.ok(h, "honey preset exists");
+  assert.match(h.axes["font-family-heading"], /^'Baloo 2', 'Mali'/);
+  assert.match(h.axes["font-family-sans"] ?? "", /^'Nunito', 'Anuphan'/);
+  assert.equal(h.axes["letter-spacing-heading"], "0");
+  assert.equal(h.axes["radius-card"], "22px");
+  assert.equal(h.axes["radius-control"], "9999px");
+  assert.equal(h.axes["border-width-card"], "2px");
+
+  const s = genrePresets.studio;
+  assert.ok(s, "studio preset exists");
+  assert.match(s.axes["font-family-heading"], /^'Plus Jakarta Sans'/);
+  assert.equal(s.axes["radius-card"], "12px");
+  assert.equal(s.axes["radius-control"], "8px");
+  assert.equal(s.axes["border-width-card"], "1px");
+
+  for (const mode of ["light", "dark"]) {
+    assert.ok(contrastRatio(h[mode]["text-on-accent"], h[mode]["accent-default"]) >= 4.5, `${mode}: text on honey accent >= 4.5`);
+    assert.ok(contrastRatio(s[mode]["text-on-accent"], s[mode]["accent-default"]) >= 4.5, `${mode}: text on studio accent >= 4.5`);
+  }
+});

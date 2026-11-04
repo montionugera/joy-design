@@ -15,10 +15,12 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   onChange?: (key: string) => void;
   /** aria-label of the tablist. */
   label?: string;
+  /** `tabIndex` on the `role="tabpanel"` element (defaults to `0` per WAI-ARIA Tabs pattern). */
+  panelTabIndex?: number;
 }
 
 export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-  ({ items, activeKey: controlledKey, onChange, label, className = '', ...rest }, ref) => {
+  ({ items, activeKey: controlledKey, onChange, label, panelTabIndex, className = '', ...rest }, ref) => {
     const uid = React.useId();
     const [internalKey, setInternalKey] = React.useState(items[0]?.key || '');
     const activeKey = controlledKey !== undefined ? controlledKey : internalKey;
@@ -73,6 +75,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
           className="joy-tab-content"
           role="tabpanel"
           id={`${uid}-panel`}
+          tabIndex={panelTabIndex}
           aria-labelledby={activeIndex >= 0 ? `${uid}-tab-${activeIndex}` : undefined}
         >
           {activeItem?.content}
