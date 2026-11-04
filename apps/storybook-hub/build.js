@@ -5071,6 +5071,28 @@ ${navigationHtml}
                 <span class="hub-palette-sub">Hard-Surface Hangar &amp; Hazard</span>
               </div>
             </div>
+            <div class="hub-palette-item" role="option" data-palette="honey" onclick="setPalette('honey')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-honey-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-honey-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-honey-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Honey Quest</span>
+                <span class="hub-palette-sub">Rounded Game Pill &amp; Cozy Gold</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="studio" onclick="setPalette('studio')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-studio-1);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-studio-2);"></span>
+                <span class="swatch-dot" style="background: var(--joy-genre-swatch-studio-3);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Studio Prism</span>
+                <span class="hub-palette-sub">Creator Console &amp; Electric Indigo</span>
+              </div>
+            </div>
           </div>
         </div>
         <button type="button" class="joy-button joy-button--ghost joy-button--sm hub-theme-toggle" id="btn-theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark theme">
@@ -10239,7 +10261,9 @@ ${navigationHtml}
       'obsidian': 'Obsidian RPG',
       'astral': 'Astral Gacha',
       'quantum': 'Quantum Brutalist',
-      'titanium': 'Titanium Mecha'
+      'titanium': 'Titanium Mecha',
+      'honey': 'Honey Quest',
+      'studio': 'Studio Prism'
     };
 
     function togglePaletteMenu() {

@@ -45,6 +45,8 @@ Unlike corporate `[data-palette]` presets (which only swap 24 color variables), 
 | `astral`       | **Astral Odyssey**         | Celestial Fantasy MMORPG / Anime RPG / Summon Banner | `14px` card corners, `9999px` star-capped capsule buttons, `2px` card borders, hard zero-blur `0 3px 0` to `0 12px 0` cel shadows, Indigo (light) / Starlight Gold (dark) accent with Amber / Sky Blue secondary                                      |
 | `quantum`      | **Quantum Brutalist**      | Neo-Brutalist / Arcade Fighter / Web3 Drop           | `0px` raw corners, `2px` exposed structural borders, `3px 3px 0` to `12px 12px 0` hard offset block shadows, `Space Grotesk` uppercase `-0.02em` display, Violet + Green (light) / Acid Lime + Electric Violet (dark) tension                         |
 | `titanium`     | **Titanium Mecha**         | Hard-Surface Sci-Fi / Mecha Hangar / Sim Telemetry   | Single top-right `12px` chamfer on cards (buttons stay `2px` rectangles), diagonal hazard-hatch surface pattern, `Chakra Petch` uppercase `+0.04em` display, Afterburner Orange + Cryo Blue tension                                                   |
+| `honey`        | **Honey Quest**            | Cozy Learning Game / Friendly Mascot RPG / Streak Rewards | `22px` card corners, `9999px` pill controls, `2px` borders, soft `0 4px 0` cel shadows, `Baloo 2` / `Nunito` rounded type, Honey Gold accent (cream light / navy dark) with Teal secondary                                                           |
+| `studio`       | **Studio Prism**           | Asset Studio / Audio DAW / High-Density Pro Workspace | `12px` card corners, `8px` controls, `1px` crisp borders, `Plus Jakarta Sans` / `Inter` / `Anuphan` `-0.02em` headings, Alabaster Slate (light) / Deep Obsidian Indigo (dark) with Electric Indigo + Mint Teal tension                               |
 
 Chamfered cards (`cyberpunk`, `titanium`) use `clip-path`, which also clips any descendant that overflows the card (popovers, menus, focus outlines). Modals and drawers therefore never receive the chamfer. Render overlays outside the card (portal) or inside a genre without a card `clip-path`.
 
@@ -54,6 +56,8 @@ Chamfered cards (`cyberpunk`, `titanium`) use `clip-path`, which also clips any 
 | `astral` | **Astral Pop** | Anime Action RPG / Cozy Chibi MMO / Gacha | `22px` squircles, `9999px` pills, `2px` cel ink outlines, hard `0 5px 0` zero-blur cel shadows, Starlight Gold + Sky Blue tension |
 | `quantum` | **Quantum Brutalist** | Neo-Brutalist / Arcade Fighter / Web3 Drop | `0px` raw corners, `2px` exposed structural borders, `6px 6px 0` hard offset block shadows, Acid Lime + Electric Violet tension |
 | `titanium` | **Titanium Mecha** | Hard-Surface Sci-Fi / Mecha Hangar / Sim Telemetry | Single top-right `12px` chamfer, diagonal hazard-hatch surface pattern, Afterburner Orange + Cryo Blue tension |
+| `honey` | **Honey Quest** | Cozy Learning Game / Friendly Mascot RPG / Streak Rewards | `22px` rounded cards, `9999px` pills, `2px` borders, soft `0 4px 0` cel shadows, Honey Gold + Teal |
+| `studio` | **Studio Prism** | Asset Studio / Audio DAW / High-Density Pro Workspace | `12px` cards, `8px` controls, `1px` crisp borders, Electric Indigo + Mint Teal |
 
 ---
 

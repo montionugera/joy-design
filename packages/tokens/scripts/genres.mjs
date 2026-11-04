@@ -480,6 +480,178 @@ export const genrePresets = {
       "elevation-xl": "0 22px 44px -8px rgba(0, 0, 0, 0.90)",
     },
   },
+
+  honey: {
+    name: "Honey Quest (Round Friendly Game Look)",
+    category: "Cozy Learning Game / Friendly Mascot RPG / Streak Rewards",
+    axes: {
+      "font-family-heading":
+        "'Baloo 2', 'Mali', 'Fredoka', var(--joy-font-family-sans)",
+      "font-family-sans":
+        "'Nunito', 'Anuphan', system-ui, sans-serif",
+      "letter-spacing-heading": "0",
+      "text-transform-heading": "none",
+      "radius-card": "22px",
+      "radius-control": "9999px",
+      "clip-path-card": "none",
+      "clip-path-control": "none",
+      "border-width-card": "2px",
+      "border-width-control": "2px",
+      "frame-outline": "none",
+      "frame-outline-offset": "0px",
+      "card-accent-bar": "3px solid var(--joy-border-strong)",
+    },
+    light: {
+      "surface-canvas": "#fbf6ea",
+      "surface-card": "#fffdf7",
+      "surface-raised": "#f6eedb",
+      "surface-sunken": "#efe4c8",
+      "text-primary": "#1e2a4a",
+      "text-secondary": "#39446a",
+      "text-muted": "#5d6580",
+      "text-on-accent": "#1e2a4a",
+      "text-link": "#8a5a00",
+      "border-subtle": "#eadfc2",
+      "border-default": "#c9b98f",
+      "border-strong": "#1e2a4a",
+      "border-focus": "#8a5a00",
+      "accent-default": "#f5b82e",
+      "accent-hover": "#f8c654",
+      "accent-active": "#e9a912",
+      "accent-subtle": "#fdf0c8",
+      "accent-text": "#8a5a00",
+      "accent-secondary": "#17705a",
+      "accent-secondary-subtle": "#dff3ea",
+      "accent-secondary-text": "#17705a",
+      "focus-ring": "#8a5a00",
+      "fx-glow": "0 6px 20px rgba(245, 184, 46, 0.22)",
+      "fx-button-shadow": "0 4px 0 rgb(30 42 74 / 0.12)",
+      "surface-pattern":
+        "radial-gradient(circle at 85% 12%, rgba(245, 184, 46, 0.14), transparent 55%)",
+      "elevation-sm": "0 4px 0 rgb(30 42 74 / 0.12)",
+      "elevation-md": "0 4px 0 rgb(30 42 74 / 0.12)",
+      "elevation-lg": "0 4px 0 rgb(30 42 74 / 0.12)",
+      "elevation-xl": "0 4px 0 rgb(30 42 74 / 0.12)",
+    },
+    dark: {
+      "surface-canvas": "#141a2c",
+      "surface-card": "#1c2440",
+      "surface-raised": "#26305a",
+      "surface-sunken": "#0e1220",
+      "text-primary": "#f3ecda",
+      "text-secondary": "#d3d6e6",
+      "text-muted": "#a9b0c8",
+      "text-on-accent": "#1e2a4a",
+      "text-link": "#f5b82e",
+      "border-subtle": "#2c3760",
+      "border-default": "#4a5890",
+      "border-strong": "#8a96c8",
+      "border-focus": "#f5b82e",
+      "accent-default": "#f5b82e",
+      "accent-hover": "#f8c654",
+      "accent-active": "#e9a912",
+      "accent-subtle": "#3a3015",
+      "accent-text": "#f5b82e",
+      "accent-secondary": "#6fe0bb",
+      "accent-secondary-subtle": "#12362d",
+      "accent-secondary-text": "#6fe0bb",
+      "focus-ring": "#f5b82e",
+      "fx-glow": "0 6px 24px rgba(245, 184, 46, 0.25)",
+      "fx-button-shadow": "0 4px 0 rgb(0 0 0 / 0.35)",
+      "surface-pattern":
+        "radial-gradient(circle at 85% 12%, rgba(245, 184, 46, 0.12), transparent 55%)",
+      "elevation-sm": "0 4px 0 rgb(0 0 0 / 0.35)",
+      "elevation-md": "0 4px 0 rgb(0 0 0 / 0.35)",
+      "elevation-lg": "0 4px 0 rgb(0 0 0 / 0.35)",
+      "elevation-xl": "0 4px 0 rgb(0 0 0 / 0.35)",
+    },
+  },
+
+  studio: {
+    name: "Studio Prism (Modern Creator Console)",
+    category: "Asset Studio / Audio DAW / High-Density Pro Workspace",
+    axes: {
+      "font-family-heading":
+        "'Plus Jakarta Sans', 'Inter', 'Anuphan', var(--joy-font-family-sans)",
+      "font-family-sans":
+        "'Plus Jakarta Sans', 'Inter', 'Anuphan', system-ui, sans-serif",
+      "letter-spacing-heading": "-0.02em",
+      "text-transform-heading": "none",
+      "radius-card": "12px",
+      "radius-control": "8px",
+      "clip-path-card": "none",
+      "clip-path-control": "none",
+      "border-width-card": "1px",
+      "border-width-control": "1px",
+      "frame-outline": "none",
+      "frame-outline-offset": "0px",
+      "card-accent-bar": "2px solid var(--joy-accent-default)",
+    },
+    light: {
+      "surface-canvas": "#f4f6f9",
+      "surface-card": "#ffffff",
+      "surface-raised": "#eef2f6",
+      "surface-sunken": "#e6ebf2",
+      "text-primary": "#0f172a",
+      "text-secondary": "#334155",
+      "text-muted": "#526077",
+      "text-on-accent": "#ffffff",
+      "text-link": "#3730a3",
+      "border-subtle": "#e2e8f0",
+      "border-default": "#94a3b8",
+      "border-strong": "#475569",
+      "border-focus": "#4338ca",
+      "accent-default": "#4338ca",
+      "accent-hover": "#3730a3",
+      "accent-active": "#312e81",
+      "accent-subtle": "#e8ecff",
+      "accent-text": "#312e81",
+      "accent-secondary": "#0f766e",
+      "accent-secondary-subtle": "#dff6f2",
+      "accent-secondary-text": "#0f5c56",
+      "focus-ring": "#4338ca",
+      "fx-glow": "0 4px 16px rgba(67, 56, 202, 0.08)",
+      "fx-button-shadow": "0 1px 2px rgba(15, 23, 42, 0.12)",
+      "surface-pattern":
+        "radial-gradient(circle at 90% 8%, rgba(67, 56, 202, 0.06), transparent 45%)",
+      "elevation-sm": "0 1px 2px rgba(15, 23, 42, 0.06)",
+      "elevation-md": "0 4px 10px -2px rgba(15, 23, 42, 0.08)",
+      "elevation-lg": "0 10px 24px -4px rgba(15, 23, 42, 0.12)",
+      "elevation-xl": "0 20px 36px -8px rgba(15, 23, 42, 0.16)",
+    },
+    dark: {
+      "surface-canvas": "#0b0f17",
+      "surface-card": "#111827",
+      "surface-raised": "#1e293b",
+      "surface-sunken": "#06090f",
+      "text-primary": "#f8fafc",
+      "text-secondary": "#cbd5e1",
+      "text-muted": "#94a3b8",
+      "text-on-accent": "#0b0f17",
+      "text-link": "#a5b4fc",
+      "border-subtle": "#1e293b",
+      "border-default": "#475569",
+      "border-strong": "#94a3b8",
+      "border-focus": "#818cf8",
+      "accent-default": "#818cf8",
+      "accent-hover": "#a5b4fc",
+      "accent-active": "#7c86ff",
+      "accent-subtle": "#1b2242",
+      "accent-text": "#c7d2fe",
+      "accent-secondary": "#2dd4bf",
+      "accent-secondary-subtle": "#0d2e2b",
+      "accent-secondary-text": "#5eead4",
+      "focus-ring": "#818cf8",
+      "fx-glow": "0 6px 24px rgba(129, 140, 248, 0.14)",
+      "fx-button-shadow": "0 1px 3px rgba(0, 0, 0, 0.45)",
+      "surface-pattern":
+        "radial-gradient(circle at 90% 8%, rgba(129, 140, 248, 0.08), transparent 45%)",
+      "elevation-sm": "0 1px 3px rgba(0, 0, 0, 0.4)",
+      "elevation-md": "0 4px 12px -2px rgba(0, 0, 0, 0.55)",
+      "elevation-lg": "0 12px 28px -4px rgba(0, 0, 0, 0.7)",
+      "elevation-xl": "0 22px 44px -8px rgba(0, 0, 0, 0.85)",
+    },
+  },
 };
 
 /**
@@ -489,8 +661,8 @@ export function buildGenresCss() {
   let css = `/* ==========================================================================
  * @montionugera/joy-tokens/genres.css
  * Opt-in 5-Axis Immersive & Genre Theme Presets + Bespoke SVG Game Art Anatomy
- * Archetypes: cyberpunk | obsidian | astral | quantum | titanium
- * Zero bloat on core theme.css: load only for Game, RPG, Fantasy, Sci-Fi, or Arcade UIs.
+ * Archetypes: cyberpunk | obsidian | astral | quantum | titanium | honey | studio
+ * Zero bloat on core theme.css: load only for Game, RPG, Fantasy, Sci-Fi, Studio, or Arcade UIs.
  * ========================================================================== */\n`;
 
   css += `
@@ -511,6 +683,12 @@ export function buildGenresCss() {
   --joy-genre-swatch-titanium-1: #151b24;
   --joy-genre-swatch-titanium-2: #fb923c;
   --joy-genre-swatch-titanium-3: #38bdf8;
+  --joy-genre-swatch-honey-1: #fbf6ea;
+  --joy-genre-swatch-honey-2: #f5b82e;
+  --joy-genre-swatch-honey-3: #17705a;
+  --joy-genre-swatch-studio-1: #111827;
+  --joy-genre-swatch-studio-2: #818cf8;
+  --joy-genre-swatch-studio-3: #2dd4bf;
 }
 `;
 

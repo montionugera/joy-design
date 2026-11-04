@@ -940,7 +940,18 @@ export function generateAllTokens() {
     font: {
       family: {
         sans: {
-          value: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+          value:
+            "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif",
+          type: "fontFamily",
+        },
+        ui: {
+          value:
+            "'Plus Jakarta Sans', 'Inter', 'Anuphan', 'Noto Sans Thai', system-ui, -apple-system, sans-serif",
+          type: "fontFamily",
+        },
+        rounded: {
+          value:
+            "'Baloo 2', 'Nunito', 'Mali', 'Anuphan', system-ui, sans-serif",
           type: "fontFamily",
         },
         mono: { value: "JetBrains Mono, Menlo, monospace", type: "fontFamily" },
