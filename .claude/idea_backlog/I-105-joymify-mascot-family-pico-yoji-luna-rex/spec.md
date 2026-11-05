@@ -25,7 +25,7 @@ The owner asked (2026-11-04): "Please add in design joymify lib and use in our q
 
 ## Sketch
 
-1. joy-design: a mascot package or module (art + names + personality lines), with Svelte and React twins, shown in the Storybook hub. The art source is still open (owner decision): crop raster art from this sheet, have each character redrawn cleanly (ChatGPT in Chrome, per memory), or redraw as SVG components like StarSlime.
+1. joy-design: a mascot package or module (art + names + personality lines), with Svelte and React twins, shown in the Storybook hub. **Art source decided (owner, 2026-11-05): redraw each character cleanly with ChatGPT (driven in Chrome), using the owner's sheet as the reference.** Pilot Yoji first and get the owner's OK on the style before drawing the other six.
 2. Joy-Quest: Yoji replaces Star Slime as the default companion; the other six become companions or chat characters (game-like direction, I-014); the shop "looks" may map onto them.
 
 ## Acceptance criteria
