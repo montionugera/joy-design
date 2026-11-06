@@ -1189,8 +1189,9 @@
     "title": "Joymify mascot family (Pico, Yoji, Luna, Rex, Mochi, Zing, Byte) as shared joy-design characters",
     "from_idea": "I-105",
     "created_at": "2026-11-06T06:47:47.448373+00:00",
-    "claimed_by": null,
-    "status": "open",
-    "release_version": null
+    "claimed_by": "claude-a6c35399",
+    "status": "claimed",
+    "release_version": null,
+    "claimed_at": "2026-11-06T06:47:48.567139+00:00"
   }
 ]
