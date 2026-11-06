@@ -14878,13 +14878,12 @@ fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "fav
 fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(designOutDir, "favicon.svg"));
 
 // Mascot pictures (I-105): the hub page references them as mascots/<id>-<pose>[@2x].webp.
+// Only /design/ is served the page (/#mascots redirects to /design/#mascots), so only dist/design/mascots is needed.
 const mascotAssetsSrc = path.join(__dirname, "../../packages/mascots/assets");
-// Copied beside both index.html files (root and /design/), as the page uses relative URLs.
-for (const mascotOutDir of [path.join(outDir, "mascots"), path.join(designOutDir, "mascots")]) {
-  fs.mkdirSync(mascotOutDir, { recursive: true });
-  for (const file of fs.readdirSync(mascotAssetsSrc).filter((f) => f.endsWith(".webp"))) {
-    fs.copyFileSync(path.join(mascotAssetsSrc, file), path.join(mascotOutDir, file));
-  }
+const mascotOutDir = path.join(designOutDir, "mascots");
+fs.mkdirSync(mascotOutDir, { recursive: true });
+for (const file of fs.readdirSync(mascotAssetsSrc).filter((f) => f.endsWith(".webp"))) {
+  fs.copyFileSync(path.join(mascotAssetsSrc, file), path.join(mascotOutDir, file));
 }
 
 // Copy Flutter Web bundle if present (F-065)
