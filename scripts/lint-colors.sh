@@ -25,6 +25,7 @@ else
     "packages/svelte/src"
     "packages/react/src"
     "packages/icons/src"
+    "packages/mascots/src"
     "apps/storybook-hub/build.js"
     "packages/tokens/build.js"
     "packages/brand/src"
