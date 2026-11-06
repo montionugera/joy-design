@@ -7,6 +7,7 @@ node -e "console.log('Verifying Node runtime compatibility...');"
 (cd packages/icons && node --test test/icons.test.js)
 (cd packages/svelte && node --test test/components.test.js)
 (cd packages/react && node --test test/components.test.js)
+(cd packages/mascots && node --test test/*.test.js)
 
 echo "==> Running Gate 1 Storybook Hub Contracts <=="
 ./scripts/precheck.sh
