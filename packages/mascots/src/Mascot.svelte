@@ -2,6 +2,7 @@
   import './mascot.css';
   import { clampGlow, clampSize, initialOf, resolveMascot } from './data.js';
   import { ASSETS } from './assets.js';
+  import type { MascotId, MascotPose } from './data.js';
 
   let {
     name = 'yoji',
@@ -10,7 +11,7 @@
     label,
     glow = 0,
     eager = false,
-  }: { name?: string; pose?: string; size?: number; label?: string; glow?: number; eager?: boolean } = $props();
+  }: { name?: MascotId; pose?: MascotPose; size?: number; label?: string; glow?: number; eager?: boolean } = $props();
 
   const r = $derived(resolveMascot(name, pose));
   const px = $derived(clampSize(size));
@@ -23,7 +24,7 @@
 
 {#if failed}
   <span
-    class="joy-mascot joy-mascot--fallback"
+    class={g > 0 ? 'joy-mascot joy-mascot--fallback joy-mascot--glow' : 'joy-mascot joy-mascot--fallback'}
     data-joy-mascot={r.id}
     data-pose={r.pose}
     style="width:{px}px;height:{px}px;--joy-mascot-glow:{g}"
@@ -33,7 +34,7 @@
   >
 {:else}
   <img
-    class="joy-mascot"
+    class={g > 0 ? 'joy-mascot joy-mascot--glow' : 'joy-mascot'}
     data-joy-mascot={r.id}
     data-pose={r.pose}
     {src}

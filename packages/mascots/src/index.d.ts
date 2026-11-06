@@ -1,8 +1,9 @@
 import type { Component } from 'svelte';
+import type { MascotId, MascotPose } from './data.js';
 
 export interface MascotProps {
-  name?: string;
-  pose?: string;
+  name?: MascotId;
+  pose?: MascotPose;
   size?: number;
   label?: string;
   glow?: number;
@@ -10,5 +11,6 @@ export interface MascotProps {
 }
 
 export const Mascot: Component<MascotProps>;
-export { MASCOTS, POSES, assetUrl } from './data.js';
-export type { MascotInfo } from './data.js';
+export { MASCOTS, POSES } from './data.js';
+export type { MascotId, MascotPose, MascotInfo } from './data.js';
+export function assetUrl(id: MascotId, pose: MascotPose, density?: 1 | 2): string;

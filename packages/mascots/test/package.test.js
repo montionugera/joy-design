@@ -32,3 +32,12 @@ test('PROVENANCE names the owner, the ChatGPT redraw date and the Duolingo discl
   assert.match(provenance, /not Duolingo/i);
   assert.match(provenance, /Yoji, Pico, Luna, Rex, Mochi, Zing, Byte/);
 });
+
+test('the repo README tells React consumers to import mascot.css and that they need a bundler for the pictures', () => {
+  const readme = fs.readFileSync(new URL('../../../README.md', import.meta.url), 'utf8');
+  const section = readme.slice(readme.indexOf('## Mascots'), readme.indexOf('## Brand kit'));
+  assert.ok(section.length > 100, 'a Mascots section exists before Brand kit');
+  assert.ok(section.includes("import '@montionugera/joy-mascots/mascot.css'"));
+  assert.match(section, /bundler/);
+  assert.match(section, /file:/);
+});

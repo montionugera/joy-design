@@ -16,7 +16,7 @@ registerHooks({
     }
     if (url.endsWith('.svelte')) {
       const file = fileURLToPath(url);
-      const { js } = compile(fs.readFileSync(file, 'utf8'), { generate: 'server', filename: file, dev: false });
+      const { js } = compile(fs.readFileSync(file, 'utf8'), { generate: globalThis.__mascotCompile ?? 'server', filename: file, dev: false });
       return { format: 'module', source: js.code, shortCircuit: true };
     }
     if (url.endsWith('.tsx') || url.endsWith('.ts')) {

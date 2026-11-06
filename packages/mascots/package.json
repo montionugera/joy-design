@@ -48,7 +48,7 @@
   "scripts": {
     "assets": "node scripts/build-assets.mjs",
     "build": "tsc -p tsconfig.build.json",
-    "test": "node --test test/*.test.js",
+    "test": "node --test test/*.test.js && node --conditions=browser --test test/dom/*.test.js",
     "check": "svelte-check --tsconfig ./tsconfig.json --threshold error"
   },
   "peerDependencies": {
@@ -64,6 +64,7 @@
     }
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.4",
     "@types/react": "^19.3.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

@@ -1,7 +1,8 @@
 import './helpers.js';
 import test from 'node:test';
 import assert from 'node:assert';
-import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { createElement as h } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { render } from 'svelte/server';
@@ -39,10 +40,15 @@ test('React: Rex cheer at 96 has alt Rex; no label is decorative', () => {
   assert.strictEqual(firstTagAttrs(reactHtml({ name: 'rex' })).alt, '');
 });
 
-test('the react entry exports Mascot and the shared data without a copy', () => {
-  const entry = fs.readFileSync(new URL('../src/react.ts', import.meta.url), 'utf8');
-  assert.ok(entry.includes("export { Mascot } from './react/Mascot.js'"), 'with the .js extension so plain Node (ssr-check.mjs) can load dist/react.js');
-  assert.ok(entry.includes("'../src/data.js'"));
-  const tsx = fs.readFileSync(new URL('../src/react/Mascot.tsx', import.meta.url), 'utf8');
-  assert.ok(tsx.includes("'../../src/data.js'"), 'imports the one shared data file');
+test('the built dist/react.js loads in plain Node and renders the same image as src', async () => {
+  // The .js extensions in the sources are what make this work; build the shipped artefact and import it.
+  execFileSync(path.resolve('node_modules/.bin/tsc'), ['-p', 'tsconfig.build.json'], { stdio: 'pipe' });
+  const built = await import('../dist/react.js');
+  assert.deepStrictEqual(Object.keys(built).sort(), ['MASCOTS', 'Mascot', 'POSES', 'assetUrl']);
+  assert.strictEqual(built.MASCOTS.length, 7);
+  const props = { name: 'rex', pose: 'cheer', label: 'Rex' };
+  assert.deepStrictEqual(
+    firstTagAttrs(renderToStaticMarkup(h(built.Mascot, props))),
+    firstTagAttrs(reactHtml(props)),
+  );
 });

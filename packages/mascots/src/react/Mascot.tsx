@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
+import type { MascotId, MascotPose } from '../../src/data.js';
 import { assetUrl, clampGlow, clampSize, initialOf, resolveMascot } from '../../src/data.js';
 
 export interface MascotProps {
-  name?: string;
-  pose?: string;
+  name?: MascotId;
+  pose?: MascotPose;
   size?: number;
   label?: string;
   glow?: number;
@@ -23,7 +24,7 @@ export function Mascot({ name = 'yoji', pose = 'idle', size = 96, label, glow = 
     const style = { width: px, height: px, '--joy-mascot-glow': g } as CSSProperties;
     return (
       <span
-        className="joy-mascot joy-mascot--fallback"
+        className={g > 0 ? 'joy-mascot joy-mascot--fallback joy-mascot--glow' : 'joy-mascot joy-mascot--fallback'}
         data-joy-mascot={r.id}
         data-pose={r.pose}
         style={style}
@@ -38,7 +39,7 @@ export function Mascot({ name = 'yoji', pose = 'idle', size = 96, label, glow = 
   const style = { '--joy-mascot-glow': g } as CSSProperties;
   return (
     <img
-      className="joy-mascot"
+      className={g > 0 ? 'joy-mascot joy-mascot--glow' : 'joy-mascot'}
       data-joy-mascot={r.id}
       data-pose={r.pose}
       src={src}

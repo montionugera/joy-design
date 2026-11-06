@@ -46,3 +46,13 @@ test('defaults: Yoji idle at 96, glow 0', () => {
   assert.strictEqual(a.width, '96');
   assert.strictEqual(a.style, '--joy-mascot-glow:0');
 });
+
+test('the Svelte entry assetUrl is SSR-safe: a bundler URL from the static imports, never file:', async () => {
+  const { assetUrl } = await import('../src/index.ts');
+  assert.ok(!assetUrl('rex', 'cheer').startsWith('file:'));
+  assert.match(assetUrl('rex', 'cheer'), /rex-cheer\.webp$/);
+  assert.match(assetUrl('rex', 'cheer', 2), /rex-cheer@2x\.webp$/);
+  assert.throws(() => assetUrl('nope', 'idle'), RangeError);
+  const a = firstTagAttrs(html({ name: 'rex', pose: 'cheer' }));
+  assert.strictEqual(assetUrl('rex', 'cheer'), a.src, 'the same URL the component renders');
+});

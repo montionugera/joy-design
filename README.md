@@ -841,6 +841,29 @@ F040_SCREENS=1 PLAYWRIGHT_PORT=6122 ./node_modules/.bin/playwright test tests/sc
 
 The last command writes the 16 acceptance screenshots (landing, primitives, forms and data display, at 375px and 1280px, light and dark) to `.claude/refined_backlog/F-040-wave-5-storybook-hub-mobile-layout-dark/research/screens/`. The per-issue status of the hub audit (HUB-001 to HUB-070), including the deferrals, is in `research/issue-coverage.md` in the same folder.
 
+## Mascots
+
+`@montionugera/joy-mascots` ships the seven characters (Yoji, Pico, Luna, Rex, Mochi, Zing, Byte) in five poses (`idle`, `cheer`, `thinking`, `try-again`, `sleepy`) as WebP pictures. The `name` and `pose` props, `assetUrl` and `MASCOTS`/`POSES` are typed with the `MascotId` and `MascotPose` unions, so a typo such as `name="rexx"` fails type-checking; at runtime an unknown value still falls back to Yoji idle for plain JavaScript callers.
+
+```svelte
+<script>
+  import { Mascot } from '@montionugera/joy-mascots';
+</script>
+<Mascot name="rex" pose="cheer" size={96} label="Rex" glow={2} />
+```
+
+```tsx
+import { Mascot } from '@montionugera/joy-mascots/react';
+import '@montionugera/joy-mascots/mascot.css';
+
+<Mascot name="rex" pose="cheer" size={96} label="Rex" glow={2} />;
+```
+
+- **React needs a bundler for the pictures.** The React entry finds each picture with `new URL(..., import.meta.url)`, which Vite, webpack 5 and similar bundlers rewrite to a real URL. In plain Node, or in a Vite server-side render, that call returns a `file:` URL, so do not render `assetUrl()` from `./react` into server HTML. The Svelte entry uses static imports, so its `assetUrl()` is a real URL in SSR, client and dev.
+- **React must import the stylesheet.** Add `import '@montionugera/joy-mascots/mascot.css'` once (the Svelte `Mascot` imports it itself). Without it there is no bob animation, no glow and the load-failure badge is unstyled.
+- `glow` is 0 to 5; at 0 no drop-shadow is applied at all (the `joy-mascot--glow` class is added only above 0).
+- If a picture fails to load, both components show a soft circle with the character's initial at the same size.
+
 ## Brand kit
 
 `packages/brand` (`@montionugera/joy-brand`) is the single source for the Joymify mark, wordmark, hero banner and social card. Geometry (`src/geometry.js`) and pure SVG renderers (`src/render.js`) take a palette built from the light-theme `--joy-brand-*` values in `packages/tokens/dist/theme.css`, so every asset traces back to the tokens, never a hand-typed hex. `node packages/brand/build.js` regenerates the committed files below; a drift test in `packages/brand/test/` fails if the committed output and a fresh build disagree. See the generated [Brand](DESIGN.md#brand) section of `DESIGN.md` for the mark geometry, the wordmark padding/overflow rules, the `--joy-brand-*` table and the Don'ts.

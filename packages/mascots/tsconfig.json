@@ -11,5 +11,5 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": []
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.svelte"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.svelte", "test/types/**/*.ts"]
 }

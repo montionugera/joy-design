@@ -4,8 +4,11 @@
   flex: none;
   object-fit: contain;
   vertical-align: middle;
-  filter: drop-shadow(0 0 calc(var(--joy-mascot-glow) * 3px) var(--joy-accent-default));
   animation: joy-mascot-bob 3.2s ease-in-out infinite;
+}
+
+.joy-mascot--glow {
+  filter: drop-shadow(0 0 calc(var(--joy-mascot-glow) * 3px) var(--joy-accent-default));
 }
 
 .joy-mascot--fallback {

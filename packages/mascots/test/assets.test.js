@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+import './helpers.js';
 
 const IDS = ['yoji', 'pico', 'luna', 'rex', 'mochi', 'zing', 'byte'];
 const POSES = ['idle', 'cheer', 'thinking', 'try-again', 'sleepy'];
@@ -28,14 +29,22 @@ test('70 WebP pictures: every character x pose x 1x/2x, right size, alpha kept',
   assert.ok(total < 2 * 1024 * 1024, `all pictures together are ${total} bytes, spec estimate is under 2 MB`);
 });
 
-test('assets.js imports all 70 files statically (what Vite rewrites in SSR, client and dev)', () => {
-  const source = fs.readFileSync(path.resolve('./src/assets.js'), 'utf8');
-  const imports = source.match(/^import \w+ from '\.\.\/assets\/[a-z-]+(@2x)?\.webp';$/gm) ?? [];
-  assert.strictEqual(imports.length, 70);
-  assert.ok(!source.includes('import.meta.url'), 'no new URL in assets.js');
-  assert.strictEqual((source.match(/^  '[a-z-]+(@2x)?': \w+,$/gm) ?? []).length, 70);
+test('assets.js maps all 70 pictures to bundler URLs (the .webp import stub in helpers.js stands in for Vite)', async () => {
+  const { ASSETS } = await import('../src/assets.js');
+  const keys = Object.keys(ASSETS);
+  assert.strictEqual(keys.length, 70);
+  for (const id of IDS) {
+    for (const pose of POSES) {
+      for (const suffix of ['', '@2x']) {
+        const key = `${id}-${pose}${suffix}`;
+        assert.strictEqual(ASSETS[key], `/assets/${key}.webp`, `${key} is a site-absolute URL of its own file, never file:`);
+      }
+    }
+  }
 });
 
+// Source check kept on purpose: a bundler only emits a picture for a literal new URL('<file>', import.meta.url), and
+// that is a property of the text; plain Node cannot observe it.
 test('urls.js lists all 70 files as literal new URL(..., import.meta.url) calls', async () => {
   const source = fs.readFileSync(path.resolve('./src/urls.js'), 'utf8');
   const literals = source.match(/new URL\('\.\.\/assets\/[a-z-]+(@2x)?\.webp', import\.meta\.url\)\.href/g) ?? [];
