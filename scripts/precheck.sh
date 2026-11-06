@@ -21,6 +21,8 @@ for root, dirs, files in os.walk('.'):
     if any(x in root for x in ['node_modules', '.git', 'dist', 'portal-bundles', '.claude', '.turbo', 'test-results', 'playwright-report', '.adal', '.gemini', '.cursor', '.kiro', '.windsurf', '.dart_tool', 'build', '.flutter-plugins', 'graft', '.build', '.swiftpm']): continue
     for f in files:
         if f in ['pnpm-lock.yaml', 'AGENTS.md'] or (f.endswith('.html') and 'docs' in root): continue
+        # Binary assets (mascot WebP, fonts, images) are not source text; random bytes decode as emoji.
+        if f.lower().endswith(('.webp', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.otf', '.mp3', '.mp4', '.zip', '.tgz', '.pdf')): continue
         p = os.path.join(root, f)
         try:
             with open(p, 'r', encoding='utf-8', errors='ignore') as fh:

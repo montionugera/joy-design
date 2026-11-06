@@ -1,0 +1,76 @@
+{
+  "name": "@montionugera/joy-mascots",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "SEE LICENSE IN PROVENANCE.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montionugera/joy-design.git",
+    "directory": "packages/mascots"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "assets",
+    "dist",
+    "src/index.ts",
+    "src/index.d.ts",
+    "src/data.js",
+    "src/data.d.ts",
+    "src/urls.js",
+    "src/assets.js",
+    "src/assets.d.ts",
+    "src/mascot.css",
+    "src/*.svelte",
+    "PROVENANCE.md"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
+    },
+    "./data": {
+      "types": "./src/data.d.ts",
+      "default": "./src/data.js"
+    },
+    "./mascot.css": "./src/mascot.css"
+  },
+  "scripts": {
+    "assets": "node scripts/build-assets.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "node --test test/*.test.js && node --conditions=browser --test test/dom/*.test.js",
+    "check": "svelte-check --tsconfig ./tsconfig.json --threshold error"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.4",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "sharp": "^0.34.0",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "typescript": "^5.9.3"
+  }
+}
