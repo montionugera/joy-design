@@ -2,7 +2,7 @@
   import './mascot.css';
   import { clampGlow, clampSize, initialOf, resolveMascot } from './data.js';
   import { ASSETS } from './assets.js';
-  import type { MascotId, MascotPose } from './data.js';
+  import type { MascotProps } from './data.js';
 
   let {
     name = 'yoji',
@@ -11,7 +11,7 @@
     label,
     glow = 0,
     eager = false,
-  }: { name?: MascotId; pose?: MascotPose; size?: number; label?: string; glow?: number; eager?: boolean } = $props();
+  }: MascotProps = $props();
 
   const r = $derived(resolveMascot(name, pose));
   const px = $derived(clampSize(size));

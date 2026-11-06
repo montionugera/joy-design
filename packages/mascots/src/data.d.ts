@@ -1,6 +1,15 @@
 export type MascotId = 'yoji' | 'pico' | 'luna' | 'rex' | 'mochi' | 'zing' | 'byte';
 export type MascotPose = 'idle' | 'cheer' | 'thinking' | 'try-again' | 'sleepy';
 
+export interface MascotProps {
+  name?: MascotId;
+  pose?: MascotPose;
+  size?: number;
+  label?: string;
+  glow?: number;
+  eager?: boolean;
+}
+
 export interface MascotInfo {
   readonly id: MascotId;
   readonly name: string;

@@ -1,16 +1,9 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
-import type { MascotId, MascotPose } from '../../src/data.js';
+import type { MascotProps } from '../../src/data.js';
 import { assetUrl, clampGlow, clampSize, initialOf, resolveMascot } from '../../src/data.js';
 
-export interface MascotProps {
-  name?: MascotId;
-  pose?: MascotPose;
-  size?: number;
-  label?: string;
-  glow?: number;
-  eager?: boolean;
-}
+export type { MascotProps };
 
 export function Mascot({ name = 'yoji', pose = 'idle', size = 96, label, glow = 0, eager = false }: MascotProps) {
   const r = resolveMascot(name, pose);
