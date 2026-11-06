@@ -9,6 +9,7 @@
         { "id": "overview", "label": "Overview & Architecture", "icon": "overview" },
         { "id": "flutter", "label": "Flutter 3.32 Showcase", "icon": "monitor" },
         { "id": "brand", "label": "Brand Assets", "icon": "brand" },
+        { "id": "mascots", "label": "Mascots", "icon": "brand" },
         { "id": "tokens", "label": "Design Tokens & Motion", "icon": "tokens" },
         { "id": "props-spec", "label": "Props & API Specs", "icon": "propsSpec" }
       ]

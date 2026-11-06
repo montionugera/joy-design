@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { SVG_ORNAMENTS } from "../../packages/tokens/scripts/genres.mjs";
 import { MARK, WORDMARK, heroLattice, wordmarkLayout, markScale } from "../../packages/brand/src/index.js";
+import { MASCOTS, POSES } from "../../packages/mascots/src/data.js";
 import { highlightCodeToHtml } from "../../packages/react/src/syntax-highlighter.ts";
 import { renderMermaidToSvg } from "../../packages/react/src/mermaid-renderer.ts";
 
@@ -5454,6 +5455,23 @@ ${navigationHtml}
               .join("")}
           </div>
         </div>
+      </section>
+
+      <!-- View: Mascots (I-105) -->
+      <section id="view-mascots" class="view-panel">
+        <h2 style="margin: 0 0 8px 0;">Mascots</h2>
+        <p class="header-tagline">The Joymify mascot family from @montionugera/joy-mascots: seven characters, five poses each. Art by the owner, redrawn in ChatGPT (see the package PROVENANCE.md).</p>
+        ${MASCOTS.map(
+          (m) => `
+        <div class="playground-box">
+          <div class="playground-header"><h3 style="margin: 0; font-size: var(--joy-font-size-lg);">${m.name}</h3><span>${m.personality.join(", ")}</span></div>
+          <div class="canvas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: var(--joy-space-3); justify-items: center;">
+            ${POSES.map(
+              (pose) => `<figure style="margin: 0; text-align: center;"><img class="hub-mascot" src="mascots/${m.id}-${pose}.webp" srcset="mascots/${m.id}-${pose}.webp 1x, mascots/${m.id}-${pose}@2x.webp 2x" width="96" height="96" alt="" loading="lazy" /><figcaption style="font-size: var(--joy-font-size-sm); color: var(--joy-text-secondary);">${pose}</figcaption></figure>`,
+            ).join("")}
+          </div>
+        </div>`,
+        ).join("")}
       </section>
 
       <!-- View: Tokens -->
@@ -14858,6 +14876,16 @@ for (const file of brandAssetFiles) {
 }
 fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(outDir, "favicon.svg"));
 fs.copyFileSync(path.join(brandAssetsSrc, "favicon.svg"), path.join(designOutDir, "favicon.svg"));
+
+// Mascot pictures (I-105): the hub page references them as mascots/<id>-<pose>[@2x].webp.
+const mascotAssetsSrc = path.join(__dirname, "../../packages/mascots/assets");
+// Copied beside both index.html files (root and /design/), as the page uses relative URLs.
+for (const mascotOutDir of [path.join(outDir, "mascots"), path.join(designOutDir, "mascots")]) {
+  fs.mkdirSync(mascotOutDir, { recursive: true });
+  for (const file of fs.readdirSync(mascotAssetsSrc).filter((f) => f.endsWith(".webp"))) {
+    fs.copyFileSync(path.join(mascotAssetsSrc, file), path.join(mascotOutDir, file));
+  }
+}
 
 // Copy Flutter Web bundle if present (F-065)
 const flutterSrcDir = path.join(__dirname, "../flutter-hub/build/web");
