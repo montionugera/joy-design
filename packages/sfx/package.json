@@ -1,0 +1,43 @@
+{
+  "name": "@montionugera/joy-sfx",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "SEE LICENSE IN PROVENANCE.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montionugera/joy-design.git",
+    "directory": "packages/sfx"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "assets",
+    "src/index.ts",
+    "src/index.d.ts",
+    "src/manifest.json",
+    "src/manifest.d.ts",
+    "PROVENANCE.md"
+  ],
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./manifest": {
+      "types": "./src/manifest.d.ts",
+      "default": "./src/manifest.json"
+    },
+    "./assets/*": "./assets/*"
+  },
+  "scripts": {
+    "manifest": "node scripts/build-manifest.mjs",
+    "test": "node --test test/*.test.js",
+    "check": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

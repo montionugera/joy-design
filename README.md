@@ -15,6 +15,7 @@ Enterprise multi-platform design system and composed Storybook workshop powering
 | `packages/icons` (`@montionugera/joy-icons`)   | SVG icons as Svelte 5 components (`@montionugera/joy-icons`) and React components (`@montionugera/joy-icons/react`), with identical rendering.                                                                                                                                                      |
 | `packages/mascots` (`@montionugera/joy-mascots`) | The Joymify mascot family (Yoji, Pico, Luna, Rex, Mochi, Zing, Byte), 5 poses each, as WebP pictures with a Svelte 5 `Mascot` (`@montionugera/joy-mascots`) and a React 19 `Mascot` (`@montionugera/joy-mascots/react`). |
 | `packages/brand` (`@montionugera/joy-brand`)   | The Joymify brand kit: geometry (`src/geometry.js`), pure SVG renderers (`src/render.js`), and `build.js`, which reads the light-theme `--joy-brand-*` values from `packages/tokens/dist/theme.css` and writes the static files in `assets/` (see [Brand kit](#brand-kit) below). |
+| `packages/sfx` (`@montionugera/joy-sfx`)       | Shared game sound effects library (51 mono 96 kbps MP3 clips, peak -12 dBFS) with TypeScript manifest, metadata, `sfxUrl`, and `createSfxPlayer` Web Audio limiter. |
 | `packages/svelte` (`@montionugera/joy-svelte`) | Svelte 5 (Runes) components.                                                                                                                                                                                                                                                      |
 | `packages/react` (`@montionugera/joy-react`)   | React 19 twins of the Svelte components: the same props, the same classes and ref forwarding.                                                                                                                                                                                     |
 | `packages/flutter` (`joymify_flutter`) | Flutter 3.32+ / Dart 3.8.1 package providing semantic token parity (`JoyThemeTokens`), pure style resolvers, and native widgets (`JoyButton`). |
@@ -61,7 +62,7 @@ Import the stylesheet once: `import '@montionugera/joy-tokens/theme.css'`. Light
 
 ## Install from the registry
 
-Six packages are publishable to GitHub Packages and to the public npm registry (npmjs.org) under the `@montionugera` scope. `@montionugera/joy-svelte` (0.2.0) is ready to publish but has not been published yet; see the first-publish note under the npmjs.org trusted publishers below.
+Seven packages are publishable to GitHub Packages and to the public npm registry (npmjs.org) under the `@montionugera` scope. `@montionugera/joy-svelte` (0.2.0) is ready to publish but has not been published yet; see the first-publish note under the npmjs.org trusted publishers below.
 
 | Package | Ships | Import |
 | --- | --- | --- |
@@ -70,6 +71,7 @@ Six packages are publishable to GitHub Packages and to the public npm registry (
 | `@montionugera/joy-mascots` | The mascot pictures (WebP, 1x and 2x), shared data, a stylesheet, the Svelte `Mascot` as source and the React `Mascot` as built JavaScript with type declarations. | `@montionugera/joy-mascots/react` (React), `@montionugera/joy-mascots` (Svelte, needs a Svelte bundler) |
 | `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
 | `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
+| `@montionugera/joy-sfx` | 51 game sound effect clips (MP3), TypeScript manifest, `sfxUrl`, and `createSfxPlayer`. | `@montionugera/joy-sfx`, `@montionugera/joy-sfx/manifest`, `@montionugera/joy-sfx/assets/*` |
 
 **Public npm (no token needed):** tokens, icons, brand and react are on npmjs.org (svelte is not yet), so install with no `.npmrc` and no token:
 
@@ -863,6 +865,34 @@ import '@montionugera/joy-mascots/mascot.css';
 - **React must import the stylesheet.** Add `import '@montionugera/joy-mascots/mascot.css'` once (the Svelte `Mascot` imports it itself). Without it there is no bob animation, no glow and the load-failure badge is unstyled.
 - `glow` is 0 to 5; at 0 no drop-shadow is applied at all (the `joy-mascot--glow` class is added only above 0).
 - If a picture fails to load, both components show a soft circle with the character's initial at the same size.
+
+## Sound effects
+
+`@montionugera/joy-sfx` provides the shared sound effects library for Joymify web and mobile apps, containing 51 short clips (mono 96 kbps MP3 files peak-normalized to -12 dBFS) sourced from Pixabay, Mixkit, and ElevenLabs. It exports `SFX_NAMES`, `SfxName`, `sfxUrl`, and `createSfxPlayer`:
+
+```ts
+import { sfxUrl, SFX_NAMES, createSfxPlayer } from '@montionugera/joy-sfx';
+
+// Resolve public URL for any cue
+const winAudioUrl = sfxUrl('win'); // '/audio/sfx/win.mp3'
+const cdnAudioUrl = sfxUrl('win', { baseUrl: 'https://cdn.joymify.com/audio/sfx/' });
+
+// Create Web Audio player with a -12 dB hard limiter ceiling
+const player = createSfxPlayer();
+
+// Unlock audio during user interaction (gesture)
+player.unlock();
+
+// Play sound effects safely (never throws when Web Audio is unsupported)
+player.play('win', { gain: 0.8 });
+
+// Mute/unmute or disable
+player.setEnabled(false);
+```
+
+- **-12 dB hard limiter:** Every effect routes through a DynamicsCompressorNode capped at -12 dB (ratio 20:1, attack 0.002s) so overlapping cues never clip or distort.
+- **Fail-safe:** `createSfxPlayer` and `play` never throw in Node, SSR, or environments without Web Audio.
+- **Accessibility:** Honors `enabled` and `reducedMotion` flags to prevent unexpected sensory disruption.
 
 ## Brand kit
 
