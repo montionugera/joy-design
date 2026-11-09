@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Tarball test for the six published packages (spec I-077, Phase 2 part 3).
 #
-# Packs @montionugera/joy-tokens, icons, brand, react, svelte and mascots exactly as `pnpm publish`
+# Packs @montionugera/joy-tokens, icons, brand, react, svelte, mascots and sfx exactly as `pnpm publish`
 # would, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside
 # this workspace, then type-checks, builds and renders that app, and server-renders
 # joy-svelte through Vite (source-exported, so it is compiled by the consumer). It is the only check that
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-packages=(tokens icons brand react svelte mascots)
+packages=(tokens icons brand react svelte mascots sfx)
 
 fail() {
   echo "consumer-smoke: FAIL: $*" >&2
@@ -34,6 +34,7 @@ allowed_pattern() {
     brand) echo '^package/(package\.json|PROVENANCE\.md|src/.+|assets/.+)$' ;;
     svelte) echo '^package/(package\.json|LICENSE|src/lib/.+)$' ;;
     mascots) echo '^package/(package\.json|PROVENANCE\.md|assets/[^/]+\.webp|dist/.+|src/(index\.ts|index\.d\.ts|data\.js|data\.d\.ts|urls\.js|assets\.js|assets\.d\.ts|mascot\.css)|src/[^/]+\.svelte)$' ;;
+    sfx) echo '^package/(package\.json|PROVENANCE\.md|assets/[^/]+\.mp3|dist/.+|src/(index\.ts|index\.d\.ts|manifest\.json|manifest\.d\.ts))$' ;;
   esac
 }
 
@@ -46,6 +47,7 @@ required_files() {
     react) echo "dist/index.js dist/index.d.ts dist/Button.js dist/Button.d.ts dist/Tabs.js dist/BrandMark.js" ;;
     svelte) echo "LICENSE src/lib/index.ts src/lib/Badge.svelte src/lib/Button.svelte src/lib/Modal.svelte" ;;
     mascots) echo "assets/yoji-idle.webp assets/yoji-idle@2x.webp dist/react.js dist/react.d.ts dist/react/Mascot.js src/index.ts src/data.js src/urls.js src/assets.js src/Mascot.svelte src/mascot.css PROVENANCE.md" ;;
+    sfx) echo "assets/win.mp3 dist/index.js dist/index.d.ts src/index.ts src/manifest.json src/manifest.d.ts PROVENANCE.md" ;;
   esac
 }
 
@@ -53,12 +55,13 @@ tarball_of() {
   echo "$work/tarballs/$1"/*.tgz
 }
 
-echo "==> 1/7 Building joy-icons, joy-react and joy-mascots"
+echo "==> 1/7 Building joy-icons, joy-react, joy-mascots and joy-sfx"
 (cd "$repo_root" && pnpm --filter @montionugera/joy-icons build)
 (cd "$repo_root" && pnpm --filter @montionugera/joy-react build)
 (cd "$repo_root" && pnpm --filter @montionugera/joy-mascots build)
+(cd "$repo_root" && pnpm --filter @montionugera/joy-sfx build)
 
-echo "==> 2/7 Packing the six packages"
+echo "==> 2/7 Packing the seven packages"
 for pkg in "${packages[@]}"; do
   mkdir -p "$work/tarballs/$pkg"
   (cd "$repo_root/packages/$pkg" && pnpm pack --pack-destination "$work/tarballs/$pkg" > /dev/null)
@@ -91,7 +94,7 @@ echo "==> 4/7 Creating the consumer app in $work/app"
 app="$work/app"
 mkdir -p "$app/src"
 
-TOKENS_TGZ="$(tarball_of tokens)" ICONS_TGZ="$(tarball_of icons)" BRAND_TGZ="$(tarball_of brand)" REACT_TGZ="$(tarball_of react)" SVELTE_TGZ="$(tarball_of svelte)" MASCOTS_TGZ="$(tarball_of mascots)" \
+TOKENS_TGZ="$(tarball_of tokens)" ICONS_TGZ="$(tarball_of icons)" BRAND_TGZ="$(tarball_of brand)" REACT_TGZ="$(tarball_of react)" SVELTE_TGZ="$(tarball_of svelte)" MASCOTS_TGZ="$(tarball_of mascots)" SFX_TGZ="$(tarball_of sfx)" \
   node -e '
 const fs = require("node:fs");
 const tarballs = {
@@ -101,6 +104,7 @@ const tarballs = {
   "@montionugera/joy-react": "file:" + process.env.REACT_TGZ,
   "@montionugera/joy-svelte": "file:" + process.env.SVELTE_TGZ,
   "@montionugera/joy-mascots": "file:" + process.env.MASCOTS_TGZ,
+  "@montionugera/joy-sfx": "file:" + process.env.SFX_TGZ,
 };
 const pkg = {
   name: "joy-consumer-smoke",
@@ -183,6 +187,7 @@ import { MARK } from '@montionugera/joy-brand';
 import { tokens } from '@montionugera/joy-tokens';
 import { Mascot } from '@montionugera/joy-mascots/react';
 import '@montionugera/joy-mascots/mascot.css';
+import { sfxUrl, SFX_NAMES, type SfxName } from '@montionugera/joy-sfx';
 
 const items: TabItem[] = [
   { key: 'overview', label: 'Overview', content: <p>Overview panel</p> },
@@ -203,6 +208,8 @@ export const badToken: typeof tokens['surface-canvas'] = 123;
 export const badTabKey: TabItem['key'] = 123;
 // @ts-expect-error BrandMark variant is 'tile' | 'bare'
 export const badBrandMarkVariant: BrandMarkProps['variant'] = 'not-a-variant';
+// @ts-expect-error SfxName is a closed union of 51 strings
+export const badSfx: SfxName = 'not-a-sfx';
 
 export function App() {
   return (
@@ -213,6 +220,7 @@ export function App() {
       </Button>
       <Tabs items={items} />
       <Mascot name="rex" pose="cheer" size={96} label="Rex" />
+      <p data-sfx-url={sfxUrl('win')}>{SFX_NAMES.length} sounds</p>
     </main>
   );
 }
@@ -230,6 +238,7 @@ import { Button, Tabs, BrandMark } from '@montionugera/joy-react';
 import { Check } from '@montionugera/joy-icons/react';
 import { MARK } from '@montionugera/joy-brand';
 import { Mascot } from '@montionugera/joy-mascots/react';
+import { sfxUrl } from '@montionugera/joy-sfx';
 import * as tokens from '@montionugera/joy-tokens';
 
 const require = createRequire(import.meta.url);
@@ -281,6 +290,12 @@ if (!cjsTokens || !cjsTokens.tokens || !cjsTokens.tokens['surface-canvas']) {
   console.error('ssr-check: the joy-tokens CommonJS entry failed to load tokens');
   process.exit(1);
 }
+const winSfx = sfxUrl('win');
+if (!winSfx || typeof winSfx !== 'string' || !winSfx.includes('win.mp3')) {
+  console.error('ssr-check: sfxUrl("win") did not resolve to a valid win.mp3 url:', winSfx);
+  process.exit(1);
+}
+
 console.log('ssr-check: rendered', html.length, 'characters of markup');
 EOF
 
@@ -298,7 +313,7 @@ const server = await createServer({
   server: { middlewareMode: true },
   plugins: [svelte()],
   resolve: { dedupe: ['svelte', '@montionugera/joy-icons', '@montionugera/joy-brand'] },
-  ssr: { noExternal: ['svelte', '@montionugera/joy-svelte', '@montionugera/joy-icons', '@montionugera/joy-mascots'] },
+  ssr: { noExternal: ['svelte', '@montionugera/joy-svelte', '@montionugera/joy-icons', '@montionugera/joy-mascots', '@montionugera/joy-sfx'] },
 });
 try {
   // render() must come from the same svelte instance as the components, so load it through Vite too.
@@ -324,6 +339,19 @@ try {
     process.exit(1);
   }
   console.log('ssr-svelte-check: rendered Mascot:', mascotHtml);
+
+  // Joy-sfx smoke check: import SFX_NAMES and resolve sfxUrl('win')
+  const sfx = await server.ssrLoadModule('@montionugera/joy-sfx');
+  const winUrl = sfx.sfxUrl('win');
+  if (!winUrl || !winUrl.includes('win.mp3')) {
+    console.error('ssr-svelte-check: sfxUrl("win") unexpected result:', winUrl);
+    process.exit(1);
+  }
+  if (!Array.isArray(sfx.SFX_NAMES) || sfx.SFX_NAMES.length !== 51) {
+    console.error('ssr-svelte-check: sfx.SFX_NAMES does not contain 51 sounds:', sfx.SFX_NAMES?.length);
+    process.exit(1);
+  }
+  console.log('ssr-svelte-check: sfxUrl("win") resolved to:', winUrl, 'with', sfx.SFX_NAMES.length, 'cues');
 } finally {
   await server.close();
 }
@@ -346,7 +374,7 @@ fi
 # tell it from a tarball. The lockfile can: a registry resolution is keyed name@<version>,
 # a tarball resolution is keyed name@file:<path>. This covers the three packages @montionugera/joy-react
 # depends on, which are installed through the overrides and not as direct dependencies only.
-if grep -nE "@montionugera/joy-(tokens|icons|brand|react|svelte|mascots)@[0-9]" "$app/pnpm-lock.yaml"; then
+if grep -nE "@montionugera/joy-(tokens|icons|brand|react|svelte|mascots|sfx)@[0-9]" "$app/pnpm-lock.yaml"; then
   fail "a @montionugera/joy-* package was resolved from a registry, not from its tarball (listed above)"
 fi
 

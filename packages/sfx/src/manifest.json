@@ -1,0 +1,410 @@
+[
+  {
+    "name": "bombBlast",
+    "file": "bombBlast.mp3",
+    "durationMs": 1500,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Animated Cartoon Explosion Impact"
+  },
+  {
+    "name": "buyPower",
+    "file": "buyPower.mp3",
+    "durationMs": 963,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "damageHit",
+    "file": "damageHit.mp3",
+    "durationMs": 546,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "dawnBreak",
+    "file": "dawnBreak.mp3",
+    "durationMs": 1632,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Chime sound"
+  },
+  {
+    "name": "diceRoll",
+    "file": "diceRoll.mp3",
+    "durationMs": 1030,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "rolling dice 2"
+  },
+  {
+    "name": "draw",
+    "file": "draw.mp3",
+    "durationMs": 540,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "flipCard"
+  },
+  {
+    "name": "emote_anger",
+    "file": "emote_anger.mp3",
+    "durationMs": 1200,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_bulb",
+    "file": "emote_bulb.mp3",
+    "durationMs": 1030,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_clap",
+    "file": "emote_clap.mp3",
+    "durationMs": 1200,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_cockroach",
+    "file": "emote_cockroach.mp3",
+    "durationMs": 571,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_cry",
+    "file": "emote_cry.mp3",
+    "durationMs": 1200,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_dots",
+    "file": "emote_dots.mp3",
+    "durationMs": 1200,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_exclamation",
+    "file": "emote_exclamation.mp3",
+    "durationMs": 460,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_fire",
+    "file": "emote_fire.mp3",
+    "durationMs": 1200,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_gg",
+    "file": "emote_gg.mp3",
+    "durationMs": 750,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_heart",
+    "file": "emote_heart.mp3",
+    "durationMs": 300,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_laugh",
+    "file": "emote_laugh.mp3",
+    "durationMs": 320,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_music",
+    "file": "emote_music.mp3",
+    "durationMs": 1200,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_paper",
+    "file": "emote_paper.mp3",
+    "durationMs": 300,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_question",
+    "file": "emote_question.mp3",
+    "durationMs": 490,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_rock",
+    "file": "emote_rock.mp3",
+    "durationMs": 450,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_scissors",
+    "file": "emote_scissors.mp3",
+    "durationMs": 340,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_shock",
+    "file": "emote_shock.mp3",
+    "durationMs": 1072,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_sleepy",
+    "file": "emote_sleepy.mp3",
+    "durationMs": 360,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_sweat",
+    "file": "emote_sweat.mp3",
+    "durationMs": 430,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emote_thanks",
+    "file": "emote_thanks.mp3",
+    "durationMs": 1140,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "emotePop",
+    "file": "emotePop.mp3",
+    "durationMs": 300,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Bubble Pop 06"
+  },
+  {
+    "name": "gameEnd",
+    "file": "gameEnd.mp3",
+    "durationMs": 1046,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "join",
+    "file": "join.mp3",
+    "durationMs": 811,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Kids cartoon close bells"
+  },
+  {
+    "name": "kaijuDiceRoll3D",
+    "file": "kaijuDiceRoll3D.mp3",
+    "durationMs": 1030,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "rolling dice 2"
+  },
+  {
+    "name": "kaijuLaserBlast",
+    "file": "kaijuLaserBlast.mp3",
+    "durationMs": 1800,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Sci-fi battle laser shots"
+  },
+  {
+    "name": "kaijuRoar",
+    "file": "kaijuRoar.mp3",
+    "durationMs": 1000,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Giant monster roar"
+  },
+  {
+    "name": "kaijuShopBuy",
+    "file": "kaijuShopBuy.mp3",
+    "durationMs": 490,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Power Up 01A"
+  },
+  {
+    "name": "laserHit",
+    "file": "laserHit.mp3",
+    "durationMs": 1690,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Laser weapon shot"
+  },
+  {
+    "name": "loss",
+    "file": "loss.mp3",
+    "durationMs": 1200,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Losing drums"
+  },
+  {
+    "name": "nightFall",
+    "file": "nightFall.mp3",
+    "durationMs": 1922,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "powerBurst",
+    "file": "powerBurst.mp3",
+    "durationMs": 1780,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Sci fi plasma gun power up"
+  },
+  {
+    "name": "reveal",
+    "file": "reveal.mp3",
+    "durationMs": 765,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "roar",
+    "file": "roar.mp3",
+    "durationMs": 1950,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "shieldBlock",
+    "file": "shieldBlock.mp3",
+    "durationMs": 400,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Shield Block Shortsword"
+  },
+  {
+    "name": "unlockChime",
+    "file": "unlockChime.mp3",
+    "durationMs": 430,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Achievement Unlocked"
+  },
+  {
+    "name": "voteLock",
+    "file": "voteLock.mp3",
+    "durationMs": 300,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Gaming lock"
+  },
+  {
+    "name": "warn",
+    "file": "warn.mp3",
+    "durationMs": 530,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Warning Notification"
+  },
+  {
+    "name": "win",
+    "file": "win.mp3",
+    "durationMs": 1850,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Video game win"
+  },
+  {
+    "name": "wireCut",
+    "file": "wireCut.mp3",
+    "durationMs": 341,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Scissors Snip 1"
+  },
+  {
+    "name": "wwDawnChime",
+    "file": "wwDawnChime.mp3",
+    "durationMs": 2948,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "Single Church Bell 2"
+  },
+  {
+    "name": "wwExecutionDrum",
+    "file": "wwExecutionDrum.mp3",
+    "durationMs": 2000,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Cinematic mystery trailer drum hit"
+  },
+  {
+    "name": "wwNightWind",
+    "file": "wwNightWind.mp3",
+    "durationMs": 1950,
+    "source": "ElevenLabs",
+    "licence": "ElevenLabs (commercial terms follow-up)",
+    "title": "ElevenLabs Sound Effects take #1"
+  },
+  {
+    "name": "wwWolfHowl",
+    "file": "wwWolfHowl.mp3",
+    "durationMs": 2000,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Lone wolf howling"
+  },
+  {
+    "name": "yieldAlert",
+    "file": "yieldAlert.mp3",
+    "durationMs": 420,
+    "source": "Mixkit",
+    "licence": "Mixkit Sound Effects Free License",
+    "title": "Digital quick tone"
+  },
+  {
+    "name": "yourTurn",
+    "file": "yourTurn.mp3",
+    "durationMs": 460,
+    "source": "Pixabay",
+    "licence": "Pixabay Content License",
+    "title": "New Notification - 3"
+  }
+]
