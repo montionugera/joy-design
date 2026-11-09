@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SFX_NAMES, sfxUrl } from '../src/index.ts';
+import { SFX_NAMES, sfxUrl } from '../src/sfx/index.js';
 
 test('sfxUrl and SFX_NAMES helper tests', async (t) => {
   await t.test('SFX_NAMES has exactly 51 unique names', () => {
@@ -14,9 +14,9 @@ test('sfxUrl and SFX_NAMES helper tests', async (t) => {
   });
 
   await t.test('sfxUrl resolves default packaged asset via new URL', () => {
-    assert.equal(sfxUrl('win'), new URL('../assets/win.mp3', import.meta.url).href);
-    assert.equal(sfxUrl('draw'), new URL('../assets/draw.mp3', import.meta.url).href);
-    assert.equal(sfxUrl('emote_gg'), new URL('../assets/emote_gg.mp3', import.meta.url).href);
+    assert.equal(sfxUrl('win'), new URL('../assets/sfx/win.mp3', import.meta.url).href);
+    assert.equal(sfxUrl('draw'), new URL('../assets/sfx/draw.mp3', import.meta.url).href);
+    assert.equal(sfxUrl('emote_gg'), new URL('../assets/sfx/emote_gg.mp3', import.meta.url).href);
   });
 
   await t.test('sfxUrl throws RangeError for unknown cue names', () => {

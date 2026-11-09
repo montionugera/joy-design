@@ -8,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(__dirname, '../../..');
-const assetsDir = path.join(pkgRoot, 'assets');
-const manifestPath = path.join(pkgRoot, 'src', 'manifest.json');
+const assetsDir = path.join(pkgRoot, 'assets', 'sfx');
+const manifestPath = path.join(pkgRoot, 'src', 'sfx', 'manifest.json');
 
 function resolvePlayJoymifyDir() {
   if (process.env.PLAY_JOYMIFY_DIR) return process.env.PLAY_JOYMIFY_DIR;
