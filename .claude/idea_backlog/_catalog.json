@@ -654,6 +654,6 @@
     "id": "I-107",
     "title": "Fold joy-sfx into joy-brand as @montionugera/joy-brand/sfx; remove packages/sfx; rule: no new npm packages",
     "created_at": "2026-11-09T05:46:29.363909+00:00",
-    "promoted_to": null
+    "promoted_to": "F-096"
   }
 ]
