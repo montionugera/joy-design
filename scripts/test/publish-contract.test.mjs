@@ -22,6 +22,7 @@ const PUBLISHED = [
   { dir: 'react', name: '@montionugera/joy-react', version: '0.2.1', license: 'MIT', sideEffects: false, files: ['dist'] },
   { dir: 'svelte', name: '@montionugera/joy-svelte', version: '0.2.0', license: 'MIT', sideEffects: false, files: ['src/lib'] },
   { dir: 'mascots', name: '@montionugera/joy-mascots', version: '0.1.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: ['*.css'], files: ['assets', 'dist', 'src/index.ts', 'src/index.d.ts', 'src/data.js', 'src/data.d.ts', 'src/urls.js', 'src/assets.js', 'src/assets.d.ts', 'src/mascot.css', 'src/*.svelte', 'PROVENANCE.md'] },
+  { dir: 'sfx', name: '@montionugera/joy-sfx', version: '0.1.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['assets', 'dist', 'src/index.ts', 'src/index.d.ts', 'src/manifest.json', 'src/manifest.d.ts', 'PROVENANCE.md'] },
 ];
 
 /** Every string leaf of an `exports` value. */
@@ -243,7 +244,7 @@ test('the build job checks out without credentials, gates, builds, tests and pac
   assert.ok(pack.block.includes('pnpm pack --pack-destination "$out/github"') && pack.block.includes('pnpm pack --pack-destination "$out/npmjs"'), 'both tarball sets must come from pnpm pack (it resolves workspace:*)');
   assert.ok(pack.block.indexOf('"$out/github"') < pack.block.indexOf('p.publishConfig='), 'the GitHub Packages set must be packed before publishConfig is rewritten');
   assert.ok(pack.block.includes(`NPMJS_URL=${NPMJS}`) && pack.block.includes("p.publishConfig={registry:'$NPMJS_URL'}"), 'the npmjs.org set must carry publishConfig.registry for npmjs.org');
-  assert.ok(/trap 'git checkout -- packages\/tokens\/package\.json packages\/icons\/package\.json packages\/brand\/package\.json packages\/react\/package\.json packages\/svelte\/package\.json packages\/mascots\/package\.json' EXIT/.test(pack.block), 'the trap must restore the six package.json files');
+  assert.ok(/trap 'git checkout -- packages\/tokens\/package\.json packages\/icons\/package\.json packages\/brand\/package\.json packages\/react\/package\.json packages\/svelte\/package\.json packages\/mascots\/package\.json packages\/sfx\/package\.json' EXIT/.test(pack.block), 'the trap must restore the seven package.json files');
   assert.ok(pack.block.indexOf('git status --porcelain') > pack.block.indexOf('trap '), 'packing must end by checking the tree is clean again');
   assert.ok(pack.block.includes('manifest.json') && pack.block.includes('.publishConfig.registry'), 'the pack step writes the manifest and checks each tarball registry');
   assert.ok(upload.block.includes('name: publish-tarballs') && upload.block.includes('if-no-files-found: error'), 'the tarballs and manifest are uploaded as the publish-tarballs artifact');
@@ -338,7 +339,7 @@ test('the publish job publishes to GitHub Packages, verifies, then npmjs.org, in
   // Dependency order, and the fixed names: nothing is taken from the artifact but versions and files.
   const loops = code.match(/for dir in ([a-z ]+); do/g) || [];
   assert.ok(loops.length >= 7, 'pack (two sets and a check), dry run, publish, verify and npmjs.org each loop over the packages');
-  for (const loop of loops) assert.strictEqual(loop, 'for dir in tokens icons brand react svelte mascots; do', 'packages must be handled in dependency order');
+  for (const loop of loops) assert.strictEqual(loop, 'for dir in tokens icons brand react svelte mascots sfx; do', 'packages must be handled in dependency order');
   for (const s of [githubPublish, verify, npmjs]) {
     assert.ok(s.block.includes('name="@montionugera/joy-$dir"'), `${s.name}: the loop must use the fixed @montionugera/joy-* names`);
   }
