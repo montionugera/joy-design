@@ -1,6 +1,11 @@
-import type { SfxManifestEntry } from './manifest.d.ts';
-
-export type { SfxManifestEntry };
+export interface SfxManifestEntry {
+  name: string;
+  file: string;
+  durationMs: number;
+  source: 'Pixabay' | 'Mixkit' | 'ElevenLabs';
+  licence: string;
+  title: string;
+}
 
 export declare const MANIFEST: readonly SfxManifestEntry[];
 

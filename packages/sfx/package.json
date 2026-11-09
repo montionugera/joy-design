@@ -13,6 +13,7 @@
   },
   "files": [
     "assets",
+    "dist",
     "src/index.ts",
     "src/index.d.ts",
     "src/manifest.json",
@@ -20,11 +21,12 @@
     "PROVENANCE.md"
   ],
   "sideEffects": false,
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "svelte": "./src/index.ts",
+      "default": "./dist/index.js"
     },
     "./manifest": {
       "types": "./src/manifest.d.ts",
@@ -34,6 +36,7 @@
   },
   "scripts": {
     "manifest": "node scripts/build-manifest.mjs",
+    "build": "tsc -p tsconfig.build.json",
     "test": "node --test test/*.test.js",
     "check": "tsc -p tsconfig.json"
   },

@@ -100,12 +100,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: ./scripts/integration.sh
 
-      # Only icons, react and mascots are built here; their dist/ is untracked.
-      - name: Build icons, react and mascots
+      # Only icons, react, mascots and sfx are built here; their dist/ is untracked.
+      - name: Build icons, react, mascots and sfx
         run: |
           pnpm --filter @montionugera/joy-icons build
           pnpm --filter @montionugera/joy-react build
           pnpm --filter @montionugera/joy-mascots build
+          pnpm --filter @montionugera/joy-sfx build
 
       - name: Tarball test (scripts/test/consumer-smoke.sh)
         run: ./scripts/test/consumer-smoke.sh

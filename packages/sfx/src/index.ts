@@ -1,7 +1,13 @@
 import manifestData from './manifest.json' with { type: 'json' };
-import type { SfxManifestEntry } from './manifest.d.ts';
 
-export type { SfxManifestEntry };
+export interface SfxManifestEntry {
+  name: string;
+  file: string;
+  durationMs: number;
+  source: 'Pixabay' | 'Mixkit' | 'ElevenLabs';
+  licence: string;
+  title: string;
+}
 
 export const MANIFEST: readonly SfxManifestEntry[] = manifestData as unknown as SfxManifestEntry[];
 
@@ -69,16 +75,24 @@ export const DEFAULT_SFX_BASE_URL = '/audio/sfx/';
 
 /**
  * Resolves the public audio asset URL for a given sound effect name.
+ * Default resolves the packaged asset via new URL('../assets/<name>.mp3', import.meta.url).
+ * Throws RangeError for any cue name not in SFX_NAMES.
  */
 export function sfxUrl(name: SfxName, baseUrlOrOptions?: string | SfxUrlOptions): string {
-  let base = DEFAULT_SFX_BASE_URL;
+  if (!SFX_NAMES.includes(name as (typeof SFX_NAMES)[number])) {
+    throw new RangeError(`Unknown SFX cue: ${String(name)}`);
+  }
+  let base: string | undefined;
   if (typeof baseUrlOrOptions === 'string') {
     base = baseUrlOrOptions;
   } else if (baseUrlOrOptions && typeof baseUrlOrOptions.baseUrl === 'string') {
     base = baseUrlOrOptions.baseUrl;
   }
-  const cleanBase = base.endsWith('/') ? base : `${base}/`;
-  return `${cleanBase}${name}.mp3`;
+  if (base !== undefined) {
+    const cleanBase = base.endsWith('/') ? base : `${base}/`;
+    return `${cleanBase}${name}.mp3`;
+  }
+  return new URL(`../assets/${name}.mp3`, import.meta.url).href;
 }
 
 export interface SfxPlayerOptions {
@@ -123,7 +137,7 @@ export function createSfxPlayer(
 ): SfxPlayer {
   let isEnabled = options?.enabled ?? true;
   const isReducedMotion = options?.reducedMotion ?? false;
-  const baseUrl = options?.baseUrl ?? DEFAULT_SFX_BASE_URL;
+  const baseUrl = options?.baseUrl;
   const factory = ctxFactoryParam ?? options?.ctxFactory ?? defaultAudioContextFactory;
 
   let audioCtx: AudioContext | null = null;
@@ -155,6 +169,12 @@ export function createSfxPlayer(
       gainNode.gain.value = gainVal;
       src.connect(gainNode);
       gainNode.connect(dest);
+      src.onended = () => {
+        try {
+          src.disconnect();
+          gainNode.disconnect();
+        } catch {}
+      };
       src.start(0);
     } catch {
       // Audio playback failure must never throw or break calling app

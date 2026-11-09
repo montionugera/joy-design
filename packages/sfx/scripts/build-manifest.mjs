@@ -6,12 +6,27 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, '..');
+const repoRoot = path.resolve(__dirname, '../../..');
 const assetsDir = path.join(pkgRoot, 'assets');
 const srcDir = path.join(pkgRoot, 'src');
 const manifestJsonPath = path.join(srcDir, 'manifest.json');
 const manifestDtsPath = path.join(srcDir, 'manifest.d.ts');
 
-const audioReadmePath = '/Users/pasitnusso/workspace/repos/play-joymify/web/art/audio/README.md';
+function resolvePlayJoymifyDir() {
+  if (process.env.PLAY_JOYMIFY_DIR) return process.env.PLAY_JOYMIFY_DIR;
+  const primary = path.resolve(repoRoot, '../../../play-joymify');
+  if (fs.existsSync(primary)) return primary;
+  for (const candidate of [
+    path.resolve(repoRoot, '../../../../play-joymify'),
+    path.resolve(repoRoot, '../play-joymify'),
+  ]) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return primary;
+}
+
+const playJoymifyDir = resolvePlayJoymifyDir();
+const audioReadmePath = path.join(playJoymifyDir, 'web/art/audio/README.md');
 
 // Static metadata fallback in case the external repo is absent
 const KNOWN_METADATA = {

@@ -34,7 +34,7 @@ allowed_pattern() {
     brand) echo '^package/(package\.json|PROVENANCE\.md|src/.+|assets/.+)$' ;;
     svelte) echo '^package/(package\.json|LICENSE|src/lib/.+)$' ;;
     mascots) echo '^package/(package\.json|PROVENANCE\.md|assets/[^/]+\.webp|dist/.+|src/(index\.ts|index\.d\.ts|data\.js|data\.d\.ts|urls\.js|assets\.js|assets\.d\.ts|mascot\.css)|src/[^/]+\.svelte)$' ;;
-    sfx) echo '^package/(package\.json|PROVENANCE\.md|assets/[^/]+\.mp3|src/(index\.ts|index\.d\.ts|manifest\.json|manifest\.d\.ts))$' ;;
+    sfx) echo '^package/(package\.json|PROVENANCE\.md|assets/[^/]+\.mp3|dist/.+|src/(index\.ts|index\.d\.ts|manifest\.json|manifest\.d\.ts))$' ;;
   esac
 }
 
@@ -47,7 +47,7 @@ required_files() {
     react) echo "dist/index.js dist/index.d.ts dist/Button.js dist/Button.d.ts dist/Tabs.js dist/BrandMark.js" ;;
     svelte) echo "LICENSE src/lib/index.ts src/lib/Badge.svelte src/lib/Button.svelte src/lib/Modal.svelte" ;;
     mascots) echo "assets/yoji-idle.webp assets/yoji-idle@2x.webp dist/react.js dist/react.d.ts dist/react/Mascot.js src/index.ts src/data.js src/urls.js src/assets.js src/Mascot.svelte src/mascot.css PROVENANCE.md" ;;
-    sfx) echo "assets/win.mp3 src/index.ts src/index.d.ts src/manifest.json src/manifest.d.ts PROVENANCE.md" ;;
+    sfx) echo "assets/win.mp3 dist/index.js dist/index.d.ts src/index.ts src/manifest.json src/manifest.d.ts PROVENANCE.md" ;;
   esac
 }
 
@@ -55,10 +55,11 @@ tarball_of() {
   echo "$work/tarballs/$1"/*.tgz
 }
 
-echo "==> 1/7 Building joy-icons, joy-react and joy-mascots"
+echo "==> 1/7 Building joy-icons, joy-react, joy-mascots and joy-sfx"
 (cd "$repo_root" && pnpm --filter @montionugera/joy-icons build)
 (cd "$repo_root" && pnpm --filter @montionugera/joy-react build)
 (cd "$repo_root" && pnpm --filter @montionugera/joy-mascots build)
+(cd "$repo_root" && pnpm --filter @montionugera/joy-sfx build)
 
 echo "==> 2/7 Packing the seven packages"
 for pkg in "${packages[@]}"; do
@@ -237,6 +238,7 @@ import { Button, Tabs, BrandMark } from '@montionugera/joy-react';
 import { Check } from '@montionugera/joy-icons/react';
 import { MARK } from '@montionugera/joy-brand';
 import { Mascot } from '@montionugera/joy-mascots/react';
+import { sfxUrl } from '@montionugera/joy-sfx';
 import * as tokens from '@montionugera/joy-tokens';
 
 const require = createRequire(import.meta.url);
@@ -288,6 +290,12 @@ if (!cjsTokens || !cjsTokens.tokens || !cjsTokens.tokens['surface-canvas']) {
   console.error('ssr-check: the joy-tokens CommonJS entry failed to load tokens');
   process.exit(1);
 }
+const winSfx = sfxUrl('win');
+if (!winSfx || typeof winSfx !== 'string' || !winSfx.includes('win.mp3')) {
+  console.error('ssr-check: sfxUrl("win") did not resolve to a valid win.mp3 url:', winSfx);
+  process.exit(1);
+}
+
 console.log('ssr-check: rendered', html.length, 'characters of markup');
 EOF
 
@@ -335,7 +343,7 @@ try {
   // Joy-sfx smoke check: import SFX_NAMES and resolve sfxUrl('win')
   const sfx = await server.ssrLoadModule('@montionugera/joy-sfx');
   const winUrl = sfx.sfxUrl('win');
-  if (winUrl !== '/audio/sfx/win.mp3') {
+  if (!winUrl || !winUrl.includes('win.mp3')) {
     console.error('ssr-svelte-check: sfxUrl("win") unexpected result:', winUrl);
     process.exit(1);
   }

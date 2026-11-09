@@ -13,10 +13,16 @@ test('sfxUrl and SFX_NAMES helper tests', async (t) => {
     assert.ok(unique.has('emote_heart'));
   });
 
-  await t.test('sfxUrl resolves default base URL', () => {
-    assert.equal(sfxUrl('win'), '/audio/sfx/win.mp3');
-    assert.equal(sfxUrl('draw'), '/audio/sfx/draw.mp3');
-    assert.equal(sfxUrl('emote_gg'), '/audio/sfx/emote_gg.mp3');
+  await t.test('sfxUrl resolves default packaged asset via new URL', () => {
+    assert.equal(sfxUrl('win'), new URL('../assets/win.mp3', import.meta.url).href);
+    assert.equal(sfxUrl('draw'), new URL('../assets/draw.mp3', import.meta.url).href);
+    assert.equal(sfxUrl('emote_gg'), new URL('../assets/emote_gg.mp3', import.meta.url).href);
+  });
+
+  await t.test('sfxUrl throws RangeError for unknown cue names', () => {
+    assert.throws(() => sfxUrl('unknownSound'), RangeError);
+    assert.throws(() => sfxUrl(''), RangeError);
+    assert.throws(() => sfxUrl(null), RangeError);
   });
 
   await t.test('sfxUrl supports custom baseUrl string', () => {

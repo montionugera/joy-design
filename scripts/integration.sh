@@ -7,6 +7,8 @@ node -e "console.log('Verifying Node runtime compatibility...');"
 (cd packages/icons && node --test test/icons.test.js)
 (cd packages/svelte && node --test test/components.test.js)
 (cd packages/react && node --test test/components.test.js)
+pnpm --filter @montionugera/joy-mascots build
+pnpm --filter @montionugera/joy-sfx build
 (cd packages/mascots && node --test test/*.test.js)
 (cd packages/sfx && node --test test/*.test.js)
 

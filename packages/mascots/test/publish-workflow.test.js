@@ -21,7 +21,7 @@ test('the build job builds joy-mascots before the smoke test', () => {
 });
 
 test('consumer smoke packs, checks and renders joy-mascots', () => {
-  assert.ok(smoke.includes('mascots'));
+  assert.ok(smoke.includes('packages=(tokens icons brand react svelte mascots sfx)'));
   assert.ok(smoke.includes('mascots) echo'), 'allowed paths and required files are defined');
   assert.ok(smoke.includes('MASCOTS_TGZ'));
   assert.ok(smoke.includes('@montionugera/joy-mascots/react'));

@@ -22,7 +22,7 @@ const PUBLISHED = [
   { dir: 'react', name: '@montionugera/joy-react', version: '0.2.1', license: 'MIT', sideEffects: false, files: ['dist'] },
   { dir: 'svelte', name: '@montionugera/joy-svelte', version: '0.2.0', license: 'MIT', sideEffects: false, files: ['src/lib'] },
   { dir: 'mascots', name: '@montionugera/joy-mascots', version: '0.1.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: ['*.css'], files: ['assets', 'dist', 'src/index.ts', 'src/index.d.ts', 'src/data.js', 'src/data.d.ts', 'src/urls.js', 'src/assets.js', 'src/assets.d.ts', 'src/mascot.css', 'src/*.svelte', 'PROVENANCE.md'] },
-  { dir: 'sfx', name: '@montionugera/joy-sfx', version: '0.1.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['assets', 'src/index.ts', 'src/index.d.ts', 'src/manifest.json', 'src/manifest.d.ts', 'PROVENANCE.md'] },
+  { dir: 'sfx', name: '@montionugera/joy-sfx', version: '0.1.0', license: 'SEE LICENSE IN PROVENANCE.md', sideEffects: false, files: ['assets', 'dist', 'src/index.ts', 'src/index.d.ts', 'src/manifest.json', 'src/manifest.d.ts', 'PROVENANCE.md'] },
 ];
 
 /** Every string leaf of an `exports` value. */

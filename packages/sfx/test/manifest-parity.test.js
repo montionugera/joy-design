@@ -7,9 +7,25 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, '..');
+const repoRoot = path.resolve(__dirname, '../../..');
 const assetsDir = path.join(pkgRoot, 'assets');
 const manifestPath = path.join(pkgRoot, 'src', 'manifest.json');
-const sourceDir = '/Users/pasitnusso/workspace/repos/play-joymify/web/public/audio/sfx';
+
+function resolvePlayJoymifyDir() {
+  if (process.env.PLAY_JOYMIFY_DIR) return process.env.PLAY_JOYMIFY_DIR;
+  const primary = path.resolve(repoRoot, '../../../play-joymify');
+  if (fs.existsSync(primary)) return primary;
+  for (const candidate of [
+    path.resolve(repoRoot, '../../../../play-joymify'),
+    path.resolve(repoRoot, '../play-joymify'),
+  ]) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return primary;
+}
+
+const playJoymifyDir = resolvePlayJoymifyDir();
+const sourceDir = path.join(playJoymifyDir, 'web/public/audio/sfx');
 
 test('SFX assets and manifest parity', async (t) => {
   await t.test('assets directory contains exactly 51 mp3 files', () => {
@@ -46,9 +62,9 @@ test('SFX assets and manifest parity', async (t) => {
     }
   });
 
-  await t.test('all 51 files match play-joymify source sha256 checksums', () => {
+  await t.test('all 51 files match play-joymify source sha256 checksums', (sub) => {
     if (!fs.existsSync(sourceDir)) {
-      t.skip(`Source dir ${sourceDir} not found`);
+      sub.skip(`Source dir ${sourceDir} not found`);
       return;
     }
     const files = fs.readdirSync(assetsDir).filter((f) => f.endsWith('.mp3'));
