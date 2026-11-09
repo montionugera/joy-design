@@ -1,6 +1,6 @@
 {
   "name": "@montionugera/joy-brand",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "license": "SEE LICENSE IN PROVENANCE.md",
   "repository": {
@@ -21,6 +21,10 @@
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
+    },
+    "./sfx": {
+      "types": "./src/sfx/index.d.ts",
+      "default": "./src/sfx/index.js"
     },
     "./assets/*": "./assets/*"
   },

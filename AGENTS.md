@@ -34,6 +34,9 @@
    - Publishing is done only by `.github/workflows/publish.yml` (a `packages-v*` tag on `main`, or a manual dry run). Never run `npm publish`, or `pnpm publish` without `--dry-run`, by hand. The workflow has two jobs: `build` (read-only token) gates, builds, tests and packs the tarballs; `publish` (`packages: write`, `id-token: write`) only downloads and uploads them, to GitHub Packages and then npmjs.org. Keep the publish job free of checkout, `pnpm` and repository scripts, and do not rename the workflow file or the `packages` environment: npmjs.org trusted publishing is bound to both. A re-run skips versions already on a registry, so it finishes a run whose npmjs.org step failed.
    - The packages are `@montionugera/joy-tokens`, `@montionugera/joy-icons`, `@montionugera/joy-brand`, `@montionugera/joy-react`, `@montionugera/joy-svelte` (not yet published) and `@montionugera/joy-mascots` on GitHub Packages (private, owned by `montionugera`) and on npmjs.org (public). A real publish authenticates to GitHub Packages with the repository's built-in token and to npmjs.org with OIDC trusted publishing; no publish secret is stored. A consumer's `.npmrc` needs `@montionugera:registry=https://npm.pkg.github.com` and `//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}`, with a token that has `read:packages`.
 
+6. **No New npm Packages**:
+   - Do not create new npm packages. Shared assets are subpath exports of an existing npmjs package (brand for identity assets incl. SFX, mascots for characters). Reason: npmjs trusted publishing needs the package to exist; the owner does not do manual first publishes.
+
 <!-- graft:start -->
 ## Graft — repo context graph
 

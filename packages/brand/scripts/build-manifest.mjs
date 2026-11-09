@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(__dirname, '../../..');
-const assetsDir = path.join(pkgRoot, 'assets');
-const srcDir = path.join(pkgRoot, 'src');
+const assetsDir = path.join(pkgRoot, 'assets', 'sfx');
+const srcDir = path.join(pkgRoot, 'src', 'sfx');
 const manifestJsonPath = path.join(srcDir, 'manifest.json');
 const manifestDtsPath = path.join(srcDir, 'manifest.d.ts');
 
