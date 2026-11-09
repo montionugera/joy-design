@@ -14,8 +14,7 @@ Enterprise multi-platform design system and composed Storybook workshop powering
 | `packages/tokens` (`@montionugera/joy-tokens`) | `src/tokens.json` is the only place colour values live. `node packages/tokens/build.js` generates `dist/theme.css` (CSS variables plus all component CSS), `dist/genres.css` (opt-in game-genre palettes, see [GENRES.md](GENRES.md)), `dist/tailwind-theme.css` (Tailwind v4 `@theme`), and `dist/index.{js,cjs,d.ts}`.                                      |
 | `packages/icons` (`@montionugera/joy-icons`)   | SVG icons as Svelte 5 components (`@montionugera/joy-icons`) and React components (`@montionugera/joy-icons/react`), with identical rendering.                                                                                                                                                      |
 | `packages/mascots` (`@montionugera/joy-mascots`) | The Joymify mascot family (Yoji, Pico, Luna, Rex, Mochi, Zing, Byte), 5 poses each, as WebP pictures with a Svelte 5 `Mascot` (`@montionugera/joy-mascots`) and a React 19 `Mascot` (`@montionugera/joy-mascots/react`). |
-| `packages/brand` (`@montionugera/joy-brand`)   | The Joymify brand kit: geometry (`src/geometry.js`), pure SVG renderers (`src/render.js`), and `build.js`, which reads the light-theme `--joy-brand-*` values from `packages/tokens/dist/theme.css` and writes the static files in `assets/` (see [Brand kit](#brand-kit) below). |
-| `packages/sfx` (`@montionugera/joy-sfx`)       | Shared game sound effects library (51 mono 96 kbps MP3 clips, peak -12 dBFS) with TypeScript manifest, metadata, `sfxUrl`, and `createSfxPlayer` Web Audio limiter. |
+| `packages/brand` (`@montionugera/joy-brand`)   | The Joymify brand kit: geometry (`src/geometry.js`), pure SVG renderers (`src/render.js`), and `build.js`, which reads the light-theme `--joy-brand-*` values from `packages/tokens/dist/theme.css` and writes the static files in `assets/` (see [Brand kit](#brand-kit) below), plus game sound effects library (`@montionugera/joy-brand/sfx`). |
 | `packages/svelte` (`@montionugera/joy-svelte`) | Svelte 5 (Runes) components.                                                                                                                                                                                                                                                      |
 | `packages/react` (`@montionugera/joy-react`)   | React 19 twins of the Svelte components: the same props, the same classes and ref forwarding.                                                                                                                                                                                     |
 | `packages/flutter` (`joymify_flutter`) | Flutter 3.32+ / Dart 3.8.1 package providing semantic token parity (`JoyThemeTokens`), pure style resolvers, and native widgets (`JoyButton`). |
@@ -62,16 +61,15 @@ Import the stylesheet once: `import '@montionugera/joy-tokens/theme.css'`. Light
 
 ## Install from the registry
 
-Seven packages are publishable to GitHub Packages and to the public npm registry (npmjs.org) under the `@montionugera` scope. `@montionugera/joy-svelte` (0.2.0) is ready to publish but has not been published yet; see the first-publish note under the npmjs.org trusted publishers below.
+Six packages are publishable to GitHub Packages and to the public npm registry (npmjs.org) under the `@montionugera` scope. `@montionugera/joy-svelte` (0.2.0) is ready to publish but has not been published yet; see the first-publish note under the npmjs.org trusted publishers below.
 
 | Package | Ships | Import |
 | --- | --- | --- |
 | `@montionugera/joy-tokens` | Built CSS variables, component CSS, Tailwind theme and the JS token map. | `@montionugera/joy-tokens/theme.css`, `@montionugera/joy-tokens/genres.css` (opt-in), `@montionugera/joy-tokens/tailwind`, `@montionugera/joy-tokens` |
 | `@montionugera/joy-icons` | React icons as built JavaScript with type declarations; Svelte icons as source. | `@montionugera/joy-icons/react` (React), `@montionugera/joy-icons` (Svelte, needs a Svelte bundler) |
 | `@montionugera/joy-mascots` | The mascot pictures (WebP, 1x and 2x), shared data, a stylesheet, the Svelte `Mascot` as source and the React `Mascot` as built JavaScript with type declarations. | `@montionugera/joy-mascots/react` (React), `@montionugera/joy-mascots` (Svelte, needs a Svelte bundler) |
-| `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types) and the generated asset files. | `@montionugera/joy-brand`, `@montionugera/joy-brand/assets/*` |
+| `@montionugera/joy-brand` | Brand geometry and SVG renderers (plain JavaScript with types), generated asset files, and sound effects library. | `@montionugera/joy-brand`, `@montionugera/joy-brand/sfx`, `@montionugera/joy-brand/assets/*` |
 | `@montionugera/joy-react` | The React components as built JavaScript with type declarations. | `@montionugera/joy-react` |
-| `@montionugera/joy-sfx` | 51 game sound effect clips (MP3), TypeScript manifest, `sfxUrl`, and `createSfxPlayer`. | `@montionugera/joy-sfx`, `@montionugera/joy-sfx/manifest`, `@montionugera/joy-sfx/assets/*` |
 
 **Public npm (no token needed):** tokens, icons, brand and react are on npmjs.org (svelte is not yet), so install with no `.npmrc` and no token:
 
@@ -104,7 +102,7 @@ import { Check } from '@montionugera/joy-icons/react';
 `@montionugera/joy-react` needs `react` and `react-dom` 19 as peers. The copies on GitHub Packages are private, so every install from there needs a token:
 
 - **On a developer machine:** a classic personal GitHub token with the `read:packages` scope, exported as `GITHUB_TOKEN`.
-- **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the seven packages' settings on GitHub, or store a personal token with `read:packages` as a secret in the consuming repo.
+- **In another repo's GitHub Actions:** that repo's automatic token cannot read these packages by default. Either grant that repo access in each of the six packages' settings on GitHub, or store a personal token with `read:packages` as a secret in the consuming repo.
 
 Fonts are still loaded by the consumer (see `DESIGN.md`). The token stacks name **Plus Jakarta Sans** (Latin UI), **Anuphan** (Thai) and, for `--joy-font-family-rounded` and the Honey Quest genre, **Baloo 2** and **Nunito**; if the app does not load them, text silently falls back to Inter or the system font. One Google Fonts link covers them all:
 
@@ -116,8 +114,8 @@ Fonts are still loaded by the consumer (see `DESIGN.md`). The token stacks name 
 
 Publishing is done only by `.github/workflows/publish.yml`. It runs on a pushed tag matching `packages-v*` whose commit is on `main`, or on a manual run, which defaults to a dry run. Versions are set by hand in each `package.json`. A published version is never reused: fix a bad release by publishing a higher version. The workflow has two jobs, so that the code it installs and builds never holds a publish permission:
 
-- **`build`** (read-only token, `contents: read`). On a tag run it fails unless the tag version (after `packages-v`) equals the version of at least one package; packages have independent versions, so it does not require all seven to match. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons`, `@montionugera/joy-react`, `@montionugera/joy-mascots` and `@montionugera/joy-sfx`, runs the tarball test `scripts/test/consumer-smoke.sh`, and fails if the gate or build left any changed or untracked file. It then packs tokens, icons, brand, react, svelte, mascots and sfx once with `pnpm pack` (so `workspace:*` becomes real versions) into two sets: one for GitHub Packages, and one for npmjs.org whose `package.json` has `publishConfig.registry` pointed at npmjs.org (the source files are restored, so the tree stays clean). The two sets differ only in that field. Both sets and a `manifest.json` (name, version and tarball per package) are uploaded as the `publish-tarballs` artifact. A dry run ends here with `npm publish --dry-run` for every tarball against both registries, using a placeholder token (a version already on npmjs.org is reported and skipped, as a real run would skip it).
-- **`publish`** (`packages: write`, `id-token: write`; skipped on a dry run). It does not check out the repository, install dependencies or run any repository script. It downloads the artifact and, in the order tokens, icons, brand, react, svelte, mascots, sfx: publishes to GitHub Packages with this repository's built-in token (the packages live under the repository's owner, so no secret is stored), checks that all seven versions are visible there, then publishes to npmjs.org with npm trusted publishing (OIDC, no stored token, `--access public`). Each registry is asked first, and a version already there is skipped. The npmjs.org loop stops at the first package that fails, so no package is published against a dependency that is missing from npmjs.org.
+- **`build`** (read-only token, `contents: read`). On a tag run it fails unless the tag version (after `packages-v`) equals the version of at least one package; packages have independent versions, so it does not require all six to match. It runs `scripts/integration.sh`, builds `@montionugera/joy-icons`, `@montionugera/joy-react` and `@montionugera/joy-mascots`, runs the tarball test `scripts/test/consumer-smoke.sh`, and fails if the gate or build left any changed or untracked file. It then packs tokens, icons, brand, react, svelte and mascots once with `pnpm pack` (so `workspace:*` becomes real versions) into two sets: one for GitHub Packages, and one for npmjs.org whose `package.json` has `publishConfig.registry` pointed at npmjs.org (the source files are restored, so the tree stays clean). The two sets differ only in that field. Both sets and a `manifest.json` (name, version and tarball per package) are uploaded as the `publish-tarballs` artifact. A dry run ends here with `npm publish --dry-run` for every tarball against both registries, using a placeholder token (a version already on npmjs.org is reported and skipped, as a real run would skip it).
+- **`publish`** (`packages: write`, `id-token: write`; skipped on a dry run). It does not check out the repository, install dependencies or run any repository script. It downloads the artifact and, in the order tokens, icons, brand, react, svelte, mascots: publishes to GitHub Packages with this repository's built-in token (the packages live under the repository's owner, so no secret is stored), checks that all six versions are visible there, then publishes to npmjs.org with npm trusted publishing (OIDC, no stored token, `--access public`). Each registry is asked first, and a version already there is skipped. The npmjs.org loop stops at the first package that fails, so no package is published against a dependency that is missing from npmjs.org.
 
 **Failures and re-runs.** A failed npmjs.org publish fails the run with an error; by then GitHub Packages is already published and verified. Re-run the failed job (or the whole workflow): versions already on GitHub Packages are skipped, the missing npmjs.org versions are published, and the run ends green. The run fails with "nothing to publish" only when every version is already on both registries.
 
@@ -125,7 +123,7 @@ Both jobs run in the GitHub environment `packages`, which the repository setting
 
 **npmjs.org trusted publishers.** tokens, icons, brand and react are live on npmjs.org and each has a trusted publisher: GitHub Actions, repository `montionugera/joy-design`, workflow file `publish.yml`, environment `packages`. Renaming the workflow file or the environment breaks the npmjs.org publish until the trusted publishers are updated. A new package needs the same one-time setup, because a trusted publisher can only be attached to a package that already exists: publish its first version by hand from a logged-in machine (`pnpm pack`, then `npm publish <tarball> --access public --registry https://registry.npmjs.org --@montionugera:registry=https://registry.npmjs.org`, with `publishConfig.registry` in the tarball pointed at npmjs.org), then add the trusted publisher in the package settings on npmjs.com. `@montionugera/joy-svelte` has no npmjs.org package yet, so its first version needs that one-time manual publish and trusted-publisher setup before the workflow can publish it to npmjs.org. It is source-exported (`.svelte` and `.ts` under `src/lib`), so a consumer compiles it and must dedupe `svelte`, `@montionugera/joy-icons` and `@montionugera/joy-brand` in Vite (`resolve.dedupe`).
 
-`scripts/test/consumer-smoke.sh` also runs locally. It packs the seven packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, type-checks, builds and renders it, and server-renders joy-svelte through Vite.
+`scripts/test/consumer-smoke.sh` also runs locally. It packs the six packages, installs the tarballs into a fresh Vite + React 19 app in a temporary folder outside this workspace, type-checks, builds and renders it, and server-renders joy-svelte through Vite.
 
 ## Quality gates
 
@@ -868,13 +866,13 @@ import '@montionugera/joy-mascots/mascot.css';
 
 ## Sound effects
 
-`@montionugera/joy-sfx` provides the shared sound effects library for Joymify web and mobile apps, containing 51 short clips (mono 96 kbps MP3 files peak-normalized to -12 dBFS) sourced from Pixabay, Mixkit, and ElevenLabs. It exports `SFX_NAMES`, `SfxName`, `sfxUrl`, and `createSfxPlayer`:
+`@montionugera/joy-brand/sfx` provides the shared sound effects library for Joymify web and mobile apps, containing 51 short clips (mono 96 kbps MP3 files peak-normalized to -12 dBFS) sourced from Pixabay, Mixkit, and ElevenLabs. It exports `SFX_NAMES`, `SfxName`, `sfxUrl`, and `createSfxPlayer`:
 
 ```ts
-import { sfxUrl, SFX_NAMES, createSfxPlayer } from '@montionugera/joy-sfx';
+import { sfxUrl, SFX_NAMES, createSfxPlayer } from '@montionugera/joy-brand/sfx';
 
 // Resolve public URL for any cue
-const winAudioUrl = sfxUrl('win'); // '/audio/sfx/win.mp3'
+const winAudioUrl = sfxUrl('win'); // resolves to packaged asset or baseUrl
 const cdnAudioUrl = sfxUrl('win', { baseUrl: 'https://cdn.joymify.com/audio/sfx/' });
 
 // Create Web Audio player with a -12 dB hard limiter ceiling

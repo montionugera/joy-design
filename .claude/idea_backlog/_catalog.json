@@ -649,5 +649,11 @@
     "title": "Shared SFX package: 51 play-joymify clips as @montionugera/joy-sfx with manifest, provenance and playSfx helper",
     "created_at": "2026-11-09T03:46:08.185883+00:00",
     "promoted_to": "F-095"
+  },
+  {
+    "id": "I-107",
+    "title": "Fold joy-sfx into joy-brand as @montionugera/joy-brand/sfx; remove packages/sfx; rule: no new npm packages",
+    "created_at": "2026-11-09T05:46:29.363909+00:00",
+    "promoted_to": "F-096"
   }
 ]

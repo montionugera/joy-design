@@ -1,17 +1,8 @@
 import manifestData from './manifest.json' with { type: 'json' };
 
-export interface SfxManifestEntry {
-  name: string;
-  file: string;
-  durationMs: number;
-  source: 'Pixabay' | 'Mixkit' | 'ElevenLabs';
-  licence: string;
-  title: string;
-}
+export const MANIFEST = Object.freeze(manifestData);
 
-export const MANIFEST: readonly SfxManifestEntry[] = manifestData as unknown as SfxManifestEntry[];
-
-export const SFX_NAMES = [
+export const SFX_NAMES = Object.freeze([
   'bombBlast',
   'buyPower',
   'damageHit',
@@ -63,26 +54,20 @@ export const SFX_NAMES = [
   'wwWolfHowl',
   'yieldAlert',
   'yourTurn',
-] as const;
-
-export type SfxName = (typeof SFX_NAMES)[number];
-
-export interface SfxUrlOptions {
-  baseUrl?: string;
-}
+]);
 
 export const DEFAULT_SFX_BASE_URL = '/audio/sfx/';
 
 /**
  * Resolves the public audio asset URL for a given sound effect name.
- * Default resolves the packaged asset via new URL('../assets/<name>.mp3', import.meta.url).
+ * Default resolves the packaged asset via new URL('../../assets/sfx/<name>.mp3', import.meta.url).
  * Throws RangeError for any cue name not in SFX_NAMES.
  */
-export function sfxUrl(name: SfxName, baseUrlOrOptions?: string | SfxUrlOptions): string {
-  if (!SFX_NAMES.includes(name as (typeof SFX_NAMES)[number])) {
+export function sfxUrl(name, baseUrlOrOptions) {
+  if (!SFX_NAMES.includes(name)) {
     throw new RangeError(`Unknown SFX cue: ${String(name)}`);
   }
-  let base: string | undefined;
+  let base;
   if (typeof baseUrlOrOptions === 'string') {
     base = baseUrlOrOptions;
   } else if (baseUrlOrOptions && typeof baseUrlOrOptions.baseUrl === 'string') {
@@ -92,32 +77,13 @@ export function sfxUrl(name: SfxName, baseUrlOrOptions?: string | SfxUrlOptions)
     const cleanBase = base.endsWith('/') ? base : `${base}/`;
     return `${cleanBase}${name}.mp3`;
   }
-  return new URL(`../assets/${name}.mp3`, import.meta.url).href;
+  return new URL(`../../assets/sfx/${name}.mp3`, import.meta.url).href;
 }
 
-export interface SfxPlayerOptions {
-  baseUrl?: string;
-  enabled?: boolean;
-  reducedMotion?: boolean;
-  ctxFactory?: () => AudioContext | null;
-}
-
-export interface PlayOptions {
-  gain?: number;
-}
-
-export interface SfxPlayer {
-  play(name: SfxName, options?: PlayOptions): void;
-  setEnabled(enabled: boolean): void;
-  unlock(): void;
-  readonly enabled: boolean;
-  readonly reducedMotion: boolean;
-}
-
-function defaultAudioContextFactory(): AudioContext | null {
+function defaultAudioContextFactory() {
   try {
     if (typeof window === 'undefined') return null;
-    const w = window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext };
+    const w = window;
     const Ctor = w.AudioContext ?? w.webkitAudioContext;
     if (!Ctor) return null;
     return new Ctor();
@@ -131,21 +97,18 @@ function defaultAudioContextFactory(): AudioContext | null {
  * Never throws when Web Audio is unavailable (e.g. in Node, SSR, or unsupported browsers).
  * Honours enabled and reducedMotion flags.
  */
-export function createSfxPlayer(
-  options?: SfxPlayerOptions,
-  ctxFactoryParam?: () => AudioContext | null
-): SfxPlayer {
+export function createSfxPlayer(options, ctxFactoryParam) {
   let isEnabled = options?.enabled ?? true;
   const isReducedMotion = options?.reducedMotion ?? false;
   const baseUrl = options?.baseUrl;
   const factory = ctxFactoryParam ?? options?.ctxFactory ?? defaultAudioContextFactory;
 
-  let audioCtx: AudioContext | null = null;
-  let limiterNode: DynamicsCompressorNode | null = null;
-  const audioBuffers = new Map<string, AudioBuffer>();
-  const loadingPromises = new Map<string, Promise<AudioBuffer | null>>();
+  let audioCtx = null;
+  let limiterNode = null;
+  const audioBuffers = new Map();
+  const loadingPromises = new Map();
 
-  function setupGraph(ctx: AudioContext) {
+  function setupGraph(ctx) {
     try {
       // Hard limiter at -12 dB ceiling
       const limiter = ctx.createDynamicsCompressor();
@@ -161,7 +124,7 @@ export function createSfxPlayer(
     }
   }
 
-  function playBuffer(ctx: AudioContext, dest: AudioNode, buf: AudioBuffer, gainVal: number) {
+  function playBuffer(ctx, dest, buf, gainVal) {
     try {
       const src = ctx.createBufferSource();
       src.buffer = buf;
@@ -181,7 +144,7 @@ export function createSfxPlayer(
     }
   }
 
-  async function loadBuffer(ctx: AudioContext, name: string, url: string): Promise<AudioBuffer | null> {
+  async function loadBuffer(ctx, name, url) {
     const existing = loadingPromises.get(name);
     if (existing) return existing;
 
@@ -207,14 +170,14 @@ export function createSfxPlayer(
     return promise;
   }
 
-  const player: SfxPlayer = {
+  const player = {
     get enabled() {
       return isEnabled;
     },
     get reducedMotion() {
       return isReducedMotion;
     },
-    setEnabled(enabled: boolean) {
+    setEnabled(enabled) {
       isEnabled = Boolean(enabled);
     },
     unlock() {
@@ -232,7 +195,7 @@ export function createSfxPlayer(
         // never throws
       }
     },
-    play(name: SfxName, playOptions?: PlayOptions) {
+    play(name, playOptions) {
       if (!isEnabled || isReducedMotion) {
         return;
       }

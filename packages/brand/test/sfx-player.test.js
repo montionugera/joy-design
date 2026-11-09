@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createSfxPlayer } from '../src/index.ts';
+import { createSfxPlayer } from '../src/sfx/index.js';
 
 // Mock Web Audio Context implementation
 function createMockAudioContext() {
