@@ -4,24 +4,31 @@ Edit this file and rebuild; the HTML is generated. Every hex is from ../gen.py (
 joy-design status ramp. Proof of contrast: joy-combined-contrast.py reads the generated file."""
 import pathlib
 
-SKY = {'sky-1': '#0B1226', 'sky-2': '#1F2352', 'sky-3': '#6B3A5B', 'sky-4': '#C7774A', 'sky-5': '#F0BE78',
+SKY = {'sky-1': '#0B1226', 'sky-2': '#101B38', 'sky-3': '#2A2014', 'sky-4': '#4A2A14', 'sky-5': '#C7743F', 'sky-6': '#F2C078',
        'sky-text': '#FBF3E9', 'pill': '#DAB362', 'pill-fg': '#150B00', 'sun': '#DAB362'}
 LIGHT = {'canvas': '#F3F5F9', 'card': '#FFFFFF', 'hover': '#F3F5F9', 'text': '#14253E', 'muted': '#4E5F7B', 'border': '#D5DBE6',
          'mast': '#14253E', 'mast-hover': '#223250', 'mast-text': '#F3F5F9', 'mast-ctl': '#A9B4C6',
          'action': '#DAB362', 'action-hover': '#F4E6CA', 'action-fg': '#150B00', 'action-edge': '#A5802B',
          'solid': '#14253E', 'solid-hover': '#223250', 'solid-fg': '#F3F5F9',
-         'live': '#A5802B', 'tile': '#14253E', 'mark': '#DAB362', 'tile-edge': '#A5802B',
-         'seam-a': '#B8892B', 'seam-b': '#9A7120',
-         'ok': '#306D35', 'warn': '#865000', 'bad': '#9F3331', 'info': '#2C6193', **SKY}
+         'live': '#AE7D0E', 'tile': '#14253E', 'mark': '#DAB362', 'tile-edge': '#A5802B',
+         'seam-a': '#E0B03A', 'seam-b': '#AE7D0E',
+         'ok': '#306D35', 'warn': '#AD4A00', 'bad': '#9F3331', 'info': '#2C6193', **SKY}
 DARK = {'canvas': '#0A121F', 'card': '#111B2B', 'hover': '#0A121F', 'text': '#EEF2F8', 'muted': '#A9B4C6', 'border': '#223250',
         'mast': '#0A121F', 'mast-hover': '#111B2B', 'mast-text': '#EEF2F8', 'mast-ctl': '#A9B4C6',
         'action': '#DAB362', 'action-hover': '#F4E6CA', 'action-fg': '#150B00', 'action-edge': '#DAB362',
         'solid': '#EEF2F8', 'solid-hover': '#D5DBE6', 'solid-fg': '#0A121F',
         'live': '#DAB362', 'tile': '#14253E', 'mark': '#DAB362', 'tile-edge': '#A5802B',
-        'seam-a': '#B8892B', 'seam-b': '#E9CD94',
-        'ok': '#93C794', 'warn': '#E08A4E', 'bad': '#FB9890', 'info': '#8FBCEB', **SKY}
-# One gradient, B's five stops. Dark keeps B's positions; light is the same sky a few minutes later (horizon raised).
-POS = {'light': (0, 30, 60, 82, 100), 'dark': (0, 42, 70, 89, 100)}
+        'seam-a': '#F0CC7A', 'seam-b': '#B8892B',
+        'ok': '#93C794', 'warn': '#F2884A', 'bad': '#FB9890', 'info': '#8FBCEB', **SKY}
+# One gradient: night navy, navy, dusk (navy with the colour let out of it), ember, copper, gold. Blue cannot reach copper without passing
+# plum or grey, so the crossing is a stop of its own: navy loses its colour in the dark, then ember gains it. Drawn in
+# oklab (oklch would take the short hue arc, through magenta). Light is the same sky a few minutes later (horizon raised).
+POS = {'light': (0, 46, 56, 63, 80, 100), 'dark': (0, 52, 61, 68, 86, 100)}
+# grain: +-2 to 5 levels of soft-light noise, so the long navy span cannot band. Inline, no request.
+NOISE = ("url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E"
+         "%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E"
+         "%3CfeColorMatrix values='.07 .07 .07 0 .395 .07 .07 .07 0 .395 .07 .07 .07 0 .395 0 0 0 0 1'/%3E%3C/filter%3E"
+         "%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E\")")
 ANGLE = 172
 SKY_H, ZONE_H, SUN_Y, SUN_R = 520, 172, 250, 48
 
@@ -32,11 +39,11 @@ def block(tok, mode):
 
 
 def grad_text(mode):
-    return f'linear-gradient({ANGLE}deg, ' + ', '.join(f'{SKY[f"sky-{i + 1}"]} {p}%' for i, p in enumerate(POS[mode])) + ')'
+    return f'linear-gradient({ANGLE}deg in oklab, ' + ', '.join(f'{SKY[f"sky-{i + 1}"]} {p}%' for i, p in enumerate(POS[mode])) + ')'
 
 
 CSS = '''
-:root{--r-ctl:3px;--r-card:4px;--ctl-h:44px;--sky-h:%(sky_h)spx;--zone-h:%(zone_h)spx;--sun-y:%(sun_y)spx;--sun-r:%(sun_r)spx}
+:root{--seam-w:6px;--r-ctl:3px;--r-card:4px;--ctl-h:44px;--sky-h:%(sky_h)spx;--zone-h:%(zone_h)spx;--sun-y:%(sun_y)spx;--sun-r:%(sun_r)spx}
 @media (min-width:900px){:root{--ctl-h:36px}}
 :root,.t-light{%(light)s}
 .t-dark{%(dark)s}
@@ -58,7 +65,9 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .sec>h2{font-size:20px;line-height:28px}
 .note{max-width:68ch;color:var(--muted);font-size:15px;line-height:24px;margin:4px 0 20px;text-wrap:pretty}
 .cap{font-size:14px;color:var(--muted);margin:8px 0 0}
-.seam{display:block;height:1px;border:0;margin:0;background:linear-gradient(90deg,transparent,var(--seam-a) 18%%,var(--seam-b) 50%%,var(--seam-a) 82%%,transparent)}
+/* seam: a diamond drawn out along a join. Two flat facets, lit and shaded; no fade. Joins only. */
+.seam,.join{display:block;height:var(--seam-w);border:0;margin:0;background:linear-gradient(var(--seam-a) 50%%,var(--seam-b) 0);clip-path:polygon(0 50%%,50%% 0,100%% 50%%,50%% 100%%)}
+.bar+.seam{position:relative;margin:calc(var(--seam-w)/-2) 0}
 
 /* mark and icons */
 .mark{flex:none;display:block}
@@ -81,7 +90,9 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .phones{display:flex;flex-wrap:wrap;justify-content:center;gap:24px 48px}
 .phone-wrap{width:min(100%%,390px)}
 .phone{border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;background:var(--card);color:var(--text);font-size:15px;line-height:22px}
-.sky{position:relative;height:var(--sky-h);background:linear-gradient(var(--sky-angle),var(--sky-stops));color:var(--sky-text);text-align:center}
+.sky,.strip div{background:%(noise)s,linear-gradient(var(--sky-angle),var(--sky-stops));background-blend-mode:soft-light,normal}
+@supports (background:linear-gradient(in oklab,red,blue)){.sky,.strip div{background-image:%(noise)s,linear-gradient(var(--sky-angle) in oklab,var(--sky-stops))}}
+.sky{position:relative;height:var(--sky-h);color:var(--sky-text);text-align:center}
 .zone{height:var(--zone-h);padding:16px 16px 0;overflow:hidden}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;margin-bottom:28px}
 .who{font-weight:600;font-size:16px}
@@ -117,7 +128,6 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .tab:has(input:checked){color:var(--text);box-shadow:inset 0 -2px 0 var(--text)}
 .tab:has(input:focus-visible){outline:2px solid var(--text);outline-offset:-3px}
 .body{display:grid;grid-template-columns:minmax(0,1fr)}
-.join{height:1px;background:linear-gradient(90deg,transparent,var(--seam-a) 18%%,var(--seam-b) 50%%,var(--seam-a) 82%%,transparent)}
 .pane{min-width:0;padding:16px}
 .pane.fill{display:flex;flex-direction:column}
 .head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0 12px;margin-bottom:8px}
@@ -125,7 +135,7 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .head p,.key{font-size:13px;color:var(--muted)}
 .grid{width:calc(100%% + 24px);margin:0 -12px;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .grid th{padding:6px 12px 8px;text-align:left;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
-.grid thead tr{background:linear-gradient(90deg,transparent,var(--seam-a) 18%%,var(--seam-b) 50%%,var(--seam-a) 82%%,transparent) bottom/100%% 1px no-repeat}
+.grid thead th{border-bottom:1px solid var(--border)}
 .grid td{padding:9px 12px;border-top:1px solid var(--border)}
 .grid tbody tr:first-child td{border-top-color:transparent}
 .grid tbody tr:hover{background:var(--hover)}
@@ -156,8 +166,8 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .jobs .m{grid-column:1;font-size:13px;color:var(--muted)}
 .jobs .btn{grid-area:2/2;margin-top:4px}
 @media (min-width:900px){
-  .body{grid-template-columns:minmax(0,1fr) 1px 352px}
-  .join{height:auto;background:linear-gradient(180deg,transparent,var(--seam-a) 18%%,var(--seam-b) 50%%,var(--seam-a) 82%%,transparent)}
+  .body{grid-template-columns:minmax(0,1fr) var(--seam-w) 352px}
+  .join{height:auto;background:linear-gradient(90deg,var(--seam-a) 50%%,var(--seam-b) 0)}
   .tab{height:40px}
   .kind{width:88px}.prog{width:196px}.status{width:132px}
 }
@@ -192,7 +202,7 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .defs h3,.rule h3{font-size:15px;font-weight:600}
 .defs p{font-size:14px;color:var(--muted)}
 .strip{height:24px;border:1px solid var(--border);border-radius:var(--r-ctl);overflow:hidden;margin:6px 0}
-.strip div{height:100%%;background:linear-gradient(90deg,var(--sky-stops))}
+.strip div{--sky-angle:90deg;height:100%%}
 .demo{display:block;padding:11px 0;margin:6px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--r-ctl)}
 .rules{max-width:980px;margin-top:16px}
 .rule{display:grid;gap:4px 24px;padding:14px 0;border-top:1px solid var(--border);font-size:15px}
@@ -210,7 +220,7 @@ h1{font-size:28px;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 }
 @keyframes beat{to{transform:rotate(45deg) scale(.72)}}
 @keyframes echo{to{transform:scale(1.07)}}
-''' % dict(light=block(LIGHT, 'light'), dark=block(DARK, 'dark'), sky_h=SKY_H, zone_h=ZONE_H, sun_y=SUN_Y, sun_r=SUN_R)
+''' % dict(light=block(LIGHT, 'light'), dark=block(DARK, 'dark'), noise=NOISE, sky_h=SKY_H, zone_h=ZONE_H, sun_y=SUN_Y, sun_r=SUN_R)
 
 
 def mark(size):
@@ -349,7 +359,7 @@ TOKENS = [
     ('action', 'Gold: the one main action'), ('action-hover', 'Main action, hover'), ('action-fg', 'Label on gold'),
     ('action-edge', 'Edge of the gold button'), ('solid', 'Decisive action (End call)'), ('solid-fg', 'Label on solid'),
     ('live', 'Lit marks: voice level, today, running'), ('pill', 'Live pill on the gradient'), ('mark', 'Mark diamond'), ('tile', 'Mark tile'),
-    ('seam-a', 'Seam, outer (C)'), ('seam-b', 'Seam, centre (C)'),
+    ('seam-a', 'Seam, lit facet'), ('seam-b', 'Seam, shaded facet'),
     ('ok', 'Status: on track, done'), ('warn', 'Status: behind'), ('bad', 'Status: off track, error'), ('info', 'Status: queued'),
     ('sky-text', 'Text on the call gradient (B)'),
 ]
@@ -358,24 +368,24 @@ TOKENS = [
 def tokens():
     cell = lambda m, k, v: f'<td><span class="t-{m}"><i class="sw" style="background:var(--{k})"></i></span><code>{v}</code></td>'
     rows = ''.join(f'<tr><th scope="row"><code>{k}</code><span>{use}</span></th>{cell("light", k, LIGHT[k])}{cell("dark", k, DARK[k])}</tr>' for k, use in TOKENS)
-    seam = lambda t: f'linear-gradient(90deg, transparent, {t["seam-a"]} 18%, {t["seam-b"]} 50%, {t["seam-a"]} 82%, transparent)'
+    seam = lambda t: f'6px at the middle, drawn to a point at each end: clip-path polygon(0 50%, 50% 0, 100% 50%, 50% 100%), {t["seam-a"]} lit half, {t["seam-b"]} shaded half'
     return f'''<table class="tok"><thead><tr><th scope="col">Role</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead><tbody>{rows}</tbody></table>
 <div class="defs">
 <div class="wide"><h3>Radii</h3><p>Controls 3px. Cards and frames 4px. Diamonds are squares turned 45 degrees, corners left square.</p></div>
 <div><h3>First Light, light</h3><div class="strip"><div class="t-light"></div></div><p><code>{grad_text("light")}</code></p></div>
 <div><h3>First Light, dark</h3><div class="strip"><div class="t-dark"></div></div><p><code>{grad_text("dark")}</code></p></div>
-<div><h3>Seam, light</h3><div class="demo t-light"><hr class="seam"></div><p><code>{seam(LIGHT)}</code>, 1px</p></div>
-<div><h3>Seam, dark</h3><div class="demo t-dark"><hr class="seam"></div><p><code>{seam(DARK)}</code>, 1px</p></div>
+<div><h3>Seam, light</h3><div class="demo t-light"><hr class="seam"></div><p><code>{seam(LIGHT)}</code></p></div>
+<div><h3>Seam, dark</h3><div class="demo t-dark"><hr class="seam"></div><p><code>{seam(DARK)}</code></p></div>
 </div>'''
 
 
 RULES = [
     ('Gold', 'The mark. Something live: the Live pill, the lit voice level, today&rsquo;s column, a running job. The one main action of a screen, as a fill, in both modes.',
      'Text, a fill larger than a button, a card background, a destructive action such as End call, or a stand-in for amber. More than one gold button on a screen.'),
-    ('Gradient', 'First Light is the call screen background and brand moments such as sign-in or launch. One per screen, same five stops in both modes.',
-     'Cards, buttons, text, charts or any data screen. Words and the mark over it stay above the plum stop; everything else sits on the solid deck.'),
-    ('Seams', 'The join between two sections of one surface, and the rule under a table header. One pixel, fading at both ends.',
-     'Card outlines, control borders, row rules, or a stripe down the side of an item. Those use the cool hairline or nothing.'),
+    ('Gradient', 'First Light is the call screen background and brand moments such as sign-in or launch. One per screen, same six stops in both modes, mixed in oklab; navy meets ember at a dark neutral stop, never through plum.',
+     'Cards, buttons, text, charts or any data screen. Words and the mark over it stay above the ember stop; everything else sits on the solid deck.'),
+    ('Seams', 'The join between two sections of one surface: masthead and body, list and side column, one panel and the next. A diamond drawn out to the width of the join, 6px at the middle, in two flat gold facets.',
+     'Card outlines, control borders, row or table-header rules, or a stripe down the side of an item. Those use the cool hairline or nothing. Never more than one seam per join.'),
     ('Status colours', 'Green, amber, red and blue for state only, each with its icon and a word.',
      'Decoration, chart series, links, emphasis, or buttons.'),
     ('Diamond', 'One unit of something counted: a check-in, a level step. The mark, and the lit mark of a live thing.',
@@ -416,7 +426,7 @@ HTML = f'''<!doctype html>
 </section>
 <section class="sec" id="tokens">
 <h2>Tokens</h2>
-<p class="note">Every value comes from the three chosen candidates or the existing status ramp. Dark amber is First Light&rsquo;s copper, so a warning cannot be mistaken for brass.</p>
+<p class="note">Amber is pulled to burnt orange in both modes, at least 25 degrees of hue from every gold and 20 from red, so a warning cannot be mistaken for brass. Gold on porcelain is one deep value, the same for seams and lit marks.</p>
 {tokens()}
 </section>
 <section class="sec" id="rules">

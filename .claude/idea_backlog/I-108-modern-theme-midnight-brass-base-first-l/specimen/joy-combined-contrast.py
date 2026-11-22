@@ -22,6 +22,48 @@ def cr(a, b):
 assert round(cr('#000000', '#ffffff'), 1) == 21.0 and round(cr('#777777', '#ffffff'), 2) == 4.48
 
 
+def _lin(c): return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+def _gam(c): c = max(0.0, min(1.0, c)); return round(255 * (12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055))
+
+
+def oklab(h):
+    r, g, b = (_lin(int(h[i:i + 2], 16) / 255) for i in (1, 3, 5))
+    l, m, s = ((0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3), (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3),
+               (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3))
+    return (0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+            0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
+
+
+def unlab(L, a, b):
+    l, m, s = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3, (L - 0.1055613458 * a - 0.0638541728 * b) ** 3, (L - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    return '#%02X%02X%02X' % (_gam(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s), _gam(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
+                              _gam(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s))
+
+
+def lch(h):
+    L, a, b = oklab(h); return L, math.hypot(a, b), math.degrees(math.atan2(b, a)) % 360
+
+
+def hue_gap(a, b):
+    d = abs(lch(a)[2] - lch(b)[2]); return min(d, 360 - d)
+
+
+def ramp(stops, tok, space):
+    """The gradient as the browser draws it, one colour per 1%: space is 'oklab' (the declared mix) or 'srgb' (the fallback)."""
+    out = []
+    for pct in range(101):
+        i = max(k for k, (_, p) in enumerate(stops) if p <= pct); j = min(i + 1, len(stops) - 1)
+        (na, pa), (nb, pb) = stops[i], stops[j]; t = (pct - pa) / (pb - pa) if pb > pa else 0
+        if space == 'oklab':
+            out.append(unlab(*(x + (y - x) * t for x, y in zip(oklab(tok[na]), oklab(tok[nb])))))
+        else:
+            out.append('#%02X%02X%02X' % tuple(round(int(tok[na][k:k + 2], 16) * (1 - t) + int(tok[nb][k:k + 2], 16) * t) for k in (1, 3, 5)))
+    return out
+
+
+assert unlab(*oklab('#C7743F')) == '#C7743F' and round(lch('#FF00FF')[2]) == 328 and round(hue_gap('#FF0000', '#0000FF')) == 125
+
+
 def block(mode):
     return re.search(r'\.t-%s\{([^}]*)\}' % mode, HTML).group(1)
 
@@ -56,12 +98,15 @@ MARK = [  # needs 3.0
     ('pill', ['sky-1', 'sky-2'], 'Live pill against the top of the gradient'),
     ('sun', ['SUN'], 'the large mark on the gradient'),
     ('mark', ['tile'], 'brand diamond on its tile'),
+    ('seam-b', ['card', 'canvas'], 'seam, shaded facet: the half that carries the seam on a porcelain surface'),
+    ('seam-a', ['mast'], 'seam, lit facet: the half that lies on the masthead'),
     ('ok', ['card', 'hover'], 'status icon'), ('warn', ['card', 'hover'], 'status icon'),
     ('bad', ['card', 'hover'], 'status icon'), ('info', ['card', 'hover'], 'status icon'),
 ]
-INFO = [('border', ['card'], 'hairline, decorative'), ('seam-a', ['card'], 'seam ends, decorative'),
-        ('seam-b', ['card'], 'seam centre, decorative'), ('tile-edge', ['mast'], 'mark tile frame, decorative'),
+INFO = [('border', ['card'], 'hairline, decorative'), ('seam-a', ['card'], 'seam, lit facet on a surface: the highlight, not what carries it'),
+        ('tile-edge', ['mast'], 'mark tile frame, decorative'),
         ('warn', ['live'], 'amber against brass: must differ in hue, not in luminance')]
+GOLDS = ('live', 'action', 'action-edge', 'pill', 'mark', 'sun', 'seam-a', 'seam-b')
 
 fail, lowest = 0, 99.0
 H = px('sky-h')
@@ -94,11 +139,30 @@ for mode in ('light', 'dark'):
                 if group is TEXT: lowest = min(lowest, v)
                 print(f'  {"text" if need == 4.5 else "mark" if need else "info"} {fg:<11} {tok[fg]} on {bg:<12} {tok[bg]} {v:5.2f}  '
                       f'{"ok" if ok else "FAIL"}{"" if need else " (not required)"}  {why}')
-    # amber and brass must not be the same colour again (the defect both reviews found): at least 25 units on one channel
-    w, g = (tuple(int(tok[k][i:i + 2], 16) for i in (1, 3, 5)) for k in ('warn', 'live'))
-    gap = max(abs(a - b) for a, b in zip(w, g))
-    if gap < 25: fail += 1
-    print(f'  hue  warn {tok["warn"]} vs live {tok["live"]}: largest channel gap {gap}  {"ok" if gap >= 25 else "FAIL"}')
+    # amber must not sit in the gold hue family again (the defect three reviews found): oklch hue, 25 degrees from every gold, 20 from red
+    for k, need in [(g, 25) for g in GOLDS] + [('bad', 20)]:
+        gap = hue_gap(tok['warn'], tok[k]); ok = gap >= need; fail += not ok
+        print(f'  hue  warn {tok["warn"]} vs {k:<11} {tok[k]} {gap:5.1f} deg (need {need})  {"ok" if ok else "FAIL"}')
+    # a seam must read as gold, not brown or grey: saturated, in the gold hue band
+    for k in ('seam-a', 'seam-b'):
+        L, C, h = lch(tok[k]); ok = C >= 0.10 and 70 <= h <= 95; fail += not ok
+        print(f'  gold {k} {tok[k]} chroma {C:.3f} hue {h:.0f}  {"ok" if ok else "FAIL"}')
+    # the gradient as drawn, both mixes: no purple or mauve, no mid-light grey, and it only gets lighter
+    for space in ('oklab', 'srgb'):
+        r = ramp(stops, tok, space); bad = []
+        for pct, c in enumerate(r):
+            L, C, h = lch(c)
+            if C > 0.02 and (h > 285 or h < 20): bad.append(f'{pct}% {c} purple (hue {h:.0f})')
+            if C < 0.03 and L > 0.27: bad.append(f'{pct}% {c} grey')
+            if pct and L < lch(r[pct - 1])[0] - 0.004: bad.append(f'{pct}% {c} darker than the step before')
+        fail += bool(bad)
+        grey = min(r, key=lambda c: lch(c)[1])
+        print(f'  sky  {space:<5} mix: least saturated point {grey} (lightness {lch(grey)[0]:.2f})  {"ok" if not bad else "FAIL " + "; ".join(bad)}')
+        # text and the mark against the colours actually under them, not only the stops
+        for fg, name, need, r_to in (('sky-text', 'text', 4.5, zone), ('sun', 'mark', 3.0, sun)):
+            worst = min(cr(tok[fg], c) for c in r[:math.ceil(r_to) + 1]); ok = worst >= need; fail += not ok
+            if fg == 'sky-text': lowest = min(lowest, worst)
+            print(f'  sky  {space:<5} mix: {name} {tok[fg]} worst {worst:5.2f} over 0-{math.ceil(r_to)}%  {"ok" if ok else "FAIL"}')
 
 # Every colour the page paints must be a token: no stray hex in CSS outside the token blocks, none in markup attributes.
 style = re.search(r'<style>(.*?)</style>', HTML, re.S).group(1)

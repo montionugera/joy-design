@@ -202,3 +202,27 @@ The reviewer could not check:
 - The typeface is untouched (system font in every specimen). `Cormorant Garamond`, `Plus Jakarta Sans` and `Inter` are all very widely used; the typeface is a separate decision and probably the larger lever.
 - The colours are hex proposals. They have not been run through the token ramps in `packages/tokens` or through `packages/tokens/test/contrast.test.js`.
 - The Flutter, Swift, Svelte and React kits read generated tokens, so a token change reaches all of them; component-level changes (sharp radii, the diamond marks, seams) do not come for free.
+
+## Fix round, 2026-11-23 (after the first review)
+
+The owner asked for the weak points to be fixed without waiting. One fixer, then an independent checker on fresh screenshots; then one more change to the gradient and one more independent look.
+
+| Weak point | What changed | Independent verdict |
+|---|---|---|
+| Gold seam was invisible in light mode | The seam is now a 6px two-facet gold lens drawn along a join (light `#E0B03A` over `#AE7D0E`, dark `#F0CC7A` over `#B8892B`), at joins only | Met: "recognisably gold", ownable |
+| Amber "Behind" too close to brass | Warning is burnt orange: light `#AD4A00`, dark `#F2884A`, 32 to 39 degrees of hue from every gold | Met. In dark mode "Behind" and "Off track" are still told apart mainly by icon and word |
+| Call gradient read purple in the middle | Rebuilt twice; see below | Met narrowly on the third version |
+
+Distinctiveness rose from 6 to **7 of 10** (the checker: "the call screen and the faceted seam plus diamond counting are ownable; the data table alone is about 6"). Clean technical pass, no banned pattern, lint 0 at both sizes.
+
+### The gradient needs the owner's eye
+
+A sky that goes from navy to copper has to cross the colour wheel somewhere, and there are only three ways to do it. Each version of the specimen took one:
+
+1. **Plum middle** (first version): the classic sunrise; the reviewer called the middle "purple-mauve, the least on-brand colour on the page".
+2. **Smoky middle** (second version): no purple, but a grey band about 30px deep where navy meets copper.
+3. **Dark middle** (third version, the one in `specimen/` now): the crossing happens while the sky is still dark, so nothing reads purple or grey. The cost, in the checker's words: the upper 55 to 60 percent is "a dark slab, not a lifting sky", copper arrives only in the bottom third, and in dark mode the bright bottom edge meets the dark deck with a hard line.
+
+Three attempts is the limit for tuning by guesswork, so this stops here. The choice between the three is taste, and it is the owner's. Stops for version 3: `#0B1226, #101B38, #2A2014, #4A2A14, #C7743F, #F2C078`, mixed in oklab. Version 2: `#0B1226, #15264A, #2A2B33, #63381A, #C7743F, #F2C078`. Version 1: theme B's five stops, `#0B1226, #1F2352, #6B3A5B, #C7774A, #F0BE78`.
+
+Still open from the checker (none high): the outer rings of the mark are faint where they cross the warm band; the solid light button for End call is the brightest thing on the dark deck; the data screen's warmth rests on gold alone (pure white cards against the brief's "warm greys").
