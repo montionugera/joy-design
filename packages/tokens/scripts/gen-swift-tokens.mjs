@@ -103,9 +103,16 @@ for (const [rampName, rampObj] of Object.entries(tokens.color || {})) {
 }
 
 // 2. Semantic Light & Dark tokens from tokens.json
-function extractSemantic(mode) {
+function extractSemantic(mode, presetKey = null) {
   const raw = tokens.semantic[mode];
-  const get = (group, key) => toSwiftColor(resolveRef(raw[group][key].value, tokens));
+  const overrides = presetKey ? (tokens.preset?.[presetKey]?.[mode] || {}) : {};
+  const get = (group, key) => {
+    const flatKey = `${group}-${key}`;
+    if (flatKey in overrides) {
+      return toSwiftColor(resolveRef(overrides[flatKey], tokens));
+    }
+    return toSwiftColor(resolveRef(raw[group][key].value, tokens));
+  };
   return {
     surfaceCanvas: get('surface', 'canvas'),
     surfaceCard: get('surface', 'card'),
@@ -130,6 +137,75 @@ function extractSemantic(mode) {
 
 const lightSem = extractSemantic('light');
 const darkSem = extractSemantic('dark');
+const modernLightSem = extractSemantic('light', 'modern');
+const modernDarkSem = extractSemantic('dark', 'modern');
+
+const modernPreset = tokens.preset?.modern;
+if (!modernPreset?.light || !modernPreset?.dark) {
+  throw new Error('tokens.preset.modern (light and dark) is required for Swift token generation');
+}
+
+function parseGradientStops(stopsStr, modeMap) {
+  return String(stopsStr)
+    .split(',')
+    .map((entry) => entry.trim())
+    .map((entry) => {
+      const m = entry.match(/^(#[0-9A-Fa-f]{6})\s+([\d.]+)%$/);
+      if (!m) {
+        throw new Error(`Invalid First Light stop entry: ${entry}`);
+      }
+      return {
+        color: toSwiftColor(m[1]),
+        location: (parseFloat(m[2]) / 100).toFixed(2),
+      };
+    });
+}
+
+function renderModernModeInstance(name, modeMap, isDark) {
+  const c = (key) => toSwiftColor(resolveRef(modeMap[key], tokens));
+  const stops = parseGradientStops(modeMap['sky-stops'], modeMap)
+    .map((s) => `            Gradient.Stop(color: ${s.color}, location: ${s.location})`)
+    .join(',\n');
+  return `    public static let ${name} = JoyModernModeTokens(
+        canvas: ${c('surface-canvas')},
+        card: ${c('surface-card')},
+        hover: ${c('surface-hover')},
+        text: ${c('text-primary')},
+        textSecondary: ${c('text-secondary')},
+        muted: ${c('text-muted')},
+        border: ${c('border-subtle')},
+        borderControl: ${c('border-default')},
+        mast: ${c('mast')},
+        mastHover: ${c('mast-hover')},
+        mastText: ${c('mast-text')},
+        mastCtl: ${c('mast-ctl')},
+        action: ${c('accent-default')},
+        actionHover: ${c('accent-hover')},
+        actionFg: ${c('text-on-accent')},
+        actionEdge: ${c('action-edge')},
+        solid: ${c('solid')},
+        solidHover: ${c('solid-hover')},
+        solidFg: ${c('solid-fg')},
+        live: ${c('live')},
+        tile: ${c('brand-tile')},
+        mark: ${c('brand-mark-on-tile')},
+        tileEdge: ${c('tile-edge')},
+        seamA: ${c('seam-a')},
+        seamB: ${c('seam-b')},
+        ok: ${c('status-success-fg')},
+        warn: ${c('status-warning-fg')},
+        bad: ${c('status-danger-fg')},
+        info: ${c('status-info-fg')},
+        skyText: ${c('sky-text')},
+        pill: ${c('pill')},
+        pillFg: ${c('pill-fg')},
+        sun: ${c('sun')},
+        firstLightStops: [
+${stops}
+        ],
+        isDark: ${isDark}
+    )`;
+}
 
 function renderSemanticInstance(name, sem, isDark) {
   return `    public static let ${name} = JoyThemeTokens(
@@ -234,6 +310,80 @@ public struct JoyThemeTokens: Sendable {
 ${renderSemanticInstance('light', lightSem, false)}
 
 ${renderSemanticInstance('dark', darkSem, true)}
+
+${renderSemanticInstance('modernLight', modernLightSem, false)}
+
+${renderSemanticInstance('modernDark', modernDarkSem, true)}
+
+    public static func modern(isDark: Bool = false) -> JoyThemeTokens {
+        isDark ? modernDark : modernLight
+    }
+}
+
+/// Complete I-108 Modern theme mode tokens (Midnight Brass, First Light, Kintsugi seams).
+public struct JoyModernModeTokens: Sendable {
+    public let canvas: Color
+    public let card: Color
+    public let hover: Color
+    public let text: Color
+    public let textSecondary: Color
+    public let muted: Color
+    public let border: Color
+    public let borderControl: Color
+    public let mast: Color
+    public let mastHover: Color
+    public let mastText: Color
+    public let mastCtl: Color
+    public let action: Color
+    public let actionHover: Color
+    public let actionFg: Color
+    public let actionEdge: Color
+    public let solid: Color
+    public let solidHover: Color
+    public let solidFg: Color
+    public let live: Color
+    public let tile: Color
+    public let mark: Color
+    public let tileEdge: Color
+    public let seamA: Color
+    public let seamB: Color
+    public let ok: Color
+    public let warn: Color
+    public let bad: Color
+    public let info: Color
+    public let skyText: Color
+    public let pill: Color
+    public let pillFg: Color
+    public let sun: Color
+    public let firstLightStops: [Gradient.Stop]
+    public let isDark: Bool
+}
+
+/// Generated I-108 Modern theme preset tokens from tokens.json.
+public enum JoyModernTokens {
+    public static let radiusControl: CGFloat = ${parsePx(modernPreset.light['radius-control'])}
+    public static let radiusCard: CGFloat = ${parsePx(modernPreset.light['radius-card'])}
+    public static let seamWidth: CGFloat = ${parsePx(modernPreset.light['seam-width'])}
+    public static let firstLightAngleDegrees: Double = ${parseFloat(modernPreset.light['sky-angle'])}
+
+    public static let sky1 = ${toSwiftColor(modernPreset.light['sky-1'])}
+    public static let sky2 = ${toSwiftColor(modernPreset.light['sky-2'])}
+    public static let sky3 = ${toSwiftColor(modernPreset.light['sky-3'])}
+    public static let sky4 = ${toSwiftColor(modernPreset.light['sky-4'])}
+    public static let sky5 = ${toSwiftColor(modernPreset.light['sky-5'])}
+    public static let sky6 = ${toSwiftColor(modernPreset.light['sky-6'])}
+    public static let skyText = ${toSwiftColor(modernPreset.light['sky-text'])}
+    public static let pill = ${toSwiftColor(modernPreset.light['pill'])}
+    public static let pillFg = ${toSwiftColor(modernPreset.light['pill-fg'])}
+    public static let sun = ${toSwiftColor(modernPreset.light['sun'])}
+
+${renderModernModeInstance('light', modernPreset.light, false)}
+
+${renderModernModeInstance('dark', modernPreset.dark, true)}
+
+    public static func mode(isDark: Bool = false) -> JoyModernModeTokens {
+        isDark ? dark : light
+    }
 }
 
 /// Canonical JoyDesign namespace shared across macOS & iOS SwiftUI tools.

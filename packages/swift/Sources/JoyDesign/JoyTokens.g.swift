@@ -228,6 +228,206 @@ public struct JoyThemeTokens: Sendable {
         statusInfoFg: Color(joyHex: 0x8FBCEB),
         isDark: true
     )
+
+    public static let modernLight = JoyThemeTokens(
+        surfaceCanvas: Color(joyHex: 0xF3F5F9),
+        surfaceCard: Color(joyHex: 0xFFFFFF),
+        surfaceElevated: Color(joyHex: 0xFFFFFF),
+        surfaceSunken: Color(joyHex: 0xF3F5F9),
+        textPrimary: Color(joyHex: 0x14253E),
+        textSecondary: Color(joyHex: 0x223250),
+        textMuted: Color(joyHex: 0x4E5F7B),
+        textOnAccent: Color(joyHex: 0x150B00),
+        borderSubtle: Color(joyHex: 0xD5DBE6),
+        borderDefault: Color(joyHex: 0x4E5F7B),
+        borderStrong: Color(joyHex: 0x14253E),
+        accentBase: Color(joyHex: 0xDAB362),
+        accentHover: Color(joyHex: 0xF4E6CA),
+        accentSubtle: Color(joyHex: 0xF4E6CA),
+        statusSuccessFg: Color(joyHex: 0x306D35),
+        statusWarningFg: Color(joyHex: 0xAD4A00),
+        statusDangerFg: Color(joyHex: 0x9F3331),
+        statusInfoFg: Color(joyHex: 0x2C6193),
+        isDark: false
+    )
+
+    public static let modernDark = JoyThemeTokens(
+        surfaceCanvas: Color(joyHex: 0x0A121F),
+        surfaceCard: Color(joyHex: 0x111B2B),
+        surfaceElevated: Color(joyHex: 0x14253E),
+        surfaceSunken: Color(joyHex: 0x0A121F),
+        textPrimary: Color(joyHex: 0xEEF2F8),
+        textSecondary: Color(joyHex: 0xD5DBE6),
+        textMuted: Color(joyHex: 0xA9B4C6),
+        textOnAccent: Color(joyHex: 0x150B00),
+        borderSubtle: Color(joyHex: 0x223250),
+        borderDefault: Color(joyHex: 0xA9B4C6),
+        borderStrong: Color(joyHex: 0xEEF2F8),
+        accentBase: Color(joyHex: 0xDAB362),
+        accentHover: Color(joyHex: 0xF4E6CA),
+        accentSubtle: Color(joyHex: 0x14253E),
+        statusSuccessFg: Color(joyHex: 0x93C794),
+        statusWarningFg: Color(joyHex: 0xF2884A),
+        statusDangerFg: Color(joyHex: 0xFB9890),
+        statusInfoFg: Color(joyHex: 0x8FBCEB),
+        isDark: true
+    )
+
+    public static func modern(isDark: Bool = false) -> JoyThemeTokens {
+        isDark ? modernDark : modernLight
+    }
+}
+
+/// Complete I-108 Modern theme mode tokens (Midnight Brass, First Light, Kintsugi seams).
+public struct JoyModernModeTokens: Sendable {
+    public let canvas: Color
+    public let card: Color
+    public let hover: Color
+    public let text: Color
+    public let textSecondary: Color
+    public let muted: Color
+    public let border: Color
+    public let borderControl: Color
+    public let mast: Color
+    public let mastHover: Color
+    public let mastText: Color
+    public let mastCtl: Color
+    public let action: Color
+    public let actionHover: Color
+    public let actionFg: Color
+    public let actionEdge: Color
+    public let solid: Color
+    public let solidHover: Color
+    public let solidFg: Color
+    public let live: Color
+    public let tile: Color
+    public let mark: Color
+    public let tileEdge: Color
+    public let seamA: Color
+    public let seamB: Color
+    public let ok: Color
+    public let warn: Color
+    public let bad: Color
+    public let info: Color
+    public let skyText: Color
+    public let pill: Color
+    public let pillFg: Color
+    public let sun: Color
+    public let firstLightStops: [Gradient.Stop]
+    public let isDark: Bool
+}
+
+/// Generated I-108 Modern theme preset tokens from tokens.json.
+public enum JoyModernTokens {
+    public static let radiusControl: CGFloat = 3
+    public static let radiusCard: CGFloat = 4
+    public static let seamWidth: CGFloat = 6
+    public static let firstLightAngleDegrees: Double = 172
+
+    public static let sky1 = Color(joyHex: 0x0B1226)
+    public static let sky2 = Color(joyHex: 0x101B38)
+    public static let sky3 = Color(joyHex: 0x2A2014)
+    public static let sky4 = Color(joyHex: 0x4A2A14)
+    public static let sky5 = Color(joyHex: 0xC7743F)
+    public static let sky6 = Color(joyHex: 0xF2C078)
+    public static let skyText = Color(joyHex: 0xFBF3E9)
+    public static let pill = Color(joyHex: 0xDAB362)
+    public static let pillFg = Color(joyHex: 0x150B00)
+    public static let sun = Color(joyHex: 0xDAB362)
+
+    public static let light = JoyModernModeTokens(
+        canvas: Color(joyHex: 0xF3F5F9),
+        card: Color(joyHex: 0xFFFFFF),
+        hover: Color(joyHex: 0xF3F5F9),
+        text: Color(joyHex: 0x14253E),
+        textSecondary: Color(joyHex: 0x223250),
+        muted: Color(joyHex: 0x4E5F7B),
+        border: Color(joyHex: 0xD5DBE6),
+        borderControl: Color(joyHex: 0x4E5F7B),
+        mast: Color(joyHex: 0x14253E),
+        mastHover: Color(joyHex: 0x223250),
+        mastText: Color(joyHex: 0xF3F5F9),
+        mastCtl: Color(joyHex: 0xA9B4C6),
+        action: Color(joyHex: 0xDAB362),
+        actionHover: Color(joyHex: 0xF4E6CA),
+        actionFg: Color(joyHex: 0x150B00),
+        actionEdge: Color(joyHex: 0xA5802B),
+        solid: Color(joyHex: 0x14253E),
+        solidHover: Color(joyHex: 0x223250),
+        solidFg: Color(joyHex: 0xF3F5F9),
+        live: Color(joyHex: 0xAE7D0E),
+        tile: Color(joyHex: 0x14253E),
+        mark: Color(joyHex: 0xDAB362),
+        tileEdge: Color(joyHex: 0xA5802B),
+        seamA: Color(joyHex: 0xE0B03A),
+        seamB: Color(joyHex: 0xAE7D0E),
+        ok: Color(joyHex: 0x306D35),
+        warn: Color(joyHex: 0xAD4A00),
+        bad: Color(joyHex: 0x9F3331),
+        info: Color(joyHex: 0x2C6193),
+        skyText: Color(joyHex: 0xFBF3E9),
+        pill: Color(joyHex: 0xDAB362),
+        pillFg: Color(joyHex: 0x150B00),
+        sun: Color(joyHex: 0xDAB362),
+        firstLightStops: [
+            Gradient.Stop(color: Color(joyHex: 0x0B1226), location: 0.00),
+            Gradient.Stop(color: Color(joyHex: 0x101B38), location: 0.46),
+            Gradient.Stop(color: Color(joyHex: 0x2A2014), location: 0.56),
+            Gradient.Stop(color: Color(joyHex: 0x4A2A14), location: 0.63),
+            Gradient.Stop(color: Color(joyHex: 0xC7743F), location: 0.80),
+            Gradient.Stop(color: Color(joyHex: 0xF2C078), location: 1.00)
+        ],
+        isDark: false
+    )
+
+    public static let dark = JoyModernModeTokens(
+        canvas: Color(joyHex: 0x0A121F),
+        card: Color(joyHex: 0x111B2B),
+        hover: Color(joyHex: 0x0A121F),
+        text: Color(joyHex: 0xEEF2F8),
+        textSecondary: Color(joyHex: 0xD5DBE6),
+        muted: Color(joyHex: 0xA9B4C6),
+        border: Color(joyHex: 0x223250),
+        borderControl: Color(joyHex: 0xA9B4C6),
+        mast: Color(joyHex: 0x0A121F),
+        mastHover: Color(joyHex: 0x111B2B),
+        mastText: Color(joyHex: 0xEEF2F8),
+        mastCtl: Color(joyHex: 0xA9B4C6),
+        action: Color(joyHex: 0xDAB362),
+        actionHover: Color(joyHex: 0xF4E6CA),
+        actionFg: Color(joyHex: 0x150B00),
+        actionEdge: Color(joyHex: 0xDAB362),
+        solid: Color(joyHex: 0xEEF2F8),
+        solidHover: Color(joyHex: 0xD5DBE6),
+        solidFg: Color(joyHex: 0x0A121F),
+        live: Color(joyHex: 0xDAB362),
+        tile: Color(joyHex: 0x14253E),
+        mark: Color(joyHex: 0xDAB362),
+        tileEdge: Color(joyHex: 0xA5802B),
+        seamA: Color(joyHex: 0xF0CC7A),
+        seamB: Color(joyHex: 0xB8892B),
+        ok: Color(joyHex: 0x93C794),
+        warn: Color(joyHex: 0xF2884A),
+        bad: Color(joyHex: 0xFB9890),
+        info: Color(joyHex: 0x8FBCEB),
+        skyText: Color(joyHex: 0xFBF3E9),
+        pill: Color(joyHex: 0xDAB362),
+        pillFg: Color(joyHex: 0x150B00),
+        sun: Color(joyHex: 0xDAB362),
+        firstLightStops: [
+            Gradient.Stop(color: Color(joyHex: 0x0B1226), location: 0.00),
+            Gradient.Stop(color: Color(joyHex: 0x101B38), location: 0.52),
+            Gradient.Stop(color: Color(joyHex: 0x2A2014), location: 0.61),
+            Gradient.Stop(color: Color(joyHex: 0x4A2A14), location: 0.68),
+            Gradient.Stop(color: Color(joyHex: 0xC7743F), location: 0.86),
+            Gradient.Stop(color: Color(joyHex: 0xF2C078), location: 1.00)
+        ],
+        isDark: true
+    )
+
+    public static func mode(isDark: Bool = false) -> JoyModernModeTokens {
+        isDark ? dark : light
+    }
 }
 
 /// Canonical JoyDesign namespace shared across macOS & iOS SwiftUI tools.
