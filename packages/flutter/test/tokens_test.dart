@@ -24,6 +24,8 @@ void main() {
     final nordic = JoyThemeTokens.nordicSlate();
     final verdant = JoyThemeTokens.verdantLawn();
     final outdoor = JoyThemeTokens.outdoor();
+    final modernLight = JoyThemeTokens.modern();
+    final modernDark = JoyThemeTokens.modern(isDark: true);
 
     expect(classic.palette, equals('classic'));
     expect(bauhaus.palette, equals('bauhaus-primary'));
@@ -31,8 +33,17 @@ void main() {
     expect(nordic.palette, equals('nordic-slate'));
     expect(verdant.palette, equals('verdant-lawn'));
     expect(outdoor.palette, equals('outdoor'));
+    expect(modernLight.palette, equals('modern'));
+    expect(modernDark.palette, equals('modern'));
+    expect(modernLight.surface.canvas, equals(const Color(0xFFF3F5F9)));
+    expect(modernDark.surface.canvas, equals(const Color(0xFF0A121F)));
+    expect(modernLight.status.warningFg, equals(const Color(0xFFAD4A00)));
+    expect(modernDark.status.warningFg, equals(const Color(0xFFF2884A)));
+    expect(JoyModernTokens.radiusControl, equals(3.0));
+    expect(JoyModernTokens.radiusCard, equals(4.0));
+    expect(JoyModernTokens.firstLightColors.length, equals(6));
 
-    expect(JoyPalettePreset.values.length, equals(6));
+    expect(JoyPalettePreset.values.length, equals(7));
   });
 
   test('JoyThemeTokens 3-level status colors and reserved words resolve', () {

@@ -161,5 +161,51 @@ test('bauhaus joy-coach tokens and 5 palette presets exist in theme.css', () => 
   assert.ok(css.includes('.joy-bevel'), '.joy-bevel utility must exist');
 });
 
+test('I-108 modern preset emits non-breaking CSS and typed JS/CJS/d.ts exports', async () => {
+  const css = fs.readFileSync(path.resolve('./dist/theme.css'), 'utf8');
+  const dts = fs.readFileSync(path.resolve('./dist/index.d.ts'), 'utf8');
+  const { presets } = await import('../dist/index.js');
+
+  // Existing :root defaults remain intact
+  assert.ok(css.includes('--joy-color-cream-100: #f8f3e8;'), ':root cream-100 must remain untouched');
+  assert.ok(css.includes('--joy-radius-control: 6px;'), ':root radius-control must remain 6px');
+  assert.ok(css.includes('--joy-radius-card: 12px;'), ':root radius-card must remain 12px');
+
+  // CSS modern preset selectors & tokens
+  assert.ok(css.includes('[data-palette="modern"], :root[data-palette="modern"]'), 'modern light selector must exist');
+  assert.ok(css.includes('[data-theme="dark"][data-palette="modern"]'), 'modern dark selector must exist');
+  assert.ok(css.includes(':root:not([data-theme="light"])[data-palette="modern"]'), 'modern prefers-color-scheme dark selector must exist');
+  for (const needle of [
+    '--joy-surface-canvas: #F3F5F9;',
+    '--joy-surface-canvas: #0A121F;',
+    '--joy-surface-card: #111B2B;',
+    '--joy-accent-default: #DAB362;',
+    '--joy-status-warning-fg: #AD4A00;',
+    '--joy-status-warning-fg: #F2884A;',
+    '--joy-seam-a: #E0B03A;',
+    '--joy-seam-b: #AE7D0E;',
+    '--joy-seam-a: #F0CC7A;',
+    '--joy-seam-b: #B8892B;',
+    '--joy-sky-1: #0B1226;',
+    '--joy-sky-6: #F2C078;',
+    '--joy-radius-control: 3px;',
+    '--joy-radius-card: 4px;',
+    '--joy-gradient-first-light: linear-gradient(172deg in oklab, #0B1226 0%, #101B38 46%, #2A2014 56%, #4A2A14 63%, #C7743F 80%, #F2C078 100%);',
+  ]) {
+    assert.ok(css.includes(needle), `theme.css missing ${needle}`);
+  }
+
+  // JS/TS exports
+  assert.ok(presets?.modern?.light, 'ESM presets.modern.light must exist');
+  assert.ok(presets?.modern?.dark, 'ESM presets.modern.dark must exist');
+  assert.strictEqual(presets.modern.light['surface-canvas'], '#F3F5F9');
+  assert.strictEqual(presets.modern.dark['surface-canvas'], '#0A121F');
+  assert.strictEqual(presets.modern.light['radius-control'], '3px');
+  assert.strictEqual(presets.modern.light['radius-card'], '4px');
+  assert.ok(dts.includes('export interface JoyPresetModern'), 'index.d.ts must declare JoyPresetModern');
+  assert.ok(dts.includes('export declare const presets: JoyPresets;'), 'index.d.ts must export typed presets');
+  assert.ok(!dts.includes('[key: string]: string;'), 'index.d.ts must remain free of loose index signatures');
+});
+
 
 

@@ -676,7 +676,8 @@ enum JoyPalettePreset {
   clayCourt,
   nordicSlate,
   verdantLawn,
-  outdoor;
+  outdoor,
+  modern;
 
   String get id {
     switch (this) {
@@ -686,11 +687,65 @@ enum JoyPalettePreset {
       case JoyPalettePreset.nordicSlate: return 'nordic-slate';
       case JoyPalettePreset.verdantLawn: return 'verdant-lawn';
       case JoyPalettePreset.outdoor: return 'outdoor';
+      case JoyPalettePreset.modern: return 'modern';
     }
   }
 
   JoyThemeTokens tokens({bool isDark = false}) =>
       JoyThemeTokens.preset(this, isDark: isDark);
+}
+
+/// I-108 Modern theme preset tokens (Midnight Brass, First Light gradient, Kintsugi seams).
+abstract final class JoyModernTokens {
+  JoyModernTokens._();
+
+  static const double radiusControl = 3.0;
+  static const double radiusCard = 4.0;
+  static const double seamWidth = 6.0;
+  static const double firstLightAngleDegrees = 172.0;
+
+  static const Color sky1 = Color(0xFF0B1226);
+  static const Color sky2 = Color(0xFF101B38);
+  static const Color sky3 = Color(0xFF2A2014);
+  static const Color sky4 = Color(0xFF4A2A14);
+  static const Color sky5 = Color(0xFFC7743F);
+  static const Color sky6 = Color(0xFFF2C078);
+  static const Color skyText = Color(0xFFFBF3E9);
+  static const Color pill = Color(0xFFDAB362);
+  static const Color pillFg = Color(0xFF150B00);
+  static const Color sun = Color(0xFFDAB362);
+  static const Color tile = Color(0xFF14253E);
+  static const Color mark = Color(0xFFDAB362);
+  static const Color tileEdge = Color(0xFFA5802B);
+
+  static const List<Color> firstLightColors = <Color>[sky1, sky2, sky3, sky4, sky5, sky6];
+  static const List<double> firstLightStopsLight = <double>[0.00, 0.46, 0.56, 0.63, 0.80, 1.00];
+  static const List<double> firstLightStopsDark = <double>[0.00, 0.52, 0.61, 0.68, 0.86, 1.00];
+
+  static const Color seamALight = Color(0xFFE0B03A);
+  static const Color seamBLight = Color(0xFFAE7D0E);
+  static const Color seamADark = Color(0xFFF0CC7A);
+  static const Color seamBDark = Color(0xFFB8892B);
+
+  static const Color mastLight = Color(0xFF14253E);
+  static const Color mastHoverLight = Color(0xFF223250);
+  static const Color mastTextLight = Color(0xFFF3F5F9);
+  static const Color mastCtlLight = Color(0xFFA9B4C6);
+  static const Color actionEdgeLight = Color(0xFFA5802B);
+  static const Color solidLight = Color(0xFF14253E);
+  static const Color solidHoverLight = Color(0xFF223250);
+  static const Color solidFgLight = Color(0xFFF3F5F9);
+  static const Color liveLight = Color(0xFFAE7D0E);
+
+  static const Color mastDark = Color(0xFF0A121F);
+  static const Color mastHoverDark = Color(0xFF111B2B);
+  static const Color mastTextDark = Color(0xFFEEF2F8);
+  static const Color mastCtlDark = Color(0xFFA9B4C6);
+  static const Color actionEdgeDark = Color(0xFFDAB362);
+  static const Color solidDark = Color(0xFFEEF2F8);
+  static const Color solidHoverDark = Color(0xFFD5DBE6);
+  static const Color solidFgDark = Color(0xFF0A121F);
+  static const Color liveDark = Color(0xFFDAB362);
 }
 
 /// Primary Joymify design tokens theme extension.
@@ -2008,6 +2063,220 @@ class JoyThemeTokens extends ThemeExtension<JoyThemeTokens> {
     ),
   );
 
+  static const JoyThemeTokens modernLight = JoyThemeTokens(
+    isDark: false,
+    palette: 'modern',
+    surface: JoySurfaceTokens(
+    canvas: Color(0xFFF3F5F9),
+    card: Color(0xFFFFFFFF),
+    raised: Color(0xFFFFFFFF),
+    sunken: Color(0xFFF3F5F9),
+    disabled: Color(0xFFF3F5F9),
+    overlay: Color(0xFFFFFFFF),
+    inverse: Color(0xFF14253E),
+    thumb: Color(0xFFFFFFFF),
+    clayBg: Color(0xFFF0D8C9),
+    clayFg: Color(0xFF8A4526),
+    hardBg: Color(0xFFE2E8EF),
+    hardFg: Color(0xFF14253E),
+    grassBg: Color(0xFFE4EADA),
+    grassFg: Color(0xFF4E5F36),
+    indoorBg: Color(0xFFE3DCCC),
+    indoorFg: Color(0xFF566A87),
+    ),
+    text: JoyTextTokens(
+    primary: Color(0xFF14253E),
+    secondary: Color(0xFF223250),
+    muted: Color(0xFF4E5F7B),
+    disabled: Color(0xFF4E5F7B),
+    inverse: Color(0xFFF3F5F9),
+    link: Color(0xFF223250),
+    onAccent: Color(0xFF150B00),
+    ),
+    border: JoyBorderTokens(
+    subtle: Color(0xFFD5DBE6),
+    base: Color(0xFF4E5F7B),
+    strong: Color(0xFF14253E),
+    focus: Color(0xFF14253E),
+    disabled: Color(0xFFD5DBE6),
+    ),
+    accent: JoyAccentTokens(
+    base: Color(0xFFDAB362),
+    hover: Color(0xFFF4E6CA),
+    active: Color(0xFFB8892B),
+    subtle: Color(0xFFF4E6CA),
+    text: Color(0xFF7D5E12),
+    gradientEnd: Color(0xFFC49A3A),
+    highlight: Color(0xFFF4E6CA),
+    ),
+    status: JoyStatusTokens(
+    success: JoyStatusLevelTokens(
+      fg: Color(0xFF306D35),
+      bg: Color(0xFFE7F2E7),
+      border: Color(0xFF93C794),
+    ),
+    warning: JoyStatusLevelTokens(
+      fg: Color(0xFFAD4A00),
+      bg: Color(0xFFF7EDDF),
+      border: Color(0xFFDFAE68),
+    ),
+    danger: JoyStatusDangerTokens(
+      fg: Color(0xFF9F3331),
+      bg: Color(0xFFFEE9E6),
+      border: Color(0xFFFB9890),
+      solidBg: Color(0xFF9F3331),
+      solidFg: Color(0xFFFFFFFF),
+      solidBorder: Color(0xFF9F3331),
+    ),
+    info: JoyStatusLevelTokens(
+      fg: Color(0xFF2C6193),
+      bg: Color(0xFFE6F0F9),
+      border: Color(0xFF8FBCEB),
+    ),
+    ),
+    elevation: JoyElevationTokens(
+    level0: <BoxShadow>[],
+    level1: <BoxShadow>[
+      BoxShadow(color: Color(0x1414253E), offset: Offset(0, 1), blurRadius: 3, spreadRadius: 0),
+      BoxShadow(color: Color(0x0A14253E), offset: Offset(0, 1), blurRadius: 2, spreadRadius: 0),
+    ],
+    level2: <BoxShadow>[
+      BoxShadow(color: Color(0x1A14253E), offset: Offset(0, 4), blurRadius: 8, spreadRadius: -2),
+      BoxShadow(color: Color(0x0F14253E), offset: Offset(0, 2), blurRadius: 4, spreadRadius: -2),
+    ],
+    level3: <BoxShadow>[
+      BoxShadow(color: Color(0x1F14253E), offset: Offset(0, 12), blurRadius: 20, spreadRadius: -4),
+      BoxShadow(color: Color(0x0A14253E), offset: Offset(0, 4), blurRadius: 6, spreadRadius: -2),
+    ],
+    accent1: <BoxShadow>[
+      BoxShadow(color: Color(0x47C49A3A), offset: Offset(0, 1), blurRadius: 2, spreadRadius: 0),
+      BoxShadow(color: Color(0x1414253E), offset: Offset(0, 1), blurRadius: 3, spreadRadius: 0),
+    ],
+    accent2: <BoxShadow>[
+      BoxShadow(color: Color(0x6BC49A3A), offset: Offset(0, 6), blurRadius: 16, spreadRadius: -2),
+      BoxShadow(color: Color(0x1F14253E), offset: Offset(0, 2), blurRadius: 6, spreadRadius: -1),
+    ],
+    accentInset: <BoxShadow>[
+      BoxShadow(color: Color(0x59856515), offset: Offset(0, 2), blurRadius: 4, spreadRadius: 0),
+    ],
+    bevel: <BoxShadow>[
+      BoxShadow(color: Color(0xB3FFFFFF), offset: Offset(0, 1), blurRadius: 0, spreadRadius: 0),
+    ],
+    ),
+    focusRing: JoyFocusRingTokens(
+      color: Color(0xFF14253E),
+      width: 2.0,
+      style: 'solid',
+    ),
+  );
+
+  static const JoyThemeTokens modernDark = JoyThemeTokens(
+    isDark: true,
+    palette: 'modern',
+    surface: JoySurfaceTokens(
+    canvas: Color(0xFF0A121F),
+    card: Color(0xFF111B2B),
+    raised: Color(0xFF14253E),
+    sunken: Color(0xFF0A121F),
+    disabled: Color(0xFF111B2B),
+    overlay: Color(0xFF111B2B),
+    inverse: Color(0xFFEEF2F8),
+    thumb: Color(0xFFEEF2F8),
+    clayBg: Color(0xFF63311B),
+    clayFg: Color(0xFFDFB093),
+    hardBg: Color(0xFF111B2B),
+    hardFg: Color(0xFFA2B2CB),
+    grassBg: Color(0xFF1A2C17),
+    grassFg: Color(0xFF8FB382),
+    indoorBg: Color(0xFF132033),
+    indoorFg: Color(0xFFA2B2CB),
+    ),
+    text: JoyTextTokens(
+    primary: Color(0xFFEEF2F8),
+    secondary: Color(0xFFD5DBE6),
+    muted: Color(0xFFA9B4C6),
+    disabled: Color(0xFFA9B4C6),
+    inverse: Color(0xFF0A121F),
+    link: Color(0xFFDAB362),
+    onAccent: Color(0xFF150B00),
+    ),
+    border: JoyBorderTokens(
+    subtle: Color(0xFF223250),
+    base: Color(0xFFA9B4C6),
+    strong: Color(0xFFEEF2F8),
+    focus: Color(0xFFEEF2F8),
+    disabled: Color(0xFF223250),
+    ),
+    accent: JoyAccentTokens(
+    base: Color(0xFFDAB362),
+    hover: Color(0xFFF4E6CA),
+    active: Color(0xFFB8892B),
+    subtle: Color(0xFF14253E),
+    text: Color(0xFFDAB362),
+    gradientEnd: Color(0xFFC49A3A),
+    highlight: Color(0xFFF4E6CA),
+    ),
+    status: JoyStatusTokens(
+    success: JoyStatusLevelTokens(
+      fg: Color(0xFF93C794),
+      bg: Color(0xFF0D2D0F),
+      border: Color(0xFF478D4B),
+    ),
+    warning: JoyStatusLevelTokens(
+      fg: Color(0xFFF2884A),
+      bg: Color(0xFF3A1E00),
+      border: Color(0xFFA96B00),
+    ),
+    danger: JoyStatusDangerTokens(
+      fg: Color(0xFFFB9890),
+      bg: Color(0xFF470D0E),
+      border: Color(0xFFC74B47),
+      solidBg: Color(0xFF9F3331),
+      solidFg: Color(0xFFFFFFFF),
+      solidBorder: Color(0xFFFB9890),
+    ),
+    info: JoyStatusLevelTokens(
+      fg: Color(0xFF8FBCEB),
+      bg: Color(0xFF0B2741),
+      border: Color(0xFF437EB9),
+    ),
+    ),
+    elevation: JoyElevationTokens(
+    level0: <BoxShadow>[],
+    level1: <BoxShadow>[
+      BoxShadow(color: Color(0x404D607D), offset: Offset(0, 0), blurRadius: 0, spreadRadius: 1),
+      BoxShadow(color: Color(0x66000000), offset: Offset(0, 1), blurRadius: 3, spreadRadius: 0),
+    ],
+    level2: <BoxShadow>[
+      BoxShadow(color: Color(0x594D607D), offset: Offset(0, 0), blurRadius: 0, spreadRadius: 1),
+      BoxShadow(color: Color(0x80000000), offset: Offset(0, 4), blurRadius: 12, spreadRadius: 0),
+    ],
+    level3: <BoxShadow>[
+      BoxShadow(color: Color(0x734D607D), offset: Offset(0, 0), blurRadius: 0, spreadRadius: 1),
+      BoxShadow(color: Color(0x99000000), offset: Offset(0, 12), blurRadius: 24, spreadRadius: -4),
+    ],
+    accent1: <BoxShadow>[
+      BoxShadow(color: Color(0x59DAB362), offset: Offset(0, 0), blurRadius: 0, spreadRadius: 1),
+      BoxShadow(color: Color(0x66000000), offset: Offset(0, 1), blurRadius: 3, spreadRadius: 0),
+    ],
+    accent2: <BoxShadow>[
+      BoxShadow(color: Color(0x80DAB362), offset: Offset(0, 0), blurRadius: 0, spreadRadius: 1),
+      BoxShadow(color: Color(0x99000000), offset: Offset(0, 6), blurRadius: 18, spreadRadius: 0),
+    ],
+    accentInset: <BoxShadow>[
+      BoxShadow(color: Color(0x73000000), offset: Offset(0, 2), blurRadius: 4, spreadRadius: 0),
+    ],
+    bevel: <BoxShadow>[
+      BoxShadow(color: Color(0x14FFFFFF), offset: Offset(0, 1), blurRadius: 0, spreadRadius: 0),
+    ],
+    ),
+    focusRing: JoyFocusRingTokens(
+      color: Color(0xFFEEF2F8),
+      width: 2.0,
+      style: 'solid',
+    ),
+  );
+
   static JoyThemeTokens classic({bool isDark = false}) =>
       isDark ? classicDark : classicLight;
   static JoyThemeTokens bauhausPrimary({bool isDark = false}) =>
@@ -2020,6 +2289,8 @@ class JoyThemeTokens extends ThemeExtension<JoyThemeTokens> {
       isDark ? verdantLawnDark : verdantLawnLight;
   static JoyThemeTokens outdoor({bool isDark = false}) =>
       isDark ? outdoorDark : outdoorLight;
+  static JoyThemeTokens modern({bool isDark = false}) =>
+      isDark ? modernDark : modernLight;
 
   static JoyThemeTokens preset(dynamic preset, {bool isDark = false}) {
     if (preset is JoyPalettePreset) {
@@ -2030,6 +2301,7 @@ class JoyThemeTokens extends ThemeExtension<JoyThemeTokens> {
         case JoyPalettePreset.nordicSlate: return nordicSlate(isDark: isDark);
         case JoyPalettePreset.verdantLawn: return verdantLawn(isDark: isDark);
         case JoyPalettePreset.outdoor: return outdoor(isDark: isDark);
+        case JoyPalettePreset.modern: return modern(isDark: isDark);
       }
     }
     final key = preset.toString().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
@@ -2038,6 +2310,7 @@ class JoyThemeTokens extends ThemeExtension<JoyThemeTokens> {
     if (key.contains('nordic')) return nordicSlate(isDark: isDark);
     if (key.contains('verdant')) return verdantLawn(isDark: isDark);
     if (key.contains('outdoor')) return outdoor(isDark: isDark);
+    if (key.contains('modern')) return modern(isDark: isDark);
     return classic(isDark: isDark);
   }
 
