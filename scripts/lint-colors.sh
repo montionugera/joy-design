@@ -32,12 +32,14 @@ else
     "packages/brand/build.js"
     "packages/flutter/lib"
     "packages/swift/Sources"
+    "packages/kotlin/src"
   )
 fi
 
 web_pattern='#(?:[0-9a-fA-F]{3,8})\b|(?:rgba?|hsla?)\(|var\(--joy-[^,)]*,[[:space:]]*[^)]*\)'
 dart_pattern='#(?:[0-9a-fA-F]{3,8})\b|Color\(0x[0-9a-fA-F]+\)|\bColors\.[a-zA-Z]+|\bCupertinoColors\.[a-zA-Z]+|\.withOpacity\(|\.withAlpha\(|\.withValues\('
 swift_pattern='#(?:[0-9a-fA-F]{3,8})\b|Color\((?:joyHex|hex):|0x[0-9a-fA-F]{6,8}\b|\b(?:NSColor|UIColor)\('
+kotlin_pattern='#(?:[0-9a-fA-F]{3,8})\b|Color\(0x[0-9a-fA-F]+\)|0x[0-9a-fA-F]{6,8}\b|\bandroid\.graphics\.Color\b|\bColor\.(?:Black|DarkGray|Gray|LightGray|White|Red|Green|Blue|Yellow|Cyan|Magenta)\b'
 allow_patterns=$(mktemp)
 component_styles=$(mktemp)
 file_list=$(mktemp)
@@ -53,12 +55,12 @@ fi
 list_files() {
   local target=$1
   if [[ -f $target ]]; then
-    if [[ $target == *.g.dart || $target == *.g.swift ]]; then
+    if [[ $target == *.g.dart || $target == *.g.swift || $target == *.g.kt ]]; then
       return 0
     fi
     printf '%s\n' "$target"
   elif [[ -d $target ]]; then
-    rg --files "$target" -g '!node_modules/**' -g '!dist/**' -g '!*.g.dart' -g '!*.g.swift'
+    rg --files "$target" -g '!node_modules/**' -g '!dist/**' -g '!*.g.dart' -g '!*.g.swift' -g '!*.g.kt' || true
   else
     echo "FAIL lint-colors: target not found: $target" >&2
     return 2
@@ -71,8 +73,8 @@ scan_target() {
   local target=$1
   local file count
 
-  # Generated Dart and Swift files (e.g. joy_tokens.g.dart, JoyTokens.g.swift) define primitive tokens and are excluded.
-  if [[ $target == *.g.dart || $target == *.g.swift ]]; then
+  # Generated Dart, Swift, and Kotlin files (e.g. joy_tokens.g.dart, JoyTokens.g.swift, JoyTokens.g.kt) define primitive tokens and are excluded.
+  if [[ $target == *.g.dart || $target == *.g.swift || $target == *.g.kt ]]; then
     printf 'PASS %s: 0 violation(s)\n' "$target"
     return
   fi
@@ -108,13 +110,16 @@ scan_target() {
   fi
 
   if [[ -d $target ]]; then
-    rg --with-filename -n --no-messages -e "$web_pattern" "$target" -g '!node_modules/**' -g '!dist/**' -g '!*.dart' -g '!*.swift' > "$raw_hits" || true
+    rg --with-filename -n --no-messages -e "$web_pattern" "$target" -g '!node_modules/**' -g '!dist/**' -g '!*.dart' -g '!*.swift' -g '!*.kt' > "$raw_hits" || true
     rg --with-filename -n --no-messages -e "$dart_pattern" "$target" -g '!node_modules/**' -g '!dist/**' -g '*.dart' -g '!*.g.dart' >> "$raw_hits" || true
     rg --with-filename -n --no-messages -e "$swift_pattern" "$target" -g '!node_modules/**' -g '!dist/**' -g '*.swift' -g '!*.g.swift' >> "$raw_hits" || true
+    rg --with-filename -n --no-messages -e "$kotlin_pattern" "$target" -g '!node_modules/**' -g '!dist/**' -g '*.kt' -g '!*.g.kt' >> "$raw_hits" || true
   elif [[ $target == *.dart ]]; then
     rg --with-filename -n --no-messages -e "$dart_pattern" "$target" > "$raw_hits" || true
   elif [[ $target == *.swift ]]; then
     rg --with-filename -n --no-messages -e "$swift_pattern" "$target" > "$raw_hits" || true
+  elif [[ $target == *.kt ]]; then
+    rg --with-filename -n --no-messages -e "$kotlin_pattern" "$target" > "$raw_hits" || true
   else
     rg --with-filename -n --no-messages -e "$web_pattern" "$target" > "$raw_hits" || true
   fi

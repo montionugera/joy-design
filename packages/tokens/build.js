@@ -9200,3 +9200,9 @@ const swiftGenScript = path.join(__dirname, 'scripts/gen-swift-tokens.mjs');
 if (fs.existsSync(swiftGenScript)) {
   execSync(`node "${swiftGenScript}"`, { stdio: 'inherit' });
 }
+
+// Generate Kotlin tokens if generator exists
+const kotlinGenScript = path.join(__dirname, 'scripts/gen-kotlin-tokens.mjs');
+if (fs.existsSync(kotlinGenScript)) {
+  execSync(`node "${kotlinGenScript}"`, { stdio: 'inherit' });
+}
