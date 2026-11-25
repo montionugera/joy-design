@@ -34,7 +34,7 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
     await expect(dropdown).toBeVisible();
 
     const items = dropdown.locator(".hub-palette-item");
-    await expect(items).toHaveCount(12);
+    await expect(items).toHaveCount(14);
 
     const palettes = await items.evaluateAll((els) =>
       els.map((el) => el.getAttribute("data-palette")),
@@ -45,6 +45,8 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
       "clay-court",
       "nordic-slate",
       "verdant-lawn",
+      "outdoor",
+      "modern",
       "cyberpunk",
       "obsidian",
       "astral",
@@ -82,6 +84,33 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
     await expect(html).toHaveAttribute("data-palette", "clay-court");
     await expect(page.locator("#hub-palette-label")).toHaveText("Clay Court");
   });
+
+  for (const [id, name] of [
+    ["outdoor", "Outdoor"],
+    ["modern", "Joy Modern"],
+  ]) {
+    for (const theme of ["light", "dark"]) {
+      test(`selecting ${id} in ${theme} marks it active and survives reload`, async ({
+        page,
+      }) => {
+        await page.evaluate((t) => localStorage.setItem("joy-theme", t), theme);
+        await page.goto("/");
+        await page.locator("#btn-palette-toggle").click();
+        await page.locator(`.hub-palette-item[data-palette="${id}"]`).click();
+
+        const html = page.locator("html");
+        const item = page.locator(`.hub-palette-item[data-palette="${id}"]`);
+        for (let pass = 0; pass < 2; pass++) {
+          await expect(html).toHaveAttribute("data-palette", id);
+          await expect(html).toHaveAttribute("data-theme", theme);
+          await expect(page.locator("#hub-palette-label")).toHaveText(name);
+          await expect(item).toHaveClass(/active/);
+          await expect(item).toHaveAttribute("aria-selected", "true");
+          if (pass === 0) await page.reload();
+        }
+      });
+    }
+  }
 
   test("switching to bauhaus-primary, nordic-slate and verdant-lawn works cleanly", async ({
     page,
@@ -215,6 +244,8 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
       "clay-court",
       "nordic-slate",
       "verdant-lawn",
+      "outdoor",
+      "modern",
       "cyberpunk",
       "obsidian",
       "astral",
@@ -308,6 +339,8 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
       "clay-court",
       "nordic-slate",
       "verdant-lawn",
+      "outdoor",
+      "modern",
     ];
     const themes = ["light", "dark"];
 
