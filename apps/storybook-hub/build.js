@@ -1953,6 +1953,11 @@ ${hubGenreCss}
     #hub-palette-active-swatch .swatch-dot--1 { background: var(--joy-accent-default); }
     #hub-palette-active-swatch .swatch-dot--2 { background: var(--joy-surface-raised); }
     #hub-palette-active-swatch .swatch-dot--3 { background: var(--joy-border-focus); }
+    [data-palette="modern"] #hub-palette-active-swatch .swatch-dot--1 { background: var(--joy-sky-5); }
+    [data-palette="modern"] #hub-palette-active-swatch .swatch-dot--2 { background: var(--joy-seam-gradient); }
+    [data-palette="modern"] #hub-palette-active-swatch .swatch-dot--3 { background: var(--joy-sky-1); }
+    /* The light-mode border vanishes on a dark dropdown; dark dots (navy, midnight) need the stronger one to keep their edge. */
+    [data-theme="dark"] .swatch-dot { border-color: var(--joy-border-default); }
     .hub-palette-dropdown {
       position: absolute;
       top: calc(100% + 4px);
@@ -2340,6 +2345,65 @@ ${hubGenreCss}
     }
     body.portal-mode .joy-hero {
       display: none !important;
+    }
+    /* F-100: with Joy Modern the Overview hero is the theme's brand moment (F-097 specimen): the First Light sky, words and actions on
+       its night end, the brass diamond at the horizon, a Kintsugi seam closing it. The sky image is sized to the bottom of the hero and
+       the night colour fills above it, so the copy never reaches the ember end however tall it wraps. */
+    [data-palette="modern"] #view-overview .joy-hero {
+      --f100-sky-h: 360px;
+      --f100-sun: 160px;
+      /* The hero's own tokens re-pointed at the sky, so the shared HeroSection rules colour the copy and buttons for it. */
+      --joy-text-primary: var(--joy-sky-text);
+      --joy-text-muted: color-mix(in oklab, var(--joy-sky-text) 82%, var(--joy-sky-2));
+      --joy-accent-text: var(--joy-sun);
+      --joy-accent-subtle: color-mix(in oklab, var(--joy-sun) 14%, transparent);
+      --joy-border-default: color-mix(in oklab, var(--joy-sun) 45%, transparent);
+      --joy-border-strong: color-mix(in oklab, var(--joy-sky-text) 62%, transparent);
+      --joy-surface-raised: transparent;
+      --joy-surface-sunken: color-mix(in oklab, var(--joy-sky-text) 12%, transparent);
+      --joy-surface-canvas: var(--joy-sky-1);
+      --joy-border-focus: var(--joy-sky-text);
+      color: var(--joy-sky-text);
+      border-radius: var(--joy-radius-card);
+      padding-bottom: calc(var(--f100-sky-h) * 0.48 + var(--f100-sun) / 2 + 24px);
+      /* The sky is tilted (172deg), so its top edge is not one colour: the first layer melts that edge into the night fill above. */
+      background-color: var(--joy-sky-1);
+      background-image: linear-gradient(var(--joy-sky-1), transparent), var(--joy-gradient-first-light-srgb);
+      background-repeat: no-repeat;
+      background-size: 100% calc(var(--f100-sky-h) * 0.4), 100% var(--f100-sky-h);
+      background-position: center bottom calc(var(--f100-sky-h) * 0.6), center bottom;
+    }
+    @supports (background-image: linear-gradient(in oklab, currentColor, currentColor)) {
+      [data-palette="modern"] #view-overview .joy-hero { background-image: linear-gradient(var(--joy-sky-1), transparent), var(--joy-gradient-first-light); }
+    }
+    @media (max-width: 479px) {
+      [data-palette="modern"] #view-overview .joy-hero { --f100-sky-h: 260px; --f100-sun: 112px; }
+    }
+    /* The diamond mark of the call screen: concentric squares turned 45 degrees, brass, centred on the horizon (48% up the sky). */
+    [data-palette="modern"] #view-overview .joy-hero::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: calc(var(--f100-sky-h) * 0.48 - var(--f100-sun) / 2);
+      width: var(--f100-sun);
+      height: var(--f100-sun);
+      margin-left: calc(var(--f100-sun) / -2);
+      background: var(--joy-sun);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-100 -100 200 200' fill='none' stroke='black' stroke-width='1.25'%3E%3Cpath opacity='.28' d='M0 -86 86 0 0 86 -86 0Z'/%3E%3Cpath opacity='.55' d='M0 -70 70 0 0 70 -70 0Z'/%3E%3Cpath stroke-width='6.4' d='M0 -48 48 0 0 48 -48 0Z'/%3E%3Cpath stroke='none' fill='black' fill-rule='evenodd' d='M0 -28 28 0 0 28 -28 0Z M6.4 0A6.4 6.4 0 1 0 -6.4 0A6.4 6.4 0 1 0 6.4 0Z'/%3E%3C/svg%3E") no-repeat center / contain;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-100 -100 200 200' fill='none' stroke='black' stroke-width='1.25'%3E%3Cpath opacity='.28' d='M0 -86 86 0 0 86 -86 0Z'/%3E%3Cpath opacity='.55' d='M0 -70 70 0 0 70 -70 0Z'/%3E%3Cpath stroke-width='6.4' d='M0 -48 48 0 0 48 -48 0Z'/%3E%3Cpath stroke='none' fill='black' fill-rule='evenodd' d='M0 -28 28 0 0 28 -28 0Z M6.4 0A6.4 6.4 0 1 0 -6.4 0A6.4 6.4 0 1 0 6.4 0Z'/%3E%3C/svg%3E") no-repeat center / contain;
+      pointer-events: none;
+    }
+    /* The seam: a diamond drawn out along the hero's bottom join, lit and shaded halves, a point at each end. */
+    [data-palette="modern"] #view-overview .joy-hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--joy-seam-width) / -2);
+      height: var(--joy-seam-width);
+      background: var(--joy-seam-gradient);
+      clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
+      pointer-events: none;
     }
     .portal-hero {
       display: none;
@@ -5030,10 +5094,10 @@ ${navigationHtml}
             </div>
             <div class="hub-palette-item" role="option" data-palette="modern" onclick="setPalette('modern')" tabindex="0">
               <span class="hub-palette-swatch">
-                <!-- Modern's signature, so the row cannot be mistaken for Joy Classic: First Light sky, brass seam, paper. -->
-                <span class="swatch-dot" style="background: var(--joy-gradient-first-light-srgb);"></span>
+                <!-- Modern's signature, so the row cannot be mistaken for Joy Classic: the sky's ember end, the brass seam, the midnight base. -->
+                <span class="swatch-dot" style="background: var(--joy-sky-5);"></span>
                 <span class="swatch-dot" style="background: var(--joy-seam-gradient);"></span>
-                <span class="swatch-dot" style="background: var(--joy-brand-cream);"></span>
+                <span class="swatch-dot" style="background: var(--joy-sky-1);"></span>
               </span>
               <div class="hub-palette-text">
                 <span class="hub-palette-name">Joy Modern</span>
