@@ -3,7 +3,7 @@ import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { contrastRatio } from "../scripts/color.mjs";
+import { contrastRatio, hexToOklch } from "../scripts/color.mjs";
 import { parseCssTokens } from "./helpers/css-tokens.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -708,5 +708,134 @@ test("WCAG 2.2 AA Contrast Gate across all 6 Palette Presets (Light & Dark) - 13
     failures.length,
     0,
     `Preset Contrast Gate failures:\n${failures.join("\n")}`,
+  );
+});
+
+test("WCAG 2.2 AA Contrast & OKLCH Gate for modern preset (Light & Dark)", () => {
+  const cssPath = path.resolve(__dirname, "../dist/theme.css");
+  const css = fs.readFileSync(cssPath, "utf8");
+  const { light, dark } = parseCssTokens(css);
+
+  const parseDecls = (body) => {
+    const res = {};
+    for (const line of body.split(";")) {
+      const m = line.match(/(--[\w-]+)\s*:\s*([^;]+)/);
+      if (m) res[m[1].trim()] = m[2].trim();
+    }
+    return res;
+  };
+
+  const lightMatch = /\[data-palette="modern"\],\s*:root\[data-palette="modern"\]\s*\{([^}]+)\}/.exec(css);
+  const darkMatch = /\[data-theme="dark"\]\[data-palette="modern"\],\s*\[data-theme="dark"\]\s*\[data-palette="modern"\]\s*\{([^}]+)\}/.exec(css);
+
+  assert.ok(lightMatch, "modern preset must have a light block in theme.css");
+  assert.ok(darkMatch, "modern preset must have a dark block in theme.css");
+
+  const pLight = { ...light, ...parseDecls(lightMatch[1]) };
+  const pDark = { ...dark, ...parseDecls(darkMatch[1]) };
+
+  const failures = [];
+  const check = (modeName, t, fgKey, bgKey, min, label) => {
+    const fg = t[fgKey];
+    const bg = t[bgKey];
+    assert.ok(fg && bg, `[modern/${modeName}] missing ${fgKey} (${fg}) or ${bgKey} (${bg})`);
+    const ratio = contrastRatio(fg, bg);
+    if (ratio < min) {
+      failures.push(`[modern/${modeName}] ${label}: ${fgKey} (${fg}) on ${bgKey} (${bg}) = ${ratio.toFixed(2)}:1 < ${min}:1`);
+    }
+  };
+
+  for (const [modeName, t] of [["Light", pLight], ["Dark", pDark]]) {
+    // Text >= 4.5:1
+    for (const surf of ["--joy-surface-canvas", "--joy-surface-card", "--joy-surface-hover"]) {
+      check(modeName, t, "--joy-text-primary", surf, 4.5, "primary text");
+      check(modeName, t, "--joy-text-secondary", surf, 4.5, "secondary text");
+      check(modeName, t, "--joy-text-muted", surf, 4.5, "muted text");
+      check(modeName, t, "--joy-text-link", surf, 4.5, "link text");
+      check(modeName, t, "--joy-accent-text", surf, 4.5, "accent text");
+    }
+    check(modeName, t, "--joy-text-primary", "--joy-surface-raised", 4.5, "primary on raised");
+    check(modeName, t, "--joy-text-primary", "--joy-accent-subtle", 4.5, "primary on accent-subtle");
+    check(modeName, t, "--joy-accent-text", "--joy-accent-subtle", 4.5, "accent-text on accent-subtle");
+    check(modeName, t, "--joy-text-disabled", "--joy-surface-disabled", 4.5, "disabled text");
+    check(modeName, t, "--joy-text-inverse", "--joy-surface-inverse", 4.5, "inverse text");
+    check(modeName, t, "--joy-text-on-accent", "--joy-accent-default", 4.5, "text-on-accent default");
+    check(modeName, t, "--joy-text-on-accent", "--joy-accent-hover", 4.5, "text-on-accent hover");
+    check(modeName, t, "--joy-text-on-accent", "--joy-accent-active", 4.5, "text-on-accent active");
+    check(modeName, t, "--joy-mast-text", "--joy-mast", 4.5, "mast text");
+    check(modeName, t, "--joy-mast-text", "--joy-mast-hover", 4.5, "mast text hover");
+    check(modeName, t, "--joy-solid-fg", "--joy-solid", 4.5, "solid button label");
+    check(modeName, t, "--joy-solid-fg", "--joy-solid-hover", 4.5, "solid button hover label");
+    check(modeName, t, "--joy-pill-fg", "--joy-pill", 4.5, "live pill label");
+    check(modeName, t, "--joy-status-danger-solid-fg", "--joy-status-danger-solid-bg", 4.5, "danger solid button");
+
+    for (const s of ["success", "warning", "danger", "info"]) {
+      check(modeName, t, `--joy-status-${s}-fg`, "--joy-surface-canvas", 4.5, `${s} on canvas`);
+      check(modeName, t, `--joy-status-${s}-fg`, "--joy-surface-card", 4.5, `${s} on card`);
+      check(modeName, t, `--joy-status-${s}-fg`, `--joy-status-${s}-bg`, 4.5, `${s} on status-bg`);
+    }
+
+    // First Light text zone stops (sky-1, sky-2) & mark stops (sky-1..sky-4)
+    for (const stop of ["--joy-sky-1", "--joy-sky-2"]) {
+      check(modeName, t, "--joy-sky-text", stop, 4.5, "sky-text on gradient text zone");
+    }
+    for (const stop of ["--joy-sky-1", "--joy-sky-2", "--joy-sky-3", "--joy-sky-4"]) {
+      check(modeName, t, "--joy-sun", stop, 3.0, "sun mark on gradient");
+    }
+
+    // UI borders & marks >= 3.0:1
+    for (const surf of ["--joy-surface-canvas", "--joy-surface-card"]) {
+      check(modeName, t, "--joy-border-default", surf, 3.0, "control border");
+      check(modeName, t, "--joy-border-strong", surf, 3.0, "strong border");
+      check(modeName, t, "--joy-border-focus", surf, 3.0, "focus border");
+      check(modeName, t, "--joy-action-edge", surf, 3.0, "gold action edge");
+      check(modeName, t, "--joy-seam-b", surf, 3.0, "kintsugi shaded seam");
+    }
+    check(modeName, t, "--joy-live", "--joy-surface-card", 3.0, "live mark");
+    check(modeName, t, "--joy-mast-ctl", "--joy-mast", 3.0, "mast control border");
+    check(modeName, t, "--joy-accent-default", "--joy-mast", 3.0, "gold action on mast");
+    check(modeName, t, "--joy-seam-a", "--joy-mast", 3.0, "kintsugi lit seam on mast");
+    check(modeName, t, "--joy-brand-mark-on-tile", "--joy-brand-tile", 3.0, "brand mark on tile");
+    check(modeName, t, "--joy-brand-mark", "--joy-surface-canvas", 3.0, "brand mark on canvas");
+
+    // OKLCH hue separation: warning must be >= 25 deg from every gold and >= 20 deg from danger
+    const hueGap = (a, b) => {
+      const d = Math.abs(hexToOklch(a).H - hexToOklch(b).H);
+      return Math.min(d, 360 - d);
+    };
+    const warnHex = t["--joy-status-warning-fg"];
+    for (const gKey of [
+      "--joy-live",
+      "--joy-accent-default",
+      "--joy-action-edge",
+      "--joy-pill",
+      "--joy-brand-mark-on-tile",
+      "--joy-sun",
+      "--joy-seam-a",
+      "--joy-seam-b",
+    ]) {
+      const gap = hueGap(warnHex, t[gKey]);
+      if (gap < 25) {
+        failures.push(`[modern/${modeName}] warning (${warnHex}) hue gap vs ${gKey} (${t[gKey]}) = ${gap.toFixed(1)} deg < 25`);
+      }
+    }
+    const redGap = hueGap(warnHex, t["--joy-status-danger-fg"]);
+    if (redGap < 20) {
+      failures.push(`[modern/${modeName}] warning (${warnHex}) hue gap vs danger (${t["--joy-status-danger-fg"]}) = ${redGap.toFixed(1)} deg < 20`);
+    }
+
+    // Kintsugi seams must read as saturated gold in OKLCH (C >= 0.10, 70 <= H <= 95)
+    for (const sKey of ["--joy-seam-a", "--joy-seam-b"]) {
+      const { C, H } = hexToOklch(t[sKey]);
+      if (C < 0.10 || H < 70 || H > 95) {
+        failures.push(`[modern/${modeName}] ${sKey} (${t[sKey]}) chroma=${C.toFixed(3)} hue=${H.toFixed(1)} outside gold band`);
+      }
+    }
+  }
+
+  assert.strictEqual(
+    failures.length,
+    0,
+    `Modern preset contrast/OKLCH failures:\n${failures.join("\n")}`,
   );
 });

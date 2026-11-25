@@ -233,23 +233,30 @@ function buildPreset(presetKey, isDark) {
   const text = { ...base.text };
   const border = { ...base.border };
   const accent = { ...base.accent };
-  const status = { ...base.status };
+  const status = {
+    success: { ...base.status.success },
+    warning: { ...base.status.warning },
+    danger: { ...base.status.danger },
+    info: { ...base.status.info },
+  };
   const elevation = { ...base.elevation };
   let focusRing = { ...base.focusRing };
 
   for (const [k, v] of Object.entries(overrides)) {
     const val = resolveRef(v, tokens);
-    if (k.startsWith('surface-')) {
+    if (k === 'focus-ring') {
+      focusRing = parseFocusRing(val, tokens);
+    } else if (k.startsWith('surface-')) {
       const prop = kebabToCamel(k.replace('surface-', ''));
-      surface[prop] = val;
+      if (prop in surface) surface[prop] = val;
     } else if (k.startsWith('text-')) {
       const prop = kebabToCamel(k.replace('text-', ''));
-      text[prop] = val;
+      if (prop in text) text[prop] = val;
     } else if (k.startsWith('border-')) {
       let prop = k.replace('border-', '');
       if (prop === 'default') prop = 'base';
       else prop = kebabToCamel(prop);
-      border[prop] = val;
+      if (prop in border) border[prop] = val;
       if (prop === 'focus') {
         focusRing = { ...focusRing, colorExpr: toDartColor(val) };
       }
@@ -257,7 +264,19 @@ function buildPreset(presetKey, isDark) {
       let prop = k.replace('accent-', '');
       if (prop === 'default') prop = 'base';
       else prop = kebabToCamel(prop);
-      accent[prop] = val;
+      if (prop in accent) accent[prop] = val;
+    } else if (k.startsWith('status-')) {
+      const rest = k.slice('status-'.length);
+      for (const kind of ['success', 'warning', 'info']) {
+        if (rest.startsWith(`${kind}-`)) {
+          const field = kebabToCamel(rest.slice(kind.length + 1));
+          if (field in status[kind]) status[kind][field] = val;
+        }
+      }
+      if (rest.startsWith('danger-')) {
+        const field = kebabToCamel(rest.slice('danger-'.length));
+        if (field in status.danger) status.danger[field] = val;
+      }
     }
   }
 
@@ -342,7 +361,23 @@ ${elevationFields}
 }
 
 // Preset enum & helpers
-const presets = ['classic', 'bauhaus-primary', 'clay-court', 'nordic-slate', 'verdant-lawn', 'outdoor'];
+const presets = ['classic', 'bauhaus-primary', 'clay-court', 'nordic-slate', 'verdant-lawn', 'outdoor', 'modern'];
+
+const modernPreset = tokens.preset?.modern;
+if (!modernPreset?.light || !modernPreset?.dark) {
+  throw new Error('tokens.preset.modern (light and dark) is required for Dart token generation');
+}
+function parseStopsPercent(stopsStr) {
+  return String(stopsStr)
+    .split(',')
+    .map((entry) => {
+      const m = entry.trim().match(/^(#[0-9A-Fa-f]{6})\s+([\d.]+)%$/);
+      if (!m) throw new Error(`Invalid First Light stop entry: ${entry}`);
+      return (parseFloat(m[2]) / 100).toFixed(2);
+    });
+}
+const modernStopsLight = parseStopsPercent(modernPreset.light['sky-stops']).join(', ');
+const modernStopsDark = parseStopsPercent(modernPreset.dark['sky-stops']).join(', ');
 
 const presetInstances = [];
 for (const pk of presets) {
@@ -926,7 +961,8 @@ enum JoyPalettePreset {
   clayCourt,
   nordicSlate,
   verdantLawn,
-  outdoor;
+  outdoor,
+  modern;
 
   String get id {
     switch (this) {
@@ -936,11 +972,65 @@ enum JoyPalettePreset {
       case JoyPalettePreset.nordicSlate: return 'nordic-slate';
       case JoyPalettePreset.verdantLawn: return 'verdant-lawn';
       case JoyPalettePreset.outdoor: return 'outdoor';
+      case JoyPalettePreset.modern: return 'modern';
     }
   }
 
   JoyThemeTokens tokens({bool isDark = false}) =>
       JoyThemeTokens.preset(this, isDark: isDark);
+}
+
+/// I-108 Modern theme preset tokens (Midnight Brass, First Light gradient, Kintsugi seams).
+abstract final class JoyModernTokens {
+  JoyModernTokens._();
+
+  static const double radiusControl = ${parseFloat(modernPreset.light['radius-control'])}.0;
+  static const double radiusCard = ${parseFloat(modernPreset.light['radius-card'])}.0;
+  static const double seamWidth = ${parseFloat(modernPreset.light['seam-width'])}.0;
+  static const double firstLightAngleDegrees = ${parseFloat(modernPreset.light['sky-angle'])}.0;
+
+  static const Color sky1 = ${toDartColor(modernPreset.light['sky-1'])};
+  static const Color sky2 = ${toDartColor(modernPreset.light['sky-2'])};
+  static const Color sky3 = ${toDartColor(modernPreset.light['sky-3'])};
+  static const Color sky4 = ${toDartColor(modernPreset.light['sky-4'])};
+  static const Color sky5 = ${toDartColor(modernPreset.light['sky-5'])};
+  static const Color sky6 = ${toDartColor(modernPreset.light['sky-6'])};
+  static const Color skyText = ${toDartColor(modernPreset.light['sky-text'])};
+  static const Color pill = ${toDartColor(modernPreset.light['pill'])};
+  static const Color pillFg = ${toDartColor(modernPreset.light['pill-fg'])};
+  static const Color sun = ${toDartColor(modernPreset.light['sun'])};
+  static const Color tile = ${toDartColor(modernPreset.light['brand-tile'])};
+  static const Color mark = ${toDartColor(modernPreset.light['brand-mark-on-tile'])};
+  static const Color tileEdge = ${toDartColor(modernPreset.light['tile-edge'])};
+
+  static const List<Color> firstLightColors = <Color>[sky1, sky2, sky3, sky4, sky5, sky6];
+  static const List<double> firstLightStopsLight = <double>[${modernStopsLight}];
+  static const List<double> firstLightStopsDark = <double>[${modernStopsDark}];
+
+  static const Color seamALight = ${toDartColor(modernPreset.light['seam-a'])};
+  static const Color seamBLight = ${toDartColor(modernPreset.light['seam-b'])};
+  static const Color seamADark = ${toDartColor(modernPreset.dark['seam-a'])};
+  static const Color seamBDark = ${toDartColor(modernPreset.dark['seam-b'])};
+
+  static const Color mastLight = ${toDartColor(modernPreset.light['mast'])};
+  static const Color mastHoverLight = ${toDartColor(modernPreset.light['mast-hover'])};
+  static const Color mastTextLight = ${toDartColor(modernPreset.light['mast-text'])};
+  static const Color mastCtlLight = ${toDartColor(modernPreset.light['mast-ctl'])};
+  static const Color actionEdgeLight = ${toDartColor(modernPreset.light['action-edge'])};
+  static const Color solidLight = ${toDartColor(modernPreset.light['solid'])};
+  static const Color solidHoverLight = ${toDartColor(modernPreset.light['solid-hover'])};
+  static const Color solidFgLight = ${toDartColor(modernPreset.light['solid-fg'])};
+  static const Color liveLight = ${toDartColor(modernPreset.light['live'])};
+
+  static const Color mastDark = ${toDartColor(modernPreset.dark['mast'])};
+  static const Color mastHoverDark = ${toDartColor(modernPreset.dark['mast-hover'])};
+  static const Color mastTextDark = ${toDartColor(modernPreset.dark['mast-text'])};
+  static const Color mastCtlDark = ${toDartColor(modernPreset.dark['mast-ctl'])};
+  static const Color actionEdgeDark = ${toDartColor(modernPreset.dark['action-edge'])};
+  static const Color solidDark = ${toDartColor(modernPreset.dark['solid'])};
+  static const Color solidHoverDark = ${toDartColor(modernPreset.dark['solid-hover'])};
+  static const Color solidFgDark = ${toDartColor(modernPreset.dark['solid-fg'])};
+  static const Color liveDark = ${toDartColor(modernPreset.dark['live'])};
 }
 
 /// Primary Joymify design tokens theme extension.
@@ -988,6 +1078,8 @@ ${presetInstances.join('\n\n')}
       isDark ? verdantLawnDark : verdantLawnLight;
   static JoyThemeTokens outdoor({bool isDark = false}) =>
       isDark ? outdoorDark : outdoorLight;
+  static JoyThemeTokens modern({bool isDark = false}) =>
+      isDark ? modernDark : modernLight;
 
   static JoyThemeTokens preset(dynamic preset, {bool isDark = false}) {
     if (preset is JoyPalettePreset) {
@@ -998,6 +1090,7 @@ ${presetInstances.join('\n\n')}
         case JoyPalettePreset.nordicSlate: return nordicSlate(isDark: isDark);
         case JoyPalettePreset.verdantLawn: return verdantLawn(isDark: isDark);
         case JoyPalettePreset.outdoor: return outdoor(isDark: isDark);
+        case JoyPalettePreset.modern: return modern(isDark: isDark);
       }
     }
     final key = preset.toString().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
@@ -1006,6 +1099,7 @@ ${presetInstances.join('\n\n')}
     if (key.contains('nordic')) return nordicSlate(isDark: isDark);
     if (key.contains('verdant')) return verdantLawn(isDark: isDark);
     if (key.contains('outdoor')) return outdoor(isDark: isDark);
+    if (key.contains('modern')) return modern(isDark: isDark);
     return classic(isDark: isDark);
   }
 

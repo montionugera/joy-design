@@ -460,5 +460,553 @@ export interface JoyTokens {
 
 export type JoyTokenName = keyof JoyTokens;
 
+export interface JoyPresetClassicLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetClassicDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetClassic {
+  name: string;
+  description: string;
+  light: JoyPresetClassicLight;
+  dark: JoyPresetClassicDark;
+}
+
+export interface JoyPresetBauhausPrimaryLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetBauhausPrimaryDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetBauhausPrimary {
+  name: string;
+  description: string;
+  light: JoyPresetBauhausPrimaryLight;
+  dark: JoyPresetBauhausPrimaryDark;
+}
+
+export interface JoyPresetClayCourtLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetClayCourtDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetClayCourt {
+  name: string;
+  description: string;
+  light: JoyPresetClayCourtLight;
+  dark: JoyPresetClayCourtDark;
+}
+
+export interface JoyPresetNordicSlateLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetNordicSlateDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetNordicSlate {
+  name: string;
+  description: string;
+  light: JoyPresetNordicSlateLight;
+  dark: JoyPresetNordicSlateDark;
+}
+
+export interface JoyPresetVerdantLawnLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetVerdantLawnDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetVerdantLawn {
+  name: string;
+  description: string;
+  light: JoyPresetVerdantLawnLight;
+  dark: JoyPresetVerdantLawnDark;
+}
+
+export interface JoyPresetOutdoorLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetOutdoorDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'color-brand-primary': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+}
+
+export interface JoyPresetOutdoor {
+  name: string;
+  description: string;
+  light: JoyPresetOutdoorLight;
+  dark: JoyPresetOutdoorDark;
+}
+
+export interface JoyPresetModernLight {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'color-brand-primary': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'surface-hover': string;
+  'surface-disabled': string;
+  'surface-overlay': string;
+  'surface-inverse': string;
+  'surface-thumb': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-disabled': string;
+  'text-inverse': string;
+  'text-link': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+  'border-disabled': string;
+  'focus-ring': string;
+  'status-success-fg': string;
+  'status-warning-fg': string;
+  'status-danger-fg': string;
+  'status-danger-solid-bg': string;
+  'status-danger-solid-fg': string;
+  'status-danger-solid-border': string;
+  'status-info-fg': string;
+  'brand-tile': string;
+  'brand-mark': string;
+  'brand-mark-on-tile': string;
+  'brand-mark-contrast': string;
+  'brand-ink-on-tile': string;
+  'radius-control': string;
+  'radius-card': string;
+  'font-family-sans': string;
+  'font-family-ui': string;
+  'mast': string;
+  'mast-hover': string;
+  'mast-text': string;
+  'mast-ctl': string;
+  'action-edge': string;
+  'solid': string;
+  'solid-hover': string;
+  'solid-fg': string;
+  'live': string;
+  'tile-edge': string;
+  'pill': string;
+  'pill-fg': string;
+  'sun': string;
+  'seam-a': string;
+  'seam-b': string;
+  'seam-width': string;
+  'seam-gradient': string;
+  'sky-1': string;
+  'sky-2': string;
+  'sky-3': string;
+  'sky-4': string;
+  'sky-5': string;
+  'sky-6': string;
+  'sky-text': string;
+  'sky-angle': string;
+  'sky-stops': string;
+  'gradient-first-light': string;
+  'gradient-first-light-srgb': string;
+}
+
+export interface JoyPresetModernDark {
+  'brand-navy': string;
+  'brand-gold': string;
+  'brand-cream': string;
+  'brand-ink': string;
+  'color-brand-primary': string;
+  'accent-default': string;
+  'accent-hover': string;
+  'accent-active': string;
+  'accent-subtle': string;
+  'accent-text': string;
+  'accent-gradient-end': string;
+  'accent-highlight': string;
+  'surface-canvas': string;
+  'surface-card': string;
+  'surface-raised': string;
+  'surface-sunken': string;
+  'surface-hover': string;
+  'surface-disabled': string;
+  'surface-overlay': string;
+  'surface-inverse': string;
+  'surface-thumb': string;
+  'text-primary': string;
+  'text-secondary': string;
+  'text-muted': string;
+  'text-disabled': string;
+  'text-inverse': string;
+  'text-link': string;
+  'text-on-accent': string;
+  'border-subtle': string;
+  'border-default': string;
+  'border-strong': string;
+  'border-focus': string;
+  'border-disabled': string;
+  'focus-ring': string;
+  'status-success-fg': string;
+  'status-warning-fg': string;
+  'status-danger-fg': string;
+  'status-danger-solid-bg': string;
+  'status-danger-solid-fg': string;
+  'status-danger-solid-border': string;
+  'status-info-fg': string;
+  'brand-tile': string;
+  'brand-mark': string;
+  'brand-mark-on-tile': string;
+  'brand-mark-contrast': string;
+  'brand-ink-on-tile': string;
+  'radius-control': string;
+  'radius-card': string;
+  'font-family-sans': string;
+  'font-family-ui': string;
+  'mast': string;
+  'mast-hover': string;
+  'mast-text': string;
+  'mast-ctl': string;
+  'action-edge': string;
+  'solid': string;
+  'solid-hover': string;
+  'solid-fg': string;
+  'live': string;
+  'tile-edge': string;
+  'pill': string;
+  'pill-fg': string;
+  'sun': string;
+  'seam-a': string;
+  'seam-b': string;
+  'seam-width': string;
+  'seam-gradient': string;
+  'sky-1': string;
+  'sky-2': string;
+  'sky-3': string;
+  'sky-4': string;
+  'sky-5': string;
+  'sky-6': string;
+  'sky-text': string;
+  'sky-angle': string;
+  'sky-stops': string;
+  'gradient-first-light': string;
+  'gradient-first-light-srgb': string;
+}
+
+export interface JoyPresetModern {
+  name: string;
+  description: string;
+  light: JoyPresetModernLight;
+  dark: JoyPresetModernDark;
+}
+
+export interface JoyPresets {
+  'classic': JoyPresetClassic;
+  'bauhaus-primary': JoyPresetBauhausPrimary;
+  'clay-court': JoyPresetClayCourt;
+  'nordic-slate': JoyPresetNordicSlate;
+  'verdant-lawn': JoyPresetVerdantLawn;
+  'outdoor': JoyPresetOutdoor;
+  'modern': JoyPresetModern;
+}
+
+export type JoyPresetName = keyof JoyPresets;
+
 export declare const tokens: JoyTokens;
+export declare const presets: JoyPresets;
 export default tokens;

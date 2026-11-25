@@ -114,7 +114,8 @@ wave6_dir=$(mktemp -d)
 trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir"' EXIT
 mkdir -p "$wave6_dir/packages/svelte/src" "$wave6_dir/packages/react/src" "$wave6_dir/packages/icons/src" \
   "$wave6_dir/apps/storybook-hub" "$wave6_dir/packages/tokens" "$wave6_dir/packages/brand/src" \
-  "$wave6_dir/packages/flutter/lib" "$wave6_dir/packages/swift/Sources/JoyDesign" "$wave6_dir/packages/mascots/src"
+  "$wave6_dir/packages/flutter/lib" "$wave6_dir/packages/swift/Sources/JoyDesign" \
+  "$wave6_dir/packages/kotlin/src/main/kotlin/com/joymify/design" "$wave6_dir/packages/mascots/src"
 cp "$clean_file" "$wave6_dir/packages/svelte/src/Clean.svelte"
 cp "$clean_file" "$wave6_dir/packages/react/src/Clean.tsx"
 cp "$clean_file" "$wave6_dir/packages/icons/src/Clean.svelte"
@@ -125,6 +126,7 @@ cp "$clean_file" "$wave6_dir/packages/brand/build.js"
 cp "$clean_file" "$wave6_dir/packages/mascots/src/Clean.js"
 printf '%s\n' 'class CleanWidget {}' > "$wave6_dir/packages/flutter/lib/clean.dart"
 printf '%s\n' 'struct CleanView {}' > "$wave6_dir/packages/swift/Sources/JoyDesign/Clean.swift"
+printf '%s\n' 'class CleanScreen {}' > "$wave6_dir/packages/kotlin/src/main/kotlin/com/joymify/design/Clean.kt"
 (cd "$wave6_dir" && bash "$repo_root/scripts/lint-colors.sh") >/dev/null 2>&1 || {
   echo "expected default mode to pass on a clean copy of every default target" >&2
   exit 1
@@ -229,6 +231,52 @@ cp "$swift_generated_file" "$swift_fixture_dir/packages/swift/Sources/JoyDesign/
 cp "$swift_literal_file" "$swift_fixture_dir/packages/swift/Sources/JoyDesign/Bad.swift"
 if (cd "$swift_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/swift/Sources) >/dev/null 2>&1; then
   echo "expected packages/swift/Sources scan to reject a Swift file with Color(hex: 0x...)" >&2
+  exit 1
+fi
+
+# Kotlin Color Linter tests
+kotlin_fixture_dir=$(mktemp -d)
+trap 'rm -rf "$fixture_dir" "$wave3_dir" "$wave4_dir" "$wave6_dir" "$dart_fixture_dir" "$swift_fixture_dir" "$kotlin_fixture_dir"' EXIT
+
+kotlin_clean_file="$kotlin_fixture_dir/clean.kt"
+kotlin_literal_file="$kotlin_fixture_dir/bad_color.kt"
+kotlin_named_file="$kotlin_fixture_dir/bad_named.kt"
+kotlin_generated_file="$kotlin_fixture_dir/JoyTokens.g.kt"
+
+printf '%s\n' 'val bg = JoyModernTokens.canvas' > "$kotlin_clean_file"
+printf '%s\n' 'val bg = Color(0xFF112233)' > "$kotlin_literal_file"
+printf '%s\n' 'val bg = Color.Red' > "$kotlin_named_file"
+printf '%s\n' 'object JoyPalette { val gold500 = Color(0xFFA5802B) }' > "$kotlin_generated_file"
+
+"$repo_root/scripts/lint-colors.sh" --strict "$kotlin_clean_file" >/dev/null
+"$repo_root/scripts/lint-colors.sh" --strict "$kotlin_generated_file" >/dev/null
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$kotlin_literal_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Kotlin Color(0x...) literal" >&2
+  exit 1
+fi
+
+if "$repo_root/scripts/lint-colors.sh" --strict "$kotlin_named_file" >/dev/null 2>&1; then
+  echo "expected strict mode to reject a Kotlin Color.* named literal" >&2
+  exit 1
+fi
+
+mkdir -p "$kotlin_fixture_dir/packages/kotlin/src/main/kotlin/com/joymify/design"
+cp "$kotlin_generated_file" "$kotlin_fixture_dir/packages/kotlin/src/main/kotlin/com/joymify/design/JoyTokens.g.kt"
+(cd "$kotlin_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/kotlin/src) >/dev/null 2>&1 || {
+  echo "expected packages/kotlin/src scan to pass when only generated .g.kt files exist" >&2
+  exit 1
+}
+
+cp "$kotlin_clean_file" "$kotlin_fixture_dir/packages/kotlin/src/main/kotlin/com/joymify/design/JoyComponents.kt"
+(cd "$kotlin_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/kotlin/src) >/dev/null 2>&1 || {
+  echo "expected packages/kotlin/src scan to pass on clean kotlin files and generated .g.kt files" >&2
+  exit 1
+}
+
+cp "$kotlin_literal_file" "$kotlin_fixture_dir/packages/kotlin/src/main/kotlin/com/joymify/design/Bad.kt"
+if (cd "$kotlin_fixture_dir" && bash "$repo_root/scripts/lint-colors.sh" packages/kotlin/src) >/dev/null 2>&1; then
+  echo "expected packages/kotlin/src scan to reject a Kotlin file with Color(0x...)" >&2
   exit 1
 fi
 

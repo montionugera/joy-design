@@ -9130,10 +9130,12 @@ for (const [k, cfg] of Object.entries(legacyAliasesMap)) {
   }
 }
 
-const jsContent = `export const tokens = ${JSON.stringify(jsObj, null, 2)};\nexport default tokens;\n`;
+const presetsObj = tokens.preset || {};
+
+const jsContent = `export const tokens = ${JSON.stringify(jsObj, null, 2)};\nexport const presets = ${JSON.stringify(presetsObj, null, 2)};\nexport default tokens;\n`;
 writeFileAtomic(path.join(outDir, 'index.js'), jsContent);
 
-const cjsContent = `exports.tokens = ${JSON.stringify(jsObj, null, 2)};\nexports.default = exports.tokens;\n`;
+const cjsContent = `exports.tokens = ${JSON.stringify(jsObj, null, 2)};\nexports.presets = ${JSON.stringify(presetsObj, null, 2)};\nexports.default = exports.tokens;\n`;
 writeFileAtomic(path.join(outDir, 'index.cjs'), cjsContent);
 
 // Strongly typed token declaration
@@ -9146,6 +9148,21 @@ const legacyDts = Object.entries(legacyAliasesMap).map(([k, cfg]) => {
   return `${depComment}\n  '${k}': string;`;
 }).join('\n');
 
+const toPascal = (str) => str.replace(/(^|[-_])([a-z0-9])/g, (_, __, ch) => ch.toUpperCase());
+const presetInterfacesDts = [];
+const presetFieldsDts = [];
+for (const [presetKey, presetDef] of Object.entries(presetsObj)) {
+  const ifacePrefix = `JoyPreset${toPascal(presetKey)}`;
+  const lightKeys = Object.keys(presetDef.light || {}).map(k => `  '${k}': string;`).join('\n');
+  const darkKeys = Object.keys(presetDef.dark || {}).map(k => `  '${k}': string;`).join('\n');
+  presetInterfacesDts.push(
+    `export interface ${ifacePrefix}Light {\n${lightKeys}\n}`,
+    `export interface ${ifacePrefix}Dark {\n${darkKeys}\n}`,
+    `export interface ${ifacePrefix} {\n  name: string;\n  description: string;\n  light: ${ifacePrefix}Light;\n  dark: ${ifacePrefix}Dark;\n}`
+  );
+  presetFieldsDts.push(`  '${presetKey}': ${ifacePrefix};`);
+}
+
 const dtsContent = `/**
  * Joymify Design Tokens
  */
@@ -9156,7 +9173,16 @@ ${legacyDts}
 
 export type JoyTokenName = keyof JoyTokens;
 
+${presetInterfacesDts.join('\n\n')}
+
+export interface JoyPresets {
+${presetFieldsDts.join('\n')}
+}
+
+export type JoyPresetName = keyof JoyPresets;
+
 export declare const tokens: JoyTokens;
+export declare const presets: JoyPresets;
 export default tokens;
 `;
 writeFileAtomic(path.join(outDir, 'index.d.ts'), dtsContent);
@@ -9173,4 +9199,10 @@ if (fs.existsSync(dartGenScript)) {
 const swiftGenScript = path.join(__dirname, 'scripts/gen-swift-tokens.mjs');
 if (fs.existsSync(swiftGenScript)) {
   execSync(`node "${swiftGenScript}"`, { stdio: 'inherit' });
+}
+
+// Generate Kotlin tokens if generator exists
+const kotlinGenScript = path.join(__dirname, 'scripts/gen-kotlin-tokens.mjs');
+if (fs.existsSync(kotlinGenScript)) {
+  execSync(`node "${kotlinGenScript}"`, { stdio: 'inherit' });
 }
