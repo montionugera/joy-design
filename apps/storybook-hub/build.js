@@ -5030,8 +5030,9 @@ ${navigationHtml}
             </div>
             <div class="hub-palette-item" role="option" data-palette="modern" onclick="setPalette('modern')" tabindex="0">
               <span class="hub-palette-swatch">
-                <span class="swatch-dot" style="background: var(--joy-brand-navy);"></span>
-                <span class="swatch-dot" style="background: var(--joy-brand-gold);"></span>
+                <!-- Modern's signature, so the row cannot be mistaken for Joy Classic: First Light sky, brass seam, paper. -->
+                <span class="swatch-dot" style="background: var(--joy-gradient-first-light-srgb);"></span>
+                <span class="swatch-dot" style="background: var(--joy-seam-gradient);"></span>
                 <span class="swatch-dot" style="background: var(--joy-brand-cream);"></span>
               </span>
               <div class="hub-palette-text">
