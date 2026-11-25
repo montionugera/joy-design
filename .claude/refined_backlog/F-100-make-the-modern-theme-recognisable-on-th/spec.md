@@ -43,3 +43,9 @@ Picker: Joy Modern's row and the active swatch show the ember end of the sky, th
 - [ ] Hero text and both buttons keep at least 4.5:1 contrast against the part of the sky behind them.
 - [ ] With any other palette active the hero's computed background is unchanged (a Playwright test compares `classic` before and after a round trip through `modern`).
 - [ ] An independent design check against the F-097 specimen finds no HIGH defect.
+
+## Follow-ups from the independent design check (2026-11-25, no HIGH; not done in F-100)
+
+- MEDIUM: the hero's "System" word and badge are brass text; the specimen's Gold rule says never text (Classic does the same).
+- MEDIUM: in dark mode the hero has no visible top edge against the page (`--joy-sky-1` is close to the dark canvas).
+- LOW: the ember band is about a third of the hero (the specimen: about 45%), no grain; the seam closes the hero instead of joining two sections; the new rule relies on the shared hero CSS for `position: relative`; the hero test does not check the tokens or contrast.
