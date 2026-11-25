@@ -311,6 +311,76 @@ test.describe("Storybook Hub Palette Preset Switcher & Bauhaus Showcase (F-049)"
     }
   });
 
+  for (const theme of ["light", "dark"]) {
+    test(`modern turns the overview hero into First Light, classic is left as it was (F-100, ${theme})`, async ({
+      page,
+    }) => {
+      await page.evaluate((t) => localStorage.setItem("joy-theme", t), theme);
+      await page.goto("/design/");
+      const hero = page.locator("#view-overview .joy-hero");
+      await expect(hero).toBeVisible();
+      const read = () =>
+        hero.evaluate((el) => {
+          const box = (p: string) => {
+            const s = getComputedStyle(el, p);
+            return {
+              content: s.content,
+              width: parseFloat(s.width) || 0,
+              height: parseFloat(s.height) || 0,
+            };
+          };
+          const s = getComputedStyle(el);
+          return {
+            image: s.backgroundImage,
+            color: s.backgroundColor,
+            diamond: box("::before"),
+            seam: box("::after"),
+          };
+        });
+      const pick = async (id: string) => {
+        await page.locator("#btn-palette-toggle").click();
+        await page.locator(`.hub-palette-item[data-palette="${id}"]`).click();
+        await expect(page.locator("html")).toHaveAttribute("data-palette", id);
+      };
+
+      const classic = await read();
+      await pick("modern");
+      const modern = await read();
+      expect(modern.image).toContain("linear-gradient");
+      for (const part of [modern.diamond, modern.seam]) {
+        expect(part.content).not.toBe("none");
+        expect(part.width).toBeGreaterThan(0);
+        expect(part.height).toBeGreaterThan(0);
+      }
+      await pick("classic");
+      expect(await read()).toEqual(classic);
+    });
+
+    test(`Joy Modern's picker dots differ from Joy Classic's and Outdoor's (F-100, ${theme})`, async ({
+      page,
+    }) => {
+      await page.evaluate((t) => localStorage.setItem("joy-theme", t), theme);
+      await page.goto("/design/");
+      await page.locator("#btn-palette-toggle").click();
+      const dots = (id: string) =>
+        page
+          .locator(`.hub-palette-item[data-palette="${id}"] .swatch-dot`)
+          .evaluateAll((els) =>
+            els.map((el) => {
+              const s = getComputedStyle(el);
+              return `${s.backgroundColor} ${s.backgroundImage}`;
+            }),
+          );
+      const modern = await dots("modern");
+      // The first dot is the ember end of the sky (--joy-sky-5): at 8px a navy-topped gradient read as Joy Classic's navy.
+      expect(modern[0]).toContain("rgb(199, 116, 63)");
+      expect(modern[0]).not.toContain("rgb(11, 18, 38)");
+      for (const other of ["classic", "outdoor"]) {
+        expect(modern).not.toEqual(await dots(other));
+      }
+    });
+  }
+
   test("captures visual verification screenshots across all 5 palettes in light and dark themes", async ({
     page,
   }, testInfo) => {
