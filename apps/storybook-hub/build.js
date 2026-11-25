@@ -5016,6 +5016,30 @@ ${navigationHtml}
                 <span class="hub-palette-sub">Wimbledon Green & Champagne</span>
               </div>
             </div>
+            <!-- These dots read semantic brand tokens; the entry's own data-palette scopes them to its preset. -->
+            <div class="hub-palette-item" role="option" data-palette="outdoor" onclick="setPalette('outdoor')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <span class="swatch-dot" style="background: var(--joy-brand-navy);"></span>
+                <span class="swatch-dot" style="background: var(--joy-brand-gold);"></span>
+                <span class="swatch-dot" style="background: var(--joy-brand-cream);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Outdoor</span>
+                <span class="hub-palette-sub">High-Noon Sunlight Contrast</span>
+              </div>
+            </div>
+            <div class="hub-palette-item" role="option" data-palette="modern" onclick="setPalette('modern')" tabindex="0">
+              <span class="hub-palette-swatch">
+                <!-- Modern's signature, so the row cannot be mistaken for Joy Classic: First Light sky, brass seam, paper. -->
+                <span class="swatch-dot" style="background: var(--joy-gradient-first-light-srgb);"></span>
+                <span class="swatch-dot" style="background: var(--joy-seam-gradient);"></span>
+                <span class="swatch-dot" style="background: var(--joy-brand-cream);"></span>
+              </span>
+              <div class="hub-palette-text">
+                <span class="hub-palette-name">Joy Modern</span>
+                <span class="hub-palette-sub">Midnight Brass & First Light</span>
+              </div>
+            </div>
             <div class="hub-palette-group-label" role="presentation">Immersive &amp; Genre (5-Axis)</div>
             <div class="hub-palette-item" role="option" data-palette="cyberpunk" onclick="setPalette('cyberpunk')" tabindex="0">
               <span class="hub-palette-swatch">
@@ -10275,6 +10299,8 @@ ${navigationHtml}
       'clay-court': 'Clay Court',
       'nordic-slate': 'Nordic Slate',
       'verdant-lawn': 'Verdant Lawn',
+      'outdoor': 'Outdoor',
+      'modern': 'Joy Modern',
       'cyberpunk': 'Cyberpunk HUD',
       'obsidian': 'Obsidian RPG',
       'astral': 'Astral Gacha',
